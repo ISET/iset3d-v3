@@ -3,11 +3,24 @@ function s = rtbPBRTConvertBlock2Struct(blockLines,varargin)
 % parse it and convert into a structure. We take advantage of the regular
 % structure of the PBRT file (assuming it is "well structured" to a certain
 % degree) and use regular expressions to extract values within.
-
+%
 % Example
 % txtLines = rtbPBRTRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
 % cameraBlock = rtbPBRTExtractBlock(txtLines,'blockName','camera')
 % cameraStruct = rtbPBRTConvertBlock2Struct(cameraBlock)
+%
+%
+%% Programming TODO
+%
+% TODO: Right now we are throwing away the value type (e.g. integer, float,
+% string). How should we keep it in the structure without over complicating
+% it? Having the value type around would make it easier and more robust
+% when we write back out into a PBRT file. 
+%
+% TODO: The struct converter doesn't quite capture all the variations it
+% needs to. For example, the spectrum type can be a string filename of a
+% spd file, but it can also be a vector that directly describes the spd
+% (e.g. [400 800 1])
 
 % TL Scienstanford 2017
 

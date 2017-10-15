@@ -21,28 +21,6 @@ function txtLines = rtbPBRTRead(fname,varargin)
 % 
 %  I am not sure why these don't run properly with our docker version.  The best
 %  would be to make them run!
-%
-%{
-  % Find a block
-  txtLines = rtbPBRTRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
-  nLines = length(txtLines);
-  for ii=1:nLines
-     thisLine = txtLines{ii};
-     if length(thisLine) >= length('Renderer')
-         if strncmp(thisLine,'Renderer',length('Renderer'))
-           fprintf('Renderer on line %d\n',ii)
-           for jj=(ii+1):nLines
-             if isempty(txtLines{jj})
-               fprintf('Block ends at %d\n',jj);
-               break;
-             end
-           end
-         end
-     end
-  end
-  % Then we can edit the lines in the block, or just delete the whole thing
-  % And then we edit the parameters which have values in brackets - []
-%}
 
 
 %%
