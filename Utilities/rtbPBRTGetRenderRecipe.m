@@ -1,4 +1,6 @@
 function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
+%% rtbPBRTGetRenderRecipe - reads a pbrt file, 
+%
 % Parse a PBRT file and return the information as a struct. We ignore
 % anything past the WorldBegin/WorldEnd block. We also assume that the PBRT
 % file has a specific structure; this means that this function may not work
@@ -13,8 +15,8 @@ function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
 % PixelFilter, and Film,
 %
 % Example
-% pbrtFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt';
-% renderRecipe = rtbPBRTGetRenderRecipe(pbrtFile);
+%   pbrtFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt';
+%   renderRecipe = rtbPBRTGetRenderRecipe(pbrtFile);
 %
 % TL Scienstanford 2017
 
@@ -23,6 +25,12 @@ function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
 % 1. What happens if one of these blocks is empty? We should automatically
 % put in the default value.
 % 2. What else do we need to read in here? Volume Integrator? 
+%
+%     rtbPBRTRead
+%      rtbPBRTReadFile
+%      rtbPBRTBlockAnalyze
+%      rtbPBRTWrite
+%
 
 %%
 p = inputParser;
