@@ -12,7 +12,7 @@ function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
 % a new, modified PBRT file.
 %
 % Right now, the blocks we read in are: Camera, SurfaceIntegrator, Sampler,
-% PixelFilter, and Film,
+% PixelFilter, and Film, and Renderer
 %
 % Example
 %   pbrtFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt';
