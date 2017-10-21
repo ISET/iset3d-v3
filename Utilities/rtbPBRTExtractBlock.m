@@ -19,6 +19,7 @@ blockName = p.Results.blockName;
 
 %% Extract lines that correspond to specified keyword
 
+blockBegin = []; blockEnd = [];
 nLines = length(txtLines);
 for ii=1:nLines
     thisLine = txtLines{ii};
@@ -35,7 +36,13 @@ for ii=1:nLines
     end
 end
 
-blockLines = txtLines(blockBegin:(blockEnd-1));
+% If the blockName is not found, then blockBegin and blockEnd will be
+% empty.
+if(~isempty('blockBegin') && ~isempty('blockEnd'))
+    blockLines = txtLines(blockBegin:(blockEnd-1));
+else
+    blockLines = [];
+end
 
 
 end

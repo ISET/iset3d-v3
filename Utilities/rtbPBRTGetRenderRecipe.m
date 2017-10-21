@@ -102,6 +102,10 @@ else
     renderer = rtbPBRTConvertBlock2Struct(rendererBlock);
 end
 
+%% Read LookAt and ConcatTransform, if they exist
+
+% TODO
+
 %% Combine into renderRecipe structure
 
 renderRecipe = struct('camera',camera,'sampler',sampler, ...
