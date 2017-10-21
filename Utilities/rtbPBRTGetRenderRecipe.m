@@ -2,7 +2,7 @@ function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
 % Parse a PBRT file and return the information as a struct. We ignore
 % anything past the WorldBegin/WorldEnd block. We also assume that the PBRT
 % file has a specific structure; this means that this function may not work
-% for all PBRT files, especially those we have not inspected and modified.
+% in all PBRT files, especially those we have not inspected and modified.
 %
 % We call this a "renderRecipe" because it contains instructions to PBRT on
 % how to render the given scene. We can make modifications to this
@@ -38,7 +38,7 @@ txtLines = rtbPBRTRead(fname);
 
 cameraBlock = rtbPBRTExtractBlock(txtLines,'blockName','Camera');
 if(isempty(cameraBlock))
-    warning('Cannot find "camera" for renderRecipe.');
+    warning('Cannot find "camera" in renderRecipe.');
     camera = struct([]); % Return empty.
 else
     camera = rtbPBRTConvertBlock2Struct(cameraBlock);
@@ -48,7 +48,7 @@ end
 
 samplerBlock = rtbPBRTExtractBlock(txtLines,'blockName','Sampler');
 if(isempty(samplerBlock))
-    warning('Cannot find "sampler" for renderRecipe.');
+    warning('Cannot find "sampler" in renderRecipe.');
     sampler = struct([]); % Return empty.
 else
     sampler = rtbPBRTConvertBlock2Struct(samplerBlock);
@@ -58,7 +58,7 @@ end
 
 filmBlock = rtbPBRTExtractBlock(txtLines,'blockName','Film');
 if(isempty(filmBlock))
-    warning('Cannot find "film" for renderRecipe.');
+    warning('Cannot find "film" in renderRecipe.');
     film = struct([]); % Return empty.
 else
     film = rtbPBRTConvertBlock2Struct(filmBlock);
@@ -68,7 +68,7 @@ end
 
 pfBlock = rtbPBRTExtractBlock(txtLines,'blockName','PixelFilter');
 if(isempty(pfBlock))
-    warning('Cannot find "filter" for renderRecipe.');
+    warning('Cannot find "filter" in renderRecipe.');
     filter = struct([]); % Return empty.
 else
     filter = rtbPBRTConvertBlock2Struct(pfBlock);
@@ -78,17 +78,27 @@ end
 
 sfBlock = rtbPBRTExtractBlock(txtLines,'blockName','SurfaceIntegrator');
 if(isempty(sfBlock))
-    warning('Cannot find "integrator" for renderRecipe.');
+    warning('Cannot find "integrator" in renderRecipe.');
     integrator = struct([]); % Return empty.
 else
     integrator = rtbPBRTConvertBlock2Struct(sfBlock);
+end
+
+%% Extract renderer block
+
+rendererBlock = rtbPBRTExtractBlock(txtLines,'blockName','Renderer');
+if(isempty(rendererBlock))
+    warning('Cannot find "renderer" in renderRecipe.');
+    renderer = struct([]); % Return empty.
+else
+    renderer = rtbPBRTConvertBlock2Struct(rendererBlock);
 end
 
 %% Combine into renderRecipe structure
 
 renderRecipe = struct('camera',camera,'sampler',sampler, ...
     'film',film,'filter',filter,'integrator',integrator,...
-    'filename',fname); 
+    'renderer',renderer,'filename',fname); 
 
 
 end
