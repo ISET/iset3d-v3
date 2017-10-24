@@ -104,13 +104,17 @@ end
 
 %% Read LookAt and ConcatTransform, if they exist
 
+% Default for now.
+warning('No eye position. Using default.');
+lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
+    
 % TODO
 
 %% Combine into renderRecipe structure
 
 renderRecipe = struct('camera',camera,'sampler',sampler, ...
     'film',film,'filter',filter,'integrator',integrator,...
-    'renderer',renderer,'filename',fname); 
+    'renderer',renderer,'lookAt',lookAt,'filename',fname); 
 
 
 end
