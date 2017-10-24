@@ -96,8 +96,8 @@ end
 
 rendererBlock = rtbPBRTExtractBlock(txtLines,'blockName','Renderer');
 if(isempty(rendererBlock))
-    warning('Cannot find "renderer" in renderRecipe.');
-    renderer = struct([]); % Return empty.
+    warning('Cannot find "renderer" in renderRecipe. Using default.');
+    renderer = struct('type','Renderer','subtype','sampler');
 else
     renderer = rtbPBRTConvertBlock2Struct(rendererBlock);
 end
