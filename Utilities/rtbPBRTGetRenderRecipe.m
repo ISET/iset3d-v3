@@ -135,6 +135,7 @@ worldStart = 0;
 while ischar(tline)
     if contains(tline, 'WorldBegin')
         worldStart = 1;
+        world{1}  = tline;  
     end
     tline = fgetl(fid);
     if worldStart
@@ -142,7 +143,7 @@ while ischar(tline)
     end
 end
 fclose(fid);
-world = {world};
+world = {world(1:end-1)}; % Get rid of the last line
 if(~worldStart)   
     warning('Cannot find "WorldBegin" for renderRecipe.');
 end
