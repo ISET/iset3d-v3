@@ -60,7 +60,18 @@ for ii = 2:nLines
     valueName = C{2};
     
     % Get the value corresponding to this type and name
-    if(strcmp(valueType,'string') || strcmp(valueType,'bool') || strcmp(valueType,'spectrum'))
+    if(strcmp(valueType,'string') || strcmp(valueType,'bool'))
+        % Find everything between quotation marks
+        C = regexp(currLine, '(?<=")[^"]+(?=")', 'match');
+        value = C{3};
+    elseif(strcmp(valueType,'spectrum'))
+       %{ 
+         TODO:
+         Spectrum can either be a spectrum file "xxx.spd" or it can be a
+         series of four numbers [wave1 wave2 value1 value2]. There might
+         be other variations, but we should check to see if brackets exist
+         and to read numbers instead of a string if they do.
+       %}
         % Find everything between quotation marks
         C = regexp(currLine, '(?<=")[^"]+(?=")', 'match');
         value = C{3};
@@ -68,6 +79,8 @@ for ii = 2:nLines
         % Find everything between brackets
         value = regexp(currLine, '(?<=\[)[^)]*(?=\])', 'match', 'once');
         value = str2double(value);
+    elseif(strcmp(valueType,'rgb'))
+        % TODO: Find three values between the brackets, e.g. [r g b]
     end
     
     if(isempty(value))
@@ -82,8 +95,8 @@ for ii = 2:nLines
         error('Parser cannot find the value associated with this type. The parser is still incomplete, so we cannot yet recognize all type cases.');
     end
     
-    % Set this value as a field in the structure using the valueName
-    [s.(valueName)]= value;
+    % Set this value and type as a field in the structure
+    [s.(valueName)] = struct('value',value,'type',valueType);
     
 end
 

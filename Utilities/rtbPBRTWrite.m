@@ -70,33 +70,25 @@ for ofns = outerFields'
             % we haven't saved it in the renderRecipe (will that change in
             % the future?) we make an educated guess. This list is probably
             % lacking...
-            currValue = renderRecipe.(ofn).(ifn);
-            if(ischar(currValue))
-                if(strcmp(currValue(end-3:end),'.spd'))
-                    % Is a spectrum file.
-                    currType = 'spectrum';
-                    lineFormat = '  "%s %s" "%s" \n';
-                else
-                    currType = 'string';
-                    lineFormat = '  "%s %s" "%s" \n';
-                end
-            else
-                if(size(currValue,2) == 4)
-                    % Somtimes spectra are defined like this.
-                    currType = 'spectrum';
-                    lineFormat = '  "%s %s" [%f %f %f %f] \n';
-                elseif(size(currValue,2) == 3)
-                    currType = 'rgb';
-                    lineFormat = '  "%s %s" [%f %f %f] \n';
-                elseif(mod(currValue,1) == 0)
-                    currType = 'integer';
-                    lineFormat = '  "%s %s" [%i] \n';
-                else
-                    currType = 'float';
-                    lineFormat = '  "%s %s" [%f] \n';
-                end
-            end
+            currValue = renderRecipe.(ofn).(ifn).value;
+            currType = renderRecipe.(ofn).(ifn).type;
             
+            if(strcmp(currType,'string') || ischar(currValue))
+                % Either a string type, or a spectrum type with a value
+                % of 'xxx.spd'
+                lineFormat = '  "%s %s" "%s" \n';
+            elseif(strcmp(currType,'spectrum') && ~ischar(currValue))
+                % A spectrum of type [wave1 wave2 value1 value2]. TODO:
+                % There are probably more variations of this...
+                lineFormat = '  "%s %s" [%f %f %f %f] \n';
+            elseif(strcmp(currType,'rgb'))
+                lineFormat = '  "%s %s" [%f %f %f] \n';
+            elseif(strcmp(currType,'float'))
+                lineFormat = '  "%s %s" [%f] \n';
+            elseif(strcmp(currType,'integer'))
+                lineFormat = '  "%s %s" [%i] \n';
+            end
+
             fprintf(fileID,lineFormat,...
                 currType,ifn,currValue);            
             
