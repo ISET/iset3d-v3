@@ -103,12 +103,50 @@ else
 end
 
 %% Read LookAt and ConcatTransform, if they exist
+  
+txtLines = rtbPBRTRead(fname);
+lookAtBlock = rtbPBRTExtractBlock(txtLines,'blockName','LookAt');
+if(isempty(lookAtBlock))
+    warning('Cannot find "LookAt" for renderRecipe. Returning default.');
+    % TODO: What is the default camera position? 
+    lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
+else
+    values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
+    from = [values{2} values{3} values{4}];
+    to = [values{5} values{6} values{7}];
+    up = [values{8} values{9} values{10}];
+    lookAt = struct('from',from,'to',to,'up',up);
+end
 
-% Default for now.
-warning('No eye position. Using default.');
-lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
-    
-% TODO
+concatTBlock = rtbPBRTExtractBlock(txtLines,'blockName','ConcatTransform');
+if(~isempty(concatTBlock))
+    % TODO:
+    % extract the transform matrix and multiply it to the lookAt
+end
+
+
+%% Extract world begin/world end
+
+% Extract world as a cell of text lines
+fid = fopen(fname, 'r');
+world = cell(1,1);
+tline = fgetl(fid);
+worldStart = 0;
+while ischar(tline)
+    if contains(tline, 'WorldBegin')
+        worldStart = 1;
+    end
+    tline = fgetl(fid);
+    if worldStart
+        world{end + 1}  = tline;      
+    end
+end
+fclose(fid);
+disp(size(world));
+world = {world};
+if(~worldStart)   
+    warning('Cannot find "WorldBegin" for renderRecipe.');
+end
 
 %% Combine into renderRecipe structure
 
