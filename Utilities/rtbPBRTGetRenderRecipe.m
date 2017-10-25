@@ -142,7 +142,6 @@ while ischar(tline)
     end
 end
 fclose(fid);
-disp(size(world));
 world = {world};
 if(~worldStart)   
     warning('Cannot find "WorldBegin" for renderRecipe.');
