@@ -151,7 +151,7 @@ end
 
 renderRecipe = struct('camera',camera,'sampler',sampler, ...
     'film',film,'filter',filter,'integrator',integrator,...
-    'renderer',renderer,'lookAt',lookAt,'filename',fname); 
+    'renderer',renderer,'lookAt',lookAt,'world',world,'filename',fname); 
 
 
 end
