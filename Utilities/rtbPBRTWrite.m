@@ -1,4 +1,4 @@
-function [] = rtbPBRTWrite(renderRecipe,outFile,varargin)
+function outFile = rtbPBRTWrite(renderRecipe,outFile,varargin)
 % Given a renderRecipe structure, write everything back out into a PBRT
 % file.
 %
