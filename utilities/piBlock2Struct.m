@@ -1,13 +1,13 @@
-function s = rtbPBRTConvertBlock2Struct(blockLines,varargin)
+function s = piBlock2Struct(blockLines,varargin)
 % Given a block of text (e.g. from rtbPBRTExtractBlock),we do our best to
 % parse it and convert into a structure. We take advantage of the regular
 % structure of the PBRT file (assuming it is "well structured" to a certain
 % degree) and use regular expressions to extract values within.
 %
 % Example
-% txtLines = rtbPBRTRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
-% cameraBlock = rtbPBRTExtractBlock(txtLines,'blockName','camera')
-% cameraStruct = rtbPBRTConvertBlock2Struct(cameraBlock)
+% txtLines     = piRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
+% cameraBlock  = piBlockExtract(txtLines,'blockName','camera')
+% cameraStruct = piBlock2Struct(cameraBlock)
 %
 %
 %% Programming TODO

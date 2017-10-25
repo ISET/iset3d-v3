@@ -1,4 +1,4 @@
-function txtLines = rtbPBRTRead(fname,varargin)
+function txtLines = piRead(fname,varargin)
 % Return every line of a PBRT file as a cell array
 %
 %

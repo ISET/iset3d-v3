@@ -1,5 +1,5 @@
-function blockLines = rtbPBRTExtractBlock(txtLines,varargin)
-% Given a series of text lines in cell format (e.g. output of rtbPBRTRead),
+function blockLines = piBlockExtract(txtLines,varargin)
+% piBlockExtract - Given a series of text lines in cell format (e.g. output of rtbPBRTRead),
 % extract a block that corresponds to the given keyword.
 
 % Example

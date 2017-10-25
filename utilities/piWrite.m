@@ -1,6 +1,7 @@
-function outFile = rtbPBRTWrite(renderRecipe,outFile,varargin)
-% Given a renderRecipe structure, write everything back out into a PBRT
-% file.
+function outFile = piWrite(renderRecipe,outFile,varargin)
+% Given a recipe write a PBRT scene file.
+%
+%   outFile = piWrite(recipe,fullOutfile,varargin)
 %
 % TL Scienstanford 2017
 
@@ -28,7 +29,7 @@ fileID = fopen(fullfile(path,sprintf('%s.pbrt',name)),'w');
 
 %% Write header
 
-fprintf(fileID,'# PBRT file created with rtbPBRTWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
+fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 fprintf(fileID,'\n');
 
 %% Write LookAt command first

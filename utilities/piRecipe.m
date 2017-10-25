@@ -1,5 +1,5 @@
-function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
-%% rtbPBRTGetRenderRecipe - reads a pbrt file, 
+function renderRecipe = piRecipe(fname,varargin)
+%% piRecipe - reads a pbrt file, 
 %
 % Parse a PBRT file and return the information as a struct. We ignore
 % anything past the WorldBegin/WorldEnd block. We also assume that the PBRT
@@ -26,8 +26,8 @@ function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
 % put in the default value.
 % 2. What else do we need to read in here? Volume Integrator? 
 %
-%     rtbPBRTRead
-%      rtbPBRTReadFile
+%     piRead
+%      piReadFile
 %      rtbPBRTBlockAnalyze
 %      rtbPBRTWrite
 %
@@ -40,72 +40,72 @@ p.parse(fname,varargin{:});
 %% Read PBRT file
 
 % Use pbrt2ISET to pull out the lines of text
-txtLines = rtbPBRTRead(fname);
+txtLines = piRead(fname);
 
 %% Extract camera  block
 
-cameraBlock = rtbPBRTExtractBlock(txtLines,'blockName','Camera');
+cameraBlock = piBlockExtract(txtLines,'blockName','Camera');
 if(isempty(cameraBlock))
     warning('Cannot find "camera" in renderRecipe.');
     camera = struct([]); % Return empty.
 else
-    camera = rtbPBRTConvertBlock2Struct(cameraBlock);
+    camera = piBlock2Struct(cameraBlock);
 end
 
 %% Extract sampler block
 
-samplerBlock = rtbPBRTExtractBlock(txtLines,'blockName','Sampler');
+samplerBlock = piBlockExtract(txtLines,'blockName','Sampler');
 if(isempty(samplerBlock))
     warning('Cannot find "sampler" in renderRecipe.');
     sampler = struct([]); % Return empty.
 else
-    sampler = rtbPBRTConvertBlock2Struct(samplerBlock);
+    sampler = piBlock2Struct(samplerBlock);
 end
 
 %% Extract film block
 
-filmBlock = rtbPBRTExtractBlock(txtLines,'blockName','Film');
+filmBlock = piBlockExtract(txtLines,'blockName','Film');
 if(isempty(filmBlock))
     warning('Cannot find "film" in renderRecipe.');
     film = struct([]); % Return empty.
 else
-    film = rtbPBRTConvertBlock2Struct(filmBlock);
+    film = piBlock2Struct(filmBlock);
 end
 
 %% Extract surface pixel filter block
 
-pfBlock = rtbPBRTExtractBlock(txtLines,'blockName','PixelFilter');
+pfBlock = piBlockExtract(txtLines,'blockName','PixelFilter');
 if(isempty(pfBlock))
     warning('Cannot find "filter" in renderRecipe.');
     filter = struct([]); % Return empty.
 else
-    filter = rtbPBRTConvertBlock2Struct(pfBlock);
+    filter = piBlock2Struct(pfBlock);
 end
 
 %% Extract (surface) integrator block
 
-sfBlock = rtbPBRTExtractBlock(txtLines,'blockName','SurfaceIntegrator');
+sfBlock = piBlockExtract(txtLines,'blockName','SurfaceIntegrator');
 if(isempty(sfBlock))
     warning('Cannot find "integrator" in renderRecipe.');
     integrator = struct([]); % Return empty.
 else
-    integrator = rtbPBRTConvertBlock2Struct(sfBlock);
+    integrator = piBlock2Struct(sfBlock);
 end
 
 %% Extract renderer block
 
-rendererBlock = rtbPBRTExtractBlock(txtLines,'blockName','Renderer');
+rendererBlock = piBlockExtract(txtLines,'blockName','Renderer');
 if(isempty(rendererBlock))
     warning('Cannot find "renderer" in renderRecipe. Using default.');
     renderer = struct('type','Renderer','subtype','sampler');
 else
-    renderer = rtbPBRTConvertBlock2Struct(rendererBlock);
+    renderer = piBlock2Struct(rendererBlock);
 end
 
 %% Read LookAt and ConcatTransform, if they exist
   
-txtLines = rtbPBRTRead(fname);
-lookAtBlock = rtbPBRTExtractBlock(txtLines,'blockName','LookAt');
+txtLines = piRead(fname);
+lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
 if(isempty(lookAtBlock))
     warning('Cannot find "LookAt" for renderRecipe. Returning default.');
     % TODO: What is the default camera position? 
@@ -118,7 +118,7 @@ else
     lookAt = struct('from',from,'to',to,'up',up);
 end
 
-concatTBlock = rtbPBRTExtractBlock(txtLines,'blockName','ConcatTransform');
+concatTBlock = piBlockExtract(txtLines,'blockName','ConcatTransform');
 if(~isempty(concatTBlock))
     % TODO:
     % extract the transform matrix and multiply it to the lookAt
