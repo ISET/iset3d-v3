@@ -1,5 +1,5 @@
 function s = piBlock2Struct(blockLines,varargin)
-% Given a block of text (e.g. from rtbPBRTExtractBlock),we do our best to
+% Given a block of text (e.g. from piExtractBlock),we do our best to
 % parse it and convert into a structure. We take advantage of the regular
 % structure of the PBRT file (assuming it is "well structured" to a certain
 % degree) and use regular expressions to extract values within.

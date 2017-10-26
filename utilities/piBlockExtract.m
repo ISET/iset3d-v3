@@ -1,10 +1,10 @@
 function blockLines = piBlockExtract(txtLines,varargin)
-% piBlockExtract - Given a series of text lines in cell format (e.g. output of rtbPBRTRead),
+% piBlockExtract - Given a series of text lines in cell format (e.g. output of piRead),
 % extract a block that corresponds to the given keyword.
 
 % Example
-% txtLines = rtbPBRTRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
-% cameraBlock = rtbPBRTExtractBlock(txtLines,'blockName','camera')
+% txtLines = piRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
+% cameraBlock = piExtractBlock(txtLines,'blockName','camera')
 
 % TL Scienstanford 2017
 
