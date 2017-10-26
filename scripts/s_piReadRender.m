@@ -13,8 +13,8 @@ ieInit
 fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
 exist(fname,'file')
 
-% Read the file and return it in a recipt format
-recipe = piRecipe(fname);
+% Read the file and return it in a recipe format
+recipe = piRead(fname);
 disp(recipe)
 
 % Write out a file based on the recipe
@@ -26,7 +26,9 @@ piWrite(recipe,oname);
 %
 % We could use the single file piRender function to rennder from this
 % output.
+[scene, outFile] = piRender(oname);
 
+vcAddObject(scene); sceneWindow;
 %% When we have a more complex data set ...
 
 

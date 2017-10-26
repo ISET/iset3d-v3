@@ -49,7 +49,8 @@ scene = sceneSet(scene,'photons',photons);
 
 scene = sceneSet(scene,'depth map',depthMap);
 scene = sceneSet(scene,'fov',p.Results.fov);
-scene = sceneAdjustLuminance(scene,'mean',100);
+% scene = sceneAdjustLuminance(scene,'mean',100);
+scene = sceneAdjustLuminance(scene,100); % ISETBIO uses this...
 
 % ieAddObject(scene); sceneWindow;
 

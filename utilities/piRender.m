@@ -97,7 +97,21 @@ end
 % params.opticsType = 'pinhole;
 % ieObject = rtbDAT2ISET(outFile,params)
 if ~exist(outFile,'file')
-    error('No output file %s\n',outFile);
+    warning('Cannot find output file %s. Searching through pbrt file for output name... \n',outFile);
+    
+    recipe = piRead(sceneFile);
+    
+    if(isfield(recipe.film,'filename'))
+        name = recipe.film.filename.value;
+        warning('Output file name was %s. \n',name);
+    else
+        error('Cannot find output file. \n');
+    end
+    
+    [path,~,~] = fileparts(sceneFile);
+    [~,name,~] = fileparts(name); % Strip the extension (often EXR)
+    outFile = fullfile(path,strcat(name,'.dat'));
+    
 end
 
 photons = piReadDAT(outFile, 'maxPlanes', 31);
