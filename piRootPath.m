@@ -1,4 +1,4 @@
-function rootPath=p2iRootPath()
+function rootPath=piRootPath()
 % Return the path to the root iset directory
 %
 % This function must reside in the directory at the base of the pbrt2ISET
@@ -8,7 +8,7 @@ function rootPath=p2iRootPath()
 % Example:
 %   fullfile(p2iRootPath,'data')
 
-rootPath=which('p2iRootPath');
+rootPath=which('piRootPath');
 
 [rootPath,fName,ext]=fileparts(rootPath);
 
