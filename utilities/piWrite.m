@@ -14,10 +14,10 @@ p.parse(renderRecipe,varargin{:});
 
 % Check if it exists. If it does, ask the user if we can overwrite.
 if(exist(outFile,'file'))
-    prompt = 'Out file already exists. Overwrite? (Y/N)';
+    prompt = 'The PBRT file we are writing the recipe to already exists. Overwrite? (Y/N)';
     userInput = input(prompt,'s');
     if(strcmp(userInput,'N'))
-        error('Out file already exists.');
+        error('PBRT file already exists.');
     else
         warning('Overwriting out file.')
         delete(outFile);

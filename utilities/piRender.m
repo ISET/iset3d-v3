@@ -103,14 +103,15 @@ if ~exist(outFile,'file')
     
     if(isfield(recipe.film,'filename'))
         name = recipe.film.filename.value;
+        [~,name,~] = fileparts(name); % Strip the extension (often EXR)
         warning('Output file name was %s. \n',name);
+        
+        [path,~,~] = fileparts(sceneFile);
+        outFile = fullfile(path,strcat(name,'.dat'));
+    
     else
         error('Cannot find output file. \n');
     end
-    
-    [path,~,~] = fileparts(sceneFile);
-    [~,name,~] = fileparts(name); % Strip the extension (often EXR)
-    outFile = fullfile(path,strcat(name,'.dat'));
     
 end
 
