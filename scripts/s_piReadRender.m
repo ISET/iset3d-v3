@@ -1,6 +1,7 @@
 % s_piReadRender
 %
-% The simplest possible script
+% The simplest script to read a PBRT scene file and then write it back
+% out.  This 
 %
 % TL/BW SCIEN
 
@@ -14,15 +15,17 @@ exist(fname,'file')
 
 % Read the file and return it in a recipt format
 recipe = piRecipe(fname);
+disp(recipe)
 
-% Write it out
+% Write out a file based on the recipe
 oname = fullfile(piRootPath,'local','deleteMe.pbrt');
-
 piWrite(recipe,oname);
 
+% You can open and view the file this way
 % edit(oname);
-% We could write the single file execution on this output and it
-% should run.  Later.
+%
+% We could use the single file piRender function to rennder from this
+% output.
 
 %% When we have a more complex data set ...
 
