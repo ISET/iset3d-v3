@@ -52,6 +52,7 @@ newCamera = piCameraCreate('realistic');
 % Update the camera
 thisR.camera = newCamera;
 
+% This could probably be a function since we change it so often. 
 thisR.film.xresolution.value = 128;
 thisR.film.yresolution.value = 128;
 thisR.sampler.pixelsamples.value = 256;
@@ -63,20 +64,26 @@ oname = fullfile(piRootPath,'local','deleteMe.pbrt');
 lensFile = fullfile(piRootPath,'data','lens','2ElLens.dat');
 copyfile(lensFile,fullfile(piRootPath,'local'));
 
+% Note: Part of the reason we cannot focus is because the scale of the
+% teapot scene is not in physical units. The camera in the scene is 12.5
+% units away from the teapot, meaning it is only 12.5 mm away! We move the
+% camera further out to try to make the distance more reasonable.
+
 % This moved us further away.  GOod function to implement.
 diff = thisR.lookAt.from - thisR.lookAt.to;
-diff = 5*diff;
+diff = 10*diff;
 thisR.lookAt.from = thisR.lookAt.to + diff;
 
-thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
+% For an object at 125 mm, the 2ElLens has a focus at 89 mm.
+thisR.camera.filmdistance.value = 89;
 
 % You can open and view the file this way
 % edit(oname);
-%
 
 %%
-[scene, outFile, result] = piRender(oname);
 
+thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
+[scene, outFile, result] = piRender(oname);
 vcAddObject(scene); sceneWindow;
 
 %%
