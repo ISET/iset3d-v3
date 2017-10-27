@@ -53,9 +53,9 @@ newCamera = piCameraCreate('realistic');
 thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
-thisR.film.xresolution.value = 128;
-thisR.film.yresolution.value = 128;
-thisR.sampler.pixelsamples.value = 256;
+thisR.film.xresolution.value = 256;
+thisR.film.yresolution.value = 256;
+thisR.sampler.pixelsamples.value = 4096;
 
 % Write out a file based on the recipe
 % TODO: This kind of copying into a working folder needs to be done
@@ -84,7 +84,9 @@ thisR.camera.filmdistance.value = 89;
 %%
 
 thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
+tic
 [scene, outFile, result] = piRender(oname);
+toc
 vcAddObject(scene); sceneWindow;
 
 %%
