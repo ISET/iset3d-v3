@@ -9,6 +9,7 @@ function outFile = piWrite(renderRecipe,outFile,varargin)
 %
 % TL Scienstanford 2017
 
+% TODO: Write out a depth map pbrt
 %%
 p = inputParser;
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
@@ -77,10 +78,6 @@ for ofns = outerFields'
                 continue;
             end
             
-            % We need to output the value type as well. Since at the moment
-            % we haven't saved it in the renderRecipe (will that change in
-            % the future?) we make an educated guess. This list is probably
-            % lacking...
             currValue = renderRecipe.(ofn).(ifn).value;
             currType = renderRecipe.(ofn).(ifn).type;
             

@@ -59,7 +59,8 @@ thisR.sampler.pixelsamples.value = 256;
 
 % Write out a file based on the recipe
 % TODO: This kind of copying into a working folder needs to be done
-% automatically in some sort of render function. 
+% automatically (TL: I'll probably do it automatically in the piWrite
+% function.)
 oname = fullfile(piRootPath,'local','deleteMe.pbrt');
 lensFile = fullfile(piRootPath,'data','lens','2ElLens.dat');
 copyfile(lensFile,fullfile(piRootPath,'local'));
