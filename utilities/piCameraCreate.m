@@ -16,7 +16,7 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
-        camera.specfile.value = '2ElLens.dat';
+        camera.specfile.value = fullfile(piRootPath,'data','lens','2ElLens.dat');
         camera.filmdistance.type = 'float';
         camera.filmdistance.value = 50;    % mm
         camera.aperture_diameter.type = 'float';
@@ -34,7 +34,7 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
-        camera.specfile.value = '2ElLens.dat';
+        camera.specfile.value = fullfile(piRootPath,'data','lens','2ElLens.dat');
         camera.filmdistance.type = 'float';
         camera.filmdistance.value = 50;    % mm
         camera.aperture_diameter.type = 'float';

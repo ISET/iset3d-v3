@@ -15,9 +15,10 @@ p = inputParser;
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 p.addRequired('outFile',@ischar);
 p.addParameter('overwrite',false,@islogical);
-
+p.addParameter('copyDir','',@isdir);
 p.parse(renderRecipe,outFile,varargin{:});
 overwrite = p.Results.overwrite;
+copyDir = p.Results.copyDir;
 
 %% Set up a text file to write into.
 
@@ -33,8 +34,22 @@ if(exist(outFile,'file')) && ~overwrite
     end
 end
 
-[path,name,~] = fileparts(outFile);
-fileID = fopen(fullfile(path,sprintf('%s.pbrt',name)),'w');
+[outpath,outname,~] = fileparts(outFile);
+fileID = fopen(fullfile(outpath,sprintf('%s.pbrt',outname)),'w');
+
+%% Copy given directory contents over
+
+if(~isempty(copyDir))
+    status = copyfile(copyDir,outpath);
+    if(~status)
+        error('Could not copy scene directory contents to output path.');
+    else
+        fprintf('Copied contents from:\n');
+        fprintf('%s \n',copyDir);
+        fprintf('to \n');
+        fprintf('%s \n \n',outpath);
+    end
+end
 
 %% Write header
 
@@ -85,6 +100,34 @@ for ofns = outerFields'
                 % Either a string type, or a spectrum type with a value
                 % of 'xxx.spd'
                 lineFormat = '  "%s %s" "%s" \n';
+                
+                % If the string has an extension like .spd or .dat, we are
+                % going to copy it over to the working folder and then
+                % rename it as a relative path in the recipe. 
+                [path,name,ext] = fileparts(currValue);
+                if(~isempty(ext))
+                    
+                    % Error check
+                    if(isempty(path))
+                        % We don't need a warning for the filename.
+                        if(~strcmp(ifn,'filename'))
+                            warning('Tried to copy file %s, but filepath does not seem to be absolute.',currValue);
+                        end
+                    else
+                        relativeValue = strcat(name,ext);
+                        [success,~,~] = copyfile(currValue,outpath);
+                        if(success)
+                            fprintf('Copied %s to: \n',currValue);
+                            fprintf('%s \n',fullfile(outpath,relativeValue));
+                            currValue = relativeValue;
+                        else
+                            % Warning or error?
+                            warning('There was a problem copying file %s.',currValue);
+                        end
+                    end
+                    
+                end
+                
             elseif(strcmp(currType,'spectrum') && ~ischar(currValue))
                 % A spectrum of type [wave1 wave2 value1 value2]. TODO:
                 % There are probably more variations of this...
