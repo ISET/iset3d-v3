@@ -46,32 +46,19 @@ vcAddObject(scene); sceneWindow;
 
 thisR = piRead(fname);
 
-% newCamera = cameraCreate('realistic diffraction');
-clear newCamera
-newCamera.type = 'Camera';
-newCamera.subtype = 'realisticDiffraction';
-newCamera.specfile.type = 'string';
-newCamera.specfile.value = '2ElLens.dat';
-newCamera.filmdistance.type = 'float';
-newCamera.filmdistance.value = 50;    % mm
-newCamera.aperture_diameter.type = 'float';
-newCamera.aperture_diameter.value = 2; % mm
-newCamera.filmdiag.type = 'float';
-newCamera.filmdiag.value = 7;
-newCamera.diffractionEnabled.type = 'bool';
-newCamera.diffractionEnabled.value = 'false';
-newCamera.chromaticFlag.type = 'bool';
-newCamera.chromaticFlag.value = 'false';
+newCamera = piCameraCreate('realistic');
+% newCamera = cameraCreate('lightfield');
 
 % Update the camera
 thisR.camera = newCamera;
 
-% Lenses need more samples than pinholes
-thisR.sampler.pixelsamples.value = 1024;
 thisR.film.xresolution.value = 128;
 thisR.film.yresolution.value = 128;
+thisR.sampler.pixelsamples.value = 256;
 
 % Write out a file based on the recipe
+% TODO: This kind of copying into a working folder needs to be done
+% automatically in some sort of render function. 
 oname = fullfile(piRootPath,'local','deleteMe.pbrt');
 lensFile = fullfile(piRootPath,'data','lens','2ElLens.dat');
 copyfile(lensFile,fullfile(piRootPath,'local'));
@@ -88,7 +75,7 @@ thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 %
 
 %%
-[scene, outFile] = piRender(oname);
+[scene, outFile, result] = piRender(oname);
 
 vcAddObject(scene); sceneWindow;
 
