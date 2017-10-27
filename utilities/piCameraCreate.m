@@ -47,11 +47,11 @@ switch cameraType
         camera.chromaticAberrationEnabled.value = 'false';
         
         % Microlens parameters
-        camera.microlens_enabled.type = 'bool';
-        camera.microlens_enabled.value = 'true';
-        camera.num_pinholes_w.type = 'int';
+        camera.microlens_enabled.type = 'float';
+        camera.microlens_enabled.value = 1;
+        camera.num_pinholes_w.type = 'float';
         camera.num_pinholes_w.value = 8;
-        camera.num_pinholes_h.type = 'int';
+        camera.num_pinholes_h.type = 'float';
         camera.num_pinholes_h.value = 8;
         
     case {'eye','realisticEye','humanEye','human'}
