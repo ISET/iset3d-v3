@@ -57,14 +57,6 @@ thisR.film.xresolution.value = 256;
 thisR.film.yresolution.value = 256;
 thisR.sampler.pixelsamples.value = 4096;
 
-% Write out a file based on the recipe
-% TODO: This kind of copying into a working folder needs to be done
-% automatically (TL: I'll probably do it automatically in the piWrite
-% function.)
-oname = fullfile(piRootPath,'local','deleteMe.pbrt');
-lensFile = fullfile(piRootPath,'data','lens','2ElLens.dat');
-copyfile(lensFile,fullfile(piRootPath,'local'));
-
 % Note: Part of the reason we cannot focus is because the scale of the
 % teapot scene is not in physical units. The camera in the scene is 12.5
 % units away from the teapot, meaning it is only 12.5 mm away! We move the
@@ -84,9 +76,9 @@ thisR.camera.filmdistance.value = 89;
 %%
 
 thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
-tic
+% We can also copy a directory over to the same folder as oname like this:
+% thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
 [scene, outFile, result] = piRender(oname);
-toc
 vcAddObject(scene); sceneWindow;
 
 %%
