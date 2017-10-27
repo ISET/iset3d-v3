@@ -25,6 +25,11 @@ exist(fname,'file')
 thisR = piRead(fname);
 disp(thisR)
 
+% Which is X?  Starting from centere -7    10     3, we are looking
+% towards the origin (0,0,0).
+% 
+% First dimension moved us to the left and positive was to the right
+% Second dimension moved towards and away (positive)
 % Write out a file based on the recipe
 oname = fullfile(piRootPath,'local','deleteMe.pbrt');
 piWrite(thisR,oname,'overwrite',true);
@@ -62,7 +67,7 @@ newCamera.chromaticFlag.value = 'false';
 thisR.camera = newCamera;
 
 % Lenses need more samples than pinholes
-thisR.sampler.pixelsamples.value = 512;
+thisR.sampler.pixelsamples.value = 1024;
 thisR.film.xresolution.value = 128;
 thisR.film.yresolution.value = 128;
 
@@ -76,7 +81,7 @@ diff = thisR.lookAt.from - thisR.lookAt.to;
 diff = 5*diff;
 thisR.lookAt.from = thisR.lookAt.to + diff;
 
-piWrite(thisR,oname,'overwrite',true);
+thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 
 % You can open and view the file this way
 % edit(oname);
