@@ -1,19 +1,27 @@
 function outFile = piWrite(renderRecipe,outFile,varargin)
 % Given a recipe write a PBRT scene file.
 %
+% Input
+%   renderRecipe:  a recipe object
+%   outFile:       path to the output pbrt scene file
+%
 %   outFile = piWrite(recipe,fullOutfile,varargin)
 %
 % TL Scienstanford 2017
 
 %%
 p = inputParser;
-p.addRequired('renderRecipe',@(x)isstruct(x));
-p.parse(renderRecipe,varargin{:});
+p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
+p.addRequired('outFile',@ischar);
+p.addParameter('overwrite',false,@islogical);
+
+p.parse(renderRecipe,outFile,varargin{:});
+overwrite = p.Results.overwrite;
 
 %% Set up a text file to write into.
 
 % Check if it exists. If it does, ask the user if we can overwrite.
-if(exist(outFile,'file'))
+if(exist(outFile,'file')) && ~overwrite
     prompt = 'The PBRT file we are writing the recipe to already exists. Overwrite? (Y/N)';
     userInput = input(prompt,'s');
     if(strcmp(userInput,'N'))
@@ -44,8 +52,10 @@ outerFields = fieldnames(renderRecipe);
 for ofns = outerFields'
     ofn = ofns{1};
     
-    if(strcmp(ofn,'world') || strcmp(ofn,'lookAt') ...
-            || strcmp(ofn,'filename'))
+    if(strcmp(ofn,'world') || ...
+            strcmp(ofn,'lookAt') || ...
+            strcmp(ofn,'inputFile') || ...
+            strcmp(ofn,'outputFile'))
         % Skip, we don't want to write these out here.
         continue;
     end
@@ -54,8 +64,8 @@ for ofns = outerFields'
     fprintf(fileID,'# %s \n',ofn);
     
     % Write main type and subtype
-    fprintf(fileID,'%s "%s" \n',renderRecipe.( ...
-        ofn).type,renderRecipe.(ofn).subtype);
+    fprintf(fileID,'%s "%s" \n',renderRecipe.(ofn).type,...
+        renderRecipe.(ofn).subtype);
     
     % Loop through inner field names
     innerFields = fieldnames(renderRecipe.(ofn));

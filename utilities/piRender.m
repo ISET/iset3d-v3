@@ -3,8 +3,22 @@ function [ieObject, outFile] = piRender(sceneFile,varargin)
 %
 %    [oi or scene] = piRender(sceneFile,varargin)
 %
+% Input
+%  sceneFile - required PBRT file.  The file should specify the
+%              location of the auxiliary (include) data
+%
+% Optional input parameter/val
+%  opticsType - lens or pinhole (default)
+%
+% Return
+%   ieObject - an ISET scene or oi struct
+%   outFile  - full path to the output file (maybe)
+%
 % Examples:
-%  Scene files are in pbrt-v2-spectral on wandell's home account.
+%
+%  Scene files are in pbrt-v2-spectral on wandell's home account.  We
+%  will start putting them up on the RdtClient server before too long.
+%  We want to figure out the format and neatening, first.
 %
 %   sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/bunny.pbrt';
 %   sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/bump-sphere.pbrt';
@@ -27,7 +41,7 @@ function [ieObject, outFile] = piRender(sceneFile,varargin)
    ieAddObject(oi); oiWindow;
 %}
 % TL/BW/AJ Scienstanford 2017
-%
+
 %% PROGRAMMING TODO
 %
 %  We should write a routine to append the required text for a Realistic Camera

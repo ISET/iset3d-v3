@@ -1,7 +1,7 @@
-function recipe = piRead(fname,varargin)
+function thisR = piRead(fname,varargin)
 % piRecipe - Read a PBRT scene file and return rendering information as a struct. 
 %
-%    piRecipe(fname, ...)
+%    recipe = piRecipe(fname, ...)
 %
 % This function parses the scene pbrt file and returns critical
 % rendering information in the "recipe". This struct contains all the
@@ -65,6 +65,9 @@ p = inputParser;
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.parse(fname,varargin{:});
 
+thisR = recipe;
+thisR.inputFile = fname;
+
 %% Read PBRT file
 
 % Open, read, close
@@ -80,9 +83,9 @@ fclose(fileID);
 cameraBlock = piBlockExtract(txtLines,'blockName','Camera');
 if(isempty(cameraBlock))
     warning('Cannot find "camera" in renderRecipe.');
-    camera = struct([]); % Return empty.
+    thisR.camera = struct([]); % Return empty.
 else
-    camera = piBlock2Struct(cameraBlock);
+    thisR.camera = piBlock2Struct(cameraBlock);
 end
 
 %% Extract sampler block
@@ -90,9 +93,9 @@ end
 samplerBlock = piBlockExtract(txtLines,'blockName','Sampler');
 if(isempty(samplerBlock))
     warning('Cannot find "sampler" in renderRecipe.');
-    sampler = struct([]); % Return empty.
+    thisR.sampler = struct([]); % Return empty.
 else
-    sampler = piBlock2Struct(samplerBlock);
+    thisR.sampler = piBlock2Struct(samplerBlock);
 end
 
 %% Extract film block
@@ -100,9 +103,9 @@ end
 filmBlock = piBlockExtract(txtLines,'blockName','Film');
 if(isempty(filmBlock))
     warning('Cannot find "film" in renderRecipe.');
-    film = struct([]); % Return empty.
+    thisR.film = struct([]); % Return empty.
 else
-    film = piBlock2Struct(filmBlock);
+    thisR.film = piBlock2Struct(filmBlock);
 end
 
 %% Extract surface pixel filter block
@@ -110,9 +113,9 @@ end
 pfBlock = piBlockExtract(txtLines,'blockName','PixelFilter');
 if(isempty(pfBlock))
     warning('Cannot find "filter" in renderRecipe.');
-    filter = struct([]); % Return empty.
+    thisR.filter = struct([]); % Return empty.
 else
-    filter = piBlock2Struct(pfBlock);
+    thisR.filter = piBlock2Struct(pfBlock);
 end
 
 %% Extract (surface) integrator block
@@ -120,9 +123,9 @@ end
 sfBlock = piBlockExtract(txtLines,'blockName','SurfaceIntegrator');
 if(isempty(sfBlock))
     warning('Cannot find "integrator" in renderRecipe.');
-    integrator = struct([]); % Return empty.
+    thisR.integrator = struct([]); % Return empty.
 else
-    integrator = piBlock2Struct(sfBlock);
+    thisR.integrator = piBlock2Struct(sfBlock);
 end
 
 %% Extract renderer block
@@ -130,9 +133,9 @@ end
 rendererBlock = piBlockExtract(txtLines,'blockName','Renderer');
 if(isempty(rendererBlock))
     warning('Cannot find "renderer" in renderRecipe. Using default.');
-    renderer = struct('type','Renderer','subtype','sampler');
+    thisR.renderer = struct('type','Renderer','subtype','sampler');
 else
-    renderer = piBlock2Struct(rendererBlock);
+    thisR.renderer = piBlock2Struct(rendererBlock);
 end
 
 %% Read LookAt and ConcatTransform, if they exist
@@ -141,13 +144,13 @@ lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
 if(isempty(lookAtBlock))
     warning('Cannot find "LookAt" for renderRecipe. Returning default.');
     % TODO: What is the default camera position? 
-    lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
+    thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
 else
     values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
     from = [values{2} values{3} values{4}];
     to = [values{5} values{6} values{7}];
     up = [values{8} values{9} values{10}];
-    lookAt = struct('from',from,'to',to,'up',up);
+    thisR.lookAt = struct('from',from,'to',to,'up',up);
 end
 
 concatTBlock = piBlockExtract(txtLines,'blockName','ConcatTransform');
@@ -179,12 +182,6 @@ world = {world(1:end-1)}; % Get rid of the last line
 if(~worldStart)   
     warning('Cannot find "WorldBegin" for renderRecipe.');
 end
-
-%% Combine into renderRecipe structure
-
-recipe = struct('camera',camera,'sampler',sampler, ...
-    'film',film,'filter',filter,'integrator',integrator,...
-    'renderer',renderer,'lookAt',lookAt,'world',world,'filename',fname); 
-
+thisR.world = world{1};
 
 end

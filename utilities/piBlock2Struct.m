@@ -1,33 +1,38 @@
 function s = piBlock2Struct(blockLines,varargin)
-% Given a block of text (e.g. from piExtractBlock),we do our best to
-% parse it and convert into a structure. We take advantage of the regular
-% structure of the PBRT file (assuming it is "well structured" to a certain
-% degree) and use regular expressions to extract values within.
+% Parse a block of scene file text (e.g. from piExtractBlock) and
+% return it as a structure 
+%
+%  s = piBlock2Struct(blockLines,varargin)
+%
+% Required input
+%   blockLines - a block of text from the top of a scene.pbrt file
+% 
+% Return
+%   s -  a struct containing the critical information from the block
+%   of text.
+%
+% We take advantage of the regular structure of the PBRT file
+% (assuming it is "well structured") and use regular expressions to
+% extract values within.
 %
 % Example
-% txtLines     = piRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
-% cameraBlock  = piBlockExtract(txtLines,'blockName','camera')
-% cameraStruct = piBlock2Struct(cameraBlock)
+%  txtLines     = piRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
+%  cameraBlock  = piBlockExtract(txtLines,'blockName','camera')
+%  cameraStruct = piBlock2Struct(cameraBlock)
 %
-%
+% TL Scienstanford 2017
+
 %% Programming TODO
-%
-% TODO: Right now we are throwing away the value type (e.g. integer, float,
-% string). How should we keep it in the structure without over complicating
-% it? Having the value type around would make it easier and more robust
-% when we write back out into a PBRT file. 
 %
 % TODO: The struct converter doesn't quite capture all the variations it
 % needs to. For example, the spectrum type can be a string filename of a
 % spd file, but it can also be a vector that directly describes the spd
 % (e.g. [400 800 1])
-
-% TL Scienstanford 2017
-
+%
 
 %%
 p = inputParser;
-p.addRequired('txtLines',@(x)(iscell(blockLines) && ~isempty(blockLines)));
+p.addRequired('blockLines',@(x)(iscell(blockLines) && ~isempty(blockLines)));
 p.parse(blockLines,varargin{:});
 
 %% Go through the text block, line by line, and try to extract the parameters

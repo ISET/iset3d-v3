@@ -1,8 +1,16 @@
 function [imageData, imageSize, lens] = piReadDAT(filename, varargin)
-%% Get multispectral image data out of a .dat file from Stanford.
+%% Read multispectral data from a .dat file (Stanford format)
 %
-% imageData = piReadDAT(filename)
+%   [imageData, imageSize, lens] = piReadDAT(filename)
 %
+% Required Input
+%   filename - existing .dat file
+%
+% Optional parameter/val
+%   maxPlanes -
+%
+% Returns
+%  
 % Reads multi-spectral .dat image data from the fiven filename.  The .dat
 % format is described by Andy Lin on the Stanford Vision and Imaging
 % Science and Technology wiki:
@@ -25,25 +33,26 @@ function [imageData, imageSize, lens] = piReadDAT(filename, varargin)
 %%% About Us://github.com/RenderToolbox/RenderToolbox4/wiki/About-Us
 %%% RenderToolbox4 is released under the MIT License.  See LICENSE file.
 
+%%
 parser = inputParser();
 parser.addRequired('filename', @ischar);
 parser.addParameter('maxPlanes', [], @isnumeric);
+
 parser.parse(filename, varargin{:});
 filename = parser.Results.filename;
 maxPlanes = parser.Results.maxPlanes;
 
-imageData = [];
-imageSize = [];
+% imageData = [];
+% imageSize = [];
 lens = [];
 
-%% Try to open the file.
+%% Open the file.
 fprintf('Opening file "%s".\n', filename);
 [fid, message] = fopen(filename, 'r');
-if fid < 0
-    error(message);
-end
+if fid < 0,  error(message); end
 
-%% Read header line to get image size.
+%% Read header line to get image size
+
 sizeLine = fgetl(fid);
 dataPosition = ftell(fid);
 [imageSize, count, err] = lineToMat(sizeLine);
@@ -61,7 +70,7 @@ fprintf('  Reading image h=%d x w=%d x %d spectral planes.\n', ...
 
 %% Optional second header line might contain realistic lens info.
 lensLine = fgetl(fid);
-[lensData, count, err] = lineToMat(lensLine);
+[lensData, count, err] = lineToMat(lensLine); %#ok<ASGLU>
 if count == 3
     dataPosition = ftell(fid);
     lens.focalLength = lensData(1);
@@ -71,18 +80,20 @@ if count == 3
         lens.focalLength, lens.fStop, lens.fieldOfView);
 end
 
-%% Read the whole .dat into memory
+%% Read the remainder of the .dat file into memory
+
 fseek(fid, dataPosition, 'bof');
 serializedImage = fread(fid, inf, 'double');
 fclose(fid);
 
 fprintf('  Read %d pixel elements for image.\n', numel(serializedImage));
 
+% Check size
 if numel(serializedImage) ~= prod(imageSize)
     error('Image should have %d pixel elements.\n', prod(imageSize))
 end
 
-%% shape the serialized data to image dimensions
+%% Reshape the serialized data to image dimensions
 imageData = reshape(serializedImage, hSize, wSize, nPlanes);
 
 if ~isempty(maxPlanes) && maxPlanes < nPlanes
@@ -93,6 +104,9 @@ end
 
 fprintf('OK.\n');
 
+end
+
+%%
 function [mat, count, err] = lineToMat(line)
 % is it an actual line?
 if isempty(line) || (isscalar(line) && line < 0)
@@ -104,3 +118,5 @@ end
 
 % scan line for numbers
 [mat, count, err] = sscanf(line, '%f', inf);
+
+end
