@@ -53,9 +53,9 @@ newCamera = piCameraCreate('realistic');
 thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
-thisR.film.xresolution.value = 128;
-thisR.film.yresolution.value = 128;
-thisR.sampler.pixelsamples.value = 256;
+thisR.film.xresolution.value = 256;
+thisR.film.yresolution.value = 256;
+thisR.sampler.pixelsamples.value = 4096;
 
 % Note: Part of the reason we cannot focus is because the scale of the
 % teapot scene is not in physical units. The camera in the scene is 12.5
@@ -78,7 +78,6 @@ thisR.camera.filmdistance.value = 89;
 thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 % We can also copy a directory over to the same folder as oname like this:
 % thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
-
 [scene, outFile, result] = piRender(oname);
 vcAddObject(scene); sceneWindow;
 

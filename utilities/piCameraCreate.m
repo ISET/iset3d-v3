@@ -1,17 +1,43 @@
 function camera = piCameraCreate(cameraType)
 %PICAMERACREATE Return a default camera structure to be placed in a
-%   recipe.The type of camera returns depends on what the user requests.
+%   recipe. 
+%
+% The type of cameras are
+%
+%    'pinhole'     - Default
+%    'realistic'   - allows chromatic aberration and diffraction and a lens file
+%    'light field' - microlens array in front of the sensor 
+%    'human eye'   - T. Lian human eye model parameters
+%
+% TL, SCIEN STANFORD 2017 
 
+%{
+% These are the options.  We should write a validation script.
+
+ piCameraCreate('pinhole')
+ piCameraCreate('realistic diffraction')
+ piCameraCreate('human eye')
+ piCameraCreate('light field')
+
+%}
+% PROGRAMMING
 %   TODO: Perhaps this should be a function of the recipe class?
+%
 
 %% Check input
-if(~ischar(cameraType))
-    error('Camera type must be a string.')
-end
+
+if notDefined('cameraType'), cameraType = 'pinhole'; end
+cameraType = ieParamFormat(cameraType);
 
 %% Return default camera given the type
 switch cameraType
-    case {'realistic','realisticDiffraction'}
+    case {'pinhole'}
+        camera.type      = 'Camera';
+        camera.subtype   = 'perspective';
+        camera.fov.type  = 'float';
+        camera.fov.value = 45;  % deg of angle
+        
+    case {'realistic','realisticdiffraction'}
         
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
@@ -54,7 +80,7 @@ switch cameraType
         camera.num_pinholes_h.type = 'float';
         camera.num_pinholes_h.value = 8;
         
-    case {'eye','realisticEye','humanEye','human'}
+    case {'eye','realisticeye','humaneye','human'}
         
         % TODO:
         % When we render, we need to make sure pbrt2ISET automatically
@@ -85,7 +111,6 @@ switch cameraType
         camera.ior4.type = 'spectrum';
         camera.ior4.value = ''; % FILL IN
 
-        
     otherwise
         error('Cannot recognize camera type.');
 end
