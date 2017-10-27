@@ -5,19 +5,19 @@
 %
 %   T(whichLens,dist) = focalDistance
 %
-%{
- vcNewGraphWin; 
- focalDistance(focalDistance < 0) = NaN;
- loglog(focalDistance');
- xlabel('Object distance'); ylabel('Focal length');
-%}
+% Plot the focal distance vs. the object distance.  You can select from
+% different lenses in the pbrt2ISET data/lens directory.
+%
+% BW SCIEN Stanford, 2017
 
 %%  All the lenses in the pbrt2ISET directory
 
 lensDir = fullfile(piRootPath,'data','lens');
-lensFiles = dir(fullfile(lensDir,'2El*.dat'));
 
-dist = logspace(0.5,5,10);
+% wide, tessar, fisheye, dgauss, telephoto, 2el, 2EL
+lensFiles = dir(fullfile(lensDir,'dgauss*.dat'));   
+
+dist = logspace(0.1,4,30);
 
 %% Calculate the focal distances
 
@@ -30,6 +30,13 @@ for ii=1:length(lensFiles)
     end
 end
 
-%%  It 
+%%  When the distance is too small, we can't get a good focus.
+
+% In that case, the distance is negative
+vcNewGraphWin;
+focalDistance(focalDistance < 0) = NaN;
+loglog(dist,focalDistance');
+xlabel('Object distance (mm)'); ylabel('Focal length (mm)');
+grid on
 
 %%
