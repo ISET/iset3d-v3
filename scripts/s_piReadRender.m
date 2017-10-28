@@ -18,6 +18,7 @@ ieInit
 
 %% In this case, everything is inside the one file.  Very simple
 
+% Pinhole camera case has infinite depth of field, so no focal length is needed.
 fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
 exist(fname,'file')
 
@@ -42,33 +43,40 @@ piWrite(thisR,oname,'overwrite',true);
 [scene, outFile] = piRender(oname);
 
 vcAddObject(scene); sceneWindow;
+sceneSet(scene,'gamma',0.5);
 %% Now, adjust this recipe to render using a lens
 
 thisR = piRead(fname);
 
-newCamera = piCameraCreate('realistic');
-% newCamera = cameraCreate('lightfield');
+% newCamera = piCameraCreate('realistic');
+newCamera = piCameraCreate('light field');
 
 % Update the camera
 thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
-thisR.film.xresolution.value = 256;
-thisR.film.yresolution.value = 256;
-thisR.sampler.pixelsamples.value = 4096;
+thisR.film.xresolution.value = 128;
+thisR.film.yresolution.value = 128;
+thisR.sampler.pixelsamples.value = 256;
 
 % Note: Part of the reason we cannot focus is because the scale of the
 % teapot scene is not in physical units. The camera in the scene is 12.5
 % units away from the teapot, meaning it is only 12.5 mm away! We move the
 % camera further out to try to make the distance more reasonable.
 
-% This moved us further away.  GOod function to implement.
+% This moved us further away.  Good function to implement.
 diff = thisR.lookAt.from - thisR.lookAt.to;
 diff = 10*diff;
 thisR.lookAt.from = thisR.lookAt.to + diff;
 
-% For an object at 125 mm, the 2ElLens has a focus at 89 mm.
-thisR.camera.filmdistance.value = 89;
+% Good function needed to find the object distance
+objDist = sqrt(sum(diff.^2));
+[p,flname,~] = fileparts(thisR.camera.specfile.value);
+focalLength = load(fullfile(p,[flname,'.FL.mat']));
+focalDistance = interp1(focalLength.dist,focalLength.focalDistance,objDist);
+% For an object at 125 mm, the 2ElLens has a focus at 89 mm.  We should be able
+% to look this up from stored data about each lens type.
+thisR.camera.filmdistance.value = focalDistance;
 
 % You can open and view the file this way
 % edit(oname);
