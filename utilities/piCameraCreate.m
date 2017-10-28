@@ -1,29 +1,29 @@
-function camera = piCameraCreate(cameraType)
-%PICAMERACREATE Return a default camera structure to be placed in a
-%   recipe. 
+function camera = piCameraCreate(cameraType,varargin)
+%PICAMERACREATE Return a camera structure to be placed in a recipe. 
 %
-% The type of cameras are
+%   camera = piCameraCreate(cameraType, parameters ..)
+%
+% Input parameters
+%  The type of cameras are
 %
 %    'pinhole'     - Default
 %    'realistic'   - allows chromatic aberration and diffraction and a lens file
 %    'light field' - microlens array in front of the sensor 
 %    'human eye'   - T. Lian human eye model parameters
 %
+% Optional parameter/values
+%     We will set it up to pass in varargin pairs.  Not implemented yet. 
+%
 % TL, SCIEN STANFORD 2017 
 
-%{
-% These are the options.  We should write a validation script.
-
- piCameraCreate('pinhole')
- piCameraCreate('realistic diffraction')
- piCameraCreate('human eye')
- piCameraCreate('light field')
-
-%}
 % PROGRAMMING
 %   TODO: Perhaps this should be a function of the recipe class?
 %
-
+%   TODO:   implement things like this for the camera type values
+%
+%           piCameraCreate('pinhole','fov',val);
+%
+s
 %% Check input
 
 if notDefined('cameraType'), cameraType = 'pinhole'; end
