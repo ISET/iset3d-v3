@@ -48,23 +48,26 @@ sceneSet(scene,'gamma',0.5);
 
 thisR = piRead(fname);
 
-% newCamera = piCameraCreate('realistic');
-newCamera = piCameraCreate('light field');
+newCamera = piCameraCreate('realistic');
+
+% Some of the parameters for the light field camera fail to produce any images,
+% while others produce kind of OK images, just not quite right.
+% for one thing, when we have a light field camera, we aren't quite sure how to
+% set the focalDistance.  That seems to be solved for other simple lenses.
+% newCamera = piCameraCreate('light field');
+% newCamera.num_pinholes_h.value = 32;
+% newCamera.num_pinholes_w.value = 32;
 
 % Update the camera
 thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
-thisR.film.xresolution.value = 128;
-thisR.film.yresolution.value = 128;
+thisR.film.xresolution.value = 512;
+thisR.film.yresolution.value = 512;
 thisR.sampler.pixelsamples.value = 256;
 
-% Note: Part of the reason we cannot focus is because the scale of the
-% teapot scene is not in physical units. The camera in the scene is 12.5
-% units away from the teapot, meaning it is only 12.5 mm away! We move the
-% camera further out to try to make the distance more reasonable.
-
-% This moved us further away.  Good function to implement.
+% We need to move the camera to a distance that is far enough away so we can
+% get a decent focus. When the object is too close, we can't focus.
 diff = thisR.lookAt.from - thisR.lookAt.to;
 diff = 10*diff;
 thisR.lookAt.from = thisR.lookAt.to + diff;
@@ -88,5 +91,6 @@ thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 % thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
 [scene, outFile, result] = piRender(oname);
 vcAddObject(scene); sceneWindow;
+sceneSet(scene,'gamma',0.5);
 
 %%
