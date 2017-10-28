@@ -23,7 +23,7 @@ function camera = piCameraCreate(cameraType,varargin)
 %
 %           piCameraCreate('pinhole','fov',val);
 %
-s
+
 %% Check input
 
 if notDefined('cameraType'), cameraType = 'pinhole'; end
