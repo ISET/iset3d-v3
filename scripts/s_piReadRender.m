@@ -14,7 +14,9 @@
 % TL/BW SCIEN
 
 %%
-ieInit
+ieInit;
+
+% In some cases, you may need to run piDockerConfig
 
 %% In this case, everything is inside the one file.  Very simple
 
