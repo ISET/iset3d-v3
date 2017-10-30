@@ -67,6 +67,8 @@ piWrite(thisR,oname,'overwrite',true);
 vcAddObject(scene); sceneWindow;
 sceneSet(scene,'gamma',0.5);
 
+%%
+
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
 p = inputParser;
