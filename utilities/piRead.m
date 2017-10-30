@@ -82,7 +82,7 @@ fclose(fileID);
 
 cameraBlock = piBlockExtract(txtLines,'blockName','Camera');
 if(isempty(cameraBlock))
-    warning('Cannot find "camera" in renderRecipe.');
+    warning('Cannot find "camera" in PBRT file.');
     thisR.camera = struct([]); % Return empty.
 else
     thisR.camera = piBlock2Struct(cameraBlock);
@@ -92,7 +92,7 @@ end
 
 samplerBlock = piBlockExtract(txtLines,'blockName','Sampler');
 if(isempty(samplerBlock))
-    warning('Cannot find "sampler" in renderRecipe.');
+    warning('Cannot find "sampler" in PBRT file.');
     thisR.sampler = struct([]); % Return empty.
 else
     thisR.sampler = piBlock2Struct(samplerBlock);
@@ -102,17 +102,20 @@ end
 
 filmBlock = piBlockExtract(txtLines,'blockName','Film');
 if(isempty(filmBlock))
-    warning('Cannot find "film" in renderRecipe.');
+    warning('Cannot find "film" in PBRT file.');
     thisR.film = struct([]); % Return empty.
 else
     thisR.film = piBlock2Struct(filmBlock);
+    
+    % Remove the filename since it inteferes with the outfile name.
+    thisR.film = rmfield(thisR.film,'filename');
 end
 
 %% Extract surface pixel filter block
 
 pfBlock = piBlockExtract(txtLines,'blockName','PixelFilter');
 if(isempty(pfBlock))
-    warning('Cannot find "filter" in renderRecipe.');
+    warning('Cannot find "filter" in PBRT file.');
     thisR.filter = struct([]); % Return empty.
 else
     thisR.filter = piBlock2Struct(pfBlock);
@@ -122,7 +125,7 @@ end
 
 sfBlock = piBlockExtract(txtLines,'blockName','SurfaceIntegrator');
 if(isempty(sfBlock))
-    warning('Cannot find "integrator" in renderRecipe.');
+    warning('Cannot find "integrator" in PBRT file.');
     thisR.integrator = struct([]); % Return empty.
 else
     thisR.integrator = piBlock2Struct(sfBlock);
@@ -132,7 +135,7 @@ end
 
 rendererBlock = piBlockExtract(txtLines,'blockName','Renderer');
 if(isempty(rendererBlock))
-    warning('Cannot find "renderer" in renderRecipe. Using default.');
+    warning('Cannot find "renderer" in PBRT file. Using default.');
     thisR.renderer = struct('type','Renderer','subtype','sampler');
 else
     thisR.renderer = piBlock2Struct(rendererBlock);
@@ -142,7 +145,7 @@ end
   
 lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
 if(isempty(lookAtBlock))
-    warning('Cannot find "LookAt" for renderRecipe. Returning default.');
+    warning('Cannot find "LookAt" for PBRT file. Returning default.');
     % TODO: What is the default camera position? 
     thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
 else
@@ -180,7 +183,7 @@ end
 fclose(fid);
 world = {world(1:end-1)}; % Get rid of the last line
 if(~worldStart)   
-    warning('Cannot find "WorldBegin" for renderRecipe.');
+    warning('Cannot find "WorldBegin" for PBRT file.');
 end
 thisR.world = world{1};
 
