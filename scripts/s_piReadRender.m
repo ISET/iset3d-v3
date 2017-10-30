@@ -27,6 +27,7 @@ exist(fname,'file')
 % Read the file and return it in a recipe format
 thisR = piRead(fname);
 disp(thisR)
+opticsType = 'pinhole';
 
 % Which is X?  Starting from centere -7    10     3, we are looking
 % towards the origin (0,0,0).
@@ -42,31 +43,44 @@ piWrite(thisR,oname,'overwrite',true);
 %
 % We could use the single file piRender function to rennder from this
 % output.
-[scene, outFile] = piRender(oname);
+[ieObject, outFile] = piRender(oname,'opticsType',opticsType);
+vcAddObject(ieObject);
+switch(opticsType)
+    case 'pinhole'
+        sceneWindow;
+        sceneSet(ieObject,'gamma',0.5);     
+    case 'lens'
+        oiWindow;
+        oiSet(ieObject,'gamma',0.5);
+end
 
-vcAddObject(scene); sceneWindow;
-sceneSet(scene,'gamma',0.5);
 %% Now, adjust this recipe to render using a lens
 
 thisR = piRead(fname);
 
 newCamera = piCameraCreate('realistic');
+opticsType = 'lens';
+thisR.camera.aperture_diameter.value = 20;
 
 % Some of the parameters for the light field camera fail to produce any images,
 % while others produce kind of OK images, just not quite right.
 % for one thing, when we have a light field camera, we aren't quite sure how to
 % set the focalDistance.  That seems to be solved for other simple lenses.
-% newCamera = piCameraCreate('light field');
-% newCamera.num_pinholes_h.value = 32;
-% newCamera.num_pinholes_w.value = 32;
+%{
+newCamera = piCameraCreate('light field');
+newCamera.aperture_diameter.value = 60;
+newCamera.num_pinholes_h.value = 64;
+newCamera.num_pinholes_w.value = 64;
+newCamera.microlens_enabled.value = 0;
+%} 
 
 % Update the camera
 thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
-thisR.film.xresolution.value = 512;
-thisR.film.yresolution.value = 512;
-thisR.sampler.pixelsamples.value = 256;
+thisR.film.xresolution.value = 576;
+thisR.film.yresolution.value = 576;
+thisR.sampler.pixelsamples.value = 128;
 
 % We need to move the camera to a distance that is far enough away so we can
 % get a decent focus. When the object is too close, we can't focus.
@@ -91,8 +105,15 @@ thisR.camera.filmdistance.value = focalDistance;
 thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 % We can also copy a directory over to the same folder as oname like this:
 % thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
-[scene, outFile, result] = piRender(oname);
-vcAddObject(scene); sceneWindow;
-sceneSet(scene,'gamma',0.5);
+[ieObject, outFile, result] = piRender(oname,'opticsType',opticsType);
+vcAddObject(ieObject);
+switch(opticsType)
+    case 'pinhole'
+        sceneWindow;
+        sceneSet(ieObject,'gamma',0.5);     
+    case 'lens'
+        oiWindow;
+        oiSet(ieObject,'gamma',0.5);
+end
 
 %%

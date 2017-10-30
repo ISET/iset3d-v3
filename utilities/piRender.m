@@ -129,24 +129,26 @@ if ~exist(outFile,'file')
     
 end
 
-photons = piReadDAT(outFile, 'maxPlanes', 31);
+%% Read the data and set some of the ieObject parameters
 
+photons = piReadDAT(outFile, 'maxPlanes', 31);
+outName = [outName,datestr(datetime('now'))];
 switch opticsType
     case 'lens'
         % If we used a lens, then the ieObject should be the optical image
         % (irradiance data).
         %
-        % You can set fov or filmDiag here.  You can also set fNumber and focalLength
-        % here.  We are using defaults for now, but we will find those numbers in
-        % the future from inside the radiance.dat file and put them in here.
+        % We should set fov or filmDiag here.  We should also set other ray
+        % trace optics parameters here. We are using defaults for now, but we
+        % will find those numbers in the future from inside the radiance.dat
+        % file and put them in here.
         ieObject = piOICreate(photons);
         ieObject = oiSet(ieObject,'name',outName);
+        ieObject = oiSet(ieObject,'optics model','ray trace');
     case 'pinhole'
         % In this case, we the radiance really describe the scene, not an oi
         ieObject = piSceneCreate(photons,'mean luminance',100);
         ieObject = sceneSet(ieObject,'name',outName);
-        % ieAddObject(ieObject); sceneWindow;
-
 end
 
 end
