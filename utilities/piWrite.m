@@ -54,7 +54,8 @@ for jj = 1:2
         currRecipe = renderRecipe; 
     elseif(jj == 2)
         % Convert recipe to a depth recipe
-        currRecipe = piRecipeConvertToDepth(renderRecipe);
+        currRecipe = copy(renderRecipe);
+        currRecipe = piRecipeConvertToDepth(currRecipe);
     end
     
     currOutfile = outfiles{jj};

@@ -1,4 +1,4 @@
-classdef recipe < handle  
+classdef recipe < matlab.mixin.Copyable
 % Contains essential information for rendering the PBRT file
 %
 %
