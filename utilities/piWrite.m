@@ -46,10 +46,6 @@ end
 
 for jj = 1:2
     
-    % We have to do this because it turns out you can't make a direct copy
-    % of a handle class, all you get is another pointer. Therefore I can't
-    % make the two different recipes before the "for" loop. We can instead
-    % make changes directly in here. 
     if(jj == 1)
         currRecipe = renderRecipe; 
     elseif(jj == 2)
