@@ -107,8 +107,10 @@ if(isempty(filmBlock))
 else
     thisR.film = piBlock2Struct(filmBlock);
     
-    % Remove the filename since it inteferes with the outfile name.
-    thisR.film = rmfield(thisR.film,'filename');
+    if(isfield(thisR,'filename'))
+        % Remove the filename since it inteferes with the outfile name.
+        thisR.film = rmfield(thisR.film,'filename');
+    end
 end
 
 %% Extract surface pixel filter block
