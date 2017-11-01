@@ -18,7 +18,7 @@ function renderRecipe = rtbPBRTGetRenderRecipe(fname,varargin)
 %   pbrtFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt';
 %   renderRecipe = rtbPBRTGetRenderRecipe(pbrtFile);
 %
-% TL Scienstanford 2017
+% TL/AJ Scienstanford 2017
 
 %% Programming TODO:
 
