@@ -15,14 +15,16 @@
 
 %%
 ieInit;
+if ~piDockerExists, piDockerConfig; end
 
 % In some cases, you may need to run piDockerConfig
 
-%% In this case, everything is inside the one file.  Very simple
+%% In this case, everything is inside the one file.
 
 % Pinhole camera case has infinite depth of field, so no focal length is needed.
 fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
 exist(fname,'file')
+
 % Read the file and return it in a recipe format
 thisR = piRead(fname);
 disp(thisR)
@@ -32,6 +34,7 @@ piWrite(thisR,oname,'overwrite',true);
 
 thisR = piRead(fname);
 newCamera = piCameraCreate('light field');
+nPinholes = 64;
 newCamera.aperture_diameter.value = 60;
 newCamera.num_pinholes_h.value = 64;
 newCamera.num_pinholes_w.value = 64;
@@ -44,58 +47,64 @@ thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
 % The number of sub-pixels times the number of pixels has to work out evenly
-thisR.film.xresolution.value = 576*2;
-thisR.film.yresolution.value = 576*2;
-thisR.sampler.pixelsamples.value = 256;
+filmSamples = 576;
+thisR.film.xresolution.value = filmSamples;
+thisR.film.yresolution.value = filmSamples;
+thisR.sampler.pixelsamples.value = 128;
 
+fprintf('Number of pixels for each pinhole %f\n',filmSamples/nPinholes);
 % Let's make this whole thing a function.  Maybe we can base it on focusLens()
 % instead of the LUT.
 
-% We need to move the camera to a distance that is far enough away so we can
-% get a decent focus. When the object is too close, we can't focus.
+% We need to move the camera far enough away so we can get a decent
+% focus. When the object is too close, we can't focus.
+
+% recipe.get('object distance');
+% recipe.set('lookAt from',xxx);
 diff = thisR.lookAt.from - thisR.lookAt.to;
 diff = 10*diff;
 thisR.lookAt.from = thisR.lookAt.to + diff;
 
 % Good function needed to find the object distance
+% focalDistance = recipe.get('focal distance');
 objDist = sqrt(sum(diff.^2));
 [p,flname,~] = fileparts(thisR.camera.specfile.value);
 focalLength = load(fullfile(p,[flname,'.FL.mat']));
 focalDistance = interp1(focalLength.dist,focalLength.focalDistance,objDist);
 % For an object at 125 mm, the 2ElLens has a focus at 89 mm.  We should be able
 % to look this up from stored data about each lens type.
+% recipe.set('film distance',focalDistance);
 thisR.camera.filmdistance.value = focalDistance;
+
+thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 
 % You can open and view the file this way
 % edit(oname);
 
-%%
+%% Render the light field oi
 
-thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 % We can also copy a directory over to the same folder as oname like this:
 % thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
 [ieObject, outFile, result] = piRender(oname,'opticsType',opticsType);
-vcAddObject(ieObject);
+
+% Show the ieObject after brightening it to a reasonable level.
 switch(opticsType)
     case 'pinhole'
-        sceneWindow;
-        sceneSet(ieObject,'gamma',0.5);     
+        oi = sceneAdjustLuminance(ieObject,100);
+        sceneSet(ieObject,'gamma',0.5);
+        vcAddObject(ieObject); sceneWindow;
     case 'lens'
-        oiWindow;
+        ieObject = oiAdjustIlluminance(ieObject,10);
         oiSet(ieObject,'gamma',0.5);
+        vcAddObject(ieObject); oiWindow;
 end
 
-%% lightfield rendering
-
 %% Create a sensor 
-%
-% Each pixel is aligned with a single sample in the OI.  Then produce the
-% sensor data (which will include color filters)
-%
 
-% Maybe we should make things brighter always as part of the read?
-oi = oiAdjustIlluminance(ieObject,10);
-
+% Make the sensor so that each pixel is aligned with a single sample
+% in the OI.  Then produce the sensor data.  The sensor has a standard
+% color filter array.
+% sensorCreate('light field',oi);
 ss = oiGet(oi,'sample spacing','m');
 sensor = sensorCreate;
 sensor = sensorSet(sensor,'pixel size same fill factor',ss(1));
@@ -107,23 +116,33 @@ sensorGet(sensor,'pixel size','um')
 sensorGet(sensor,'size')
 sensorGet(sensor,'fov',[],oi)
 
+% Compute the sensor responses and show
 sensor = sensorCompute(sensor,oi);
 ieAddObject(sensor); sensorWindow('scale',1);
 
-%% Interpolate (bilinear) the color filter data to produce an image
-%
+%% Use the image processor to demosaic (bilinear) the color filter data
+
 ip = ipCreate;
 ip = ipCompute(ip,sensor);
 vcAddObject(ip); ipWindow;
 
+%% Convert the rgb data into a lightfield structure 
 
-%% Pack the samples of the rgb image into the lightfield structure used by the light field toolbox
-%  nPinholes = [thisR.camera.num_pinholes_h.value,thisR.camera.num_pinholes_w.value];
-nPinholes = [data.numPinholesH, data.numPinholesW];
+% This is the format used by Don Dansereau's light field toolbox
+
+% nPinholes = recipe.get('npinholes');
+nPinholes = [thisR.camera.num_pinholes_h.value,thisR.camera.num_pinholes_w.value];
+% nPinholes = [data.numPinholesH, data.numPinholesW];
+
+% Not sure when we write this or where it is.
 lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
 
 superPixels(1) = size(lightfield,1);
 superPixels(2) = size(lightfield,2);
+
+%% Display the light field
+
+LFDispVidCirc(lightfield)
 
 %% Display individual images
 %
@@ -212,7 +231,5 @@ end
 % visualizing
 % LFDispMousePan(lightfield)
 
-%% 
-LFDispVidCirc(lightfield)
 
 %%
