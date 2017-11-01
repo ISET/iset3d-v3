@@ -209,8 +209,6 @@ switch opticsType
         % ieAddObject(ieObject); sceneWindow;  
 end
 
-
-
 %% Ask the system for the current user id.
 % function uid = getUserId()
 % [~, uid] = system('id -u `whoami`');
