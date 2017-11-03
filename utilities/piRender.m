@@ -70,10 +70,13 @@ if(isempty(workingFolder))
 end
 
 %% Set up files to render, depending on 'renderType'
-% We assume that piWrite already gave us a depth file with name
-% xxx_depth.pbrt
 
+% Write out a pbrt file with depth
 depthFile = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
+recipe = piRead(sceneFile);
+depthRecipe = piRecipeConvertToDepth(recipe);
+depthFile = piWrite(depthRecipe,depthFile);
+
 filesToRender = {};
 label = {};
 switch renderType
@@ -91,6 +94,10 @@ switch renderType
     otherwise
         error('Cannot recognize render type.');
 end
+
+% We need these to avoid errors further down.
+depthMap = [];
+photons = []; 
 
 for ii = 1:length(filesToRender)
     
