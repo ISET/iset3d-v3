@@ -32,12 +32,16 @@ disp(thisR)
 oname = fullfile(piRootPath,'local','lfTest.pbrt');
 piWrite(thisR,oname,'overwrite',true);
 
+% The relationship between the pinholes/microlens and the sub-pixels.
+% We want the number of xresolution/yresolution values to be a sqrt()
+% 128*9  
+nMicroLens = 128;
 thisR = piRead(fname);
 newCamera = piCameraCreate('light field');
 nPinholes = 64;
 newCamera.aperture_diameter.value = 60;
-newCamera.num_pinholes_h.value = 64;
-newCamera.num_pinholes_w.value = 64;
+newCamera.num_pinholes_h.value = nMicroLens;
+newCamera.num_pinholes_w.value = nMicroLens;
 newCamera.microlens_enabled.value = 0;  % Not sure about on or off
 
 opticsType = 'lens';
@@ -47,10 +51,9 @@ thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
 % The number of sub-pixels times the number of pixels has to work out evenly
-filmSamples = 576;
-thisR.film.xresolution.value = filmSamples;
-thisR.film.yresolution.value = filmSamples;
-thisR.sampler.pixelsamples.value = 128;
+thisR.film.xresolution.value = nMicroLens*3;
+thisR.film.yresolution.value = nMicroLens*3;
+thisR.sampler.pixelsamples.value = 256;
 
 fprintf('Number of pixels for each pinhole %f\n',filmSamples/nPinholes);
 % Let's make this whole thing a function.  Maybe we can base it on focusLens()
@@ -134,7 +137,9 @@ vcAddObject(ip); ipWindow;
 nPinholes = [thisR.camera.num_pinholes_h.value,thisR.camera.num_pinholes_w.value];
 % nPinholes = [data.numPinholesH, data.numPinholesW];
 
-% Not sure when we write this or where it is.
+%% Pack the samples of the rgb image into the lightfield structure used by the light field toolbox
+nPinholes = [thisR.camera.num_pinholes_h.value,thisR.camera.num_pinholes_w.value];
+% nPinholes = [data.numPinholesH, data.numPinholesW];
 lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
 
 superPixels(1) = size(lightfield,1);
