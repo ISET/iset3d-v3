@@ -33,12 +33,23 @@ oname = fullfile(piRootPath,'local','lfTest.pbrt');
 piWrite(thisR,oname,'overwrite',true);
 
 thisR = piRead(fname);
-newCamera = piCameraCreate('light field');
+
+% nMicroLens_h = 128;   % This is row (and col) I think.
+% nMicroLens_w = 128;
+nMicroLens = [128 128];
+nSubPixels = 5;
+aperture = 60;
+pixelSamples = 128;
+newCamera = piCameraCreate('light field',...
+    'microlens',nMicroLens,...
+    'subpixels',nSubpixels,...
+    'aperture',aperture,...
+    'pixel samples',pixelSamples);
+
 opticsType = 'lens';
 
 % The relationship between the pinholes/microlens and the sub-pixels.
-nMicroLens_h = 256;   % This is row (and col) I think.
-nMicroLens_w = 256;
+
 nMicroLens = nMicroLens_h * nMicroLens_w;
 newCamera.aperture_diameter.value = 60;  % mm
 newCamera.num_pinholes_h.value = nMicroLens_h;
@@ -50,11 +61,11 @@ thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
 % The number of sub-pixels times the number of pixels has to work out evenly
-thisR.film.xresolution.value = nMicroLens_h*5;
-thisR.film.yresolution.value = nMicroLens_w*5;
+thisR.film.xresolution.value = nMicroLens_h*nSubPixels;
+thisR.film.yresolution.value = nMicroLens_w*nSubPixels;
 
 % Ray samples 
-thisR.sampler.pixelsamples.value = 512;
+thisR.sampler.pixelsamples.value = 128;
 
 filmSamples = thisR.film.xresolution.value * thisR.film.yresolution.value;
 
@@ -209,6 +220,7 @@ vcNewGraphWin; imagesc(img);
 % % by shifting the images first, and then summing.  The amount of the shift is in
 % % the 'Slope' parameter. Use different Slopes for the benchLF and metronomeLF
 % % pictures This is for metronome: Slope = -0.5:0.2:1.0;
+%{
 Shift = -0.5:0.5:3.0;  % BenchLF
 
 vcNewGraphWin([],'wide');
@@ -219,6 +231,7 @@ for ii = 1:length(Shift)
     axis image;
     title(sprintf('%0.2f',Shift(ii)))
 end
+%}
 
 %% The white image
 
