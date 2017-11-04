@@ -30,7 +30,7 @@ oname = fullfile(piRootPath,'local','deleteMe.pbrt');
 piWrite(thisR,oname,'overwrite',true);
 
 % Render
-ieObject = piRender(oname,'opticsType',opticsType);
+ieObject = piRender(oname);
 vcAddObject(ieObject);
 switch(opticsType)
     case 'pinhole'

@@ -9,7 +9,6 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 %              location of the auxiliary (include) data
 %
 % Optional input parameter/val
-%  opticsType - lens or pinhole (default)
 %  renderType - render radiance, depth or both (default)
 %
 % Return
@@ -38,7 +37,7 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 %{
    % Example 1 - run the docker container
    sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/rtbVilla-daylight.pbrt';
-   [scene, outFile] = piRender(sceneFile,'opticsType','pinhole');
+   [scene, outFile] = piRender(sceneFile);
    ieAddObject(scene); sceneWindow;
 
    % Example 2 - read the radiance file into an ieObject
@@ -54,12 +53,10 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 
 p = inputParser;
 p.addRequired('pbrtFile',@(x)(exist(x,'file')));
-p.addParameter('opticsType','pinhole',@ischar);
 rTypes = {'radiance','depth','both'};
 p.addParameter('renderType','both',@(x)(contains(x,rTypes))); 
 
 p.parse(pbrtFile,varargin{:});
-opticsType = p.Results.opticsType;
 renderType = p.Results.renderType;
 
 %% Set up the working folder.  We need the absolute path.
@@ -75,6 +72,7 @@ end
 depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
 recipe      = piRead(pbrtFile);
 depthRecipe = piRecipeConvertToDepth(recipe);
+
 % Always overwrite?
 depthFile   = piWrite(depthRecipe,depthFile,'overwrite',true);
 
@@ -144,10 +142,8 @@ for ii = 1:length(filesToRender)
         fprintf('Outfile file was set to %s.\n',outFile);
     end
     
-    %% Convert the radiance dat to an ieObject
-    %
-    % params.opticsType = 'pinhole;
-    % ieObject = rtbDAT2ISET(outFile,params)
+    %% Convert the radiance.dat to an ieObject
+
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
@@ -180,7 +176,7 @@ end
 
 %% Read the data and set some of the ieObject parameters
 
-ieObjName = [name, datestr(datetime('now'))];
+ieObjName = sprintf('%s-%s',name,datestr(now,'mmm-dd,HH:MM'));
 
 % Only return the depth map
 if(strcmp(renderType,'depth'))
@@ -189,8 +185,8 @@ if(strcmp(renderType,'depth'))
     return;
 end
 
-% Otherwise return a scene or optical image
-switch opticsType
+% If radiance, return a scene or optical image
+switch recipe.get('optics type')
     case 'lens'
         % If we used a lens, the ieObject is an optical image (irradiance).
         %
@@ -206,8 +202,9 @@ switch opticsType
         end
         % Not sure why TL commented this out.  Putting it back in.
         ieObject = oiSet(ieObject,'optics model','ray trace');
+    
     case 'pinhole'
-        % In this case, we the radiance really describe the scene, not an oi
+        % In this case, we the radiance describes the scene, not an oi
         ieObject = piSceneCreate(photons,'mean luminance',100);
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(depthMap))
