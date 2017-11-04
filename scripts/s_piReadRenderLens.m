@@ -17,14 +17,14 @@ if ~piDockerExists, piDockerConfig; end
 fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
+%% Edit the recipe, replacing camera with a lens-based camera
+
 % Read the file and return a recipe
 thisR = piRead(fname);
 
-%% Edit the recipe, replacing camera with a lens-based camera
-
 thisR.set('camera','realistic');
 
-thisR.set('aperture',20);
+thisR.set('aperture',2);
 thisR.set('film resolution',576);
 thisR.set('rays per pixel',256);
 opticsType = thisR.get('optics type');

@@ -34,8 +34,15 @@ thisROrig.camera.filmdistance.value = focalDistance;
 
 
 
-%%
+%%  Check the fields here with the fields produced in s_piReadRenderLens.m
 
 isequal(thisR.camera,thisROrig.camera)
+names = fieldnames(thisR.camera);
+for ii=1:length(names)
+    if ~isequal(thisR.camera.(names{ii}), thisROrig.camera.(names{ii}))
+        names{ii}
+    end
+end
+
 isequal(thisR.camera.filmdistance,thisROrig.camera.filmdistance)
 

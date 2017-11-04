@@ -42,7 +42,7 @@ switch param
         % To adjust the parameters use recipe.set() calls
         thisR.camera = piCameraCreate(val);
     case 'aperture'
-        thisR.camera.aperture_diameter.value = 60;
+        thisR.camera.aperture_diameter.value = val;
     case 'focaldistance'
         thisR.camera.filmdistance.value = val;
     case 'autofocus'

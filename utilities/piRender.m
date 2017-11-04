@@ -16,6 +16,12 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 %   ieObject - an ISET scene. oi, or a depth map image
 %   outFile  - full path to the output file (maybe)
 %
+% TL SCIEN Stanford, 2017
+
+% Programming todo
+%   Fix up the ray trace parameters and optics model in ISETBIO to work with
+%   this.  Not sure what we will do for ISET.
+
 % Examples:
 %
 %  Scene files are in pbrt-v2-spectral on wandell's home account.  We
@@ -194,12 +200,12 @@ switch opticsType
         % file and put them in here.
         ieObject = piOICreate(photons);
         ieObject = oiSet(ieObject,'name',ieObjName);
-        
         % I think this should work (BW)
         if(~isempty(depthMap))
             ieObject = oiSet(ieObject,'depth map',depthMap);
         end
-        % ieObject = oiSet(ieObject,'optics model','ray trace');
+        % Not sure why TL commented this out.  Putting it back in.
+        ieObject = oiSet(ieObject,'optics model','ray trace');
     case 'pinhole'
         % In this case, we the radiance really describe the scene, not an oi
         ieObject = piSceneCreate(photons,'mean luminance',100);
@@ -207,7 +213,6 @@ switch opticsType
         if(~isempty(depthMap))
             ieObject = sceneSet(ieObject,'depth map',depthMap);
         end
-        % ieAddObject(ieObject); sceneWindow;  
 end
 
 end
