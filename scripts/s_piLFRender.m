@@ -34,31 +34,38 @@ piWrite(thisR,oname,'overwrite',true);
 
 thisR = piRead(fname);
 newCamera = piCameraCreate('light field');
-nPinholes = 64;
-newCamera.aperture_diameter.value = 60;
-newCamera.num_pinholes_h.value = 64;
-newCamera.num_pinholes_w.value = 64;
-newCamera.microlens_enabled.value = 0;  % Not sure about on or off
-
 opticsType = 'lens';
+
+% The relationship between the pinholes/microlens and the sub-pixels.
+nMicroLens_h = 256;   % This is row (and col) I think.
+nMicroLens_w = 256;
+nMicroLens = nMicroLens_h * nMicroLens_w;
+newCamera.aperture_diameter.value = 60;  % mm
+newCamera.num_pinholes_h.value = nMicroLens_h;
+newCamera.num_pinholes_w.value = nMicroLens_w;
+newCamera.microlens_enabled.value = 0;  % Not sure about on or off
 
 % Update the camera
 thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
 % The number of sub-pixels times the number of pixels has to work out evenly
-filmSamples = 576;
-thisR.film.xresolution.value = filmSamples;
-thisR.film.yresolution.value = filmSamples;
-thisR.sampler.pixelsamples.value = 128;
+thisR.film.xresolution.value = nMicroLens_h*5;
+thisR.film.yresolution.value = nMicroLens_w*5;
 
-fprintf('Number of pixels for each pinhole %f\n',filmSamples/nPinholes);
+% Ray samples 
+thisR.sampler.pixelsamples.value = 512;
+
+filmSamples = thisR.film.xresolution.value * thisR.film.yresolution.value;
+
+fprintf('Number of pixels behind each microlens %f\n',filmSamples/nMicroLens);
+
 % Let's make this whole thing a function.  Maybe we can base it on focusLens()
 % instead of the LUT.
 
-% We need to move the camera far enough away so we can get a decent
-% focus. When the object is too close, we can't focus.
-
+% We need to move the camera far enough away so we can get a decent focus. When
+% the object is too close, we can't focus.  This should really be a function of
+% some sort, also.
 % recipe.get('object distance');
 % recipe.set('lookAt from',xxx);
 diff = thisR.lookAt.from - thisR.lookAt.to;
@@ -71,15 +78,12 @@ objDist = sqrt(sum(diff.^2));
 [p,flname,~] = fileparts(thisR.camera.specfile.value);
 focalLength = load(fullfile(p,[flname,'.FL.mat']));
 focalDistance = interp1(focalLength.dist,focalLength.focalDistance,objDist);
-% For an object at 125 mm, the 2ElLens has a focus at 89 mm.  We should be able
-% to look this up from stored data about each lens type.
+
+% We should be able to look this up from stored data about each lens type.
 % recipe.set('film distance',focalDistance);
 thisR.camera.filmdistance.value = focalDistance;
 
 thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
-
-% You can open and view the file this way
-% edit(oname);
 
 %% Render the light field oi
 
@@ -90,13 +94,14 @@ thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 % Show the ieObject after brightening it to a reasonable level.
 switch(opticsType)
     case 'pinhole'
-        oi = sceneAdjustLuminance(ieObject,100);
-        sceneSet(ieObject,'gamma',0.5);
-        vcAddObject(ieObject); sceneWindow;
+        scene = sceneAdjustLuminance(ieObject,100);
+        sceneSet(scene,'gamma',0.5);
+        vcAddObject(scene); sceneWindow;
     case 'lens'
-        ieObject = oiAdjustIlluminance(ieObject,10);
-        oiSet(ieObject,'gamma',0.5);
-        vcAddObject(ieObject); oiWindow;
+        oi = oiAdjustIlluminance(ieObject,10);
+        vcAddObject(oi); oiWindow;
+        oiSet(oi,'gamma',0.5);
+
 end
 
 %% Create a sensor 
@@ -126,85 +131,84 @@ ip = ipCreate;
 ip = ipCompute(ip,sensor);
 vcAddObject(ip); ipWindow;
 
-%% Convert the rgb data into a lightfield structure 
-
+%% Pack the samples of the rgb image into the lightfield structure used by the light field toolbox
 % This is the format used by Don Dansereau's light field toolbox
 
 % nPinholes = recipe.get('npinholes');
 nPinholes = [thisR.camera.num_pinholes_h.value,thisR.camera.num_pinholes_w.value];
-% nPinholes = [data.numPinholesH, data.numPinholesW];
-
-% Not sure when we write this or where it is.
 lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
 
 superPixels(1) = size(lightfield,1);
 superPixels(2) = size(lightfield,2);
 
+%% Display the image from the center pixel of each microlens
+img = squeeze(lightfield(3,3,:,:,:));
+vcNewGraphWin; imagesc(img);
+
 %% Display the light field
 
-LFDispVidCirc(lightfield)
+% LFDispVidCirc(lightfield)
 
 %% Display individual images
 %
-%    lightField(:,:, row, col, :) 
-%
-% gives us a view from corresponding pixels in each of the pinhole
-% (microlens array) data sets. The pixels at the edges don't really get any
-% rays or if they do they get very little late (are noisier).
-
-vcNewGraphWin;
-cnt = 1;
-rList = 1:2:superPixels(1);
-cList = 1:2:superPixels(2);
-for rr=rList
-    for cc=cList
-        img = squeeze(lightfield(rr,cc,:,:,:));
-        subplot(length(rList),length(cList),cnt), imagescRGB(img);
-        cnt = cnt + 1;
-    end
-end
-
-%% Compare the leftmost and rightmost images in the middle
-vcNewGraphWin([],'wide');
-
-img = squeeze(lightfield(3,2,:,:,:));
-subplot(1,2,1), imagescRGB(img);
-
-img = squeeze(lightfield(3,8,:,:,:));
-subplot(1,2,2), imagescRGB(img);
-
-%% Example images illustrating change in aperture size
-
-% If we sume all the r,g and b pixels within each superPixel, we get a
-% single RGB image corresponding to the mean.  
-
-% This is a large aperture
-vcNewGraphWin;
-img = squeeze(sum(sum(lightfield,2),1));
-imagescRGB(img);
-title('Image at microlens plane')
-
-% Now narrow the aperture, which increase the depth of field
-vcNewGraphWin;
-tmp = lightfield(4:6,4:6,:,:,:);
-img = squeeze(sum(sum(tmp,2),1));
-imagescRGB(img);
-title('Image at microlens plane')
-
-% Single pixel aperture
-vcNewGraphWin;
-tmp = lightfield(5,5,:,:,:);
-img = squeeze(sum(sum(tmp,2),1));
-imagescRGB(img);
-title('Image at microlens plane')
-
-%% Now what if we move the sensor forward?
-
-% This corresponds to selecting a slightly different plane for the image
-% sensor by shifting the images first, and then summing.  The amount of the
-% shift is in the 'Slope' parameter.
-% Use different Slopes for the benchLF and metronomeLF pictures
-% This is for metronome: Slope = -0.5:0.2:1.0;
+% %    lightField(:,:, row, col, :)
+% %
+% % gives us a view from corresponding pixels in each of the pinhole (microlens
+% % array) data sets. The pixels at the edges don't really get any rays or if they
+% % do they get very little late (are noisier).
+% 
+% vcNewGraphWin;
+% cnt = 1;
+% rList = 1:2:superPixels(1);
+% cList = 1:2:superPixels(2);
+% for rr=rList
+%     for cc=cList
+%         img = squeeze(lightfield(rr,cc,:,:,:));
+%         subplot(length(rList),length(cList),cnt), imagescRGB(img);
+%         cnt = cnt + 1;
+%     end
+% end
+% 
+% %% Compare the leftmost and rightmost images in the middle
+% vcNewGraphWin([],'wide');
+% 
+% img = squeeze(lightfield(3,2,:,:,:));
+% subplot(1,2,1), imagescRGB(img);
+% 
+% img = squeeze(lightfield(3,8,:,:,:));
+% subplot(1,2,2), imagescRGB(img);
+% 
+% %% Example images illustrating change in aperture size
+% 
+% % If we sume all the r,g and b pixels within each superPixel, we get a single
+% % RGB image corresponding to the mean.
+% 
+% % This is a large aperture
+% vcNewGraphWin;
+% img = squeeze(sum(sum(lightfield,2),1));
+% imagescRGB(img);
+% title('Image at microlens plane')
+% 
+% % Now narrow the aperture, which increase the depth of field
+% vcNewGraphWin;
+% tmp = lightfield(4:6,4:6,:,:,:);
+% img = squeeze(sum(sum(tmp,2),1));
+% imagescRGB(img);
+% title('Image at microlens plane')
+% 
+% % Single pixel aperture
+% vcNewGraphWin;
+% tmp = lightfield(5,5,:,:,:);
+% img = squeeze(sum(sum(tmp,2),1));
+% imagescRGB(img);
+% title('Image at microlens plane')
+% 
+% %% Now what if we move the sensor forward?
+% 
+% % This corresponds to selecting a slightly different plane for the image sensor
+% % by shifting the images first, and then summing.  The amount of the shift is in
+% % the 'Slope' parameter. Use different Slopes for the benchLF and metronomeLF
+% % pictures This is for metronome: Slope = -0.5:0.2:1.0;
 Shift = -0.5:0.5:3.0;  % BenchLF
 
 vcNewGraphWin([],'wide');

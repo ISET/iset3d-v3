@@ -1,7 +1,7 @@
-function [ieObject, outFile, result] = piRender(sceneFile,varargin)
+function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 % Read a PBRT V2 scene file, run the docker cmd locally, return the oi.
 %
-%    [oi or scene or depth map] = piRender(sceneFile,varargin)
+%    [oi or scene or depth map] = piRender(pbrtFile,varargin)
 %
 % Input
 %  sceneFile - required PBRT file.  The file should specify the
@@ -9,7 +9,7 @@ function [ieObject, outFile, result] = piRender(sceneFile,varargin)
 %
 % Optional input parameter/val
 %  opticsType - lens or pinhole (default)
-%  renderType - what type of image to render (both, depth, or radiance)
+%  renderType - render outputs (radiance, depth or both)
 %
 % Return
 %   ieObject - an ISET scene or oi struct, possibly just a depth map image
@@ -54,17 +54,18 @@ function [ieObject, outFile, result] = piRender(sceneFile,varargin)
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
 p = inputParser;
-p.addRequired('sceneFile',@(x)(exist(x,'file')));
+p.addRequired('pbrtFile',@(x)(exist(x,'file')));
 p.addParameter('opticsType','pinhole',@ischar);
-p.addParameter('renderType','both',@ischar);
+rTypes = {'radiance','depth','both'};
+p.addParameter('renderType','both',@(x)(contains(x,rTypes))); 
 
-p.parse(sceneFile,varargin{:});
+p.parse(pbrtFile,varargin{:});
 opticsType = p.Results.opticsType;
 renderType = p.Results.renderType;
 
 %% Set up the working folder.  We need the absolute path.
 
-[workingFolder, name, ~] = fileparts(sceneFile);
+[workingFolder, name, ~] = fileparts(pbrtFile);
 if(isempty(workingFolder))
     error('We need an absolute path for the working folder.');
 end
@@ -72,16 +73,16 @@ end
 %% Set up files to render, depending on 'renderType'
 
 % Write out a pbrt file with depth
-depthFile = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
-recipe = piRead(sceneFile);
+depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
+recipe      = piRead(pbrtFile);
 depthRecipe = piRecipeConvertToDepth(recipe);
-depthFile = piWrite(depthRecipe,depthFile);
+depthFile   = piWrite(depthRecipe,depthFile);
 
 filesToRender = {};
 label = {};
 switch renderType
     case {'both','all'}
-        filesToRender{1} = sceneFile;
+        filesToRender{1} = pbrtFile;
         label{1} = 'radiance';
         filesToRender{2} = depthFile;
         label{2} = 'depth';
@@ -89,7 +90,7 @@ switch renderType
         filesToRender = {depthFile};
         label{1} = 'depth';
     case {'radiance'}
-        filesToRender = {sceneFile};
+        filesToRender = {pbrtFile};
         label{1} = 'radiance';
     otherwise
         error('Cannot recognize render type.');
@@ -150,14 +151,14 @@ for ii = 1:length(filesToRender)
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching through pbrt file for output name... \n',outFile);
         
-        recipe = piRead(sceneFile);
+        recipe = piRead(pbrtFile);
         
         if(isfield(recipe.film,'filename'))
             name = recipe.film.filename.value;
             [~,name,~] = fileparts(name); % Strip the extension (often EXR)
             warning('Output file name was %s. \n',name);
             
-            [path,~,~] = fileparts(sceneFile);
+            [path,~,~] = fileparts(pbrtFile);
             outFile = fullfile(path,strcat(name,'.dat'));
             
         else
@@ -165,25 +166,25 @@ for ii = 1:length(filesToRender)
         end
         
     end
-    
-    outputData = piReadDAT(outFile, 'maxPlanes', 31);
-    
+        
     % Depending on what we rendered, we assign the output data to
     % photons or depth map.
     if(strcmp(label{ii},'radiance'))
-        photons = outputData;
+        photons = piReadDAT(outFile, 'maxPlanes', 31);
     elseif(strcmp(label{ii},'depth'))
-        depthMap = outputData(:,:,1); 
+        tmp = piReadDAT(outFile, 'maxPlanes', 31);
+        depthMap = tmp(:,:,1); clear tmp;
     end
     
 end
 
 %% Read the data and set some of the ieObject parameters
 
-photons = piReadDAT(outFile, 'maxPlanes', 31);
-outName = [outName,datestr(datetime('now'))];
-% Only return the depth map if that's all the user wanted.
+ieObjName = [name, datestr(datetime('now'))];
+
+% Only return the depth map
 if(strcmp(renderType,'depth'))
+    % Could create a dummy object (empty) and put the depth map in that.
     ieObject = depthMap; % not technically an ieObject...
     return;
 end
@@ -199,7 +200,7 @@ switch opticsType
         % will find those numbers in the future from inside the radiance.dat
         % file and put them in here.
         ieObject = piOICreate(photons);
-        ieObject = oiSet(ieObject,'name',outName);
+        ieObject = oiSet(ieObject,'name',ieObjName);
         
         % I think this should work (BW)
         if(~isempty(depthMap))
@@ -216,8 +217,4 @@ switch opticsType
         % ieAddObject(ieObject); sceneWindow;  
 end
 
-%% Ask the system for the current user id.
-% function uid = getUserId()
-% [~, uid] = system('id -u `whoami`');
-% uid = strtrim(uid);
-% rtbRunDocker(cmd)
+end
