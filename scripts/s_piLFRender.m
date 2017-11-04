@@ -32,36 +32,40 @@ disp(thisR)
 oname = fullfile(piRootPath,'local','lfTest.pbrt');
 piWrite(thisR,oname,'overwrite',true);
 
-% The relationship between the pinholes/microlens and the sub-pixels.
-% We want the number of xresolution/yresolution values to be a sqrt()
-% 128*9  
-nMicroLens = 128;
 thisR = piRead(fname);
 newCamera = piCameraCreate('light field');
-nPinholes = 64;
-newCamera.aperture_diameter.value = 60;
-newCamera.num_pinholes_h.value = nMicroLens;
-newCamera.num_pinholes_w.value = nMicroLens;
-newCamera.microlens_enabled.value = 0;  % Not sure about on or off
-
 opticsType = 'lens';
+
+% The relationship between the pinholes/microlens and the sub-pixels.
+nMicroLens_h = 256;   % This is row (and col) I think.
+nMicroLens_w = 256;
+nMicroLens = nMicroLens_h * nMicroLens_w;
+newCamera.aperture_diameter.value = 60;  % mm
+newCamera.num_pinholes_h.value = nMicroLens_h;
+newCamera.num_pinholes_w.value = nMicroLens_w;
+newCamera.microlens_enabled.value = 0;  % Not sure about on or off
 
 % Update the camera
 thisR.camera = newCamera;
 
 % This could probably be a function since we change it so often. 
 % The number of sub-pixels times the number of pixels has to work out evenly
-thisR.film.xresolution.value = nMicroLens*3;
-thisR.film.yresolution.value = nMicroLens*3;
+thisR.film.xresolution.value = nMicroLens_h*5;
+thisR.film.yresolution.value = nMicroLens_w*5;
+
+% Ray samples 
 thisR.sampler.pixelsamples.value = 256;
 
-fprintf('Number of pixels for each pinhole %f\n',filmSamples/nPinholes);
+filmSamples = thisR.film.xresolution.value * thisR.film.yresolution.value;
+
+fprintf('Number of pixels behind each microlens %f\n',filmSamples/nMicroLens);
+
 % Let's make this whole thing a function.  Maybe we can base it on focusLens()
 % instead of the LUT.
 
-% We need to move the camera far enough away so we can get a decent
-% focus. When the object is too close, we can't focus.
-
+% We need to move the camera far enough away so we can get a decent focus. When
+% the object is too close, we can't focus.  This should really be a function of
+% some sort, also.
 % recipe.get('object distance');
 % recipe.set('lookAt from',xxx);
 diff = thisR.lookAt.from - thisR.lookAt.to;
@@ -74,15 +78,12 @@ objDist = sqrt(sum(diff.^2));
 [p,flname,~] = fileparts(thisR.camera.specfile.value);
 focalLength = load(fullfile(p,[flname,'.FL.mat']));
 focalDistance = interp1(focalLength.dist,focalLength.focalDistance,objDist);
-% For an object at 125 mm, the 2ElLens has a focus at 89 mm.  We should be able
-% to look this up from stored data about each lens type.
+
+% We should be able to look this up from stored data about each lens type.
 % recipe.set('film distance',focalDistance);
 thisR.camera.filmdistance.value = focalDistance;
 
 thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
-
-% You can open and view the file this way
-% edit(oname);
 
 %% Render the light field oi
 
@@ -93,13 +94,14 @@ thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
 % Show the ieObject after brightening it to a reasonable level.
 switch(opticsType)
     case 'pinhole'
-        oi = sceneAdjustLuminance(ieObject,100);
-        sceneSet(ieObject,'gamma',0.5);
-        vcAddObject(ieObject); sceneWindow;
+        scene = sceneAdjustLuminance(ieObject,100);
+        sceneSet(scene,'gamma',0.5);
+        vcAddObject(scene); sceneWindow;
     case 'lens'
-        ieObject = oiAdjustIlluminance(ieObject,10);
-        oiSet(ieObject,'gamma',0.5);
-        vcAddObject(ieObject); oiWindow;
+        oi = oiAdjustIlluminance(ieObject,10);
+        vcAddObject(oi); oiWindow;
+        oiSet(oi,'gamma',0.5);
+
 end
 
 %% Create a sensor 
@@ -129,21 +131,19 @@ ip = ipCreate;
 ip = ipCompute(ip,sensor);
 vcAddObject(ip); ipWindow;
 
-%% Convert the rgb data into a lightfield structure 
-
+%% Pack the samples of the rgb image into the lightfield structure used by the light field toolbox
 % This is the format used by Don Dansereau's light field toolbox
 
 % nPinholes = recipe.get('npinholes');
 nPinholes = [thisR.camera.num_pinholes_h.value,thisR.camera.num_pinholes_w.value];
-% nPinholes = [data.numPinholesH, data.numPinholesW];
-
-%% Pack the samples of the rgb image into the lightfield structure used by the light field toolbox
-nPinholes = [thisR.camera.num_pinholes_h.value,thisR.camera.num_pinholes_w.value];
-% nPinholes = [data.numPinholesH, data.numPinholesW];
 lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
 
 superPixels(1) = size(lightfield,1);
 superPixels(2) = size(lightfield,2);
+
+%% Display the image from the center pixel of each microlens
+img = squeeze(lightfield(2,2,:,:,:));
+vcNewGraphWin; imagesc(img);
 
 %% Display the light field
 
