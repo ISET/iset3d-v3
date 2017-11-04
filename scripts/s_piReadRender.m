@@ -22,12 +22,11 @@ ieInit;
 
 % Pinhole camera case has infinite depth of field, so no focal length is needed.
 fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
-exist(fname,'file')
+if ~exist(fname,'file'), error('File not found'); end
 
 % Read the file and return it in a recipe format
 thisR = piRead(fname);
-disp(thisR)
-opticsType = 'pinhole';
+opticsType = thisR.recipeGet('optics type');
 
 % Which is X?  Starting from centere -7    10     3, we are looking
 % towards the origin (0,0,0).

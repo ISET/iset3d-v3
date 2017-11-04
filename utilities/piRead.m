@@ -137,7 +137,7 @@ end
 
 rendererBlock = piBlockExtract(txtLines,'blockName','Renderer');
 if(isempty(rendererBlock))
-    warning('Cannot find "renderer" in PBRT file. Using default.');
+    % warning('Cannot find "renderer" in PBRT file. Using default.');
     thisR.renderer = struct('type','Renderer','subtype','sampler');
 else
     thisR.renderer = piBlock2Struct(rendererBlock);

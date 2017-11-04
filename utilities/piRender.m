@@ -1,7 +1,8 @@
 function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
-% Read a PBRT V2 scene file, run the docker cmd locally, return the oi.
+% Read a PBRT V2 scene file, run the docker cmd locally, return the ieObject.
 %
-%    [oi or scene or depth map] = piRender(pbrtFile,varargin)
+% Syntax:
+%  [oi or scene or depth map] = piRender(pbrtFile,varargin)
 %
 % Input
 %  sceneFile - required PBRT file.  The file should specify the
@@ -12,7 +13,7 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 %  renderType - render outputs (radiance, depth or both)
 %
 % Return
-%   ieObject - an ISET scene or oi struct, possibly just a depth map image
+%   ieObject - an ISET scene. oi, or a depth map image
 %   outFile  - full path to the output file (maybe)
 %
 % Examples:
@@ -42,14 +43,6 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
    ieAddObject(oi); oiWindow;
 %}
 % TL/BW/AJ Scienstanford 2017
-
-%% PROGRAMMING TODO
-%
-%  We should write a routine to append the required text for a Realistic Camera
-%  and then run with a lens file
-%
-%  Should have an option to create the depth map
-%
 
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
@@ -192,8 +185,7 @@ end
 % Otherwise return a scene or optical image
 switch opticsType
     case 'lens'
-        % If we used a lens, then the ieObject should be the optical image
-        % (irradiance data).
+        % If we used a lens, the ieObject is an optical image (irradiance).
         %
         % We should set fov or filmDiag here.  We should also set other ray
         % trace optics parameters here. We are using defaults for now, but we
@@ -210,7 +202,7 @@ switch opticsType
     case 'pinhole'
         % In this case, we the radiance really describe the scene, not an oi
         ieObject = piSceneCreate(photons,'mean luminance',100);
-        ieObject = sceneSet(ieObject,'name',outname);
+        ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(depthMap))
             ieObject = sceneSet(ieObject,'depth map',depthMap);
         end

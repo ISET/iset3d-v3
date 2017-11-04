@@ -22,14 +22,14 @@ classdef recipe < matlab.mixin.Copyable
         % for piWrite to convert the structs to text output in the
         % scene.pbrt file.
         
-        camera;      % A struct
-        sampler;   
-        film;
-        filter;
-        integrator;
+        camera;      % Struct of camera parameters, such as lens file
+        sampler;     % Sampling algorithm.  Only a few are allowed
+        film;        % Equivalent to ISET sensor
+        filter;      % Usually pixel filter
+        integrator;  % Usually SurfaceIntegrator
         renderer;    %
         lookAt;      % from/to/up struct
-        world;       % A big cell array with all the WorldBegin/End stuff
+        world;       % A cell array with all the WorldBegin/End contents
         inputFile;   % Original input file
         outputFile;  % Where outputFile = piWrite(recipe);
         
@@ -43,6 +43,12 @@ classdef recipe < matlab.mixin.Copyable
         function obj = recipe(varargin)
             % Who knows what we will in the future.
         end
+        function val = get(obj,varargin)
+            % Returns derived parameters of the recipe that require some
+            % computation
+            val = recipeGet(obj,varargin{:});
+        end
+        
     end
     
 end
