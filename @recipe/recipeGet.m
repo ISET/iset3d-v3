@@ -25,16 +25,16 @@ function val = recipeGet(thisR,param,varargin)
 % Programming todo
 %
 
+%%
+if isequal(param,'help')
+    doc('recipe.recipeGet');
+    return;
+end
+
 p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar); 
-
-if isequal(param,'help')
-    % Maybe something else here?
-    doc('recipe.recipeGet');
-    return;
-end
 
 p.parse(thisR,param,varargin{:});
 
@@ -44,15 +44,25 @@ switch param
 
     case 'opticstype'
         % perspective means pinhole.  Maybe we should rename.
-        % lens means lens.
+        % realisticDiffraction means lens.  Not sure of all the possibilities
+        % yet.
         val = thisR.camera.subtype;
-        if isequal(val,'perspective'), val = 'pinhole'; end
+        if isequal(val,'perspective'), val = 'pinhole';
+        elseif ismember(val,{'realisticDiffraction'})
+            val = 'lens';
+        end
     case 'objectdistance'
         diff = thisR.lookAt.from - thisR.lookAt.to;
         val = sqrt(sum(diff.^2));
-        
+    case 'objectdirection'
+        % A unit vector in the lookAt direction
+        val = thisR.lookAt.from - thisR.lookAt.to;
+        val = val/norm(val);
+    case 'fromto'
+        val = thisR.lookAt.from - thisR.lookAt.to;
+
     case 'focaldistance'
-        opticsType = thisR.get('camera type');
+        opticsType = thisR.get('optics type');
         switch opticsType
             case {'pinhole','perspective'}
                 disp('Pinhole optics.  No focal distance');

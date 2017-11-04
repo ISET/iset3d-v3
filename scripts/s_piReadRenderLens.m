@@ -1,6 +1,13 @@
 %% s_piReadRenderLens
+%
+%
+% See Temporary.m for a thisROrig that runs correctly.  Delete that when this
+% runs correctly.
+%
+% BW SCIEN Team, 2017
 
-%%
+%% Initialize ISET and docker
+
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
@@ -13,50 +20,46 @@ if ~exist(fname,'file'), error('File not found'); end
 % Read the file and return a recipe
 thisR = piRead(fname);
 
-%% Replace the pinhole camera with a lens-based camera
+%% Edit the recipe, replacing camera with a lens-based camera
 
-newCamera = piCameraCreate('realistic');
-thisR.camera.aperture_diameter.value = 60;
-opticsType = 'lens';
+thisR.set('camera','realistic');
 
-% Update the camera
-thisR.camera = newCamera;
+thisR.set('aperture',20);
+thisR.set('film resolution',576);
+thisR.set('rays per pixel',256);
+opticsType = thisR.get('optics type');
 
-% This could probably be a function since we change it so often. 
-thisR.film.xresolution.value = 576*2;
-thisR.film.yresolution.value = 576*2;
-thisR.sampler.pixelsamples.value = 256;
-
-% We need to move the camera to a distance that is far enough away so we can
-% get a decent focus. When the object is too close, we can't focus.
-diff = thisR.lookAt.from - thisR.lookAt.to;
-diff = 10*diff;
-thisR.lookAt.from = thisR.lookAt.to + diff;
+% We need to move the camera far enough away so we get a decent focus.
+objDist = thisR.get('object distance');
+thisR.set('object distance',10*objDist);
+thisR.set('autofocus',true);
 
 % Good function needed to find the object distance
-objDist = sqrt(sum(diff.^2));
-[p,flname,~] = fileparts(thisR.camera.specfile.value);
-focalLength = load(fullfile(p,[flname,'.FL.mat']));
-focalDistance = interp1(focalLength.dist,focalLength.focalDistance,objDist);
+% focalDistance = thisR.get('focal distance');
+% thisR.set('focal distance',focalDistance);
+
 % For an object at 125 mm, the 2ElLens has a focus at 89 mm.  We should be able
 % to look this up from stored data about each lens type.
-thisR.camera.filmdistance.value = focalDistance;
+%  thisR.camera.filmdistance.value = focalDistance;
 
 % You can open and view the file this way
 % edit(oname);
 
-%%
+%% Write out the modified pbrt file
 
-thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
-% We can also copy a directory over to the same folder as oname like this:
-% thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
-[ieObject, outFile, result] = piRender(oname,'opticsType',opticsType);
-vcAddObject(ieObject);
-switch(opticsType)
-    case 'pinhole'
-        sceneWindow;
-        sceneSet(ieObject,'gamma',0.5);     
-    case 'lens'
-        oiWindow;
-        oiSet(ieObject,'gamma',0.5);
-end
+% This takes longer than the pinhole because, well, aperture
+
+oname = fullfile(piRootPath,'local','lensTest.pbrt');
+
+piWrite(thisR, oname,'overwrite',true);
+
+% piWrite(thisROrig, oname,'overwrite',true);
+
+%% Render and bring up the oi window
+
+[oi, thisR.outputFile, result] = piRender(oname,'opticsType',opticsType);
+vcAddObject(oi);
+oiWindow;
+oiSet(ieObject,'gamma',0.5);
+
+%%

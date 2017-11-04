@@ -1,5 +1,8 @@
 function camera = piCameraSet(camera,param,val)
-% Camera set value
+% Deprecated - using recipeSet() instead.
+% 
+% I left this here because we might call this from recipeSet() for the camera
+% types.  We will see.
 %
 %   camera = piCameraSet(camera,param,val)
 %
@@ -8,7 +11,8 @@ function camera = piCameraSet(camera,param,val)
 % Programming TODO
 %  Should this be a class?
 
-%% Set up
+%% Parameter set up
+
 p = inputParser;
 p.addRequired('camera',@isstruct);
 p.addRequired('param',@ischar);

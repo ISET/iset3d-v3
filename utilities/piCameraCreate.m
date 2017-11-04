@@ -115,11 +115,5 @@ switch cameraType
         error('Cannot recognize camera type.');
 end
 
-%% If the user sent in parameters, adjust them here
-if mod(varargin,2), error('Parameter/Val pairs not right'); end
-for ii=1:2:length(varargin)
-    camera = piCameraSet(camera,varargin{ii},varargin{ii+1});
-end
-
 end
 

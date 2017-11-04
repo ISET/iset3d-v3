@@ -4,7 +4,7 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 % Syntax:
 %  [oi or scene or depth map] = piRender(pbrtFile,varargin)
 %
-% Input
+% Inputf
 %  sceneFile - required PBRT file.  The file should specify the
 %              location of the auxiliary (include) data
 %
@@ -69,7 +69,8 @@ end
 depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
 recipe      = piRead(pbrtFile);
 depthRecipe = piRecipeConvertToDepth(recipe);
-depthFile   = piWrite(depthRecipe,depthFile);
+% Always overwrite?
+depthFile   = piWrite(depthRecipe,depthFile,'overwrite',true);
 
 filesToRender = {};
 label = {};

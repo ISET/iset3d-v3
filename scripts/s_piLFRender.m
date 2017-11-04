@@ -17,36 +17,34 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-% In some cases, you may need to run piDockerConfig
-
 %% In this case, everything is inside the one file.
 
 % Pinhole camera case has infinite depth of field, so no focal length is needed.
 fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
-exist(fname,'file')
+if ~exist(fname,'file'), error('File not found %s\n',fname); end
 
 % Read the file and return it in a recipe format
 thisR = piRead(fname);
 disp(thisR)
 
 oname = fullfile(piRootPath,'local','lfTest.pbrt');
-piWrite(thisR,oname,'overwrite',true);
 
-thisR = piRead(fname);
+thisR.set('camera','light field');
+nMicroLens   = [128 128];  % Height/width
+nSubPixels   = 5;          % height/width 
+aperture     = 60;         % mm
+pixelSamples = 128;        % Count
 
-% nMicroLens_h = 128;   % This is row (and col) I think.
-% nMicroLens_w = 128;
-nMicroLens = [128 128];
-nSubPixels = 5;
-aperture = 60;
-pixelSamples = 128;
-newCamera = piCameraCreate('light field',...
-    'microlens',nMicroLens,...
-    'subpixels',nSubpixels,...
+params = struct(...
+    'nmicrolens',nMicroLens,...
+    'nsubpixels',nSubPixels,...
     'aperture',aperture,...
-    'pixel samples',pixelSamples);
+    'raysperpixel',pixelSamples);
 
-opticsType = 'lens';
+% Make this run
+thisR.set(params);
+
+opticsType = thisR.get('optics type');
 
 % The relationship between the pinholes/microlens and the sub-pixels.
 
@@ -112,7 +110,6 @@ switch(opticsType)
         oi = oiAdjustIlluminance(ieObject,10);
         vcAddObject(oi); oiWindow;
         oiSet(oi,'gamma',0.5);
-
 end
 
 %% Create a sensor 

@@ -26,12 +26,6 @@ if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname);
 opticsType = thisR.recipeGet('optics type');
 
-% Which is X?  Starting from centere -7    10     3, we are looking
-% towards the origin (0,0,0).
-% 
-% First dimension moved us to the left and positive was to the right
-% Second dimension moved towards and away (positive)
-% Write out a file based on the recipe
 oname = fullfile(piRootPath,'local','deleteMe.pbrt');
 piWrite(thisR,oname,'overwrite',true);
 
