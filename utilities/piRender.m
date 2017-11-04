@@ -10,7 +10,7 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 %
 % Optional input parameter/val
 %  opticsType - lens or pinhole (default)
-%  renderType - render outputs (radiance, depth or both)
+%  renderType - render radiance, depth or both (default)
 %
 % Return
 %   ieObject - an ISET scene. oi, or a depth map image
@@ -142,7 +142,7 @@ for ii = 1:length(filesToRender)
     % params.opticsType = 'pinhole;
     % ieObject = rtbDAT2ISET(outFile,params)
     if ~exist(outFile,'file')
-        warning('Cannot find output file %s. Searching through pbrt file for output name... \n',outFile);
+        warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
         recipe = piRead(pbrtFile);
         
