@@ -11,7 +11,7 @@ function oi = piOICreate(photons,varargin)
 %    fNumber     - dimensionless
 %    filmDiag    - meters
 %    fov         - horizontal field of view (deg)
-%
+%    mean illuminance
 % Return
 %  An ISET oi structure
 %
@@ -23,6 +23,7 @@ function oi = piOICreate(photons,varargin)
 
 %%
 p = inputParser;
+p.KeepUnmatched = true;
 p.addRequired('photons',@isnumeric);
 p.addParameter('focalLength',0.004,@isscalar);   % Meters
 p.addParameter('fNumber',4,@isscalar);           % Dimensionless
@@ -72,6 +73,14 @@ else
 end
 oi = oiSet(oi,'fov',fov);
 
-%ieAddObject(oi); oiWindow;
+% Set additional parameters the user may have sent in
+% For example, 'mean illuminance'
+if ~isempty(varargin) 
+    for ii=1:2:length(varargin) 
+        param = ieParamFormat(varargin{ii});
+        val = varargin{ii+1};
+        oi = oiSet(oi,param,val);
+    end
+end
 
 end
