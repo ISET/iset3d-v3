@@ -78,6 +78,8 @@ for ofns = outerFields'
         continue;
     end
     
+    % fprintf('outer field %s\n',ofn);
+    
     % Write header for block
     fprintf(fileID,'# %s \n',ofn);
     

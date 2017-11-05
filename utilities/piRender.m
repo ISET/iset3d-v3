@@ -203,7 +203,8 @@ switch recipe.get('optics type')
         if(~isempty(depthMap))
             ieObject = oiSet(ieObject,'depth map',depthMap);
         end
-        % Not sure why TL commented this out.  Putting it back in.
+        % This always worked in ISET, but not in ISETBIO.  So I stuck in a hack
+        % to ISETBIO to make it work there temporarily and created an issue
         ieObject = oiSet(ieObject,'optics model','ray trace');
     
     case 'pinhole'

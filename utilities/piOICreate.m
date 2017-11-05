@@ -12,6 +12,7 @@ function oi = piOICreate(photons,varargin)
 %    filmDiag    - meters
 %    fov         - horizontal field of view (deg)
 %    mean illuminance
+%
 % Return
 %  An ISET oi structure
 %
