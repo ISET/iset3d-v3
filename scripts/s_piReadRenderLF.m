@@ -13,22 +13,22 @@
 %
 % TL/BW SCIEN
 
-%%
+%% Initialize ISET and Docker
+
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% In this case, everything is inside the one file.
+%% Specify the pbrt scene file and its dependencies
 
-% Pinhole camera case has infinite depth of field, so no focal length is needed.
-fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
-if ~exist(fname,'file'), error('File not found %s\n',fname); end
+% We organize the pbrt files with its includes (textures, brdfs, spds, geometry)
+% in a single directory. 
+fname = fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
+if ~exist(fname,'file'), error('File not found'); end
 
-oname = fullfile(piRootPath,'local','lfTest.pbrt');
-
-%% Set parameters
-
-% Read the file and return it in a recipe format
+% Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
+
+%% Modify the recipe, thisR, to adjust the rendering
 
 thisR.set('camera','light field');
 thisR.set('n microlens',[128 128]);
@@ -43,15 +43,26 @@ objDist = thisR.get('object distance');
 thisR.set('object distance',10*objDist);
 thisR.set('autofocus',true);
 
-piWrite(thisR, oname,'overwrite',true);
+%% Set up Docker 
 
-%% Render the light field oi
+% Docker will mount the volume specified by the working directory
+workingDirectory = fullfile(piRootPath,'local');
 
-% We can also copy a directory over to the same folder as oname like this:
-% thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
-[oi, outFile, result] = piRender(oname,'meanilluminance',10);
-vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);
+% We copy the pbrt scene directory to the working directory
+[p,n,e] = fileparts(fname); 
+copyfile(p,workingDirectory);
 
+% Now write out the edited pbrt scene file, based on thisR, to the working
+% directory.
+oname = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, oname, 'overwrite', true);
+
+%% Render with the Docker container
+
+oi = piRender(oname,'meanilluminance',10);
+
+% Show it in ISET
+vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
 
 %% Create a sensor 
 
@@ -92,7 +103,7 @@ superPixels(2) = size(lightfield,2);
 
 %% Display the image from the center pixel of each microlens
 img = squeeze(lightfield(3,3,:,:,:));
-vcNewGraphWin; imagesc(img);
+vcNewGraphWin; imagesc(img); truesize; axis off
 
 %% Display the light field
 
