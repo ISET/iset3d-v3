@@ -1,6 +1,6 @@
 %% Light field tool examples
 %
-% These are from the Dansereau toolbox
+% These are from the Dansereau toolbox.  They are in CISET/utility.
 % 
 % Convert the OI to an IP and then
 
@@ -22,9 +22,7 @@ vcNewGraphWin; imagesc(img); truesize; axis off
 LFDispVidCirc(lightfield)
 
 %% Display individual images
-%
 
-% 
 % This is a large aperture
 vcNewGraphWin;
 img = squeeze(sum(sum(lightfield,2),1));

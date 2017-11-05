@@ -1,26 +1,21 @@
-%% s_piReadRenderLens
+% s_piReadRender
 %
-% Rendering takes longer through a lens as the size of the aperture grows.
-% The pinhole case is always the fastest, of course.
+% Read a PBRT scene file, adjust the LookAt
 %
-% See Temporary.m for a thisROrig that runs correctly.  Delete that when this
-% runs correctly.
-%
-% See also
-%  s_piReadRender, s_piReadRenderLF
-%  
-%
-% BW SCIEN Team, 2017
+% Path requirements
+%    ISET or ISETBIO
+%    pbrt2ISET  - 
+%   
+% AJ/TL/BW SCIEN
 
-%% Initialize ISET and Docker
-
+%% Set up ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Specify the pbrt scene file and its dependencies
 
 % We organize the pbrt files with its includes (textures, brdfs, spds, geometry)
-% in a single directory. 
+% in a single directory.
 fname = fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
@@ -29,15 +24,6 @@ thisR = piRead(fname);
 
 %% Modify the recipe, thisR, to adjust the rendering
 
-thisR.set('camera','realistic');
-thisR.set('aperture',4);  % The number of rays should go up with the aperture 
-thisR.set('film resolution',512);
-thisR.set('rays per pixel',384);
-
-% We need to move the camera far enough away so we get a decent focus.
-objDist = thisR.get('object distance');
-thisR.set('object distance',10*objDist);
-thisR.set('autofocus',true);
 
 %% Set up Docker 
 
@@ -55,9 +41,9 @@ piWrite(thisR, oname, 'overwrite', true);
 
 %% Render with the Docker container
 
-oi = piRender(oname,'meanilluminance',10);
+ieObject = piRender(oname);
 
 % Show it in ISET
-vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
+vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
 
 %%
