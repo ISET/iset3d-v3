@@ -96,6 +96,8 @@ vcNewGraphWin; imagesc(img);
 
 %% Display the light field
 
+% Need to add the lightfield toolbox for this to work
+%
 % LFDispVidCirc(lightfield)
 
 %% Display individual images
