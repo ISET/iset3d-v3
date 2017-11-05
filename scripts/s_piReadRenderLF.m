@@ -23,94 +23,35 @@ if ~piDockerExists, piDockerConfig; end
 fname = fullfile(piRootPath,'data','teapot-area-light.pbrt');
 if ~exist(fname,'file'), error('File not found %s\n',fname); end
 
-% Read the file and return it in a recipe format
-thisR = piRead(fname);
-disp(thisR)
-
 oname = fullfile(piRootPath,'local','lfTest.pbrt');
 
+%% Set parameters
+
+% Read the file and return it in a recipe format
+thisR = piRead(fname);
+
 thisR.set('camera','light field');
-nMicroLens   = [128 128];  % Height/width
-nSubPixels   = 5;          % height/width 
-aperture     = 60;         % mm
-pixelSamples = 128;        % Count
+thisR.set('n microlens',[128 128]);
+thisR.set('n subpixels',[5, 5]);
+thisR.set('microlens',0);   % Not sure about on or off
+thisR.set('aperture',50);
+thisR.set('rays per pixel',128);
+thisR.set('light field film resolution',[]);
 
-params = struct(...
-    'nmicrolens',nMicroLens,...
-    'nsubpixels',nSubPixels,...
-    'aperture',aperture,...
-    'raysperpixel',pixelSamples);
+% We need to move the camera far enough away so we get a decent focus.
+objDist = thisR.get('object distance');
+thisR.set('object distance',10*objDist);
+thisR.set('autofocus',true);
 
-% Make this run
-thisR.set(params);
-
-opticsType = thisR.get('optics type');
-
-% The relationship between the pinholes/microlens and the sub-pixels.
-
-nMicroLens = nMicroLens_h * nMicroLens_w;
-newCamera.aperture_diameter.value = 60;  % mm
-newCamera.num_pinholes_h.value = nMicroLens_h;
-newCamera.num_pinholes_w.value = nMicroLens_w;
-newCamera.microlens_enabled.value = 0;  % Not sure about on or off
-
-% Update the camera
-thisR.camera = newCamera;
-
-% This could probably be a function since we change it so often. 
-% The number of sub-pixels times the number of pixels has to work out evenly
-thisR.film.xresolution.value = nMicroLens_h*nSubPixels;
-thisR.film.yresolution.value = nMicroLens_w*nSubPixels;
-
-% Ray samples 
-thisR.sampler.pixelsamples.value = 128;
-
-filmSamples = thisR.film.xresolution.value * thisR.film.yresolution.value;
-
-fprintf('Number of pixels behind each microlens %f\n',filmSamples/nMicroLens);
-
-% Let's make this whole thing a function.  Maybe we can base it on focusLens()
-% instead of the LUT.
-
-% We need to move the camera far enough away so we can get a decent focus. When
-% the object is too close, we can't focus.  This should really be a function of
-% some sort, also.
-% recipe.get('object distance');
-% recipe.set('lookAt from',xxx);
-diff = thisR.lookAt.from - thisR.lookAt.to;
-diff = 10*diff;
-thisR.lookAt.from = thisR.lookAt.to + diff;
-
-% Good function needed to find the object distance
-% focalDistance = recipe.get('focal distance');
-objDist = sqrt(sum(diff.^2));
-[p,flname,~] = fileparts(thisR.camera.specfile.value);
-focalLength = load(fullfile(p,[flname,'.FL.mat']));
-focalDistance = interp1(focalLength.dist,focalLength.focalDistance,objDist);
-
-% We should be able to look this up from stored data about each lens type.
-% recipe.set('film distance',focalDistance);
-thisR.camera.filmdistance.value = focalDistance;
-
-thisR.outputFile = piWrite(thisR,oname,'overwrite',true);
+piWrite(thisR, oname,'overwrite',true);
 
 %% Render the light field oi
 
 % We can also copy a directory over to the same folder as oname like this:
 % thisR.outputFile = piWrite(thisR,oname,'copyDir',xxx,'overwrite',true);
-[ieObject, outFile, result] = piRender(oname,'opticsType',opticsType);
+[oi, outFile, result] = piRender(oname,'meanilluminance',10);
+vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);
 
-% Show the ieObject after brightening it to a reasonable level.
-switch(opticsType)
-    case 'pinhole'
-        scene = sceneAdjustLuminance(ieObject,100);
-        sceneSet(scene,'gamma',0.5);
-        vcAddObject(scene); sceneWindow;
-    case 'lens'
-        oi = oiAdjustIlluminance(ieObject,10);
-        vcAddObject(oi); oiWindow;
-        oiSet(oi,'gamma',0.5);
-end
 
 %% Create a sensor 
 

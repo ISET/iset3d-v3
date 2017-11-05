@@ -42,15 +42,7 @@ param = ieParamFormat(param);
 
 switch param
 
-    case 'opticstype'
-        % perspective means pinhole.  Maybe we should rename.
-        % realisticDiffraction means lens.  Not sure of all the possibilities
-        % yet.
-        val = thisR.camera.subtype;
-        if isequal(val,'perspective'), val = 'pinhole';
-        elseif ismember(val,{'realisticDiffraction'})
-            val = 'lens';
-        end
+        % Scene
     case 'objectdistance'
         diff = thisR.lookAt.from - thisR.lookAt.to;
         val = sqrt(sum(diff.^2));
@@ -61,6 +53,16 @@ switch param
     case 'fromto'
         val = thisR.lookAt.from - thisR.lookAt.to;
 
+        % Camera
+    case 'opticstype'
+        % perspective means pinhole.  Maybe we should rename.
+        % realisticDiffraction means lens.  Not sure of all the possibilities
+        % yet.
+        val = thisR.camera.subtype;
+        if isequal(val,'perspective'), val = 'pinhole';
+        elseif ismember(val,{'realisticDiffraction'})
+            val = 'lens';
+        end
     case 'focaldistance'
         opticsType = thisR.get('optics type');
         switch opticsType
@@ -76,6 +78,15 @@ switch param
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
+    case 'nmicrolens'
+        % How many microlens (pinholes)
+        val(2) = thisR.camera.num_pinholes_w.value;
+        val(1) = thisR.camera.num_pinholes_h.value;
+
+    case 'nsubpixels'
+        % How many film pixels behind each microlens/pinhole
+        val(2) = thisR.camera.subpixels_w;
+        val(1) = thisR.camera.subpixels_h;
         
     otherwise
         error('Unknown parameter %s\n',param);

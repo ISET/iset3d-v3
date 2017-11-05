@@ -52,6 +52,8 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
 p = inputParser;
+p.KeepUnmatched = true;
+
 p.addRequired('pbrtFile',@(x)(exist(x,'file')));
 rTypes = {'radiance','depth','both'};
 p.addParameter('renderType','both',@(x)(contains(x,rTypes))); 
@@ -194,7 +196,8 @@ switch recipe.get('optics type')
         % trace optics parameters here. We are using defaults for now, but we
         % will find those numbers in the future from inside the radiance.dat
         % file and put them in here.
-        ieObject = piOICreate(photons);
+        
+        ieObject = piOICreate(photons,varargin{:});  % Settable parameters passed
         ieObject = oiSet(ieObject,'name',ieObjName);
         % I think this should work (BW)
         if(~isempty(depthMap))
@@ -205,7 +208,7 @@ switch recipe.get('optics type')
     
     case 'pinhole'
         % In this case, we the radiance describes the scene, not an oi
-        ieObject = piSceneCreate(photons,'mean luminance',100);
+        ieObject = piSceneCreate(photons,'meanLuminance',100);
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(depthMap))
             ieObject = sceneSet(ieObject,'depth map',depthMap);

@@ -90,13 +90,17 @@ for ofns = outerFields'
     if(~isempty(innerFields))
         for ifns = innerFields'
             ifn = ifns{1};
-            % Skip these since we've written these out earlier already
-            if(strcmp(ifn,'type') || strcmp(ifn,'subtype'))
+            % Skip these since we've written these out earlier or they are
+            % localized to pbrt2ISET but not pbrt scene files
+            if(strcmp(ifn,'type') || ...
+                    strcmp(ifn,'subtype') || ...
+                    strcmp(ifn,'subpixels_h') || ...
+                    strcmp(ifn,'subpixels_w'))
                 continue;
             end
             
             currValue = renderRecipe.(ofn).(ifn).value;
-            currType = renderRecipe.(ofn).(ifn).type;
+            currType  = renderRecipe.(ofn).(ifn).type;
             
             if(strcmp(currType,'string') || ischar(currValue))
                 % Either a string type, or a spectrum type with a value
