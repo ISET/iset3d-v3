@@ -29,7 +29,7 @@ function camera = piCameraCreate(cameraType,varargin)
 if notDefined('cameraType'), cameraType = 'pinhole'; end
 cameraType = ieParamFormat(cameraType);
 
-%% Return default camera given the type
+%% Initialize the default camera type
 switch cameraType
     case {'pinhole'}
         camera.type      = 'Camera';

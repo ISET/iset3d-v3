@@ -41,12 +41,19 @@ classdef recipe < matlab.mixin.Copyable
     methods
         % Constructor
         function obj = recipe(varargin)
-            % Who knows what we will in the future.
+            % Who knows what we will do in the future.
         end
+        
         function val = get(obj,varargin)
             % Returns derived parameters of the recipe that require some
             % computation
             val = recipeGet(obj,varargin{:});
+        end
+        
+        function val = set(obj,varargin)
+            % Sets parameters of the recipe.  Shortens the set call, mainly, and
+            % does some parameter value checking.
+            val = recipeSet(obj,varargin{:});
         end
         
     end
