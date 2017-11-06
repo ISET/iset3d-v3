@@ -20,6 +20,11 @@ function oi = piOICreate(photons,varargin)
 %        If fov is set, we use it
 %        If fov is not set, we use filmdiag.
 %  
+% Example
+%{
+  oi = piOICreate(abs(randi(128,128,31)));
+  oi = piOICreate(abs(randi(128,128,31)),'mean illuminance',10);
+%}
 % BW, SCIENTSTANFORD, 2017
 
 %%
@@ -30,6 +35,11 @@ p.addParameter('focalLength',0.004,@isscalar);   % Meters
 p.addParameter('fNumber',4,@isscalar);           % Dimensionless
 p.addParameter('filmDiag',[],@isscalar);         % Meters
 p.addParameter('fov',[],@isscalar)               % Horizontal fov, degrees
+
+% Format arguments so that p.parse will run.
+for ii=1:2:length(varargin)
+    varargin{ii} = ieParamFormat(varargin{ii});
+end
 
 p.parse(photons,varargin{:});
 
@@ -80,7 +90,13 @@ if ~isempty(varargin)
     for ii=1:2:length(varargin) 
         param = ieParamFormat(varargin{ii});
         val = varargin{ii+1};
-        oi = oiSet(oi,param,val);
+        try
+            % See if this is a valid oiSet
+            oi = oiSet(oi,param,val);
+        catch
+            % Do nothing if it is not.  renderType, for example.
+        end
+        
     end
 end
 

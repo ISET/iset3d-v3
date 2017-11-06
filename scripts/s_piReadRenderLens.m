@@ -31,8 +31,8 @@ thisR = piRead(fname);
 
 thisR.set('camera','realistic');
 thisR.set('aperture',4);  % The number of rays should go up with the aperture 
-thisR.set('film resolution',512);
-thisR.set('rays per pixel',384);
+thisR.set('film resolution',256);
+thisR.set('rays per pixel',128);
 
 % We need to move the camera far enough away so we get a decent focus.
 objDist = thisR.get('object distance');
@@ -55,7 +55,7 @@ piWrite(thisR, oname, 'overwrite', true);
 
 %% Render with the Docker container
 
-oi = piRender(oname,'meanilluminance',10);
+oi = piRender(oname,'meanilluminance',10,'renderType','radiance');
 
 % Show it in ISET
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
