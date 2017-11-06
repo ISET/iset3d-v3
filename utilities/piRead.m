@@ -144,7 +144,18 @@ else
 end
 
 %% Read LookAt and ConcatTransform, if they exist
-  
+
+% We should also read in 'Transform' which is present in some pbrt
+% scene files.  If that exists, don't bother with lookAt or
+% ConcatTransform.
+%
+% They can exist anywhere in the file.  We only want, however, the
+% transform that applies to the camera.  That must appear outside of
+% WorldBegin/End
+%
+% We might curate our pbrt files by including only the lookAt, which
+% is really all that we need.
+
 lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
 if(isempty(lookAtBlock))
     warning('Cannot find "LookAt" for PBRT file. Returning default.');
@@ -164,6 +175,11 @@ if(~isempty(concatTBlock))
     % extract the transform matrix and multiply it to the lookAt
 end
 
+% Here we should see what we have and build world2Cam matrix and then
+% use piTransform2Lookat to convert to a lookAt.  Once lookAt is
+% saved, we can use piLookAt2Transform.m to get the world2Cam back.
+% So the piWrite really only needs to include the lookAt.  We might
+% simply transform all files into that format.
 
 %% Extract world begin/world end
 

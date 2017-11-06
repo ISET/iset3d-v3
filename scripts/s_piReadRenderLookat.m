@@ -5,7 +5,10 @@
 % Path requirements
 %    ISET or ISETBIO
 %    pbrt2ISET  - 
-%   
+% 
+%{
+fname = fullfile(piRootPath,'data','bunny','bunny.pbrt');
+%}
 % AJ/TL/BW SCIEN
 
 %% Set up ISET and Docker
@@ -22,9 +25,6 @@ if ~exist(fname,'file'), error('File not found'); end
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
 
-%% Modify the recipe, thisR, to adjust the rendering
-
-
 %% Set up Docker 
 
 % Docker will mount the volume specified by the working directory
@@ -36,6 +36,7 @@ copyfile(p,workingDirectory);
 
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
+% oname should be thisR.outFile.  Then get rid of oname.
 oname = fullfile(workingDirectory,[n,e]);
 piWrite(thisR, oname, 'overwrite', true);
 
@@ -45,5 +46,30 @@ ieObject = piRender(oname);
 
 % Show it in ISET
 vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
+
+%%  Reset and make a stereo image to the original
+
+% First dimension is right-left
+% Second dimension is towards the object.
+% 
+thisR = piRead(fname);
+thisR.lookAt.from = thisR.lookAt.from + [1 0 0];
+piWrite(thisR, oname, 'overwrite', true);
+
+ieObject = piRender(oname);
+
+% Show it in ISET
+vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
+
+%% Point the camera a little higher
+
+thisR = piRead(fname);
+thisR.lookAt.to = [0 0 2];
+piWrite(thisR, oname, 'overwrite', true);
+
+ieObject = piRender(oname);
+
+% Show it in ISET
+vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);   
 
 %%

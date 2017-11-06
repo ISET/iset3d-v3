@@ -16,9 +16,11 @@ p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 p.addRequired('outFile',@ischar);
 p.addParameter('overwrite',false,@islogical);
 p.addParameter('copyDir','',@isdir);
+
 p.parse(renderRecipe,outFile,varargin{:});
+
 overwrite = p.Results.overwrite;
-copyDir = p.Results.copyDir;
+copyDir   = p.Results.copyDir;
 
 %% Copy given directory contents over
 
@@ -34,7 +36,6 @@ if(~isempty(copyDir))
         fprintf('%s \n \n',outpath);
     end
 end
-
 
 %% Set up a text files to write into.
 
