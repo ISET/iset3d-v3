@@ -52,9 +52,9 @@ piWrite(thisR, oname, 'overwrite', true);
 
 %% Render with the Docker container
 
-ieObject = piRender(oname);
+scene = piRender(oname);
 
 % Show it in ISET
-vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
+vcAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);     
 
 %%
