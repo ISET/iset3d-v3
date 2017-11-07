@@ -37,12 +37,12 @@ copyfile(p,workingDirectory);
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
 % oname should be thisR.outFile.  Then get rid of oname.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, 'overwrite', true);
 
 %% Render with the Docker container
 
-ieObject = piRender(oname);
+ieObject = piRender(thisR);
 
 % Show it in ISET
 vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
@@ -54,9 +54,10 @@ vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);
 % 
 thisR = piRead(fname);
 thisR.lookAt.from = thisR.lookAt.from + [1 0 0];
-piWrite(thisR, oname, 'overwrite', true);
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, 'overwrite', true);
 
-ieObject = piRender(oname);
+ieObject = piRender(thisR);
 
 % Show it in ISET
 vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
@@ -65,9 +66,10 @@ vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);
 
 thisR = piRead(fname);
 thisR.lookAt.to = [0 0 2];
-piWrite(thisR, oname, 'overwrite', true);
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, 'overwrite', true);
 
-ieObject = piRender(oname);
+ieObject = piRender(thisR);
 
 % Show it in ISET
 vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);   
