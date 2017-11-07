@@ -32,6 +32,7 @@ classdef recipe < matlab.mixin.Copyable
         world;       % A cell array with all the WorldBegin/End contents
         inputFile;   % Original input file
         outputFile;  % Where outputFile = piWrite(recipe);
+        version;     % A PBRTv2 file or a PBRTv3 file
         
     end
     

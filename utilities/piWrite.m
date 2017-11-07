@@ -57,12 +57,14 @@ fileID = fopen(outFile,'w');
 %% Write header
 
 fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
+fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
 fprintf(fileID,'\n');
 
 %% Write LookAt command first
 
 fprintf(fileID,'LookAt %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f \n', ...
     [renderRecipe.lookAt.from renderRecipe.lookAt.to renderRecipe.lookAt.up]);
+fprintf(fileID,'\n');
 
 %% Write all other blocks using a for loop
 
@@ -71,10 +73,17 @@ outerFields = fieldnames(renderRecipe);
 for ofns = outerFields'
     ofn = ofns{1};
     
+    % If empty, we skip this field.
+    if(~isfield(renderRecipe.(ofn),'type') || ...
+            ~isfield(renderRecipe.(ofn),'subtype'))
+        continue;
+    end
+    
     if(strcmp(ofn,'world') || ...
             strcmp(ofn,'lookAt') || ...
             strcmp(ofn,'inputFile') || ...
-            strcmp(ofn,'outputFile'))
+            strcmp(ofn,'outputFile')|| ...
+            strcmp(ofn,'version'))
         % Skip, we don't want to write these out here.
         continue;
     end

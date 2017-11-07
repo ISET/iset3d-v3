@@ -63,10 +63,21 @@ function thisR = piRead(fname,varargin)
 %%
 p = inputParser;
 p.addRequired('fname',@(x)(exist(fname,'file')));
+p.addParameter('version',2,@(x)isnumeric(x));
 p.parse(fname,varargin{:});
+
+ver = p.Results.version;
 
 thisR = recipe;
 thisR.inputFile = fname;
+
+%% Check version number
+if(ver ~= 2 && ver ~=3)
+    error('PBRT version number incorrect. Possible versions are 2 or 3.');
+else
+    thisR.version = ver;
+end
+
 
 %% Read PBRT file
 
@@ -107,7 +118,7 @@ if(isempty(filmBlock))
 else
     thisR.film = piBlock2Struct(filmBlock);
     
-    if(isfield(thisR,'filename'))
+    if(isfield(thisR.film,'filename'))
         % Remove the filename since it inteferes with the outfile name.
         thisR.film = rmfield(thisR.film,'filename');
     end
@@ -125,7 +136,12 @@ end
 
 %% Extract (surface) integrator block
 
-sfBlock = piBlockExtract(txtLines,'blockName','SurfaceIntegrator');
+if(ver == 2)
+    sfBlock = piBlockExtract(txtLines,'blockName','SurfaceIntegrator');
+elseif(ver == 3)
+    sfBlock = piBlockExtract(txtLines,'blockName','Integrator');
+end
+
 if(isempty(sfBlock))
     warning('Cannot find "integrator" in PBRT file.');
     thisR.integrator = struct([]); % Return empty.
@@ -135,12 +151,16 @@ end
 
 %% Extract renderer block
 
-rendererBlock = piBlockExtract(txtLines,'blockName','Renderer');
-if(isempty(rendererBlock))
-    % warning('Cannot find "renderer" in PBRT file. Using default.');
-    thisR.renderer = struct('type','Renderer','subtype','sampler');
+if(ver == 2)
+    rendererBlock = piBlockExtract(txtLines,'blockName','Renderer');
+    if(isempty(rendererBlock))
+        % warning('Cannot find "renderer" in PBRT file. Using default.');
+        thisR.renderer = struct('type','Renderer','subtype','sampler');
+    else
+        thisR.renderer = piBlock2Struct(rendererBlock);
+    end
 else
-    thisR.renderer = piBlock2Struct(rendererBlock);
+    warning('Renderers do not exist in PBRTv3. Leaving blank...')
 end
 
 %% Read LookAt and ConcatTransform, if they exist
