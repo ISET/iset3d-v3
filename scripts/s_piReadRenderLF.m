@@ -54,12 +54,12 @@ copyfile(p,workingDirectory);
 
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, 'overwrite', true);
 
 %% Render with the Docker container
 
-oi = piRender(oname,'meanilluminance',10);
+oi = piRender(thisR,'meanilluminance',10);
 
 % Show it in ISET
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   

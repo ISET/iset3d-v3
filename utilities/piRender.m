@@ -1,19 +1,17 @@
-function [ieObject, outFile, result] = piRender(recipe,varargin)
+function [ieObject, result] = piRender(recipe,varargin)
 % Read a PBRT V2 scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
 %  [oi or scene or depth map] = piRender(thisR,varargin)
 %
-% Inputf
-%  sceneFile - required PBRT file.  The file should specify the
-%              location of the auxiliary (include) data
+% Input
+%  recipe - The outputFile of the recipe specifies the file to render
 %
 % Optional input parameter/val
 %  renderType - render radiance, depth or both (default)
 %
 % Return
 %   ieObject - an ISET scene. oi, or a depth map image
-%   outFile  - full path to the output file (maybe)
 %
 % TL SCIEN Stanford, 2017
 
@@ -62,7 +60,7 @@ p.addParameter('renderType','both',@(x)(contains(x,rTypes)));
 p.parse(recipe,varargin{:});
 renderType = p.Results.renderType;
 
-%% Set up the working folder.  We need the absolute path.
+%% Set up the working folder that will be mounted by the Docker image
 
 [workingFolder, name, ~] = fileparts(recipe.outputFile);
 if(isempty(workingFolder))
@@ -79,16 +77,16 @@ depthRecipe = piRecipeConvertToDepth(recipe);
 % Always overwrite?
 piWrite(depthRecipe,'overwrite',true);
 
-pbrtFile = recipe.inputFile;
-depthFile = depthRecipe.inputFile;
+pbrtFile = recipe.outputFile;
+depthFile = depthRecipe.outputFile;
 
 filesToRender = {};
 label = {};
 switch renderType
     case {'both','all'}
-        filesToRender{1} = recipe.inputFile;  % pbrtFile
+        filesToRender{1} = pbrtFile;
         label{1} = 'radiance';
-        filesToRender{2} = depthRecipe.inputFile; % depthFile;
+        filesToRender{2} = depthFile;
         label{2} = 'depth';
     case {'depth','depthmap'}
         filesToRender = {depthFile};

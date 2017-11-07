@@ -3,12 +3,11 @@
 % Rendering takes longer through a lens as the size of the aperture grows.
 % The pinhole case is always the fastest, of course.
 %
-% See Temporary.m for a thisROrig that runs correctly.  Delete that when this
-% runs correctly.
+% This rendering is set with a relatively small number of rays per pixel
+% for speed.
 %
 % See also
 %  s_piReadRender, s_piReadRenderLF
-%  
 %
 % BW SCIEN Team, 2017
 
@@ -50,12 +49,12 @@ copyfile(p,workingDirectory);
 
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, 'overwrite', true);
 
-%% Render with the Docker container
+%% Render the output file with the Docker container
 
-oi = piRender(oname,'meanilluminance',10,'renderType','radiance');
+oi = piRender(thisR,'meanilluminance',10,'renderType','both');
 
 % Show it in ISET
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
