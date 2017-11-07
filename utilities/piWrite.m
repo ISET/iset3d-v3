@@ -1,29 +1,30 @@
-function outFile = piWrite(renderRecipe,outFile,varargin)
+function outpath = piWrite(renderRecipe,varargin)
 % Given a recipe write a PBRT scene file.
+%
+% Syntax
+%   outpath = piWrite(recipe,fullOutfile,varargin)
 %
 % Input
 %   renderRecipe:  a recipe object
-%   outFile:       path to the output pbrt scene file
 %
-%   outFile = piWrite(recipe,fullOutfile,varargin)
+% Return
+%    output - path to the output file directory
 %
-% TL Scienstanford 2017
+% TL Scien Stanford 2017
 
-% TODO: Write out a depth map pbrt
 %%
 p = inputParser;
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
-p.addRequired('outFile',@ischar);
 p.addParameter('overwrite',false,@islogical);
 p.addParameter('copyDir','',@isdir);
 
-p.parse(renderRecipe,outFile,varargin{:});
+p.parse(renderRecipe,varargin{:});
 
 overwrite = p.Results.overwrite;
 copyDir   = p.Results.copyDir;
 
 %% Copy given directory contents over
-
+outFile = renderRecipe.outputFile;
 [outpath,~,~] = fileparts(outFile);
 if(~isempty(copyDir))
     status = copyfile(copyDir,outpath);

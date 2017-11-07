@@ -1,7 +1,10 @@
 function recipe = piRecipeConvertToDepth(recipe,varargin)
-% piRecipeConvertToDepth - Read a recipe and make the appropriate changes
-% so that it will render a depth map.
+% piRecipeConvertToDepth - Change recipe to render a depth map
 %
+% Syntax:
+%    recipe = piRecipeConvertToDepth(recipe,varargin)
+%
+% TL, SCIEN Stanford, 2017
 %%
 p = inputParser;
 p.addRequired('recipe',@(x)isequal(class(x),'recipe'));
@@ -34,6 +37,11 @@ filter.xwidth.type = 'float';
 filter.ywidth.value = 0.5;
 filter.ywidth.type = 'float';
 recipe.filter = filter;
+
+% Assign the right depth output file
+[workingFolder,name,~] = fileparts(recipe.outputFile);
+depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
+recipe.outputFile = depthFile;
 
 end
 

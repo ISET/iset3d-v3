@@ -45,14 +45,13 @@ workingDirectory = fullfile(piRootPath,'local');
 [p,n,e] = fileparts(fname); 
 copyfile(p,workingDirectory);
 
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+% Write out the pbrt scene file, based on thisR, to the working directory.
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, 'overwrite', true);
 
 %% Render with the Docker container
 
-scene = piRender(oname);
+scene = piRender(thisR);
 
 % Show it in ISET
 vcAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);     

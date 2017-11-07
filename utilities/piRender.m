@@ -1,8 +1,8 @@
-function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
+function [ieObject, outFile, result] = piRender(recipe,varargin)
 % Read a PBRT V2 scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
-%  [oi or scene or depth map] = piRender(pbrtFile,varargin)
+%  [oi or scene or depth map] = piRender(thisR,varargin)
 %
 % Inputf
 %  sceneFile - required PBRT file.  The file should specify the
@@ -54,16 +54,17 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 p = inputParser;
 p.KeepUnmatched = true;
 
-p.addRequired('pbrtFile',@(x)(exist(x,'file')));
+% p.addRequired('pbrtFile',@(x)(exist(x,'file')));
+p.addRequired('recipe',@(x)(isequal(class(x),'recipe')));
 rTypes = {'radiance','depth','both'};
 p.addParameter('renderType','both',@(x)(contains(x,rTypes))); 
 
-p.parse(pbrtFile,varargin{:});
+p.parse(recipe,varargin{:});
 renderType = p.Results.renderType;
 
 %% Set up the working folder.  We need the absolute path.
 
-[workingFolder, name, ~] = fileparts(pbrtFile);
+[workingFolder, name, ~] = fileparts(recipe.outputFile);
 if(isempty(workingFolder))
     error('We need an absolute path for the working folder.');
 end
@@ -71,20 +72,23 @@ end
 %% Set up files to render, depending on 'renderType'
 
 % Write out a pbrt file with depth
-depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
-recipe      = piRead(pbrtFile);
+% depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
+% recipe      = piRead(thisR.inputFile);
 depthRecipe = piRecipeConvertToDepth(recipe);
 
 % Always overwrite?
-depthFile   = piWrite(depthRecipe,depthFile,'overwrite',true);
+piWrite(depthRecipe,'overwrite',true);
+
+pbrtFile = recipe.inputFile;
+depthFile = depthRecipe.inputFile;
 
 filesToRender = {};
 label = {};
 switch renderType
     case {'both','all'}
-        filesToRender{1} = pbrtFile;
+        filesToRender{1} = recipe.inputFile;  % pbrtFile
         label{1} = 'radiance';
-        filesToRender{2} = depthFile;
+        filesToRender{2} = depthRecipe.inputFile; % depthFile;
         label{2} = 'depth';
     case {'depth','depthmap'}
         filesToRender = {depthFile};
