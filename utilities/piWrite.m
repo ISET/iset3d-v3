@@ -4,6 +4,7 @@ function outFile = piWrite(renderRecipe,outFile,varargin)
 % Input
 %   renderRecipe:  a recipe object
 %   outFile:       path to the output pbrt scene file
+%   copyDir:       copy given directory over to the outpath
 %
 %   outFile = piWrite(recipe,fullOutfile,varargin)
 %
