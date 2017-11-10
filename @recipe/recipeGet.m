@@ -60,7 +60,7 @@ switch param
         % yet.
         val = thisR.camera.subtype;
         if isequal(val,'perspective'), val = 'pinhole';
-        elseif ismember(val,{'realisticDiffraction'})
+        elseif ismember(val,{'realisticDiffraction','realisticEye'})
             val = 'lens';
         end
     case 'focaldistance'

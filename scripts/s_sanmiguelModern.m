@@ -28,6 +28,9 @@ thisR.set('rays per pixel',384);
 workingDirectory = fullfile(piRootPath,'local');
 
 % We copy the pbrt scene directory to the working directory
+% Note from Trisha: We can do this in piWrite using the flag
+% "copyDir", so something like:
+% piWrite(thisR,oname,'overwrite',true,'copyDir',p) 
 [p,n,e] = fileparts(fname); 
 copyfile(p,workingDirectory);
 
