@@ -4,16 +4,17 @@ function [ieObject, result] = piRender(thisR,varargin)
 % Syntax:
 %  [oi or scene or depth map] = piRender(thisR,varargin)
 %
-% Input
-%  thisR - A recipe, whose outputFile specifies the file
+% REQUIRED input
+%  thisR - A recipe, whose outputFile specifies the file, OR a string that
+%          is a full path to a scene pbrt file.
 %
-% Optional input parameter/val
-%  renderType - render radiance, depth or both (default)
+% OPTIONAL input parameter/val
+%  renderType - render radiance, depth or both (default).  If the input is
+%               a fullpath to a file, then we only render the radiance
+%               data. Ask if you want this changed to permit a depth map.
 %
-% Return
+% RETURN
 %   ieObject - an ISET scene. oi, or a depth map image
-%
-% TL SCIEN Stanford, 2017
 %
 % Examples:
 %
@@ -46,7 +47,8 @@ function [ieObject, result] = piRender(thisR,varargin)
    scene = piRender(pbrtFile);
    ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
 %}
-% TL/BW/AJ Scienstanford 2017
+%
+% TL SCIEN Stanford, 2017
 
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
@@ -81,10 +83,10 @@ if ischar(thisR)
         error('We need an absolute path for the working folder.');
     end
     
-elseif isclass(thisR)
+elseif strcmp(class(thisR),'recipe')
     %% Set up the working folder that will be mounted by the Docker image
     
-    thisR.get('optics type');
+    opticsType = thisR.get('optics type');
     
     % Set up the radiance file
     [workingFolder, name, ~] = fileparts(thisR.outputFile);
@@ -107,7 +109,10 @@ elseif isclass(thisR)
         depthFile = depthRecipe.outputFile;
     end
     
+else
+    error('A full path to a scene pbrt file or a recipe class is required\n');
 end
+
 
 filesToRender = {};
 label = {};
