@@ -49,7 +49,11 @@ switch param
         % thisR.set('autofocus',true);
         % Sets the film distance so the lookAt to point is in good focus
         if val
-            thisR.set('focal distance',thisR.get('focal distance'));
+            fdist = thisR.get('focal distance');
+            if isnan(fdist)
+                error('Camera is probably too close (%f) to focus.',thisR.get('object distance'));
+            end
+            thisR.set('focal distance',fdist);
         end
     case 'microlens'
         % Not sure about what this means.  It is on or off

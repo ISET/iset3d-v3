@@ -31,16 +31,15 @@ thisR = piRead(fname);
 %% Modify the recipe, thisR, to adjust the rendering
 
 thisR.set('camera','light field');
-thisR.set('n microlens',[192 192]);
-thisR.set('n subpixels',[2, 2]);
+thisR.set('n microlens',[128 128]);
+thisR.set('n subpixels',[7, 7]);
 thisR.set('microlens',1);   % Not sure about on or off
 thisR.set('aperture',50);
 thisR.set('rays per pixel',128);
 thisR.set('light field film resolution',true);
 
 % We need to move the camera far enough away so we get a decent focus.
-objDist = thisR.get('object distance');
-thisR.set('object distance',10*objDist);
+thisR.set('object distance',35);   % I guess about 10 mm away because the scene is tiny
 thisR.set('autofocus',true);
 
 %% Set up Docker 
@@ -102,7 +101,7 @@ superPixels(1) = size(lightfield,1);
 superPixels(2) = size(lightfield,2);
 
 %% Display the image from the center pixel of each microlens
-img = squeeze(lightfield(2,2,:,:,:));
+img = squeeze(lightfield(3,3,:,:,:));
 vcNewGraphWin; imagesc(img); truesize; axis off
 
 %%

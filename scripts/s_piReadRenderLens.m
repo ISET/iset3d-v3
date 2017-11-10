@@ -29,13 +29,13 @@ thisR = piRead(fname);
 %% Modify the recipe, thisR, to adjust the rendering
 
 thisR.set('camera','realistic');
-thisR.set('aperture',4);  % The number of rays should go up with the aperture 
+thisR.set('aperture',3);  % The number of rays should go up with the aperture 
 thisR.set('film resolution',256);
 thisR.set('rays per pixel',128);
 
-% We need to move the camera far enough away so we get a decent focus.
+% We need to move the camera far enough away so we get a decent view.
 objDist = thisR.get('object distance');
-thisR.set('object distance',10*objDist);
+thisR.set('object distance',3.5*objDist);
 thisR.set('autofocus',true);
 
 %% Set up Docker 
