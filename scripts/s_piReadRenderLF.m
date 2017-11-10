@@ -105,3 +105,4 @@ img = squeeze(lightfield(3,3,:,:,:));
 vcNewGraphWin; imagesc(img); truesize; axis off
 
 %%
+LFDispVidCirc(lightfield);
