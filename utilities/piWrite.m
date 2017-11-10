@@ -61,8 +61,16 @@ fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clo
 fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
 fprintf(fileID,'\n');
 
-%% Write LookAt command first
+%% Write Scale and LookAt commands first
 
+% Optional Scale
+if(~isempty(renderRecipe.scale))   
+   fprintf(fileID,'Scale %0.2f %0.2f %0.2f \n', ...
+    [renderRecipe.scale(1) renderRecipe.scale(2) renderRecipe.scale(3)]);
+    fprintf(fileID,'\n');
+end
+
+% Required LookAt 
 fprintf(fileID,'LookAt %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f \n', ...
     [renderRecipe.lookAt.from renderRecipe.lookAt.to renderRecipe.lookAt.up]);
 fprintf(fileID,'\n');

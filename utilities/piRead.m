@@ -163,6 +163,17 @@ else
     warning('Renderers do not exist in PBRTv3. Leaving blank...')
 end
 
+%% Read Scale, if it exists
+% Because PBRT is a LHS and many object models are exported with a RHS,
+% sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
+% is already in the PBRT file, we want to keep it around.
+scaleBlock = piBlockExtract(txtLines,'blockName','Scale');
+if(isempty(scaleBlock))
+    thisR.scale = [];
+else
+    values = textscan(scaleBlock{1}, '%s %f %f %f');
+    thisR.scale = [values{2} values{3} values{4}];
+end
 %% Read LookAt and ConcatTransform, if they exist
 
 % We should also read in 'Transform' which is present in some pbrt
