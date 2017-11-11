@@ -40,7 +40,7 @@ switch cameraType
         camera.fov.type  = 'float';
         camera.fov.value = 45;  % deg of angle
         
-    case {'realistic','realisticdiffraction'}
+    case {'realistic','realisticdiffraction','lens'}
         
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
