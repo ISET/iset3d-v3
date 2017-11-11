@@ -1,4 +1,4 @@
-%% sanmiguel scene with pbrt2ISET
+%% Render the sanmiguel scene with pinhole optics
 %
 % BW SCIEN 2017
 
@@ -11,7 +11,8 @@ if ~piDockerExists, piDockerConfig; end
 
 % We organize the pbrt files with its includes (textures, brdfs, spds, geometry)
 % in a single directory. 
-fname = '/home/wandell/pbrt-v2-spectral/pbrtScenes/sanmiguel/sanmiguel.pbrt';
+% fname = '/home/wandell/pbrt-v2-spectral/pbrtScenes/sanmiguel/sanmiguel.pbrt';
+fname = fullfile(piRootPath,'data','sanmiguel','sanmiguel.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
 % Read the main scene pbrt file.  Return it as a recipe
@@ -36,12 +37,14 @@ copyfile(p,workingDirectory);
 
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+piWrite(thisR, 'overwrite', true);
 
 %% Render with the Docker container
 
-[scene, ~, result] = piRender(oname);
+tic
+scene = piRender(oname);
+toc
 
 % Show it in ISET
 vcAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);   
