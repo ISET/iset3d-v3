@@ -58,6 +58,19 @@ switch param
         thisR.camera.aperture_diameter.value = val;
     case 'focaldistance'
         thisR.camera.filmdistance.value = val;
+    case 'lookat'
+        % Includes the from, to and up in a struct
+        if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
+            thisR.lookAt = val; 
+        end
+        
+    case 'from'
+        thisR.lookAt.from = val;
+    case 'to'
+        thisR.lookAt.to = val;
+    case 'up'
+        thisR.lookAt.up = val;
+        
     case 'autofocus'
         % thisR.set('autofocus',true);
         % Sets the film distance so the lookAt to point is in good focus
