@@ -28,27 +28,30 @@ function [ieObject, result] = piRender(thisR,varargin)
 %   sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/rtbTeapot-metal.pbrt';
 %   sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/rtbVilla-daylight.pbrt';
 %
-% Example code
+%
+% TL SCIEN Stanford, 2017
+
+% Examples 
 %{
    % Example 1 - run the docker container
    sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/rtbVilla-daylight.pbrt';
    [scene, outFile] = piRender(sceneFile);
    ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
-
+%}
+%{
    % Example 2 - read the radiance file into an ieObject
    % We are pretending in this case that it was created with a lens
    radianceFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/bunny.dat';
    photons = piReadDAT(radianceFile, 'maxPlanes', 31);
    oi = piOIcreate(photons);
    ieAddObject(oi); oiWindow;
-
+%}
+%{
    % Example 3 - render an existing pbrt file
    pbrtFile = '/Users/wandell/Documents/MATLAB/pbrt2ISET/local/teapot-area-light.pbrt';
    scene = piRender(pbrtFile);
    ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
 %}
-%
-% TL SCIEN Stanford, 2017
 
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
@@ -83,14 +86,14 @@ if ischar(thisR)
         error('We need an absolute path for the working folder.');
     end
     
-elseif strcmp(class(thisR),'recipe')
+elseif isa(thisR,'recipe')
     %% Set up the working folder that will be mounted by the Docker image
     
     opticsType = thisR.get('optics type');
     
     % Set up the radiance file
     [workingFolder, name, ~] = fileparts(thisR.outputFile);
-    if(isempty(workingFolder))
+    if(~exist(workingFolder,'dir'))
         error('We need an absolute path for the working folder.');
     end
     pbrtFile = thisR.outputFile;
@@ -100,11 +103,10 @@ elseif strcmp(class(thisR),'recipe')
         
         % Write out a pbrt file with depth
         % depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
-        % recipe      = piRead(thisR.inputFile);
         depthRecipe = piRecipeConvertToDepth(thisR);
         
-        % Always overwrite?
-        piWrite(depthRecipe,'overwrite',true);
+        % Always overwrite the depth file, but don't copy over the whole directory
+        piWrite(depthRecipe,'overwritefile',true,'overwritedir',false);
         
         depthFile = depthRecipe.outputFile;
     end
@@ -167,7 +169,7 @@ for ii = 1:length(filesToRender)
     %% Invoke the Docker command with or without capturing results.
     tic
     [status, result] = piRunCommand(cmd);
-    toc
+    elapsedTime = toc; 
     
     %% Check the return
     
@@ -176,8 +178,8 @@ for ii = 1:length(filesToRender)
         disp(result)
         pause;
     else
-        fprintf('Docker run status %d, seems OK.\n',status);
-        fprintf('Outfile file was set to %s.\n',outFile);
+        % fprintf('Docker run status %d, seems OK.\n',status);
+        fprintf('Outfile file: %s.\n',outFile);
     end
     
     %% Convert the radiance.dat to an ieObject
@@ -210,6 +212,8 @@ for ii = 1:length(filesToRender)
         depthMap = tmp(:,:,1); clear tmp;
     end
     
+    fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
+
 end
 
 %% Read the data and set some of the ieObject parameters

@@ -27,18 +27,9 @@ thisR = piRead(fname);
 
 %% Set up Docker 
 
-% Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
-
-% We copy the pbrt scene directory to the working directory
 [p,n,e] = fileparts(fname); 
-copyfile(p,workingDirectory);
-
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-% oname should be thisR.outFile.  Then get rid of oname.
-thisR.outputFile = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, 'overwrite', true);
+thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+piWrite(thisR);
 
 %% Render with the Docker container
 
@@ -54,8 +45,9 @@ vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);
 % 
 thisR = piRead(fname);
 thisR.lookAt.from = thisR.lookAt.from + [1 0 0];
-thisR.outputFile = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, 'overwrite', true);
+[p,n,e] = fileparts(fname); 
+thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+piWrite(thisR);
 
 ieObject = piRender(thisR);
 
@@ -66,8 +58,9 @@ vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);
 
 thisR = piRead(fname);
 thisR.lookAt.to = [0 0 2];
-thisR.outputFile = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, 'overwrite', true);
+[p,n,e] = fileparts(fname); 
+thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+piWrite(thisR);
 
 ieObject = piRender(thisR);
 

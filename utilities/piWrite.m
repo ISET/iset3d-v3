@@ -1,58 +1,79 @@
-function outpath = piWrite(renderRecipe,varargin)
-% Given a recipe write a PBRT scene file.
+function workingDir = piWrite(renderRecipe,varargin)
+% Write a PBRT scene file based on its renderRecipe
 %
 % Syntax
-%   outpath = piWrite(recipe,fullOutfile,varargin)
+%   workingDir = piWrite(recipe,varargin)
+%
+% The pbrt scene file and all of its auxiliary files are written out in a
+% working directory that will be mounted by the docker container.
 %
 % Input
-%   renderRecipe:  a recipe object
+%   renderRecipe:  a recipe object describing the rendering parameters.  This
+%       includes the inputFile and the outputFile, which are used to find the
+%       directories containing all of the pbrt scene data.
+%
+% Optional parameter/values
+%   overwritefile - If scene PBRT file exists, overwrite (default true)
+%   overwritedir  - If the auxiliary files exist, overwrite (default true) 
 %
 % Return
-%    output - path to the output file directory
+%    workingDir - path to the output directory mounted by the Docker containe
 %
 % TL Scien Stanford 2017
 
 %%
 p = inputParser;
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
-p.addParameter('overwrite',false,@islogical);
-p.addParameter('copyDir','',@isdir);
+p.addParameter('workingDir','',@isdir);
+
+% Copy over the whole directory
+p.addParameter('overwritedir', true,@islogical);
+
+% Overwrite the specific scene file
+p.addParameter('overwritefile',true,@islogical);
 
 p.parse(renderRecipe,varargin{:});
 
-overwrite = p.Results.overwrite;
-copyDir   = p.Results.copyDir;
+overwritefile = p.Results.overwritefile;
+overwritedir  = p.Results.overwritedir;
 
-%% Copy given directory contents over
+%% Potentially copy the input directory to the Docker working directory
+
+inputDir   = fileparts(renderRecipe.inputFile);
+workingDir = fileparts(renderRecipe.outputFile);
+if(exist(workingDir,'dir') && exist(inputDir,'dir'))
+    if overwritedir
+        status = copyfile(inputDir,workingDir);
+        if(~status)
+            error('Failed to copy input directory to docker working directory.');
+        else
+            fprintf('Copied contents from:\n');
+            fprintf('%s \n',inputDir);
+            fprintf('to \n');
+            fprintf('%s \n \n',workingDir);
+        end
+    end
+else
+    error('Either input (%s) or working (%s) directory does not exist.',inputDir,workingDir);
+end
+
+%% Potentially over-write the scene PBRT file
+
 outFile = renderRecipe.outputFile;
-[outpath,~,~] = fileparts(outFile);
-if(~isempty(copyDir))
-    status = copyfile(copyDir,outpath);
-    if(~status)
-        error('Could not copy scene directory contents to output path.');
-    else
-        fprintf('Copied contents from:\n');
-        fprintf('%s \n',copyDir);
-        fprintf('to \n');
-        fprintf('%s \n \n',outpath);
-    end
-end
 
-%% Set up a text files to write into.
-
-% Check if it exists. If it does, ask the user if we can overwrite.
-if(exist(outFile,'file')) && ~overwrite
-    fprintf('Writing out to %s \n',outFile);
-    prompt = 'The PBRT file we are writing the recipe to already exists. Overwrite? (Y/N)';
-    userInput = input(prompt,'s');
-    if(strcmp(userInput,'N'))
-        error('PBRT file already exists.');
-    else
-        warning('Overwriting out file.')
+% Check if the outFile exists. If it does, decide what to do.
+if(exist(outFile,'file'))
+    if overwritefile
+        fprintf('Overwriting PBRT file %s.\n',outFile)
         delete(outFile);
-    end
+    else
+        error('PBRT file %s exists.',outFile);
+    end 
 end
 
+%% OK, we are good to go. Open up the file.
+
+% fprintf('Opening %s for output\n',outFile);
 fileID = fopen(outFile,'w');
 
 %% Write header
@@ -147,10 +168,10 @@ for ofns = outerFields'
                         %}
                     else
                         relativeValue = strcat(name,ext);
-                        [success,~,~] = copyfile(currValue,outpath);
+                        [success,~,~] = copyfile(currValue,workingDir);
                         if(success)
-                            fprintf('Copied %s to: \n',currValue);
-                            fprintf('%s \n',fullfile(outpath,relativeValue));
+                            % fprintf('Copied %s to: \n',currValue);
+                            % fprintf('%s \n',fullfile(workingDir,relativeValue));
                             currValue = relativeValue;
                         else
                             % Warning or error?
