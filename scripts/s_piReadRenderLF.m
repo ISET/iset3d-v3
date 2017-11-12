@@ -1,20 +1,14 @@
-% s_piReadRender
+% s_piReadRenderLF
 %
-% The simplest script to read a PBRT scene file and then write it back
-% out.  This 
+% Implements a light field camera system with an array of microlenses over a
+% sensor.  Converts the OI into a sensor, the sensor into a rendered image, and
+% then uses D. Dansereau's toolbox to produce a small video of the images seen
+% through the different sub-images.
 %
 %  Time        N Rays    NMicroLens     Nsubpixels
-%             128 rays     128 uLens    subPixels 7,7
+%   162 s        128      128, 128         7,7
 %
-% Path requirements
-%    ISET
-%    CISET      - If we need the autofocus, we could use this
-%    pbrt2ISET  - 
-%   
-%    Consider RemoteDataToolbox, UnitTestToolbox for the lenses and
-%    curated scenes.
-%
-% TL/BW SCIEN
+% TL/BW SCIEN, 2017
 
 %% Initialize ISET and Docker
 
@@ -101,3 +95,5 @@ vcNewGraphWin; imagesc(img); truesize; axis off
 
 %%
 LFDispVidCirc(lightfield);
+
+%%
