@@ -39,7 +39,7 @@ thisR = piRead(fname);
 
 % Write out the pbrt scene file, based on thisR.  By def, to the working directory.
 [p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
 piWrite(thisR);
 
 %% Render with the Docker container

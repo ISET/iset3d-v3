@@ -115,7 +115,6 @@ else
     error('A full path to a scene pbrt file or a recipe class is required\n');
 end
 
-
 filesToRender = {};
 label = {};
 switch renderType

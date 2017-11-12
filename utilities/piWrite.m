@@ -71,6 +71,15 @@ if(exist(outFile,'file'))
     end 
 end
 
+%% If the optics type is lens, always copy the lens file
+if isequal(renderRecipe.get('optics type'),'lens')
+    [~,name,ext] = fileparts(renderRecipe.camera.specfile.value);
+    lensFile = fullfile(workingDir,[name,ext]);
+    if ~exist(lensFile,'file')
+        copyfile(renderRecipe.camera.specfile.value,lensFile);
+    end
+end
+
 %% OK, we are good to go. Open up the file.
 
 % fprintf('Opening %s for output\n',outFile);
