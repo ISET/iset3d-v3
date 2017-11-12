@@ -6,8 +6,8 @@
 %
 %  Timing     film resol   rays per pixel
 %     216 s     192          128
-%     90  s     256          128 
-%     40  m     512          384 
+%     285 s     256          128 
+%     40  m     768          128 
 %
 % The sanmiguel scene is fairly large, so we do not include it in the github
 % repository.  To download it, you can use the RemoteDataToolbox
@@ -48,30 +48,11 @@ if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname);
 
 %%
-thisR.set('film resolution',256);
+thisR.set('film resolution',768);
 thisR.set('rays per pixel',128);
-% thisR.set('autofocus',true);
 
 %% Set up Docker 
 
-% Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
-
-% We copy the pbrt scene directory to the working directory
-[p,n,e] = fileparts(fname); 
-copyfile(p,workingDirectory);
-
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-thisR.outputFile = fullfile(workingDirectory,[n,e]);
-
-% TL: We could do this in piWrite using a flag something like
-%
-%   piWrite(thisR,'overwrite',true,'workingDir',workingDir)
-%
-% We find the directory containing the pbrt scene file from the thisR.inputFile
-% and we copy the whole directory over to working directory and assign the
-% outputFile name.
 [p,n,e] = fileparts(fname); 
 thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
 piWrite(thisR);
