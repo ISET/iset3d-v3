@@ -4,6 +4,8 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % The recipe has lots of fields, including camera, filter, and so forth. Many
 % comments needed here.
 % 
+% Examples
+%   thisR.set('lensFile','dgauss.22deg.3.0mm.dat')
 %
 % BW ISETBIO Team, 2017
 
@@ -20,6 +22,8 @@ vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
 p.addRequired('val');
+
+p.addParameter('lensfile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
 
 p.parse(thisR, param, val, varargin{:});
 
@@ -40,7 +44,9 @@ switch param
     case 'camera'
         % Initialize a camera type with default parameters
         % To adjust the parameters use recipe.set() calls
-        thisR.camera = piCameraCreate(val);
+        thisR.camera = piCameraCreate(val,p.Results.lensfile);
+    case 'lensfile'
+        thisR.camera.specfile.value = val;
     case 'aperture'
         thisR.camera.aperture_diameter.value = val;
     case 'focaldistance'
