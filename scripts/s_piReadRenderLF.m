@@ -3,6 +3,9 @@
 % The simplest script to read a PBRT scene file and then write it back
 % out.  This 
 %
+%  Time        N Rays    NMicroLens     Nsubpixels
+%             128 rays     128 uLens    subPixels 7,7
+%
 % Path requirements
 %    ISET
 %    CISET      - If we need the autofocus, we could use this
@@ -42,19 +45,11 @@ thisR.set('light field film resolution',true);
 thisR.set('object distance',35);   % I guess about 10 mm away because the scene is tiny
 thisR.set('autofocus',true);
 
-%% Set up Docker 
+%% Set up Docker files
 
-% Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
-
-% We copy the pbrt scene directory to the working directory
 [p,n,e] = fileparts(fname); 
-copyfile(p,workingDirectory);
-
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-thisR.outputFile = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, 'overwrite', true);
+thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+piWrite(thisR);
 
 %% Render with the Docker container
 

@@ -4,13 +4,30 @@
 %
 % Timing on a Linux box with multiple cores (gray.stanford.edu).
 %
-%  Timing     film resolution     rays per pixe.
-%     90 sec    256 resolution     128 
-%     40 min    512 resolution     384 
+%  Timing     film resol   rays per pixel
+%     216 s     192          128
+%     90  s     256          128 
+%     40  m     512          384 
 %
-% PROGRAMMING TODO
-%  We should place the sanmiguel scene up on the RdtClient server for most
-%  people, and here we should include instructions about how to download it.
+% The sanmiguel scene is fairly large, so we do not include it in the github
+% repository.  To download it, you can use the RemoteDataToolbox
+% <https://github.com/isetbio/RemoteDataToolbox.git>.  
+%
+% The commands to download from the RDT are
+%
+%{
+ rdt = RdtClient('isetbio');               % Open the connection
+ a = rdt.searchArtifacts('sanmiguel');     % Root name of the artifact
+
+ % Where you put the file and how you set it up is your choice. 
+ destinationFolder = fullfile(piRootPath,'local');
+ rdt.readArtifact(a,'destinationFolder',destinationFolder);
+ fnameZIP = fullfile(destinationFolder,'sanmiguel.zip'); 
+ unzip(fnameZIP);
+
+ %  Make the fname below consistent with what you did above.  Might be this.
+ fname = fullfile(destinationFolder,'sanmiguel','sanmiguel.pbrt'); 
+%}
 %
 % BW SCIEN 2017
 
@@ -41,22 +58,27 @@ thisR.set('rays per pixel',128);
 workingDirectory = fullfile(piRootPath,'local');
 
 % We copy the pbrt scene directory to the working directory
-% Note from Trisha: We can do this in piWrite using the flag
-% "copyDir", so something like:
-% piWrite(thisR,oname,'overwrite',true,'copyDir',p) 
 [p,n,e] = fileparts(fname); 
 copyfile(p,workingDirectory);
 
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
 thisR.outputFile = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, 'overwrite', true);
+
+% TL: We could do this in piWrite using a flag something like
+%
+%   piWrite(thisR,'overwrite',true,'workingDir',workingDir)
+%
+% We find the directory containing the pbrt scene file from the thisR.inputFile
+% and we copy the whole directory over to working directory and assign the
+% outputFile name.
+[p,n,e] = fileparts(fname); 
+thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+piWrite(thisR);
 
 %% Render with the Docker container
 
-tic
 scene = piRender(thisR);
-toc
 
 % Show it in ISET
 vcAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
