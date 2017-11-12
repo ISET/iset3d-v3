@@ -1,15 +1,15 @@
 % s_piReadRender
 %
-% Read a PBRT scene file, adjust the LookAt
+% Read a PBRT scene file (teapot-area), make three versions, adjusting  the
+% LookAt directions.  First the original.  Then make a stereo version pair.
+% Another points the camera at a different direction. 
 %
-% Path requirements
-%    ISET or ISETBIO
-%    pbrt2ISET  - 
-% 
-%{
-fname = fullfile(piRootPath,'data','bunny','bunny.pbrt');
-%}
-% AJ/TL/BW SCIEN
+% This is done with pinhole optics for speed, but could be done with a lens
+% camera.
+%
+% See also:  s_piReadRenderLens
+%
+% AJ/TL/BW SCIEN Stanford, 2017
 
 %% Set up ISET and Docker
 ieInit;
@@ -25,9 +25,12 @@ if ~exist(fname,'file'), error('File not found'); end
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
 
-%% Set up Docker 
+% Save the original lookAt.  We will write over it below.
+lookAt = thisR.get('lookAt');
 
-[p,n,e] = fileparts(fname); 
+%% Set up Docker working directory and file
+
+[~,n,e] = fileparts(fname); 
 thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
 piWrite(thisR);
 
@@ -38,15 +41,12 @@ ieObject = piRender(thisR);
 % Show it in ISET
 vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
 
-%%  Reset and make a stereo image to the original
+%%  Make an image with a camera positioned adjacent to the original
 
 % First dimension is right-left
 % Second dimension is towards the object.
-% 
-thisR = piRead(fname);
-thisR.lookAt.from = thisR.lookAt.from + [1 0 0];
-[p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+% The up direction is specified in lookAt.up
+thisR.set('from',lookAt.from + [1 0 0]);
 piWrite(thisR);
 
 ieObject = piRender(thisR);
@@ -56,10 +56,7 @@ vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);
 
 %% Point the camera a little higher
 
-thisR = piRead(fname);
-thisR.lookAt.to = [0 0 2];
-[p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+thisR.set('to',[0 0 2]);
 piWrite(thisR);
 
 ieObject = piRender(thisR);
