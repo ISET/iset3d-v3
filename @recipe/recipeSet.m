@@ -3,7 +3,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %
 % The recipe has lots of fields, including camera, filter, and so forth. Many
 % comments needed here.
-% 
+%
 % Examples
 %   thisR.set('lensFile','dgauss.22deg.3.0mm.dat')
 %
@@ -31,6 +31,13 @@ param = ieParamFormat(p.Results.param);
 
 %% Act
 switch param
+    
+        % Rendering and Docker related
+    case {'outputfile'}
+        thisR.outputFile = val;
+    case {'inputFile'}
+        thisR.inputFile = val;
+        
         % Scene
     case 'objectdistance'
         % Adjust the lookat 'from' field to match the distance in val
@@ -39,7 +46,7 @@ switch param
         % Make the unit vector a val distance away and add
         newDirection = objDirection*val;
         thisR.lookAt.from = thisR.lookAt.to + newDirection;
-
+        
         % Camera
     case 'camera'
         % Initialize a camera type with default parameters
@@ -66,7 +73,7 @@ switch param
         thisR.camera.microlens_enabled.value = val;
     case 'nmicrolens'
         % Number of microlens/pinhole samples for a light field camera
-        % 
+        %
         if length(val) == 1, val(2) = val(1); end
         thisR.camera.num_pinholes_h.value = val(1);
         thisR.camera.num_pinholes_w.value = val(2);
@@ -92,7 +99,6 @@ switch param
     case {'pixelsamples','raysperpixel'}
         thisR.sampler.pixelsamples.value = val;
         
-        
-    otherwise 
+    otherwise
         error('Unknown parameter %s\n',param);
 end

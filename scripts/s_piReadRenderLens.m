@@ -49,7 +49,7 @@ thisR.set('autofocus',true);
 %% Set up Docker directory
 
 [p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
 piWrite(thisR);
 
 %% Render the output file with the Docker container
