@@ -176,10 +176,11 @@ for ii = 1:length(filesToRender)
         warning('Docker did not run correctly');
         disp(result)
         pause;
-    else
-        % fprintf('Docker run status %d, seems OK.\n',status);
-        fprintf('Outfile file: %s.\n',outFile);
     end
+    % Used to have an else condition here
+    % fprintf('Docker run status %d, seems OK.\n',status);
+    % fprintf('Outfile file: %s.\n',outFile);
+    
     
     %% Convert the radiance.dat to an ieObject
 
