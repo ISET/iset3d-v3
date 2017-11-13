@@ -26,10 +26,10 @@ thisR = piRead(fname);
 % thisR.set('object distance',5000);
 
 thisR.set('camera','lens');
-thisR.set('film resolution',256);
+thisR.set('film resolution',128);
 thisR.set('rays per pixel',128);
 
-thisR.set('object distance',5000);
+thisR.set('object distance',300);
 thisR.set('autofocus',true);
 
 %% Set up Docker 
@@ -37,26 +37,16 @@ thisR.set('autofocus',true);
 % Docker will mount the volume specified by the working directory
 workingDirectory = fullfile(piRootPath,'local');
 
-% We copy the pbrt scene directory to the working directory
-% Note from Trisha: We can do this in piWrite using the flag
-% "copyDir", so something like:
-% piWrite(thisR,oname,'overwrite',true,'copyDir',p) 
 [p,n,e] = fileparts(fname); 
-copyfile(p,workingDirectory);
 
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
 thisR.outputFile = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, 'overwrite', true);
+piWrite(thisR, 'overwritedir', true);
 
 %% Render with the Docker container
-
-% tic
-% scene = piRender(thisR);
-% toc
-% vcAddObject(oi); sceneWindow; sceneSet(scene,'gamma',0.5);   
 
 tic
 oi = piRender(thisR);
 toc
-vcAddObject(oi); oiWindow; oiSet(scene,'gamma',0.5);   
+vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
