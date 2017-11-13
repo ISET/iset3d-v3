@@ -21,11 +21,11 @@ thisR = piRead(fname);
 %% The file has RealisticEye, but we use the default lens
 
 thisR.set('camera','lens');   % Lens, not pinhole
-thisR.set('aperture',5);      % Try varying for depth of field effects
+thisR.set('aperture',2);      % Try varying for depth of field effects
 thisR.set('film resolution',256);
 thisR.set('rays per pixel',256);
 
-thisR.set('object distance',175); % Could be much bigger
+thisR.set('object distance',400); % Could be much bigger
 thisR.set('autofocus',true);      % Sets focal distances to 300
 
 %% Set up Docker 
