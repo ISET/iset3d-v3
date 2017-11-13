@@ -20,33 +20,21 @@ thisR = piRead(fname);
 
 %% The file has RealisticEye, but we use the default lens
 
-% thisR.set('camera','pinhole');
-% thisR.set('film resolution',256);
-% thisR.set('rays per pixel',128);
-% thisR.set('object distance',5000);
+thisR.set('camera','lens');   % Lens, not pinhole
+thisR.set('aperture',5);      % Try varying for depth of field effects
+thisR.set('film resolution',256);
+thisR.set('rays per pixel',256);
 
-thisR.set('camera','lens');
-thisR.set('film resolution',128);
-thisR.set('rays per pixel',128);
-
-thisR.set('object distance',300);
-thisR.set('autofocus',true);
+thisR.set('object distance',175); % Could be much bigger
+thisR.set('autofocus',true);      % Sets focal distances to 300
 
 %% Set up Docker 
 
-% Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
-
 [p,n,e] = fileparts(fname); 
-
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-thisR.outputFile = fullfile(workingDirectory,[n,e]);
+thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
 piWrite(thisR, 'overwritedir', true);
 
 %% Render with the Docker container
 
-tic
 oi = piRender(thisR);
-toc
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
