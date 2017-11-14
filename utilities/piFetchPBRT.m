@@ -8,10 +8,9 @@ function [fnameZIP, artifact] = piFetchPBRT(aName,varargin)
 %   artifactName - The base name of the artifact that can be found by a search
 %   
 % Optional inputs
-%   destinationFolder - default is piRootPath/local
+%   destinationFolder - default is piRootPath/data
 %   unzip     - perform the unzip operation (default true)
-%   deletezip - delete after unzipping (default false; only done if unzip 
-%               is true
+%   deletezip - delete zip after unzipping (default false)
 %
 % Return
 %   fnameZIP - full path to the zip file
@@ -29,25 +28,37 @@ function [fnameZIP, artifact] = piFetchPBRT(aName,varargin)
 
 % Examples
 %{
-aName = 'whiteScene';
-[fnameZIP, artifact] = piFetchPBRT(aName);
-[p,n,e] = fileparts(fnameZIP); 
-pbrtFile = fullfile(p,n,[n,'.pbrt']);
-thisR = piRead(pbrtFile);
-thisR.outputFile = pbrtFile;
-scene = piRender(thisR);
-vcAddObject(scene); sceneWindow;
+ % Specify the scene name, download it, and render it
+ % By default, the download is to piRootPath/data
+ [fnameZIP, artifact] = piFetchPBRT('whiteScene');
+ [p,n,e] = fileparts(fnameZIP);
+ name = fullfile(p,n); fname = [n,'.pbrt'];
+
+ % Read the recipe from the pbrt scene file, 
+ % which is contained inside a directory of the same name
+ thisR = piRead(fullfile(dname,fname));
+
+ % Render the output to the piRootPath/local output directory
+ thisR.outputFile = fullfile(piRootPath,'local',fname); 
+ scene = piRender(thisR);
+
+ % View it
+ vcAddObject(scene); sceneWindow;
 %}
 %{
-% Sanmiguel scene
-aName = 'sanmiguel';
-[fnameZIP, artifact] = piFetchPBRT(aName);
+ % By default, this places the data in piRootPath/data.  
+ % You could set the 'deletezip', true parameter.
+ [fnameZIP, artifact] = piFetchPBRT('sanmiguel');
+
+ % Assumes the scene pbrt file is in piRootPath/data
+ % And places the output in piRootPath/local
+ s_sanmiguel;
 %}
 
 %% Parse inputs
 p = inputParser;
 p.addRequired('aName',@ischar);
-p.addParameter('destinationFolder',fullfile(piRootPath,'local'),@ischar);
+p.addParameter('destinationFolder',fullfile(piRootPath,'data'),@ischar);
 p.addParameter('unzip',true,@islogical);
 p.addParameter('deletezip',false,@islogical);
 
