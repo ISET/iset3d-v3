@@ -215,7 +215,7 @@ end
 % Apply all transforms together and return a final LookAt.
 lookAtTransform = piLookat2Transform(initFrom,initTo,initUp);
 [from,to,up,flip] = piTransform2LookAt(lookAtTransform*concatTransform);
-thisR.lookAt = struct('from',from,'to',to,'up',up);
+thisR.lookAt = struct('from',from','to',to','up',up');
 
 %% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
