@@ -191,6 +191,7 @@ end
 % scene files.  If that exists, don't bother with lookAt or
 % ConcatTransform.
 
+flip = 0;
 
 lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
 if(isempty(lookAtBlock))
@@ -198,9 +199,9 @@ if(isempty(lookAtBlock))
     thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
 else
     values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
-    initFrom = [values{2} values{3} values{4}];
-    initTo = [values{5} values{6} values{7}];
-    initUp = [values{8} values{9} values{10}];
+    from = [values{2} values{3} values{4}];
+    to = [values{5} values{6} values{7}];
+    up = [values{8} values{9} values{10}];
 end
 
 concatTBlock = piBlockExtract(txtLines,'blockName','ConcatTransform');
@@ -208,14 +209,14 @@ if(~isempty(concatTBlock))
     values = textscan(concatTBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
     values = cell2mat(values(2:end));
     concatTransform = reshape(values,[4 4]);
-else
-    concatTransform = eye(4,4);
+    
+    % Apply transform and update lookAt
+    lookAtTransform = piLookat2Transform(from,to,up);
+    [from,to,up,flip] = piTransform2LookAt(lookAtTransform*concatTransform);
+
 end
 
-% Apply all transforms together and return a final LookAt.
-lookAtTransform = piLookat2Transform(initFrom,initTo,initUp);
-[from,to,up,flip] = piTransform2LookAt(lookAtTransform*concatTransform);
-thisR.lookAt = struct('from',from','to',to','up',up');
+thisR.lookAt = struct('from',from,'to',to,'up',up);
 
 %% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
