@@ -47,8 +47,9 @@ if ~exist(fname,'file'), error('File not found'); end
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
 
-%%
-thisR.set('film resolution',768);
+%% Default is a relatively low resolution (256).
+
+thisR.set('film resolution',256);
 thisR.set('rays per pixel',128);
 
 %% Set up Docker 
