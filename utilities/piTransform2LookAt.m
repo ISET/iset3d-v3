@@ -65,4 +65,8 @@ end
 up = world2Cam\[0 1 0 0]'; % TL: I don't think the above up's are correct, just from trial and error.  
 up = up(1:3);
 
+from = from';
+up = up';
+to = to';
+
 end
