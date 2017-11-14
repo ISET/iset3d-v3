@@ -89,6 +89,25 @@ txtLines = tmp{1};
 
 fclose(fileID);
 
+%% Split text file into pre-world section
+
+worldBeginIndex = 0;
+
+for ii = 1:length(txtLines)
+    currLine = txtLines{ii};
+    if(contains(currLine,'WorldBegin'))
+        worldBeginIndex = ii;
+        break;
+    end
+end
+if(worldBeginIndex == 0)
+    warning('Cannot find WorldBegin.');
+    worldBeginIndex = ii;
+end
+
+thisR.world = txtLines(worldBeginIndex:end);
+txtLines = txtLines(1:(worldBeginIndex-1));
+
 %% Extract camera  block
 
 cameraBlock = piBlockExtract(txtLines,'blockName','Camera');
@@ -163,6 +182,41 @@ else
     warning('Renderers do not exist in PBRTv3. Leaving blank...')
 end
 
+%% Read LookAt and ConcatTransform, if they exist
+%
+% Since we've split txtLines appropriately previously, we don't have to
+% worry about finding transforms within the World block.
+%
+% We should also read in 'Transform' which is present in some pbrt
+% scene files.  If that exists, don't bother with lookAt or
+% ConcatTransform.
+
+
+lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
+if(isempty(lookAtBlock))
+    warning('Cannot find "LookAt" for PBRT file. Returning default.');
+    thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
+else
+    values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
+    initFrom = [values{2} values{3} values{4}];
+    initTo = [values{5} values{6} values{7}];
+    initUp = [values{8} values{9} values{10}];
+end
+
+concatTBlock = piBlockExtract(txtLines,'blockName','ConcatTransform');
+if(~isempty(concatTBlock))
+    values = textscan(concatTBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
+    values = cell2mat(values(2:end));
+    concatTransform = reshape(values,[4 4]);
+else
+    concatTransform = eye(4,4);
+end
+
+% Apply all transforms together and return a final LookAt.
+lookAtTransform = piLookat2Transform(initFrom,initTo,initUp);
+[from,to,up,flip] = piTransform2LookAt(lookAtTransform*concatTransform);
+thisR.lookAt = struct('from',from,'to',to,'up',up);
+
 %% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
@@ -174,66 +228,37 @@ else
     values = textscan(scaleBlock{1}, '%s %f %f %f');
     thisR.scale = [values{2} values{3} values{4}];
 end
-%% Read LookAt and ConcatTransform, if they exist
 
-% We should also read in 'Transform' which is present in some pbrt
-% scene files.  If that exists, don't bother with lookAt or
-% ConcatTransform.
-%
-% They can exist anywhere in the file.  We only want, however, the
-% transform that applies to the camera.  That must appear outside of
-% WorldBegin/End
-%
-% We might curate our pbrt files by including only the lookAt, which
-% is really all that we need.
-
-lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
-if(isempty(lookAtBlock))
-    warning('Cannot find "LookAt" for PBRT file. Returning default.');
-    % TODO: What is the default camera position? 
-    thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
-else
-    values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
-    from = [values{2} values{3} values{4}];
-    to = [values{5} values{6} values{7}];
-    up = [values{8} values{9} values{10}];
-    thisR.lookAt = struct('from',from,'to',to,'up',up);
+% Sometimes the axis flip is "hidden" in the concatTransform matrix. In
+% this case, the flip flag will be true. When the flip flag is true, we
+% always output Scale -1 1 1.
+if(flip)
+    thisR.scale = [-1 1 1];
 end
-
-concatTBlock = piBlockExtract(txtLines,'blockName','ConcatTransform');
-if(~isempty(concatTBlock))
-    % TODO:
-    % extract the transform matrix and multiply it to the lookAt
-end
-
-% Here we should see what we have and build world2Cam matrix and then
-% use piTransform2Lookat to convert to a lookAt.  Once lookAt is
-% saved, we can use piLookAt2Transform.m to get the world2Cam back.
-% So the piWrite really only needs to include the lookAt.  We might
-% simply transform all files into that format.
 
 %% Extract world begin/world end
 
-% Extract world as a cell of text lines
-fid = fopen(fname, 'r');
-world = cell(1,1);
-tline = fgetl(fid);
-worldStart = 0;
-while ischar(tline)
-    if contains(tline, 'WorldBegin')
-        worldStart = 1;
-        world{1}  = tline;  
-    end
-    tline = fgetl(fid);
-    if worldStart
-        world{end + 1}  = tline;      
-    end
-end
-fclose(fid);
-world = {world(1:end-1)}; % Get rid of the last line
-if(~worldStart)   
-    warning('Cannot find "WorldBegin" for PBRT file.');
-end
-thisR.world = world{1};
+% % Extract world as a cell of text lines
+% fid = fopen(fname, 'r');
+% world = cell(1,1);
+% tline = fgetl(fid);
+% worldStart = 0;
+% while ischar(tline)
+%     if contains(tline, 'WorldBegin')
+%         worldStart = 1;
+%         world{1}  = tline;  
+%     end
+%     tline = fgetl(fid);
+%     if worldStart
+%         world{end + 1}  = tline;      
+%     end
+% end
+% fclose(fid);
+% world = {world(1:end-1)}; % Get rid of the last line
+% if(~worldStart)   
+%     warning('Cannot find "WorldBegin" for PBRT file.');
+% end
+% thisR.world = world{1};
+
 
 end
