@@ -3,32 +3,40 @@ function thisR = piRead(fname,varargin)
 %
 %    recipe = piRecipe(fname, ...)
 %
-% This function parses the scene pbrt file and returns critical
-% rendering information in the "recipe". This struct contains all the
-% essential information on how to render the given scene. We can
-% modify the recipe programmatically to generate multiple renderings. 
+% piRead parses a scene pbrt file and returns critical rendering information in
+% the various slots of the "recipe". The recipe object contains all the
+% essential information on how to render the given scene. We can modify the
+% recipe programmatically to generate multiple renderings.
 %
-% The function piWrite uses the recipe to write out a PBRT file that
-% can be used to implement the specifics of the recipe.  The function
-% piRender uses the PBRT scene file and the recipe to execute the PBRT
-% docker image and produce the rendered output (in an ISET scene or oi
-% format).
+% piWrite uses the recipe to write out a PBRT file; piRender executes the PBRT
+% docker image to produce the rendered output (in an ISET scene or oi format).
 %
 % Required inputs
 %   fname - a pbrt scene file name
 %
 % Optional parameter/values
-%    
+%   'version' - Which version of PBRT.  Only ver 2 is implemented now. Ver 3 is
+%               being worked on.
+%
 % Return
-%   recipe - The parameters needed to render the pbrt scene file
+%   recipe - A recipe object with the parameters needed to write a new pbrt
+%            scene file
 %
-% We assume that the PBRT file has a specific structure; this means
-% that this function may not work in all PBRT files, especially those
-% we have not inspected and modified.
+% Caution:  The reading algorithm assumes that
 %
-% Text beyond the WorldBegin/WorldEnd block is ignored. 
+%     * There is a block of text before WorldBegin and nothing after 
+%     * Comments (indicated by '#' in the first character) and blank lines are
+%     ignored.
+%     * Block names we recognize are listed below.  When a block name is
+%     detected, the lines that follow beginning with a '"' are included in the
+%     block.
+%    
+% This function will not work in PBRT files, that do not meet these criteria.
 %
-% Right now, the blocks we can read are: 
+% Text beyond the WorldBegin/WorldEnd block is stored in recipe.world. 
+%
+% Blocks we can read are
+%   
 %   Camera, SurfaceIntegrator, Sampler, PixelFilter, and Film, and Renderer
 %
 % Example
@@ -36,29 +44,6 @@ function thisR = piRead(fname,varargin)
 %   recipe = piRecipe(pbrtFile);
 %
 % TL Scienstanford 2017
-
-%% Programming TODO:
-%
-% 1. What happens if one of these blocks is empty? We should automatically
-% put in the default value.
-% 2. What else do we need to read in here? Volume Integrator? 
-%
-%     piRead
-%      piReadFile
-%      rtbPBRTBlockAnalyze
-%      rtbPBRTWrite
-%
-% Note BW:  Suggest creating a recipe structure in the opening part
-% of the script and adding the blocks to the pre-defined struct.  It
-% might be that we make the recipe a class with methods.
-%
-% Note BW:  Let's make the 'WorldBegin' extraction a function, pulling
-% it out of here, so we can augment it and parse it over time.
-%
-% Note BW:  Shall we call piRead -> piReadFile()?
-%
-% I think it is funny (in a good way) that we have piRecipe.  Tee hee.
-%
 
 %%
 p = inputParser;
@@ -78,18 +63,19 @@ else
     thisR.version = ver;
 end
 
-
 %% Read PBRT file
 
 % Open, read, close
 fileID = fopen(fname);
 
-tmp = textscan(fileID,'%s','Delimiter','\n');
+% I don't understand why the spaces or tabs at the beginning of the line are not
+% returned here. (BW).
+tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
 txtLines = tmp{1};
 
 fclose(fileID);
 
-%% Split text file into pre-world section
+%% Split text lines into pre-WorldBegin and WorldBegin sections
 
 worldBeginIndex = 0;
 
@@ -105,8 +91,13 @@ if(worldBeginIndex == 0)
     worldBeginIndex = ii;
 end
 
+% Store the text in WorldBegin
 thisR.world = txtLines(worldBeginIndex:end);
+
+% Here are the text lines from before WorldBegin
 txtLines = txtLines(1:(worldBeginIndex-1));
+
+%% It would be nice to identify every block
 
 %% Extract camera  block
 
