@@ -121,6 +121,8 @@ switch ieParamFormat(param)
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
+    case 'fov'
+        val = thisR.camera.fov;
         
         % Light field camera parameters
     case 'nmicrolens'
@@ -132,6 +134,16 @@ switch ieParamFormat(param)
         % How many film pixels behind each microlens/pinhole
         val(2) = thisR.camera.subpixels_w;
         val(1) = thisR.camera.subpixels_h;
+        
+        % Film
+    case 'filmresolution'
+        val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
+    case 'filmxresolution'
+        val = thisR.film.xresolution.value;
+    case 'filmyresolution'
+        val = [thisR.film.yresolution.value];
+    case 'filmsubtype'
+        val = thisR.film.subtype;
         
     otherwise
         error('Unknown parameter %s\n',param);
