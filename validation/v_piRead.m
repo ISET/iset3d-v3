@@ -4,6 +4,8 @@ function v_piRead
 % More examples needed.
 %
 % BW, SCIEN Stanford, 2017
+%%
+disp('Validating pi_read');
 
 %% Read the first test file
 
