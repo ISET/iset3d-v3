@@ -69,8 +69,9 @@ fprintf('  Reading image h=%d x w=%d x %d spectral planes.\n', ...
     hSize, wSize, nPlanes);
 
 %% Optional second header line might contain realistic lens info.
-lensLine = fgetl(fid);
-[lensData, count, err] = lineToMat(lensLine); %#ok<ASGLU>
+pbrtVer = 2; % By default, we assume this is a version 2 file
+headerLine = fgetl(fid);
+[lensData, count, err] = lineToMat(headerLine); %#ok<ASGLU>
 if count == 3
     dataPosition = ftell(fid);
     lens.focalLength = lensData(1);
@@ -78,6 +79,11 @@ if count == 3
     lens.fieldOfView = lensData(3);
     fprintf('  Found lens data focalLength=%d, fStop=%d, fieldOfView=%d.\n', ...
         lens.focalLength, lens.fStop, lens.fieldOfView);
+elseif contains(headerLine,'v3')
+        % If in the header line we get a 'v3' flag, we know its a version 3
+        % output file. 
+        dataPosition = ftell(fid);
+        pbrtVer = 3;
 end
 
 %% Read the remainder of the .dat file into memory
@@ -94,7 +100,17 @@ if numel(serializedImage) ~= prod(imageSize)
 end
 
 %% Reshape the serialized data to image dimensions
-imageData = reshape(serializedImage, hSize, wSize, nPlanes);
+
+% Depending on the PBRT version, we reshape differently. This is due to
+% inherent difference in how v2 and v3 store the final image data. It is
+% much easier to do the reshape here than to change v3 to write out in the
+% same way v2 writes out. 
+if(pbrtVer == 2)
+    imageData = reshape(serializedImage, hSize, wSize, nPlanes);
+elseif(pbrtVer == 3)
+    imageData = reshape(serializedImage, wSize, hSize, nPlanes);
+    imageData = permute(imageData,[2 1 3]);
+end
 
 if ~isempty(maxPlanes) && maxPlanes < nPlanes
     fprintf('  Limiting %d planes to maxPlanes = %d.\n', imageSize(3), maxPlanes);
