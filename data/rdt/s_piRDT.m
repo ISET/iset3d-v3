@@ -35,18 +35,38 @@ unzip(file);
 
 %% Putting up some other pbrt scenes
 
-% Remote directory
+% Remote directory for all the PBRT scene files.
+% Each is stashed with its own resources and a base scene file.
+% We can change the camera, lookAt and such using piRead/piWrite
+% sequences.
 rdt.crp('/resources/scenes/pbrt');
 
+% Some PBRT scenes are here
 chdir(fullfile(piRootPath,'data'))
 
-% PBRT scenes
+% 1
 artifactPath = fullfile(pwd,'teapot-area.zip');
 rdt.publishArtifact(artifactPath);
 
+% 2
 artifactPath = fullfile(pwd,'whiteScene.zip');
 rdt.publishArtifact(artifactPath);
 
+% Others were here, at least temporarily
+% If ISETBIO is on your path, (not ISET), then this would work
+chdir(fullfile(isetRootPath,'data','pbrtscenes'))
 
+% 3
+artifactPath = fullfile(pwd,'ChessSet.zip');
+rdt.publishArtifact(artifactPath);
 
+% 4
+artifactPath = fullfile(pwd,'SlantedBar.zip');
+rdt.publishArtifact(artifactPath);
 
+% 5 
+artifactPath = fullfile(pwd,'NumbersAtDepth.zip');
+rdt.publishArtifact(artifactPath);
+
+% 6 - sanmiguel done manually
+%%  
