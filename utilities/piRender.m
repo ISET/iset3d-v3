@@ -255,6 +255,11 @@ switch opticsType
         if(~isempty(depthMap))
             ieObject = sceneSet(ieObject,'depth map',depthMap);
         end
+        
+        % There may be other parameters here in this future
+        if strcmp(thisR.get('optics type'),'pinhole')
+            ieObject = sceneSet(ieObject,'fov',thisR.get('fov'));
+        end
 end
 
 end

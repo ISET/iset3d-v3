@@ -63,6 +63,9 @@ switch param
         if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
             thisR.lookAt = val; 
         end
+    case 'fov'
+        % We should check that this is a pinhole, I think
+        thisR.camera.fov.value = val;
         
     case 'from'
         thisR.lookAt.from = val;

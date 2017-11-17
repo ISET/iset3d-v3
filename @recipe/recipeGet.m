@@ -30,6 +30,7 @@ function val = recipeGet(thisR,param,varargin)
 %     'from to'
 %     'optics type'
 %     'focal distance'
+%     'fov'  (Field of view) if a pinhole optics type
 %     
 %    % Light field camera
 %     'n microlens'
@@ -122,7 +123,15 @@ switch ieParamFormat(param)
                 error('Unknown camera type %s\n',opticsType);
         end
     case 'fov'
-        val = thisR.camera.fov;
+        % If pinhole optics, this works.  Should check and deal with other
+        % cases, I suppose.
+        if isequal(thisR.get('optics type'),'pinhole')
+            val = thisR.camera.fov.value;
+        else
+            warning('Not a pinhole camera.  Setting fov to 40');
+            val = 40;
+        end
+        
         
         % Light field camera parameters
     case 'nmicrolens'
