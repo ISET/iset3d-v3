@@ -1,7 +1,7 @@
-function camera = piCameraCreate(cameraType,varargin)
+function camera = piCameraCreate(cameraType,lensFile,varargin)
 %PICAMERACREATE Return a camera structure to be placed in a recipe. 
 %
-%   camera = piCameraCreate(cameraType, parameters ..)
+%   camera = piCameraCreate(cameraType, lensFile, ..)
 %
 % Input parameters
 %  The type of cameras are
@@ -29,6 +29,9 @@ function camera = piCameraCreate(cameraType,varargin)
 if notDefined('cameraType'), cameraType = 'pinhole'; end
 cameraType = ieParamFormat(cameraType);
 
+% Default lens file.  We should probably flip this all to inputParser mode.
+if notDefined('lensFile'), lensFile = 'dgauss.22deg.12.5mm.dat'; end
+
 %% Initialize the default camera type
 switch cameraType
     case {'pinhole'}
@@ -37,12 +40,12 @@ switch cameraType
         camera.fov.type  = 'float';
         camera.fov.value = 45;  % deg of angle
         
-    case {'realistic','realisticdiffraction'}
+    case {'realistic','realisticdiffraction','lens'}
         
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
-        camera.specfile.value = fullfile(piRootPath,'data','lens','2ElLens.dat');
+        camera.specfile.value = fullfile(piRootPath,'data','lens',lensFile);
         camera.filmdistance.type = 'float';
         camera.filmdistance.value = 50;    % mm
         camera.aperture_diameter.type = 'float';
@@ -60,7 +63,7 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
-        camera.specfile.value = fullfile(piRootPath,'data','lens','2ElLens.dat');
+        camera.specfile.value = fullfile(piRootPath,'data','lens',lensFile);
         camera.filmdistance.type = 'float';
         camera.filmdistance.value = 50;    % mm
         camera.aperture_diameter.type = 'float';

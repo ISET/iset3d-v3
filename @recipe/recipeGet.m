@@ -13,10 +13,34 @@ function val = recipeGet(thisR,param,varargin)
 % Returns
 %     val - derived parameter
 %
+% Parameters
+%
+%   % Data management
+%     'input file'       
+%     'output file'
+%     'working directory' 
+%
+%   % Camera and scene
+%     'object distance'
+%     'object direction'
+%     'look at'
+%     'from'
+%     'to'
+%     'up'
+%     'from to'
+%     'optics type'
+%     'focal distance'
+%     'fov'  (Field of view) if a pinhole optics type
+%     
+%    % Light field camera
+%     'n microlens'
+%     'n subpixels'
+%      
 % BW, ISETBIO Team, 2017
 
 % Examples
 %{
+  val = thisR.get('working directory');
   val = thisR.get('object distance');
   val = thisR.get('focal distance');
   val = thisR.get('camera type');
@@ -38,11 +62,22 @@ p.addRequired('param',@ischar);
 
 p.parse(thisR,param,varargin{:});
 
-param = ieParamFormat(param); 
-
-switch param
-
-        % Scene
+switch ieParamFormat(param)
+    
+        % Data management
+    case 'inputfile'
+        val = thisR.inputFile;
+    case 'outputfile'
+        % This file location defines the working directory that docker
+        % mounts to run.
+        val = thisR.outputFile;
+    case {'workingdirectory','dockerdirectory'}
+        % Docker mounts this directory.  Everything is copied into it for
+        % the piRender command to run.
+        outputFile = thisR.get('output file');
+        val = fileparts(outputFile);
+        
+        % Scene and camera relationship
     case 'objectdistance'
         diff = thisR.lookAt.from - thisR.lookAt.to;
         val = sqrt(sum(diff.^2));
@@ -50,9 +85,18 @@ switch param
         % A unit vector in the lookAt direction
         val = thisR.lookAt.from - thisR.lookAt.to;
         val = val/norm(val);
+    case 'lookat'
+        val = thisR.lookAt;
+    case 'from'
+        val = thisR.lookAt.from;
+    case 'to'
+        val = thisR.lookAt.to;
+    case 'up'
+        val = thisR.lookAt.up;
     case 'fromto'
+        % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
-
+        
         % Camera
     case 'opticstype'
         % perspective means pinhole.  Maybe we should rename.
@@ -60,7 +104,7 @@ switch param
         % yet.
         val = thisR.camera.subtype;
         if isequal(val,'perspective'), val = 'pinhole';
-        elseif ismember(val,{'realisticDiffraction'})
+        elseif ismember(val,{'realisticDiffraction','realisticEye'})
             val = 'lens';
         end
     case 'focaldistance'
@@ -78,15 +122,37 @@ switch param
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
+    case 'fov'
+        % If pinhole optics, this works.  Should check and deal with other
+        % cases, I suppose.
+        if isequal(thisR.get('optics type'),'pinhole')
+            val = thisR.camera.fov.value;
+        else
+            warning('Not a pinhole camera.  Setting fov to 40');
+            val = 40;
+        end
+        
+        
+        % Light field camera parameters
     case 'nmicrolens'
         % How many microlens (pinholes)
         val(2) = thisR.camera.num_pinholes_w.value;
         val(1) = thisR.camera.num_pinholes_h.value;
-
+        
     case 'nsubpixels'
         % How many film pixels behind each microlens/pinhole
         val(2) = thisR.camera.subpixels_w;
         val(1) = thisR.camera.subpixels_h;
+        
+        % Film
+    case 'filmresolution'
+        val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
+    case 'filmxresolution'
+        val = thisR.film.xresolution.value;
+    case 'filmyresolution'
+        val = [thisR.film.yresolution.value];
+    case 'filmsubtype'
+        val = thisR.film.subtype;
         
     otherwise
         error('Unknown parameter %s\n',param);

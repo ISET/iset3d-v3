@@ -38,12 +38,20 @@ thisR = recipeSet(thisR,'filmresolution',128);
 % Docker will mount the volume specified by the working directory
 workingDirectory = fullfile(piRootPath,'local');
 
-oname = fullfile(workingDirectory,'whiteScene.pbrt');
-piWrite(thisR, oname, 'overwrite', true);
+% We copy the pbrt scene directory to the working directory
+[p,n,e] = fileparts(fname); 
+copyfile(p,workingDirectory);
+
+% Now write out the edited pbrt scene file, based on thisR, to the working
+% directory.
+thisR.outputFile = fullfile(workingDirectory,[n,e]);
+
+% oname = fullfile(workingDirectory,'whiteScene.pbrt');
+piWrite(thisR, 'overwrite', true);
 
 %% Render with the Docker container
 
-[oi, ~, result] = piRender(oname);
+oi = piRender(oname);
 
 % Show it in ISET
 vcAddObject(oi); oiWindow;   

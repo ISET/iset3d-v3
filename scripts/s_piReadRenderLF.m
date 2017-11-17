@@ -1,17 +1,14 @@
-% s_piReadRender
+% s_piReadRenderLF
 %
-% The simplest script to read a PBRT scene file and then write it back
-% out.  This 
+% Implements a light field camera system with an array of microlenses over a
+% sensor.  Converts the OI into a sensor, the sensor into a rendered image, and
+% then uses D. Dansereau's toolbox to produce a small video of the images seen
+% through the different sub-images.
 %
-% Path requirements
-%    ISET
-%    CISET      - If we need the autofocus, we could use this
-%    pbrt2ISET  - 
-%   
-%    Consider RemoteDataToolbox, UnitTestToolbox for the lenses and
-%    curated scenes.
+%  Time        N Rays    NMicroLens     Nsubpixels
+%   162 s        128      128, 128         7,7
 %
-% TL/BW SCIEN
+% TL/BW SCIEN, 2017
 
 %% Initialize ISET and Docker
 
@@ -31,35 +28,26 @@ thisR = piRead(fname);
 %% Modify the recipe, thisR, to adjust the rendering
 
 thisR.set('camera','light field');
-thisR.set('n microlens',[192 192]);
-thisR.set('n subpixels',[2, 2]);
+thisR.set('n microlens',[128 128]);
+thisR.set('n subpixels',[7, 7]);
 thisR.set('microlens',1);   % Not sure about on or off
 thisR.set('aperture',50);
 thisR.set('rays per pixel',128);
 thisR.set('light field film resolution',true);
 
 % We need to move the camera far enough away so we get a decent focus.
-objDist = thisR.get('object distance');
-thisR.set('object distance',10*objDist);
+thisR.set('object distance',35);   % I guess about 10 mm away because the scene is tiny
 thisR.set('autofocus',true);
 
-%% Set up Docker 
+%% Set up Docker files
 
-% Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
-
-% We copy the pbrt scene directory to the working directory
 [p,n,e] = fileparts(fname); 
-copyfile(p,workingDirectory);
-
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
+piWrite(thisR);
 
 %% Render with the Docker container
 
-oi = piRender(oname,'meanilluminance',10);
+oi = piRender(thisR,'meanilluminance',10);
 
 % Show it in ISET
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
@@ -102,7 +90,10 @@ superPixels(1) = size(lightfield,1);
 superPixels(2) = size(lightfield,2);
 
 %% Display the image from the center pixel of each microlens
-img = squeeze(lightfield(2,2,:,:,:));
+img = squeeze(lightfield(3,3,:,:,:));
 vcNewGraphWin; imagesc(img); truesize; axis off
+
+%%
+LFDispVidCirc(lightfield);
 
 %%

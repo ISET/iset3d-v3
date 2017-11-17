@@ -29,6 +29,7 @@ classdef recipe < matlab.mixin.Copyable
         integrator;  % Usually SurfaceIntegrator
         renderer;    %
         lookAt;      % from/to/up struct
+        scale;       % Optional scale factor to flip handedness
         world;       % A cell array with all the WorldBegin/End contents
         inputFile;   % Original input file
         outputFile;  % Where outputFile = piWrite(recipe);

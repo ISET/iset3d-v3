@@ -1,14 +1,21 @@
 %% s_piReadRenderLens
 %
-% Rendering takes longer through a lens as the size of the aperture grows.
-% The pinhole case is always the fastest, of course.
+% Renders an optical image (oi) for the teapot-area-light scene through a lens.
+% This rendering takes longer than a pinhole, and the duration increases with
+% the aperture size.
 %
-% See Temporary.m for a thisROrig that runs correctly.  Delete that when this
-% runs correctly.
+% This rendering is set with a relatively small number of rays per pixel
+% for speed.
+%
+%  Time (sec)     film res        n Rays        Aperture
+%     9            256            128             2
+%     2            256            128             3
+%     2.4          256            256             3
+%     18           256            256             2
+%     25           256            256             5
 %
 % See also
 %  s_piReadRender, s_piReadRenderLF
-%  
 %
 % BW SCIEN Team, 2017
 
@@ -30,32 +37,24 @@ thisR = piRead(fname);
 %% Modify the recipe, thisR, to adjust the rendering
 
 thisR.set('camera','realistic');
-thisR.set('aperture',4);  % The number of rays should go up with the aperture 
+thisR.set('aperture',2);  % The number of rays should go up with the aperture 
 thisR.set('film resolution',256);
 thisR.set('rays per pixel',128);
 
-% We need to move the camera far enough away so we get a decent focus.
+% We need to move the camera far enough away so we get a decent view.
 objDist = thisR.get('object distance');
-thisR.set('object distance',10*objDist);
+thisR.set('object distance',3.5*objDist);
 thisR.set('autofocus',true);
 
-%% Set up Docker 
+%% Set up Docker directory
 
-% Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
-
-% We copy the pbrt scene directory to the working directory
 [p,n,e] = fileparts(fname); 
-copyfile(p,workingDirectory);
+thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
+piWrite(thisR);
 
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+%% Render the output file with the Docker container
 
-%% Render with the Docker container
-
-oi = piRender(oname,'meanilluminance',10,'renderType','radiance');
+oi = piRender(thisR,'meanilluminance',10,'renderType','both');
 
 % Show it in ISET
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
