@@ -1,13 +1,12 @@
 % s_piReadRender
 %
-% Read a PBRT scene file, interpret it, render it (with depth map)
+% Read a PBRT scene file, interpret it, render it (with depth map).  On a fast
+% machine, this takes about 5 sec.
 %
 % Path requirements
 %    ISET or ISETBIO
 %    pbrt2ISET  - 
-%   
-%    Consider RemoteDataToolbox, UnitTestToolbox for the lenses and
-%    curated scenes.
+%    Consider RemoteDataToolbox for other uses.
 %
 %{
 fname = fullfile(piRootPath,'data','bunny','bunny.pbrt');
@@ -36,23 +35,16 @@ thisR = piRead(fname);
 %% Modify the recipe, thisR, to adjust the rendering
 
 
-%% Set up Docker 
+%% Set up Docker directory
 
-% Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
-
-% We copy the pbrt scene directory to the working directory
+% Write out the pbrt scene file, based on thisR.  By def, to the working directory.
 [p,n,e] = fileparts(fname); 
-copyfile(p,workingDirectory);
-
-% Now write out the edited pbrt scene file, based on thisR, to the working
-% directory.
-oname = fullfile(workingDirectory,[n,e]);
-piWrite(thisR, oname, 'overwrite', true);
+thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
+piWrite(thisR);
 
 %% Render with the Docker container
 
-scene = piRender(oname);
+scene = piRender(thisR);
 
 % Show it in ISET
 vcAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);     

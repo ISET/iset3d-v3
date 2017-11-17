@@ -1,15 +1,31 @@
 function blockLines = piBlockExtract(txtLines,varargin)
-% piBlockExtract - Given a series of text lines in cell format (e.g. output of piRead),
-% extract a block that corresponds to the given keyword.
-
-% Example
-% txtLines = piRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
-% cameraBlock = piExtractBlock(txtLines,'blockName','camera')
-
+% piBlockExtract - Extract text blocks that correspond to the given keyword.
+%
+% Syntax
+%   blockLines = piBlockExtract(txtLines,varargin)
+% 
+% Input
+%   txtLines - Cell array of text lines, usually from piRead
+% 
+% Optional parameters
+%   'blockName' - A string defining the block.  Case insensitivie????
+%
+% Return
+%   blockLines - Cell array of text lines in the block
+%
+% Examples in source
+%
 % TL Scienstanford 2017
 
+% Examples
+%{
+   txtLines = piRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
+   cameraBlock = piExtractBlock(txtLines,'blockName','camera')
+%}
 
-%%
+
+%%  Identify the blockname.  
+
 p = inputParser;
 p.addRequired('txtLines',@(x)(iscell(txtLines) && ~isempty(txtLines)));
 addParameter(p,'blockName','Camera',@ischar);
@@ -24,10 +40,14 @@ nLines = length(txtLines);
 for ii=1:nLines
     thisLine = txtLines{ii};
     if length(thisLine) >= length(blockName)
+        % The line is long enough, so compare if it starts with the blockname
         if strncmp(thisLine,blockName,length(blockName))
+            % It does, so this is the start
             blockBegin = ii;
+            % Keep adding lines whose first symbol is a double quote (")
             for jj=(ii+1):nLines
-                if isempty(txtLines{jj})
+                if isempty(txtLines{jj}) || ~isequal(txtLines{jj}(1),'"') % isempty(txtLines{jj})
+                    % Some other character, so get out.
                     blockEnd = jj;
                     break;
                 end
@@ -36,12 +56,12 @@ for ii=1:nLines
     end
 end
 
-% If the blockName is not found, then blockBegin and blockEnd will be
-% empty.
+% If not blockBegin/End return empty
+blockLines = [];  
+
+% Otherwise, return the textlines
 if(~isempty('blockBegin') && ~isempty('blockEnd'))
     blockLines = txtLines(blockBegin:(blockEnd-1));
-else
-    blockLines = [];
 end
 
 

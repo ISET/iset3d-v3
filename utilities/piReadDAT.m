@@ -47,7 +47,7 @@ maxPlanes = parser.Results.maxPlanes;
 lens = [];
 
 %% Open the file.
-fprintf('Opening file "%s".\n', filename);
+% fprintf('Opening file "%s".\n', filename);
 [fid, message] = fopen(filename, 'r');
 if fid < 0,  error(message); end
 
@@ -118,7 +118,7 @@ if ~isempty(maxPlanes) && maxPlanes < nPlanes
     imageData = imageData(:, :, 1:maxPlanes);
 end
 
-fprintf('OK.\n');
+% fprintf('OK.\n');
 
 end
 

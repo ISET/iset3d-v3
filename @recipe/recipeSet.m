@@ -3,7 +3,9 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %
 % The recipe has lots of fields, including camera, filter, and so forth. Many
 % comments needed here.
-% 
+%
+% Examples
+%   thisR.set('lensFile','dgauss.22deg.3.0mm.dat')
 %
 % BW ISETBIO Team, 2017
 
@@ -21,12 +23,21 @@ p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
 p.addRequired('val');
 
+p.addParameter('lensfile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
+
 p.parse(thisR, param, val, varargin{:});
 
 param = ieParamFormat(p.Results.param);
 
 %% Act
 switch param
+    
+        % Rendering and Docker related
+    case {'outputfile'}
+        thisR.outputFile = val;
+    case {'inputFile'}
+        thisR.inputFile = val;
+        
         % Scene
     case 'objectdistance'
         % Adjust the lookat 'from' field to match the distance in val
@@ -35,28 +46,50 @@ switch param
         % Make the unit vector a val distance away and add
         newDirection = objDirection*val;
         thisR.lookAt.from = thisR.lookAt.to + newDirection;
-
+        
         % Camera
     case 'camera'
         % Initialize a camera type with default parameters
         % To adjust the parameters use recipe.set() calls
-        thisR.camera = piCameraCreate(val);
+        thisR.camera = piCameraCreate(val,p.Results.lensfile);
+    case 'lensfile'
+        thisR.camera.specfile.value = val;
     case 'aperture'
         thisR.camera.aperture_diameter.value = val;
     case 'focaldistance'
         thisR.camera.filmdistance.value = val;
+    case 'lookat'
+        % Includes the from, to and up in a struct
+        if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
+            thisR.lookAt = val; 
+        end
+    case 'fov'
+        % We should check that this is a pinhole, I think
+        thisR.camera.fov.value = val;
+        
+    case 'from'
+        thisR.lookAt.from = val;
+    case 'to'
+        thisR.lookAt.to = val;
+    case 'up'
+        thisR.lookAt.up = val;
+        
     case 'autofocus'
         % thisR.set('autofocus',true);
         % Sets the film distance so the lookAt to point is in good focus
         if val
-            thisR.set('focal distance',thisR.get('focal distance'));
+            fdist = thisR.get('focal distance');
+            if isnan(fdist)
+                error('Camera is probably too close (%f) to focus.',thisR.get('object distance'));
+            end
+            thisR.set('focal distance',fdist);
         end
     case 'microlens'
         % Not sure about what this means.  It is on or off
         thisR.camera.microlens_enabled.value = val;
     case 'nmicrolens'
         % Number of microlens/pinhole samples for a light field camera
-        % 
+        %
         if length(val) == 1, val(2) = val(1); end
         thisR.camera.num_pinholes_h.value = val(1);
         thisR.camera.num_pinholes_w.value = val(2);
@@ -82,7 +115,6 @@ switch param
     case {'pixelsamples','raysperpixel'}
         thisR.sampler.pixelsamples.value = val;
         
-        
-    otherwise 
+    otherwise
         error('Unknown parameter %s\n',param);
 end

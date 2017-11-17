@@ -1,19 +1,33 @@
-function recipe = piRecipeConvertToDepth(recipe,varargin)
-% piRecipeConvertToDepth - Read a recipe and make the appropriate changes
-% so that it will render a depth map.
+function depthRecipe = piRecipeConvertToDepth(recipe,varargin)
+% Convert radiance recipe to a corresponding depth map recipe
 %
-%%
+% Syntax:
+%    depthRecipe = piRecipeConvertToDepth(recipe,varargin)
+%
+% Input
+%  recipe - a typical radiance input recipe
+%
+% Return
+%  depthRecipe - the radiance recipe is converted to a depth recipe for the
+%  same file
+%
+% TL, SCIEN Stanford, 2017
+
+%% Verify and clone the radiance recipe
+
 p = inputParser;
 p.addRequired('recipe',@(x)isequal(class(x),'recipe'));
 p.parse(recipe,varargin{:});
 
-%% 
+depthRecipe = copy(recipe);
+
+%% Adjust the recipe values
 
 % Assign metadata integrator
 integrator = struct('type','SurfaceIntegrator','subtype','metadata');
 integrator.strategy.value = 'depth'; 
 integrator.strategy.type = 'string';
-recipe.integrator = integrator;
+depthRecipe.integrator = integrator;
 
 % Change sampler type for better depth sampling
 sampler = struct('type','Sampler','subtype','stratified');
@@ -25,7 +39,7 @@ sampler.xsamples.value= 1;
 sampler.xsamples.type = 'integer';
 sampler.ysamples.value = 1;
 sampler.ysamples.type = 'integer';
-recipe.sampler = sampler;
+depthRecipe.sampler = sampler;
 
 % Change filter for better depth sampling
 filter = struct('type','PixelFilter','subtype','box');
@@ -33,7 +47,12 @@ filter.xwidth.value = 0.5;
 filter.xwidth.type = 'float';
 filter.ywidth.value = 0.5;
 filter.ywidth.type = 'float';
-recipe.filter = filter;
+depthRecipe.filter = filter;
+
+% Assign the right depth output file.  Deep copy issue here?
+[workingFolder, name, ~] = fileparts(recipe.outputFile);
+depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
+depthRecipe.outputFile = depthFile;
 
 end
 

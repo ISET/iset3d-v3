@@ -1,58 +1,88 @@
-function outFile = piWrite(renderRecipe,outFile,varargin)
-% Given a recipe write a PBRT scene file.
+function workingDir = piWrite(renderRecipe,varargin)
+% Write a PBRT scene file based on its renderRecipe
+%
+% Syntax
+%   workingDir = piWrite(recipe,varargin)
+%
+% The pbrt scene file and all of its auxiliary files are written out in a
+% working directory that will be mounted by the docker container.
 %
 % Input
-%   renderRecipe:  a recipe object
-%   outFile:       path to the output pbrt scene file
-%   copyDir:       copy given directory over to the outpath
+%   renderRecipe:  a recipe object describing the rendering parameters.  This
+%       includes the inputFile and the outputFile, which are used to find the
+%       directories containing all of the pbrt scene data.
 %
-%   outFile = piWrite(recipe,fullOutfile,varargin)
+% Optional parameter/values
+%   overwritefile - If scene PBRT file exists, overwrite (default true)
+%   overwritedir  - If the auxiliary files exist, overwrite (default true) 
 %
-% TL Scienstanford 2017
+% Return
+%    workingDir - path to the output directory mounted by the Docker containe
+%
+% TL Scien Stanford 2017
 
-% TODO: Write out a depth map pbrt
 %%
 p = inputParser;
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
-p.addRequired('outFile',@ischar);
-p.addParameter('overwrite',false,@islogical);
-p.addParameter('copyDir','',@isdir);
+p.addParameter('workingDir','',@isdir);
 
-p.parse(renderRecipe,outFile,varargin{:});
+% Copy over the whole directory
+p.addParameter('overwritedir', true,@islogical);
 
-overwrite = p.Results.overwrite;
-copyDir   = p.Results.copyDir;
+% Overwrite the specific scene file
+p.addParameter('overwritefile',true,@islogical);
 
-%% Copy given directory contents over
+p.parse(renderRecipe,varargin{:});
 
-[outpath,~,~] = fileparts(outFile);
-if(~isempty(copyDir))
-    status = copyfile(copyDir,outpath);
-    if(~status)
-        error('Could not copy scene directory contents to output path.');
-    else
-        fprintf('Copied contents from:\n');
-        fprintf('%s \n',copyDir);
-        fprintf('to \n');
-        fprintf('%s \n \n',outpath);
+overwritefile = p.Results.overwritefile;
+overwritedir  = p.Results.overwritedir;
+
+%% Potentially copy the input directory to the Docker working directory
+
+inputDir   = fileparts(renderRecipe.inputFile);
+workingDir = fileparts(renderRecipe.outputFile);
+if(exist(workingDir,'dir') && exist(inputDir,'dir'))
+    if overwritedir
+        status = copyfile(inputDir,workingDir);
+        if(~status)
+            error('Failed to copy input directory to docker working directory.');
+        else
+            fprintf('Copied contents from:\n');
+            fprintf('%s \n',inputDir);
+            fprintf('to \n');
+            fprintf('%s \n \n',workingDir);
+        end
     end
+else
+    error('Either input (%s) or working (%s) directory does not exist.',inputDir,workingDir);
 end
 
-%% Set up a text files to write into.
+%% Potentially over-write the scene PBRT file
 
-% Check if it exists. If it does, ask the user if we can overwrite.
-if(exist(outFile,'file')) && ~overwrite
-    fprintf('Writing out to %s \n',outFile);
-    prompt = 'The PBRT file we are writing the recipe to already exists. Overwrite? (Y/N)';
-    userInput = input(prompt,'s');
-    if(strcmp(userInput,'N'))
-        error('PBRT file already exists.');
-    else
-        warning('Overwriting out file.')
+outFile = renderRecipe.outputFile;
+
+% Check if the outFile exists. If it does, decide what to do.
+if(exist(outFile,'file'))
+    if overwritefile
+        fprintf('Overwriting PBRT file %s.\n',outFile)
         delete(outFile);
+    else
+        error('PBRT file %s exists.',outFile);
+    end 
+end
+
+%% If the optics type is lens, always copy the lens file
+if isequal(renderRecipe.get('optics type'),'lens')
+    [~,name,ext] = fileparts(renderRecipe.camera.specfile.value);
+    lensFile = fullfile(workingDir,[name,ext]);
+    if ~exist(lensFile,'file')
+        copyfile(renderRecipe.camera.specfile.value,lensFile);
     end
 end
 
+%% OK, we are good to go. Open up the file.
+
+% fprintf('Opening %s for output\n',outFile);
 fileID = fopen(outFile,'w');
 
 %% Write header
@@ -61,8 +91,16 @@ fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clo
 fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
 fprintf(fileID,'\n');
 
-%% Write LookAt command first
+%% Write Scale and LookAt commands first
 
+% Optional Scale
+if(~isempty(renderRecipe.scale))   
+   fprintf(fileID,'Scale %0.2f %0.2f %0.2f \n', ...
+    [renderRecipe.scale(1) renderRecipe.scale(2) renderRecipe.scale(3)]);
+    fprintf(fileID,'\n');
+end
+
+% Required LookAt 
 fprintf(fileID,'LookAt %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f \n', ...
     [renderRecipe.lookAt.from renderRecipe.lookAt.to renderRecipe.lookAt.up]);
 fprintf(fileID,'\n');
@@ -139,10 +177,10 @@ for ofns = outerFields'
                         %}
                     else
                         relativeValue = strcat(name,ext);
-                        [success,~,~] = copyfile(currValue,outpath);
+                        [success,~,~] = copyfile(currValue,workingDir);
                         if(success)
-                            fprintf('Copied %s to: \n',currValue);
-                            fprintf('%s \n',fullfile(outpath,relativeValue));
+                            % fprintf('Copied %s to: \n',currValue);
+                            % fprintf('%s \n',fullfile(workingDir,relativeValue));
                             currValue = relativeValue;
                         else
                             % Warning or error?

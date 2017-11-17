@@ -1,4 +1,4 @@
-function [from, to, up] = piTransform2LookAt(world2Cam)
+function [from, to, up, flip] = piTransform2LookAt(world2Cam)
 % Convert world2Cam transform matrix to from/to/up representation
 % 
 % Syntax
@@ -55,11 +55,18 @@ from = from(1:3);
 % replaced by a single LookAt but a LookAt and a scaling matrix to
 % express this reflection part. We have to keep tracking of the
 % determinant of the transform matrix in doing this translations
-if det(world2Cam) < 0,     up = world2Cam\[0 -1 0 0]';
-    % up = cam2World*[0 -1 0 0]';
-else,                      up = world2Cam\[0 1 0 0]';
-    % up = cam2World*[0 1 0 0]';
+if det(world2Cam) < 0 
+    % up = world2Cam\[0 -1 0 0]';
+    flip = 1;
+else                   
+    % up = world2Cam\[0 1 0 0]';
+    flip = 0;
 end
+up = world2Cam\[0 1 0 0]'; % TL: I don't think the above up's are correct, just from trial and error.  
 up = up(1:3);
+
+from = from';
+up = up';
+to = to';
 
 end

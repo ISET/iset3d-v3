@@ -1,26 +1,21 @@
-function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
+function [ieObject, result] = piRender(thisR,varargin)
 % Read a PBRT V2 scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
-%  [oi or scene or depth map] = piRender(pbrtFile,varargin)
+%  [oi or scene or depth map] = piRender(thisR,varargin)
 %
-% Inputf
-%  sceneFile - required PBRT file.  The file should specify the
-%              location of the auxiliary (include) data
+% REQUIRED input
+%  thisR - A recipe, whose outputFile specifies the file, OR a string that
+%          is a full path to a scene pbrt file.
 %
-% Optional input parameter/val
-%  renderType - render radiance, depth or both (default)
+% OPTIONAL input parameter/val
+%  renderType - render radiance, depth or both (default).  If the input is
+%               a fullpath to a file, then we only render the radiance
+%               data. Ask if you want this changed to permit a depth map.
 %
-% Return
+% RETURN
 %   ieObject - an ISET scene. oi, or a depth map image
-%   outFile  - full path to the output file (maybe)
 %
-% TL SCIEN Stanford, 2017
-
-% Programming todo
-%   Fix up the ray trace parameters and optics model in ISETBIO to work with
-%   this.  Not sure what we will do for ISET.
-
 % Examples:
 %
 %  Scene files are in pbrt-v2-spectral on wandell's home account.  We
@@ -33,13 +28,17 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
 %   sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/rtbTeapot-metal.pbrt';
 %   sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/rtbVilla-daylight.pbrt';
 %
-% Example code
+%
+% TL SCIEN Stanford, 2017
+
+% Examples 
 %{
    % Example 1 - run the docker container
    sceneFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/rtbVilla-daylight.pbrt';
    [scene, outFile] = piRender(sceneFile);
-   ieAddObject(scene); sceneWindow;
-
+   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+%}
+%{
    % Example 2 - read the radiance file into an ieObject
    % We are pretending in this case that it was created with a lens
    radianceFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/bunny.dat';
@@ -47,36 +46,74 @@ function [ieObject, outFile, result] = piRender(pbrtFile,varargin)
    oi = piOIcreate(photons);
    ieAddObject(oi); oiWindow;
 %}
-% TL/BW/AJ Scienstanford 2017
+%{
+   % Example 3 - render an existing pbrt file
+   pbrtFile = '/Users/wandell/Documents/MATLAB/pbrt2ISET/local/teapot-area-light.pbrt';
+   scene = piRender(pbrtFile);
+   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+%}
 
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
 p = inputParser;
 p.KeepUnmatched = true;
 
-p.addRequired('pbrtFile',@(x)(exist(x,'file')));
+% p.addRequired('pbrtFile',@(x)(exist(x,'file')));
+p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
 rTypes = {'radiance','depth','both'};
 p.addParameter('renderType','both',@(x)(contains(x,rTypes))); 
 
-p.parse(pbrtFile,varargin{:});
+p.parse(thisR,varargin{:});
 renderType = p.Results.renderType;
 
-%% Set up the working folder.  We need the absolute path.
+if ischar(thisR)
+    % In this case, we are just rendering a pbrt file.  No depthFile.
+    % We could do more/better in the future.  The directory containing the
+    % pbrtFile will be mounted.
+    pbrtFile = thisR;
+    
+    % Figure out this optics type of the file
+    thisR = piRead(pbrtFile);
+    opticsType = thisR.get('optics type');
 
-[workingFolder, name, ~] = fileparts(pbrtFile);
-if(isempty(workingFolder))
-    error('We need an absolute path for the working folder.');
+    if ~strcmp(renderType,'radiance')
+        warning('For a file name input, we only render radiance');
+        renderType = 'radiance';
+    end
+    
+    [workingFolder, name, ~] = fileparts(pbrtFile);
+    if(isempty(workingFolder))
+        error('We need an absolute path for the working folder.');
+    end
+    
+elseif isa(thisR,'recipe')
+    %% Set up the working folder that will be mounted by the Docker image
+    
+    opticsType = thisR.get('optics type');
+    
+    % Set up the radiance file
+    [workingFolder, name, ~] = fileparts(thisR.outputFile);
+    if(~exist(workingFolder,'dir'))
+        error('We need an absolute path for the working folder.');
+    end
+    pbrtFile = thisR.outputFile;
+
+    % Set up the depth file
+    if strcmp(renderType,'both') || strcmp(renderType,'depth')
+        
+        % Write out a pbrt file with depth
+        % depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
+        depthRecipe = piRecipeConvertToDepth(thisR);
+        
+        % Always overwrite the depth file, but don't copy over the whole directory
+        piWrite(depthRecipe,'overwritefile',true,'overwritedir',false);
+        
+        depthFile = depthRecipe.outputFile;
+    end
+    
+else
+    error('A full path to a scene pbrt file or a recipe class is required\n');
 end
-
-%% Set up files to render, depending on 'renderType'
-
-% Write out a pbrt file with depth
-depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
-recipe      = piRead(pbrtFile);
-depthRecipe = piRecipeConvertToDepth(recipe);
-
-% Always overwrite?
-depthFile   = piWrite(depthRecipe,depthFile,'overwrite',true);
 
 filesToRender = {};
 label = {};
@@ -131,7 +168,7 @@ for ii = 1:length(filesToRender)
     %% Invoke the Docker command with or without capturing results.
     tic
     [status, result] = piRunCommand(cmd);
-    toc
+    elapsedTime = toc; 
     
     %% Check the return
     
@@ -139,20 +176,21 @@ for ii = 1:length(filesToRender)
         warning('Docker did not run correctly');
         disp(result)
         pause;
-    else
-        fprintf('Docker run status %d, seems OK.\n',status);
-        fprintf('Outfile file was set to %s.\n',outFile);
     end
+    % Used to have an else condition here
+    % fprintf('Docker run status %d, seems OK.\n',status);
+    % fprintf('Outfile file: %s.\n',outFile);
+    
     
     %% Convert the radiance.dat to an ieObject
 
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
-        recipe = piRead(pbrtFile);
+        thisR = piRead(pbrtFile);
         
-        if(isfield(recipe.film,'filename'))
-            name = recipe.film.filename.value;
+        if(isfield(thisR.film,'filename'))
+            name = thisR.film.filename.value;
             [~,name,~] = fileparts(name); % Strip the extension (often EXR)
             warning('Output file name was %s. \n',name);
             
@@ -174,6 +212,8 @@ for ii = 1:length(filesToRender)
         depthMap = tmp(:,:,1); clear tmp;
     end
     
+    fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
+
 end
 
 %% Read the data and set some of the ieObject parameters
@@ -188,23 +228,24 @@ if(strcmp(renderType,'depth'))
 end
 
 % If radiance, return a scene or optical image
-switch recipe.get('optics type')
+switch opticsType 
     case 'lens'
         % If we used a lens, the ieObject is an optical image (irradiance).
-        %
+        
         % We should set fov or filmDiag here.  We should also set other ray
         % trace optics parameters here. We are using defaults for now, but we
         % will find those numbers in the future from inside the radiance.dat
         % file and put them in here.
-        
         ieObject = piOICreate(photons,varargin{:});  % Settable parameters passed
         ieObject = oiSet(ieObject,'name',ieObjName);
         % I think this should work (BW)
         if(~isempty(depthMap))
             ieObject = oiSet(ieObject,'depth map',depthMap);
         end
-        % This always worked in ISET, but not in ISETBIO.  So I stuck in a hack
-        % to ISETBIO to make it work there temporarily and created an issue
+        
+        % This always worked in ISET, but not in ISETBIO.  So I stuck in a
+        % hack to ISETBIO to make it work there temporarily and created an
+        % issue. (BW).
         ieObject = oiSet(ieObject,'optics model','ray trace');
     
     case 'pinhole'
@@ -213,6 +254,11 @@ switch recipe.get('optics type')
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(depthMap))
             ieObject = sceneSet(ieObject,'depth map',depthMap);
+        end
+        
+        % There may be other parameters here in this future
+        if strcmp(thisR.get('optics type'),'pinhole')
+            ieObject = sceneSet(ieObject,'fov',thisR.get('fov'));
         end
 end
 
