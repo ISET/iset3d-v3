@@ -24,17 +24,17 @@ function val = recipeGet(thisR,param,varargin)
 %     'object distance'
 %     'object direction'
 %     'look at'
-%     'from'
-%     'to'
-%     'up'
-%     'from to'
+%       'from'
+%       'to'
+%       'up'
+%       'from to' - vector difference from - to
 %     'optics type'
-%     'focal distance'
-%     'fov'  (Field of view) if a pinhole optics type
+%     'focal distance' - See ... (mm)
+%     'fov'  (Field of view) if a pinhole 'optics type'
 %     
 %    % Light field camera
-%     'n microlens'
-%     'n subpixels'
+%     'n microlens' (alias 'n pinholes') - 2-vector, row,col
+%     'n subpixels' - 2 vector, row,col
 %      
 % BW, ISETBIO Team, 2017
 
@@ -128,13 +128,15 @@ switch ieParamFormat(param)
         if isequal(thisR.get('optics type'),'pinhole')
             val = thisR.camera.fov.value;
         else
+            % Perhaps we could figure out the FOV here for the lens or
+            % light field type cameras.  Should be possible.
             warning('Not a pinhole camera.  Setting fov to 40');
             val = 40;
         end
         
         
         % Light field camera parameters
-    case 'nmicrolens'
+    case {'nmicrolens','npinholes'}
         % How many microlens (pinholes)
         val(2) = thisR.camera.num_pinholes_w.value;
         val(1) = thisR.camera.num_pinholes_h.value;

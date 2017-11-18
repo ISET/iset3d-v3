@@ -7,7 +7,7 @@
 %
 %  Timing     film resol   rays per pixel
 %   482 s        128            128
-%   XXX          192            192
+%   1063 s       192            128
 %
 % The ChessSet scene data are fairly large, so we do not include it in the
 % github repository.  To download it, use the piFetchPBRT command below.
