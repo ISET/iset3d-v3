@@ -6,7 +6,8 @@
 % through the different sub-images.
 %
 %  Time        N Rays    NMicroLens     Nsubpixels
-%   162 s        128      128, 128         7,7
+%    30 s         64        128         7,7
+%   162 s        128        128         7,7
 %
 % TL/BW SCIEN, 2017
 
@@ -29,7 +30,7 @@ thisR = piRead(fname);
 
 % Configure the light field camera
 thisR.set('camera','light field');
-thisR.set('n microlens',[128 128]);
+thisR.set('n microlens',[64 64]);
 thisR.set('n subpixels',[7, 7]);
 
 thisR.set('microlens',1);   % Not sure what on or off means.  Investigate.
@@ -89,4 +90,17 @@ img = squeeze(lightfield(r,c,:,:,:).^(1/2.2));
 vcNewGraphWin; imagesc(img); truesize; axis off
 %}
 
-%%
+%% Whiten up this image
+%{
+
+correctionMatrix = piWhiteField(thisR);
+v = sensorGet(sensor,'volts');
+v = v ./ correctionMatrix;
+sensor = sensorSet(sensor,'volts',v);
+sensorImageWindow;
+
+ip = ipCompute(ip,sensor);
+lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
+LFDispVidCirc(lightfield.^(1/2.2));
+
+%}

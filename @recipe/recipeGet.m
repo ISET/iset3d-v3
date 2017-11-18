@@ -150,10 +150,13 @@ switch ieParamFormat(param)
     case 'filmresolution'
         val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
     case 'filmxresolution'
+        % An integer
         val = thisR.film.xresolution.value;
     case 'filmyresolution'
+        % An integer
         val = [thisR.film.yresolution.value];
     case 'filmsubtype'
+        % What are the legitimate options?
         val = thisR.film.subtype;
         
     otherwise
