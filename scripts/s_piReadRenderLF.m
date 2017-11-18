@@ -27,19 +27,21 @@ thisR = piRead(fname);
 
 %% Modify the recipe, thisR, to adjust the rendering
 
+% Configure the light field camera
 thisR.set('camera','light field');
 thisR.set('n microlens',[128 128]);
 thisR.set('n subpixels',[7, 7]);
-thisR.set('microlens',1);   % Not sure about on or off
-thisR.set('aperture',50);
-thisR.set('rays per pixel',128);
-thisR.set('light field film resolution',true);
 
-% We need to move the camera far enough away so we get a decent focus.
-thisR.set('object distance',35);   % I guess about 10 mm away because the scene is tiny
+thisR.set('microlens',1);   % Not sure what on or off means.  Investigate.
+thisR.set('aperture',50);   % LF cameras need a big aperture
+thisR.set('rays per pixel',128);   % Governs quality of rendering
+thisR.set('light field film resolution',true);  % Sets film resolution
+
+% Move the camera far enough away to get a decent focus.
+thisR.set('object distance',35);  % In mm
 thisR.set('autofocus',true);
 
-%% Set up Docker files
+%% Write out modified PBRT file
 
 [p,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
@@ -54,46 +56,37 @@ vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);
 
 %% Create a sensor 
 
-% Make the sensor so that each pixel is aligned with a single sample
+% Make a sensor so that each pixel is aligned with a single sample
 % in the OI.  Then produce the sensor data.  The sensor has a standard
-% color filter array.
-% sensorCreate('light field',oi);
-ss = oiGet(oi,'sample spacing','m');
-sensor = sensorCreate;
-sensor = sensorSet(sensor,'pixel size same fill factor',ss(1));
-sensor = sensorSet(sensor,'size',oiGet(oi,'size'));
-sensor = sensorSet(sensor,'exp time',0.010);
-
-% Describe
-sensorGet(sensor,'pixel size','um')
-sensorGet(sensor,'size')
-sensorGet(sensor,'fov',[],oi)
+% Bayer color filter array.
+sensor = sensorCreate('light field',oi);
 
 % Compute the sensor responses and show
 sensor = sensorCompute(sensor,oi);
 ieAddObject(sensor); sensorWindow('scale',1);
 
-%% Use the image processor to demosaic (bilinear) the color filter data
+%% Use the image processor to demosaic (bilinear) the sensor data
 
 ip = ipCreate;
 ip = ipCompute(ip,sensor);
 vcAddObject(ip); ipWindow;
 
-%% Pack the samples of the rgb image into the lightfield structure used by the light field toolbox
-% This is the format used by Don Dansereau's light field toolbox
+%% Pack the sensor rgb image into the lightfield structure
 
-% nPinholes = recipe.get('npinholes');
-nPinholes  = thisR.get('n microlens');
+% This is the format used by Don Dansereau's light field toolbox
+nPinholes  = thisR.get('n microlens');  % Or pinholes
 lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
 
-superPixels(1) = size(lightfield,1);
-superPixels(2) = size(lightfield,2);
+% Click on window and press ESC to end
+LFDispVidCirc(lightfield.^(1/2.2));
 
-%% Display the image from the center pixel of each microlens
-img = squeeze(lightfield(3,3,:,:,:));
+%% Display the center pixel image
+
+%{
+r = ceil(size(lightfield,1)/2);
+c = ceil(size(lightfield,2)/2);
+img = squeeze(lightfield(r,c,:,:,:).^(1/2.2));
 vcNewGraphWin; imagesc(img); truesize; axis off
-
-%%
-LFDispVidCirc(lightfield);
+%}
 
 %%
