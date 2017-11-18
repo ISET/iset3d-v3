@@ -6,6 +6,8 @@
 % Timing on a 2015 MacPro with a few cores.
 %
 %  Timing     film resol   rays per pixel
+%   482 s        128            128
+%   XXX          192            192
 %
 % The ChessSet scene data are fairly large, so we do not include it in the
 % github repository.  To download it, use the piFetchPBRT command below.
@@ -33,19 +35,22 @@ if ~exist(fname,'file'), error('File not found'); end
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
 
-%% Default is a relatively low resolution (256).
+%% Default is a relatively low resolution
+
+% Set up LF camera
 thisR.set('camera','light field');
-thisR.set('n microlens',[128 128]);
+thisR.set('n microlens',[192 192]);
 thisR.set('n subpixels',[7, 7]);
+
+%  Configure for big aperture and pbrt parameters
 thisR.set('microlens',1);   % Not sure about on or off
 thisR.set('aperture',50);
 thisR.set('rays per pixel',128);
-thisR.set('light field film resolution',true);
+thisR.set('light field film resolution',true); % Sets film resolution
 
-% We need to move the camera far enough away so we get a decent focus.
-thisR.set('object distance',35); 
+% Set the film distance to get a focus for the lookAt.to
 thisR.set('autofocus',true);
-%% Set up Docker 
+%% Write the pbrt file we will render
 
 [p,n,e] = fileparts(fname); 
 thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
@@ -58,4 +63,27 @@ oi = piRender(thisR);
 % Show it in ISET
 vcAddObject(oi); oiWindow;
 
+%% Create a matched light field sensor
+
+sensor = sensorCreate('light field',oi);
+sensor = sensorCompute(sensor,oi);
+vcAddObject(sensor); sensorWindow;
+
+%% Image process ... should really use the whiteScene here
+
+ip = ipCreate;
+ip = ipCompute(ip,sensor);
+vcAddObject(ip); ipWindow;
+
+%%  Show the different views
+
+nPinholes  = thisR.get('n microlens');
+lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
+
+% Click on window and press ESC to end
+LFDispVidCirc(lightfield.^(1/2.2));
+
 %%
+
+
+
