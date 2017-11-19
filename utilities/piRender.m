@@ -60,11 +60,17 @@ p.KeepUnmatched = true;
 
 % p.addRequired('pbrtFile',@(x)(exist(x,'file')));
 p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
+
+% Squeeze out spaces and force lower case
+for ii=1:2:length(varargin)
+    varargin{ii} = ieParamFormat(varargin{ii}); 
+end
+
 rTypes = {'radiance','depth','both'};
-p.addParameter('renderType','both',@(x)(contains(x,rTypes))); 
+p.addParameter('rendertype','both',@(x)(contains(x,rTypes))); 
 
 p.parse(thisR,varargin{:});
-renderType = p.Results.renderType;
+renderType = p.Results.rendertype;
 
 if ischar(thisR)
     % In this case, we are just rendering a pbrt file.  No depthFile.
