@@ -8,20 +8,26 @@ function [correctionMatrix, sensor,oi] = piWhiteField(lfRecipe,varargin)
 %  lfRecipe:  Recipe describing the light field camera you used to render
 %
 % Optional inputs
-%  None
+%  'mean illuminance' - Set oi mean illuminance (default 10 lux)
+%
 % Returns
 %    correctionMatrix:  Sensor pixel voltage array from white scene
 %    sensor:            Contains the responses to the white scene
 %    oi:                The light field of the white scene
 %
-% The white field response (correctionMatrix) can be used to normalize the
-% sensor response.  In this case, a large white field will be rendered as
-% white.   
+% The white field response (correctionMatrix) is computed.  This matrix can
+% be used to normalize the sensor volts from a light field camera,
+% accounting for the inhomogeneity across the subpixels and for color
+% sensitivity differences.  When the correction matrix is applied, a large
+% white field will be rendered as white.
 %
-% The white scene has to be calculated using the same camera parameters as
-% in the original light field.  This correctionMatrix can be reused if the
-% camera is maintained, but it must be recalibrated if we change the number
-% of pinholes, subpixel properties, lens, or film.
+% The white scene is calculated using the same camera parameters as in the
+% original light field.  This correctionMatrix can be reused, but it must
+% be recalibrated if you change the number of pinholes, subpixel
+% properties, lens, or film.
+%
+% By default, the white scene is treated as if it is a 10 lux image.  The
+% sensor created here is the one returned sensorCreate('light field',oi). 
 %
 % See also:  s_piReadRenderLF, ip2lightfield
 %
@@ -29,16 +35,22 @@ function [correctionMatrix, sensor,oi] = piWhiteField(lfRecipe,varargin)
 %
 % BW, Scien Stanford, 2017
 
-% Programming Notes
+%% Programming Notes
 %
-%  You can download the white scene, if it is not local, using
+% We need a way to send in different sensor parameters, I guess.
+%
+% You can download the white scene, if it is not local, using\
+%
 %   piFetchPBRT('whiteScene');
+%
 %  We need a way to just save and load the white calibration values rather
 %  than re-running every time.
 %
+
+%% Example
 %{
 
-% This is based on running the chess set scene.
+% This is based on running the chess set scene.  Neaten or eliminate soon.
 
 % Not sure why the chess voltages are so low.  Probably the exposure
 % duration.
@@ -65,6 +77,17 @@ LFDispVidCirc(lightfield.^(1/2.2));
 
 %}
 
+%% Begin routine
+p = inputParser;
+p.addRequired('lfRecipe',@(x)(isa(x,'recipe')));
+
+for ii=1:2:length(varargin)
+    varargin{ii} = ieParamFormat(varargin{ii});
+end
+p.addParameter('meanilluminance',10,@isscalar)
+p.parse(lfRecipe,varargin{:});
+meanIlluminance = p.Results.meanilluminance;
+
 %% Load in the white scene
 
 % Read the white pbrt file.  Return it as a recipe
@@ -73,24 +96,28 @@ if ~exist(fname,'file'), error('File not found'); end
 whiteRecipe = piRead(fname);
 
 % Copy the camera and film parts of the light field recipe
-whiteRecipe.camera = lfRecipe.camera;
-whiteRecipe.film   = lfRecipe.film;
+whiteRecipe.camera    = lfRecipe.camera;
+whiteRecipe.film      = lfRecipe.film;
+whiteRecipe.sampler   = lfRecipe.sampler;
+whiteRecipe.filter    = lfRecipe.filter;
+whiteRecipe.renderer  = lfRecipe.renderer;
 
 % Where we store the output
 whiteRecipe.set('outputFile',fullfile(piRootPath,'local','whiteScene.pbrt'));
 piWrite(whiteRecipe);
 
 %%
-oi = piRender(whiteRecipe);
+oi = piRender(whiteRecipe,'renderType','radiance');
 oi = oiSet(oi,'name','LF white field');
+oi = oiSet(oi,'mean illuminance',meanIlluminance);
+% vcAddObject(oi); oiWindow; 
 
 %% Build up the sensor calibration
 sensor = sensorCreate('light field',oi);
 sensor = sensorCompute(sensor,oi);
 correctionMatrix = sensorGet(sensor,'volts');
+% vcAddObject(sensor); sensorImageWindow; 
 
-% vcAddObject(sensor); sensorImageWindow;
-%% 
 end
 
 

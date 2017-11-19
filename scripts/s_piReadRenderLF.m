@@ -30,7 +30,7 @@ thisR = piRead(fname);
 
 % Configure the light field camera
 thisR.set('camera','light field');
-thisR.set('n microlens',[64 64]);
+thisR.set('n microlens',[128 128]);
 thisR.set('n subpixels',[7, 7]);
 
 thisR.set('microlens',1);   % Not sure what on or off means.  Investigate.
@@ -42,6 +42,8 @@ thisR.set('light field film resolution',true);  % Sets film resolution
 thisR.set('object distance',35);  % In mm
 thisR.set('autofocus',true);
 
+% thisR.get('film resolution')
+
 %% Write out modified PBRT file
 
 [p,n,e] = fileparts(fname); 
@@ -50,10 +52,18 @@ piWrite(thisR);
 
 %% Render with the Docker container
 
-oi = piRender(thisR,'meanilluminance',10);
+oi = piRender(thisR,'mean illuminance',10);
 
 % Show it in ISET
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
+
+%% White balance
+
+%{
+[cMatrix,~,oiW] = piWhiteField(thisR);
+vcAddObject(oiW); oiWindow;
+vcNewGraphWin; imagesc(cMatrix)
+%}
 
 %% Create a sensor 
 
@@ -61,10 +71,31 @@ vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);
 % in the OI.  Then produce the sensor data.  The sensor has a standard
 % Bayer color filter array.
 sensor = sensorCreate('light field',oi);
+sensor = sensorSet(sensor,'exp time',0.005);  % 10 ms.
 
 % Compute the sensor responses and show
 sensor = sensorCompute(sensor,oi);
 ieAddObject(sensor); sensorWindow('scale',1);
+
+%{
+function sensor = sensorScale(sensor,varargin);
+%
+% Typical:
+%    'volts' cMatrix derived by piWhiteField
+%
+% Do we have this type of scaling somewhere else?
+v = sensorGet(sensor,'volts'); 
+lst = (cMatrix > 1/10);   % Don't want to scale by more than this
+v(lst) = v(lst) ./ cMatrix(lst);
+% vcNewGraphWin; imagesc(v);
+
+sensorW = sensorSet(sensor,'volts',v);
+sensorW = sensorSet(sensorW,'name','white field'); 
+ieAddObject(sensorW); sensorWindow('scale',1);
+
+sensor = sensorW;
+% 
+%}
 
 %% Use the image processor to demosaic (bilinear) the sensor data
 
@@ -78,8 +109,12 @@ vcAddObject(ip); ipWindow;
 nPinholes  = thisR.get('n microlens');  % Or pinholes
 lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
 
-% Click on window and press ESC to end
-LFDispVidCirc(lightfield.^(1/2.2));
+%% Show little video if you like
+
+%{
+ % Click on window and press ESC to end
+ LFDispVidCirc(lightfield.^(1/2.2));
+%}
 
 %% Display the center pixel image
 
@@ -93,11 +128,17 @@ vcNewGraphWin; imagesc(img); truesize; axis off
 %% Whiten up this image
 %{
 
-correctionMatrix = piWhiteField(thisR);
+% Produces the pixel voltages to a uniform white scene
+[correctionMatrix, wSensor] = piWhiteField(thisR);
+vcAddObject(wSensor); sensorImageWindow;
+vcNewGraphWin; histogram(correctionMatrix(:));
+
+% Read the voltages from the teapot scene and scale them by the correction
+% matrix
 v = sensorGet(sensor,'volts');
 v = v ./ correctionMatrix;
-sensor = sensorSet(sensor,'volts',v);
-sensorImageWindow;
+sensorCC = sensorSet(sensor,'volts',v);
+vcAddObject(sensorCC); sensorImageWindow;
 
 ip = ipCompute(ip,sensor);
 lightfield = ip2lightfield(ip,'pinholes',nPinholes,'colorspace','srgb');
