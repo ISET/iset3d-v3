@@ -41,7 +41,7 @@ function [correctionMatrix, sensor,oi] = piWhiteField(lfRecipe,varargin)
 %
 % You can download the white scene, if it is not local, using\
 %
-%   piFetchPBRT('whiteScene');
+%   piPBRTFetch('whiteScene');
 %
 %  We need a way to just save and load the white calibration values rather
 %  than re-running every time.
