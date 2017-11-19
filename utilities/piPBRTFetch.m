@@ -1,9 +1,8 @@
-function [fnameZIP, artifact] = piFetchPBRT(aName,varargin)
-% Deprecated.  Use piPBRTFetch
+function [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
 % FETCH a PBRT file from the RDT archive to a local directory.
 %
 % Syntax
-%  piFetchPBRT(artifactName,varargin)
+%  piPBRTFetch(artifactName,varargin)
 %
 % Required input
 %   artifactName - The base name of the artifact that can be found by a search
@@ -31,7 +30,7 @@ function [fnameZIP, artifact] = piFetchPBRT(aName,varargin)
 %{
  % Specify the scene name, download it, and render it
  % By default, the download is to piRootPath/data
- [fnameZIP, artifact] = piFetchPBRT('whiteScene');
+ [fnameZIP, artifact] = piPBRTFetch('whiteScene');
  [p,n,e] = fileparts(fnameZIP);
  name = fullfile(p,n); fname = [n,'.pbrt'];
 
@@ -49,17 +48,12 @@ function [fnameZIP, artifact] = piFetchPBRT(aName,varargin)
 %{
  % By default, this places the data in piRootPath/data.  
  % You could set the 'deletezip', true parameter.
- [fnameZIP, artifact] = piFetchPBRT('sanmiguel');
+ [fnameZIP, artifact] = piPBRTFetch('sanmiguel');
 
  % Assumes the scene pbrt file is in piRootPath/data
  % And places the output in piRootPath/local
  s_sanmiguel;
 %}
-
-warning('Calling piPBRTFetch.  This routine is deprecated').
-piPBRTFetch(aName,varargin{:});
-
-end
 
 %% Parse inputs
 p = inputParser;

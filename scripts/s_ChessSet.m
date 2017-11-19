@@ -19,7 +19,7 @@
 % <https://github.com/isetbio/RemoteDataToolbox.git>.
 % 
 % Download comment
-%   piFetchPBRT('ChessSet');      % Get the chess set for the RDT
+%   piPBRTFetch('ChessSet');      % Get the chess set for the RDT
 %
 % BW SCIEN 2017
 
