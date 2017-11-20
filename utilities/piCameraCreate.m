@@ -88,7 +88,7 @@ switch cameraType
         % TODO:
         % When we render, we need to make sure pbrt2ISET automatically
         % copies over all the correct files into a the working folder. This
-        % is taken care of in the eye modeling code repo, but not here.
+        % is taken care of in ISETBIO, but not here.
         % TODO: 
         % Move some default accomodated eye and dispersion curves for the
         % eye into the data folder in pbrt2ISET. Fill them into the missing
