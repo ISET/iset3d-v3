@@ -153,7 +153,7 @@ elseif(ver == 3)
 end
 
 if(isempty(sfBlock))
-    warning('Cannot find "integrator" in PBRT file.');
+    warning('Cannot find "integrator" in PBRT file. Did you forget to turn on the v3 flag?');
     thisR.integrator = struct([]); % Return empty.
 else
     thisR.integrator = piBlock2Struct(sfBlock);
@@ -170,23 +170,18 @@ if(ver == 2)
         thisR.renderer = piBlock2Struct(rendererBlock);
     end
 else
-    warning('Renderers do not exist in PBRTv3. Leaving blank...')
+    warning('"Renderer" does not exist in the new PBRTv3 format. We will leave the field blank in the recipe.')
 end
 
-%% Read LookAt and ConcatTransform, if they exist
-%
-% Since we've split txtLines appropriately previously, we don't have to
-% worry about finding transforms within the World block.
-%
-% We should also read in 'Transform' which is present in some pbrt
-% scene files.  If that exists, don't bother with lookAt or
-% ConcatTransform.
+%% Read LookAt, Transforms, and ConcatTransform, if they exist
+% Parse the camera position.
 
+% A flag for flipping from a RHS to a LHS. 
 flip = 0;
 
 lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
 if(isempty(lookAtBlock))
-    warning('Cannot find "LookAt" for PBRT file. Returning default.');
+    % Default camera position.
     thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
 else
     values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
@@ -195,6 +190,22 @@ else
     up = [values{8} values{9} values{10}];
 end
 
+% If there's a transform it will overwrite the LookAt.
+transformBlock = piBlockExtract(txtLines,'blockName','Transform');
+if(~isempty(transformBlock))
+    values = textscan(transformBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
+    values = cell2mat(values(2:end));
+    transform = reshape(values,[4 4]);
+    [from,to,up,flip] = piTransform2LookAt(transform);
+end
+
+% Error checking
+if(isempty(transformBlock) && isempty(lookAtBlock))
+    warning('Cannot find "LookAt" or "Transform" in PBRT file. Returning default.');
+end
+
+% If there's a concat transform, we use it to update the current camera
+% position. 
 concatTBlock = piBlockExtract(txtLines,'blockName','ConcatTransform');
 if(~isempty(concatTBlock))
     values = textscan(concatTBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
@@ -227,30 +238,5 @@ end
 if(flip)
     thisR.scale = [-1 1 1];
 end
-
-%% Extract world begin/world end
-
-% % Extract world as a cell of text lines
-% fid = fopen(fname, 'r');
-% world = cell(1,1);
-% tline = fgetl(fid);
-% worldStart = 0;
-% while ischar(tline)
-%     if contains(tline, 'WorldBegin')
-%         worldStart = 1;
-%         world{1}  = tline;  
-%     end
-%     tline = fgetl(fid);
-%     if worldStart
-%         world{end + 1}  = tline;      
-%     end
-% end
-% fclose(fid);
-% world = {world(1:end-1)}; % Get rid of the last line
-% if(~worldStart)   
-%     warning('Cannot find "WorldBegin" for PBRT file.');
-% end
-% thisR.world = world{1};
-
 
 end
