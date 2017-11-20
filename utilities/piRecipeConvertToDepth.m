@@ -24,7 +24,11 @@ depthRecipe = copy(recipe);
 %% Adjust the recipe values
 
 % Assign metadata integrator
-integrator = struct('type','SurfaceIntegrator','subtype','metadata');
+if(recipe.version == 3)
+    integrator = struct('type','Integrator','subtype','metadata');
+else 
+    integrator = struct('type','SurfaceIntegrator','subtype','metadata');
+end
 integrator.strategy.value = 'depth'; 
 integrator.strategy.type = 'string';
 depthRecipe.integrator = integrator;
@@ -48,6 +52,11 @@ filter.xwidth.type = 'float';
 filter.ywidth.value = 0.5;
 filter.ywidth.type = 'float';
 depthRecipe.filter = filter;
+
+% Error checking
+if(isempty(recipe.outputFile))
+    error('Recipe output file is empty.');
+end
 
 % Assign the right depth output file.  Deep copy issue here?
 [workingFolder, name, ~] = fileparts(recipe.outputFile);
