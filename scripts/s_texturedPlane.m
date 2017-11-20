@@ -1,9 +1,10 @@
 %% Demonstrate how to use the texturedPlane scene
 % The textured plane scene consists of a single plane sized 1 m x 1 m.
-% Initially, it is located at the origin (0,0,0). The plane can be
-% arbitrarly textured with an EXR image file. You will need to scale and
+% Initially, it is located at the origin (0,0,0) and rotated so it is
+% perpendicular to the y-axis and parallel to the x-axis. The plane can be
+% arbitrarily textured with an EXR image file. You will need to scale and
 % translate the plane away from the camera in order to see anything. We
-% have some handy function in pbrt2ISET that can do this. 
+% have some handy functions in pbrt2ISET that can do this.
 %
 % Side note: The "no filtering" flag for the texture is automatically
 % turned on, so there is no anti-aliasing filter applied during rendering
@@ -19,9 +20,6 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the pbrt scene
-% This scene consists of an infinite light source and a white disk placed 1
-% meter away from the camera. The disk itself has a radius of 1 meter as
-% well.
 fname = fullfile(piRootPath,'data','texturedPlane','texturedPlane.pbrt');
 
 % Read the main scene pbrt file.  Return it as a recipe
@@ -40,9 +38,6 @@ end
 % scene =
 % sceneEye('texturedPlane','planeDistance',1000,'texture','resolution.exr');
 %
-% ...means "load a textured plane scene at a distance of 1000 mm with the
-% resolution texture attached."
-%
 % This is only possible because the sceneEye object can automatically take
 % care of these setps for the user. It is more convenient for the user but
 % has less flexibility. Maybe we should think about whether we want
@@ -59,7 +54,7 @@ translate = 1000; % mm
 % also know that our camera is located at the origin and looking down the
 % positive y-axis. 
 % Note: The order of scaling and translating matters!
-piMoveObject(thisR,'Plane','Scale',[scale scale scale]); 
+piMoveObject(thisR,'Plane','Scale',[scale scale scale]); % The plane is oriented in the x-z plane
 piMoveObject(thisR,'Plane','Translate',[0 translate 0]); 
 
 %% Attach a desired texture
@@ -75,7 +70,7 @@ piMoveObject(thisR,'Plane','Translate',[0 translate 0]);
 imageName = 'squareResolutionChart.exr';
 imageFile = fullfile(piRootPath,'data','imageTextures',imageName);
 
-% The original file has an dummy texture called "dummyTexture.exr." We have
+% The original file has an dummy texture called "dummyTexture.exr." We use
 % pbrt2ISET find and replace this texture with one of our own. Be sure to
 % copy it to the right folder location!
 % TODO: Should we have piWrite check for textures in the world block and
