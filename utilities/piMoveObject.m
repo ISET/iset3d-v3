@@ -68,7 +68,6 @@ world = recipe.world;
 
 % Find an ObjectBegin/ObjectEnd block within world. This will not always
 % exist, especially for wild scenes that weren't exported from RTB4.
-% ObjectBegin "2_BlackMaterial"
 targetLine = sprintf('ObjectBegin "%s"',objectName);
 foundFlag = 0;
 for ii = 1:length(world)

@@ -1,0 +1,73 @@
+# This scene consists of a textured plane that is illuminated by an
+# infinite, D65 light. By default the plane is 1 m x 1 m and is located
+# at (0,0,0). You will probably want to translate the plane away from 
+# the camera and scale it appropriately. 
+
+# camera default orientation
+LookAt 0 0 0 0 0 -1 0 1 0 
+
+# camera scene position
+ConcatTransform [-1 0 0 0 0 0 -1 0 0 1 0 0 0 0 0 1] 
+
+# 1_Camera
+Camera "perspective"
+  "float fov" [30]
+
+# integrator
+SurfaceIntegrator "path" 
+  "integer maxdepth" [1] 
+
+# sampler
+Sampler "lowdiscrepancy" 
+  "integer pixelsamples" [128] 
+
+# filter
+PixelFilter "gaussian" 
+  "float alpha" [2] 
+  "float xwidth" [2] 
+  "float ywidth" [2] 
+
+# film
+Film "image" 
+  "integer xresolution" [128] 
+  "integer yresolution" [128] 
+
+WorldBegin
+
+# User specified texture
+Texture "planeTexture" "spectrum" "imagemap" 
+  "string filename" "dummyTexture.exr" 
+  "bool noFiltering" "true" 
+
+# 1_DefaultMaterial
+MakeNamedMaterial "1_DefaultMaterial" "string type" "uber" 
+  "rgb Kd" [0.600000 0.600000 0.600000] 
+  "rgb Ks" [0 0 0] 
+  "spectrum Kr" [300 0 800 0] 
+  "float roughness" [0] 
+  "float index" [1] 
+  "rgb opacity" [1 1 1] 
+
+# 2_DisplayPlaneMaterial
+MakeNamedMaterial "2_DisplayPlaneMaterial" "string type" "uber" 
+  "rgb Ks" [0.0 0.0 0.0] 
+  "texture Kd" "planeTexture" 
+
+# Plane
+ObjectBegin "Plane"
+  NamedMaterial "2_DisplayPlaneMaterial"   
+  Include "scenes/PBRT/pbrt-geometry/1_DisplayPlane.pbrt"   
+ObjectEnd
+
+# Plane
+# from node Plane
+AttributeBegin  
+  ObjectInstance "Plane"   
+AttributeEnd
+
+LightSource "infinite" 
+  "integer nsamples" [8] 
+  "spectrum L" "D65.spd" 
+
+WorldEnd
+
