@@ -149,7 +149,12 @@ for ii = 1:length(filesToRender)
     
     %% Build the docker command
     dockerCommand   = 'docker run -ti --rm';
-    dockerImageName = 'vistalab/pbrt-v2-spectral';
+    
+    if(thisR.version == 3)
+        dockerImageName = 'vistalab/pbrt-v3-spectral';
+    else
+        dockerImageName = 'vistalab/pbrt-v2-spectral';
+    end
     
     [~,currName,~] = fileparts(currFile);
     
