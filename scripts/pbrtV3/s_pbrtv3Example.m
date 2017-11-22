@@ -61,7 +61,7 @@ recipe.set('outputFile',fullfile(piRootPath,'local',strcat(oiName,'.pbrt')));
 piWrite(recipe);
 [oi, result] = piRender(recipe);
 
-oi = oiSet(oi,'gamma',0.5);
-
 vcAddObject(oi);
 oiWindow;
+
+oi = oiSet(oi,'gamma',0.5);
