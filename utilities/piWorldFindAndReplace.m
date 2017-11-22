@@ -34,7 +34,7 @@ world = recipe.world;
 foundCount = 0;
 for ii = 1:length(world)
     currLine = world{ii};
-    if(contains(currLine,oldString))
+    if(~isempty(strfind(currLine,oldString)))
         
         foundCount = foundCount + 1;
         currLine = strrep(currLine,oldString,newString);
@@ -44,7 +44,7 @@ for ii = 1:length(world)
 end
 
 if(foundCount == 0)
-    warning('Did not find object: %s \n',objectName);
+    warning('Did not find string: %s \n',oldString);
 else
     fprintf('Found and replaced %i instances. \n',foundCount);
 end
