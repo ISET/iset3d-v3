@@ -13,7 +13,7 @@ if ~piDockerExists, piDockerConfig; end
 % Replace this with your own path. You can find the living room scene here:
 % https://benedikt-bitterli.me/resources/
 % or the direct link here:
-% https://benedikt-bitterli.me/resources/pbrt-v3/bathroom.zip
+% https://benedikt-bitterli.me/resources/pbrt-v3/living-room-2.zip
 recipe = piRead('/Users/trishalian/GitRepos/pbrt-v3-scenes-Bitterli/living-room-2/scene.pbrt','version',3);
 
 %% Change the camera lens
