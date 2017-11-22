@@ -81,7 +81,7 @@ worldBeginIndex = 0;
 
 for ii = 1:length(txtLines)
     currLine = txtLines{ii};
-    if(contains(currLine,'WorldBegin'))
+    if(~isempty(strfind(currLine,'WorldBegin')))
         worldBeginIndex = ii;
         break;
     end
