@@ -104,7 +104,7 @@ switch ieParamFormat(param)
         % yet.
         val = thisR.camera.subtype;
         if isequal(val,'perspective'), val = 'pinhole';
-        elseif ismember(val,{'realisticDiffraction','realisticEye'})
+        elseif ismember(val,{'realisticDiffraction','realisticEye','realistic'})
             val = 'lens';
         end
     case 'focaldistance'
