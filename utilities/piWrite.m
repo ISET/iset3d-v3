@@ -80,7 +80,11 @@ if isequal(renderRecipe.get('optics type'),'lens')
     end
     lensFile = fullfile(workingDir,[name,ext]);
     if ~exist(lensFile,'file')
-        copyfile(renderRecipe.camera.specfile.value,lensFile);
+        if(renderRecipe.version == 3)
+            copyfile(renderRecipe.camera.lensfile.value,lensFile);
+        else
+            copyfile(renderRecipe.camera.specfile.value,lensFile);
+        end
     end
 end
 
