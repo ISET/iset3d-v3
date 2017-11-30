@@ -68,7 +68,7 @@ for ii=1:2:length(varargin)
 end
 
 rTypes = {'radiance','depth','both'};
-p.addParameter('rendertype','both',@(x)(contains(x,rTypes))); 
+p.addParameter('rendertype','both'); 
 
 p.addParameter('version',2,@(x)isnumeric(x));
 
