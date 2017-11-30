@@ -35,6 +35,7 @@ switch param
         % Rendering and Docker related
     case {'outputfile'}
         thisR.outputFile = val;
+
     case {'inputFile'}
         thisR.inputFile = val;
         
@@ -54,6 +55,7 @@ switch param
         thisR.camera = piCameraCreate(val,p.Results.lensfile);
     case 'lensfile'
         thisR.camera.specfile.value = val;
+        thisR.camera.specfile.type = 'string';
     case 'aperture'
         thisR.camera.aperture_diameter.value = val;
     case 'focaldistance'
