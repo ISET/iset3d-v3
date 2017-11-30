@@ -74,11 +74,15 @@ end
 %% If the optics type is lens, always copy the lens file
 if isequal(renderRecipe.get('optics type'),'lens')
     if(renderRecipe.version == 3)
-        [relPath,name,ext] = fileparts(renderRecipe.camera.lensfile.value);
+        [relpath,name,ext] = fileparts(renderRecipe.camera.lensfile.value);
     else
-        [relPath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
+        [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
     end
-    lensFile = fullfile(workingDir,relPath,[name,ext]);
+    % Check for an absolute path for the lens
+    if(isempty(relpath))
+        warning('An absolute path is needed for the lens file.');
+    end
+    lensFile = fullfile(workingDir,[name,ext]);
     if ~exist(lensFile,'file')
         if(renderRecipe.version == 3)
             copyfile(renderRecipe.camera.lensfile.value,lensFile);
