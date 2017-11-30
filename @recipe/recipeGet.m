@@ -126,7 +126,12 @@ switch ieParamFormat(param)
         % If pinhole optics, this works.  Should check and deal with other
         % cases, I suppose.
         if isequal(thisR.get('optics type'),'pinhole')
-            val = thisR.camera.fov.value;
+            
+            if isfield(thisR.camera,'fov')
+                val = thisR.camera.fov.value;
+            else
+                val = atand(thisR.camera.filmdiag.value/2/thisR.camera.filmdistance.value);
+            end
         else
             % Perhaps we could figure out the FOV here for the lens or
             % light field type cameras.  Should be possible.
