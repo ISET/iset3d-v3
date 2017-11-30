@@ -36,7 +36,7 @@ function [imageData, imageSize, lens] = piReadDAT(filename, varargin)
 %%
 parser = inputParser();
 parser.addRequired('filename', @ischar);
-parser.addParameter('maxPlanes', [], @isnumeric);
+parser.addParameter('maxPlanes', 31, @isnumeric);
 
 parser.parse(filename, varargin{:});
 filename = parser.Results.filename;

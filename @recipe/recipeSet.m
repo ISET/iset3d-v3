@@ -35,6 +35,7 @@ switch param
         % Rendering and Docker related
     case {'outputfile'}
         thisR.outputFile = val;
+
     case {'inputFile'}
         thisR.inputFile = val;
         
@@ -52,8 +53,11 @@ switch param
         % Initialize a camera type with default parameters
         % To adjust the parameters use recipe.set() calls
         thisR.camera = piCameraCreate(val,p.Results.lensfile);
+    case 'cameratype'
+        thisR.camera.subtype = val;
     case 'lensfile'
         thisR.camera.specfile.value = val;
+        thisR.camera.specfile.type = 'string';
     case 'aperture'
         thisR.camera.aperture_diameter.value = val;
     case 'focaldistance'
