@@ -25,6 +25,8 @@ classdef gCloud < handle
         
         dockerImage = '';
         
+        targets;
+        
     end
     
     methods
