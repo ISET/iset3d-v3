@@ -30,7 +30,11 @@ cmd = sprintf('gsutil cp %s/%s %s/%s.pbrt %s/',sceneFolder,zipFileName,...
                                           cloudFolder);
 system(cmd);
 
+target.camera = scene.camera;
+target.local = fullfile(sceneFolder,sprintf('%s.pbrt',sceneFile));
+target.remote = fullfile(cloudFolder,sprintf('%s.pbrt',sceneFile));
 
+obj.targets = cat(1,obj.targets,target);      
 
 
 end

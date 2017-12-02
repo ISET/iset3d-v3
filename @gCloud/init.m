@@ -47,6 +47,8 @@ if isempty(result)
     system(cmd);
 end
 
+%{
+
 % Create a cleanup job in the user namespace.
 cmd = sprintf('kubectl get jobs --namespace=%s | grep cleanup',obj.namespace);
 [~, result] = system(cmd);
@@ -56,7 +58,7 @@ if isempty(strfind(result,'cleanup'))
         obj.namespace,obj.namespace,obj.namespace);
     system(cmd);
 end
-
+%}
 
 %% Push the docker rendering image to the project
 
@@ -71,9 +73,9 @@ cmd = sprintf('gcloud container images list --repository=%s | grep %s',container
 % the future.
 if isempty(result)
     % We need to copy the container to gcloud 
-    cmd = sprintf('docker pull rendertooblox/%s',containerName);
+    cmd = sprintf('docker pull hblasins/%s',containerName);
     system(cmd);
-    cmd = sprintf('docker tag rendertoolbox/%s %s/%s',containerName, containerDir, containerName);
+    cmd = sprintf('docker tag hblasins/%s %s/%s',containerName, containerDir, containerName);
     system(cmd);
     cmd = sprintf('gcloud docker -- push %s/%s',containerDir, containerName);
     system(cmd);
