@@ -209,7 +209,11 @@ for ofns = outerFields'
             elseif(strcmp(currType,'rgb'))
                 lineFormat = '  "%s %s" [%f %f %f] \n';
             elseif(strcmp(currType,'float'))
-                lineFormat = '  "%s %s" [%f] \n';
+                if(length(currValue) > 1)
+                    lineFormat = '  "%s %s" [%f %f %f %f] \n';
+                else
+                    lineFormat = '  "%s %s" [%f] \n';
+                end
             elseif(strcmp(currType,'integer'))
                 lineFormat = '  "%s %s" [%i] \n';
             end
