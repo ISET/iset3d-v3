@@ -33,12 +33,16 @@ integrator.strategy.value = 'depth';
 integrator.strategy.type = 'string';
 depthRecipe.integrator = integrator;
 
+% For version 3, we have to turn off the weighting on the camera
+if(recipe.version == 3)
+    depthRecipe.camera.noweighting.value = 'true';
+    depthRecipe.camera.noweighting.type = 'bool';
+end
+
 % Change sampler type for better depth sampling
 sampler = struct('type','Sampler','subtype','stratified');
 sampler.jitter.value = 'false';
 sampler.jitter.type = 'bool';
-sampler.pixelsamples.value = 8;
-sampler.pixelsamples.type = 'integer';
 sampler.xsamples.value= 1;
 sampler.xsamples.type = 'integer';
 sampler.ysamples.value = 1;

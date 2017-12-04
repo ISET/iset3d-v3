@@ -37,7 +37,7 @@ recipe.camera.lensfile.value = lensFile; % mm
 recipe.camera.lensfile.type = 'string';
 
 % Set the aperture to be the largest possible.
-recipe.camera.aperturediameter.value = 0.87; % mm
+recipe.camera.aperturediameter.value = 1; % mm
 recipe.camera.aperturediameter.type = 'float';
 
 % Focus at roughly meter away. 
@@ -50,8 +50,9 @@ recipe.film.diagonal.type = 'float';
 
 %% Change render quality
 % This quality takes around 30 seconds to render on a machine with 8 cores.
-recipe.set('filmresolution',[128 128]);
+recipe.set('filmresolution',[256 256]);
 recipe.set('pixelsamples',256);
+recipe.integrator.maxdepth.value = 1;
 
 %% Render
 
@@ -59,7 +60,7 @@ oiName = 'livingRoomWideAngle';
 recipe.set('outputFile',fullfile(piRootPath,'local',strcat(oiName,'.pbrt')));
 
 piWrite(recipe);
-[oi, result] = piRender(recipe);
+[oi, result] = piRender(recipe,'renderType','depth');
 
 vcAddObject(oi);
 oiWindow;
