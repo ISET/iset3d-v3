@@ -4,7 +4,7 @@ for t=1:length(obj.targets)
     
     jobName = lower(obj.targets(t).remote);
     jobName(jobName == '_' | jobName == '.' | jobName == '-' | jobName == '/' | jobName == ':') = '';
-    jobName = jobName(max(1,length(jobName)-63):end);
+    jobName = jobName(max(1,length(jobName)-62):end);
     
     % Kubernetess does not allow two jobs with the same name.
     % We need to delete the old one first
