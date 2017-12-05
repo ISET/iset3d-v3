@@ -113,7 +113,7 @@ if(~isempty(renderRecipe.scale))
 end
 
 % Required LookAt 
-fprintf(fileID,'LookAt %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f \n', ...
+fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
     [renderRecipe.lookAt.from renderRecipe.lookAt.to renderRecipe.lookAt.up]);
 fprintf(fileID,'\n');
 
