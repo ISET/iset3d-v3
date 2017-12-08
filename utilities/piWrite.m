@@ -4,8 +4,14 @@ function workingDir = piWrite(renderRecipe,varargin)
 % Syntax
 %   workingDir = piWrite(recipe,varargin)
 %
-% The pbrt scene file and all of its auxiliary files are written out in a
-% working directory that will be mounted by the docker container.
+% The pbrt scene file and all of its resources files are written out
+% in a working directory that will be mounted by the docker container.
+%
+% In some cases, there are multiple PBRT files that use the same
+% resources files.  If you know the resources files are already there,
+% you can set overwriteresources to false.  Similarly if you do not
+% want to overwrite the pbrt scene file, set overwritepbrtfile to
+% false.
 %
 % Input
 %   renderRecipe:  a recipe object describing the rendering parameters.  This
@@ -13,36 +19,46 @@ function workingDir = piWrite(renderRecipe,varargin)
 %       directories containing all of the pbrt scene data.
 %
 % Optional parameter/values
-%   overwritefile - If scene PBRT file exists, overwrite (default true)
-%   overwritedir  - If the auxiliary files exist, overwrite (default true) 
+%   overwritepbrtfile  - If scene PBRT file exists,    overwrite (default true)
+%   overwriteresources - If the resources files exist, overwrite (default true) 
 %
 % Return
 %    workingDir - path to the output directory mounted by the Docker containe
 %
 % TL Scien Stanford 2017
 
+%{
+piWrite(thisR,'overwrite resources',false);
+%}
 %%
 p = inputParser;
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
-p.addParameter('workingDir','',@isdir);
+
+% Format the parameters by removing spaces and forcing lower case.
+if ~isempty(varargin), varargin = ieParamFormat(varargin); end
+p.addParameter('workingdir','',@isdir);
 
 % Copy over the whole directory
-p.addParameter('overwritedir', true,@islogical);
+p.addParameter('overwriteresources', true,@islogical);
 
 % Overwrite the specific scene file
-p.addParameter('overwritefile',true,@islogical);
+p.addParameter('overwritepbrtfile',true,@islogical);
 
 p.parse(renderRecipe,varargin{:});
 
-overwritefile = p.Results.overwritefile;
-overwritedir  = p.Results.overwritedir;
+workingDir          = p.Results.workingdir;
+overwritepbrtfile   = p.Results.overwritepbrtfile;
+overwriteresources  = p.Results.overwriteresources;
 
 %% Potentially copy the input directory to the Docker working directory
 
 inputDir   = fileparts(renderRecipe.inputFile);
 workingDir = fileparts(renderRecipe.outputFile);
 if(exist(workingDir,'dir') && exist(inputDir,'dir'))
-    if overwritedir
+    % This is a full directory copy, so all of the resources in the
+    % input directory are written to the working directory that the
+    % docker container mounts.
+    if overwriteresources
         status = copyfile(inputDir,workingDir);
         if(~status)
             error('Failed to copy input directory to docker working directory.');
@@ -63,26 +79,48 @@ outFile = renderRecipe.outputFile;
 
 % Check if the outFile exists. If it does, decide what to do.
 if(exist(outFile,'file'))
-    if overwritefile
+    if overwritepbrtfile
+        % This is the pbrt scene file.
         fprintf('Overwriting PBRT file %s.\n',outFile)
         delete(outFile);
     else
+        % Do not overwrite is set, and yet it exists.  This will cause
+        % trouble later.  So we stop here.
         error('PBRT file %s exists.',outFile);
     end 
 end
 
 %% If the optics type is lens, always copy the lens file
+
 if isequal(renderRecipe.get('optics type'),'lens')
-    if(renderRecipe.version == 3)
+    % We are planning to make the variable lensfile everywhere.  But
+    % for version 2 the lens file is stored in the specfile field.
+    
+    % We could check that the lens file is an absolute path by
+    % confirming that the first character is '/'
+    
+    if isfield(renderRecipe.camera,'lensfile')
         [relpath,name,ext] = fileparts(renderRecipe.camera.lensfile.value);
-    else
-        [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
+    elseif isfield(renderRecipe.camera,'specfile')
+        if (renderRecipe.version == 3)
+            warning('Use lensfield, not specfile for version 3 and higher');
+            [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
+        end
     end
+    
+    %     if(renderRecipe.version == 3)
+    %         [relpath,name,ext] = fileparts(renderRecipe.camera.lensfile.value);
+    %     elseif
+    %         [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
+    %     end
+    
     % Check for an absolute path for the lens
     if(isempty(relpath))
         warning('An absolute path is needed for the lens file.');
     end
-    lensFile = fullfile(workingDir,[name,ext]);
+    lensDir = fullfile(workingDir,'lens');
+    if ~exist(lensDir,'dir'), mkdir(lensDir); end
+    lensFile = fullfile(lensDir,[name,ext]);
     if ~exist(lensFile,'file')
         if(renderRecipe.version == 3)
             copyfile(renderRecipe.camera.lensfile.value,lensFile);
@@ -173,11 +211,12 @@ for ofns = outerFields'
                 % If the string has an extension like .spd or .dat, we are
                 % going to copy it over to the working folder and then
                 % rename it as a relative path in the recipe.
-                [path,name,ext] = fileparts(currValue);
+                [thisPath,name,ext] = fileparts(currValue);
                 if(~isempty(ext))
                     
-                    % Error check
-                    if(isempty(path))
+                    % Error check - Needs more comments about the
+                    % relative path and absolute path.  BW/TL to do.
+                    if(isempty(thisPath))
                         % We don't need a warning for the filename.
                         % TL: Got rid of warning for now, since it gets
                         % annoying. Maybe we should just assume the user
