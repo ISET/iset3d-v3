@@ -31,7 +31,7 @@ lookAt = thisR.get('lookAt');
 %% Set up Docker working directory and file
 
 [~,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+thisR.outputFile = fullfile(piRootPath,'local','chess',[n,e]);
 piWrite(thisR);
 
 %% Render with the Docker container
