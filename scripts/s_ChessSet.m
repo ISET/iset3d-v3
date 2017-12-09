@@ -37,6 +37,7 @@ if ~exist(fname,'file'), error('File not found'); end
 
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
+from = thisR.get('from');
 
 %% Default is a relatively low resolution (256).
 thisR.set('camera','pinhole');

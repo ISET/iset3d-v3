@@ -28,7 +28,8 @@ function workingDir = piWrite(renderRecipe,varargin)
 % TL Scien Stanford 2017
 
 %{
-piWrite(thisR,'overwrite resources',false);
+piWrite(thisR,'overwriteresources',false);
+piWrite(thisR);
 %}
 %%
 p = inputParser;
@@ -44,11 +45,15 @@ p.addParameter('overwriteresources', true,@islogical);
 % Overwrite the specific scene file
 p.addParameter('overwritepbrtfile',true,@islogical);
 
+% Force overwrite of the lens file
+p.addParameter('overwritelensfile',true,@islogical);
+
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
-overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwriteresources  = p.Results.overwriteresources;
+overwritepbrtfile   = p.Results.overwritepbrtfile;
+overwritelensfile   = p.Results.overwritelensfile;
 
 %% Potentially copy the input directory to the Docker working directory
 
@@ -94,39 +99,36 @@ end
 
 if isequal(renderRecipe.get('optics type'),'lens')
     % We are planning to make the variable lensfile everywhere.  But
-    % for version 2 the lens file is stored in the specfile field.
-    
-    % We could check that the lens file is an absolute path by
-    % confirming that the first character is '/'
+    % for version 2 the lens file is stored in the specfile field. So, we
+    % have some special cases here.
     
     if isfield(renderRecipe.camera,'lensfile')
-        [relpath,name,ext] = fileparts(renderRecipe.camera.lensfile.value);
+        inputLensFile = renderRecipe.camera.lensfile.value;
     elseif isfield(renderRecipe.camera,'specfile')
         if (renderRecipe.version == 3)
-            warning('Use lensfield, not specfile for version 3 and higher');
+            warning('Use lensfile, not specfile, for version 3 and higher');
         end
-        [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
+        inputLensFile = renderRecipe.camera.specfile.value;
     end
     
-    %     if(renderRecipe.version == 3)
-    %         [relpath,name,ext] = fileparts(renderRecipe.camera.lensfile.value);
-    %     elseif
-    %         [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
-    %     end
-    
-    % Check for an absolute path for the lens
-    if(isempty(relpath))
-        warning('An absolute path is needed for the lens file.');
+    % Verify that the input lens is a full path
+    if ~strcmp(inputLensFile(1),'/')
+        error('You must specify an absolute path for the lens file.');
     end
-    lensDir = fullfile(workingDir,'lens');
-    if ~exist(lensDir,'dir'), mkdir(lensDir); end
-    lensFile = fullfile(lensDir,[name,ext]);
-    if ~exist(lensFile,'file')
-        if(renderRecipe.version == 3)
-            copyfile(renderRecipe.camera.lensfile.value,lensFile);
-        else
-            copyfile(renderRecipe.camera.specfile.value,lensFile);
-        end
+    
+    % Figure out the working lens file directory and name
+    [~,name,ext] = fileparts(inputLensFile);
+    workingLensDir = fullfile(workingDir,'lens');
+    if ~exist(workingLensDir,'dir'), mkdir(workingLensDir); end
+    workingLensFile = fullfile(workingLensDir,[name,ext]);
+    
+    % If the working copy doesn't exist, copy it.  If it exists but there
+    % is a force overwrite, delete and copy.
+    if ~exist(workingLensFile,'file')
+        copyfile(inputLensFile,workingLensFile);
+    elseif overwritelensfile
+        delete(workingLensFile);
+        copyfile(inputLensFile,workingLensFile);
     end
 end
 
@@ -196,7 +198,9 @@ for ofns = outerFields'
             if(strcmp(ifn,'type') || ...
                     strcmp(ifn,'subtype') || ...
                     strcmp(ifn,'subpixels_h') || ...
-                    strcmp(ifn,'subpixels_w'))
+                    strcmp(ifn,'subpixels_w') || ...
+                    strcmp(ifn,'specfile') || ...
+                    strcmp(ifn','lensfile'))
                 continue;
             end
             
