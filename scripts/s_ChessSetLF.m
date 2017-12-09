@@ -39,7 +39,7 @@ thisR = piRead(fname);
 
 % Set up LF camera
 thisR.set('camera','light field');
-thisR.set('n microlens',[192 192]);
+thisR.set('n microlens',[128 128]);
 thisR.set('n subpixels',[7, 7]);
 
 %  Configure for big aperture and pbrt parameters
@@ -53,7 +53,7 @@ thisR.set('autofocus',true);
 %% Write the pbrt file we will render
 
 [p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+thisR.outputFile = fullfile(piRootPath,'local','chessLF',[n,e]);
 piWrite(thisR);
 
 %% Render with the Docker container
