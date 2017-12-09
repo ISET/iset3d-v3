@@ -38,8 +38,8 @@ thisR = piRead(fname);
 
 thisR.set('camera','realistic');
 thisR.set('aperture',2);  % The number of rays should go up with the aperture 
-thisR.set('film resolution',256);
-thisR.set('rays per pixel',128);
+thisR.set('film resolution',128);
+thisR.set('rays per pixel',96);
 
 % We need to move the camera far enough away so we get a decent view.
 objDist = thisR.get('object distance');

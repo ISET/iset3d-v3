@@ -28,7 +28,7 @@ function workingDir = piWrite(renderRecipe,varargin)
 % TL Scien Stanford 2017
 
 %{
-piWrite(thisR,'overwriteresources',false);
+piWrite(thisR,'overwrite resources',false,'overwrite pbrt file',true);
 piWrite(thisR);
 %}
 %%
@@ -217,43 +217,38 @@ for ofns = outerFields'
             currType  = renderRecipe.(ofn).(ifn).type;
             
             if(strcmp(currType,'string') || ischar(currValue))
-                % Either a string type, or a spectrum type with a value
-                % of 'xxx.spd'
+                % We have a string with some value
                 lineFormat = '  "%s %s" "%s" \n';
                 
-                % If the string has an extension like .spd or .dat, we are
-                % going to copy it over to the working folder and then
-                % rename it as a relative path in the recipe.
-                [thisPath,name,ext] = fileparts(currValue);
+                % The currValue might be a full path to a file with an
+                % extension. We find the base file name and copy the
+                % file to the working directory. Then, we transform
+                % the string to be printed in the pbrt scene file to
+                % be its new relative path.  There is a minor
+                % exception for the lens file.
+                % Perhaps we should have a better test here, say an
+                % exist() test. (BW).
+                [~,name,ext] = fileparts(currValue);
+
                 if(~isempty(ext))
-                    
-                    % Error check - Needs more comments about the
-                    % relative path and absolute path.  BW/TL to do.
-                    if(isempty(thisPath))
-                        % We don't need a warning for the filename.
-                        % TL: Got rid of warning for now, since it gets
-                        % annoying. Maybe we should just assume the user
-                        % knows what they are doing.
-                        %{
-                        if(~strcmp(ifn,'filename'))
-                            warning('Tried to copy file %s, but filepath does not seem to be absolute.',currValue);
+                    % OK, it has an extension.  So we swing into
+                    % action.  First, copy the file to the working
+                    % directory - unless it is a lens file, in which
+                    % case it is already in place (see above)                    
+                    fileName = strcat(name,ext);
+                    if ~(strcmp(ifn,'specfile') || strcmp(ifn,'lensfile'))
+                        if ~copyfile(currValue,workingDir)
+                            warning('Problem copying %s\n',currValue);
                         end
-                        %}
+                        % Update the file for the relative path
+                        currValue = fileName;
                     else
-                        relativeValue = strcat(name,ext);
-                        [success,~,~] = copyfile(currValue,workingDir);
-                        if(success)
-                            % fprintf('Copied %s to: \n',currValue);
-                            % fprintf('%s \n',fullfile(workingDir,relativeValue));
-                            currValue = relativeValue;
-                        else
-                            % Warning or error?
-                            warning('There was a problem copying file %s.',currValue);
-                        end
+                        % It is a lens, so just update the name.  It
+                        % was already copied
+                        currValue = fullfile('lens',strcat(name,ext));
                     end
-                    
                 end
-                
+                                
             elseif(strcmp(currType,'spectrum') && ~ischar(currValue))
                 % A spectrum of type [wave1 wave2 value1 value2]. TODO:
                 % There are probably more variations of this...
