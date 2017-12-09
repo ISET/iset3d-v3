@@ -6,8 +6,10 @@
 % through the different sub-images.
 %
 %  Time        N Rays    NMicroLens     Nsubpixels
+%                 64         64         7,7
 %    30 s         64        128         7,7
 %   150 s        128        128         7,7
+%   103 s         16        128         7,7
 %
 % TL/BW SCIEN, 2017
 
@@ -35,7 +37,7 @@ thisR.set('n subpixels',[7, 7]);
 
 thisR.set('microlens',1);   % Not sure what on or off means.  Investigate.
 thisR.set('aperture',50);   % LF cameras need a big aperture
-thisR.set('rays per pixel',128);   % Governs quality of rendering
+thisR.set('rays per pixel',16);   % Governs quality of rendering
 thisR.set('light field film resolution',true);  % Sets film resolution
 
 % Move the camera far enough away to get a decent focus.
@@ -47,7 +49,7 @@ thisR.set('autofocus',true);
 %% Write out modified PBRT file
 
 [p,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
+thisR.set('outputFile',fullfile(piRootPath,'local','teapot',[n,e]));
 piWrite(thisR);
 
 %% Render with the Docker container
