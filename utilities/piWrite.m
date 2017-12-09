@@ -55,30 +55,33 @@ overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 
-%% Potentially copy the input directory to the Docker working directory
+%% Copy the input directory to the Docker working directory
 
+% Input must exist
 inputDir   = fileparts(renderRecipe.inputFile);
+if ~exist(inputDir,'dir'), error('Could not find %s\n',inputDir); end
+
+% Make working dir if it does not already exist
 workingDir = fileparts(renderRecipe.outputFile);
-if(exist(workingDir,'dir') && exist(inputDir,'dir'))
-    % This is a full directory copy, so all of the resources in the
-    % input directory are written to the working directory that the
-    % docker container mounts.
-    if overwriteresources
-        status = copyfile(inputDir,workingDir);
-        if(~status)
-            error('Failed to copy input directory to docker working directory.');
-        else
-            fprintf('Copied contents from:\n');
-            fprintf('%s \n',inputDir);
-            fprintf('to \n');
-            fprintf('%s \n \n',workingDir);
-        end
+if ~exist(workingDir,'dir'), mkdir(workingDir); end
+
+% This is a full directory copy, so all of the resources in the
+% input directory are written to the docker working directory.  In some
+% cases we are looping so we can turn off the repeated copies with this
+% flag.
+if overwriteresources
+    status = copyfile(inputDir,workingDir);
+    if(~status)
+        error('Failed to copy input directory to docker working directory.');
+    else
+        fprintf('Copied contents from:\n');
+        fprintf('%s \n',inputDir);
+        fprintf('to \n');
+        fprintf('%s \n \n',workingDir);
     end
-else
-    error('Either input (%s) or working (%s) directory does not exist.',inputDir,workingDir);
 end
 
-%% Potentially over-write the scene PBRT file
+%% Potentially overwrite the scene PBRT file
 
 outFile = renderRecipe.outputFile;
 
@@ -89,18 +92,18 @@ if(exist(outFile,'file'))
         fprintf('Overwriting PBRT file %s.\n',outFile)
         delete(outFile);
     else
-        % Do not overwrite is set, and yet it exists.  This will cause
-        % trouble later.  So we stop here.
+        % Do not overwrite is set, and yet it exists. We don't like this
+        % condition, so we throw an error.
         error('PBRT file %s exists.',outFile);
     end 
 end
 
-%% If the optics type is lens, always copy the lens file
+%% If the optics type is lens, copy the lens file to a lens sub-directory
 
 if isequal(renderRecipe.get('optics type'),'lens')
-    % We are planning to make the variable lensfile everywhere.  But
-    % for version 2 the lens file is stored in the specfile field. So, we
-    % have some special cases here.
+    % In version 2 the lens file is stored in the specfile field. We didn't
+    % like that, and so we are shifting to lensfile field in version 3.
+    % This deals with the compatibility.
     
     if isfield(renderRecipe.camera,'lensfile')
         inputLensFile = renderRecipe.camera.lensfile.value;
@@ -131,6 +134,11 @@ if isequal(renderRecipe.get('optics type'),'lens')
         copyfile(inputLensFile,workingLensFile);
     end
 end
+
+%% Make sure there is a renderings sub-directory of the working directory
+
+renderingDir = fullfile(workingDir,'renderings');
+if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
 
 %% OK, we are good to go. Open up the file.
 
@@ -193,14 +201,15 @@ for ofns = outerFields'
     if(~isempty(innerFields))
         for ifns = innerFields'
             ifn = ifns{1};
-            % Skip these since we've written these out earlier or they are
-            % localized to pbrt2ISET but not pbrt scene files
+            % Skip these since we've written these out earlier, they are
+            % localized to pbrt2ISET but not pbrt scene files. We make a
+            % second copy of the lens file in the workingDir because some
+            % docker containers require it. In the future, we should
+            % exclude lens file and specfile. (BW).
             if(strcmp(ifn,'type') || ...
                     strcmp(ifn,'subtype') || ...
                     strcmp(ifn,'subpixels_h') || ...
-                    strcmp(ifn,'subpixels_w') || ...
-                    strcmp(ifn,'specfile') || ...
-                    strcmp(ifn','lensfile'))
+                    strcmp(ifn,'subpixels_w'))
                 continue;
             end
             
