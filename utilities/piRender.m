@@ -116,7 +116,9 @@ elseif isa(thisR,'recipe')
         depthRecipe = piRecipeConvertToDepth(thisR);
         
         % Always overwrite the depth file, but don't copy over the whole directory
-        piWrite(depthRecipe,'overwritefile',true,'overwritedir',false);
+        piWrite(depthRecipe,'overwritepbrtfile',true,...
+            'overwritelensfile',false,...
+            'overwriteresources',false);
         
         depthFile = depthRecipe.outputFile;
     end
@@ -162,14 +164,9 @@ for ii = 1:length(filesToRender)
     
     [~,currName,~] = fileparts(currFile);
     
-    outFile = fullfile(workingFolder,[currName,'.dat']);
+    outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
     renderCommand = sprintf('pbrt --outfile %s %s', ...
         outFile, currFile);
-    
-    % Not sure why this is not needed here, or it is needed in RtbPBRTRenderer.
-    % if ~isempty(user)
-    %     dockerCommand = sprintf('%s --user="%s":"%s"', dockerCommand, user, user);
-    % end
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
