@@ -36,7 +36,7 @@ p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
 % Format the parameters by removing spaces and forcing lower case.
 if ~isempty(varargin), varargin = ieParamFormat(varargin); end
-p.addParameter('workingdir','',@isdir);
+% p.addParameter('workingdir','',@isdir);
 
 % Copy over the whole directory
 p.addParameter('overwriteresources', true,@islogical);
@@ -46,7 +46,7 @@ p.addParameter('overwritepbrtfile',true,@islogical);
 
 p.parse(renderRecipe,varargin{:});
 
-workingDir          = p.Results.workingdir;
+% workingDir          = p.Results.workingdir;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwriteresources  = p.Results.overwriteresources;
 
@@ -104,8 +104,8 @@ if isequal(renderRecipe.get('optics type'),'lens')
     elseif isfield(renderRecipe.camera,'specfile')
         if (renderRecipe.version == 3)
             warning('Use lensfield, not specfile for version 3 and higher');
-            [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
         end
+        [relpath,name,ext] = fileparts(renderRecipe.camera.specfile.value);
     end
     
     %     if(renderRecipe.version == 3)
