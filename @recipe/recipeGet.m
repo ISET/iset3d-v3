@@ -164,6 +164,9 @@ switch ieParamFormat(param)
         % What are the legitimate options?
         val = thisR.film.subtype;
         
+    case {'raysperpixel'}
+        val = thisR.sampler.pixelsamples.value;
+
     otherwise
         error('Unknown parameter %s\n',param);
 end
