@@ -16,47 +16,59 @@ if ~piDockerExists, piDockerConfig; end
 
 % We organize the pbrt files with its includes (textures, brdfs, spds, geometry)
 % in a single directory. 
-% fname = fullfile(piRootPath,'data','ChessSet','chessSet.pbrt');
-fname = fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
+%
+fname = fullfile(piRootPath,'data','ChessSet','chessSet.pbrt');
+workDir = fullfile(piRootPath,'local','chess');
+%}
+
+%{
+ fname = fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
+ workDir = fullfile(piRootPath,'local','teapot');
+%}
+
 if ~exist(fname,'file'), error('File not found'); end
 [~,basename,ext] = fileparts(fname); 
 
 % Working directory
-workDir = fullfile(piRootPath,'local','teapot');
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
 from = thisR.get('from');
 
-FOV = thisR.get('fov');
-
-
 %% Set up Docker 
 
-% thisR.get('rays per pixel')
-thisR.set('rays per pixel',32);
-
+% For teapot
+%{
+thisR.get('rays per pixel')
+thisR.set('rays per pixel',8);
+FOV = thisR.get('fov');
+%}
 
 % Chess set
-% thisR.set('camera','pinhole');
-% thisR.set('from',from + [0 0 100]);  % First left/right, 2nd moved camera closer and to the right 
-% thisR.set('film resolution',256);
-% thisR.set('rays per pixel',128);
+%
+ thisR.set('camera','pinhole');
+ thisR.set('film resolution',256);
+ thisR.set('rays per pixel',64);
+ FOV = thisR.get('fov');
+%}
+
 
 %%
 
-nShots = 6;
-eTime  = 0.004;
+nShots = 4;
+eTime  = 0.006;
 sensor = sensorCreate;
 sensor = sensorSet(sensor,'fov',FOV);
-sensor = sensorSet(sensor,'exp time',0.008);  % 8 ms exposure
+sensor = sensorSet(sensor,'exp time',eTime);  
 vSwing = sensorGet(sensor,'pixel voltage swing');
 
 % These are the positions of the camera for each shot
 % We need a convenient way to express the parameters in terms of angles or
 % distance or something
-x = randn(nShots,1)*0.3;
-dFrom = zeros(nShots,3);
-dFrom(:,1) = x;
+% Now, we set the scalar to be a percentage of the distance to the
+% object.
+d = thisR.get('object distance');
+sd = d*0.005;
+dFrom = randn(nShots,3)*sd;
 
 for ii=1:nShots
     outputName = sprintf('%s-%d%s',basename,ii,ext);
@@ -83,20 +95,20 @@ for ii=1:nShots
     
     oi = oiCreate;
     oi = oiCompute(oi,scene);
-    % vcAddObject(oi); oiWindow;
+    vcAddObject(oi); oiWindow;
     
     sensor = sensorSet(sensor,'exp time',eTime);
     sensor = sensorCompute(sensor,oi);
-    % vcAddObject(sensor); sensorWindow;
-    if ii == 1
-        volts = sensorGet(sensor,'volts');
-        voltSum = volts;
-    else
-        voltSum = voltSum + sensorGet(sensor,'volts');
+    sensor = sensorSet(sensor,'name',sprintf('from %d',ii));
+    volts = sensorGet(sensor,'volts');
+    vcAddObject(sensor); sensorWindow('scale',true);
+    
+    if ii == 1, voltSum = volts;
+    else,       voltSum = voltSum + volts;
     end
     
     outputName = sprintf('%s-%d%s',basename,ii,'.png');
-    vImage = fullfile(workingDir,'renderings',outputName);
+    vImage = fullfile(workDir,'renderings',outputName);
 
     % Write out png scaled to 0 to 255, re: voltage swing
     imwrite((volts/vSwing)*255,vImage,'png');
