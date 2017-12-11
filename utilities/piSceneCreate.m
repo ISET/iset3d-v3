@@ -29,6 +29,8 @@ p.addRequired('photons',@isnumeric);
 p.addParameter('fov',40,@isscalar)               % Horizontal fov, degrees
 p.addParameter('meanluminance',100,@isscalar);
 
+if ~isempty(varargin), varargin = ieParamFormat(varargin); end
+
 p.parse(photons,varargin{:});
 
 %% Sometimes ISET is not initiated. We need at least this
@@ -49,9 +51,9 @@ scene = sceneSet(scene,'fov',p.Results.fov);
 scene = sceneAdjustLuminance(scene,p.Results.meanluminance); % ISETBIO uses this...
 
 % Adjust other parameters
-if ~isempty(varargin) 
+if ~isempty(varargin)
     for ii=1:2:length(varargin) 
-        param = ieParamFormat(varargin{ii}); 
+        param = varargin{ii}; 
         val = varargin{ii+1};
         scene = sceneSet(scene,param,val);
     end
