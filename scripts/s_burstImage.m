@@ -56,14 +56,13 @@ FOV = thisR.get('fov');
  % First left/right, 2nd moved camera closer and to the right
  % I like this view.
  thisR.set('from',from);   
- FOV = thisR.get('fov');
 %}
 
 
 %%
 
 nShots = 8;
-eTime  = 0.003;
+eTime  = 0.004;
 sensor = sensorCreate;
 sensor = sensorSet(sensor,'fov',FOV);
 sensor = sensorSet(sensor,'exp time',eTime);
@@ -109,13 +108,13 @@ for ii=1:nShots
     
     oi = oiCreate;
     oi = oiCompute(oi,scene);
-    vcAddObject(oi); oiWindow;
+    % vcAddObject(oi); oiWindow;
     
     sensor = sensorCompute(sensor,oi);
     sensor = sensorSet(sensor,'name',sprintf('from %d',ii));
     
     volts  = sensorGet(sensor,'volts');
-    vcAddObject(sensor); sensorWindow('scale',true);
+    % vcAddObject(sensor); sensorWindow('scale',true);
     
     if ii == 1, voltSum = volts;
     else,       voltSum = voltSum + volts;
@@ -136,6 +135,8 @@ sensorBurst = sensorSet(sensorBurst,'name','burst');
 vcAddObject(sensorBurst); sensorWindow;
 sensorSet(sensorBurst,'gamma',0.5);
 
+
+
 %%  Now a single shot from a still recording with the same total time.
 
 thisR.set('from',from);  % First left/right, 2nd moved camera closer and to the right
@@ -150,4 +151,12 @@ sensor = sensorCompute(sensor,oi);
 sensor = sensorSet(sensor,'name','still');
 vcAddObject(sensor); sensorWindow;
 sensorSet(sensor,'gamma',0.5);
+
+%%
+rgb = sensorShowImage(sensor,0.5,1);
+vcNewGraphWin;imagescRGB(rgb); title('Still');
+
+rgb = sensorShowImage(sensorBurst,0.5,1);
+vcNewGraphWin;imagescRGB(rgb); title('Burst');
+
 %%
