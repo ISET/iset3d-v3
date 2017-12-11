@@ -3,9 +3,12 @@
 %  Chess set example with pinhole for speed.
 %  Others can be built on this
 %
-%  For Rob Jones
+%  To simulate blurring we need to compute with no noise, except for
+%  one of the frames
+%  To simulate burst photography we have sensor noise with each
+%  capture.
 %
-% BW
+% BW (For Rob Jones, Psych 221, Fall 2017)
 
 %% Initialize ISET and Docker
 
@@ -39,7 +42,7 @@ from = thisR.get('from');
 % For teapot
 %{
 thisR.get('rays per pixel')
-thisR.set('rays per pixel',8);
+thisR.set('rays per pixel',64);
 FOV = thisR.get('fov');
 %}
 
@@ -47,18 +50,29 @@ FOV = thisR.get('fov');
 %
  thisR.set('camera','pinhole');
  thisR.set('film resolution',256);
- thisR.set('rays per pixel',64);
+ thisR.set('rays per pixel',128);
+ from = from + [0 0 100];
+ 
+ % First left/right, 2nd moved camera closer and to the right
+ % I like this view.
+ thisR.set('from',from);   
  FOV = thisR.get('fov');
 %}
 
 
 %%
 
-nShots = 4;
-eTime  = 0.006;
+nShots = 8;
+eTime  = 0.003;
 sensor = sensorCreate;
 sensor = sensorSet(sensor,'fov',FOV);
-sensor = sensorSet(sensor,'exp time',eTime);  
+sensor = sensorSet(sensor,'exp time',eTime);
+
+% If blur mode, then we add electronic noise in only one frame
+% For burst mode, we have electronic noise every time we measure
+% 1 is photon only, 2 is electronics and photon noise
+sensor = sensorSet(sensor,'noise flag',2);   
+
 vSwing = sensorGet(sensor,'pixel voltage swing');
 
 % These are the positions of the camera for each shot
@@ -97,10 +111,10 @@ for ii=1:nShots
     oi = oiCompute(oi,scene);
     vcAddObject(oi); oiWindow;
     
-    sensor = sensorSet(sensor,'exp time',eTime);
     sensor = sensorCompute(sensor,oi);
     sensor = sensorSet(sensor,'name',sprintf('from %d',ii));
-    volts = sensorGet(sensor,'volts');
+    
+    volts  = sensorGet(sensor,'volts');
     vcAddObject(sensor); sensorWindow('scale',true);
     
     if ii == 1, voltSum = volts;
@@ -111,7 +125,7 @@ for ii=1:nShots
     vImage = fullfile(workDir,'renderings',outputName);
 
     % Write out png scaled to 0 to 255, re: voltage swing
-    imwrite((volts/vSwing)*255,vImage,'png');
+    imwrite((volts/vSwing),vImage,'png');
 end
 
 %% Create a matched light field sensor
