@@ -16,21 +16,22 @@ function val = recipeGet(thisR,param,varargin)
 % Parameters
 %
 %   % Data management
-%     'input file'       
-%     'output file'
-%     'working directory' 
+%     'input file'  - original scene pbrt file
+%     'output file' - scene pbrt file in working directory
+%     'working directory' - directory mounted by docker image
 %
 %   % Camera and scene
-%     'object distance'
-%     'object direction'
-%     'look at'
+%     'object distance'  - The units are from the scene, not real.
+%                          We are hoping to get everything in mm
+%     'object direction' - An angle, I guess ...
+%     'look at'          - Three components
 %       'from'
 %       'to'
 %       'up'
-%       'from to' - vector difference from - to
+%       'from to' - vector difference (from - to)
 %     'optics type'
-%     'focal distance' - See ... (mm)
-%     'fov'  (Field of view) if a pinhole 'optics type'
+%     'focal distance' - See autofocus calculation (mm)
+%     'fov'  (Field of view) present if 'optics type' is 'pinhole'
 %     
 %    % Light field camera
 %     'n microlens' (alias 'n pinholes') - 2-vector, row,col
@@ -164,6 +165,9 @@ switch ieParamFormat(param)
         % What are the legitimate options?
         val = thisR.film.subtype;
         
+    case {'raysperpixel'}
+        val = thisR.sampler.pixelsamples.value;
+
     otherwise
         error('Unknown parameter %s\n',param);
 end
