@@ -2,17 +2,19 @@ function [ isetObj ] = download( obj, varargin )
 
 isetObj = cell(1,length(obj.targets));
 
+[targetFolder] = fileparts(obj.targets(1).local);
+[remoteFolder, remoteFile] = fileparts(obj.targets(1).remote);
+
+cmd = sprintf('gsutil rsync -r %s %s',remoteFolder,targetFolder);
+[status, result] = system(cmd);
+
+
 for t=1:length(obj.targets)
     
     [targetFolder] = fileparts(obj.targets(t).local);
     [remoteFolder, remoteFile] = fileparts(obj.targets(t).remote);
     
-    cmd = sprintf('gsutil cp %s/%s.dat %s/%s.dat',remoteFolder,remoteFile,targetFolder,remoteFile);
-    [status, result] = system(cmd);
-    
-    
-    
-    outFile = sprintf('%s/%s.dat',targetFolder,remoteFile);
+    outFile = sprintf('%s/renderings/%s.dat',targetFolder,remoteFile);
     photons = piReadDAT(outFile, 'maxPlanes', 31);
     
     
