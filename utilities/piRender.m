@@ -219,9 +219,11 @@ end
 % If radiance, return a scene or optical image
 
 % Remove renderType and version from varargin
-func = @(x)(strcmp(x,'rendertype') || strcmp(x,'version'));
-lst = find(cellfun(func,varargin));
-varargin = cellDelete(varargin,[lst lst+1]);
+if(~isempty(varargin))
+    func = @(x)(strcmp(x,'rendertype') || strcmp(x,'version'));
+    lst = find(cellfun(func,varargin));
+    varargin = cellDelete(varargin,[lst lst+1]);
+end
 
 switch opticsType 
     case 'lens'
