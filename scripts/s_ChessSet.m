@@ -37,6 +37,7 @@ if ~exist(fname,'file'), error('File not found'); end
 
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
+from = thisR.get('from');
 
 %% Default is a relatively low resolution (256).
 thisR.set('camera','pinhole');
@@ -47,7 +48,7 @@ thisR.set('rays per pixel',128);
 %% Set up Docker 
 
 [p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+thisR.outputFile = fullfile(piRootPath,'local','chess',[n,e]);
 piWrite(thisR);
 
 %% Render with the Docker container

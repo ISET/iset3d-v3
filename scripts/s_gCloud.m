@@ -16,13 +16,25 @@ if exist(workdir,'dir') == false,
 end
 
 scene = piRead(fName);
-scene.set('rays per pixel',32);
 
-d = fileparts(fName);
-scene.set('outputFile',fullfile(workdir,'city.pbrt'));
-piWrite(scene);
+distances = [0.01 0.1 10];
+
+for d=1:length(distances)
+
+        scene.set('camera type','realisticDiffraction');
+        scene.set('lens file','/home/hblasins/Documents/MATLAB/RTBscenes/SharedData/dgauss.22deg.3.0mm.dat')
+
+        filmDist = focusLens(fullfile('/home/hblasins/Documents/MATLAB/RTBscenes/SharedData/dgauss.22deg.3.0mm.dat'),distances(d)*1000);
+
+        scene.set('focal distance',filmDist);
+        scene.set('outputFile',fullfile(workdir,sprintf('city_lens_%i.pbrt',d)));
+        piWrite(scene);
+    
+        gCloud.upload(scene);
+end
 
 
-gCloud.upload(scene);
+
+
 gCloud.render();
-gCloud.download();
+objects = gCloud.download();

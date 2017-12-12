@@ -47,7 +47,7 @@ if isempty(result)
     system(cmd);
 end
 
-%{
+
 
 % Create a cleanup job in the user namespace.
 cmd = sprintf('kubectl get jobs --namespace=%s | grep cleanup',obj.namespace);
@@ -58,7 +58,7 @@ if isempty(strfind(result,'cleanup'))
         obj.namespace,obj.namespace,obj.namespace);
     system(cmd);
 end
-%}
+
 
 %% Push the docker rendering image to the project
 
