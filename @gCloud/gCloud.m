@@ -59,7 +59,7 @@ classdef gCloud < handle
             obj.cloudBucket = p.Results.cloudBucket;
             obj.dockerImage = p.Results.dockerImage;
             
-            [status, obj.namespace] = system('echo -n $USER');
+            obj.namespace = getenv('USER');
         end
         
     end

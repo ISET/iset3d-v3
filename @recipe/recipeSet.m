@@ -71,6 +71,14 @@ switch param
         % We should check that this is a pinhole, I think
         thisR.camera.fov.value = val;
         
+    case 'diffraction'
+        thisR.camera.diffractionEnabled.value = val;
+        thisR.camera.diffractionEnabled.type = 'bool';
+        
+    case 'chromaticaberration'
+        thisR.camera.chromaticAberrationEnabled.value = val;
+        thisR.camera.chromaticAberrationEnabled.type = 'bool';
+        
     case 'from'
         thisR.lookAt.from = val;
     case 'to'
@@ -91,12 +99,15 @@ switch param
     case 'microlens'
         % Not sure about what this means.  It is on or off
         thisR.camera.microlens_enabled.value = val;
+        thisR.camera.microlens_enabled.type = 'float';
     case 'nmicrolens'
         % Number of microlens/pinhole samples for a light field camera
         %
         if length(val) == 1, val(2) = val(1); end
         thisR.camera.num_pinholes_h.value = val(1);
+        thisR.camera.num_pinholes_h.type = 'integer';
         thisR.camera.num_pinholes_w.value = val(2);
+        thisR.camera.num_pinholes_w.type = 'integer';
     case 'lightfieldfilmresolution'
         % This is printed out in the pbrt scene file
         nMicrolens = thisR.get('n microlens');
@@ -114,7 +125,9 @@ switch param
         if length(val) == 1, val(2) = val(1); end
         thisR.film.xresolution.value = val(1);
         thisR.film.yresolution.value = val(2);
-        
+    case 'filmdiagonal'
+        thisR.camera.filmdiag.value = val(1);
+        thisR.camera.filmdiag.type = 'float';
         % Sampler
     case {'pixelsamples','raysperpixel'}
         thisR.sampler.pixelsamples.value = val;
