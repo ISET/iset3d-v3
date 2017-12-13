@@ -1,6 +1,6 @@
 function H = plotJSONrig( jsonFile )
 
-% Plot a Facebook rig based on the rig JSON file.
+% Plot a Facebook rig based on the rig JSON file. Useful for debugging. 
 
 rig = jsonread(jsonFile);
 rig = rig.cameras;
