@@ -219,9 +219,11 @@ end
 % If radiance, return a scene or optical image
 
 % Remove renderType and version from varargin
-func = @(x)(strcmp(x,'rendertype') || strcmp(x,'version'));
-lst = find(cellfun(func,varargin));
-varargin = cellDelete(varargin,[lst lst+1]);
+if(~isempty(varargin))
+    func = @(x)(strcmp(x,'rendertype') || strcmp(x,'version'));
+    lst = find(cellfun(func,varargin));
+    varargin = cellDelete(varargin,[lst lst+1]);
+end
 
 switch opticsType 
     case 'lens'
@@ -242,10 +244,9 @@ switch opticsType
         % hack to ISETBIO to make it work there temporarily and created an
         % issue. (BW).
         ieObject = oiSet(ieObject,'optics model','ray trace');
-    
-    case 'pinhole'
-        % In this case, we the radiance describes the scene
-        ieObject = piSceneCreate(photons,varargin{:});
+    case {'pinhole','environment'}
+        % In this case, we the radiance describes the scene, not an oi
+        ieObject = piSceneCreate(photons,'meanLuminance',100);
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(depthMap))
             ieObject = sceneSet(ieObject,'depth map',depthMap);
