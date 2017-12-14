@@ -1,5 +1,10 @@
 function [ isetObj ] = download( obj, varargin )
 
+p = inputParser;
+p.addParameter('returnObjs',true,@islogical);
+p.parse(varargin{:});
+
+
 isetObj = cell(1,length(obj.targets));
 
 [targetFolder] = fileparts(obj.targets(1).local);
@@ -15,7 +20,13 @@ for t=1:length(obj.targets)
     [remoteFolder, remoteFile] = fileparts(obj.targets(t).remote);
     
     outFile = sprintf('%s/renderings/%s.dat',targetFolder,remoteFile);
-    photons = piReadDAT(outFile, 'maxPlanes', 31);
+    try
+        photons = piReadDAT(outFile, 'maxPlanes', 31);
+        obj.targets(t).renderingComplete = 1;
+    catch
+        obj.targets(t).renderingComplete = 0;
+        continue;
+    end
     
     
     ieObjName = sprintf('%s-%s',remoteFile,datestr(now,'mmm-dd,HH:MM'));
@@ -62,7 +73,9 @@ for t=1:length(obj.targets)
             end
     end
     
-    isetObj{t} = ieObject;
+    if p.Results.returnObjs
+        isetObj{t} = ieObject;
+    end
     
 end
 

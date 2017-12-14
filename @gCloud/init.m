@@ -4,7 +4,7 @@ function [ obj ] = init( obj, varargin )
 cmd = sprintf('gcloud container clusters list --filter=%s',obj.clusterName);
 [~, result] = system(cmd);
 
-if isempty(result)
+if isempty(result) || length(result) < 2
     % we need to create a new cluster
     
     cmd = sprintf('gcloud container clusters create %s --num-nodes=1 --max-nodes-per-pool=100 --machine-type=%s --zone=%s --scopes default,storage-rw',...
