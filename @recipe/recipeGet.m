@@ -105,6 +105,7 @@ switch ieParamFormat(param)
         % yet.
         val = thisR.camera.subtype;
         if isequal(val,'perspective'), val = 'pinhole';
+        elseif isequal(val,'environment'), val = 'environment';
         elseif ismember(val,{'realisticDiffraction','realisticEye','realistic'})
             val = 'lens';
         end
@@ -113,6 +114,9 @@ switch ieParamFormat(param)
         switch opticsType
             case {'pinhole','perspective'}
                 disp('Pinhole optics.  No focal distance');
+                val = NaN;
+            case {'environment'}
+                disp('Panorama rendering. No focal distance');
                 val = NaN;
             case 'lens'
                 % Focal distance given the object distance and the lens file
