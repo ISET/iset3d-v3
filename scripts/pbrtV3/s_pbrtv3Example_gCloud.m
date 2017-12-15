@@ -77,7 +77,7 @@ gCloud.render();
 % Pause for user input (wait until gCloud job is done)
 x = 'N';
 while(~strcmp(x,'Y'))
-    x = input('Did the gCloud render finish yet? (Y/N)');
+    x = input('Did the gCloud render finish yet? (Y/N)','s');
 end
 
 objects = gCloud.download();
