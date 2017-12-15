@@ -12,7 +12,11 @@ zlabel('z');
 s = 5;
 
 for ii = 1:length(rig)
-    c = rig{ii};
+    if(iscell(rig))
+        c = rig{ii};
+    else
+        c = rig(ii);
+    end
     
     quiver3(c.origin(1),c.origin(2),c.origin(3), ...
     c.up(1),c.up(2),c.up(3),s,'b');
