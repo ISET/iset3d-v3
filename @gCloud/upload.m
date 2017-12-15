@@ -33,6 +33,7 @@ system(cmd);
 target.camera = scene.camera;
 target.local = fullfile(sceneFolder,sprintf('%s.pbrt',sceneFile));
 target.remote = fullfile(cloudFolder,sprintf('%s.pbrt',sceneFile));
+target.renderingComplete = 0;
 
 obj.targets = cat(1,obj.targets,target);      
 

@@ -1,10 +1,23 @@
 function [ obj ] = render( obj )
 
+symbols = ['a':'z' '0':'9'];
+
 for t=1:length(obj.targets)
+    
+    if isfield(obj.targets(t),'renderingComplete') && (obj.targets(t).renderingComplete == 1) 
+        continue;
+    end
+        
     
     jobName = lower(obj.targets(t).remote);
     jobName(jobName == '_' | jobName == '.' | jobName == '-' | jobName == '/' | jobName == ':') = '';
-    jobName = jobName(max(1,length(jobName)-62):end);
+    fprintf('Rendering: %s\n',jobName);
+    jobName = jobName(max(1,length(jobName)-30):end);
+    
+    nums = randi(numel(symbols),[1 31]);
+    randName = symbols(nums);
+    jobName = [randName jobName];
+    
     
     % Kubernetess does not allow two jobs with the same name.
     % We need to delete the old one first
@@ -24,7 +37,14 @@ for t=1:length(obj.targets)
         (nCores-0.9)*1000,...
         obj.targets(t).remote);
     
-    [status, result] = system(kubeCmd);
+    cntr = 0;
+    while cntr < 100
+        [status, result] = system(kubeCmd);
+        if status == 0, break; end;
+        pause(60);
+        fprintf('Error issuing kubectl command, pausing for 60 seconds, %i/%i\n',cntr/100);
+    end
+    
     
     fprintf('%s\n',result);
 end

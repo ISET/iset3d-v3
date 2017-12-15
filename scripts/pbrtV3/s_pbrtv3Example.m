@@ -31,7 +31,7 @@ recipe.camera = struct('type','Camera','subtype','realistic');
 
 % PBRTv3 will throw an error if there is the extra focal length on the top
 % of the lens file, so our lens files have to be slightly modified.
-lensFile = fullfile(piRootPath,'scripts','pbrtV3','wide.56deg.6.0mm_v3.dat');recipe.camera.lensfile.value = lensFile;
+lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','wide.56deg.6.0mm_v3.dat');recipe.camera.lensfile.value = lensFile;
 % Attach the lens
 recipe.camera.lensfile.value = lensFile; % mm
 recipe.camera.lensfile.type = 'string';
@@ -50,8 +50,8 @@ recipe.film.diagonal.type = 'float';
 
 %% Change render quality
 % This quality takes around 30 seconds to render on a machine with 8 cores.
-recipe.set('filmresolution',[256 256]);
-recipe.set('pixelsamples',256);
+recipe.set('filmresolution',[128 128]);
+recipe.set('pixelsamples',128);
 recipe.integrator.maxdepth.value = 1;
 
 %% Render
@@ -60,7 +60,7 @@ oiName = 'livingRoomWideAngle';
 recipe.set('outputFile',fullfile(piRootPath,'local',strcat(oiName,'.pbrt')));
 
 piWrite(recipe);
-[oi, result] = piRender(recipe,'renderType','depth');
+[oi, result] = piRender(recipe);
 
 vcAddObject(oi);
 oiWindow;

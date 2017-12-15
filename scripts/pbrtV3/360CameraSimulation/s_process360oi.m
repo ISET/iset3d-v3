@@ -5,13 +5,16 @@
 %% Initialize
 ieInit;
 
-workingDir = fullfile('/Users/trishalian/RenderedData/360Renders','livingRoom2048');
+workingDir = fullfile('/Users/trishalian/RenderedData/360Renders','whiteRoom2048');
 dataDirectory = fullfile(workingDir,'OI');
 
 outputDirectory = fullfile(workingDir,'rgb'); 
 if(~exist(outputDirectory,'dir'))
     mkdir(outputDirectory);
 end 
+
+%% Read first file to determine photon scale factor and fixed exposure time
+% TODO?
 
 %% Get scale factor to remove vignetting
 
@@ -38,7 +41,7 @@ if(exist(wideAngleWhiteFile,'file'))
 else
     vignetteScale = 1;
 end
-        
+      
 %% Loop through all images
 
 dirInfo = dir(fullfile(dataDirectory,'*.mat'));
@@ -61,7 +64,8 @@ for ii = 1:nFiles
     % Instead of adjusting illuminance for each image, we scale the number
     % of photons by the same factor for all images on the rig. This keeps
     % the scale across images on the rig relative. 
-    scale = 1e13; % This creates an mean illuminance of roughly 50 lux for cam1. 
+    scale = 1e13; % This creates an mean illuminance of roughly 50 lux for cam1 for the whiteRoom
+    % scale = 1e11; % for livingroom
     photons = scale.*oiGet(oi,'photons');
     oi = oiSet(oi,'photons',photons);
     
@@ -113,8 +117,9 @@ for ii = 1:nFiles
     sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
     
     % Set exposure time
-    sensor = sensorSet(sensor,'exp time',1/600); % in seconds
-    % sensor = sensorSet(sensor,'auto Exposure',true);
+    sensor = sensorSet(sensor,'exp time',1/600); % in seconds (for whiteRoom)
+    %sensor = sensorSet(sensor,'exp time',1/1000); % in seconds (for livingRoom)
+    %sensor = sensorSet(sensor,'auto Exposure',true);
 
     % Compute!
     sensor = sensorCompute(sensor,oi);
@@ -179,21 +184,69 @@ for ii = 1:nFiles
     
 end
 
+%% Output a json geometry rig file
+
 % Save camera rig geometry info
 % Maybe we should write this in a text file. 
 save(fullfile(outputDirectory,'cameraRigGeometry.mat'),'originAll','targetAll','upAll','indicesAll','rigOrigin');
 
+% Subtract rig origin
+originAll = originAll - rigOrigin;
+targetAll = targetAll - rigOrigin;
+
+% Scale to cm
+originAll = originAll.*10^2;
+targetAll = targetAll.*10^2;
+upAll = upAll.*10^2;
+
+% Some calculations
+upAll = upAll./sqrt(sum(upAll.^2,2));
+forwardAll = targetAll - originAll;
+forwardAll = forwardAll./sqrt(sum(forwardAll.^2,2));
+
+rightAll = zeros(size(forwardAll));
+for ii = 1:length(forwardAll)
+    rightAll(ii,:) = cross(forwardAll(ii,:),upAll(ii,:));
+end
+rightAll = rightAll./sqrt(sum(rightAll.^2,2));
+
 % Plot
-figure; hold on;
-forwardAll = targetAll - originAll/norm(targetAll - originAll) + originAll;
-s = 1;
+figure(10);clf; hold on; grid on;
+xlabel('x'); ylabel('y'); zlabel('z');
+
+s = 10;
 for ii = 1:length(indicesAll)
     
-    quiver3(originAll(ii,1),originAll(ii,2),originAll(ii,3), ...
-    upAll(ii,1),upAll(ii,2),upAll(ii,3),s,'b');
-    quiver3(originAll(ii,1),originAll(ii,2),originAll(ii,3), ...
-    forwardAll(ii,1),forwardAll(ii,2),forwardAll(ii,3),s,'g');
 
-    text(originAll(ii,1),originAll(ii,2),originAll(ii,3),num2str(indicesAll(ii)));
+    quiver3(originAll(ii,1),originAll(ii,2),originAll(ii,3), ...
+        upAll(ii,1),upAll(ii,2),upAll(ii,3),s,'b');
+
+    quiver3(originAll(ii,1),originAll(ii,2),originAll(ii,3), ...
+        forwardAll(ii,1),forwardAll(ii,2),forwardAll(ii,3),s,'g');
+
+    quiver3(originAll(ii,1),originAll(ii,2),originAll(ii,3), ...
+        rightAll(ii,1),rightAll(ii,2),rightAll(ii,3),s,'r');
+
+    plot3(originAll(ii,1),originAll(ii,2),originAll(ii,3),'rx');
+    text(originAll(ii,1)+0.01,originAll(ii,2)+0.01,originAll(ii,3)+0.01,num2str(indicesAll(ii)));
     
 end
+
+% Read in the default rig and change to match above values
+rig = jsonread('/Users/trishalian/GitRepos/Surround360/surround360_render/res/config/camera_rig.json');
+
+for ii = 1:length(rig.cameras)
+    currCam = rig.cameras{ii};
+    currID = currCam.id;
+    id = double(cell2mat(textscan(currID,'cam%d')));
+    indexMatch = find(indicesAll == id);
+    currCam.origin = originAll(indexMatch,:);
+    currCam.up = upAll(indexMatch,:);
+    currCam.forward = forwardAll(indexMatch,:);
+    currCam.right = rightAll(indexMatch,:);
+    rig.cameras{ii} = currCam;
+end
+
+opts = struct('indent',' ');
+jsonwrite(fullfile(workingDir,'camera_rig_initial.json'),rig,opts);
+
