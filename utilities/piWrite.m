@@ -33,11 +33,11 @@ piWrite(thisR);
 %}
 %%
 p = inputParser;
+
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
 % Format the parameters by removing spaces and forcing lower case.
 if ~isempty(varargin), varargin = ieParamFormat(varargin); end
-% p.addParameter('workingdir','',@isdir);
 
 % Copy over the whole directory
 p.addParameter('overwriteresources', true,@islogical);
