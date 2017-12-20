@@ -22,7 +22,7 @@ thisR = piRead(fname);
 
 thisR.set('camera','lens');   % Lens, not pinhole
 thisR.set('aperture',6);      % Try varying for depth of field effects
-thisR.set('film resolution',512);
+thisR.set('film resolution',256);
 thisR.set('rays per pixel',256);
 
 thisR.set('object distance',300); % Could be much bigger
@@ -32,7 +32,7 @@ thisR.set('autofocus',true);      % Sets focal distances to 300
 
 [p,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
-piWrite(thisR, 'overwritedir', true);
+piWrite(thisR);
 
 %% Render with the Docker container
 

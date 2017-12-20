@@ -8,16 +8,56 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Select scene
-
+% PARAMETERS
+% -------------------
+gcloudFlag = 1;
 sceneName = 'livingRoom';
+filmResolution = [256 256];
+pixelSamples = 256;
+bounces = 4;
+%saveDir = '/sni-storage/wandell/users/tlian/360Scenes/';
+saveDir = '/Users/trishalian/RenderedData/360Renders/';
+%sceneDir = '/home/tlian/';
+sceneDir = '/Users/trishalian/GitRepos/pbrt-v3-scenes-Bitterli/';
+workingDir = fullfile(piRootPath,'local','360Rig');
+% -------------------
+
+% Setup gcloud
+if(gcloudFlag)
+    gCloud = gCloud('dockerImage','gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud',...
+        'cloudBucket','gs://primal-surfer-140120.appspot.com');
+    % gCloud.renderDepth = false;
+    gCloud.init();  
+
+end
+
+% Check working directory
+if(~exist(workingDir,'dir'))
+    mkdir(workingDir);
+end
+
+% Setup save directory
+saveLocation = fullfile(saveDir, ...
+    sprintf('%s_%i_%i_%i_%i',...
+    sceneName,...
+    filmResolution(1),...
+    filmResolution(2),...
+    pixelSamples,...
+    bounces));
+if(~exist(saveLocation,'dir'))
+    warning('Save location does not exist. Creating...')
+    mkdir(saveLocation);
+end
+    
+    
+%% Select scene
 
 switch sceneName
     case('whiteRoom')
-        pbrtFile = '/home/tlian/living-room-2/scene.pbrt';
+        pbrtFile = fullfile(sceneDir,'living-room-2','scene.pbrt');
         rigOrigin = [0.9476 1.3018 3.4785] + [0 0.600 0];
     case('livingRoom')
-        pbrtFile = '/home/tlian/living-room/scene.pbrt';
+        pbrtFile = fullfile(sceneDir,'living-room','scene.pbrt');
         rigOrigin = [2.7007    1.5571   -1.6591];
         forward = [-0.9618    0.0744    0.2635];
         up = [0.0718    0.9972   -0.0197];
@@ -36,7 +76,7 @@ basePlateHeight = 0;
 numCamerasCircum = 14;
 
 % Which subset of cameras to render
-whichCameras = [1:3:14 15] + 1; % Facebook indexes starting from 0. 
+whichCameras = [1:3] + 1; % Facebook indexes starting from 0. 
 
 % Calculates the correct lookAts for each of the cameras. 
 % First camera is the one looking up
@@ -87,14 +127,12 @@ for ii = 1:size(camOrigins,1)
     % lens.
     if(camI(ii) == 0 || camI(ii) == (numCamerasCircum+1) || camI(ii) == (numCamerasCircum+2))
         % Top and bottom cameras
-        lensFile = fullfile(piRootPath,'scripts','pbrtV3','fisheye.87deg.6.0mm_v3.dat');
-        % We have to use a smaller sensor size here because the lens is so
-        % small...
+        lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','fisheye.87deg.6.0mm_v3.dat');
         recipe.film.diagonal.value = 16;
         recipe.film.diagonal.type = 'float';
     else
         % Circumference cameras
-        lensFile = fullfile(piRootPath,'scripts','pbrtV3','wide.56deg.6.0mm_v3.dat');
+        lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','wide.56deg.6.0mm_v3.dat');
         % Use a 1" sensor size
         recipe.film.diagonal.value = 16;
         recipe.film.diagonal.type = 'float';
@@ -109,9 +147,6 @@ for ii = 1:size(camOrigins,1)
     recipe.camera.aperturediameter.type = 'float';
 
     %% Set render quality
-    filmResolution = [256 256];
-    pixelSamples = 256;
-    bounces = 4;
     recipe.set('filmresolution',filmResolution);
     recipe.set('pixelsamples',pixelSamples);
     recipe.integrator.maxdepth.value = bounces;
@@ -119,52 +154,96 @@ for ii = 1:size(camOrigins,1)
     %% Set camera lookAt
     
     % PBRTv3 has units of meters, so we scale here.
-    
     origin = camOrigins(ii,:)*10^-3 + rigOrigin;
     target = camTargets(ii,:)*10^-3 + rigOrigin;
     up = camUps(ii,:)*10^-3 + rigOrigin.*camUps(ii,:);
     recipe.set('from',origin);
     recipe.set('to',target);
     recipe.set('up',up);
+      
+    % Look straight down/up
+    %recipe.set('from',rigOrigin);
+    %recipe.set('up',rigOrigin+forward);
+    %recipe.set('to',rigOrigin + [up(1) -up(2) up(3)]);
     
-    % Look straight down
-    %{
-    recipe.set('from',rigOrigin);
-    recipe.set('up',rigOrigin+forward);
-    recipe.set('to',rigOrigin + [up(1) -up(2) up(3)]);
-    %}
-    
-    recipe.set('outputFile',fullfile(piRootPath,'local',strcat(oiName,'.pbrt')));
+    recipe.set('outputFile',fullfile(workingDir,strcat(oiName,'.pbrt')));
     
     piWrite(recipe);
     
-    [oi, result] = piRender(recipe);
-    vcAddObject(oi);
-    oiWindow;
-    
-    %{
-    % Fast depth render
-    [depthMap, result] = piRender(recipe,'renderType','depth');
-    figure(ii+1);
-    imagesc(depthMap); colorbar;
-    %}
-
+    if(gcloudFlag)
+        gCloud.upload(recipe);
+    else
+        
+        [oi, result] = piRender(recipe);
+        vcAddObject(oi);
+        oiWindow;
+        
+        % Fast depth render
+        %[depthMap, result] = piRender(recipe,'renderType','depth');
+        %figure(ii+1);
+        %imagesc(depthMap); colorbar;
+        
+        
     % Save the OI along with location information
-    saveLocation = fullfile('/sni-storage/wandell/users/tlian/360Scenes/', ...
-        sprintf('%s_%i_%i_%i_%i',sceneName,filmResolution(1),filmResolution(2),pixelSamples,bounces));
-    if(~exist(saveLocation,'dir'))
-        warning('Save location does not exist. Creating...')
-        mkdir(saveLocation);
-        %saveLocation = fullfile(piRootPath,'local');
-    end
     oiFilename = fullfile(saveLocation,oiName);
     save(oiFilename,'oi','origin','target','up','rigOrigin');
     
-    
     clear oi
+    
+    % Delete the .dat file if it exists (to avoid running out of local storage space)
+    [p,n,e] = fileparts(recipe.outputFile);
+    datFile = fullfile(p,'renderings',strcat(n,'.dat'));
+    if(exist(datFile,'file'))
+        delete(datFile);
+    end
+    datFileDepth = fullfile(p,'renderings',strcat(n,'_depth.dat'));
+    if(exist(datFileDepth,'file'))
+        delete(datFileDepth);
+    end
+        
+    end
+    
 end
 
+%% Render in gCloud (if applicable)
 
+if(gcloudFlag)
+    
+    gCloud.render();
+    
+    % Save the gCloud object in case MATLAB closes
+    save(fullfile(workingDir,'gCloudBackup.mat'),'gCloud');
+    
+    % Pause for user input (wait until gCloud job is done)
+    x = 'N';
+    while(~strcmp(x,'Y'))
+        x = input('Did the gCloud render finish yet? (Y/N)','s');
+    end
+    
+    objects = gCloud.download();
+    
+    for ii = 1:length(objects)
+        
+        oi = objects{ii};
+        
+        oiFilename = fullfile(saveLocation,oiName);
+        save(oiFilename,'oi','origin','target','up','rigOrigin');
+        
+        vcAddAndSelectObject(oi);
+        oiWindow;
+        
+        % Delete dat file to save space
+        [p,n,e] = fileparts(gCloud.targets(ii).local);
+        
+        datFile = fullfile(p,'renderings',strcat(n,'.dat'));
+        if(exist(datFile,'file'))
+            delete(datFile);
+        end
+    
+    end
+    
+    
+end
 %% Render ODS panorama
 
 %{
