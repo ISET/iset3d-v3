@@ -27,6 +27,9 @@ classdef gCloud < handle
         
         targets;
         
+        % Depth map flag
+        renderDepth = false;
+        
     end
     
     methods
@@ -45,6 +48,7 @@ classdef gCloud < handle
             p.addOptional('autoscaling',true,@islogical);
             p.addOptional('cloudBucket','',@ischar);
             p.addOptional('dockerImage','',@ischar);
+            p.addOptional('renderDepth',false,@islogical)
             
             p.parse(varargin{:});
             
@@ -58,6 +62,7 @@ classdef gCloud < handle
             obj.autoscaling = p.Results.autoscaling;
             obj.cloudBucket = p.Results.cloudBucket;
             obj.dockerImage = p.Results.dockerImage;
+            obj.renderDepth = p.Results.renderDepth;
             
             obj.namespace = getenv('USER');
         end

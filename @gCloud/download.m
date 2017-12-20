@@ -4,7 +4,6 @@ p = inputParser;
 p.addParameter('returnObjs',true,@islogical);
 p.parse(varargin{:});
 
-
 isetObj = cell(1,length(obj.targets));
 
 [targetFolder] = fileparts(obj.targets(1).local);
@@ -13,8 +12,17 @@ isetObj = cell(1,length(obj.targets));
 cmd = sprintf('gsutil rsync -r %s %s',remoteFolder,targetFolder);
 [status, result] = system(cmd);
 
+numRadianceRenders = 0;
 
 for t=1:length(obj.targets)
+    
+    % Skip depth targets and keep track of the number of radiance renders
+    % so we return the right number of isetObjects at the end.
+    if(obj.targets(t).depthRender)
+        continue;
+    else
+        numRadianceRenders = numRadianceRenders + 1;
+    end
     
     [targetFolder] = fileparts(obj.targets(t).local);
     [remoteFolder, remoteFile] = fileparts(obj.targets(t).remote);
@@ -28,6 +36,18 @@ for t=1:length(obj.targets)
         continue;
     end
     
+    % Grab the depth map
+    if(obj.renderDepth)
+        outFile = sprintf('%s/renderings/%s_depth.dat',targetFolder,remoteFile);
+        try
+            depthMap = piReadDAT(outFile, 'maxPlanes', 31);
+            depthMap = depthMap(:,:,1);
+            obj.targets(t).renderingComplete = 1;
+        catch
+            obj.targets(t).renderingComplete = 0;
+            continue;
+        end
+    end
     
     ieObjName = sprintf('%s-%s',remoteFile,datestr(now,'mmm-dd,HH:MM'));
     if strcmp(obj.targets(t).camera.subtype,'perspective')
@@ -79,6 +99,12 @@ for t=1:length(obj.targets)
     
 end
 
+% Remove any empty cells
+% This is caused by a mismatch in number of targets vs number of actual
+% radiance renders. 
+if(length(isetObj) ~= numRadianceRenders)
+     isetObj = isetObj(~cellfun('isempty',isetObj));
+end
 
 end
 
