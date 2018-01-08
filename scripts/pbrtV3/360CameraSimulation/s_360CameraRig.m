@@ -28,6 +28,7 @@ if(gcloudFlag)
         'cloudBucket','gs://primal-surfer-140120.appspot.com');
     % gCloud.renderDepth = false;
     gCloud.init();  
+    gCloud.clusterName = 'trisha';
 
 end
 
