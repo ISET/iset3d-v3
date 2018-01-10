@@ -14,6 +14,9 @@ function [ieObject, result] = piRender(thisR,varargin)
 %  renderType - render radiance, depth or both (default).  If the input is
 %               a fullpath to a file, then we only render the radiance
 %               data. Ask if you want this changed to permit a depth map.
+%               The coordinates option is a metadata type available in
+%               pbrt-v3-spectral that returns the global (x,y,z)
+%               coordinates of each intersection in the image. 
 %  vesion       - PBRT version, 2 or 3
 %  
 % RETURN
@@ -44,7 +47,7 @@ for ii=1:2:length(varargin)
     varargin{ii} = ieParamFormat(varargin{ii}); 
 end
 
-rTypes = {'radiance','depth','both'};
+rTypes = {'radiance','depth','both','coordinates'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes))); 
 
 p.addParameter('version',2,@(x)isnumeric(x));
@@ -100,6 +103,18 @@ elseif isa(thisR,'recipe')
         depthFile = depthRecipe.outputFile;
     end
     
+    % Set up a metadata render
+    if(strcmp(renderType,'coordinates'))
+        if(thisR.version ~= 3)
+            error('Coordinates metadata render only available right now for pbrt-v3-spectral.');
+        end
+        coordRecipe = piRecipeConvertToDepth(thisR,'metadata','coordinates');
+        piWrite(coordRecipe,'overwritepbrtfile',true,...
+            'overwritelensfile',false,...
+            'overwriteresources',false);
+        coordFile = coordRecipe.outputFile;
+    end
+    
 else
     error('A full path to a scene pbrt file or a recipe class is required\n');
 end
@@ -118,6 +133,9 @@ switch renderType
     case {'radiance'}
         filesToRender = {pbrtFile};
         label{1} = 'radiance';
+    case {'coordinates'}
+        filesToRender = {coordFile};
+        label{1} = 'coordinates';
     otherwise
         error('Cannot recognize render type.');
 end
@@ -199,6 +217,9 @@ for ii = 1:length(filesToRender)
     elseif(strcmp(label{ii},'depth'))
         tmp = piReadDAT(outFile, 'maxPlanes', 31);
         depthMap = tmp(:,:,1); clear tmp;
+    elseif(strcmp(label{ii},'coordinates'))
+        tmp = piReadDAT(outFile, 'maxPlanes', 31);
+        coordMap = tmp(:,:,1:3); clear tmp; 
     end
     
     fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
@@ -213,6 +234,12 @@ ieObjName = sprintf('%s-%s',name,datestr(now,'mmm-dd,HH:MM'));
 if(strcmp(renderType,'depth'))
     % Could create a dummy object (empty) and put the depth map in that.
     ieObject = depthMap; % not technically an ieObject...
+    return;
+end
+
+% Only return the coordinates metadata
+if(strcmp(renderType,'coordinates'))
+    ieObject = coordMap;
     return;
 end
 

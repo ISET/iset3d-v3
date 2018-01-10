@@ -11,14 +11,14 @@ if ~piDockerExists, piDockerConfig; end
 % PARAMETERS
 % -------------------
 gcloudFlag = 1;
-sceneName = 'livingRoom';
+sceneName = 'bathroom';
 filmResolution = [256 256];
 pixelSamples = 256;
 bounces = 4;
-%saveDir = '/sni-storage/wandell/users/tlian/360Scenes/';
-saveDir = '/Users/trishalian/RenderedData/360Renders/';
-%sceneDir = '/home/tlian/';
-sceneDir = '/Users/trishalian/GitRepos/pbrt-v3-scenes-Bitterli/';
+saveDir = '/sni-storage/wandell/users/tlian/360Scenes/';
+%saveDir = '/Users/trishalian/RenderedData/360Renders/';
+sceneDir = '/home/tlian/';
+%sceneDir = '/Users/trishalian/GitRepos/pbrt-v3-scenes-Bitterli/';
 workingDir = fullfile(piRootPath,'local','360Rig');
 % -------------------
 
@@ -26,9 +26,9 @@ workingDir = fullfile(piRootPath,'local','360Rig');
 if(gcloudFlag)
     gCloud = gCloud('dockerImage','gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud',...
         'cloudBucket','gs://primal-surfer-140120.appspot.com');
-    % gCloud.renderDepth = false;
-    gCloud.init();  
+    gCloud.renderDepth = true;
     gCloud.clusterName = 'trisha';
+    gCloud.init();  
 
 end
 
@@ -62,6 +62,9 @@ switch sceneName
         rigOrigin = [2.7007    1.5571   -1.6591];
         forward = [-0.9618    0.0744    0.2635];
         up = [0.0718    0.9972   -0.0197];
+    case('bathroom')
+        pbrtFile = fullfile(sceneDir,'bathroom','scene.pbrt');
+        rigOrigin = [0.3   1.667   -1.5];
     otherwise
         error('Scene not recognized.');
 end
@@ -77,7 +80,7 @@ basePlateHeight = 0;
 numCamerasCircum = 14;
 
 % Which subset of cameras to render
-whichCameras = [1:3] + 1; % Facebook indexes starting from 0. 
+whichCameras = [0:2:16] + 1; % Facebook indexes starting from 0. 
 
 % Calculates the correct lookAts for each of the cameras. 
 % First camera is the one looking up
@@ -155,17 +158,28 @@ for ii = 1:size(camOrigins,1)
     %% Set camera lookAt
     
     % PBRTv3 has units of meters, so we scale here.
+    
     origin = camOrigins(ii,:)*10^-3 + rigOrigin;
     target = camTargets(ii,:)*10^-3 + rigOrigin;
     up = camUps(ii,:)*10^-3 + rigOrigin.*camUps(ii,:);
     recipe.set('from',origin);
     recipe.set('to',target);
     recipe.set('up',up);
-      
+    
+    
     % Look straight down/up
-    %recipe.set('from',rigOrigin);
-    %recipe.set('up',rigOrigin+forward);
-    %recipe.set('to',rigOrigin + [up(1) -up(2) up(3)]);
+    %{
+    forward = recipe.lookAt.to-recipe.lookAt.from;
+    forward = forward./norm(forward);
+    up = recipe.lookAt.up - recipe.lookAt.from;
+    up = up./norm(up);
+    recipe.set('from',rigOrigin);
+    recipe.set('up',rigOrigin+forward);
+    recipe.set('to',rigOrigin + [up(1) up(2) up(3)]);
+    %}
+    %recipe.set('from',[0 0 0]);
+    %recipe.set('up',[1 0 0]);
+    %recipe.set('to',[0 2 0]);
     
     recipe.set('outputFile',fullfile(workingDir,strcat(oiName,'.pbrt')));
     
@@ -177,7 +191,7 @@ for ii = 1:size(camOrigins,1)
         
         [oi, result] = piRender(recipe);
         vcAddObject(oi);
-        oiWindow;
+        %oiWindow;
         
         % Fast depth render
         %[depthMap, result] = piRender(recipe,'renderType','depth');
@@ -185,6 +199,24 @@ for ii = 1:size(camOrigins,1)
         %imagesc(depthMap); colorbar;
         
         
+        [coordMap, ~] = piRender(recipe,'renderType','coordinates');
+        figure(ii+1); 
+        subplot(1,3,1); imagesc(coordMap(:,:,1)); axis image; colorbar; title('x-axis')
+        subplot(1,3,2); imagesc(coordMap(:,:,2)); axis image; colorbar; title('y-axis')
+        subplot(1,3,3); imagesc(coordMap(:,:,3)); axis image; colorbar; title('z-axis')
+        
+        
+        %{
+        rgb = oiGet(oi,'rgb');
+        fig = figure(ii+1);
+        imshow(rgb);
+        title('Click to get coordinates. Press return when done.');
+        [x, y] = getpts(fig);
+        for jj = 1:size(x,1)
+            fprintf('(%0.3f %0.3f %0.3f)\n',coordMap(round(x(jj)),round(y(jj)),:));
+        end
+        %}
+            
     % Save the OI along with location information
     oiFilename = fullfile(saveLocation,oiName);
     save(oiFilename,'oi','origin','target','up','rigOrigin');
