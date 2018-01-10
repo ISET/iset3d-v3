@@ -17,7 +17,9 @@ function depthRecipe = piRecipeConvertToDepth(recipe,varargin)
 
 p = inputParser;
 p.addRequired('recipe',@(x)isequal(class(x),'recipe'));
+p.addParameter('metadata','depth',@ischar);
 p.parse(recipe,varargin{:});
+metadata = p.Results.metadata;
 
 depthRecipe = copy(recipe);
 
@@ -29,7 +31,7 @@ if(recipe.version == 3)
 else 
     integrator = struct('type','SurfaceIntegrator','subtype','metadata');
 end
-integrator.strategy.value = 'depth'; 
+integrator.strategy.value = metadata; 
 integrator.strategy.type = 'string';
 depthRecipe.integrator = integrator;
 
@@ -64,7 +66,7 @@ end
 
 % Assign the right depth output file.  Deep copy issue here?
 [workingFolder, name, ~] = fileparts(recipe.outputFile);
-depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
+depthFile   = fullfile(workingFolder,sprintf('%s_%s.pbrt',name,metadata));
 depthRecipe.outputFile = depthFile;
 
 end
