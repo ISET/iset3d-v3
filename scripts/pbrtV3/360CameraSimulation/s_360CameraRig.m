@@ -10,16 +10,15 @@ if ~piDockerExists, piDockerConfig; end
 
 % PARAMETERS
 % -------------------
-gcloudFlag = 1;
-sceneName = 'bathroom';
-filmResolution = [256 256];
-pixelSamples = 256;
-bounces = 4;
+gcloudFlag = 0;
+sceneName = 'livingRoom';
+filmResolution = [128 128];
+pixelSamples = 128;
+bounces = 1;
 saveDir = '/sni-storage/wandell/users/tlian/360Scenes/';
 %saveDir = '/Users/trishalian/RenderedData/360Renders/';
-sceneDir = '/home/tlian/';
-%sceneDir = '/Users/trishalian/GitRepos/pbrt-v3-scenes-Bitterli/';
-workingDir = fullfile(piRootPath,'local','360Rig');
+sceneDir = '/sni-storage/wandell/users/tlian/360Scenes/scenes';
+workingDir = fullfile(saveDir,'workingFolder'); % Save to data server directly to avoid limited space issues
 % -------------------
 
 % Setup gcloud
@@ -28,8 +27,8 @@ if(gcloudFlag)
         'cloudBucket','gs://primal-surfer-140120.appspot.com');
     gCloud.renderDepth = true;
     gCloud.clusterName = 'trisha';
+    gCloud.maxInstances = 20;
     gCloud.init();  
-
 end
 
 % Check working directory
@@ -80,7 +79,7 @@ basePlateHeight = 0;
 numCamerasCircum = 14;
 
 % Which subset of cameras to render
-whichCameras = [0:2:16] + 1; % Facebook indexes starting from 0. 
+whichCameras = [1:2:14] + 1; % Facebook indexes starting from 0. 
 
 % Calculates the correct lookAts for each of the cameras. 
 % First camera is the one looking up
@@ -191,29 +190,27 @@ for ii = 1:size(camOrigins,1)
         
         [oi, result] = piRender(recipe);
         vcAddObject(oi);
-        %oiWindow;
+        oiWindow;
         
         % Fast depth render
         %[depthMap, result] = piRender(recipe,'renderType','depth');
         %figure(ii+1);
         %imagesc(depthMap); colorbar;
         
-        
+        %{
         [coordMap, ~] = piRender(recipe,'renderType','coordinates');
         figure(ii+1); 
         subplot(1,3,1); imagesc(coordMap(:,:,1)); axis image; colorbar; title('x-axis')
         subplot(1,3,2); imagesc(coordMap(:,:,2)); axis image; colorbar; title('y-axis')
         subplot(1,3,3); imagesc(coordMap(:,:,3)); axis image; colorbar; title('z-axis')
         
-        
-        %{
         rgb = oiGet(oi,'rgb');
         fig = figure(ii+1);
         imshow(rgb);
         title('Click to get coordinates. Press return when done.');
         [x, y] = getpts(fig);
         for jj = 1:size(x,1)
-            fprintf('(%0.3f %0.3f %0.3f)\n',coordMap(round(x(jj)),round(y(jj)),:));
+            fprintf('(%0.3f %0.3f %0.3f)\n',coordMap(round(y(jj)),round(x(jj)),:));
         end
         %}
             
@@ -253,25 +250,47 @@ if(gcloudFlag)
         x = input('Did the gCloud render finish yet? (Y/N)','s');
     end
     
+    % Set the DAT output folder to the data directory so we avoid running
+    % out of space on our local folder.
+    % TODO: Maybe we should set the output folder in the recipe to the
+    % remote data directory?
+    for ii = 1:length(gCloud.targets)
+        [path,name,ext] = fileparts(gCloud.targets(ii).local);
+        gCloud.targets(ii).local = fullfile(saveLocation,strcat(name,ext));
+    end
+    
+    % Double check that the saveLocation exists, or else the gsync will
+    % fail quietly, which is dangerous!
+    if(~exist(saveLocation,'dir'))
+        mkdir(saveLocation);
+    end
+    
     objects = gCloud.download();
     
     for ii = 1:length(objects)
         
         oi = objects{ii};
         
-        oiFilename = fullfile(saveLocation,oiName);
+        % Save optical image to the appropriate folder
+        oiName = oiGet(oi,'name');
+        % "Fix" name. (OI name now has date, but we want to use the "camX"
+        % name when saving)
+        C = strsplit(oiName,'-');
+        oiName = C{1};
+        oiFilename = fullfile(saveLocation,strcat(oiName,'.mat'));
         save(oiFilename,'oi','origin','target','up','rigOrigin');
+        fprintf('Saved oi at %s \n',oiFilename);
         
-        vcAddAndSelectObject(oi);
-        oiWindow;
+%         vcAddAndSelectObject(oi);
+%         oiWindow;
         
-        % Delete dat file to save space
-        [p,n,e] = fileparts(gCloud.targets(ii).local);
-        
-        datFile = fullfile(p,'renderings',strcat(n,'.dat'));
-        if(exist(datFile,'file'))
-            delete(datFile);
-        end
+%         % Delete dat file to save space
+%         [p,n,e] = fileparts(gCloud.targets(ii).local);
+%         
+%         datFile = fullfile(p,'renderings',strcat(n,'.dat'));
+%         if(exist(datFile,'file'))
+%             delete(datFile);
+%         end
     
     end
     
