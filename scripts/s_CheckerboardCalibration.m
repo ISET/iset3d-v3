@@ -10,14 +10,27 @@
 
 %% Initialize ISET and Docker
 
+ieInit;
+if ~piDockerExists, piDockerConfig; end
+
 % Set seed
 rng(1);
 
 % Set number of images to render
 numImages = 5;
 
-ieInit;
-if ~piDockerExists, piDockerConfig; end
+% gCloud Flag
+gcloudFlag = 0;
+
+% Setup gcloud
+if(gcloudFlag)
+    gCloud = gCloud('dockerImage','gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud',...
+        'cloudBucket','gs://primal-surfer-140120.appspot.com');
+    gCloud.renderDepth = true;
+    gCloud.clusterName = 'trisha';
+    gCloud.maxInstances = 20;
+    gCloud.init();  
+end
 
 %% Read the pbrt scene
 
@@ -31,6 +44,7 @@ workingDir = fullfile(piRootPath,'local','checkerboardCalibration');
 if(~isdir(workingDir))
     mkdir(workingDir);
 end
+saveLocation = workingDir;
 
 %% Attach the checkerboard texture
 
@@ -80,9 +94,9 @@ thisR.camera.aperturediameter.type = 'float';
 % appropriately. See:
 % https://dsp.stackexchange.com/questions/6055/how-does-resizing-an-image-affect-the-intrinsic-camera-matrix
 
-thisR.set('filmresolution',[256 256]); 
+thisR.set('filmresolution',[256 256]);
 thisR.set('pixelsamples',128); % We don't need many pixel samples for this simple scene
-thisR.integrator.maxdepth.value = 1; % No specularities, so we a max depth of 1 is enough. 
+thisR.integrator.maxdepth.value = 1; % No specularities, so we a max depth of 1 is enough.
 
 %% Rotate and translate the plane and render
 
@@ -104,25 +118,91 @@ for ii = 1:numImages
     % Clear any existing transform in the recipe first!
     thisR = piClearObjectTransforms(thisR,'Plane');
     
-    % Insert transforms 
+    % Insert transforms
     % Warning: The order matters!
     thisR = piMoveObject(thisR,'Plane','Scale',[1 1 h/w].*1/3);
     thisR = piMoveObject(thisR,'Plane','Rotate',[xRotate 1 0 0]);
     thisR = piMoveObject(thisR,'Plane','Rotate',[yRotate 0 1 0]);
     thisR = piMoveObject(thisR,'Plane','Rotate',[zRotate 0 0 1]);
     thisR = piMoveObject(thisR,'Plane','Translate', ...
-        [xTranslate yTranslate zTranslate]);   
+        [xTranslate yTranslate zTranslate]);
     
     % Set output file
-    filename = sprintf('img%d.pbrt',ii);
-    thisR.outputFile = fullfile(workingDir,filename);
+    oiName = sprintf('img%d',ii);
+    thisR.outputFile = fullfile(workingDir,strcat(oiName,'.pbrt'));
     
-    % Write and render
     piWrite(thisR);
-    [oi,result] = piRender(thisR);
     
-    vcAddObject(oi);
-    oiWindow;
+    if(~gcloudFlag)
+        % Write and render
+        [oi,result] = piRender(thisR);
+        vcAddObject(oi);
+        oiWindow;
+    else
+        gCloud.upload(recipe);
+    end
+    
+    % Save the OI
+    oiFilename = fullfile(saveLocation,oiName);
+    save(oiFilename,'oi');
+    
+    clear oi
+    
+    % Delete the .dat file if it exists (to avoid running out of local storage space)
+    [p,n,e] = fileparts(recipe.outputFile);
+    datFile = fullfile(p,'renderings',strcat(n,'.dat'));
+    if(exist(datFile,'file'))
+        delete(datFile);
+    end
+    datFileDepth = fullfile(p,'renderings',strcat(n,'_depth.dat'));
+    if(exist(datFileDepth,'file'))
+        delete(datFileDepth);
+    end
+    
+end
+
+%% Render in gCloud, if selected
+if(gcloudFlag)
+    gCloud.render();
+    
+    % Save the gCloud object in case MATLAB closes
+    save(fullfile(workingDir,'gCloudBackup.mat'),'gCloud');
+    
+    % Pause for user input (wait until gCloud job is done)
+    x = 'N';
+    while(~strcmp(x,'Y'))
+        x = input('Did the gCloud render finish yet? (Y/N)','s');
+    end
+    
+    objects = gCloud.download();
+    
+    for ii = 1:length(objects)
+        
+        oi = objects{ii};
+        
+        % Save optical image to the appropriate folder
+        oiName = oiGet(oi,'name');
+        
+        % "Fix" name. (OI name now has date, but we want to use the "imgX"
+        % name when saving)
+        C = strsplit(oiName,'-');
+        oiName = C{1};
+        oiFilename = fullfile(saveLocation,strcat(oiName,'.mat'));
+        save(oiFilename,'oi');
+        fprintf('Saved oi at %s \n',oiFilename);
+        
+        vcAddAndSelectObject(oi);
+        oiWindow;
+        
+        % Delete dat file to save space
+        [p,n,e] = fileparts(gCloud.targets(ii).local);
+        
+        datFile = fullfile(p,'renderings',strcat(n,'.dat'));
+        if(exist(datFile,'file'))
+            delete(datFile);
+        end
+        
+    end
     
 end
 
