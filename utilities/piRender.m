@@ -249,7 +249,9 @@ end
 if(~isempty(varargin))
     func = @(x)(strcmp(x,'rendertype') || strcmp(x,'version'));
     lst = find(cellfun(func,varargin));
-    varargin = cellDelete(varargin,[lst lst+1]);
+    if(~isempty(lst))
+        varargin = cellDelete(varargin,[lst lst+1]);
+    end
 end
 
 switch opticsType 
