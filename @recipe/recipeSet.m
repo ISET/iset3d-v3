@@ -105,9 +105,9 @@ switch param
         %
         if length(val) == 1, val(2) = val(1); end
         thisR.camera.num_pinholes_h.value = val(1);
-        thisR.camera.num_pinholes_h.type = 'integer';
+        thisR.camera.num_pinholes_h.type = 'float';
         thisR.camera.num_pinholes_w.value = val(2);
-        thisR.camera.num_pinholes_w.type = 'integer';
+        thisR.camera.num_pinholes_w.type = 'float';
     case 'lightfieldfilmresolution'
         % This is printed out in the pbrt scene file
         nMicrolens = thisR.get('n microlens');
