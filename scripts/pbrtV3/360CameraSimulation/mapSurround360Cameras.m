@@ -1,19 +1,14 @@
-function [locations, targets, up, camI] = mapSurround360Cameras(numCamerasCircum, whichCameras,basePlateHeight) %, fovRectilinear, resX, resY)
+function [locations, targets, up, camI] = mapSurround360Cameras(numCamerasCircum, whichCameras,radius)
 
 %MAPSURROUND360CAMERAS Outputs and plots "LookAt's" for cameras arranged
-%around a circumference. Also outputs JSON file describing camera setup.
+%around a circumference. 
 
 % fov is horizontal FOV of rectilinear lens (circumference)
 
 % TODO: Break this into more functions in the future
 
-% Base plate has a radius of 6.911 inches == 175.54 mm
-% I think the last element of the lens will roughly be at the edge of the
-% base plate, since the lenses seem to stick out of the plate, judging from
-% the other diagrams in the schematics.
-radius = 175.54; % mm
 angleIncrement = 360/numCamerasCircum;
-%basePlateHeight = 1524; % mm, this is adjustable, from 4'10'' min to 6'2'' max
+basePlateHeight = 0; % Fixed at zero. We can adjust the base plate height by physically adjusting all camera heights in the main script. 
 
 % Set up the camera locations around the circumference
 horizCameraLocations = zeros(14,3); % [x,y,z]
@@ -68,7 +63,10 @@ quiver3(vertCameraLocations(:,1),vertCameraLocations(:,2),vertCameraLocations(:,
 locationsAll = [horizCameraLocations; vertCameraLocations];
 targetsAll = [horizLookDir; vertLookDir];
 upAll = cameraUp;
-indexing = [15 1:14 16 17]; % Facebook indexes the camera starting from 0.
+% For the Facebook stitching code, the first camera should be the one
+% looking up, then the circumference ones, then the two looking down. We
+% rearrange our cameras to match this order. 
+indexing = [numCamerasCircum+1 1:numCamerasCircum numCamerasCircum+2 numCamerasCircum+3]; 
 locationsAll = locationsAll(indexing,:);
 targetsAll = targetsAll(indexing,:);
 upAll = upAll(indexing,:);
