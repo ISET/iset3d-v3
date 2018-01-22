@@ -70,6 +70,7 @@ switch param
     case 'fov'
         % We should check that this is a pinhole, I think
         thisR.camera.fov.value = val;
+        thisR.camera.fov.type = 'float';
         
     case 'diffraction'
         thisR.camera.diffractionEnabled.value = val;
