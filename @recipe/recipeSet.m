@@ -131,7 +131,10 @@ switch param
         % Sampler
     case {'pixelsamples','raysperpixel'}
         thisR.sampler.pixelsamples.value = val;
-        
+    case{'cropwindow','crop window'}
+        thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
+        thisR.film.cropwindow.type = 'float';
     otherwise
         error('Unknown parameter %s\n',param);
 end
+ 
