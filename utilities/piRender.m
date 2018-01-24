@@ -17,7 +17,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               The coordinates option is a metadata type available in
 %               pbrt-v3-spectral that returns the global (x,y,z)
 %               coordinates of each intersection in the image. 
-%  vesion       - PBRT version, 2 or 3
+%  version       - PBRT version, 2 or 3
 %  
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
@@ -63,7 +63,7 @@ if ischar(thisR)
     pbrtFile = thisR;
     
     % Figure out this optics type of the file
-    thisR = piRead(pbrtFile);
+    thisR = piRead(pbrtFile,'version',version);
     opticsType = thisR.get('optics type');
 
     if ~strcmp(renderType,'radiance')
