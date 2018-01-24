@@ -13,20 +13,19 @@ if ~piDockerExists, piDockerConfig; end
 
 % Rendering parameters
 gcloudFlag = 0;
-sceneName = 'bedroom';
+sceneName = 'whiteRoom';
 %xRes = 2704; %round(2704/16);
 %yRes = 2028; %round(2028/16);
 % filmResolution = [xRes yRes];
 filmResolution = [128 128];
 pixelSamples = 128;
-bounces = 2;
+bounces = 1;
 
 % Save parameters
 %saveName = strcat(sceneName,'-Google');
 saveName = sceneName;
 saveDir = '/sni-storage/wandell/users/tlian/360Scenes/';
 %saveDir = '/Users/trishalian/RenderedData/360Renders/';    
-sceneDir = '/sni-storage/wandell/users/tlian/360Scenes/scenes';
 workingDir = fullfile(saveDir,'workingFolder'); % Save to data server directly to avoid limited space issues
 
 % Camera parameters
@@ -34,7 +33,7 @@ workingDir = fullfile(saveDir,'workingFolder'); % Save to data server directly t
 % fisheyes pointing down, where N = numCamerasCircum. This is according to
 % the convention of the Surround360 rig.
 numCamerasCircum = 14; % 14 for Facebook, 16 for Google
-whichCameras = [0:16] + 1; % Index convention starts from 0. 
+whichCameras = [1] + 1; % Index convention starts from 0. 
 radius = 175.54;% 175.54 mm for Facebook, 140 mm for Google
 % -------------------
 
@@ -69,29 +68,7 @@ end
     
 %% Select scene
 
-switch sceneName
-    case('whiteRoom')
-        pbrtFile = fullfile(sceneDir,'living-room-2','scene.pbrt');
-        rigOrigin = [0.9476 1.3018 3.4785] + [0 0.600 0];
-    case('livingRoom')
-        pbrtFile = fullfile(sceneDir,'living-room','scene.pbrt');
-        rigOrigin = [2.7007    1.5571   -1.6591];
-        forward = [-0.9618    0.0744    0.2635];
-        up = [0.0718    0.9972   -0.0197];
-    case('bathroom')
-        pbrtFile = fullfile(sceneDir,'bathroom','scene.pbrt');
-        rigOrigin = [0.3   1.667   -1.5];
-    case('kitchen')
-        pbrtFile = fullfile(sceneDir,'kitchen','scene.pbrt');
-        rigOrigin = [0.1768    1.7000   -0.2107];
-    case('bathroom2')
-        pbrtFile = fullfile(sceneDir,'bathroom2','scene.pbrt');
-    case('bedroom')
-        pbrtFile = fullfile(sceneDir,'bedroom','scene.pbrt');
-        rigOrigin = [1.1854    1.1615    1.3385];
-    otherwise
-        error('Scene not recognized.');
-end
+[pbrtFile,rigOrigin] = selectBitterliScene(sceneName);
 
 %% Calculate camera locations
 
@@ -219,7 +196,7 @@ for ii = 1:size(camOrigins,1)
         vcAddObject(oi);
         oiWindow;
         
-        %{
+        
         % Render coordinate maps (x,y,z coordinates)
         [coordMap, ~] = piRender(recipe,'renderType','coordinates');
         figure(ii+1); 
@@ -238,7 +215,7 @@ for ii = 1:size(camOrigins,1)
         for jj = 1:size(x,1)
             fprintf('(%0.3f %0.3f %0.3f)\n',coordMap(round(y(jj)),round(x(jj)),:));
         end
-        %}
+        
         
     % Save the OI along with location information
     oiFilename = fullfile(saveLocation,oiName);
