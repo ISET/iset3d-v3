@@ -14,9 +14,9 @@ function [ieObject, result] = piRender(thisR,varargin)
 %  renderType - render radiance, depth or both (default).  If the input is
 %               a fullpath to a file, then we only render the radiance
 %               data. Ask if you want this changed to permit a depth map.
-%               The coordinates option is a metadata type available in
-%               pbrt-v3-spectral that returns the global (x,y,z)
-%               coordinates of each intersection in the image. 
+%               We have multiple different metadata options. For pbrt-v2 we
+%               have depth, mesh, and material. For pbrt-v3 we have depth
+%               and coordinates at the moment. 
 %  version       - PBRT version, 2 or 3
 %  
 % RETURN
@@ -47,7 +47,7 @@ for ii=1:2:length(varargin)
     varargin{ii} = ieParamFormat(varargin{ii}); 
 end
 
-rTypes = {'radiance','depth','both','coordinates'};
+rTypes = {'radiance','depth','both','coordinates','material','mesh'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes))); 
 
 p.addParameter('version',2,@(x)isnumeric(x));
@@ -88,32 +88,32 @@ elseif isa(thisR,'recipe')
     end
     pbrtFile = thisR.outputFile;
 
-    % Set up the depth file
-    if strcmp(renderType,'both') || strcmp(renderType,'depth')
+    % Set up any metadata render. By default, we do "both" which includes
+    % both the radiance and the depth map. 
+    if (~strcmp(renderType,'radiance'))
         
-        % Write out a pbrt file with depth
-        % depthFile   = fullfile(workingFolder,strcat(name,'_depth.pbrt'));
-        depthRecipe = piRecipeConvertToDepth(thisR);
-        
-        % Always overwrite the depth file, but don't copy over the whole directory
-        piWrite(depthRecipe,'overwritepbrtfile',true,...
-            'overwritelensfile',false,...
-            'overwriteresources',false);
-        
-        depthFile = depthRecipe.outputFile;
-    end
-    
-    % Set up a metadata render
-    if(strcmp(renderType,'coordinates'))
-        if(thisR.version ~= 3)
+        % Do some checks for the renderType.
+        if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
             error('Coordinates metadata render only available right now for pbrt-v3-spectral.');
         end
-        coordRecipe = piRecipeConvertToDepth(thisR,'metadata','coordinates');
-        piWrite(coordRecipe,'overwritepbrtfile',true,...
+        if((thisR.version ~= 2) && (strcmp(renderType,'mesh') || strcmp(renderType,'material')))
+            error('Mesh or material metadata render is only available right now for pbrt-v2-spectral.');
+        end
+        
+        if(strcmp(renderType,'both'))
+            metadataType = 'depth';
+        else
+            metadataType = renderType;
+        end
+        
+        metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType);
+        piWrite(metadataRecipe,'overwritepbrtfile',true,...
             'overwritelensfile',false,...
             'overwriteresources',false);
-        coordFile = coordRecipe.outputFile;
+        metadataFile = metadataRecipe.outputFile;
+        
     end
+    
     
 else
     error('A full path to a scene pbrt file or a recipe class is required\n');
@@ -125,23 +125,25 @@ switch renderType
     case {'both','all'}
         filesToRender{1} = pbrtFile;
         label{1} = 'radiance';
-        filesToRender{2} = depthFile;
-        label{2} = 'depth';
-    case {'depth','depthmap'}
-        filesToRender = {depthFile};
-        label{1} = 'depth';
+        filesToRender{2} = metadataFile;
+        label{2} = 'depth'; 
     case {'radiance'}
         filesToRender = {pbrtFile};
         label{1} = 'radiance';
     case {'coordinates'}
-        filesToRender = {coordFile};
+        % We need coordinates to be separate since it's return type is
+        % different than the other metadata types. 
+        filesToRender = {metadataFile};
         label{1} = 'coordinates';
+    case{'material','mesh','depth'}
+        filesToRender = {metadataFile};
+        label{1} = 'metadata';
     otherwise
         error('Cannot recognize render type.');
 end
 
 % We need these to avoid errors further down.
-depthMap = [];
+metadataMap = [];
 photons = []; 
 
 for ii = 1:length(filesToRender)
@@ -214,9 +216,9 @@ for ii = 1:length(filesToRender)
     % photons or depth map.
     if(strcmp(label{ii},'radiance'))
         photons = piReadDAT(outFile, 'maxPlanes', 31);
-    elseif(strcmp(label{ii},'depth'))
+    elseif(strcmp(label{ii},'depth') || strcmp(label{ii},'metadata') )
         tmp = piReadDAT(outFile, 'maxPlanes', 31);
-        depthMap = tmp(:,:,1); clear tmp;
+        metadataMap = tmp(:,:,1); clear tmp;
     elseif(strcmp(label{ii},'coordinates'))
         tmp = piReadDAT(outFile, 'maxPlanes', 31);
         coordMap = tmp(:,:,1:3); clear tmp; 
@@ -230,14 +232,16 @@ end
 
 ieObjName = sprintf('%s-%s',name,datestr(now,'mmm-dd,HH:MM'));
 
-% Only return the depth map
-if(strcmp(renderType,'depth'))
+% Only return the metadata map (MxNx1)
+if(strcmp(renderType,'depth') || strcmp(renderType,'material') || strcmp(renderType,'mesh'))
     % Could create a dummy object (empty) and put the depth map in that.
-    ieObject = depthMap; % not technically an ieObject...
+    ieObject = metadataMap; % not technically an ieObject...
     return;
 end
 
 % Only return the coordinates metadata
+% We keep the coordinate map separate from the rest of the metadata because
+% it's (MxNx3)
 if(strcmp(renderType,'coordinates'))
     ieObject = coordMap;
     return;
@@ -265,8 +269,8 @@ switch opticsType
         ieObject = piOICreate(photons,varargin{:});  % Settable parameters passed
         ieObject = oiSet(ieObject,'name',ieObjName);
         % I think this should work (BW)
-        if(~isempty(depthMap))
-            ieObject = oiSet(ieObject,'depth map',depthMap);
+        if(~isempty(metadataMap))
+            ieObject = oiSet(ieObject,'depth map',metadataMap);
         end
         
         % This always worked in ISET, but not in ISETBIO.  So I stuck in a
@@ -277,8 +281,8 @@ switch opticsType
         % In this case, we the radiance describes the scene, not an oi
         ieObject = piSceneCreate(photons,'meanLuminance',100);
         ieObject = sceneSet(ieObject,'name',ieObjName);
-        if(~isempty(depthMap))
-            ieObject = sceneSet(ieObject,'depth map',depthMap);
+        if(~isempty(metadataMap))
+            ieObject = sceneSet(ieObject,'depth map',metadataMap);
         end
         
         % There may be other parameters here in this future
