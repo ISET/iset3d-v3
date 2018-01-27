@@ -12,7 +12,7 @@ cloudFolder = fullfile(obj.cloudBucket,obj.namespace,sceneName);
 % If renderDepth flag is on, generate depth files
 if(obj.renderDepth)
     
-    depthScene = piRecipeConvertToDepth(scene);
+    depthScene = piRecipeConvertToMetadata(scene);
     
     % Always overwrite the depth file, but don't copy over the whole directory
     piWrite(depthScene,'overwritepbrtfile',true,...
