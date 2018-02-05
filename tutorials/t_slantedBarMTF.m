@@ -98,31 +98,41 @@ end
 % We can use the ISO12233 standard to calculate the MTF from a slanted bar.
 
 % First render the slanted bar. You might want to increase the numRays and
-% resolution for less noisy results.
-myScene = sceneEye('slantedBar','planeDistance',200);
+% resolution for less noisy results. With numRays = 256 and resolution =
+% 128, this takes roughly 1 min to render on an 8 core machine.
+myScene = sceneEye('slantedBar','planeDistance',200+7.69);
 myScene.name = 'slantedBarForMTF';
 myScene.accommodation = 5;
 myScene.fov = 1;
 myScene.numCABands = 8;
-myScene.numRays = 128;
+myScene.numRays = 256;
 myScene.resolution = 128;
 oi = myScene.render;
 
-% Crop the image so we only have the bar
+% Crop the image so we only have the slanted line visible. The ISO12233
+% routine will be confused by the edges of the retinal image if we don't
+% first crop it.
 cropRadius = myScene.resolution/(2*sqrt(2))-5;
 oiCenter = myScene.resolution/2;
 barOI = oiCrop(oi,round([oiCenter-cropRadius oiCenter-cropRadius ...
     cropRadius*2 cropRadius*2]));
 
 % Convert to illuminance
-% TODO: Is this the best way to go about calculating the MTF? Should we
-% instead take the 550 nm photons? How should we convert from photons to
-% RGB values to be passed into the ISO12233 routine? 
+% TODO: How should we convert from photons over wavelength to RGB values to
+% be passed into the ISO12233 routine?  Here we are essentically weighting
+% the spectrum according to the luminosity function, thus producing a
+% grayscale image to pass into ISO2233.
+barOI = oiSet(barOI,'mean illuminance',1);
 barImage = oiGet(barOI,'illuminance');
 
 % Calculate MTF
 deltaX_mm = oiGet(oi,'sample spacing')*10^3; % Get pixel pitch
-% ISET is required for this calculation (not in ISETBIO)
-% TODO: Add this in ISETBIO? 
-[results, fitme, esf, h] = ISO12233(barImage, deltaX_mm(1),[1/3 1/3 1/3]);
+[results, fitme, esf, h] = ISO12233(barImage, deltaX_mm(1),[1/3 1/3 1/3],'none');
 
+% Convert to cycles per degree
+mmPerDeg = 0.2852; % Approximate (assuming a small FOV and an focal length of 16.32 mm)
+plot(results.freq*mmPerDeg,results.mtf);
+xlabel('Spatial Frequency (cycles/deg)');
+ylabel('Contrast Reduction (SFR)');
+grid on;
+axis([0 60 0 1])
