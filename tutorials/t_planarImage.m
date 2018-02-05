@@ -41,7 +41,7 @@ myScene = sceneEye('texturedPlane',...
                    'planeSize',size,...
                    'planeTexture',imageTexture);
                
-%% Change eye properties
+%% Accommodate to the plane
 
 % We can have the display image approximately cover the entire retinal
 % image by matching the FOV. 
@@ -50,12 +50,19 @@ myScene.fov = planeFOV;
 % Accommodate to the plane
 myScene.accommodation = 1/(distance*10^-3); 
 
-
-%% Render
+myScene.name = sprintf('%0.2fdiopters',myScene.accommodation);
 oi = myScene.render;
 vcAddAndSelectObject(oi);
 oiWindow
 
+%%  Accommodate away from the plane
+
+myScene.fov = planeFOV;
+myScene.accommodation = 1/(100*10^-3);
+myScene.name = sprintf('%0.2fdiopters',myScene.accommodation);
+oi = myScene.render;
+vcAddAndSelectObject(oi);
+oiWindow
 
                 
                 

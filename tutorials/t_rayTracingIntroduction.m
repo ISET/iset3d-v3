@@ -61,9 +61,6 @@ myScene = sceneEye('numbersAtDepth');
 % list of the parameters available in the object structure:
 myScene
 
-% You can see the description of each parameter by...
-% TODO: How?
-
 % Let's render a quick, low quality retinal image first. Let's name this
 % render fastExample.
 myScene.name = 'fastExample';
@@ -87,7 +84,7 @@ oiWindow;
 
 %% Step through accommodation
 % Now let's render a series of retinal images at different accommodations.
-% This section renders roughly in 1 min on a machine with 2 cores. 
+% This section renders roughly in 30 sec on a machine with 8 cores. 
 
 accomm = [1 5 10]; % in diopters
 opticalImages = cell(length(accomm),1);
