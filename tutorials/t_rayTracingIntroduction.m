@@ -36,15 +36,14 @@ ieInit;
 % ISETBIO and pbrt2ISET.
 % These scenes include:
 % 1. numbersAtDepth
-% ...
-%
-% You can find a description and sample images of these scenes in
-% isetbioDataPath/pbrtscenes.
-% TODO: Update the above scenes
+% 2. texturedPlane
+% 3. chessSet
+% 4. slantedBar
+% You can find a description and sample images of these scenes on the wiki
+% page (https://github.com/isetbio/isetbio/wiki/3D-Image-Formation). 
 
 % You can select a scene as follows:
 myScene = sceneEye('numbersAtDepth');
-% myScene = sceneEye('/Users/tlian/GitRepos/isetbio/isettools/data/pbrtscenes/NumbersAtDepth_flip/numbersAtDepth.pbrt');
 
 % ISETBIO requires a "working directory." If one is not specified when
 % creating a scene, the default is in isetbioRootPath/local. All data
