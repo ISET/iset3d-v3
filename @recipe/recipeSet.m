@@ -35,10 +35,13 @@ switch param
         % Rendering and Docker related
     case {'outputfile'}
         thisR.outputFile = val;
+    case {'outputfile_materials'}
+        thisR.outputFile_materials = val;
 
     case {'inputFile'}
         thisR.inputFile = val;
-        
+    case {'inputFile_materials'}
+        thisR.inputFile_materials = val;        
         % Scene
     case 'objectdistance'
         % Adjust the lookat 'from' field to match the distance in val
