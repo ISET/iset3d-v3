@@ -31,7 +31,7 @@ pilistmaterial(thisR);
 
 %% Write thisR to *_material.pbrt
 oiName = 'carandbuilding';
-thisR.set('outputFile',fullfile(piRootPath,'local',strcat(oiName,'_materials.pbrt')));
+thisR.set('outputFile_materials',fullfile(piRootPath,'local',strcat(oiName,'_materials.pbrt')));
 piWriteMaterial(thisR);
 %%
 % %% Render
