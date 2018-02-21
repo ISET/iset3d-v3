@@ -1,4 +1,4 @@
-function [materials, txtLines] = piReadMaterial(fname,varargin)
+function [thisR, txtLines,list] = piReadMaterial(fname,varargin)
 % Parses a *_material.pbrt file written by the PBRT Cinema 4D exporter
 %
 % Syntax:
@@ -50,6 +50,10 @@ fclose(fileID);
 %% Extract lines that correspond to specified keyword
 materials = piBlockExtractMaterial(txtLines);
 
+%% pass materials to recipe.materials
+thisR = recipe;
+thisR.materials = materials;
+thisR.txtLines = txtLines;
 end
 
 function materials = piBlockExtractMaterial(txtLines)
@@ -155,6 +159,14 @@ for ii=1:nLines
                     materials(cnt).floatvroughness = piParseNumericString(thisLine{ss+1});
                 case 'float roughness'
                     materials(cnt).floatroughness = piParseNumericString(thisLine{ss+1});
+                case 'spectrum Kd'
+                    materials(cnt).spectrumkd = thisLine{ss+1};
+                case 'spectrum Ks'
+                    materials(cnt).spectrumks = thisLine{ss+1};
+                case 'string namedmaterial1'
+                    materials(cnt).stringnamedmaterial1 = thisLine{ss+1};
+                case 'string namedmaterial2'
+                    materials(cnt).stringnamedmaterial2 = thisLine{ss+1};
                     
                 otherwise
                     % fprintf('Unknown case %s\n',thisLine{ss});
@@ -198,6 +210,10 @@ m.colorks = [];
 m.floaturoughness = [];
 m.floatvroughness = [];
 m.floatroughness =[];
+m.spectrumkd = '';
+m.spectrumks ='';
+m.stringnamedmaterial1 = '';
+m.stringnamedmaterial2 = '';
 end
 
 %%
@@ -214,3 +230,4 @@ g = piParseNumericString(thisLine{ss+2});
 b = piParseNumericString(thisLine{ss+3});
 rgb = [r,g,b];
 end
+
