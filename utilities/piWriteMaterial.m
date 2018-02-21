@@ -6,7 +6,7 @@ function piWriteMaterial(thisR)
 %%
 % Empty any line that contains MakeNamedMaterial
 % The remaining lines have a texture definition.
-output = thisR.outputFile;
+output = thisR.outputFile_materials;
 txtLines = thisR.txtLines;
 for i = 1:size(txtLines)
     if ~isempty(txtLines(i))
