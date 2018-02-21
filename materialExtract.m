@@ -1,4 +1,24 @@
-function materialR = materialExtract(txtLines,blockName)
+function materialR = piBlockExtractMaterial(txtLines,blockName)
+% Extract parameters of a material from a block of text
+%
+% Syntax:
+%
+% Desription:
+%
+% Inputs
+%  txtLines
+%  blockName - String defining what we are looking for
+%
+% Outputs:
+%   materialR:  An array of structs defining the material
+%
+% Optional key/value pairs
+%
+% ZL SCIEN Stanford, 2018;
+%
+% See also
+
+%
 blockBegin = []; blockEnd = [];
 nLines = length(txtLines);
 for ii=1:nLines

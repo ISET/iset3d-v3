@@ -23,6 +23,7 @@ if ~exist(fname,'file'), error('File not found'); end
 %% Convert all jpg textures to png format.
 
 checktextureformat(work_dir)
+
 %% Call material lib
 [materiallib]=piMateriallib;
 
