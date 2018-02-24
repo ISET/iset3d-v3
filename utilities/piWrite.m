@@ -151,6 +151,11 @@ fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clo
 fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
 fprintf(fileID,'\n');
 
+% If a crop window exists, write out a warning
+if(isfield(renderRecipe.film,'cropwindow'))
+    fprintf(fileID,'# Warning: Crop window exists! \n');
+end
+
 %% Write Scale and LookAt commands first
 
 % Optional Scale

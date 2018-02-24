@@ -54,7 +54,7 @@ piWrite(thisR);
 
 %% Render with the Docker container
 
-oi = piRender(thisR,'mean illuminance',10);
+[oi,results] = piRender(thisR,'mean illuminance',10);
 
 % Show it in ISET
 vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   

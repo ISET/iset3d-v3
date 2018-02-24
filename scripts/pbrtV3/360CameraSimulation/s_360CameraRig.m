@@ -10,25 +10,41 @@ if ~piDockerExists, piDockerConfig; end
 
 % PARAMETERS
 % -------------------
-gcloudFlag = 1;
-sceneName = 'livingRoom';
-filmResolution = [256 256];
-pixelSamples = 256;
-bounces = 4;
-%saveDir = '/sni-storage/wandell/users/tlian/360Scenes/';
-saveDir = '/Users/trishalian/RenderedData/360Renders/';
-%sceneDir = '/home/tlian/';
-sceneDir = '/Users/trishalian/GitRepos/pbrt-v3-scenes-Bitterli/';
-workingDir = fullfile(piRootPath,'local','360Rig');
+
+% Rendering parameters
+gcloudFlag = 0;
+sceneName = 'whiteRoom';
+%xRes = 2704; %round(2704/16);
+%yRes = 2028; %round(2028/16);
+% filmResolution = [xRes yRes];
+filmResolution = [128 128];
+pixelSamples = 128;
+bounces = 1;
+
+% Save parameters
+%saveName = strcat(sceneName,'-Google');
+saveName = sceneName;
+saveDir = '/sni-storage/wandell/users/tlian/360Scenes/';
+%saveDir = '/Users/trishalian/RenderedData/360Renders/';    
+workingDir = fullfile(saveDir,'workingFolder'); % Save to data server directly to avoid limited space issues
+
+% Camera parameters
+% By default, cam0 is a fisheye pointing up and cam(N+1) and cam(N+2) are
+% fisheyes pointing down, where N = numCamerasCircum. This is according to
+% the convention of the Surround360 rig.
+numCamerasCircum = 14; % 14 for Facebook, 16 for Google
+whichCameras = [1] + 1; % Index convention starts from 0. 
+radius = 175.54;% 175.54 mm for Facebook, 140 mm for Google
 % -------------------
 
 % Setup gcloud
 if(gcloudFlag)
     gCloud = gCloud('dockerImage','gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud',...
         'cloudBucket','gs://primal-surfer-140120.appspot.com');
-    % gCloud.renderDepth = false;
+    gCloud.renderDepth = true;
+    gCloud.clusterName = 'trisha';
+    gCloud.maxInstances = 20;
     gCloud.init();  
-
 end
 
 % Check working directory
@@ -52,42 +68,20 @@ end
     
 %% Select scene
 
-switch sceneName
-    case('whiteRoom')
-        pbrtFile = fullfile(sceneDir,'living-room-2','scene.pbrt');
-        rigOrigin = [0.9476 1.3018 3.4785] + [0 0.600 0];
-    case('livingRoom')
-        pbrtFile = fullfile(sceneDir,'living-room','scene.pbrt');
-        rigOrigin = [2.7007    1.5571   -1.6591];
-        forward = [-0.9618    0.0744    0.2635];
-        up = [0.0718    0.9972   -0.0197];
-    otherwise
-        error('Scene not recognized.');
-end
+[pbrtFile,rigOrigin] = selectBitterliScene(sceneName);
 
 %% Calculate camera locations
-
-% We will manually shift all cameras according to the rig origin, so we
-% will leave this blank for now. With pbrt2ISET it's difficult to tell
-% where the scene origin is, so this is not as useful as it was before. 
-basePlateHeight = 0; 
-
-% Match FacebookSurround setup.
-numCamerasCircum = 14;
-
-% Which subset of cameras to render
-whichCameras = [1:3] + 1; % Facebook indexes starting from 0. 
 
 % Calculates the correct lookAts for each of the cameras. 
 % First camera is the one looking up
 % Followed by the cameras around the circumference
 % Followed by the two cameras looking down.
 [camOrigins, camTargets, camUps, camI] = mapSurround360Cameras(numCamerasCircum, ...
-    whichCameras,basePlateHeight);
+    whichCameras,radius);
 
 %%  Switch coordinates
-% There is a coordinate switch for this scene compared to the coordinate
-% system we use in mapSurround360Cameras. Specifically:
+% There is a coordinate switch for these pbrt scenes compared to the
+% coordinate system we use in mapSurround360Cameras. Specifically:
 % Our Y == Scene Z
 % Our Z == Scene Y
 % Our X == Scene X
@@ -117,6 +111,10 @@ recipe.sampler.subtype = 'halton';
 
 %% Loop through each camera in the rig and render.
 
+% For gCloud
+rigInfo = cell(size(camOrigins,1),5);
+allRecipes = cell(size(camOrigins,1),1); 
+
 for ii = 1:size(camOrigins,1)
     
     % Follow Facebook's naming conventions for the cameras
@@ -128,22 +126,25 @@ for ii = 1:size(camOrigins,1)
     if(camI(ii) == 0 || camI(ii) == (numCamerasCircum+1) || camI(ii) == (numCamerasCircum+2))
         % Top and bottom cameras
         lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','fisheye.87deg.6.0mm_v3.dat');
-        recipe.film.diagonal.value = 16;
-        recipe.film.diagonal.type = 'float';
     else
         % Circumference cameras
         lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','wide.56deg.6.0mm_v3.dat');
-        % Use a 1" sensor size
-        recipe.film.diagonal.value = 16;
-        recipe.film.diagonal.type = 'float';
+        %lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','wide.56deg.3.0mm_v3.dat');
     end
     
+    % Set sensor size
+    recipe.film.diagonal.value = 16; % Facebook (1")
+    %recipe.film.diagonal.value = 8; % Google Jump (~1/2.3") Bumped up a bit to try to get more FOV
+    recipe.film.diagonal.type = 'float';
+        
     % Attach the lens
     recipe.camera.lensfile.value = lensFile; % mm
     recipe.camera.lensfile.type = 'string';
     
     % Set the aperture to be the largest possible.
-    recipe.camera.aperturediameter.value = 10; % mm (something very large)
+    % PBRT-v3-spectral will automatically scale it down to the largest
+    % possible aperture for the chosen lens. 
+    recipe.camera.aperturediameter.value = 10; % mm 
     recipe.camera.aperturediameter.type = 'float';
 
     %% Set render quality
@@ -160,28 +161,60 @@ for ii = 1:size(camOrigins,1)
     recipe.set('from',origin);
     recipe.set('to',target);
     recipe.set('up',up);
-      
-    % Look straight down/up
-    %recipe.set('from',rigOrigin);
-    %recipe.set('up',rigOrigin+forward);
-    %recipe.set('to',rigOrigin + [up(1) -up(2) up(3)]);
+    
+    % Do some calculations to have the camera look straight down/up
+    %{
+    forward = recipe.lookAt.to-recipe.lookAt.from;
+    forward = forward./norm(forward);
+    up = recipe.lookAt.up - recipe.lookAt.from;
+    up = up./norm(up);
+    recipe.set('from',rigOrigin);
+    recipe.set('up',rigOrigin+forward);
+    recipe.set('to',rigOrigin + [up(1) up(2) up(3)]);
+    %}
     
     recipe.set('outputFile',fullfile(workingDir,strcat(oiName,'.pbrt')));
     
     piWrite(recipe);
     
     if(gcloudFlag)
-        gCloud.upload(recipe);
+        % Save all generated recipes in a cell matrix to be uploaded to
+        % gCloud later in the script. 
+        allRecipes{ii} = copy(recipe);
+        
+        % Save rig info in a large cell matrix. We will save these in the
+        % optical image after we download the rendered data from gCloud. 
+        rigInfo{ii,1} = oiName;
+        rigInfo{ii,2} = origin;
+        rigInfo{ii,3} = target;
+        rigInfo{ii,4} = up;
+        rigInfo{ii,5} = rigOrigin;
+        
     else
         
         [oi, result] = piRender(recipe);
         vcAddObject(oi);
         oiWindow;
         
-        % Fast depth render
-        %[depthMap, result] = piRender(recipe,'renderType','depth');
-        %figure(ii+1);
-        %imagesc(depthMap); colorbar;
+        
+        % Render coordinate maps (x,y,z coordinates)
+        [coordMap, ~] = piRender(recipe,'renderType','coordinates');
+        figure(ii+1); 
+        subplot(1,3,1); imagesc(coordMap(:,:,1)); axis image; colorbar; title('x-axis')
+        subplot(1,3,2); imagesc(coordMap(:,:,2)); axis image; colorbar; title('y-axis')
+        subplot(1,3,3); imagesc(coordMap(:,:,3)); axis image; colorbar; title('z-axis')
+        
+        % Open the RGB image and let the user click on the image; return
+        the corresponding coordinates. This is helpful when trying to place
+        area lights into the pbrt scene file. 
+        rgb = oiGet(oi,'rgb');
+        fig = figure(ii+2);
+        imshow(rgb);
+        title('Click to get coordinates. Press return when done.');
+        [x, y] = getpts(fig);
+        for jj = 1:size(x,1)
+            fprintf('(%0.3f %0.3f %0.3f)\n',coordMap(round(y(jj)),round(x(jj)),:));
+        end
         
         
     % Save the OI along with location information
@@ -190,7 +223,9 @@ for ii = 1:size(camOrigins,1)
     
     clear oi
     
-    % Delete the .dat file if it exists (to avoid running out of local storage space)
+    % Delete the .dat file if it exists (to avoid running out of local
+    % storage space. Since the oi has already been saved, the .dat file is
+    % redundant at this point.
     [p,n,e] = fileparts(recipe.outputFile);
     datFile = fullfile(p,'renderings',strcat(n,'.dat'));
     if(exist(datFile,'file'))
@@ -209,6 +244,15 @@ end
 
 if(gcloudFlag)
     
+    % Upload all recipes to gCloud
+    % Note: We have to do the upload here because we want to wait until all
+    % pbrt files have been written out before we start uploading. This way
+    % all the data needed to render all pbrt files is ready in the working
+    % folder.(gCloud.upload only zips the working directory up once!)
+    for ii = 1:length(allRecipes)
+        gCloud.upload(allRecipes{ii});
+    end
+    
     gCloud.render();
     
     % Save the gCloud object in case MATLAB closes
@@ -226,19 +270,27 @@ if(gcloudFlag)
         
         oi = objects{ii};
         
-        oiFilename = fullfile(saveLocation,oiName);
-        save(oiFilename,'oi','origin','target','up','rigOrigin');
+        % "Fix" name. (OI name now includes date, but we want to use the
+        % "camX" name when saving)
+        oiName = oiGet(oi,'name');
+        C = strsplit(oiName,'-');
+        oiName = C{1};
+        oiFilename = fullfile(saveLocation,strcat(oiName,'.mat'));
         
-        vcAddAndSelectObject(oi);
-        oiWindow;
-        
-        % Delete dat file to save space
-        [p,n,e] = fileparts(gCloud.targets(ii).local);
-        
-        datFile = fullfile(p,'renderings',strcat(n,'.dat'));
-        if(exist(datFile,'file'))
-            delete(datFile);
+        % Load up rig info
+        % Match "camX" name with the ones recorded in the rigInfo cell matrix. 
+        for jj = 1:size(rigInfo,1)
+            if(strcmp(oiName,rigInfo{jj,1}))
+                origin = rigInfo{jj,2};
+                target = rigInfo{jj,3};
+                up = rigInfo{jj,4};
+                rigOrigin = rigInfo{jj,5};
+                break;
+            end
         end
+        
+        save(oiFilename,'oi','origin','target','up','rigOrigin');
+        fprintf('Saved oi at %s \n',oiFilename);
     
     end
     
