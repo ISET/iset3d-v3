@@ -22,8 +22,8 @@ materiallib.carpaint.string='substrate';
 %% chrome_spd
 materiallib.chrome_spd.floatroughness=0.01;
 materiallib.chrome_spd.string='metal';
-materiallib.chrome_spd.spectrumkd='spds/Al.k.spd';
-materiallib.chrome_spd.spectrumks='spds/Al.eta.spd';
+materiallib.chrome_spd.spectrumkd='spds/metals/Al.k.spd';
+materiallib.chrome_spd.spectrumks='spds//metals/Al.eta.spd';
 
 %% blackrubber
 materiallib.blackrubber.floatroughness = 0.5;
@@ -32,12 +32,18 @@ materiallib.blackrubber.rgbkd = [ .01 .01 .01 ];
 materiallib.blackrubber.rgbks = [ 0.2 .2 .2 ];
 %% mirror
 materiallib.mirror.string='mirror';
+materiallib.mirror.rgbkr = [0.9 0.9 0.9];
 %% matte
 materiallib.matte.string = 'matte';
+materiallib.matte.rgbkd = [0.7 0.7 0.7];
 %% plastic
-materiallib.matte.string = 'plastic';
+materiallib.plastic.string = 'plastic';
+materiallib.plastic.rgbkd = [0.25 0.25 0.25];
+materiallib.plastic.rgbks = [0.25 0.25 0.25];
 %% glass
-materiallib.matte.string = 'glass';
+materiallib.glass.string = 'glass';
+materiallib.glass.rgbkr = [0.9 0.9 0.9];
+materiallib.glass.rgbkt = [0.9 0.9 0.9];
 end
 
 

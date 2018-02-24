@@ -34,18 +34,29 @@ end
 
 fileID = fopen(output,'w');
 
-for row=1:size(textureLines)
+for row=1:length(textureLines)
     fprintf(fileID,'%s\n',textureLines{row});
 end
 
 % Add the materials
-for row=1:length(materialTxt)
-    fprintf(fileID,'%s\n',materialTxt{row});
+if contains(materialTxt{length(materialTxt)},'"paint_base"')
+    fprintf(fileID,'%s\n',materialTxt{length(materialTxt)});
+    fprintf(fileID,'%s\n',materialTxt{length(materialTxt)-1});
+    nmaterialTxt = length(materialTxt)-2;
+    for row=1:nmaterialTxt
+        fprintf(fileID,'%s\n',materialTxt{row});
+        
+    end
+else
+    for row=1:length(materialTxt)
+        fprintf(fileID,'%s\n',materialTxt{row});
+        
+    end
 end
-
 fclose(fileID);
 [~,n,e] = fileparts(output);
 fprintf('%s%s are overwritten successfully \n', n,e);
+
 end
 
 %% function that converts the struct to text
