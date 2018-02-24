@@ -1,4 +1,4 @@
-function [thisR, txtLines,list] = piReadMaterial(fname,varargin)
+function [materials, txtLines] = piReadMaterial(fname,varargin)
 % Parses a *_material.pbrt file written by the PBRT Cinema 4D exporter
 %
 % Syntax:
@@ -51,9 +51,9 @@ fclose(fileID);
 materials = piBlockExtractMaterial(txtLines);
 
 %% pass materials to recipe.materials
-thisR = recipe;
-thisR.materials = materials;
-thisR.txtLines = txtLines;
+% thisR = recipe;
+% thisR.materials = materials;
+% thisR.txtLines = txtLines;
 end
 
 function materials = piBlockExtractMaterial(txtLines)
