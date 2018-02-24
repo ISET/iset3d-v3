@@ -73,6 +73,7 @@ switch param
     case 'fov'
         % We should check that this is a pinhole, I think
         thisR.camera.fov.value = val;
+        thisR.camera.fov.type = 'float';
         
     case 'diffraction'
         thisR.camera.diffractionEnabled.value = val;
@@ -108,9 +109,9 @@ switch param
         %
         if length(val) == 1, val(2) = val(1); end
         thisR.camera.num_pinholes_h.value = val(1);
-        thisR.camera.num_pinholes_h.type = 'integer';
+        thisR.camera.num_pinholes_h.type = 'float';
         thisR.camera.num_pinholes_w.value = val(2);
-        thisR.camera.num_pinholes_w.type = 'integer';
+        thisR.camera.num_pinholes_w.type = 'float';
     case 'lightfieldfilmresolution'
         % This is printed out in the pbrt scene file
         nMicrolens = thisR.get('n microlens');
@@ -134,7 +135,10 @@ switch param
         % Sampler
     case {'pixelsamples','raysperpixel'}
         thisR.sampler.pixelsamples.value = val;
-        
+    case{'cropwindow','crop window'}
+        thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
+        thisR.film.cropwindow.type = 'float';
     otherwise
         error('Unknown parameter %s\n',param);
 end
+ 
