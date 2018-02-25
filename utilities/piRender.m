@@ -161,6 +161,11 @@ for ii = 1:length(filesToRender)
     
     [~,currName,~] = fileparts(currFile);
     
+    % Make sure renderings folder exists
+    if(~exist(fullfile(workingFolder,'renderings'),'dir'))
+        mkdir(fullfile(workingFolder,'renderings'));
+    end
+    
     outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
     renderCommand = sprintf('pbrt --outfile %s %s', ...
         outFile, currFile);
