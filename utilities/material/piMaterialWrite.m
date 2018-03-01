@@ -1,7 +1,18 @@
-function piWriteMaterial(thisR)
+function piMaterialWrite(thisR)
 % find cells except for NamedMaterial
 
 %% Parse the output file, working directory, stuff like that.
+
+% converts any jpg file names
+% in the PBRT files into png file names
+ntxtLines=length(thisR.txtLines);
+for jj = 1:ntxtLines
+str = thisR.txtLines(jj);
+if ~isempty(contains(str,'jpg'))
+    thisR.txtLines(jj) = strrep(str,'jpg','png');
+end
+end
+
 
 %%
 % Empty any line that contains MakeNamedMaterial
@@ -55,7 +66,7 @@ else
 end
 fclose(fileID);
 [~,n,e] = fileparts(output);
-fprintf('%s%s are overwritten successfully \n', n,e);
+fprintf('%s%s are written successfully \n', n,e);
 
 end
 

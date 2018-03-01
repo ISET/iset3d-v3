@@ -1,0 +1,20 @@
+Transform [0.721232486441 -0.0184295553105 -0.692447869513 0  0.00556502548342 0.999767907348 -0.0208125425958 0  0.692670723355 0.0111571918058 0.721167654625 0  -150.672397261 -167.600025647 1542.89031955 1]
+Integrator "path"
+  "integer maxdepth" [ 33 ] 
+
+Sampler "sobol" 
+  "integer pixelsamples" [ 64 ] 
+
+PixelFilter "triangle" 
+  "float xwidth" [ 1.000000 ] 
+  "float ywidth" [ 1.000000 ] 
+
+Film "image" 
+  "integer xresolution" [ 1280 ] 
+  "integer yresolution" [ 720 ] 
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	Include "SimpleScene_materials.pbrt"
+	Include "SimpleScene_geometry.pbrt"
+WorldEnd
