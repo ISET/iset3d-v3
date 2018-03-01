@@ -46,7 +46,7 @@ materiallib.carpaint.string='substrate';
 materiallib.chrome_spd.floatroughness=0.01;
 materiallib.chrome_spd.string='metal';
 materiallib.chrome_spd.spectrumkd='spds/metals/Al.k.spd';
-materiallib.chrome_spd.spectrumks='spds//metals/Al.eta.spd';
+materiallib.chrome_spd.spectrumks='spds/metals/Al.eta.spd';
 
 %% blackrubber
 %

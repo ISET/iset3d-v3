@@ -1,4 +1,4 @@
-function piMaterialsList(thisR)
+function piMaterialList(thisR)
 % List materials type in this PBRT scene
 %
 % ZL, SCIEN Stanford, 2018

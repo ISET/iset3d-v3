@@ -11,12 +11,12 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt_material files
-
-fname = fullfile(piRootPath,'local','SimpleScene','SimpleScene.pbrt');
+FilePath = fullfile(piRootPath,'FromC4','SimpleScene');
+fname = fullfile(FilePath,'SimpleScene.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname,'version',3);
 
-fname_materials = fullfile(piRootPath,'local','SimpleScene','SimpleScene_materials.pbrt');
+fname_materials = fullfile(FilePath,'SimpleScene_materials.pbrt');
 if ~exist(fname_materials,'file'), error('File not found'); end
 [thisR.materials,thisR.txtLines] = piMaterialRead(fname_materials,'version',3);
 %% Call material lib
@@ -25,45 +25,26 @@ thisR.materiallib = piMateriallib;
 %% list the property of materials 
 
 piMaterialList(thisR);
-%% Convert all jpg textures to png format,only *.png&*.exr are supported in pbrt.
+%% Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
 
-work_dir = fullfile(piRootPath,'local','SimpleScene');
-piTextureFileFormat(work_dir);
+piTextureFileFormat(FilePath);
 
-%% Assign Materials
+%% Assign Materials and Color
 % For detail: http://www.pbrt.org/fileformat-v3.html.
 % Color chart: http://prideout.net/archive/colors.php
 
 % We need a way to use strings to assign new materials to the target
 % material.
-target   = thisR.materiallib.mirror;
-idx = 6;    
-piMaterialAssign(thisR,idx,target);
+target   = thisR.materiallib.chrome_spd;
+rgbkd    = [0 1 0];
+%rgbkr = [0.753 0.753 0.753];
+material = 'pyramid'; 
+piMaterialAssign(thisR,material,target,'rgbkr',rgbkr);
 
 piMaterialList(thisR);
 
-%% Assign Color
-%
-% kd is the diffuse reflectance
-rgbkd = [1 0 0]; % Red
-
-% rgbkd = [0.943 0.710 0.113] %golden
-% rgbkd= [0 1 0] % green
-% rgbkd= [1 1 0] % yellow
-% rgbkd= [0 0 1] % blue
-% rgbkd= [0.753 0.753 0.753] % Silver
-
-% kr is another type of reflectance, maybe specular?
-% rgbkr= [1 0 0];% Red
-% rgbkr= [0 1 0] % green
-% rgbkr= [1 1 0] % yellow
-% rgbkr= [0 0 1] % blue
-rgbkr = [0.753 0.753 0.753]; % Silver
-thisR.materials(idx).rgbkr = rgbkr;
-
 %% Write thisR to *_material.pbrt
-oiName = 'SimpleScene';
-thisR.set('outputFile_materials',fullfile(work_dir,strcat(oiName,'_materials.pbrt')));
+thisR.set('outputFile_materials',fullfile(FilePath,'SimpleScene_materials.pbrt'));
 
 piMaterialWrite(thisR);
 

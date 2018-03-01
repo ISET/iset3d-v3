@@ -1,4 +1,4 @@
-function [materials, txtLines] = piReadMaterial(fname,varargin)
+function [materials, txtLines] = piMaterialRead(fname,varargin)
 % Parses a *_material.pbrt file written by the PBRT Cinema 4D exporter
 %
 % Syntax:

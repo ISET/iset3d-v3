@@ -81,7 +81,7 @@ worldBeginIndex = 0;
 
 for ii = 1:length(txtLines)
     currLine = txtLines{ii};
-    if(~isempty(strfind(currLine,'WorldBegin')))
+    if(contains(currLine,'WorldBegin'))
         worldBeginIndex = ii;
         break;
     end
@@ -97,36 +97,50 @@ thisR.world = txtLines(worldBeginIndex:end);
 % Here are the text lines from before WorldBegin
 txtLines = txtLines(1:(worldBeginIndex-1));
 
+%% Check if header indicates exporter
+
+% Unfortunately we have to re-read the text file in order to check the
+% header. 
+fileID = fopen(fname);
+tmp = textscan(fileID,'%s','Delimiter','\n');
+headerCheck = tmp{1};
+fclose(fileID);
+if contains(headerCheck{1}, 'Exported by PBRT exporter for Cinema 4D')
+    exporterFlag = true;
+else
+    exporterFlag = false;
+end
+    
 %% It would be nice to identify every block
 
 %% Extract camera  block
 
-cameraBlock = piBlockExtract(txtLines,'blockName','Camera');
-if(isempty(cameraBlock))
+cameraStruct = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
+if(isempty(cameraStruct))
     warning('Cannot find "camera" in PBRT file.');
     thisR.camera = struct([]); % Return empty.
 else
-    thisR.camera = piBlock2Struct(cameraBlock);
+    thisR.camera = cameraStruct;
 end
 
 %% Extract sampler block
 
-samplerBlock = piBlockExtract(txtLines,'blockName','Sampler');
-if(isempty(samplerBlock))
+samplerStruct = piBlockExtract(txtLines,'blockName','Sampler','exporterFlag',exporterFlag);
+if(isempty(samplerStruct))
     warning('Cannot find "sampler" in PBRT file.');
     thisR.sampler = struct([]); % Return empty.
 else
-    thisR.sampler = piBlock2Struct(samplerBlock);
+    thisR.sampler = samplerStruct;
 end
 
 %% Extract film block
 
-filmBlock = piBlockExtract(txtLines,'blockName','Film');
-if(isempty(filmBlock))
+filmStruct = piBlockExtract(txtLines,'blockName','Film','exporterFlag',exporterFlag);
+if(isempty(filmStruct))
     warning('Cannot find "film" in PBRT file.');
     thisR.film = struct([]); % Return empty.
 else
-    thisR.film = piBlock2Struct(filmBlock);
+    thisR.film = filmStruct;
     
     if(isfield(thisR.film,'filename'))
         % Remove the filename since it inteferes with the outfile name.
@@ -136,50 +150,56 @@ end
 
 %% Extract surface pixel filter block
 
-pfBlock = piBlockExtract(txtLines,'blockName','PixelFilter');
-if(isempty(pfBlock))
+pfStruct = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
+if(isempty(pfStruct))
     warning('Cannot find "filter" in PBRT file.');
     thisR.filter = struct([]); % Return empty.
 else
-    thisR.filter = piBlock2Struct(pfBlock);
+    thisR.filter = pfStruct;
 end
 
 %% Extract (surface) integrator block
 
 if(ver == 2)
-    sfBlock = piBlockExtract(txtLines,'blockName','SurfaceIntegrator');
+    sfStruct = piBlockExtract(txtLines,'blockName','SurfaceIntegrator','exporterFlag',exporterFlag);
 elseif(ver == 3)
-    sfBlock = piBlockExtract(txtLines,'blockName','Integrator');
+    sfStruct = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
 end
 
-if(isempty(sfBlock))
+if(isempty(sfStruct))
     warning('Cannot find "integrator" in PBRT file. Did you forget to turn on the v3 flag?');
     thisR.integrator = struct([]); % Return empty.
 else
-    thisR.integrator = piBlock2Struct(sfBlock);
+    thisR.integrator = sfStruct;
 end
 
 %% Extract renderer block
 
 if(ver == 2)
-    rendererBlock = piBlockExtract(txtLines,'blockName','Renderer');
-    if(isempty(rendererBlock))
+    rendererStruct = piBlockExtract(txtLines,'blockName','Renderer','exporterFlag',exporterFlag);
+    if(isempty(rendererStruct))
         % warning('Cannot find "renderer" in PBRT file. Using default.');
         thisR.renderer = struct('type','Renderer','subtype','sampler');
     else
-        thisR.renderer = piBlock2Struct(rendererBlock);
+        thisR.renderer = rendererStruct;
     end
 else
     warning('"Renderer" does not exist in the new PBRTv3 format. We will leave the field blank in the recipe.')
 end
 
 %% Read LookAt, Transforms, and ConcatTransform, if they exist
+% TODO: In the future we should move all these Transforms into
+% piBlockExtract so that all the parsing is done there. That would make
+% much more sense, organizationally. However, it's more complicated than,
+% since some of the transforms act on each other, so we'll have to be very
+% clever when doing the transforms.
+
 % Parse the camera position.
 
 % A flag for flipping from a RHS to a LHS. 
 flip = 0;
 
-lookAtBlock = piBlockExtract(txtLines,'blockName','LookAt');
+[~, lookAtBlock] = piBlockExtract(txtLines,'blockName','LookAt','exporterFlag',exporterFlag);
 if(isempty(lookAtBlock))
     % Default camera position.
     thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
@@ -191,7 +211,7 @@ else
 end
 
 % If there's a transform it will overwrite the LookAt.
-transformBlock = piBlockExtract(txtLines,'blockName','Transform');
+[~, transformBlock] = piBlockExtract(txtLines,'blockName','Transform','exporterFlag',exporterFlag);
 if(~isempty(transformBlock))
     values = textscan(transformBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
     values = cell2mat(values(2:end));
@@ -206,7 +226,7 @@ end
 
 % If there's a concat transform, we use it to update the current camera
 % position. 
-concatTBlock = piBlockExtract(txtLines,'blockName','ConcatTransform');
+[~, concatTBlock] = piBlockExtract(txtLines,'blockName','ConcatTransform','exporterFlag',exporterFlag);
 if(~isempty(concatTBlock))
     values = textscan(concatTBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
     values = cell2mat(values(2:end));
@@ -224,7 +244,7 @@ thisR.lookAt = struct('from',from,'to',to,'up',up);
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
 % is already in the PBRT file, we want to keep it around.
-scaleBlock = piBlockExtract(txtLines,'blockName','Scale');
+[~, scaleBlock] = piBlockExtract(txtLines,'blockName','Scale','exporterFlag',exporterFlag);
 if(isempty(scaleBlock))
     thisR.scale = [];
 else
