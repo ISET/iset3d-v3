@@ -96,4 +96,4 @@ piWrite(thisR, 'workingDir', workingDir);
 scene = piRender(thisR);
 
 % Show it in ISET
-vcAddObject(scene); sceneWindow;   
+ieAddObject(scene); sceneWindow;   

@@ -43,7 +43,7 @@ function [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
  scene = piRender(thisR);
 
  % View it
- vcAddObject(scene); sceneWindow;
+ ieAddObject(scene); sceneWindow;
 %}
 %{
  % By default, this places the data in piRootPath/data.  

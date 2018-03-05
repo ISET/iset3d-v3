@@ -52,7 +52,7 @@ exposureTime = sensorGet(sensor,'exp time');
 fprintf('Exposure Time is 1/%0.2f s \n',1/exposureTime);
 
 % Check the sensor window
-vcAddObject(sensor);
+ieAddObject(sensor);
 sensorWindow;
 
 %% Image Processing
@@ -64,7 +64,7 @@ ip = ipSet(ip,'correction method illuminant','gray world');
 % Compute!
 ip = ipCompute(ip,sensor);
 
-vcAddObject(ip);
+ieAddObject(ip);
 ipWindow;
 
 %% Get RGB image

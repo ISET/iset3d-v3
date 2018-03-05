@@ -62,7 +62,7 @@ for ipd = [64]
     piWrite(recipe);
     [scene, result] = piRender(recipe);
     
-    vcAddObject(scene);
+    ieAddObject(scene);
     sceneWindow;
     
     % Save the OI along with location information

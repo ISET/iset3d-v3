@@ -82,7 +82,7 @@ end
 
 objects = gCloud.download();
 oi = objects{1};
-vcAddObject(oi);
+ieAddObject(oi);
 oiWindow;
 
 oi = oiSet(oi,'gamma',0.5);

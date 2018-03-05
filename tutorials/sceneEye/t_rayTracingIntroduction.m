@@ -77,7 +77,7 @@ oi = myScene.render;
 
 % Now we have an optical image that we can use with the rest of ISETBIO. We
 % can take a look at what it looks like right now:
-vcAddObject(oi);
+ieAddObject(oi);
 oiWindow;
 
 
@@ -98,7 +98,7 @@ for ii = 1:length(accomm)
     % directory. In general, you may want to periodically clear your
     % working directory to avoid a build up of files.
     oi = myScene.render;
-    vcAddObject(oi);
+    ieAddObject(oi);
     opticalImages{ii} = oi;
 end
 

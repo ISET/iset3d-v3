@@ -29,7 +29,7 @@ piWrite(thisR);
 
 scene = piRender(thisR);
 scene = oiSet(scene,'name','Radiance_and_Depth');
-vcAddObject(scene); sceneWindow;   
+ieAddObject(scene); sceneWindow;   
 
 %% Render an image segmented by material type.
 
@@ -69,6 +69,6 @@ imagesc(meshImage);colormap;
 %% Render only a radiance image
 scene = piRender(thisR,'renderType','radiance');
 scene = oiSet(scene,'name','RadianceOnly');
-vcAddObject(scene); sceneWindow; 
+ieAddObject(scene); sceneWindow; 
 
 %%

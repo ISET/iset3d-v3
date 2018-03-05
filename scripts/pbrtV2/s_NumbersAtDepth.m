@@ -38,13 +38,13 @@ piWrite(thisR);
 
 oi = piRender(thisR);
 oi = oiSet(oi,'name','big aperture');
-vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
+ieAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
 
 %%
 thisR.set('aperture',2);      % Try varying for depth of field effects
 piWrite(thisR, 'overwritedir', true);
 oi = piRender(thisR);
 oi = oiSet(oi,'name','small aperture');
-vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
+ieAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
 
 %%

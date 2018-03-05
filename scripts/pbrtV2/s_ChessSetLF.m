@@ -61,19 +61,19 @@ piWrite(thisR);
 oi = piRender(thisR);
 
 % Show it in ISET
-vcAddObject(oi); oiWindow;
+ieAddObject(oi); oiWindow;
 
 %% Create a matched light field sensor
 
 sensor = sensorCreate('light field',oi);
 sensor = sensorCompute(sensor,oi);
-vcAddObject(sensor); sensorWindow;
+ieAddObject(sensor); sensorWindow;
 
 %% Image process ... should really use the whiteScene here
 
 ip = ipCreate;
 ip = ipCompute(ip,sensor);
-vcAddObject(ip); ipWindow;
+ieAddObject(ip); ipWindow;
 
 %%  Show the different views
 
