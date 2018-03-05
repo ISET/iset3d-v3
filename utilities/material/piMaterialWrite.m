@@ -1,22 +1,28 @@
 function piMaterialWrite(thisR)
-% find cells except for NamedMaterial
+% Write the material file from PBRT V3, as input from Cinema 4D
+%
+% The main scene file (scene.pbrt) includes a scene_materials.pbrt
+% file.  This routine writes out the materials file from the
+% information in the recipe.
+%
+% ZL, SCIEN STANFORD, 2018
+
+%% We should confirm that thisR is a recipe
 
 %% Parse the output file, working directory, stuff like that.
 
-% converts any jpg file names
-% in the PBRT files into png file names
+% Converts any jpg file names in the PBRT files into png file names
 ntxtLines=length(thisR.txtLines);
 for jj = 1:ntxtLines
-str = thisR.txtLines(jj);
-if ~isempty(contains(str,'jpg'))
-    thisR.txtLines(jj) = strrep(str,'jpg','png');
-end
+    str = thisR.txtLines(jj);
+    if ~isempty(contains(str,'jpg'))
+        thisR.txtLines(jj) = strrep(str,'jpg','png');
+    end
 end
 
-
-%%
-% Empty any line that contains MakeNamedMaterial
+%% Empty any line that contains MakeNamedMaterial
 % The remaining lines have a texture definition.
+
 output = thisR.outputFile_materials;
 txtLines = thisR.txtLines;
 for i = 1:size(txtLines)
@@ -27,21 +33,19 @@ for i = 1:size(txtLines)
     end
 end
 
-% Squeeze out the empty lines????
-% Some day we might get the parsed textures here.
+% Squeeze out the empty lines. Some day we might get the parsed
+% textures here. 
 textureLines = txtLines(~cellfun('isempty',txtLines));
 
 %% Create txtLines for the material struct array
 
 materialTxt = cell(1,length(thisR.materials));
 for ii=1:length(thisR.materials)
-  materialTxt{ii} = piMaterialText(thisR.materials(ii)); % function that converts the struct to text
+    % Converts the material struct to text
+    materialTxt{ii} = piMaterialText(thisR.materials(ii)); 
 end
 
-%% Combine txtLines that are textures and defined materials
-% materiallist = vertcat(txtLines(~cellfun('isempty',txtLines)),struct2cell(materialR));
-
-%% Write to .pbrt texture-material file
+%% Write to scene_material.pbrt texture-material file
 
 fileID = fopen(output,'w');
 
@@ -65,19 +69,24 @@ else
     end
 end
 fclose(fileID);
+
 [~,n,e] = fileparts(output);
-fprintf('%s%s are written successfully \n', n,e);
+fprintf('Material file %s written successfully.\n', [n,e]);
 
 end
 
 %% function that converts the struct to text
 function val = piMaterialText(materials)
+% For each type of material, we have a method to write a line in the
+% material file.
+%
+
 val_name = sprintf('MakeNamedMaterial "%s" ',materials.name);
 val = val_name;
 val_string = sprintf(' "string type" "%s" ',materials.string);
 val = strcat(val, val_string);
 
-if ~isempty(materials.floatindex) 
+if ~isempty(materials.floatindex)
     val_floatindex = sprintf(' "float index" [%0.5f] ',materials.floatindex);
     val = strcat(val, val_floatindex);
 end
@@ -151,8 +160,10 @@ if ~isempty(materials.stringnamedmaterial1)
     val_stringnamedmaterial1 = sprintf(' "string namedmaterial1" "%s" ',materials.stringnamedmaterial1);
     val = strcat(val, val_stringnamedmaterial1);
 end
+
 if ~isempty(materials.stringnamedmaterial2)
     val_stringnamedmaterial2 = sprintf(' "string namedmaterial2" "%s" ',materials.stringnamedmaterial2);
     val = strcat(val, val_stringnamedmaterial2);
 end
+
 end

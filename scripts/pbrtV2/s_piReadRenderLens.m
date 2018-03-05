@@ -57,6 +57,6 @@ piWrite(thisR);
 oi = piRender(thisR,'meanilluminance',10,'renderType','both');
 
 % Show it in ISET
-vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
+ieAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
 
 %%
