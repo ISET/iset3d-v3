@@ -56,6 +56,6 @@ piWrite(thisR);
 scene = piRender(thisR);
 
 % Show it in ISET
-vcAddObject(scene); sceneWindow;
+ieAddObject(scene); sceneWindow;
 
 %%

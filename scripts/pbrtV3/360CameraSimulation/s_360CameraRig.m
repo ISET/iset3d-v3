@@ -193,7 +193,7 @@ for ii = 1:size(camOrigins,1)
     else
         
         [oi, result] = piRender(recipe);
-        vcAddObject(oi);
+        ieAddObject(oi)
         oiWindow;
         
         

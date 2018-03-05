@@ -101,7 +101,7 @@ for ii = 1:nFiles
     exposureTime = sensorGet(sensor,'exp time');
     fprintf('Exposure Time is 1/%0.2f s \n',1/exposureTime);
     
-%     vcAddObject(sensor); 
+%     ieAddObject(sensor); 
 %     sensorWindow;
 
     % --- Setup Image Processing ---

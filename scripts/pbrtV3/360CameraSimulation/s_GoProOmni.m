@@ -214,7 +214,7 @@ for ii = 1:size(originAll,1)
     else
         
         [oi, result] = piRender(recipe);
-        vcAddObject(oi);
+        ieAddObject(oi);
         oiWindow;
         
         % Save the OI along with location information

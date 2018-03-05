@@ -68,7 +68,7 @@ foo = ieScale(foo,sensorGet(sensor,'pixel voltage swing'));
 vcNewGraphWin; imagesc(foo.^(1/2.2)); colormap(gray); truesize
 
 sensor = sensorSet(sensor,'volts',foo);
-vcAddObject(sensor); sensorImageWindow;
+ieAddObject(sensor); sensorImageWindow;
 
 ip = ipCreate;
 ip = ipCompute(ip,sensor);
@@ -110,13 +110,13 @@ piWrite(whiteRecipe);
 oi = piRender(whiteRecipe,'renderType','radiance');
 oi = oiSet(oi,'name','LF white field');
 oi = oiSet(oi,'mean illuminance',meanIlluminance);
-% vcAddObject(oi); oiWindow; 
+% ieAddObject(oi); oiWindow; 
 
 %% Build up the sensor calibration
 sensor = sensorCreate('light field',oi);
 sensor = sensorCompute(sensor,oi);
 correctionMatrix = sensorGet(sensor,'volts');
-% vcAddObject(sensor); sensorImageWindow; 
+% ieAddObject(sensor); sensorImageWindow; 
 
 end
 

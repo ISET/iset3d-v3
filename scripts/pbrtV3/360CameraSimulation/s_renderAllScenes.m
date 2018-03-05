@@ -120,7 +120,7 @@ for ii = 1:length(sceneNames)
     % Store the horizontal field of view in degrees in the oi
     oi = oiSet(oi, 'fov', fov);
     
-    vcAddObject(oi);
+    ieAddObject(oi)
     oiWindow;
     
     %% Save
