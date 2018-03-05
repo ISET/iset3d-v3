@@ -1,6 +1,0 @@
-Texture "checkerboard_color" "spectrum" "imagemap" "string filename" "checkerboard.png"
-MakeNamedMaterial "RUBBER" "string type" "uber" "float index" [1.33300] "rgb Kr" [0.00466 0.00466 0.00466] "rgb Ks" [0.00466 0.00466 0.00466] "rgb Kd" [0.70000 0.01000 0.01000] "float roughness" [0.67358]
-MakeNamedMaterial "GLASS" "string type" "glass" "float index" [1.33300]
-MakeNamedMaterial "BODY" "string type" "substrate" "float index" [1.33300] "rgb Kr" [0.00823 0.00823 0.00823] "rgb Ks" [0.00000 0.00000 0.00000] "rgb Kd" [0.21788 0.39581 0.30943] "float uroughness" [0.00050] "float vroughness" [0.00051] "float roughness" [0.00000]
-MakeNamedMaterial "mirror" "string type" "mirror" "float index" [1.33300] "rgb Kr" [0.75300 0.75300 0.75300] "rgb Ks" [0.05088 0.05088 0.05088] "rgb Kd" [0.36725 0.36725 0.36725] "float roughness" [0.67358]
-MakeNamedMaterial "Material" "string type" "matte" "float index" [1.33300] "texture Kd" "checkerboard_color" "rgb Kr" [0.05088 0.05088 0.05088] "rgb Ks" [0.05088 0.05088 0.05088] "float roughness" [0.67358]
