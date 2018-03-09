@@ -5,8 +5,8 @@
 %% Initialize
 ieInit;
 
-workingDir = fullfile('/Users/trishalian/RenderedData/360Renders','whiteRoom2048');
-dataDirectory = fullfile(workingDir,'OI');
+workingDir = fullfile('/share/wandell/users/tlian/360Scenes/renderings','livingRoom-GoPro_2704_2028_2048_8');
+dataDirectory = workingDir; %fullfile(workingDir,'OI');
 
 outputDirectory = fullfile(workingDir,'rgb'); 
 if(~exist(outputDirectory,'dir'))
@@ -42,7 +42,7 @@ end
       
 %% Loop through all images
 
-dirInfo = dir(fullfile(dataDirectory,'*.mat'));
+dirInfo = dir(fullfile(dataDirectory,'cam*.mat'));
 nFiles = length(dirInfo);
 
 originAll = [];
@@ -66,7 +66,7 @@ for ii = 1:nFiles
     % of photons by the same factor for all images on the rig. This keeps
     % the scale across images on the rig relative. You may have to play
     % with the scale depending on the scene. 
-    scale = 1e13; % This creates an mean illuminance of roughly 50 lux for cam1 for the whiteRoom
+    scale = 5e12; % This creates an mean illuminance of roughly 50 lux for cam1 for the whiteRoom
     %scale = 1e11; % for livingroom
     photons = scale.*oiGet(oi,'photons');
     oi = oiSet(oi,'photons',photons);
@@ -134,18 +134,19 @@ for ii = 1:nFiles
     % they run counter clockwise. I think this is due to some coordinate
     % axes flips.
     
-    allIndices = [0 circshift(14:-1:1,1) 15 16];
-    expression = '(\d+)';
-    matchStr = regexp(dirInfo(ii).name,expression,'match');
-    currIndex = str2double(cell2mat(matchStr));
-    newIndex = allIndices(currIndex+1);
-    
+%     allIndices = [0 circshift(14:-1:1,1) 15 16];
 %     expression = '(\d+)';
 %     matchStr = regexp(dirInfo(ii).name,expression,'match');
 %     currIndex = str2double(cell2mat(matchStr));
-%     newIndex = currIndex;
+%     newIndex = allIndices(currIndex+1);
+    
+    expression = '(\d+)';
+    matchStr = regexp(dirInfo(ii).name,expression,'match');
+    currIndex = str2double(cell2mat(matchStr));
+    newIndex = currIndex;
     
     % Save the images according to the Surround360 format
+    ip = ipSet(pi,'gamma',3.0);
     srgb = ipGet(ip,'data srgb');
     
     % Crop the image
@@ -159,7 +160,7 @@ for ii = 1:nFiles
     if(~exist(imageDir,'dir'))
         mkdir(imageDir);
     end
-    imwrite(srgb,fullfile(imageDir,'000000.png'))
+    imwrite(srgb,fullfile(piRootPath,'local','000000.png'))
     
     
     % We will save the origins/targets etc. according to the new index.

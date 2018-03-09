@@ -11,10 +11,9 @@ function [] = piPBRTPush(fnameZIP,varargin)
 %
 % Required input
 %   fnameZIP - filename of ZIP file to push onto the server 
-%   artifactName - The base name of the artifact that can be found by a search
 %   
 % Optional inputs
-%   None at the moment
+%   artifactName - The base name of the artifact that can be found by a search
 %
 % Return
 %   None at the moment
@@ -52,15 +51,21 @@ end
 % To upload requires that you have a password on the Remote Data site.
 % Login here. 
 rd = RdtClient('isetbio');
-rd.credentialsDialog
+rd.credentialsDialog();
 
 %% Upload to RDT archive
 rd.crp('/resources/scenes/pbrt');
+version = '1';
+
 fprintf('Uploading... \n');
 if(isempty(artifactName))
-    rd.publishArtifact(fnameZIP);
+    [~,n,~] = fileparts(fnameZIP);
+    rd.publishArtifact(fnameZIP,...
+        'version',version,...
+        'description','pbrt scene',...
+        'name',n);
 else
-    rd.publishArtifact(fnameZIP,'artifactId',artifactName);
+    %rd.publishArtifact(fnameZIP,'artifactId',artifactName);
 end
  
 %% Update status

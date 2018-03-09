@@ -72,7 +72,7 @@ thisR.camera.focusdistance.value = 1.5; % meter
 thisR.camera.focusdistance.type = 'float';
 
 % Attach the lens
-lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','wide.56deg.6.0mm_v3.dat');
+lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','wide.56deg.3.0mm_v3.dat');
 halfFOV = 56;
 %lensFile = fullfile(piRootPath,'scripts','pbrtV3','360CameraSimulation','fisheye.87deg.6.0mm_v3.dat');
 %halfFOV = 87;
@@ -80,7 +80,8 @@ thisR.camera.lensfile.value = lensFile; % mm
 thisR.camera.lensfile.type = 'string';
 
 % Set film size
-thisR.film.diagonal.value = 16;
+% thisR.film.diagonal.value = 7.66;
+thisR.film.diagonal.value = 8;
 thisR.film.diagonal.type = 'float';
 
 % Set the aperture to be the largest possible.
@@ -94,26 +95,33 @@ thisR.camera.aperturediameter.type = 'float';
 % appropriately. See:
 % https://dsp.stackexchange.com/questions/6055/how-does-resizing-an-image-affect-the-intrinsic-camera-matrix
 
-thisR.set('filmresolution',[256 256]);
-thisR.set('pixelsamples',128); % We don't need many pixel samples for this simple scene
+thisR.set('filmresolution',[169 127]);
+thisR.set('pixelsamples',64); % We don't need many pixel samples for this simple scene
 thisR.integrator.maxdepth.value = 1; % No specularities, so we a max depth of 1 is enough.
 
 %% Rotate and translate the plane and render
-
-for ii = 1:numImages
+angle = [40 45 55];
+for ii = 1:length(angle)
     
     % Pick a distance along the optical axis (y-axis)
-    yTranslate = randi([150 1000]);
+    %yTranslate = randi([150 1000]);
+    yTranslate = 500;
     
     % Determine x and z rotation/translations based on the lens' FOV
     % Note: 1/2*halfFOV seems like a good approx to keep the checkerboard
     % within frame for this sensor.
-    maxTranslate = floor(tand(halfFOV/2)*yTranslate);
-    xTranslate = randi([-maxTranslate maxTranslate]);
-    zTranslate = randi([-maxTranslate maxTranslate]);
-    xRotate = randi([-45 45]);
-    yRotate = randi([-90 90]);
-    zRotate = randi([-45 45]);
+%     maxTranslate = floor(tand(halfFOV/2)*yTranslate);
+%     xTranslate = randi([-maxTranslate maxTranslate]);
+%     zTranslate = randi([-maxTranslate maxTranslate]);
+%     xRotate = randi([-45 45]);
+%     yRotate = randi([-90 90]);
+%     zRotate = randi([-45 45]);
+    
+    zTranslate = tand(angle(ii))*yTranslate;
+    xTranslate = 0;
+    xRotate = 0; 
+    yRotate = 0;
+    zRotate = 0;
     
     % Clear any existing transform in the recipe first!
     thisR = piClearObjectTransforms(thisR,'Plane');
@@ -128,7 +136,7 @@ for ii = 1:numImages
         [xTranslate yTranslate zTranslate]);
     
     % Set output file
-    oiName = sprintf('img%d',ii);
+    oiName = sprintf('fov%d',angle(ii));
     thisR.outputFile = fullfile(workingDir,strcat(oiName,'.pbrt'));
     
     piWrite(thisR);
@@ -149,7 +157,7 @@ for ii = 1:numImages
     clear oi
     
     % Delete the .dat file if it exists (to avoid running out of local storage space)
-    [p,n,e] = fileparts(recipe.outputFile);
+    [p,n,e] = fileparts(thisR.outputFile);
     datFile = fullfile(p,'renderings',strcat(n,'.dat'));
     if(exist(datFile,'file'))
         delete(datFile);

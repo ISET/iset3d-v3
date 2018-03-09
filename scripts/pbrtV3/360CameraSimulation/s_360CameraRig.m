@@ -12,14 +12,14 @@ if ~piDockerExists, piDockerConfig; end
 % -------------------
 
 % Rendering parameters
-gcloudFlag = 0;
+gcloudFlag = 1;
 sceneName = 'whiteRoom';
 %xRes = 2704; %round(2704/16);
 %yRes = 2028; %round(2028/16);
 % filmResolution = [xRes yRes];
-filmResolution = [128 128];
-pixelSamples = 128;
-bounces = 1;
+filmResolution = [2048 2048];
+pixelSamples = 2048;
+bounces = 4;
 
 % Save parameters
 %saveName = strcat(sceneName,'-Google');
@@ -33,8 +33,8 @@ workingDir = fullfile(saveDir,'workingFolder'); % Save to data server directly t
 % fisheyes pointing down, where N = numCamerasCircum. This is according to
 % the convention of the Surround360 rig.
 numCamerasCircum = 14; % 14 for Facebook, 16 for Google
-whichCameras = [1] + 1; % Index convention starts from 0. 
-radius = 175.54;% 175.54 mm for Facebook, 140 mm for Google
+whichCameras = [0:16] + 1; % Index convention starts from 0. 
+radius = 230;% 230 mm for Facebook, 150 mm for Google
 % -------------------
 
 % Setup gcloud
@@ -196,7 +196,7 @@ for ii = 1:size(camOrigins,1)
         vcAddObject(oi);
         oiWindow;
         
-        
+        %{
         % Render coordinate maps (x,y,z coordinates)
         [coordMap, ~] = piRender(recipe,'renderType','coordinates');
         figure(ii+1); 
@@ -215,7 +215,7 @@ for ii = 1:size(camOrigins,1)
         for jj = 1:size(x,1)
             fprintf('(%0.3f %0.3f %0.3f)\n',coordMap(round(y(jj)),round(x(jj)),:));
         end
-        
+        %}
         
     % Save the OI along with location information
     oiFilename = fullfile(saveLocation,oiName);
@@ -233,8 +233,8 @@ for ii = 1:size(camOrigins,1)
     end
     datFileDepth = fullfile(p,'renderings',strcat(n,'_depth.dat'));
     if(exist(datFileDepth,'file'))
-        delete(datFileDepth);
-    end
+        delete(datFileDepths
+        endsdf
         
     end
     
