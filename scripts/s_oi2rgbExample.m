@@ -9,14 +9,14 @@
 ieInit;
 
 % Load the OI here
-oiFilename = '/share/wandell/users/tlian/360Scenes/ODS/ODS_4096_2048_1024_4.mat';
+oiFilename = '';
 load(oiFilename);
 
 %% Make some adjustments to the OI
 
-% For a single image, we can just adjust illuminance directly. For multiple
-% images in a camera rig, we have to be careful about the scaling. See
-% "s_process360oi.m"
+% For a single image, we can just adjust illuminance directly. (For
+% multiple captures in the same scene, we have to be careful about how we
+% scale these photons.)
 oi = oiSet(oi,'mean illuminance',10); % in lux
 
 % Check the oi
@@ -41,8 +41,7 @@ sensor = sensorSet(sensor,'size',sensorSize);
 sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
 
 % Set exposure time
-sensor = sensorSet(sensor,'exp time',1/600); % in seconds
-%sensor = sensorSet(sensor,'auto Exposure',true); % Use auto exposure. 
+sensor = sensorSet(sensor,'auto Exposure',true); % Use auto exposure. 
 
 % Compute!
 sensor = sensorCompute(sensor,oi);
@@ -69,8 +68,9 @@ ipWindow;
 
 %% Get RGB image
 srgb = ipGet(ip,'data srgb');
+imshow(srgb);
 
 %% Save RGB image
-[p,n,e] = fileparts(oiFilename);
-imwrite(srgb,fullfile(p,strcat(n,'.png')));
+% [p,n,e] = fileparts(oiFilename);
+% imwrite(srgb,fullfile(p,strcat(n,'.png')));
 
