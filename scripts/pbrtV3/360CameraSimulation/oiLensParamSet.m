@@ -8,7 +8,7 @@
 %% Initialize
 clear; close all; ieInit;
 
-oiDir = '/share/wandell/users/tlian/360Scenes/renderings/livingRoom_2048_2048_2048_8';
+oiDir = '/share/wandell/users/tlian/360Scenes/renderings/bathroom-Samsung_2048_2048_2048_8';
 overWriteFlag = false; % Directly overwrite the optical images?
 
 if(~overWriteFlag)
@@ -54,6 +54,11 @@ for ii = 1:nFiles
     apertureDiameter = 0.435;
     filmDiag = 8;
       %}
+    
+    % Samsung camera
+    lensFocalLength = 6;
+    apertureDiameter = 6;
+    filmDiag = 16;
     
     % Load current optical image
     load(fullfile(oiDir,currFilename));

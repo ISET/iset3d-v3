@@ -9,7 +9,7 @@
 ieInit;
 
 % Load the OI here
-oiFilename = '/Users/trishalian/RenderedData/livingRoomHQSingleShot.mat';
+oiFilename = '/share/wandell/users/tlian/360Scenes/ODS/ODS_4096_2048_1024_4.mat';
 load(oiFilename);
 
 %% Make some adjustments to the OI
@@ -41,7 +41,7 @@ sensor = sensorSet(sensor,'size',sensorSize);
 sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
 
 % Set exposure time
-sensor = sensorSet(sensor,'exp time',1/200); % in seconds
+sensor = sensorSet(sensor,'exp time',1/600); % in seconds
 %sensor = sensorSet(sensor,'auto Exposure',true); % Use auto exposure. 
 
 % Compute!
@@ -69,3 +69,8 @@ ipWindow;
 
 %% Get RGB image
 srgb = ipGet(ip,'data srgb');
+
+%% Save RGB image
+[p,n,e] = fileparts(oiFilename);
+imwrite(srgb,fullfile(p,strcat(n,'.png')));
+
