@@ -1,0 +1,8 @@
+Texture "checkerboard_color" "spectrum" "imagemap" "string filename" "checkerboard.png"
+MakeNamedMaterial "pyramid" "string type" "metal" "float index" [1.33300] "rgb Kr" [0.75300 0.75300 0.75300] "rgb Ks" [0.03310 0.03310 0.03310] "rgb Kd" [0.04817 0.47932 0.60383] "float roughness" [0.01000] "spectrum Kd" "spds/metals/Al.k.spd" "spectrum Ks" "spds/metals/Al.eta.spd"
+MakeNamedMaterial "Text_cavs" "string type" "uber" "float index" [1.33300] "rgb Kr" [0.03310 0.03310 0.03310] "rgb Ks" [0.03310 0.03310 0.03310] "rgb Kd" [0.95597 0.57112 0.02732] "float roughness" [0.50000]
+MakeNamedMaterial "Text" "string type" "uber" "float index" [1.33300] "rgb Kr" [0.03310 0.03310 0.03310] "rgb Ks" [0.03310 0.03310 0.03310] "rgb Kd" [0.00478 0.15293 0.46208] "float roughness" [0.50000]
+MakeNamedMaterial "BODY" "string type" "substrate" "float index" [1.33300] "rgb Kr" [0.00823 0.00823 0.00823] "rgb Ks" [0.00000 0.00000 0.00000] "rgb Kd" [1.00000 0.00000 0.00000] "float uroughness" [0.00050] "float vroughness" [0.00051] "float roughness" [0.00000]
+MakeNamedMaterial "Material" "string type" "uber" "float index" [1.33300] "texture Kd" "checkerboard_color" "rgb Kr" [0.05088 0.05088 0.05088] "rgb Ks" [0.05088 0.05088 0.05088] "float roughness" [0.67358]
+MakeNamedMaterial "GLASS" "string type" "glass" "float index" [1.33300] "rgb Kr" [0.00415 0.00415 0.00415]
+MakeNamedMaterial "mirror" "string type" "mirror" "float index" [1.33300] "rgb Kr" [0.75300 0.75300 0.75300] "rgb Ks" [0.05088 0.05088 0.05088] "float roughness" [0.67358]
