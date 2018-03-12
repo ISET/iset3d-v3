@@ -1,4 +1,4 @@
-function [materials, txtLines] = piMaterialRead(fname,varargin)
+function [materiallist, txtLines] = piMaterialRead(fname,varargin)
 % Parses a *_material.pbrt file written by the PBRT Cinema 4D exporter
 %
 % Syntax:
@@ -48,7 +48,8 @@ txtLines = tmp{1};
 fclose(fileID);
 
 %% Extract lines that correspond to specified keyword
-materials = piBlockExtractMaterial(txtLines);
+materiallist = piBlockExtractMaterial(txtLines);
+
 
 %% pass materials to recipe.materials
 % thisR = recipe;
@@ -56,7 +57,7 @@ materials = piBlockExtractMaterial(txtLines);
 % thisR.txtLines = txtLines;
 end
 
-function materials = piBlockExtractMaterial(txtLines)
+function materiallist = piBlockExtractMaterial(txtLines)
 % Extract parameters of a material from a block of text
 %
 % Syntax:
@@ -174,7 +175,9 @@ for ii=1:nLines
         end
     end
 end
-
+for jj = 1:cnt
+materiallist.(materials(jj).name)= materials(jj);
+end
 fprintf('Read %d materials on %d lines\n',cnt,nLines);
 
 end
