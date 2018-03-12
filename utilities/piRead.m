@@ -49,13 +49,14 @@ function thisR = piRead(fname,varargin)
 p = inputParser;
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('version',2,@(x)isnumeric(x));
+p.addParameter('readmaterials', true,@islogical);
 p.parse(fname,varargin{:});
 
 ver = p.Results.version;
 
 thisR = recipe;
 thisR.inputFile = fname;
-
+readmaterials  = p.Results.readmaterials;
 %% Check version number
 if(ver ~= 2 && ver ~=3)
     error('PBRT version number incorrect. Possible versions are 2 or 3.');
@@ -107,8 +108,10 @@ headerCheck = tmp{1};
 fclose(fileID);
 if contains(headerCheck{1}, 'Exported by PBRT exporter for Cinema 4D')
     exporterFlag = true;
+    thisR.exporter = 'C4D';
 else
     exporterFlag = false;
+    thisR.exporter = []; % some other exporter like obj2pbrt?
 end
     
 %% It would be nice to identify every block
@@ -258,5 +261,20 @@ end
 if(flip)
     thisR.scale = [-1 1 1];
 end
-
+%% Read Material.pbrt file if pbrt file is exported by C4D.
+if exporterFlag    
+    if readmaterials
+       % Check if a materials.pbrt exist
+       [p,n,~] = fileparts(fname);
+       fname_materials = sprintf('%s_materials.pbrt',n);
+       inputFile_materials=fullfile(p,fname_materials);
+       if ~exist(inputFile_materials,'file'), error('File not found'); end
+       [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
+       thisR.materials.inputFile_materials = inputFile_materials;
+       % Call material lib
+       thisR.materials.lib = piMateriallib;
+       % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
+       piTextureFileFormat(thisR);
+    end
+end
 end

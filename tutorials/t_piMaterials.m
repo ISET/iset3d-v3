@@ -14,54 +14,39 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt_material files
-FilePath = fullfile(piRootPath,'data','SimpleSceneV3');
+FilePath = fullfile(piRootPath,'FromC4','SimpleScene');
 fname = fullfile(FilePath,'SimpleScene.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
 % Warnings may appear about filter and Renderer
 thisR = piRead(fname,'version',3);
 
-fname_materials = fullfile(FilePath,'SimpleScene_materials.pbrt');
-if ~exist(fname_materials,'file'), error('File not found'); end
-[thisR.materials,thisR.txtLines] = piMaterialRead(fname_materials,'version',3);
+%% Assign Materials and Color
 
-%% Call material lib
-
-thisR.materiallib = piMateriallib;
-%% list the property of materials 
-
+% it's helpful to check what current material properties are.
 piMaterialList(thisR);
 
-%% Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
+material = thisR.materials.list.BODY;   % A type of material.
+target = thisR.materials.lib.carpaintmix;      % Give it a chrome spd
+rgbkd  = [1 0 0];                        % Make it green diffuse reflection
+rgbkr  = [0.753 0.753 0.753];            % Specularish in the different channels
 
-piTextureFileFormat(thisR);
-
-%% Assign Materials and Color
-% For detail: http://www.pbrt.org/fileformat-v3.html.
-% Color chart: http://prideout.net/archive/colors.php
-
-% We use strings to assign new materials to the target material.
-material = 'pyramid';   % A type of material.
-target = thisR.materiallib.chrome_spd;  % Give it a chrome spd
-rgbkd  = [0 1 0];            % Make it green diffuse reflection
-rgbkr  = [0.753 0.753 0.753];% Specularish in the different channels
-
-piMaterialAssign(thisR,material,target,'rgbkr',rgbkr);
+piMaterialAssign(thisR,material,target,'rgbkd',rgbkd,'rgbkr',rgbkr);
+% it's helpful to check what current material properties are.
 piMaterialList(thisR);
 
 %% Write thisR to *_material.pbrt
 
 % Write out the pbrt scene file, based on thisR.  By def, to the working directory.
 [p,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','SimpleScene',[n,e]));
-outputMaterials = fullfile(fileparts(thisR.get('outputFile')),'SimpleScene_materials.pbrt');
-thisR.set('outputFile_materials',outputMaterials);
+thisR.set('outputFile',fullfile(piRootPath,'local','SimpileSceneExport',[n,e]));
 
+% material.pbrt is supposed to overwrite itself.
 piWrite(thisR);
 
 % This should be inside of piWrite, called when there is a .material
 % slot
-piMaterialWrite(thisR);
+% piMaterialWrite(thisR);
 
 %% Change the camera lens
 

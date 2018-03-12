@@ -12,19 +12,19 @@ function piMaterialWrite(thisR)
 %% Parse the output file, working directory, stuff like that.
 
 % Converts any jpg file names in the PBRT files into png file names
-ntxtLines=length(thisR.txtLines);
+ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
-    str = thisR.txtLines(jj);
+    str = thisR.materials.txtLines(jj);
     if ~isempty(contains(str,'jpg'))
-        thisR.txtLines(jj) = strrep(str,'jpg','png');
+        thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
     end
 end
 
 %% Empty any line that contains MakeNamedMaterial
 % The remaining lines have a texture definition.
 
-output = thisR.outputFile_materials;
-txtLines = thisR.txtLines;
+output = thisR.materials.outputFile_materials;
+txtLines = thisR.materials.txtLines;
 for i = 1:size(txtLines)
     if ~isempty(txtLines(i))
         if contains(txtLines(i),'MakeNamedMaterial')
@@ -38,11 +38,12 @@ end
 textureLines = txtLines(~cellfun('isempty',txtLines));
 
 %% Create txtLines for the material struct array
-
-materialTxt = cell(1,length(thisR.materials));
-for ii=1:length(thisR.materials)
+field =fieldnames(thisR.materials.list);
+materialTxt = cell(1,length(field));
+ 
+for ii=1:length(materialTxt)
     % Converts the material struct to text
-    materialTxt{ii} = piMaterialText(thisR.materials(ii)); 
+    materialTxt{ii} = piMaterialText(thisR.materials.list.(cell2mat(field(ii)))); 
 end
 
 %% Write to scene_material.pbrt texture-material file

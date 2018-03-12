@@ -48,12 +48,16 @@ p.addParameter('overwritepbrtfile',true,@islogical);
 % Force overwrite of the lens file
 p.addParameter('overwritelensfile',true,@islogical);
 
+% Overwrite materials.pbrt
+p.addParameter('overwritematerials',true,@islogical);
+
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
 overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
+overwritematerials  = p.Results.overwritematerials;
 
 %% Copy the input directory to the Docker working directory
 
@@ -146,7 +150,6 @@ if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
 fileID = fopen(outFile,'w');
 
 %% Write header
-
 fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
 fprintf(fileID,'\n');
@@ -188,10 +191,7 @@ for ofns = outerFields'
             strcmp(ofn,'inputFile') || ...
             strcmp(ofn,'outputFile')|| ...
             strcmp(ofn,'version')) || ...
-            strcmp(ofn,'inputFile_materials')|| ...
-            strcmp(ofn,'outputFile_materials')|| ...
             strcmp(ofn,'materials')|| ...
-            strcmp(ofn,'materiallib')|| ...
             strcmp(ofn,'world')
         % Skip, we don't want to write these out here.
         continue;
@@ -299,4 +299,13 @@ end
 
 fclose(fileID);
 
+%% Overwrite Materials.pbrt
+if contains(renderRecipe.exporter, 'C4D')
+if overwritematerials
+    [~,n] = fileparts(renderRecipe.inputFile);
+    fname_materials = sprintf('%s_materials.pbrt',n);
+    renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+    piMaterialWrite(renderRecipe);
+end
+end
 end
