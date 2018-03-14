@@ -96,9 +96,6 @@ elseif isa(thisR,'recipe')
         if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
             error('Coordinates metadata render only available right now for pbrt-v3-spectral.');
         end
-        if((thisR.version ~= 2) && (strcmp(renderType,'mesh') || strcmp(renderType,'material')))
-            error('Mesh or material metadata render is only available right now for pbrt-v2-spectral.');
-        end
         
         if(strcmp(renderType,'both'))
             metadataType = 'depth';
