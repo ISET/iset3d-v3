@@ -30,10 +30,6 @@ function rd = piPBRTPush(fnameZIP,varargin)
 %
 % See also:  piPBRTFetch, piPBRTList
 
-% Examples
-%{
-
-%}
 %% Parse inputs
 p = inputParser;
 
@@ -51,21 +47,17 @@ rd           = p.Results.rd;
 
 %% Check given file
 
-[p,n,e] = fileparts(fnameZIP);
 
 % Check zip file existence
-if(~exist(fnameZIP,'file'))
-    error('Given file does not exist.');
-end
+if(~exist(fnameZIP,'file')), error('Cannot find %s.',fnameZIP); end
 
-% Check that fnameZIP is an absolute path
-if(isempty(p))
-    fnameZIP = which(fnameZIP);
-end
+% fnameZIP should be an absolute path
+% True, but I think this is handled in the publish command now.
+% if(isempty(p)), fnameZIP = which(fnameZIP); end
 
 % Check that it is a zip file using the extension
-% Is there a better way to do this?
-if(~strcmp(e,'.zip'))
+[~,fname,ext] = fileparts(fnameZIP);
+if(~strcmp(ext,'.zip'))
     error('Given file does not seem to be a zip file.')
 end
 
@@ -98,7 +90,7 @@ if(isempty(artifactName))
     % Use the file name as the artifact name
     rd.publishArtifact(fnameZIP,...
         'version',archivaVersion,...
-        'name',n);
+        'name',fname);
 else
     % The user seems to want another name for the artifact
     rd.publishArtifact(fnameZIP,'artifactId',artifactName);
