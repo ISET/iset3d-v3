@@ -31,19 +31,29 @@ function [] = piPBRTPush(fnameZIP,varargin)
 p = inputParser;
 p.addRequired('fnameZIP',@ischar);
 p.addParameter('artifactName','',@ischar);
+p.addParameter('pbrtVersion',2,@isscalar);
 
 p.parse(fnameZIP,varargin{:});
 artifactName = p.Results.artifactName;
+pbrtVersion = p.Results.pbrtVersion;
+
+%% Check given file
+
+[p,n,e] = fileparts(fnameZIP);
 
 % Check zip file existence
 if(~exist(fnameZIP,'file'))
     error('Given file does not exist.');
 end
 
+% Check that fnameZIP is an absolute path
+if(isempty(p))
+    error('Given file must be an absolute path.');
+end
+
 % Check that it is a zip file using the extension
 % Is there a better way to do this?
-[~,~,ext] = fileparts(fnameZIP);
-if(~strcmp(ext,'.zip'))
+if(~strcmp(e,'.zip'))
     error('Given file does not seem to be a zip file.')
 end
 
@@ -54,15 +64,17 @@ rd = RdtClient('isetbio');
 rd.credentialsDialog();
 
 %% Upload to RDT archive
-rd.crp('/resources/scenes/pbrt');
+if(pbrtVersion == 2)
+    rd.crp('/resources/scenes/pbrt');
+elseif(pbrtVersion == 3)
+    rd.crp('/resources/scenes/pbrt/v3');
+end
 version = '1';
 
 fprintf('Uploading... \n');
 if(isempty(artifactName))
-    [~,n,~] = fileparts(fnameZIP);
     rd.publishArtifact(fnameZIP,...
         'version',version,...
-        'description','pbrt scene',...
         'name',n);
 else
     %rd.publishArtifact(fnameZIP,'artifactId',artifactName);
