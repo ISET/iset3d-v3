@@ -14,7 +14,7 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt_material files
-FilePath = fullfile(piRootPath,'FromC4','SimpleScene');
+FilePath = fullfile(piRootPath,'data','V3','SimpleScene');
 fname = fullfile(FilePath,'SimpleScene.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
@@ -39,7 +39,7 @@ piMaterialList(thisR);
 
 % Write out the pbrt scene file, based on thisR.  By def, to the working directory.
 [p,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','SimpileSceneExport',[n,e]));
+thisR.set('outputFile',fullfile(piRootPath,'local','SimpleSceneExport',[n,e]));
 
 % material.pbrt is supposed to overwrite itself.
 piWrite(thisR);
