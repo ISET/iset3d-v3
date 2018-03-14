@@ -29,10 +29,15 @@ function [] = piPBRTPush(fnameZIP,varargin)
 
 %% Parse inputs
 p = inputParser;
+
+% varargin = ieParamFormat(varargin);
 p.addRequired('fnameZIP',@ischar);
 p.addParameter('artifactName','',@ischar);
+p.addParameter('pbrtVersion',@isscalar);
 
 p.parse(fnameZIP,varargin{:});
+
+pbrtVersion  = p.Results.pbrtVersion;
 artifactName = p.Results.artifactName;
 
 % Check zip file existence
@@ -54,16 +59,22 @@ rd = RdtClient('isetbio');
 rd.credentialsDialog();
 
 %% Upload to RDT archive
-rd.crp('/resources/scenes/pbrt');
-version = '1';
+
+rd.crp('/resources/scenes/pbrt')
+% if isequal(pbrtVersion,3), rd.crp('/resources/scenes/pbrt/V3');
+% else,                      rd.crp('/resources/scenes/pbrt/V2');
+% end
 
 fprintf('Uploading... \n');
+version = '1';   % Archiva version
 if(isempty(artifactName))
     [~,n,~] = fileparts(fnameZIP);
-    rd.publishArtifact(fnameZIP,...
-        'version',version,...
-        'description','pbrt scene',...
-        'name',n);
+    rd.publishArtifact(fnameZIP,'version',version);
+%     rd.publishArtifact(fnameZIP,...
+%         'version',version,...
+%         'description','pbrt scene',...
+%         'name',n);
+    
 else
     %rd.publishArtifact(fnameZIP,'artifactId',artifactName);
 end
