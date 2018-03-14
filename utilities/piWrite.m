@@ -301,11 +301,11 @@ fclose(fileID);
 
 %% Overwrite Materials.pbrt
 if contains(renderRecipe.exporter, 'C4D')
-if overwritematerials
-    [~,n] = fileparts(renderRecipe.inputFile);
-    fname_materials = sprintf('%s_materials.pbrt',n);
-    renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
-    piMaterialWrite(renderRecipe);
-end
+    if overwritematerials
+        [~,n] = fileparts(renderRecipe.inputFile);
+        fname_materials = sprintf('%s_materials.pbrt',n);
+        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+        piMaterialWrite(renderRecipe);
+    end
 end
 end

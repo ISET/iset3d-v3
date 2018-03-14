@@ -107,11 +107,10 @@ tmp = textscan(fileID,'%s','Delimiter','\n');
 headerCheck = tmp{1};
 fclose(fileID);
 if contains(headerCheck{1}, 'Exported by PBRT exporter for Cinema 4D')
-    exporterFlag = true;
+    exporterFlag   = true;
     thisR.exporter = 'C4D';
 else
     exporterFlag = false;
-    thisR.exporter = []; % some other exporter like obj2pbrt?
 end
     
 %% It would be nice to identify every block
