@@ -6,7 +6,6 @@
 
 %% Basic V2 basic testing
 disp('Teapot:  Takes one minute or so')
-s_piReadRender
 s_piReadRenderLookat
 
 %%  Version 2 slightly more complex
