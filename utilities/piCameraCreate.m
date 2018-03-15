@@ -1,4 +1,4 @@
-function camera = piCameraCreate(cameraType,lensFile,varargin)
+function camera = piCameraCreate(cameraType,varargin)
 %PICAMERACREATE Return a camera structure to be placed in a recipe. 
 %
 %   camera = piCameraCreate(cameraType, lensFile, ..)
@@ -12,7 +12,9 @@ function camera = piCameraCreate(cameraType,lensFile,varargin)
 %    'human eye'   - T. Lian human eye model parameters
 %
 % Optional parameter/values
-%     We will set it up to pass in varargin pairs.  Not implemented yet. 
+%     version      - pbrt version number for the recipe. Depending on the
+%                    version, we will use different values for the 
+%                    realistic camera. 
 %
 % TL, SCIEN STANFORD 2017 
 
@@ -26,11 +28,15 @@ function camera = piCameraCreate(cameraType,lensFile,varargin)
 
 %% Check input
 
-if notDefined('cameraType'), cameraType = 'pinhole'; end
-cameraType = ieParamFormat(cameraType);
+p = inputParser;
+p.addRequired('cameraType',@ischar);
+p.addParameter('lensFile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
+p.addParameter('pbrtVersion',2,@isscalar);
 
-% Default lens file.  We should probably flip this all to inputParser mode.
-if notDefined('lensFile'), lensFile = 'dgauss.22deg.12.5mm.dat'; end
+p.parse(cameraType,varargin{:});
+
+lensFile      = p.Results.lensFile;
+pbrtVersion   = p.Results.pbrtVersion;
 
 %% Initialize the default camera type
 switch cameraType
@@ -42,21 +48,32 @@ switch cameraType
         
     case {'realistic','realisticdiffraction','lens'}
         
-        camera.type = 'Camera';
-        camera.subtype = 'realisticDiffraction';
-        camera.specfile.type = 'string';
-        camera.specfile.value = fullfile(piRootPath,'data','lens',lensFile);
-        camera.filmdistance.type = 'float';
-        camera.filmdistance.value = 50;    % mm
-        camera.aperture_diameter.type = 'float';
-        camera.aperture_diameter.value = 2; % mm
-        camera.filmdiag.type = 'float';
-        camera.filmdiag.value = 7;
-        camera.diffractionEnabled.type = 'bool';
-        camera.diffractionEnabled.value = 'false';
-        camera.chromaticAberrationEnabled.type = 'bool';
-        camera.chromaticAberrationEnabled.value = 'false';
-
+        if(pbrtVersion == 2)
+            camera.type = 'Camera';
+            camera.subtype = 'realisticDiffraction';
+            camera.specfile.type = 'string';
+            camera.specfile.value = fullfile(piRootPath,'data','lens',lensFile);
+            camera.filmdistance.type = 'float';
+            camera.filmdistance.value = 50;    % mm
+            camera.aperture_diameter.type = 'float';
+            camera.aperture_diameter.value = 2; % mm
+            camera.filmdiag.type = 'float';
+            camera.filmdiag.value = 7;
+            camera.diffractionEnabled.type = 'bool';
+            camera.diffractionEnabled.value = 'false';
+            camera.chromaticAberrationEnabled.type = 'bool';
+            camera.chromaticAberrationEnabled.value = 'false';
+        elseif(pbrtVersion == 3)
+            camera.type = 'Camera';
+            camera.subtype = 'realistic';
+            camera.lensfile.type = 'string';
+            camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
+            camera.aperturediameter.type = 'float';
+            camera.aperturediameter.value = 1;    % mm
+            camera.focusdistance.type = 'float';
+            camera.focusdistance.value = 10; % mm
+        end
+        
     case {'microlens','lightfield','plenoptic'}
         
         % General parameters

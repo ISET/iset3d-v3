@@ -29,7 +29,7 @@ p.parse(thisR, param, val, varargin{:});
 
 param = ieParamFormat(p.Results.param);
 
-%% Act
+%% Act 
 switch param
     
     % Rendering and Docker related
@@ -52,16 +52,43 @@ switch param
     case 'camera'
         % Initialize a camera type with default parameters
         % To adjust the parameters use recipe.set() calls
-        thisR.camera = piCameraCreate(val,p.Results.lensfile);
+        thisR.camera = piCameraCreate(val,'lensFile',p.Results.lensfile, ...
+            'pbrtVersion',thisR.version);
+        
+        % If version number is 3, add the film diagonal into the Film
+        if(thisR.version == 3)
+            thisR.film.diagonal.value = 35;
+            thisR.film.diagonal.type = 'float';
+        end
+        
     case 'cameratype'
         thisR.camera.subtype = val;
     case 'lensfile'
-        thisR.camera.specfile.value = val;
-        thisR.camera.specfile.type = 'string';
+        if(thisR.version == 3)
+            thisR.camera.lensfile.value = val;
+            thisR.camera.lensfile.type = 'string';
+        elseif(thisR.version == 2)
+            thisR.camera.specfile.value = val;
+            thisR.camera.specfile.type = 'string';
+        end
     case 'aperture'
-        thisR.camera.aperture_diameter.value = val;
-    case 'focaldistance'
-        thisR.camera.filmdistance.value = val;
+        if(thisR.version == 3)
+            thisR.camera.aperturediameter.value = val;
+            thisR.camera.aperturediameter.type = 'float';
+        elseif(thisR.version == 2)
+            thisR.camera.aperture_diameter.value = val;
+            thisR.camera.aperture_diameter.type = 'float';
+        end
+    case {'focaldistance','filmdistance'}
+        % What to do here? Focus distance is interpreted differently for
+        % version 2 and version 3...
+        if(thisR.version == 2)
+            thisR.camera.filmdistance.value = val;
+            thisR.camera.filmdistance.type = 'float';
+        elseif(thisR.version == 3)
+            thisR.camera.focusdistance.value = val;
+            thisR.camera.focusdistance.type = 'float';
+        end
     case 'lookat'
         % Includes the from, to and up in a struct
         if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
@@ -73,13 +100,20 @@ switch param
         thisR.camera.fov.type = 'float';
         
     case 'diffraction'
-        thisR.camera.diffractionEnabled.value = val;
-        thisR.camera.diffractionEnabled.type = 'bool';
+        if(thisR.version == 2)
+            thisR.camera.diffractionEnabled.value = val;
+            thisR.camera.diffractionEnabled.type = 'bool';
+        elseif(thisR.version == 3)
+            warning('diffraction parameter not applicable for version 3')
+        end
         
     case 'chromaticaberration'
-        thisR.camera.chromaticAberrationEnabled.value = val;
-        thisR.camera.chromaticAberrationEnabled.type = 'bool';
-        
+        if(thisR.version == 2)
+            thisR.camera.chromaticAberrationEnabled.value = val;
+            thisR.camera.chromaticAberrationEnabled.type = 'bool';
+        elseif(thisR.version == 3)
+            warning('chromaticaberration parameter not applicable for version 3')
+        end
     case 'from'
         thisR.lookAt.from = val;
     case 'to'
@@ -126,11 +160,16 @@ switch param
         if length(val) == 1, val(2) = val(1); end
         thisR.film.xresolution.value = val(1);
         thisR.film.yresolution.value = val(2);
-    case 'filmdiagonal'
-        thisR.camera.filmdiag.value = val(1);
-        thisR.camera.filmdiag.type = 'float';
-        % Sampler
+    case {'filmdiagonal','diagonal'}
+        if(thisR.version == 2)
+            thisR.camera.filmdiag.value = val(1);
+            thisR.camera.filmdiag.type = 'float';
+        elseif(thisR.version == 3)
+            thisR.film.diagonal.value = val(1);
+            thisR.film.diagonal.type = 'float';
+        end
     case {'pixelsamples','raysperpixel'}
+        % Sampler
         thisR.sampler.pixelsamples.value = val;
     case{'cropwindow','crop window'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
