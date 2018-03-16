@@ -21,6 +21,17 @@ if ~exist(fname,'file'), error('File not found'); end
 % Warnings may appear about filter and Renderer
 thisR = piRead(fname,'version',3);
 
+
+%% Change render quality
+
+% [800 600] 32 - takes around 30 seconds to render on a machine with 8 cores.
+% [300 150] 16 -
+
+thisR.set('filmresolution',[800 600]);
+thisR.set('pixelsamples',16);
+
+thisR.integrator.maxdepth.value = 5;  %Multiple bounces of a ray allowed
+
 %% Assign Materials and Color
 
 % it's helpful to check what current material properties are.
@@ -44,12 +55,24 @@ thisR.set('outputFile',fullfile(piRootPath,'local','SimpleSceneExport',[n,e]));
 % material.pbrt is supposed to overwrite itself.
 piWrite(thisR);
 
-% This should be inside of piWrite, called when there is a .material
-% slot
-% piMaterialWrite(thisR);
+%% Render
+tic, scene = piRender(thisR); toc
+
+ieAddObject(scene); sceneWindow;
+
+%% Label the pixels by mesh of origin and material
+
+meshImage = piRender(thisR,'renderType','mesh'); % This just returns a 2D image
+vcNewGraphWin; 
+imagesc(meshImage);colormap(jet);title('Mesh')
+
+materialImage = piRender(thisR,'renderType','material'); % This just returns a 2D image
+vcNewGraphWin; 
+imagesc(materialImage); colormap(jet); title('Material')
+
 
 %% Change the camera lens
-
+%{ 
 % TODO: We need to put the following into piCameraCreate, but how do we
 % differentiate between a version 2 vs a version 3 camera? The
 % thisR.version can tell us, but piCameraCreate does not take a thisR as
@@ -78,20 +101,4 @@ thisR.camera.focusdistance.type = 'float';
 % Use a 1" sensor size
 thisR.film.diagonal.value = 16; 
 thisR.film.diagonal.type = 'float';
-
-%% Change render quality
-
-% [800 600] 32 - takes around 30 seconds to render on a machine with 8 cores.
-% [300 150] 16 -
-
-thisR.set('filmresolution',[300 150]);
-thisR.set('pixelsamples',16);
-thisR.integrator.maxdepth.value = 1;
-
-%% Render
-tic
-oi = piRender(thisR);
-toc
-
-ieAddObject(oi);
-oiWindow;
+%}
