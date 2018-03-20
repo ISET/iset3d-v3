@@ -1,0 +1,15 @@
+# Exported by PBRT exporter for Cinema 4D 
+#Transform [0.998716432037 0.00180365571549 0.0506185263152 0  0.0 0.999365772631 -0.0356097247172 0  -0.050650650344 0.0355640172153 0.998083018741 0  -42.8297732226 -35.981913526 409.576103425 1]
+Transform [-1.0 -1.36562778446e-17 -1.21700878806e-16 0  -3.08148791102e-33 0.993763090634 -0.111511971077 0  1.22464679915e-16 -0.111511971077 -0.993763090634 0  0.22464679915e-13 10.511971077 450.763090634 1]
+Camera "perspective" "float fov" [31.417275658] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["stop.png"] "integer xresolution" [640] "integer yresolution" [480]
+Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+LightSource "spot" "rgb I" [100000 80000 60000] "point from" [0 0 150] "point to" [0 30 0] "float coneangle" [45] "float conedeltaangle" [15]
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	LightSource "distant" "rgb L" [1 1 1] "point from" [0 0 0] "point to" [0.307380528749 -0.0343963518352 0.950964787672]
+	Include "stop_materials.pbrt"
+	Include "stop_geometry.pbrt"
+WorldEnd
