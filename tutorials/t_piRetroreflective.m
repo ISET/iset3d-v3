@@ -13,7 +13,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt_material files
 FilePath = fullfile(piRootPath,'data','V3','StopSign');
-fname = fullfile(FilePath,'Stop.pbrt');
+fname = fullfile(FilePath,'stop.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
 % Warnings may appear about filter and Renderer
@@ -183,6 +183,8 @@ ip = ipCompute(ip,sensor);
 
 result_retro = ip.data.result;
 
+%%
+vcNewGraphWin;
 imshowpair(result_uber.^(1/2.2),result_retro.^(1/2.2),'montage');
 
 title('Uber vs Retroreflective','FontSize', 24)
