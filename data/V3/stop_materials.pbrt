@@ -1,0 +1,10 @@
+Texture "r_1_1_add_b_color" "spectrum" "imagemap" "string filename" "r_1_1_add_b.jpg"
+MakeNamedMaterial "Allway" "string type" "retroreflective" "float index" [1.333] "texture Kd" "r_1_1_add_b_color" "rgb Ks" [0.1 0.1 0.1] "rgb Kr" [0.1 0.1 0.1] "float roughness" [0.1]
+Texture "sign_back_color" "spectrum" "imagemap" "string filename" "sign_back.jpg"
+MakeNamedMaterial "clean" "string type" "retroreflective" "float index" [1.333] "texture Kd" "sign_back_color" "rgb Ks" [0.1 0.1 0.1] "rgb Kr" [0.1 0.1 0.1] "float roughness" [0.1]
+Texture "r_1_1_color" "spectrum" "imagemap" "string filename" "r_1_1.jpg"
+MakeNamedMaterial "Stop" "string type" "retroreflective" "float index" [1.333] "texture Kd" "r_1_1_color" "rgb Ks" [0.1 0.1 0.1] "rgb Kr" [0.1 0.1 0.1] "float roughness" [0.1]
+Texture "sign_back_color" "spectrum" "imagemap" "string filename" "sign_back.jpg"
+MakeNamedMaterial "sign__back" "string type" "uber" "float index" [1.333] "texture Kd" "sign_back_color" "rgb Ks" [0.1 0.1 0.1] "rgb Kr" [0.1 0.1 0.1] "float roughness" [0.1]
+Texture "sign_back_color" "spectrum" "imagemap" "string filename" "sign_back.jpg"
+MakeNamedMaterial "sign_back" "string type" "uber" "float index" [1.333] "texture Kd" "sign_back_color" "rgb Ks" [0.1 0.1 0.1] "rgb Kr" [0.1 0.1 0.1] "float roughness" [0.1]
