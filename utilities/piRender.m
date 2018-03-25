@@ -278,7 +278,7 @@ switch opticsType
         % This always worked in ISET, but not in ISETBIO.  So I stuck in a
         % hack to ISETBIO to make it work there temporarily and created an
         % issue. (BW).
-        ieObject = oiSet(ieObject,'optics model','ray trace');
+        ieObject = oiSet(ieObject,'optics model','iset3d');
     case {'pinhole','environment'}
         % In this case, we the radiance describes the scene, not an oi
         ieObject = piSceneCreate(photons,'meanLuminance',100);

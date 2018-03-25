@@ -30,7 +30,9 @@ function val = recipeGet(thisR, param, varargin)
 %       'up'
 %       'from to' - vector difference (from - to)
 %     'optics type'
+%     'lens file'
 %     'focal distance' - See autofocus calculation (mm)
+%     'pupil diameter' - In millimeters
 %     'fov'  (Field of view) present if 'optics type' is 'pinhole'
 %     
 %    % Light field camera
@@ -45,6 +47,8 @@ function val = recipeGet(thisR, param, varargin)
   val = thisR.get('object distance');
   val = thisR.get('focal distance');
   val = thisR.get('camera type');
+  val = thisR.get('lens file');
+
 %}
 
 % Programming todo
@@ -115,6 +119,18 @@ switch ieParamFormat(param)
         elseif ismember(val,{'realisticDiffraction','realisticEye','realistic'})
             val = 'lens';
         end
+    case 'lensfile'
+        %
+        subType = thisR.camera.subtype;
+        switch(lower(subType))
+            case 'realisticeye'
+                [~,val,~] = fileparts(thisR.camera.specfile.value);
+            case 'pinhole'
+                val = 'pinhole (no lens)';
+            otherwise
+                error('Unknown camera subtype %s\n',subType);
+        end
+        
     case 'focaldistance'
         opticsType = thisR.get('optics type');
         switch opticsType
@@ -149,7 +165,12 @@ switch ieParamFormat(param)
             warning('Not a pinhole camera.  Setting fov to 40');
             val = 40;
         end
-        
+    case 'pupildiameter'
+        % Default is millimeters
+        val = 0;  % Pinhole
+        if strcmp(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.pupilDiameter.value;
+        end
         
         % Light field camera parameters
     case {'nmicrolens','npinholes'}
