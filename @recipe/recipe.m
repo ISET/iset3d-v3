@@ -35,13 +35,9 @@ classdef recipe < matlab.mixin.Copyable
         % INPUTFILE -  Original input file
         inputFile = '';   
         
-%       inputFile_materials;   % Original input file
-        outputFile = '';  % Where outputFile = piWrite(recipe);
-%       outputFile_materials;  % Where outputFile = piWrite(recipe);
+        outputFile = ''; % Where outputFile = piWrite(recipe);
         version = 2;     % A PBRTv2 file or a PBRTv3 file
-        materials;   % material list parsed from *_material.pbrt file
-%       materiallib; % material lib
-%       txtLines;    % All txt lines
+        materials;       % material list parsed from *_material.pbrt file
         exporter = '';
     end
     
