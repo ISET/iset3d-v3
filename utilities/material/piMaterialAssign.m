@@ -80,14 +80,16 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
         if ~isempty(p.Results.rgbkd)
             thisR.materials.list.(slotname).rgbkd = p.Results.rgbkd;
         end
-    %% Assign color 
-    if ~isempty(p.Results.rgbkd); thisR.materials.list.(slotname).rgbkd = p.Results.rgbkd; end
-    if ~isempty(p.Results.rgbkr); thisR.materials.list.(slotname).rgbkr = p.Results.rgbkr; end
-    if ~isempty(p.Results.rgbkt); thisR.materials.list.(slotname).rgbkt = p.Results.rgbkt; end
-    if ~isempty(p.Results.rgbks); thisR.materials.list.(slotname).rgbks = p.Results.rgbks; end 
-    if ~isempty(p.Results.rgbkd); thisR.materials.list.(slotname).rgbkd = p.Results.rgbkd; end
-    if ~isempty(p.Results.colorkd);thisR.materials.list.(slotname).colorkd = p.Results.colorkd;end
-    if ~isempty(p.Results.colorks);thisR.materials.list.(slotname).colorks = p.Results.colorks;end
+    %% Assign color
+    thisR.materials.list.(slotname) = ...
+        piCopyColor(thisR.materials.list.(slotname), p);
+%     if ~isempty(p.Results.rgbkd); thisR.materials.list.(slotname).rgbkd = p.Results.rgbkd; end
+%     if ~isempty(p.Results.rgbkr); thisR.materials.list.(slotname).rgbkr = p.Results.rgbkr; end
+%     if ~isempty(p.Results.rgbkt); thisR.materials.list.(slotname).rgbkt = p.Results.rgbkt; end
+%     if ~isempty(p.Results.rgbks); thisR.materials.list.(slotname).rgbks = p.Results.rgbks; end 
+%     if ~isempty(p.Results.rgbkd); thisR.materials.list.(slotname).rgbkd = p.Results.rgbkd; end
+%     if ~isempty(p.Results.colorkd);thisR.materials.list.(slotname).colorkd = p.Results.colorkd;end
+%     if ~isempty(p.Results.colorks);thisR.materials.list.(slotname).colorks = p.Results.colorks;end
     else
         thisR.materials.list.paint_base = piMaterialCreate;
         thisR.materials.list.paint_base.name = 'paint_base';
@@ -101,14 +103,16 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
             piCopyMaterial(thisR.materials.list.(materialNames{idx}),target);
         
     end
-    %% Assign color 
-    if ~isempty(p.Results.rgbkd);  thisR.materials.list.paint_base.rgbkd = p.Results.rgbkd; end
-    if ~isempty(p.Results.rgbkr);  thisR.materials.list.paint_base.rgbkr = p.Results.rgbkr; end
-    if ~isempty(p.Results.rgbkt);  thisR.materials.list.paint_base.rgbkt = p.Results.rgbkt; end
-    if ~isempty(p.Results.rgbks);  thisR.materials.list.paint_base.rgbks = p.Results.rgbks; end 
-    if ~isempty(p.Results.rgbkd);  thisR.materials.list.paint_base.rgbkd = p.Results.rgbkd; end
-    if ~isempty(p.Results.colorkd);thisR.materials.list.paint_base.colorkd = p.Results.colorkd;end
-    if ~isempty(p.Results.colorks);thisR.materials.list.paint_base.colorks = p.Results.colorks;end
+    %% Assign color
+    thisR.materials.list.paint_base = ...
+        piCopyColor(thisR.materials.list.paint_base, p);
+%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.paint_base.rgbkd = p.Results.rgbkd; end
+%     if ~isempty(p.Results.rgbkr);  thisR.materials.list.paint_base.rgbkr = p.Results.rgbkr; end
+%     if ~isempty(p.Results.rgbkt);  thisR.materials.list.paint_base.rgbkt = p.Results.rgbkt; end
+%     if ~isempty(p.Results.rgbks);  thisR.materials.list.paint_base.rgbks = p.Results.rgbks; end 
+%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.paint_base.rgbkd = p.Results.rgbkd; end
+%     if ~isempty(p.Results.colorkd);thisR.materials.list.paint_base.colorkd = p.Results.colorkd;end
+%     if ~isempty(p.Results.colorks);thisR.materials.list.paint_base.colorks = p.Results.colorks;end
 else
     % The original material has every possible type of material slot.
     % We write all of the target slots into the corresponding material
@@ -117,13 +121,15 @@ else
         piCopyMaterial(thisR.materials.list.(materialNames{idx}),target);
     
     %% Assign color the person sent ins
-    if ~isempty(p.Results.rgbkd);  thisR.materials.list.(materialNames{idx}).rgbkd = p.Results.rgbkd; end
-    if ~isempty(p.Results.rgbkr);  thisR.materials.list.(materialNames{idx}).rgbkr = p.Results.rgbkr; end
-    if ~isempty(p.Results.rgbkt);  thisR.materials.list.(materialNames{idx}).rgbkt = p.Results.rgbkt; end
-    if ~isempty(p.Results.rgbks);  thisR.materials.list.(materialNames{idx}).rgbks = p.Results.rgbks; end 
-    if ~isempty(p.Results.rgbkd);  thisR.materials.list.(materialNames{idx}).rgbkd = p.Results.rgbkd; end
-    if ~isempty(p.Results.colorkd);thisR.materials.list.(materialNames{idx}).colorkd = p.Results.colorkd;end
-    if ~isempty(p.Results.colorks);thisR.materials.list.(materialNames{idx}).colorks = p.Results.colorks;end
+    thisR.materials.list.(materialNames{idx}) = ...
+        piCopyColor(thisR.materials.list.(materialNames{idx}), p);
+%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.(materialNames{idx}).rgbkd = p.Results.rgbkd; end
+%     if ~isempty(p.Results.rgbkr);  thisR.materials.list.(materialNames{idx}).rgbkr = p.Results.rgbkr; end
+%     if ~isempty(p.Results.rgbkt);  thisR.materials.list.(materialNames{idx}).rgbkt = p.Results.rgbkt; end
+%     if ~isempty(p.Results.rgbks);  thisR.materials.list.(materialNames{idx}).rgbks = p.Results.rgbks; end 
+%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.(materialNames{idx}).rgbkd = p.Results.rgbkd; end
+%     if ~isempty(p.Results.colorkd);thisR.materials.list.(materialNames{idx}).colorkd = p.Results.colorkd;end
+%     if ~isempty(p.Results.colorks);thisR.materials.list.(materialNames{idx}).colorks = p.Results.colorks;end
 end
 
 
@@ -138,6 +144,17 @@ for ii = 1:nProperties
     thisMaterial.(materialProperties{ii}) = target.(materialProperties{ii});
 end
 
+end
+
+%% Color assignment
+function thisColor = piCopyColor(thisColor, p)
+    if ~isempty(p.Results.rgbkd);  thisColor.rgbkd = p.Results.rgbkd; end
+    if ~isempty(p.Results.rgbkr);  thisColor.rgbkr = p.Results.rgbkr; end
+    if ~isempty(p.Results.rgbkt);  thisColor.rgbkt = p.Results.rgbkt; end
+    if ~isempty(p.Results.rgbks);  thisColor.rgbks = p.Results.rgbks; end 
+    if ~isempty(p.Results.rgbkd);  thisColor.rgbkd = p.Results.rgbkd; end
+    if ~isempty(p.Results.colorkd);thisColor.colorkd = p.Results.colorkd;end
+    if ~isempty(p.Results.colorks);thisColor.colorks = p.Results.colorks;end
 end
 
 

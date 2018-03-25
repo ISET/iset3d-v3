@@ -1,0 +1,11 @@
+MakeNamedMaterial "Background" "string type" "uber" "float index" [1.333] "rgb Kd" [0.603827338855 0.603827338855 0.603827338855] "rgb Ks" [0.0331047665709 0.0331047665709 0.0331047665709] "rgb Kr" [0.0331047665709 0.0331047665709 0.0331047665709] "float roughness" [0.5]
+Texture "r_1_1_add_b_color" "spectrum" "imagemap" "string filename" "r_1_1_add_b.png"
+MakeNamedMaterial "Allway" "string type" "uber" "float index" [1.333] "texture Kd" "r_1_1_add_b_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+Texture "sign_back_color" "spectrum" "imagemap" "string filename" "sign_back.png"
+MakeNamedMaterial "clean" "string type" "uber" "float index" [1.333] "texture Kd" "sign_back_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+Texture "r_1_1_color" "spectrum" "imagemap" "string filename" "r_1_1.png"
+MakeNamedMaterial "Stop" "string type" "uber" "float index" [1.333] "texture Kd" "r_1_1_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+Texture "sign_back_color" "spectrum" "imagemap" "string filename" "sign_back.png"
+MakeNamedMaterial "sign__back" "string type" "uber" "float index" [1.333] "texture Kd" "sign_back_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+Texture "sign_back_color" "spectrum" "imagemap" "string filename" "sign_back.png"
+MakeNamedMaterial "sign_back" "string type" "uber" "float index" [1.333] "texture Kd" "sign_back_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
