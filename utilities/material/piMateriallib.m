@@ -83,6 +83,17 @@ materiallib.glass.string = 'glass';
 materiallib.glass.rgbkr = [0.9 0.9 0.9];
 materiallib.glass.rgbkt = [0.9 0.9 0.9];
 
+%% Retroreflective
+%
+% Standard glass appearance
+
+materiallib.retroreflective.string = 'retroreflective';
+
+%% Uber
+%
+% Standard glass appearance
+
+materiallib.uber.string = 'uber';
 end
 
 
