@@ -120,15 +120,19 @@ switch ieParamFormat(param)
             val = 'lens';
         end
     case 'lensfile'
-        %
+        % See if there is a lens file and assign it.
         subType = thisR.camera.subtype;
         switch(lower(subType))
-            case 'realisticeye'
-                [~,val,~] = fileparts(thisR.camera.specfile.value);
             case 'pinhole'
                 val = 'pinhole (no lens)';
             otherwise
-                error('Unknown camera subtype %s\n',subType);
+                % realisticeye and realisticDiffraction both work here.
+                % Not sure what else is out there.
+                try
+                    [~,val,~] = fileparts(thisR.camera.specfile.value);
+                catch
+                    error('Unknown lens file %s\n',subType);
+                end
         end
         
     case 'focaldistance'

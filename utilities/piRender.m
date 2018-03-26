@@ -279,6 +279,8 @@ switch opticsType
         % hack to ISETBIO to make it work there temporarily and created an
         % issue. (BW).
         ieObject = oiSet(ieObject,'optics model','iset3d');
+        lensfile = thisR.get('lens file');
+        ieObject = oiSet(ieObject,'optics name',lensfile);
     case {'pinhole','environment'}
         % In this case, we the radiance describes the scene, not an oi
         ieObject = piSceneCreate(photons,'meanLuminance',100);
