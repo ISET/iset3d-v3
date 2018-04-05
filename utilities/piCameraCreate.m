@@ -100,7 +100,7 @@ switch cameraType
         camera.num_pinholes_h.type = 'float';
         camera.num_pinholes_h.value = 8;
         
-    case {'eye','realisticeye','humaneye','human'}
+    case {'eye','realisticeye','humaneye','human','realisticEye'}
         
         % TODO:
         % When we render, we need to make sure pbrt2ISET automatically
