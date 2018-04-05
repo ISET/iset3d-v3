@@ -1,8 +1,8 @@
-function recipe = piMoveObject(recipe,objectName,transformType,transform,varargin)
+function recipe = piObjectTransform(recipe,objectName,transformType,transform,varargin)
 % Move an object inside of a scene. 
 %
 % Syntax
-%   recipe = piMoveObject(recipe,objectName,transformType,transform,varargin)
+%   recipe = piObjectTransform(recipe,objectName,transformType,transform,varargin)
 %
 % We look for an object within the WorldBegin/WorldEnd block with
 % objectName. We then insert the given transform, so the object can be

@@ -54,8 +54,8 @@ translate = 1000; % mm
 % also know that our camera is located at the origin and looking down the
 % positive y-axis. 
 % Note: The order of scaling and translating matters!
-piMoveObject(thisR,'Plane','Scale',[scale scale scale]); % The plane is oriented in the x-z plane
-piMoveObject(thisR,'Plane','Translate',[0 translate 0]); 
+piObjectTransform(thisR,'Plane','Scale',[scale scale scale]); % The plane is oriented in the x-z plane
+piObjectTransform(thisR,'Plane','Translate',[0 translate 0]); 
 
 %% Attach a desired texture
 % Let's add a resolution chart texture.
