@@ -128,11 +128,11 @@ for ii = 1:length(angle)
     
     % Insert transforms
     % Warning: The order matters!
-    thisR = piMoveObject(thisR,'Plane','Scale',[1 1 h/w].*1/3);
-    thisR = piMoveObject(thisR,'Plane','Rotate',[xRotate 1 0 0]);
-    thisR = piMoveObject(thisR,'Plane','Rotate',[yRotate 0 1 0]);
-    thisR = piMoveObject(thisR,'Plane','Rotate',[zRotate 0 0 1]);
-    thisR = piMoveObject(thisR,'Plane','Translate', ...
+    thisR = piObjectTransform(thisR,'Plane','Scale',[1 1 h/w].*1/3);
+    thisR = piObjectTransform(thisR,'Plane','Rotate',[xRotate 1 0 0]);
+    thisR = piObjectTransform(thisR,'Plane','Rotate',[yRotate 0 1 0]);
+    thisR = piObjectTransform(thisR,'Plane','Rotate',[zRotate 0 0 1]);
+    thisR = piObjectTransform(thisR,'Plane','Translate', ...
         [xTranslate yTranslate zTranslate]);
     
     % Set output file
