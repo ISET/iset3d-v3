@@ -71,7 +71,7 @@ switch param
             thisR.camera.specfile.value = val;
             thisR.camera.specfile.type = 'string';
         end
-    case 'aperture'
+    case {'aperture','aperturediameter'}
         if(thisR.version == 3)
             thisR.camera.aperturediameter.value = val;
             thisR.camera.aperturediameter.type = 'float';
@@ -79,7 +79,7 @@ switch param
             thisR.camera.aperture_diameter.value = val;
             thisR.camera.aperture_diameter.type = 'float';
         end
-    case {'focaldistance','filmdistance'}
+    case {'focaldistance','filmdistance','focusdistance'}
         % What to do here? Focus distance is interpreted differently for
         % version 2 and version 3...
         if(thisR.version == 2)
