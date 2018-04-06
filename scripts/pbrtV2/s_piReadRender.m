@@ -4,10 +4,12 @@
 % machine, this takes about 5 sec.
 %
 % Path requirements
-%    ISET or ISETBIO
-%    pbrt2ISET  - 
+%    ISETCAM or ISETBIO
+%    iset3d  - 
 %    Consider RemoteDataToolbox for other uses.
 %
+
+% Examples:
 %{
 fname = fullfile(piRootPath,'data','bunny','bunny.pbrt');
 
