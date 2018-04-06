@@ -67,7 +67,6 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
     end
     if cnt~=0
         slotname = sprintf('paint_base%d',cnt);
-        
         thisR.materials.list.(slotname) = piMaterialCreate;
         thisR.materials.list.(slotname).name = slotname;
 
@@ -83,13 +82,7 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
     %% Assign color
     thisR.materials.list.(slotname) = ...
         piCopyColor(thisR.materials.list.(slotname), p);
-%     if ~isempty(p.Results.rgbkd); thisR.materials.list.(slotname).rgbkd = p.Results.rgbkd; end
-%     if ~isempty(p.Results.rgbkr); thisR.materials.list.(slotname).rgbkr = p.Results.rgbkr; end
-%     if ~isempty(p.Results.rgbkt); thisR.materials.list.(slotname).rgbkt = p.Results.rgbkt; end
-%     if ~isempty(p.Results.rgbks); thisR.materials.list.(slotname).rgbks = p.Results.rgbks; end 
-%     if ~isempty(p.Results.rgbkd); thisR.materials.list.(slotname).rgbkd = p.Results.rgbkd; end
-%     if ~isempty(p.Results.colorkd);thisR.materials.list.(slotname).colorkd = p.Results.colorkd;end
-%     if ~isempty(p.Results.colorks);thisR.materials.list.(slotname).colorks = p.Results.colorks;end
+
     else
         thisR.materials.list.paint_base = piMaterialCreate;
         thisR.materials.list.paint_base.name = 'paint_base';
@@ -100,19 +93,13 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
         
         % Assign carpaintmix
         thisR.materials.list.(materialNames{idx}) = ...
-            piCopyMaterial(thisR.materials.list.(materialNames{idx}),target);
+            piCopyMaterial(thisR.materials.list.(materialNames{idx}),target.carpaint);
         
     end
     %% Assign color
     thisR.materials.list.paint_base = ...
         piCopyColor(thisR.materials.list.paint_base, p);
-%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.paint_base.rgbkd = p.Results.rgbkd; end
-%     if ~isempty(p.Results.rgbkr);  thisR.materials.list.paint_base.rgbkr = p.Results.rgbkr; end
-%     if ~isempty(p.Results.rgbkt);  thisR.materials.list.paint_base.rgbkt = p.Results.rgbkt; end
-%     if ~isempty(p.Results.rgbks);  thisR.materials.list.paint_base.rgbks = p.Results.rgbks; end 
-%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.paint_base.rgbkd = p.Results.rgbkd; end
-%     if ~isempty(p.Results.colorkd);thisR.materials.list.paint_base.colorkd = p.Results.colorkd;end
-%     if ~isempty(p.Results.colorks);thisR.materials.list.paint_base.colorks = p.Results.colorks;end
+
 else
     % The original material has every possible type of material slot.
     % We write all of the target slots into the corresponding material
@@ -123,13 +110,7 @@ else
     %% Assign color the person sent ins
     thisR.materials.list.(materialNames{idx}) = ...
         piCopyColor(thisR.materials.list.(materialNames{idx}), p);
-%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.(materialNames{idx}).rgbkd = p.Results.rgbkd; end
-%     if ~isempty(p.Results.rgbkr);  thisR.materials.list.(materialNames{idx}).rgbkr = p.Results.rgbkr; end
-%     if ~isempty(p.Results.rgbkt);  thisR.materials.list.(materialNames{idx}).rgbkt = p.Results.rgbkt; end
-%     if ~isempty(p.Results.rgbks);  thisR.materials.list.(materialNames{idx}).rgbks = p.Results.rgbks; end 
-%     if ~isempty(p.Results.rgbkd);  thisR.materials.list.(materialNames{idx}).rgbkd = p.Results.rgbkd; end
-%     if ~isempty(p.Results.colorkd);thisR.materials.list.(materialNames{idx}).colorkd = p.Results.colorkd;end
-%     if ~isempty(p.Results.colorks);thisR.materials.list.(materialNames{idx}).colorks = p.Results.colorks;end
+
 end
 
 
