@@ -30,6 +30,7 @@
 
 %% Initialize ISETBIO
 ieInit;
+if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast, low quality retinal image
 % We have several scenes that have been modified and verified to work with
