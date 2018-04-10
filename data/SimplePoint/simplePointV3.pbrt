@@ -44,14 +44,12 @@ MakeNamedMaterial "PointMaterial" "string type" "uber"
 # Point
 ObjectBegin "Point"
   Material "matte" "color Kd" [1 1 1]
-  Translate 0 0 10
   Shape "disk" "float radius" [1]
 ObjectEnd
 
 # Background plane
 ObjectBegin "Plane"
   Material "matte" "color Kd" [0 0 0]
-  Translate 0 0 20
   Shape "disk" "float radius" [1]
 ObjectEnd
 

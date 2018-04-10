@@ -28,7 +28,7 @@ ieInit;
 
 % We're going to place the "display" 1 meter away from the eye with a 40
 % degree FOV.
-distance = 1000;
+distance = 1;
 planeFOV = 40;
 width = 2*tand(planeFOV/2)*distance;
 size = [width width];
@@ -48,17 +48,17 @@ myScene = sceneEye('texturedPlane',...
 myScene.fov = planeFOV;
 
 % Accommodate to the plane
-myScene.accommodation = 1/(distance*10^-3); 
+myScene.accommodation = 1/distance; 
 
 myScene.name = sprintf('%0.2fdiopters',myScene.accommodation);
-oi = myScene.render;
+[oi, result] = myScene.render;
 vcAddAndSelectObject(oi);
 oiWindow
 
 %%  Accommodate away from the plane
 
 myScene.fov = planeFOV;
-myScene.accommodation = 1/(100*10^-3);
+myScene.accommodation = 1/0.1;
 myScene.name = sprintf('%0.2fdiopters',myScene.accommodation);
 oi = myScene.render;
 vcAddAndSelectObject(oi);

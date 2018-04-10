@@ -28,10 +28,10 @@ AttributeEnd
 # Add a disk
 AttributeBegin
 Material "matte" "color Kd" [1 1 1]
-Translate 0 1000 0
+Translate 0 1 0
 Rotate 90 1 0 0
 Shape "disk"
-  "float radius" [1000]
+  "float radius" [1]
 AttributeEnd
     
 WorldEnd
