@@ -1,0 +1,53 @@
+# This scene consists of a textured plane that is illuminated by an
+# infinite, D65 light. By default the plane is 1 m x 1 m and is located
+# at (0,0,0). You will probably want to translate the plane away from 
+# the camera and scale it appropriately. 
+
+Transform [1.0 0.0 0 0  -0.0 1.0 0.0 0  0 -0.0 1.0 0  0.0 0.0 0.0 1]
+
+Camera "perspective"
+ "float fov" [30] 
+
+Sampler "lowdiscrepancy" 
+  "integer pixelsamples" [128] 
+
+# filter
+PixelFilter "gaussian" 
+  "float alpha" [2] 
+  "float xwidth" [2] 
+  "float ywidth" [2] 
+
+Film "image"
+ "integer xresolution" [128]
+  "integer yresolution" [128]
+
+Integrator "path"
+ "integer maxdepth" [1] 
+
+WorldBegin
+
+# Default Material
+Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	
+Texture "squareResolutionChart_color" "spectrum" "imagemap"
+  "string filename" "dummyTexture.exr"
+  "bool noFiltering" "true" 
+
+MakeNamedMaterial "PlaneMaterial" "string type" "uber"
+  "rgb Ks" [0 0 0]
+  "texture Kd" "squareResolutionChart_color"
+
+ObjectBegin "Plane"
+  NamedMaterial "PlaneMaterial"
+  Include "texturedPlane_geometry.pbrt"
+ObjectEnd
+
+AttributeBegin  
+  ObjectInstance "Plane"   
+AttributeEnd
+
+LightSource "infinite" 
+  "integer nsamples" [8] 
+  "spectrum L" "D65.spd" 
+
+WorldEnd

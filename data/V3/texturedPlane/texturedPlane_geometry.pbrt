@@ -1,0 +1,8 @@
+AttributeBegin
+	# Plane
+	ConcatTransform [1.0 -0.0 0.0 0  0.0 1.0 0 0  -0.0 0 1.0 0  0.0 0.0 0.0 1]
+	AttributeBegin
+		NamedMaterial "PlaneMaterial"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-0.5 0.5 0 0.5 0.5 0 0.5 -0.5 0 -0.5 -0.5 0 ] "float uv" [0 1 1 1 1 0 0 0 ] "normal N" [0.0 0 -1.0 0.0 0 -1.0 0.0 0 -1.0 0.0 0 -1.0 ]
+	AttributeEnd
+AttributeEnd
