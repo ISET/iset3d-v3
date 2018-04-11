@@ -49,8 +49,13 @@ remotedirectory = p.Results.remotedirectory;
 
 % We may end up adding a V2 sub-directory.  For now it is files and V3
 % files inside of remote/V3
-if isequal(lower(p.Results.version),'v3')
-    remotedirectory = fullfile(remotedirectory,'v3');
+switch lower(p.Results.version)
+    case{'v3'}
+        remotedirectory = fullfile(remotedirectory,'v3');
+    case{'v2'}
+        remotedirectory = fullfile(remotedirectory,'v2');
+    otherwise
+        error('Unknown version %s\n',p.Results.version);
 end
 
 %%

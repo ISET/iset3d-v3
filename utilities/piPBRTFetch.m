@@ -8,13 +8,15 @@ function [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
 %   artifactName - The base name of the artifact that can be found by a search
 %   
 % Optional inputs
-%   destinationFolder - default is piRootPath/data
-%   unzip     - perform the unzip operation (default true)
-%   deletezip - delete zip after unzipping (default false)
+%   'unzip'      - perform the unzip operation (default true)
+%   'delete zip' - delete zip after unzipping (default false)
+%   'destination folder' - default is piRootPath/data
+%   'pbrt version'       - PBRT version.  Default is current v2, but it
+%                          may change to v3 before very long
 %
 % Return
 %   fnameZIP - full path to the zip file
-%   artifact - artifact that was found on the remote site during the search
+%   artifact - artifact found on the remote site
 %
 % Description
 %   The PBRT data are stored as zip files that include the pbrt scene file
@@ -32,14 +34,18 @@ function [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
  % By default, the download is to piRootPath/data
  [fnameZIP, artifact] = piPBRTFetch('whiteScene');
  [p,n,e] = fileparts(fnameZIP);
- name = fullfile(p,n); fname = [n,'.pbrt'];
+ dname = fullfile(p,n); 
+ fname = [n,'.pbrt'];
 
  % Read the recipe from the pbrt scene file, 
  % which is contained inside a directory of the same name
  thisR = piRead(fullfile(dname,fname));
 
+ % Something wrong here in how this is set up ..
+ % BW should fix.
+ 
  % Render the output to the piRootPath/local output directory
- thisR.outputFile = fullfile(piRootPath,'local',fname); 
+ thisR.outputFile = fullfile(piRootPath,'local',n,fname); 
  scene = piRender(thisR);
 
  % View it
@@ -57,20 +63,39 @@ function [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
 
 %% Parse inputs
 p = inputParser;
+
+% Forces optional inputs to lower case
+for ii=1:2:length(varargin)
+    varargin{ii} = ieParamFormat(varargin{ii});
+end
+
 p.addRequired('aName',@ischar);
-p.addParameter('destinationFolder',fullfile(piRootPath,'data'),@ischar);
+
+p.addParameter('destinationfolder',fullfile(piRootPath,'data'),@ischar);
 p.addParameter('unzip',true,@islogical);
 p.addParameter('deletezip',false,@islogical);
+p.addParameter('pbrtversion','v2',@ischar);
 
 p.parse(aName,varargin{:});
-destinationFolder = p.Results.destinationFolder;
-zipFlag = p.Results.unzip;
-deleteFlag = p.Results.deletezip;
+
+zipFlag      = p.Results.unzip;
+deleteFlag   = p.Results.deletezip;
+pbrtVersion  = p.Results.pbrtversion;
+destinationFolder = p.Results.destinationfolder;
+
 
 %% Get the file from the RDT
 
 rdt = RdtClient('isetbio');
-rdt.crp('/resources/scenes/pbrt');
+switch lower(pbrtVersion)
+    case 'v2'
+        rdt.crp('/resources/scenes/pbrt/v2');
+    case 'v3'
+        rdt.crp('/resources/scenes/pbrt/v3');
+    otherwise
+        error('unknown pbrt version %s\n',pbrtVersion);
+end
+
 a = rdt.searchArtifacts(aName);
 [fnameZIP, artifact] =rdt.readArtifact(a(1),'destinationFolder',destinationFolder);
 
