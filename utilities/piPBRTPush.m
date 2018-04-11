@@ -18,8 +18,7 @@ function rd = piPBRTPush(fnameZIP,varargin)
 % Optional inputs
 %   artifactName - The base name of the artifact that can be found by
 %   a search 
-%   pbrtVersion  - Can specify a v3 file, so the data are put inside
-%                  the v3 folder
+%   pbrtVersion  - V2 or V3. Data are put inside the appropriate folder
 %   rd           - If you have an open RdtClient you can pass it here
 %                  so you are not asked for a password again.
 %
@@ -32,17 +31,20 @@ function rd = piPBRTPush(fnameZIP,varargin)
 
 %% Parse inputs
 p = inputParser;
+for ii=1:2:length(varargin)
+    varargin{ii} = ieParamFormat(varargin{ii});
+end
 
 % varargin = ieParamFormat(varargin);
 p.addRequired('fnameZIP',@ischar);
-p.addParameter('artifactName','',@ischar);
-p.addParameter('pbrtVersion','v2',@ischar);
+p.addParameter('artifactname','',@ischar);
+p.addParameter('pbrtversion','v2',@ischar);
 p.addParameter('rd',[],@(x)(isa(x,'RdtClient')));
 
 p.parse(fnameZIP,varargin{:});
 
-artifactName = p.Results.artifactName;
-pbrtVersion  = p.Results.pbrtVersion;
+artifactName = p.Results.artifactname;
+pbrtVersion  = p.Results.pbrtversion;
 rd           = p.Results.rd;
 
 %% Check given file
@@ -75,7 +77,7 @@ end
 % sub-directory remote/V3.
 switch lower(pbrtVersion)
     case 'v2'
-        rd.crp('/resources/scenes/pbrt');
+        rd.crp('/resources/scenes/pbrt/v2');
     case 'v3'
         rd.crp('/resources/scenes/pbrt/v3');
     otherwise

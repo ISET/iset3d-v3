@@ -8,11 +8,13 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the pbrt scene
-% This scene consists of an infinite light source and a white disk placed 1
-% meter away from the camera. The disk itself has a radius of 1 meter as
-% well.
-% fname = fullfile(piRootPath,'data','yeahright','yeahright.pbrt');
-fname = '/home/wandell/pbrt-v2-spectral/pbrtScenes/yeahright/yeahright.pbrt';
+
+% fname = '/home/wandell/pbrt-v2-spectral/pbrtScenes/yeahright/yeahright.pbrt';
+fname = fullfile(piRootPath,'data','yeahright','yeahright.pbrt');
+if ~exist(fname,'file')
+    piPBRTFetch('yeahright');
+    if ~exist(fname,'file'), error('File not downloaded: %s',fname); end
+end
 
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
