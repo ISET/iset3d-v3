@@ -16,17 +16,10 @@
 % The commands to download from the RDT are
 %
 %{
- rdt = RdtClient('isetbio');               % Open the connection
- a = rdt.searchArtifacts('sanmiguel');     % Root name of the artifact
-
- % Where you put the file and how you set it up is your choice. 
- destinationFolder = fullfile(piRootPath,'local');
- rdt.readArtifact(a,'destinationFolder',destinationFolder);
- fnameZIP = fullfile(destinationFolder,'sanmiguel.zip'); 
- unzip(fnameZIP);
-
- %  Make the fname below consistent with what you did above.  Might be this.
- fname = fullfile(destinationFolder,'sanmiguel','sanmiguel.pbrt'); 
+ if ~exist(fullfile(piRootPath,'data','sanmiguel'),'dir')
+    piPBRTFetch('sanmiguel');
+ end
+ s_sanmiguel
 %}
 %
 % BW SCIEN 2017
@@ -36,11 +29,15 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
+% Check that you have the sanmiguel data in the data directory.
+if ~exist(fullfile(piRootPath,'data','sanmiguel'),'dir')
+    piPBRTFetch('sanmiguel','pbrt version','v2');
+end
+
 %% Specify the pbrt scene file and its dependencies
 
 % We organize the pbrt files with its includes (textures, brdfs, spds, geometry)
 % in a single directory. 
-% fname = '/home/wandell/pbrt-v2-spectral/pbrtScenes/sanmiguel/sanmiguel.pbrt';
 fname = fullfile(piRootPath,'data','sanmiguel','sanmiguel.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
@@ -49,8 +46,8 @@ thisR = piRead(fname);
 
 %% Default is a relatively low resolution (256).
 
-thisR.set('film resolution',256);
-thisR.set('rays per pixel',128);
+thisR.set('film resolution',768);
+thisR.set('rays per pixel',256);
 
 %% Set up Docker 
 
