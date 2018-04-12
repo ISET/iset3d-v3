@@ -51,8 +51,11 @@ if ~isfield(vcSESSION,'SCENE')
     vcSESSION.SCENE = {};
 end
 
-%%
-oi = oiCreate;
+%% Create a shift invariant optical image
+
+% There are some problems here.  What do we do about the OTF, in
+% particular, which does not really apply to this calculation?
+oi = oiCreate('shift invariant');
 oi = initDefaultSpectrum(oi);
 oi = oiSet(oi,'photons',photons);
 oi = oiSet(oi,'optics focal length', p.Results.focalLength);

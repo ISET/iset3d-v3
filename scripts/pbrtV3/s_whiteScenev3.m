@@ -63,4 +63,4 @@ piWrite(recipe);
 oi = piRender(recipe);
 
 % Show it in ISET
-vcAddObject(oi); oiWindow;   
+ieAddObject(oi); oiWindow;   

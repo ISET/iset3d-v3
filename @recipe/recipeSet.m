@@ -37,8 +37,7 @@ switch param
         thisR.outputFile = val;
 
     case {'inputFile'}
-        thisR.inputFile = val;
-        
+        thisR.inputFile = val;   
         % Scene
     case 'objectdistance'
         % Adjust the lookat 'from' field to match the distance in val

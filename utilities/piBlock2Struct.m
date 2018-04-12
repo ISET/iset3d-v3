@@ -1,3 +1,4 @@
+% DEPRECATED
 function s = piBlock2Struct(blockLines,varargin)
 % Parse a block of scene file text (e.g. from piExtractBlock) and
 % return it as a structure 
