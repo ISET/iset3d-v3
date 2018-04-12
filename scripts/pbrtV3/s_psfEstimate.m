@@ -41,7 +41,10 @@ recipe.set('pixelsamples',256);
 recipe.set('camera','realistic');
 recipe.set('lensfile',fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat'));
 recipe.set('filmdiagonal',10); 
+
 recipe.set('focus distance',3);
+recipe.set('aperture diameter',5);
+
 %% Write and render
 
 oiName = 'psfTest';
