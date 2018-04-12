@@ -128,10 +128,18 @@ switch ieParamFormat(param)
             otherwise
                 % realisticeye and realisticDiffraction both work here.
                 % Not sure what else is out there.
-                try
-                    [~,val,~] = fileparts(thisR.camera.specfile.value);
-                catch
-                    error('Unknown lens file %s\n',subType);
+                if thisR.version==2
+                    try
+                        [~,val,~] = fileparts(thisR.camera.specfile.value);
+                    catch
+                        error('Unknown lens file %s\n',subType);
+                    end
+                elseif thisR.version == 3
+                    try
+                        [~,val,~] = fileparts(thisR.camera.lensfile.value);
+                    catch
+                        error('Unknown lens file %s\n',subType);
+                    end
                 end
         end
         
