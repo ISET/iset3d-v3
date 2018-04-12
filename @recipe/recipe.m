@@ -13,8 +13,6 @@ classdef recipe < matlab.mixin.Copyable
 %  permissible list of terms included.  Again, for SurfaceIntegrator in V2 these
 %  appear to be described in http://www.pbrt.org/fileformat.html
 
-%
-
     properties (GetAccess=public, SetAccess=public)
         % Can be set by user
         %
@@ -22,7 +20,9 @@ classdef recipe < matlab.mixin.Copyable
         % for piWrite to convert the structs to text output in the
         % scene.pbrt file.
         
-        camera;      % Struct of camera parameters, such as lens file
+        % CAMERA - struct of camera parameters, including the lens
+        % file
+        camera;     
         sampler;     % Sampling algorithm.  Only a few are allowed
         film;        % Equivalent to ISET sensor
         filter;      % Usually pixel filter
@@ -31,10 +31,14 @@ classdef recipe < matlab.mixin.Copyable
         lookAt;      % from/to/up struct
         scale;       % Optional scale factor to flip handedness
         world;       % A cell array with all the WorldBegin/End contents
-        inputFile;   % Original input file
-        outputFile;  % Where outputFile = piWrite(recipe);
-        version;     % A PBRTv2 file or a PBRTv3 file
         
+        % INPUTFILE -  Original input file
+        inputFile = '';   
+        
+        outputFile = ''; % Where outputFile = piWrite(recipe);
+        version = 2;     % A PBRTv2 file or a PBRTv3 file
+        materials;       % material list parsed from *_material.pbrt file
+        exporter = '';
     end
     
     properties (Dependent)

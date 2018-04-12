@@ -1,5 +1,5 @@
 function [ieObject, result] = piRender(thisR,varargin)
-% Read a PBRT V2 scene file, run the docker cmd locally, return the ieObject.
+% Read a PBRT scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
 %  [oi or scene or depth map] = piRender(thisR,varargin)
@@ -17,7 +17,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               We have multiple different metadata options. For pbrt-v2 we
 %               have depth, mesh, and material. For pbrt-v3 we have depth
 %               and coordinates at the moment. 
-%  version       - PBRT version, 2 or 3
+%  version    - PBRT version, 2 or 3
 %  
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
@@ -278,7 +278,9 @@ switch opticsType
         % This always worked in ISET, but not in ISETBIO.  So I stuck in a
         % hack to ISETBIO to make it work there temporarily and created an
         % issue. (BW).
-        ieObject = oiSet(ieObject,'optics model','ray trace');
+        ieObject = oiSet(ieObject,'optics model','iset3d');
+        lensfile = thisR.get('lens file');
+        ieObject = oiSet(ieObject,'optics name',lensfile);
     case {'pinhole','environment'}
         % In this case, we the radiance describes the scene, not an oi
         ieObject = piSceneCreate(photons,'meanLuminance',100);

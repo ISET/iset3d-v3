@@ -1,0 +1,13 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [0.999815791761 -0.000904461407941 0.0191719716093 0  0.0 0.998889055542 0.0471238232541 0  -0.0191932942933 -0.0471151426576 0.998705051948 0  -263.297853824 -260.063902545 2243.2923028 1]
+Camera "perspective" "float fov" [28.841546255] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["SimpleScene.exr"] "integer xresolution" [640] "integer yresolution" [480]
+Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+LightSource "infinite" "rgb scale" [1.0 1.0 1.0]
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	Include "SimpleScene_materials.pbrt"
+	Include "SimpleScene_geometry.pbrt"
+WorldEnd
