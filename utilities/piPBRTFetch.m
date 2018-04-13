@@ -61,16 +61,19 @@ p.addRequired('aName',@ischar);
 p.addParameter('destinationFolder',fullfile(piRootPath,'data'),@ischar);
 p.addParameter('unzip',true,@islogical);
 p.addParameter('deletezip',false,@islogical);
+p.addParameter('pbrtversion',2,@(x)(x == 2 || x == 3));
+p.addParameter('remotedirectory','/resources/scenes/pbrt',@ischar);
 
 p.parse(aName,varargin{:});
 destinationFolder = p.Results.destinationFolder;
 zipFlag = p.Results.unzip;
 deleteFlag = p.Results.deletezip;
+remotedirectory = sprintf('%s/v%d',p.Results.remotedirectory,p.Results.pbrtversion');
 
 %% Get the file from the RDT
-
 rdt = RdtClient('isetbio');
-rdt.crp('/resources/scenes/pbrt');
+rdt.crp(remotedirectory);
+
 a = rdt.searchArtifacts(aName);
 [fnameZIP, artifact] =rdt.readArtifact(a(1),'destinationFolder',destinationFolder);
 
