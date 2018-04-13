@@ -69,7 +69,7 @@ switch cameraType
             camera.lensfile.type = 'string';
             camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
             camera.aperturediameter.type = 'float';
-            camera.aperturediameter.value = 1;    % mm
+            camera.aperturediameter.value = 5;    % mm
             camera.focusdistance.type = 'float';
             camera.focusdistance.value = 10; % mm
         end
