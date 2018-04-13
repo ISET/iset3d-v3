@@ -31,13 +31,16 @@ for ii=1:2:length(varargin)
     varargin{ii} = ieParamFormat(varargin{ii});
 end
 p.addParameter('print',true,@islogical);
+p.addParameter('pbrtversion',2,@(x)(x == 2 || x == 3));
 p.addParameter('remotedirectory','/resources/scenes/pbrt',@ischar);
 
 p.parse(varargin{:});
 
+remotedirectory = sprintf('%s/v%d',p.Results.remotedirectory,p.Results.pbrtversion');
+
 %%
 rdt = RdtClient('isetbio');
-rdt.crp(p.Results.remotedirectory);
+rdt.crp(remotedirectory);
 artifacts = rdt.listArtifacts('print',p.Results.print);
 
 end
