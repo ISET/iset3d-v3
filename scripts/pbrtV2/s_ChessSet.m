@@ -33,7 +33,9 @@ if ~piDockerExists, piDockerConfig; end
 % We organize the pbrt files with its includes (textures, brdfs, spds, geometry)
 % in a single directory. 
 fname = fullfile(piRootPath,'data','ChessSet','chessSet.pbrt');
-if ~exist(fname,'file'), error('File not found'); end
+if ~exist(fname,'file')
+    piPBRTFetch('ChessSet','pbrtversion',2); 
+end
 
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);

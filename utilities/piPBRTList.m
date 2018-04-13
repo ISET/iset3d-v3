@@ -41,6 +41,7 @@ for ii=1:2:length(varargin)
     varargin{ii} = ieParamFormat(varargin{ii});
 end
 p.addParameter('print',true,@islogical);
+p.addParameter('pbrtversion',2,@(x)(x == 2 || x == 3));
 p.addParameter('remotedirectory','/resources/scenes/pbrt',@ischar);
 p.addParameter('version','V2',@ischar);
 
@@ -57,6 +58,8 @@ switch lower(p.Results.version)
     otherwise
         error('Unknown version %s\n',p.Results.version);
 end
+
+remotedirectory = sprintf('%s/v%d',p.Results.remotedirectory,p.Results.pbrtversion');
 
 %%
 rdt = RdtClient('isetbio');

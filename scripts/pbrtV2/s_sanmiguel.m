@@ -52,7 +52,7 @@ thisR.set('rays per pixel',256);
 %% Set up Docker 
 
 [p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(piRootPath,'local',[n,e]);
+thisR.outputFile = fullfile(piRootPath,'local','sanmiguel',[n,e]);
 piWrite(thisR);
 
 %% Render with the Docker container

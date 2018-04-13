@@ -52,6 +52,9 @@ function [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
  ieAddObject(scene); sceneWindow;
 %}
 %{
+ [fnameZIP, artifact] = piPBRTFetch('SimpleScene','pbrtversion',3);
+%}
+%{
  % By default, this places the data in piRootPath/data.  
  % You could set the 'deletezip', true parameter.
  [fnameZIP, artifact] = piPBRTFetch('sanmiguel');
@@ -74,30 +77,23 @@ p.addRequired('aName',@ischar);
 p.addParameter('destinationfolder',fullfile(piRootPath,'data'),@ischar);
 p.addParameter('unzip',true,@islogical);
 p.addParameter('deletezip',false,@islogical);
-p.addParameter('pbrtversion','v2',@ischar);
+
+p.addParameter('pbrtversion',2,@(x)(x == 2 || x == 3));
+p.addParameter('remotedirectory','/resources/scenes/pbrt',@ischar);
 
 p.parse(aName,varargin{:});
 
-zipFlag      = p.Results.unzip;
-deleteFlag   = p.Results.deletezip;
-pbrtVersion  = p.Results.pbrtversion;
 destinationFolder = p.Results.destinationfolder;
-
+zipFlag           = p.Results.unzip;
+deleteFlag        = p.Results.deletezip;
+remotedirectory   = sprintf('%s/v%d',p.Results.remotedirectory,p.Results.pbrtversion');
 
 %% Get the file from the RDT
-
 rdt = RdtClient('isetbio');
-switch lower(pbrtVersion)
-    case 'v2'
-        rdt.crp('/resources/scenes/pbrt/v2');
-    case 'v3'
-        rdt.crp('/resources/scenes/pbrt/v3');
-    otherwise
-        error('unknown pbrt version %s\n',pbrtVersion);
-end
+rdt.crp(remotedirectory);
 
 a = rdt.searchArtifacts(aName);
-[fnameZIP, artifact] =rdt.readArtifact(a(1),'destinationFolder',destinationFolder);
+[fnameZIP, artifact] = rdt.readArtifact(a(1),'destinationFolder',destinationFolder);
 
 %% If download succeeded, check if unzip and delete are requested
 if exist(fnameZIP,'file')
