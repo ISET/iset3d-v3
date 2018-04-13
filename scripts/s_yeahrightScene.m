@@ -10,7 +10,7 @@ if ~piDockerExists, piDockerConfig; end
 %% Read the pbrt scene
 fname = fullfile(piRootPath,'data','yeahright','yeahright.pbrt');
 if ~exist(fname,'file')
-    piPBRTFetch('yeahright','pbrt version',2);
+    piPBRTFetch('yeahright','pbrtversion',2);
 end
 
 % Read the main scene pbrt file.  Return it as a recipe
