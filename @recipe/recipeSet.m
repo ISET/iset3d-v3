@@ -175,12 +175,13 @@ switch param
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
     case{'maxdepth','bounces'}
-        if(~(strcmp(thisR.integrator.subtype,'directlighting') || ...
-                strcmp(thisR.integrator.subtype,'path')))
-            error('Integrator type must be directlighting or path for this to be set.');
+        if(~strcmp(thisR.integrator.subtype,'path'))
+            warning('Changing integrator sub type to "path"');
         end
         thisR.integrator.maxdepth.value = val(1);
         thisR.integrator.maxdepth.type = 'integer';
+        % When there are multiple bounces, apply this integrator
+        thisR.integrator.subtype = 'path';
     otherwise
         error('Unknown parameter %s\n',param);
 end
