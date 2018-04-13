@@ -32,7 +32,7 @@ myScene.resolution = 128;
 
 oi = myScene.render;
 
-vcAddObject(oi);
+ieAddObject(oi);
 oiWindow;
 
 %% Try moving the slanted bar in and out of focus
@@ -49,7 +49,7 @@ for ii = 1:length(planeDistance)
     
     oi = myScene.render;
     
-    vcAddObject(oi);
+    ieAddObject(oi);
     oiWindow;
 
 end
@@ -89,7 +89,7 @@ for ii = 1:length(planeDistance)
     
     oi = myScene.render;
     
-    vcAddObject(oi);
+    ieAddObject(oi);
     oiWindow;
 end
 

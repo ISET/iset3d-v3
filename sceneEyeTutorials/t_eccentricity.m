@@ -32,7 +32,7 @@ myScene.numRays = 64;
 myScene.resolution = 106;
 oi = myScene.render;
 
-vcAddObject(oi);
+ieAddObject(oi);
 oiWindow;
 
 %% Render a couple of smaller images a different locations on the retina
@@ -70,7 +70,7 @@ for ii = 1:length(ecc)
     myScene.name = sprintf('%i_%i_ecc',currEcc(1),currEcc(2));
     
     oi = myScene.render;
-    vcAddObject(oi);
+    ieAddObject(oi);
     oiWindow;
     
 end

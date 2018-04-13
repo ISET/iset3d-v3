@@ -57,7 +57,7 @@ piWrite(thisR);
 [oi,results] = piRender(thisR,'mean illuminance',10);
 
 % Show it in ISET
-vcAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
+ieAddObject(oi); oiWindow; oiSet(oi,'gamma',0.5);   
 
 %% Create a sensor 
 
@@ -75,7 +75,7 @@ sensor = sensorCompute(sensor,oi);
 
 ip = ipCreate;
 ip = ipCompute(ip,sensor);
-vcAddObject(ip); ipWindow;
+ieAddObject(ip); ipWindow;
 
 %% Pack the sensor rgb image into the lightfield structure
 
@@ -108,8 +108,8 @@ vcNewGraphWin; imagesc(img); truesize; axis off
 
 % This should get us how to scale each pixel so white is white
 [cMatrix,sensorW,oiW] = piWhiteField(thisR);
-% vcAddObject(oiW); oiWindow;
-% vcAddObject(sensorW); sensorImageWindow;
+% ieAddObject(oiW); oiWindow;
+% ieAddObject(sensorW); sensorImageWindow;
 % vcNewGraphWin; imagesc(cMatrix); truesize
 
 % This function should be added to ISET, I think, to correct
