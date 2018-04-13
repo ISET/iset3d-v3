@@ -104,17 +104,17 @@ for ii=1:nShots
         'renderType','radiance',...
         'meanluminance',100,...
         'fov',FOV);
-    % vcAddObject(scene); sceneWindow;
+    % ieAddObject(scene); sceneWindow;
     
     oi = oiCreate;
     oi = oiCompute(oi,scene);
-    % vcAddObject(oi); oiWindow;
+    % ieAddObject(oi); oiWindow;
     
     sensor = sensorCompute(sensor,oi);
     sensor = sensorSet(sensor,'name',sprintf('from %d',ii));
     
     volts  = sensorGet(sensor,'volts');
-    % vcAddObject(sensor); sensorWindow('scale',true);
+    % ieAddObject(sensor); sensorWindow('scale',true);
     
     if ii == 1, voltSum = volts;
     else,       voltSum = voltSum + volts;
@@ -132,7 +132,7 @@ end
 % This is the blurred image
 sensorBurst = sensorSet(sensor,'volts',voltSum);
 sensorBurst = sensorSet(sensorBurst,'name','burst');
-vcAddObject(sensorBurst); sensorWindow;
+ieAddObject(sensorBurst); sensorWindow;
 sensorSet(sensorBurst,'gamma',0.5);
 
 
@@ -149,7 +149,7 @@ oi = oiCompute(oi,scene);
 sensor = sensorSet(sensor,'exp time',nShots * eTime);
 sensor = sensorCompute(sensor,oi);
 sensor = sensorSet(sensor,'name','still');
-vcAddObject(sensor); sensorWindow;
+ieAddObject(sensor); sensorWindow;
 sensorSet(sensor,'gamma',0.5);
 
 %%

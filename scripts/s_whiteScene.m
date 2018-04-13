@@ -54,4 +54,4 @@ piWrite(thisR, 'overwrite', true);
 oi = piRender(oname);
 
 % Show it in ISET
-vcAddObject(oi); oiWindow;   
+ieAddObject(oi); oiWindow;   

@@ -39,7 +39,7 @@ piWrite(thisR);
 ieObject = piRender(thisR);
 
 % Show it in ISET
-vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
+ieAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
 
 %%  Make an image with a camera positioned adjacent to the original
 
@@ -52,7 +52,7 @@ piWrite(thisR);
 ieObject = piRender(thisR);
 
 % Show it in ISET
-vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
+ieAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);     
 
 %% Point the camera a little higher
 
@@ -62,6 +62,6 @@ piWrite(thisR);
 ieObject = piRender(thisR);
 
 % Show it in ISET
-vcAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);   
+ieAddObject(ieObject); sceneWindow; sceneSet(ieObject,'gamma',0.5);   
 
 %%
