@@ -78,15 +78,15 @@ switch param
             thisR.camera.aperture_diameter.value = val;
             thisR.camera.aperture_diameter.type = 'float';
         end
-    case {'focaldistance','filmdistance','focusdistance'}
-        % What to do here? Focus distance is interpreted differently for
-        % version 2 and version 3...
-        if(thisR.version == 2)
+    case {'filmdistance'}
             thisR.camera.filmdistance.value = val;
             thisR.camera.filmdistance.type = 'float';
-        elseif(thisR.version == 3)
+    case {'focusdistance'}
+        if(thisR.version == 3)
             thisR.camera.focusdistance.value = val;
             thisR.camera.focusdistance.type = 'float';
+        else
+            warning('focus distance parameter not applicable for version 2');
         end
     case 'lookat'
         % Includes the from, to and up in a struct
@@ -128,7 +128,7 @@ switch param
             if isnan(fdist)
                 error('Camera is probably too close (%f) to focus.',thisR.get('object distance'));
             end
-            thisR.set('focal distance',fdist);
+            thisR.set('film distance',fdist);
         end
     case 'microlens'
         % Not sure about what this means.  It is on or off
