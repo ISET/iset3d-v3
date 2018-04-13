@@ -11,12 +11,13 @@ if ~piDockerExists, piDockerConfig; end
 % Good options are
 % kitchen, bathroom, bathroom2, living-room, SimpleScene
 destinationFolder = fullfile(piRootPath,'data','V3');
-if ~exist(fullfile(destinationFolder,'white-room'),'dir')
-    piPBRTFetch('white-room','pbrtversion',3,'destinationFolder',destinationFolder);
+sceneName = 'white-room';
+if ~exist(fullfile(destinationFolder,sceneName),'dir')
+    piPBRTFetch(sceneName,'pbrtversion',3,'destinationFolder',destinationFolder);
 end
 
 % For all the scenes except SimpleScene
-fname = fullfile(sceneDir,'scene.pbrt');
+fname = fullfile(destinationFolder,sceneName,'scene.pbrt');
 
 recipe = piRead(fname,'version',3);
 
