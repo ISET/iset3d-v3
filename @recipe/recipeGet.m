@@ -204,6 +204,21 @@ switch ieParamFormat(param)
     case 'filmyresolution'
         % An integer
         val = [thisR.film.yresolution.value];
+    case 'aperturediameter'
+        switch thisR.version
+            case 2
+                val = thisR.camera.aperture_diameter.value;
+            case 3
+                val = thisR.camera.aperturediameter.value;
+        end
+        
+    case {'filmdiagonal','diagonal'}
+        switch thisR.version
+            case 2
+                val = thisR.camera.filmdiag.value;
+            case 3
+                val = thisR.film.diagonal.value;
+        end
     case 'filmsubtype'
         % What are the legitimate options?
         val = thisR.film.subtype;
