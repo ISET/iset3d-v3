@@ -25,7 +25,7 @@ piWrite(thisR);
 
 scene = piRender(thisR);
 scene = oiSet(scene,'name','Radiance_and_Depth');
-vcAddObject(scene); sceneWindow;   
+ieAddObject(scene); sceneWindow;   
 
 %% Render an image segmented by material type.
 
