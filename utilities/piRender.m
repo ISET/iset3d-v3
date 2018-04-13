@@ -1,4 +1,4 @@
-function [ieObject, result] = piRender(thisR,varargin)
+function [ieObject, result, scaleFactor] = piRender(thisR,varargin)
 % Read a PBRT scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
@@ -18,9 +18,16 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               have depth, mesh, and material. For pbrt-v3 we have depth
 %               and coordinates at the moment. 
 %  version    - PBRT version, 2 or 3
+%  scaleFactor - photons are scaled by a value in order to produce
+%               reasonable illuminance. Here, you can manually input a
+%               scale factor to apply to this particular render. If empty,
+%               a default value is used
 %  
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
+%   result - PBRT output from the terminal, vital for debugging!
+%   scaleFactor - the scaling factor for the photons (see scaleFactor in
+%                 OPTIONAL inputs)
 %
 % See also s_piReadRender*.m
 %
@@ -49,12 +56,13 @@ end
 
 rTypes = {'radiance','depth','both','coordinates','material','mesh'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes))); 
-
+p.addParameter('scaleFactor',[],@(x)isnumeric(x));
 p.addParameter('version',2,@(x)isnumeric(x));
 
 p.parse(thisR,varargin{:});
 renderType = p.Results.rendertype;
 version    = p.Results.version;
+scaleFactor = p.Results.scaleFactor;
 
 if ischar(thisR)
     % In this case, we are just rendering a pbrt file.  No depthFile.
@@ -281,6 +289,28 @@ switch opticsType
         ieObject = oiSet(ieObject,'optics model','iset3d');
         lensfile = thisR.get('lens file');
         ieObject = oiSet(ieObject,'optics name',lensfile);
+        
+        % If the user provide a scaling factor, scale the photons with this
+        % value. Otherwise scale the photons to produce a reasonable
+        % illuminance.
+        if(isempty(scaleFactor))
+            % TL: So ideally we shoudl change oiAdjustIlluminance so that
+            % it returns the scaling factor, but I'm a bit afraid to change
+            % things in ISETBIO. So for now we can just calculate the scale
+            % after the fact.
+            oldPhotons = oiGet(ieObject,'photons');
+            ieObject = oiAdjustIlluminance(ieObject,5);
+            newPhotons = oiGet(ieObject,'photons');
+            scaleFactor = mode(newPhotons(:)./oldPhotons(:)); % Should be the same value everywhere. 
+        else
+            photons = oiGet(ieObject,'photons');
+            ieObject = oiSet(ieObject,'photons',photons*scaleFactor);
+            
+            % ISETBIO seems to have a bug where it doesn't automatically
+            % calculate new illuminance, so here we force it. 
+            ieObject.data.illuminance = oiCalculateIlluminance(ieObject);
+        end
+        
     case {'pinhole','environment'}
         % In this case, we the radiance describes the scene, not an oi
         ieObject = piSceneCreate(photons,'meanLuminance',100);
