@@ -272,12 +272,21 @@ switch opticsType
     case 'lens'
         % If we used a lens, the ieObject is an optical image (irradiance).
         
-        % We should set fov or filmDiag here.  We should also set other ray
-        % trace optics parameters here. We are using defaults for now, but we
-        % will find those numbers in the future from inside the radiance.dat
-        % file and put them in here.
-        ieObject = piOICreate(photons,varargin{:});  % Settable parameters passed
+        % See if we can find the optics parameters
+        [focalLength, fNumber, filmDiag, ~, success] = ...
+            piRecipeFindOpticsParams(thisR);
+        if(success)
+            ieObject = piOICreate(photons,...
+                'focalLength',focalLength,...
+                'fNumber',fNumber,...
+                'filmDiag',filmDiag); 
+        else
+            % Could not find the optics parameters. Using default.
+            ieObject = piOICreate(photons); 
+        end
+        
         ieObject = oiSet(ieObject,'name',ieObjName);
+        
         % I think this should work (BW)
         if(~isempty(metadataMap))
             ieObject = oiSet(ieObject,'depth map',metadataMap);
