@@ -47,6 +47,6 @@ piWrite(thisR);
 scene = piRender(thisR);
 
 % Show it in ISET
-vcAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);     
+ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);     
 
 %%
