@@ -80,16 +80,11 @@ copyfile(imageFile,workingDir);
 thisR = piWorldFindAndReplace(thisR,'dummyTexture.exr',imageName);
 
 %% Write out a new pbrt file
-
-% We copy the pbrt scene directory to the working directory
-[p,n,e] = fileparts(fname); 
-copyfile(p,workingDir);
-
 % Now write out the edited pbrt scene file, based on thisR, to the working
 % directory.
 thisR.outputFile = fullfile(workingDir,[n,e]);
 
-piWrite(thisR, 'workingDir', workingDir);
+piWrite(thisR);
 
 %% Render with the Docker container
 
