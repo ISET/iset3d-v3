@@ -22,31 +22,38 @@ if ~piDockerExists, piDockerConfig; end
 
 % The slanted bar scene consists of a square plane (1x1 m) that is
 % split in half diagonally. The bottom left half is white while the top
-% right half is black. By default the plane is placed at [0 1 0] meters,
+% right half is black. By default the plane is placed at [0 0 1] meters,
 % but we can change that by given sceneEye an optional 'planeDistance'
 % input. 
-myScene = sceneEye('slantedBar','planeDistance',500); % Create a slanted bar at 0.5 meter
+myScene = sceneEye('slantedBar','planeDistance',0.5); % Create a slanted bar at 0.5 meter
 myScene.name = 'slantedBarFast';
 myScene.numRays = 64;
 myScene.resolution = 128; 
 
+myScene.accommodation = 2;
+myScene.pupilDiameter = 4;
+myScene.fov = 4;
+
 oi = myScene.render;
 
-ieAddObject(oi);
+vcAddObject(oi);
 oiWindow;
 
 %% Try moving the slanted bar in and out of focus
 
-planeDistance = [100 300 500 1000];
+planeDistance = [0.1 0.3 0.5 1]; % meters
 
 for ii = 1:length(planeDistance)
     
     myScene = sceneEye('slantedBar','planeDistance',planeDistance(ii));
-    myScene.name = sprintf('slantedBar_%0.2fmm',planeDistance(ii));
+    myScene.name = sprintf('slantedBar_%0.2fm',planeDistance(ii));
     myScene.numRays = 64;
     myScene.resolution = 128;
-    myScene.accommodation = 2; 
     
+    myScene.accommodation = 2; 
+    myScene.pupilDiameter = 4;
+    myScene.fov = 3;
+
     oi = myScene.render;
     
     ieAddObject(oi);
@@ -72,22 +79,25 @@ end
 % slight shift. In most cases this slight difference does not make a huge
 % difference, but for color fringing it does. In the future we need to fix
 % this discrepancy.
-planeDistance = [195 200 205] + 7.69;
+planeDistance = ([195 200 205] + 7.69)*10^-3; % meters
 
 for ii = 1:length(planeDistance)
     
     myScene = sceneEye('slantedBar','planeDistance',planeDistance(ii));
-    myScene.name = sprintf('slantedBar_LCA_%0.2fmm',planeDistance(ii));
+    myScene.name = sprintf('slantedBar_LCA_%0.2fmm',planeDistance(ii)*10^3);
     
     % Zoom in to see the color fringes
-    myScene.fov = 1;
+    myScene.fov = 0.5;
     
     myScene.accommodation = 5;
+    myScene.pupilDiameter = 4;
+    myScene.fov = 1;
+
     myScene.numCABands = 8;
     myScene.numRays = 64;
     myScene.resolution = 128;
     
-    oi = myScene.render;
+    [oi, results] = myScene.render;
     
     ieAddObject(oi);
     oiWindow;
@@ -100,7 +110,7 @@ end
 % First render the slanted bar. You might want to increase the numRays and
 % resolution for less noisy results. With numRays = 256 and resolution =
 % 128, this takes roughly 1 min to render on an 8 core machine.
-myScene = sceneEye('slantedBar','planeDistance',200+7.69);
+myScene = sceneEye('slantedBar','planeDistance',(200+7.69)*10^-3);
 myScene.name = 'slantedBarForMTF';
 myScene.accommodation = 5;
 myScene.fov = 1;
@@ -126,6 +136,7 @@ barOI = oiSet(barOI,'mean illuminance',1);
 barImage = oiGet(barOI,'illuminance');
 
 % Calculate MTF
+figure;
 deltaX_mm = oiGet(oi,'sample spacing')*10^3; % Get pixel pitch
 [results, fitme, esf, h] = ISO12233(barImage, deltaX_mm(1),[1/3 1/3 1/3],'none');
 
