@@ -9,7 +9,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Import the pbrt file
 
-fname = fullfile(piRootPath,'data','SimpleScene','SimpleScene.pbrt');
+fname = fullfile(piRootPath,'data','V3','SimpleScene','SimpleScene.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname,'version',3); % We must specify version 3 here!
 
@@ -61,7 +61,7 @@ imagesc(meshImage);colormap;
 %% Render the coordinates of the intersections
 
 coordMap = piRender(thisR,'renderType','coordinates');
-figure(5);
+figure(6);
 subplot(1,3,1); imagesc(coordMap(:,:,1)); axis image; colorbar; title('x-axis')
 subplot(1,3,2); imagesc(coordMap(:,:,2)); axis image; colorbar; title('y-axis')
 subplot(1,3,3); imagesc(coordMap(:,:,3)); axis image; colorbar; title('z-axis')
