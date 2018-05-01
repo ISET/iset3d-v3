@@ -1,4 +1,4 @@
-%% t_slantedBarMTF.m
+%% t_eyePupilDiameter.m
 %
 % Render the slanted bar at different pupil diameters.
 %
@@ -14,17 +14,16 @@ if ~piDockerExists, piDockerConfig; end
 % Since rendering these images often takes a while, we will save out the
 % optical images into a folder for later processing.
 saveDirName = sprintf('pupil_%s',datestr(now,'mm-dd-yy_HH_MM'));
-saveDir = fullfile(isetbioRootPath,'local','saveDirName');
+saveDir = fullfile(isetbioRootPath,'local',saveDirName);
 if(~exist(saveDir,'dir'))
     mkdir(saveDir);
 end
 
 %% Load scene
-planeDistance = 3; % 3 meter away
+planeDistance = 5; % 3 meter away
 myScene = sceneEye('slantedBar','planeDistance',planeDistance); 
 
 %% Set fixed parameters
-myScene.resolution = 512; 
 myScene.accommodation = 1/planeDistance; % Accomodate to plane
 myScene.fov = 4;
 
@@ -32,12 +31,16 @@ myScene.numCABands = 6;
 myScene.diffractionEnabled = true;
 
 %% Loop through pupil diameters
-pupilDiameters = [6 5 4 3 2];
-numRays = [1024 1024 1024 2048 4096]; % This needs to change with pupil diameter
+pupilDiameters = [6 5 4 3 2 1];
+
+% HQ version
+% numRays = [1024 1024 1024 2048 4096 4096]; 
+% myScene.resolution = 512; 
 
 % Fast test version
 numRays = [128 128 128 128 128];
 myScene.resolution = 128; 
+
 
 if(length(numRays) ~= length(pupilDiameters))
     error('numRays and pupilDiameters length need to match!')
