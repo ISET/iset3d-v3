@@ -110,6 +110,10 @@ switch param
         if(thisR.version == 2)
             thisR.camera.chromaticAberrationEnabled.value = val;
             thisR.camera.chromaticAberrationEnabled.type = 'bool';
+            
+            % Set chromatic aberration correctly
+            thisR.renderer.subtype = 'spectralrenderer';
+
         elseif(thisR.version == 3)
             warning('chromaticaberration parameter not applicable for version 3')
         end
