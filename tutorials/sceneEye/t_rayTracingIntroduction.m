@@ -3,8 +3,10 @@
 % This tutorial is an introduction to modeling the optics of the eye using
 % ray-tracing in ISETBIO. 
 % 
-% To begin, you must have the Github repo pbrt2ISET on your MATLAB path.
-% You can find it here: https://github.com/RenderToolbox/pbrt2ISET
+% To begin, you must have the Github repo iset3d on your MATLAB path:
+% https://github.com/ISET/iset3d 
+% as well as the Github repo isetbio on your path:
+% https://github.com/isetbio/isetbio
 % 
 % You must also have docker installed and running on your machine. You can
 % find general instructions on docker here: https://www.docker.com/
@@ -13,17 +15,17 @@
 % by tracing the light passing from the scene through the optics of the
 % human eye onto the retina. We use a modified version of PBRT (Physically
 % Based Ray Tracer) to do this calculation. Our version of PBRT, which we
-% call pbrt-v2-spectral, has the ability to render through the optics of
-% the human eye and to trace rays spectrally. Pbrt-v2-spectral has also
+% call pbrt-v3-spectral, has the ability to render through the optics of
+% the human eye and to trace rays spectrally. Pbrt-v3-spectral has also
 % been dockerized so you do not need to compile or install the source code
 % in order to render images. Instead, you must have docker installed and
 % running on your computer and the scenes should automatically render
 % through the docker container.
 % 
-% You can find the source code for pbrt-v2-spectral here:
-% https://github.com/scienstanford/pbrt-v2-spectral
+% You can find the source code for pbrt-v3-spectral here:
+% https://github.com/scienstanford/pbrt-v3-spectral
 %
-% Depends on: pbrt2ISET, ISETBIO, Docker
+% Depends on: iset3d, isetbio, Docker
 %
 % TL ISETBIO Team, 2017
     
@@ -33,15 +35,9 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast, low quality retinal image
-% We have several scenes that have been modified and verified to work with
-% ISETBIO and pbrt2ISET.
-% These scenes include:
-% 1. numbersAtDepth
-% 2. texturedPlane
-% 3. chessSet
-% 4. slantedBar
-% You can find a description and sample images of these scenes on the wiki
-% page (https://github.com/isetbio/isetbio/wiki/3D-Image-Formation). 
+% We have several scenes that have been tailored specifically for isetbio
+% and iset3d. You can find a description of these scenes (and more) on the
+% wiki page (https://github.com/isetbio/isetbio/wiki/3D-rendering).
 
 % You can select a scene as follows:
 myScene = sceneEye('numbersAtDepth');
@@ -66,11 +62,11 @@ myScene
 myScene.name = 'fastExample';
 
 % Let's change the number of rays to render with. 
-myScene.numRays = 64;
+myScene.numRays = 256;
 
 % Let's also change the resolution of the render. The retinal image is
 % always square, so there is only one parameter for resolution.
-myScene.resolution = 128;
+myScene.resolution = 256;
 
 % Now let's render. This may take a few seconds, depending on the number of
 % cores on your machine. On a machine with 2 cores it takes ~15 seconds. 
