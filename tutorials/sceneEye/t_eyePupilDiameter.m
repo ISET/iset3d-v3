@@ -1,8 +1,10 @@
 %% t_eyePupilDiameter.m
 %
-% Render the slanted bar at different pupil diameters.
+% Render the slanted bar scene at different pupil diameters. The rendered
+% images can be used to calculate the MTF of the eye at a specific pupil
+% size. 
 %
-% Depends on: pbrt2ISET, ISETBIO, Docker, ISET
+% Depends on: iset3d, isetbio, Docker
 %
 % TL ISETBIO Team, 2017
 
@@ -20,7 +22,7 @@ if(~exist(saveDir,'dir'))
 end
 
 %% Load scene
-planeDistance = 5; % 3 meter away
+planeDistance = 5; % 5 meters away
 myScene = sceneEye('slantedBar','planeDistance',planeDistance); 
 
 %% Set fixed parameters
@@ -40,7 +42,6 @@ pupilDiameters = [6 5 4 3 2 1];
 % Fast test version
 numRays = [128 128 128 128 128];
 myScene.resolution = 128; 
-
 
 if(length(numRays) ~= length(pupilDiameters))
     error('numRays and pupilDiameters length need to match!')

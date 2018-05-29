@@ -2,7 +2,7 @@
 %
 % Render the slanted bar at different pupil diameters.
 %
-% Depends on: pbrt2ISET, ISETBIO, Docker, ISET
+% Depends on: iset3d, isetbio, Docker, isetcloud
 %
 % TL ISETBIO Team, 2017
 
@@ -34,9 +34,8 @@ gcp = gCloud('dockerAccount',dockerAccount,...
     'clusterName',clusterName,...
     'cloudBucket',cloudBucket,'zone',zone,'instanceType',instanceType);
 toc
-% gcp.Configlist; Doesn't seem to work
 
-% Render depth?
+% Render depth
 gcp.renderDepth = true;
 
 % Clear the target operations
@@ -48,9 +47,9 @@ myScene = sceneEye('slantedBar','planeDistance',planeDistance);
 
 %% Set fixed parameters
 myScene.accommodation = 1/planeDistance; % Accomodate to plane
-myScene.fov = 4;
+myScene.fov = 2;
 
-myScene.numCABands = 6;
+myScene.numCABands = 8;
 myScene.diffractionEnabled = true;
 
 %% Loop through pupil diameters
@@ -69,10 +68,6 @@ if(length(numRays) ~= length(pupilDiameters))
     error('numRays and pupilDiameters length need to match!')
 end
 
- % Store all sceneEye objects in a map where the key is the sceneEye name.
- % Later, we will save them with the corresponding optical image.
-sceneMap = containers.Map('KeyType','char','ValueType','any');
-
 for ii = 1:length(pupilDiameters)
     
     currPupilDiam = pupilDiameters(ii);
@@ -83,24 +78,16 @@ for ii = 1:length(pupilDiameters)
     
     myScene.name = sprintf('pupilDiam_%0.2fmm',currPupilDiam);
     
-    % Instead of rendering, we add it to the list of gcloud targets
-    % Note: since sceneEye is a a special object (different from the usual
-    % recipe we use in iset3d) we use a helper function that will
-    % facilitate the adding of each sceneEye into the gCloud class
     if(ii == length(pupilDiameters))
         fprintf('Uploading zip... \n');
         uploadFlag = true;
     else
         uploadFlag = false;
     end
-    [cloudFolder,zipFileName] = add2gcloud(gcp,myScene,'uploadZip',uploadFlag);
-    sceneMap(myScene.name) = myScene.copy;
+    [cloudFolder,zipFileName] =  ...
+        sendToCloud(gcp,myScene,'uploadZip',uploadFlag);
     
 end
-
-%% Confirm the uploaded pbrt scene files and zip with resources
-
-% gcp.ls(cloudFolder) Doesn't seem to work
 
 %% Render
 gcp.render();
@@ -109,7 +96,7 @@ gcp.render();
 
 % Save the gCloud object in case MATLAB closes
 gCloudName = sprintf('%s_gcpBackup_%s',mfilename,currDate);
-save(fullfile(myScene.workingDir,gCloudName),'gcp','sceneMap','saveDir');
+save(fullfile(saveDir,gCloudName),'gcp','saveDir');
     
 % Pause for user input (wait until gCloud job is done)
 x = 'N';
@@ -119,10 +106,7 @@ end
 
 %% Download the data
 
-keySet = keys(sceneMap); 
-
-% Does this have to be the first recipe?
-oiAll = gcp.downloadPBRT(sceneMap(keySet{1}).recipe);
+[oiAll, seAll] = downloadFromCloud(gcp);
 
 for ii=1:length(oiAll)
     
@@ -130,19 +114,8 @@ for ii=1:length(oiAll)
     ieAddObject(oi);
     oiWindow;
     
-    % Save the oi and the corresponding myScene object into the save
-    % directory.
-    clear myScene
-    oiName = oiGet(oi,'name');
-    for jj = 1:length(keySet)
-        % We have to do this, unfortunately, since the oiName has a date
-        % tacked onto to it.
-        if(contains(oiName,keySet{jj}))
-            sceneName = keySet{jj};
-            break;
-        end
-    end
-    myScene = sceneMap(sceneName);
+    myScene = seAll{ii};
+    
     saveFilename = fullfile(saveDir,[myScene.name '.mat']);
     save(saveFilename,'oi','myScene');
     

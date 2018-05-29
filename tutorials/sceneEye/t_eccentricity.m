@@ -8,7 +8,7 @@
 %
 % "Developer" note: 
 % The way this is done in sceneEye.render is a bit of a hack, in that we
-% will instruct pbrt-v2-spectral to render a very large retinal image that
+% will instruct pbrt-v3-spectral to render a very large retinal image that
 % encompasses the desired eccentricity, but then also set a crop window
 % which will only render the section of the image we are interested in.
 % However, these values are all calculated automatically and for the most
