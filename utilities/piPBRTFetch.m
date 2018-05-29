@@ -88,6 +88,11 @@ zipFlag           = p.Results.unzip;
 deleteFlag        = p.Results.deletezip;
 remotedirectory   = sprintf('%s/v%d',p.Results.remotedirectory,p.Results.pbrtversion');
 
+%% Check for RDT
+if(~exist('RdtClient','file'))
+    error('Cannot find RdtClient. This scene requires RemoteDataToolbox to be installed. Is it on your path?')
+end
+
 %% Get the file from the RDT
 rdt = RdtClient('isetbio');
 rdt.crp(remotedirectory);
