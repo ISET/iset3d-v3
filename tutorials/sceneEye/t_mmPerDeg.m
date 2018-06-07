@@ -5,6 +5,7 @@
 
 %% Initialize ISETBIO
 ieInit;
+clear; close all;
 
 %% Load scene
 myScene = sceneEye('blankScene');
@@ -16,7 +17,7 @@ myScene = sceneEye('blankScene');
 originalWorld = myScene.recipe.world; 
 
 sphereDistance = 100; % meters
-sphereAngle = 0.5;
+sphereAngle = 0.2;
 sphereRadius = tand(sphereAngle/2)*sphereDistance;
 
 % Optical axis
@@ -35,7 +36,9 @@ myScene.recipe = piAddSphere(myScene.recipe,...
 
 %% Set parameters
 
-myScene.resolution = 256; 
+myScene.fov = 5;
+
+myScene.resolution = 128; 
 myScene.numRays = 128;
 myScene.accommodation = 1/sphereDistance;
 
