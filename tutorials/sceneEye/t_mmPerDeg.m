@@ -35,9 +35,7 @@ myScene.recipe = piAddSphere(myScene.recipe,...
     'location',[x 0 sphereDistance]);
 
 %% Set parameters
-
 myScene.fov = 5;
-
 myScene.resolution = 128; 
 myScene.numRays = 128;
 myScene.accommodation = 1/sphereDistance;
