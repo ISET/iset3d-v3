@@ -12,15 +12,17 @@
 ieInit;
 clear; close all;
 showOi = true;
-showFigs = false;
+showFigs = true;
 
 %% Parameters
-sphereDistanceMeters = 100; 
-sphereDiameterDegrees = 0.4;
-renderingFovDegrees = 40;
+sphereDistanceMeters = 100;
+%sphereSeparationsDegrees = [0.5 1 2 4 6 8 10 12 14 16 18];
+sphereSeparationsDegrees = [0.5];
+renderingFovDegrees = 1.2;
+sphereDiameterDegrees = renderingFovDegrees/20;
 
 %% Loop over separations in degrees
-sphereSeparationsDegrees = [0.5 1 2 4 6 8 10 12 14 16 18];
+
 for ss = 1:length(sphereSeparationsDegrees)
     %% Load scene, compute sphere specifics and add spheres
     sphereSeparationDegrees = sphereSeparationsDegrees(ss);
@@ -89,20 +91,36 @@ for ss = 1:length(sphereSeparationsDegrees)
     photonsRed = squeeze(photons(:,:,indexRed));
     photonsRG = photonsRed-photonsGreen;
     
-    % Read peak
-    [~,minIndexRed] = max(photonsRG(:));
+    % Find red peak location
+    gauassianSigmaPixels = 3;
+    gaussianSizePixels = 9;
+    convKernal = fspecial('gaussian',[gaussianSizePixels gaussianSizePixels],gauassianSigmaPixels);
+    smoothRG = conv2(photonsRG,convKernal,'same');
+    [~,minIndexRed] = max(smoothRG(:));
     [iRed,jRed] = ind2sub(size(photonsRG),minIndexRed);
-    photonsRed(iRed,jRed) = max(photonsRed(:));
-    if (showFigs)
-        figure; imshow(photonsRed/max(photonsRed(:)));
-    end
     
-    % Green peak location
-    [~,maxIndexGreen] = min(photonsRG(:));
+    % Find green peak location
+    [~,maxIndexGreen] = min(smoothRG(:));
     [iGreen,jGreen] = ind2sub(size(photonsRG),maxIndexGreen);
-    photonsGreen(iGreen,jGreen) = max(photonsGreen(:));
+    
+    % Figure to diagnose whether we found the right place in 
+    % the image.
     if (showFigs)
-        figure; imshow(photonsGreen/max(photonsGreen(:)));
+        figure; clf; hold on
+        plot(photonsGreen(iGreen,:),'g','LineWidth',2);
+        plot(photonsRed(iRed,:),'r','LineWidth',2);
+        plot(photonsRG(iGreen,:),'k','LineWidth',2);
+        plot(smoothRG(iGreen,:),'y:','LineWidth',2);
+        plot([jGreen jGreen],[0 max(photonsGreen(:))],'g','LineWidth',2);
+        plot([jRed jRed],[0 max(photonsGreen(:))],'r','LineWidth',2);
+        xlabel('Position (pixels)')
+        ylabel('Intensity');
+        title({sprintf('Separation %0.1f deg, fov %0.1f (deg)', ...
+            sphereSeparationDegrees,renderingFovDegrees) ; ...
+            sprintf('Red center %d pixels, green center %d pixels, image %d pixels', ...
+            jRed,jGreen,theScene.resolution) });
+        %figure; imshow(photonsRed/max(photonsRed(:)));
+        %figure; imshow(photonsGreen/max(photonsGreen(:)));
     end
     
     % Offset in pixels and then mm
