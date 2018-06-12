@@ -1,4 +1,4 @@
-function [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
+dfunction [fnameZIP, artifact] = piPBRTFetch(aName,varargin)
 % FETCH a PBRT file from the RDT archive to a local directory.
 %
 % Syntax
