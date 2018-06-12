@@ -47,7 +47,7 @@ thisR = piRead(fname);
 %% Default is a relatively low resolution (256).
 
 thisR.set('film resolution',768);
-thisR.set('rays per pixel',256);
+thisR.set('rays per pixel',1024);
 
 %% Set up Docker 
 
