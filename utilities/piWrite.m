@@ -52,7 +52,7 @@ p.addParameter('overwritelensfile',true,@islogical);
 p.addParameter('overwritematerials',true,@islogical);
 
 % Create a new materials.pbrt
-p.addParameter('creatematerials',true,@islogical);
+p.addParameter('creatematerials',false,@islogical);
 
 p.parse(renderRecipe,varargin{:});
 
