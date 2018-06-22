@@ -36,6 +36,12 @@ end
 
 lensName = recipe.get('lensfile');
 
+% If we are using the realistic eye, we skip this step since the
+% lens file is unique
+if(strcmp(recipe.camera.subtype,'realisticEye'))
+    return;
+end
+
 try
     % Guess focal length (effective) from lens name
     focalLength = str2double(extractBetween(lensName,'deg.','mm'));

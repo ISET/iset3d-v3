@@ -120,8 +120,26 @@ switch param
         if(thisR.version == 2)
             thisR.camera.chromaticAberrationEnabled.value = val;
             thisR.camera.chromaticAberrationEnabled.type = 'bool';
+            
+            % Set chromatic aberration correctly
+            thisR.renderer.subtype = 'spectralrenderer';
+
         elseif(thisR.version == 3)
-            warning('chromaticaberration parameter not applicable for version 3')
+            thisR.camera.chromaticAberrationEnabled.value = val;
+            thisR.camera.chromaticAberrationEnabled.type = 'bool';
+            
+            thisR.integrator.subtype = 'spectralpath';
+            if(ischar(val))
+                % User probably put in true or false, so let's just use a
+                % default of 8 bands.
+                warning('Using a default of 8 sampled bands for the chromatic aberration.');
+                thisR.integrator.numCABands.value = 8;
+                thisR.integrator.numCABands.type = 'integer';
+            else
+                thisR.integrator.numCABands.value = val;
+                thisR.integrator.numCABands.type = 'integer';
+            end
+            
         end
     case 'from'
         thisR.lookAt.from = val;

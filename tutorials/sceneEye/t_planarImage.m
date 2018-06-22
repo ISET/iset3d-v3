@@ -17,7 +17,7 @@
 % viewer.
 % 4. Render a new retinal image.
 %
-% Depends on: pbrt2ISET, ISETBIO, Docker, ISET
+% Depends on: iset3d, isetbio, Docker
 %
 % TL ISETBIO Team, 2017
 
@@ -36,6 +36,8 @@ size = [width width];
 % We're going to use the following texture on the plane
 imageTexture = fullfile(piRootPath,'data','imageTextures','squareResolutionChart.exr');
 
+% We load up the textured plane scene with the parameters we calculated
+% above:
 myScene = sceneEye('texturedPlane',...
                    'planeDistance',distance,...
                    'planeSize',size,...

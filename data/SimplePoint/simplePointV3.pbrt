@@ -60,7 +60,7 @@ AttributeEnd
 
 LightSource "infinite" 
   "integer nsamples" [8] 
-  "spectrum L" "D65.spd" 
+  "spectrum L" "EqualEnergy.spd" 
 
 WorldEnd
 
