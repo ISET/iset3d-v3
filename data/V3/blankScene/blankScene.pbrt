@@ -1,0 +1,31 @@
+Transform [1.0 0.0 0 0  -0.0 1.0 0.0 0  0 -0.0 1.0 0  0.0 0.0 0.0 1]
+
+Camera "perspective"
+ "float fov" [30] 
+
+Sampler "lowdiscrepancy" 
+  "integer pixelsamples" [128] 
+
+# filter
+PixelFilter "gaussian" 
+  "float alpha" [2] 
+  "float xwidth" [2] 
+  "float ywidth" [2] 
+
+Film "image"
+ "integer xresolution" [128]
+  "integer yresolution" [128]
+
+Integrator "path"
+ "integer maxdepth" [1] 
+
+WorldBegin
+
+# Default Material
+Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	
+LightSource "infinite" 
+  "integer nsamples" [8] 
+  "spectrum L" "D65.spd" 
+
+WorldEnd

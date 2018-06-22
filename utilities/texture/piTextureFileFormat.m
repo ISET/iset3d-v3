@@ -24,7 +24,7 @@ if ~isempty(jpgFiles)
     for ii=1:nfiles
         currentfilename = jpgFiles(ii).name;
         currentimage    = imread(currentfilename);
-        currentname = erase(jpgFiles(ii).name,".jpg");
+        currentname = erase(jpgFiles(ii).name,'.jpg');
         output = sprintf('%s.png',currentname);
         imwrite(currentimage,output);
         % After writing the pngs, we erase the jpg file.

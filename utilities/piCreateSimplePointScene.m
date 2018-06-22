@@ -21,7 +21,7 @@ parser.addParameter('pointDiameter',0.01, @isnumeric);
 parser.addParameter('pointRGB', [], @isvector);
 parser.addParameter('pointSpectrum', '', @isstring);
 parser.addParameter('pointDistance',1, @isnumeric);
-parser.addParameter('illumination', 'D65.spd', @ischar);
+parser.addParameter('illumination', 'EqualEnergy.spd', @ischar);
 parser.addParameter('pbrtVersion', 3, @isnumeric);
 
 parser.parse(varargin{:});
@@ -80,7 +80,7 @@ piObjectTransform(recipe,'Plane','Translate',[0 0 pointDistance+0.5*unitScale]);
 
 %% Make adjustments to the light
 
-recipe = piWorldFindAndReplace(recipe,'D65.spd',illumination);
+recipe = piWorldFindAndReplace(recipe,'EqualEnergy.spd',illumination);
 
 
 end

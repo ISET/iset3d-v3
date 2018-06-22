@@ -51,6 +51,9 @@ p.addParameter('overwritelensfile',true,@islogical);
 % Overwrite materials.pbrt
 p.addParameter('overwritematerials',true,@islogical);
 
+% Create a new materials.pbrt
+p.addParameter('creatematerials',false,@islogical);
+
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
@@ -58,6 +61,7 @@ overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
+creatematerials  = p.Results.creatematerials;
 
 %% Copy the input directory to the Docker working directory
 
@@ -289,20 +293,37 @@ end
 
 
 %% Write out WorldBegin/WorldEnd
+if creatematerials
+    for ii = 1:length(renderRecipe.world)
+        currLine = renderRecipe.world{ii};
+        if contains(currLine, 'materials.pbrt')
+            [~,n] = fileparts(renderRecipe.outputFile);
+            currLine = sprintf('Include "%s_materials.pbrt"',n);
+        end
+        fprintf(fileID,'%s \n',currLine);
+    end
 
-for ii = 1:length(renderRecipe.world)
+else
+    for ii = 1:length(renderRecipe.world)
     currLine = renderRecipe.world{ii};
     fprintf(fileID,'%s \n',currLine);
+    end
 end
-
 %% Close file
 
 fclose(fileID);
 
 %% Overwrite Materials.pbrt
 if contains(renderRecipe.exporter, 'C4D')
+    if ~creatematerials
     if overwritematerials
         [~,n] = fileparts(renderRecipe.inputFile);
+        fname_materials = sprintf('%s_materials.pbrt',n);
+        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+        piMaterialWrite(renderRecipe);
+    end
+    else
+        [~,n] = fileparts(renderRecipe.outputFile);
         fname_materials = sprintf('%s_materials.pbrt',n);
         renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
         piMaterialWrite(renderRecipe);

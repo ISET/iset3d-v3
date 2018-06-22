@@ -1,9 +1,9 @@
 %% t_eyeMovement3D.m
 %
-% This tutorial shows how to move the eye throughout the scene. We will use
-% the chess set scene for this tutorial. 
+% This tutorial shows how to translate and rotate the eye throughout the
+% scene. We will use the chess set scene for this tutorial.
 %
-% Depends on: pbrt2ISET, ISETBIO, Docker
+% Depends on: iset3d, isetbio, Docker, RemoteDataToolbox
 %
 % TL ISETBIO Team, 2017
 
@@ -44,7 +44,7 @@ for ii = 1:length(xShift)
     oiWindow;
 end
 
-% Loop through images in a gif
+% Loop through images like a video
 % TODO: Best way to do this?
 
 
@@ -71,42 +71,8 @@ for ii = 1:length(xShift)
     oiWindow;
 end
 
-% Loop through images in a gif
+% Loop through images like a video
 % TODO: Best way to do this?
 
-%% Create binocular retinal images
-
-ipd = 64; % Average interpupillary distance
-
-myScene = sceneEye('chessSet');
-myScene.resolution = 128; 
-myScene.numRays = 128;
-
-leftEyePos = myScene.eyePos - [ipd/2 0 0];
-rightEyePos = myScene.eyePos + [ipd/2 0 0];
-
-% Set accommodation to the right distance
-dist = sqrt(sum(myScene.eyePos.^2 + leftEyePos.^2)); % in mm
-myScene.accommodation = 1/(dist*10^-3);
-
-% Plot the arrangement (top down)
-figure(1); grid on; hold on;
-xlabel('x (mm)');
-ylabel('y (mm)');
-plot(leftEyePos(1),leftEyePos(2),'ro');
-plot(rightEyePos(1),rightEyePos(2),'ro');
-plot(myScene.eyeTo(1),myScene.eyeTo(2),'bx');
-
-myScene.eyePos = leftEyePos;
-myScene.name = 'leftEye';
-oi = myScene.render;
-vcAddAndSelectObject(oi);
-oiWindow;
-    
-myScene.eyePos = rightEyePos;
-myScene.name = 'rightEye';
-oi = myScene.render;
-vcAddAndSelectObject(oi);
-oiWindow;
 
     
