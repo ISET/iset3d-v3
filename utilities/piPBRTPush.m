@@ -17,7 +17,7 @@ function rd = piPBRTPush(fnameZIP,varargin)
 %   
 % Optional inputs
 %   artifactName - The base name of the artifact that can be found by
-%   a search 
+%                  a search 
 %   pbrtVersion  - V2 or V3. Data are put inside the appropriate folder
 %   rd           - If you have an open RdtClient you can pass it here
 %                  so you are not asked for a password again.

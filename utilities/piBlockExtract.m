@@ -3,44 +3,45 @@ function [s, blockLines] = piBlockExtract(txtLines,varargin)
 
 % Syntax
 %   s = piBlockExtract(txtLines,varargin)
+%
+% Description
+%  Used extensively by piRead to parse important blocks within a PBRT
+%  scene file.
 % 
 % Input
 %   txtLines - Cell array of text lines, usually from piRead
 % 
 % Optional parameters
-%   'blockName' - A string defining the block.  Case insensitivie????
-%   'exporterFlag' - if true, we use piBlockExtractC4D instead since the syntax given by the exportr is different.  
+%   'blockName'    - A string defining the block.
+%   'exporterFlag' - if true, we use piBlockExtractC4D instead since
+%                    the syntax given by the exportr is different.   
 %
 % Return
-%   s -  a struct containing the critical information from the block
-%   of text.
-%   blockLines - the extracted text lines directly (without parsing)
-%
-% Examples in source
+%   s          - a struct containing information from the block of text
+%   blockLines - extracted text lines directly (without parsing)
 %
 % TL Scienstanford 2017
+%
+% See also
+%   piRead, piWrite, piBlockExtractC4D
 
-% Examples
-%{
-   txtLines = piRead('/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt');
-   cameraStruct = piExtractBlock(txtLines,'blockName','camera')
-%}
-
+% We should say more about the legitimate block names. (BW).
 
 %%  Identify the blockname.  
 
 p = inputParser;
 p.addRequired('txtLines',@(x)(iscell(txtLines) && ~isempty(txtLines)));
+
+% We need a valid list of potential block names here.
 addParameter(p,'blockName','Camera',@ischar);
 addParameter(p,'exporterFlag',false,@islogical);
 p.parse(txtLines,varargin{:});
 
-blockName = p.Results.blockName;
+blockName    = p.Results.blockName;
 exporterFlag = p.Results.exporterFlag;
 
 % Initialize
 s = [];
-blockLines = [];
 
 %% If the exporter flag is true, use piBlockExtractC4D instead of this function.
 if(exporterFlag)

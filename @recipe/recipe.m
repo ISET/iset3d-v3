@@ -1,6 +1,8 @@
 classdef recipe < matlab.mixin.Copyable
-% Contains essential information for rendering the PBRT file
+% The recipe class contains essential information to render PBRT files
 %
+% Syntax
+%   thisR = recipe;
 %
 % TL Scien Stanford, 2017
 

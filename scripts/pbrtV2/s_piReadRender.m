@@ -1,24 +1,17 @@
-% s_piReadRender
+%% s_piReadRender
 %
-% Read a PBRT scene file, interpret it, render it (with depth map).  On a fast
-% machine, this takes about 5 sec.
+% Read a PBRT scene file, interpret it, render it (with depth map).
+% On a reasonable machine, this takes about 10 sec.
 %
-% Path requirements
+% Dependencies (see wiki pages for iset3d)
 %    ISETCAM or ISETBIO
-%    iset3d  - 
-%    Consider RemoteDataToolbox for other uses.
+%    iset3d
+%    Docker must be set up
 %
-
-% Examples:
-%{
-fname = fullfile(piRootPath,'data','bunny','bunny.pbrt');
-
-% This has a lot of includes and dependencies.
-% Also, in general, the includes need to be copied to the 'local' directory
-% where the pbrt scene file and lens file are placed.
-fname = fullfile(piRootPath,'data','teapot-metal','teapot-metal.pbrt');
-%}
 % TL/BW SCIEN
+%
+% See also
+%   piRead, piWrite, piRender
 
 %% Set up ISET and Docker
 ieInit;
@@ -44,7 +37,7 @@ thisR = piRead(fname);
 thisR.set('outputFile',fullfile(piRootPath,'local','teapot',[n,e]));
 piWrite(thisR);
 
-%% Render with the Docker container
+%% Render locally with the pbrt Docker container
 
 scene = piRender(thisR);
 
