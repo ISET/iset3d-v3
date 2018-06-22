@@ -1,22 +1,37 @@
 function thisR = piRead(fname,varargin)
-% piRecipe - Read a PBRT scene file and return rendering information as a struct. 
+% Read an parse a PBRT scene file, returning a rendering recipe
 %
-%    recipe = piRecipe(fname, ...)
+% Syntax
+%    thisR = piRead(fname, varargin)
 %
-% piRead parses a scene pbrt file and returns critical rendering information in
-% the various slots of the "recipe". The recipe object contains all the
-% essential information on how to render the given scene. We can modify the
-% recipe programmatically to generate multiple renderings.
+% Description
+%  PIREAD parses a pbrt scene file and returns critical rendering
+%  information in the various slots of the "recipe" object. The recipe
+%  object contains the information used by PBRT to render the scene.
 %
-% piWrite uses the recipe to write out a PBRT file; piRender executes the PBRT
-% docker image to produce the rendered output (in an ISET scene or oi format).
+%  We extract blocks with these names from the text prior to WorldBegin
+%
+%    Camera, Sampler, Film, PixelFilter, SurfaceIntegrator (V2, or
+%    Integrator in V3), Renderer, LookAt, Transform, ConcatTransform,
+%    Scale
+%
+%  We modify the recipe programmatically to generate multiple
+%  renderings.
+%  
+%  The related routine, piWrite, uses the recipe to write out a PBRT
+%  file locally; piRender executes the PBRT docker image to produce the
+%  rendered output (in an ISET scene or oi format).  Alternatively,
+%  the gCloud object can be used to upload and render the files on the
+%  Google Cloud Platform (see isetcloud).
 %
 % Required inputs
 %   fname - a pbrt scene file name
 %
 % Optional parameter/values
-%   'version' - Which version of PBRT.  Only ver 2 is implemented now. Ver 3 is
-%               being worked on.
+%   'version' - Which version of PBRT, 2 or 3.
+%   'read materials' - When PBRT scene file is exported by cinema4d,
+%        the exporterflag is set and we read the materials file.  If
+%        you do not want to read that file, set this to false.
 %
 % Return
 %   recipe - A recipe object with the parameters needed to write a new pbrt
@@ -24,29 +39,38 @@ function thisR = piRead(fname,varargin)
 %
 % Caution:  The reading algorithm assumes that
 %
-%     * There is a block of text before WorldBegin and nothing after 
+%     * There is a block of text before WorldBegin and no more text after 
 %     * Comments (indicated by '#' in the first character) and blank lines are
 %     ignored.
-%     * Block names we recognize are listed below.  When a block name is
-%     detected, the lines that follow beginning with a '"' are included in the
-%     block.
+%     * When a block is encountered, the text lines that follow
+%     beginning with a '"' are included in the block.
 %    
-% This function will not work in PBRT files, that do not meet these criteria.
+%  piRead will not work with PBRT files that do not meet these
+%  criteria.
 %
-% Text beyond the WorldBegin/WorldEnd block is stored in recipe.world. 
-%
-% Blocks we can read are
-%   
-%   Camera, SurfaceIntegrator, Sampler, PixelFilter, and Film, and Renderer
-%
-% Example
-%   pbrtFile = '/home/wandell/pbrt-v2-spectral/pbrt-scenes/sanmiguel.pbrt';
-%   recipe = piRecipe(pbrtFile);
+%  Text starting at WorldBegin to the end of the file (not just
+%  WorldEnd) is stored in recipe.world.
 %
 % TL Scienstanford 2017
+%
+% See also
+%   piWrite, piRender, piBlockExtract
+
+% Examples:
+%{
+ fname=fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
+ thisR = piRead(fname,'version',2);
+%}
+%{
+ fname=fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
+ thisR = piRead(fname,'version',3);
+%}
 
 %%
 p = inputParser;
+
+varargin =ieParamFormat(varargin);
+
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('version',2,@(x)isnumeric(x));
 p.addParameter('readmaterials', true,@islogical);
@@ -92,13 +116,13 @@ if(worldBeginIndex == 0)
     worldBeginIndex = ii;
 end
 
-% Store the text in WorldBegin
+% Store the text from WorldBegin to the end here
 thisR.world = txtLines(worldBeginIndex:end);
 
-% Here are the text lines from before WorldBegin
+% Store the text lines from before WorldBegin here
 txtLines = txtLines(1:(worldBeginIndex-1));
 
-%% Check if header indicates exporter
+%% Check if header indicates this is an exported Cinema 4D file
 
 % Unfortunately we have to re-read the text file in order to check the
 % header. 
@@ -186,7 +210,7 @@ if(ver == 2)
         thisR.renderer = rendererStruct;
     end
 else
-    warning('"Renderer" does not exist in the new PBRTv3 format. We will leave the field blank in the recipe.')
+    warning('"Renderer" does not exist in the new PBRTv3 format. We leave the field blank .')
 end
 
 %% Read LookAt, Transforms, and ConcatTransform, if they exist
@@ -261,6 +285,9 @@ if(flip)
     thisR.scale = [-1 1 1];
 end
 %% Read Material.pbrt file if pbrt file is exported by C4D.
+
+% Is the read materials flag necessary?  Can't we just check if this
+% is an exporterFlag case and see if there is a file?
 if exporterFlag    
     if readmaterials
        % Check if a materials.pbrt exist
@@ -276,4 +303,5 @@ if exporterFlag
        piTextureFileFormat(thisR);
     end
 end
+
 end

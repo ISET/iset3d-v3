@@ -1,13 +1,23 @@
 function thisR = recipeSet(thisR, param, val, varargin)
-% Set a recipe value
+% Set a recipe class value
 %
-% The recipe has lots of fields, including camera, filter, and so forth. Many
-% comments needed here.
+% Syntax
+%   thisR = recipeSet(thisR, param, val, varargin)
 %
-% Examples
-%   thisR.set('lensFile','dgauss.22deg.3.0mm.dat')
+% Description:
+%   The recipe class manages the PBRT rendering parameters.  The class
+%   has many fields specifying camera and rendering parameters. This
+%   method is only capable of setting one parameter at a time.
 %
 % BW ISETBIO Team, 2017
+%
+% See also
+%    recipeGet
+
+% Examples
+%{
+  thisR.set('lensFile','dgauss.22deg.3.0mm.dat')
+%}
 
 %% Set up
 if isequal(param,'help')
