@@ -97,7 +97,7 @@ outFile = renderRecipe.outputFile;
 if(exist(outFile,'file'))
     if overwritepbrtfile
         % This is the pbrt scene file.
-        fprintf('Overwriting PBRT file %s.\n',outFile)
+        fprintf('Overwriting PBRT file %s\n',outFile)
         delete(outFile);
     else
         % Do not overwrite is set, and yet it exists. We don't like this
