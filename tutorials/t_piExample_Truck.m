@@ -45,10 +45,10 @@ rgbkr  = [0.7 0.7 0.7];            % Specularish in the different channels
 piMaterialAssign(thisR,material.name,target,'rgbkd',rgbkd,'rgbkr',rgbkr);
 piMaterialList(thisR);
 %% Read a geometry file exported by C4d and extract objects information
-obj = piGeometryRead(thisR);
+Car_1 = piGeometryRead(thisR);
 
 %% Write out
-piGeometryWrite(thisR, obj);
+piGeometryWrite(thisR, Car_1);
 %%
 [p,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local','car_1',[n,e]));
