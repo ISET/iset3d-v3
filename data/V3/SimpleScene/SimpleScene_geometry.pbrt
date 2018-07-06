@@ -588,7 +588,7 @@ AttributeBegin
 		AttributeEnd
 	AttributeEnd
 	AttributeBegin
-		# Plane.001
+		# Plane
 		ConcatTransform [731.393127441 -0.0 0.0 0  0.0 4.4784912622e-14 731.393127441 0  -0.0 -731.393127441 4.4784912622e-14 0  -112.655197443 -210.861602644 322.117503813 1]
 		AttributeBegin
 			NamedMaterial "Material"
@@ -596,7 +596,7 @@ AttributeBegin
 		AttributeEnd
 	AttributeEnd
 	AttributeBegin
-		# Plane
+		# Glass
 		ConcatTransform [0.235242972905 -99.99970163 -0.0765541668445 0  99.9934161441 0.234368252379 1.12329842736 0  -1.12311557142 -0.0791916012017 99.9936614996 0  -392.143913436 -4.82046086362 238.681792899 1]
 		AttributeBegin
 			NamedMaterial "GLASS"
@@ -604,7 +604,7 @@ AttributeBegin
 		AttributeEnd
 	AttributeEnd
 	AttributeBegin
-		# Plane.002
+		# mirro
 		ConcatTransform [-99.9928804526 -0.63026512982 -1.01322488308 0  -0.859286449797 -20.8834188646 97.7913389273 0  -0.82794064245 97.7930756697 20.876514684 0  -67.053257554 220.963102421 -38.9753913637 1]
 		AttributeBegin
 			NamedMaterial "mirror"

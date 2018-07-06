@@ -70,7 +70,7 @@ piWrite(thisR);
 
 %% Render
 tic, oi_uber = piRender(thisR); toc
-
+oi_uber = oiSet(oi_uber,'name','Uber');
 ieAddObject(oi_uber); oiWindow;
 
 %% Assign Retroreflective Materials.
@@ -93,101 +93,102 @@ piMaterialList(thisR);
 thisR.set('outputFile',fullfile(piRootPath,'local','StopExport',[n,e]));
 
 % material.pbrt is supposed to overwrite itself.
-piWrite(thisR);
+piWrite(thisR,'creatematerials',true);
 
 %% Render
 %tic, oi = piRender(thisR); toc
 tic, oi_retro = piRender(thisR); toc
+oi_retro = oiSet(oi_retro,'name','Retro');
 ieAddObject(oi_retro); oiWindow;
-
-%% oi_uber
-oi = oi_uber;
-scale = 4.5495e15; % this scale creates roughly 10 lux of mean illuminance in the optical image.
-photons = scale.*oiGet(oi,'photons');
-oi = oiSet(oi,'photons',photons);
-
-% ieAddObject(oi); oiWindow;
-
-%% Sensor
-% To create the sensor structure, we call
-sensor = sensorCreate();
-
-sensorPixelSize = oiGet(oi,'sample spacing','m');
-oiHeight = oiGet(oi,'height');
-oiWidth = oiGet(oi,'width');
-sensorSize = round([oiHeight oiWidth]./sensorPixelSize);
-sensor = sensorSet(sensor,'size',sensorSize);
-sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
-
-% We are now ready to compute the sensor image
-sensor = sensorSet(sensor,'auto Exposure',false); % Disable auto exposure.
-sensor = sensorSet(sensor,'exp time',2.3454e-04);
-sensor = sensorCompute(sensor,oi);
-
-% ieAddObject(sensor); sensorWindow;
-
-exposureTime = sensorGet(sensor,'exp time');
-fprintf('Exposure time was: %f \n',exposureTime);
-
-%% Image Processor
-ip = ipCreate;
-ip = ipSet(ip,'name','Unbalanced');
-%ip = ipSet(ip,'scaledisplay',0);
-ip = ipCompute(ip,sensor);
-% As in the other cases, we can bring up a window to view the
-% processed data, this time a full RGB image.
-ieAddObject(ip); ipWindow
-
-result_uber = ip.data.result;
-
-% imshow(result.^(1/2.2));
-% title('Material: Uber')
-
-%% oi_retro
-oi = oi_retro;
-scale = 4.5495e15; % this scale creates roughly 10 lux of mean illuminance in the optical image.
-photons = scale.*oiGet(oi,'photons');
-oi = oiSet(oi,'photons',photons);
-
-% ieAddObject(oi); oiWindow;
-
-%% Sensor
-% To create the sensor structure, we call
-sensor = sensorCreate();
-
-sensorPixelSize = oiGet(oi,'sample spacing','m');
-oiHeight = oiGet(oi,'height');
-oiWidth = oiGet(oi,'width');
-sensorSize = round([oiHeight oiWidth]./sensorPixelSize);
-sensor = sensorSet(sensor,'size',sensorSize);
-sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
-
-% We are now ready to compute the sensor image
-sensor = sensorSet(sensor,'auto Exposure',false); % Disable auto exposure.
-sensor = sensorSet(sensor,'exp time',2.3454e-04);
-sensor = sensorCompute(sensor,oi);
-
-% ieAddObject(sensor); sensorWindow;
-
-exposureTime = sensorGet(sensor,'exp time');
-fprintf('Exposure time was: %f \n',exposureTime);
-
-%% Image Processor
-ip = ipCreate;
-ip = ipSet(ip,'name','Unbalanced');
-%ip = ipSet(ip,'scaledisplay',0);
-ip = ipCompute(ip,sensor);
-% As in the other cases, we can bring up a window to view the
-% processed data, this time a full RGB image.
-% ieAddObject(ip); ipWindow
-
-result_retro = ip.data.result;
-
 %%
-vcNewGraphWin;
-imshowpair(result_uber.^(1/2.2),result_retro.^(1/2.2),'montage');
+% %% oi_uber
+% oi = oi_uber;
+% scale = 4.5495e15; % this scale creates roughly 10 lux of mean illuminance in the optical image.
+% photons = scale.*oiGet(oi,'photons');
+% oi = oiSet(oi,'photons',photons);
 
-title('Uber vs Retroreflective','FontSize', 24)
+% ieAddObject(oi); oiWindow;
+
+% %% Sensor
+% % To create the sensor structure, we call
+% sensor = sensorCreate();
+% 
+% sensorPixelSize = oiGet(oi,'sample spacing','m');
+% oiHeight = oiGet(oi,'height');
+% oiWidth = oiGet(oi,'width');
+% sensorSize = round([oiHeight oiWidth]./sensorPixelSize);
+% sensor = sensorSet(sensor,'size',sensorSize);
+% sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
+% 
+% % We are now ready to compute the sensor image
+% % sensor = sensorSet(sensor,'auto Exposure',ture); % Disable auto exposure.
+% % sensor = sensorSet(sensor,'exp time',2.3454e-04);
+% sensor = sensorCompute(sensor,oi);
+% 
+% % ieAddObject(sensor); sensorWindow;
+% 
+% exposureTime = sensorGet(sensor,'exp time');
+% fprintf('Exposure time was: %f \n',exposureTime);
+% 
+% %% Image Processor
+% ip = ipCreate;
+% ip = ipSet(ip,'name','Unbalanced');
+% %ip = ipSet(ip,'scaledisplay',0);
+% ip = ipCompute(ip,sensor);
+% % As in the other cases, we can bring up a window to view the
+% % processed data, this time a full RGB image.
+% ieAddObject(ip); ipWindow
+% 
+% result_uber = ip.data.result;
+% 
+% % imshow(result.^(1/2.2));
+% % title('Material: Uber')
+% 
+% %% oi_retro
+% oi = oi_retro;
+% scale = 4.5495e15; % this scale creates roughly 10 lux of mean illuminance in the optical image.
+% photons = scale.*oiGet(oi,'photons');
+% oi = oiSet(oi,'photons',photons);
+% 
+% % ieAddObject(oi); oiWindow;
+% 
+% %% Sensor
+% % To create the sensor structure, we call
+% sensor = sensorCreate();
+% 
+% sensorPixelSize = oiGet(oi,'sample spacing','m');
+% oiHeight = oiGet(oi,'height');
+% oiWidth = oiGet(oi,'width');
+% sensorSize = round([oiHeight oiWidth]./sensorPixelSize);
+% sensor = sensorSet(sensor,'size',sensorSize);
+% sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
+% 
+% % We are now ready to compute the sensor image
+% sensor = sensorSet(sensor,'auto Exposure',true); % Disable auto exposure.
+% %sensor = sensorSet(sensor,'exp time',2.3454e-04);
+% sensor = sensorCompute(sensor,oi);
+% 
+% % ieAddObject(sensor); sensorWindow;
+% 
+% exposureTime = sensorGet(sensor,'exp time');
+% fprintf('Exposure time was: %f \n',exposureTime);
+% 
+% %% Image Processor
+% ip = ipCreate;
+% ip = ipSet(ip,'name','Unbalanced');
+% %ip = ipSet(ip,'scaledisplay',0);
+% ip = ipCompute(ip,sensor);
+% % As in the other cases, we can bring up a window to view the
+% % processed data, this time a full RGB image.
+% % ieAddObject(ip); ipWindow
+% 
+% result_retro = ip.data.result;
+% 
+% %%
+% vcNewGraphWin;
+% imshowpair(result_uber.^(1/2.2),result_retro.^(1/2.2),'montage');
+% 
+% title('Uber vs Retroreflective','FontSize', 18)
 
 
 

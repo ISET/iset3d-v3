@@ -14,8 +14,10 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt_material files
-FilePath = fullfile(piRootPath,'local','SimpleSceneExport');
-fname = fullfile(FilePath,'new_SimpleScene.pbrt');
+% FilePath = fullfile(piRootPath,'data','ChessSet');
+FilePath = '/Users/zhenyiliu/git_repo/Rendering_Resources/PBRT_models/Vehicles/car/car_1';
+% FilePath = '/Users/zhenyiliu/git_repo/pbrt-v3-scenes/vw-van';
+fname = fullfile(FilePath,'Car_1.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
 % Warnings may appear about filter and Renderer
@@ -27,51 +29,69 @@ thisR = piRead(fname,'version',3);
 % [800 600] 32 - takes around 30 seconds to render on a machine with 8 cores.
 % [300 150] 16 -
 
-thisR.set('filmresolution',[800 600]);
-thisR.set('pixelsamples',16);
+thisR.set('filmresolution',[640 480]);
+thisR.set('pixelsamples',32);
 
 thisR.integrator.maxdepth.value = 5;  %Multiple bounces of a ray allowed
 
 %% Assign Materials and Color
 
-% it's helpful to check what current material properties are.
+%it's helpful to check what current material properties are.
 piMaterialList(thisR);
-
-material = thisR.materials.list.BODY;   % A type of material.
+material = thisR.materials.list.SubaruXV_carpaint00SG;   % A type of material.
 target = thisR.materials.lib.carpaintmix;      % Give it a chrome spd
-rgbkd  = [1 0 0];                        % Make it green diffuse reflection
-rgbkr  = [0.753 0.753 0.753];            % Specularish in the different channels
-
-piMaterialAssign(thisR,material,target,'rgbkd',rgbkd,'rgbkr',rgbkr);
-% it's helpful to check what current material properties are.
+rgbkd  = [1 0 0];                        % Make it red diffuse reflection
+rgbkr  = [0.7 0.7 0.7];            % Specularish in the different channels
+piMaterialAssign(thisR,material.name,target,'rgbkd',rgbkd,'rgbkr',rgbkr);
 piMaterialList(thisR);
+%% Read a geometry file exported by C4d and extract objects information
+obj = piGeometryRead(thisR);
 
-%% Write thisR to *_material.pbrt
-
-% Write out the pbrt scene file, based on thisR.  By def, to the working directory.
+%% Write out
+piGeometryWrite(thisR, obj);
+%%
 [p,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','SimpleSceneExport',[n,e]));
-
-% material.pbrt is supposed to overwrite itself.
+thisR.set('outputFile',fullfile(piRootPath,'local','car_1',[n,e]));
 piWrite(thisR);
-
+ 
 %% Render
 tic, scene = piRender(thisR); toc
-vcNewGraphWin; 
-imagesc(scene);colormap(jet);title('Mesh')
-% ieAddObject(scene); sceneWindow;
 
-%% Label the pixels by mesh of origin and material
+ieAddObject(scene); sceneWindow;
+
+%% Label the pixels by mesh of origin
 
 meshImage = piRender(thisR,'renderType','mesh'); % This just returns a 2D image
-vcNewGraphWin; 
-imagesc(meshImage);colormap(jet);title('Mesh')
+vcNewGraphWin;imshow(meshImage)
+image(meshImage);colormap(jet);title('Mesh')
 
-materialImage = piRender(thisR,'renderType','material'); % This just returns a 2D image
-vcNewGraphWin; 
-imagesc(materialImage); colormap(jet); title('Material')
+% materialImage = piRender(thisR,'renderType','material'); % This just returns a 2D image
+% vcNewGraphWin; 
+% imagesc(materialImage); colormap(jet); title('Material')
 
+ %% Create a label map
+ labelMap(1).name = 'car';
+ labelMap(1).id = 7;
+ labelMap(1).color = [0 0 1];
+ labelMap(2).name='person';
+ labelMap(2).id = 8;
+ labelMap(2).color = [0 1 0];
+ labelMap(3).name='truck';
+ labelMap(3).id = 9;
+ labelMap(3).color = [1 0 0];
+ labelMap(4).name='bus';
+ labelMap(4).id = 1;
+ labelMap(4).color = [1 0 1];
+ 
+ 
+%% Draw a bounding box
+%  meshfile = '/Users/zhenyiliu/git_repo/iset3d/local/truck/renderings/Prius_mesh.dat';
 
+ %  [classMap, instanceMap] = mergeMetadata(meshfile,labelMap);
+ %  detections = getBndBox(classMap,instanceMap,labelMap,sceneMetadata(i));
+ obj = piBBoxExtract(thisR, obj, scene, meshImage, labelMap);
+ %%
+ 
 %% Change the camera lens
 %{ 
 % TODO: We need to put the following into piCameraCreate, but how do we

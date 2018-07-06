@@ -15,7 +15,7 @@ thisR = piRead(fname,'version',3); % We must specify version 3 here!
 
 %% Write out recipe
 
-thisR.set('film resolution',[192 108]);
+thisR.set('film resolution',[400 300]);
 
 [p,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
