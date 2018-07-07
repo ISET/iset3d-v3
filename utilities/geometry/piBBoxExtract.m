@@ -1,6 +1,7 @@
 function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
  % Read primitive ID from _mesh.txt
-
+ % Add class information here: convert meshImage(instanceSeg) to A
+ % classSeg.
  labelMap;
  instanceIDs = unique(meshImage);% Find index of labeled object
  instanceIDs = instanceIDs(instanceIDs > 0);
@@ -36,6 +37,7 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
      objects(detections(dd).index).bndbox.ymin = detections(dd).bndbox.ymin;
      objects(detections(dd).index).bndbox.ymax = detections(dd).bndbox.ymax;
      objects(detections(dd).index).label       = detections(dd).label;
+     dd = dd+1;
  end
  
  figure;
@@ -56,13 +58,13 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
  fid_tmp = fopen(fullfile(workdir,'renderings',sprintf('%s_mesh_mesh.txt',name)));
  instanceIDlist = textscan(fid_tmp,'%s','Delimiter','\n');
  instanceIDlist = instanceIDlist{1};
- fclose(fid_tmp);
+ fclose(fid_tmp);dd = 1;
  for ii = 1:length(instanceIDlist)
      tmp = strfind(instanceIDlist{ii},' ');
      id{ii}.index = str2double(instanceIDlist{ii}(1:tmp-1));
      id{ii}.name = instanceIDlist{ii}(tmp+1:end); 
      % Search the corresponding name with the id found in meshImage
-     dd = 1;
+     
      for jj = 1:length(instanceIDs)    
      if instanceIDs(jj) == id{ii}.index
          instance{dd} = id{ii};
