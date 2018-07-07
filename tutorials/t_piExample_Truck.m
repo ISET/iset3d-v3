@@ -15,7 +15,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt_material files
 % FilePath = fullfile(piRootPath,'data','ChessSet');
-FilePath = '/Users/zhenyiliu/git_repo/Rendering_Resources/PBRT_models/Vehicles/car/car_1';
+FilePath = '/Volumes/group/wandell/data/NN_Camera_Generalization/pbrt_assets/car/car_1';
 % FilePath = '/Users/zhenyiliu/git_repo/pbrt-v3-scenes/vw-van';
 fname = fullfile(FilePath,'Car_1.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
@@ -38,17 +38,15 @@ thisR.integrator.maxdepth.value = 5;  %Multiple bounces of a ray allowed
 
 %it's helpful to check what current material properties are.
 piMaterialList(thisR);
-material = thisR.materials.list.SubaruXV_carpaint00SG;   % A type of material.
-target = thisR.materials.lib.carpaintmix;      % Give it a chrome spd
-rgbkd  = [1 0 0];                        % Make it red diffuse reflection
-rgbkr  = [0.7 0.7 0.7];            % Specularish in the different channels
-piMaterialAssign(thisR,material.name,target,'rgbkd',rgbkd,'rgbkr',rgbkr);
-piMaterialList(thisR);
+% assign all the materials according to its name
+piMaterialGroupAssign(thisR);
+
+
 %% Read a geometry file exported by C4d and extract objects information
-Car_1 = piGeometryRead(thisR);
+scene_1 = piGeometryRead(thisR);
 
 %% Write out
-piGeometryWrite(thisR, Car_1);
+piGeometryWrite(thisR, scene_1);
 %%
 [p,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local','car_1',[n,e]));
@@ -58,6 +56,33 @@ piWrite(thisR);
 tic, scene = piRender(thisR); toc
 
 ieAddObject(scene); sceneWindow;
+
+
+%% Add a traffic sign
+
+trafficsign= piAssetsCreate('/Volumes/group/wandell/data/NN_Camera_Generalization/pbrt_assets/traffic_signs/schoolzone/schoolzone.pbrt');
+piAssetsAdd(thisR, scene, trafficsign, car)
+
+for ii= 1:length(fieldnames(thisR_sign.materials.list))
+    index = length(fieldnames(thisR.materials.list));
+    thisR.materials.list(index+ii)= thisR_sign.materials.list.(ii);
+end
+scene_1(3)=trafficsign;
+scene_1(3).position = [0 1.84 -5];
+scene_1(2).rotate = [45 0 1 0];
+thisR.lookAt.from = [0 0 -20];
+%% Write out
+piGeometryWrite(thisR, scene_1);
+%%
+[p,n,e] = fileparts(fname); 
+thisR.set('outputFile',fullfile(piRootPath,'local','car_1',[n,e]));
+piWrite(thisR);
+
+%%
+tic, scene = piRender(thisR); toc
+
+ieAddObject(scene); sceneWindow;
+
 
 %% Label the pixels by mesh of origin
 
@@ -89,7 +114,7 @@ image(meshImage);colormap(jet);title('Mesh')
 
  %  [classMap, instanceMap] = mergeMetadata(meshfile,labelMap);
  %  detections = getBndBox(classMap,instanceMap,labelMap,sceneMetadata(i));
- obj = piBBoxExtract(thisR, obj, scene, meshImage, labelMap);
+ obj = piBBoxExtract(thisR, scene_1, scene, meshImage, labelMap);
  %%
  
 %% Change the camera lens
