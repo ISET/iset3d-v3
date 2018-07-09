@@ -92,6 +92,13 @@ if ~convertedflag
 %                     groupobj(hh).translate = transform(13:15);
                     groupobj(hh).rotate    = [0 0 0 0];
                     groupobj(hh).position = transform(13:15);
+                    % Add type of the object, get it from the file name,
+                    % could be wrong, but this is how we named the object
+                    
+                    
+                    
+                    
+                    
                 end
             end
             % find child objects
