@@ -72,5 +72,5 @@ for ii = 1:length(mlist)
         piMaterialAssign(thisR,material.name,target);
     end
 end
-fprintf('%d materials assigned',ii);
+fprintf('%d materials assigned \n',ii);
 end

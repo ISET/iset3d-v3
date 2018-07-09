@@ -15,7 +15,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt_material files
 % FilePath = fullfile(piRootPath,'data','ChessSet');
-FilePath = '/Volumes/group/wandell/data/NN_Camera_Generalization/pbrt_assets/car/car_1';
+FilePath = '/Volumes/group/wandell/data/NN_Camera_Generalization/pbrt_assets/car/car_2';
 % FilePath = '/Users/zhenyiliu/git_repo/pbrt-v3-scenes/vw-van';
 fname = fullfile(FilePath,'Car_1.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
@@ -40,6 +40,8 @@ thisR.integrator.maxdepth.value = 5;  %Multiple bounces of a ray allowed
 piMaterialList(thisR);
 % assign all the materials according to its name
 piMaterialGroupAssign(thisR);
+% Check again.
+piMaterialList(thisR);
 
 
 %% Read a geometry file exported by C4d and extract objects information
@@ -48,10 +50,11 @@ scene_1 = piGeometryRead(thisR);
 %% Write out
 piGeometryWrite(thisR, scene_1);
 %%
-[p,n,e] = fileparts(fname); 
+[~,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local','car_1',[n,e]));
 piWrite(thisR);
- 
+
+
 %% Render
 tic, scene = piRender(thisR); toc
 
