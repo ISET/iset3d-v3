@@ -17,7 +17,7 @@ if ~piDockerExists, piDockerConfig; end
 % FilePath = fullfile(piRootPath,'data','ChessSet');
 FilePath = '/Volumes/group/wandell/data/NN_Camera_Generalization/pbrt_assets/car/car_2';
 % FilePath = '/Users/zhenyiliu/git_repo/pbrt-v3-scenes/vw-van';
-fname = fullfile(FilePath,'Car_1.pbrt');
+fname = fullfile(FilePath,'Car_2.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
 % Warnings may appear about filter and Renderer
@@ -33,7 +33,8 @@ thisR.set('filmresolution',[640 480]);
 thisR.set('pixelsamples',32);
 
 thisR.integrator.maxdepth.value = 5;  %Multiple bounces of a ray allowed
-
+% Add skymap
+piAddSkymap(thisR,'day')
 %% Assign Materials and Color
 
 %it's helpful to check what current material properties are.
@@ -49,11 +50,11 @@ scene_1 = piGeometryRead(thisR);
 
 %% Write out
 piGeometryWrite(thisR, scene_1);
+
 %%
 [~,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','car_1',[n,e]));
+thisR.set('outputFile',fullfile(piRootPath,'local','car_2',[n,e]));
 piWrite(thisR);
-
 
 %% Render
 tic, scene = piRender(thisR); toc

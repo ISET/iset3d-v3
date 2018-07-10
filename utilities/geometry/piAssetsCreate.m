@@ -36,7 +36,7 @@ if isempty(st), st = scitran('stanfordlabs'); end
 hierarchy = st.projectHierarchy('Computer Graphics','project id','5b3eac08d294db0016bb1a2b');
 % projects = st.search('project','project label exact','Computer Graphics')
 assets = [];
-cnt = 1;
+% cnt = 1;
 
 %% Cars
 % Create Assets obj struct
@@ -48,8 +48,8 @@ for ii=1:inputs.nCars
     currentClass = 'car';
     nClass = length(assets.(currentClass));
     
-    objects(cnt).class = currentClass;
-    objects(cnt).id = randi(nClass);
+    assets(ii).class = currentClass;
+    
     % Download a random car obj from flywheel car session
     
     % list the acquisition labels in the first session
@@ -59,16 +59,16 @@ for ii=1:inputs.nCars
         'session label exact','spaceship',...
         'acquisition label contains','Car',...
         'file name contains','obj');
-    fname     = fullfile(stRootPath,'local','myCar.obj');
-    localFile = st.fileDownload(file{1},'destination',fname);
+
     
     % Example of how to randomly select acquisitions from a specific
     % session
     whichSession = 1;
     nAcqs = length(hierarchy.acquisitions{whichSession});
     nSamples = 2;
-    r = randi(nAcqs,[nSamples,1]);   % Column veftor of random integers
-    
+    assets(ii).id = randi(nAcqs);    
+    fname     = fullfile(piRootPath,'local','myCar.obj');
+    localFile = st.fileDownload(file{1},'destination',fname);
     % Choose one aquisition or mutiple? zip 
     % desDir folder or file?
     % unzip it
@@ -77,7 +77,6 @@ for ii=1:inputs.nCars
     geometry = piGeometryRead(thisR);
     assets(ii).material =thisR.materials.list;
     assets(ii).geometry = geometry;
-    cnt = cnt+1;
 end
 
 

@@ -7,7 +7,30 @@ function piMaterialWrite(thisR)
 %
 % ZL, SCIEN STANFORD, 2018
 
-%% We should confirm that thisR is a recipe
+%% 
+p = inputParser;
+p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
+
+%% 
+workingDir = fileparts(thisR.outputFile);
+% copy spds to working directroy
+spds_path = fullfile(piRootPath,'data','spds');
+desdir = fullfile(workingDir,'spds');
+if ~exist(desdir,'dir'), mkdir(desdir);end
+status = copyfile(spds_path,desdir);
+if(~status), error('Failed to copy spds directory to docker working directory.');end
+% copy skymaps to working directroy
+skymaps_path = fullfile(piRootPath,'data','skymaps');
+desdir=fullfile(workingDir,'skymaps');
+if ~exist(desdir,'dir'), mkdir(desdir);end
+status = copyfile(skymaps_path,desdir);
+if(~status), error('Failed to copy skymaps directory to docker working directory.');end
+% copy brdfs to working directroy
+brdfs_path = fullfile(piRootPath,'data','brdfs');
+desdir = fullfile(workingDir,'brdfs');
+if ~exist(desdir,'dir'), mkdir(desdir);end
+status = copyfile(brdfs_path,desdir);
+if(~status), error('Failed to copy brdfs directory to docker working directory.');end
 
 %% Parse the output file, working directory, stuff like that.
 
@@ -71,9 +94,17 @@ else
 end
 fclose(fileID);
 
-[~,n,e] = fileparts(output);
+[f,n,e] = fileparts(output);
 fprintf('Material file %s written successfully.\n', [n,e]);
+%% Copy necessary rendering resources to output folder
+workdir = fullfile(f,n);
+% from data/spds to local/workdir
 
+% from data/brdfs to local/brdfs
+
+% skymaps
+
+% lens
 end
 
 %% function that converts the struct to text

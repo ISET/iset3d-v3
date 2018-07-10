@@ -89,6 +89,7 @@ if overwriteresources
     end
 end
 
+
 %% Potentially overwrite the scene PBRT file
 
 outFile = renderRecipe.outputFile;
