@@ -28,7 +28,7 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         rgbkr = [1 0 0];
-        piMaterialAssign(thisR,material.name,target);
+        piMaterialAssign(thisR,material.name,target,'rgbkr',rgbkr);
     elseif contains(mlist(ii),'chrome')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
@@ -38,6 +38,11 @@ for ii = 1:length(mlist)
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.uber;
+        piMaterialAssign(thisR,material.name,target);
+    elseif contains(mlist(ii),'rim')
+        name = cell2mat(mlist(ii));
+        material = thisR.materials.list.(name);
+        target = thisR.materials.lib.chrome_spd;
         piMaterialAssign(thisR,material.name,target);
     elseif contains(mlist(ii),'tire')
         name = cell2mat(mlist(ii));

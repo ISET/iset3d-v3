@@ -41,16 +41,6 @@ for ii = 1: length(obj)
 
         for kk = 1:length(obj(ii))
             fprintf(fid_obj,'AttributeBegin \n');
-            %if isfield(obj(ii),'concattransform')
-                % 
-%                 if ~isempty(obj(ii).concattransform)
-%                     fprintf(fid_obj,'ConcatTransform [%f %f %f %f  %f %f %f %f  %f %f %f %f  %f %f %f %f]\n', obj(ii).concattransform.x,...
-%                         obj(ii).concattransform.y,obj(ii).concattransform.z,obj(ii).concattransform.t);
-%                 end
-                % Default rotate needs to be [0 0 0 0] when we exported 3d
-                % mesh to pbrt, we only read concattransform
-                % translate is converted from concattransform. 
-            %end
             if isempty(obj(ii).position)
                 fprintf(fid_obj,'Translate 0 0 0 \n');
             else
@@ -58,11 +48,38 @@ for ii = 1: length(obj)
             end
             if ~isempty(obj(ii).rotate)
                 fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
-            end
-            
+            end 
             fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
             fprintf(fid_obj,'AttributeEnd \n \n');
         end
+    end
+    % create a spot light point from current position along x axis
+    % will come back later and modify the parameters here, meters and
+    % coneangle/ conedeltaangle
+    % front light point to front, give 10 meters here, might change later
+    if contains(obj(ii).name,'_lightfront')
+        from = obj(ii).position;
+        to = obj(ii).position + [20 0 0];
+        obj(ii).position = [0 0 0];
+        fprintf(fid_obj,'AttributeBegin \n');
+        fprintf(fid_obj,'Translate %f %f %f \n',obj(ii).position);
+        if ~isequal(obj(ii).rotate,[0 0 0 0])
+        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
+        end
+        fprintf(fid_obj,'LightSource "spot" "color I" [1.0 1.0 1.0] "rgb scale" [100.0 100.0 100.0] "point from" [%f %f %f] "point to" [%f %f %f] "float coneangle" [30] "float conedeltaangle" [5] \n',from,to);
+        fprintf(fid_obj,'AttributeEnd \n \n');
+    end
+    if contains(obj(ii).name,'_lightback')
+        from = obj(ii).position;
+        to = obj(ii).position + [-5 0 0];
+        obj(ii).position = [0 0 0];
+        fprintf(fid_obj,'AttributeBegin \n');
+        fprintf(fid_obj,'Translate %f %f %f \n',obj(ii).position);
+        if ~isequal(obj(ii).rotate,[0 0 0 0])
+        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
+        end
+        fprintf(fid_obj,'LightSource "spot" "color I" [1.0 1.0 1.0] "rgb scale" [100.0 100.0 100.0] "point from" [%f %f %f] "point to" [%f %f %f] "float coneangle" [30] "float conedeltaangle" [5] \n',from,to);
+        fprintf(fid_obj,'AttributeEnd \n \n');
     end
 end
 fclose(fid_obj);
