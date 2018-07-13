@@ -24,7 +24,7 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
          if isequal(objects(jj).name, instance{ii}.name)
              [~,name] = fileparts(thisR.outputFile);
              tmp = strfind(name,'_');label = name(1:tmp-1);
-             detections(dd).label = label;
+%            detections(dd).label = label;
              detections(dd).index = jj;
          end
      end
@@ -71,6 +71,6 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
          dd = dd+1;
      end
      end
-     fprintf('%d object instances found \n',dd);
+     fprintf('%d object instances found \n',dd-1);
  end
  end

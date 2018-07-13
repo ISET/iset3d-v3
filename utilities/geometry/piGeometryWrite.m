@@ -9,7 +9,7 @@ function  piGeometryWrite(thisR,obj)
 %
 % Zhenyi, 2018
 %%
-[Filepath,scene_fname] = fileparts(thisR.inputFile);
+[Filepath,scene_fname] = fileparts(thisR.outputFile);
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));[~,n,e]=fileparts(fname);
 
 %% Make parent obj files which includes all the child obj files
@@ -46,7 +46,7 @@ for ii = 1: length(obj)
             else
                 fprintf(fid_obj,'Translate %f %f %f \n',obj(ii).position);
             end
-            if ~isempty(obj(ii).rotate)
+            if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0 0 0 0])
                 fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
             end 
             fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);

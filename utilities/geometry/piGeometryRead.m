@@ -78,6 +78,9 @@ if ~convertedflag
                 groupobj(hh).size.l = size_num(1);
                 groupobj(hh).size.h = size_num(2);
                 groupobj(hh).size.w = size_num(3);
+                groupobj(hh).size.pmin = [-size_num(1)/2 -size_num(3)/2];
+                groupobj(hh).size.pmax = [size_num(1)/2 size_num(3)/2];
+                
                 %         %
                 %         Groupobj(hh).center = mean(Groupobj(hh).box);
                 groupobj(hh).name = sprintf('%s',Groupobj_name);
@@ -93,13 +96,10 @@ if ~convertedflag
                     groupobj(hh).rotate    = [0 0 0 0];
                     groupobj(hh).position = transform(13:15);
                     % Add type of the object, get it from the file name,
-                    % could be wrong, but this is how we named the object
-                    
-                    
-                    
-                    
-                    
+                    % could be wrong, but this is how we named the object 
                 end
+                groupobj(hh).rotate    = [0 0 0 0];
+                groupobj(hh).position = [0 0 0];
             end
             % find child objects
             
@@ -133,8 +133,8 @@ if ~convertedflag
                 end
                 % save obj to a pbrt file
                 output_name = sprintf('%s.pbrt', obj(jj).name);
-                output_folder = sprintf(fullfile(Filepath, 'scene','PBRT','pbrt-geometry'));
-                output = fullfile(output_folder,output_name);
+                output_folder = sprintf(fullfile(Filepath,'scene','PBRT','pbrt-geometry'));
+                output = fullfile('scene','PBRT','pbrt-geometry',output_name);
                 obj(jj).output = output;
                 %             if contains(txtLines(ii-3),'ConcatTransform')
                 %                 obj(jj).concattransform = txtLines{ii-3};
