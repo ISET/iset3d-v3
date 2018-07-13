@@ -72,7 +72,7 @@ end
 %% Write to scene_material.pbrt texture-material file
 
 fileID = fopen(output,'w');
-
+fprintf(fileID,'# Exported by piMaterialWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 for row=1:length(textureLines)
     fprintf(fileID,'%s\n',textureLines{row});
 end

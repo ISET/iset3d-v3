@@ -284,24 +284,32 @@ end
 if(flip)
     thisR.scale = [-1 1 1];
 end
+%% Material file header check
+[p,n,~] = fileparts(fname);
+fname_materials = sprintf('%s_materials.pbrt',n);
+inputFile_materials=fullfile(p,fname_materials);
+fileID = fopen(inputFile_materials);
+tmp = textscan(fileID,'%s','Delimiter','\n');
+headerCheck = tmp{1};
+fclose(fileID);
 %% Read Material.pbrt file if pbrt file is exported by C4D.
-
 % Is the read materials flag necessary?  Can't we just check if this
 % is an exporterFlag case and see if there is a file?
-if exporterFlag    
+if exporterFlag
     if readmaterials
-       % Check if a materials.pbrt exist
-       [p,n,~] = fileparts(fname);
-       fname_materials = sprintf('%s_materials.pbrt',n);
-       inputFile_materials=fullfile(p,fname_materials);
-       if ~exist(inputFile_materials,'file'), error('File not found'); end
-       [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
-       thisR.materials.inputFile_materials = inputFile_materials;
-       % Call material lib
-       thisR.materials.lib = piMateriallib;
-       % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
-       piTextureFileFormat(thisR);
+        % Check if a materials.pbrt exist
+        if ~exist(inputFile_materials,'file'), error('File not found'); end
+        [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
+        thisR.materials.inputFile_materials = inputFile_materials;
+        % Call material lib
+        thisR.materials.lib = piMateriallib;
+        % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
+        piTextureFileFormat(thisR);
     end
+elseif contains(headerCheck{1}, 'Exported by piMaterialWrite')
+    [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
+    thisR.materials.inputFile_materials = inputFile_materials;
+    % Call material lib
+    thisR.materials.lib = piMateriallib;
 end
-
 end

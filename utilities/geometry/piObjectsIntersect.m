@@ -1,5 +1,13 @@
 function [ intersect ] = piObjectsIntersect( refObj, objs)
 
+refbox = refObj.
+
+
+
+
+
+
+
 refBox = refObj.bndbox + repmat(refObj.position(:),[1, 2])*1000;
 
 intersect = false;
