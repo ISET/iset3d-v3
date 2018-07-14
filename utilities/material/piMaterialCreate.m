@@ -1,4 +1,4 @@
-function m = materialCreate
+function m = piMaterialCreate
 % Template for the material structure.
 % We have noticed these as possible additions
 %    spectrum Kd
@@ -30,6 +30,8 @@ m.floatvroughness = [];
 m.floatroughness =[];
 m.spectrumkd = '';
 m.spectrumks ='';
+m.spectrumk = '';
+m.spectrumeta ='';
 m.stringnamedmaterial1 = '';
 m.stringnamedmaterial2 = '';
 

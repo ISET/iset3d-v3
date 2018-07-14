@@ -1,4 +1,4 @@
-function piObjectRotate(object,degree)
+function object=piObjectRotate(object,degree)
 % only rotate around y axis is allowed 
 
 

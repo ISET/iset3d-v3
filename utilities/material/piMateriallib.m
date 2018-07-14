@@ -21,7 +21,7 @@ function [materiallib] = piMateriallib
 materiallib.carpaintmix.paint_mirror.string = 'mirror';
 materiallib.carpaintmix.paint_mirror.rgbkr = [.1 .1 .1];
 materiallib.carpaintmix.paint_base.string='substrate';
-materiallib.carpaintmix.paint_base.colorkd = [.7 .125 .125];
+materiallib.carpaintmix.paint_base.colorkd = piColorPick('random');
 materiallib.carpaintmix.paint_base.colorks =[.1 .1 .1];
 materiallib.carpaintmix.paint_base.floaturoughness=0.01;
 materiallib.carpaintmix.paint_base.floatvroughness=0.01;
@@ -45,8 +45,8 @@ materiallib.carpaint.string='substrate';
 %
 materiallib.chrome_spd.floatroughness=0.01;
 materiallib.chrome_spd.string='metal';
-materiallib.chrome_spd.spectrumkd='spds/metals/Al.k.spd';
-materiallib.chrome_spd.spectrumks='spds/metals/Al.eta.spd';
+materiallib.chrome_spd.spectrumk='spds/metals/Ag.k.spd';
+materiallib.chrome_spd.spectrumeta='spds/metals/Ag.eta.spd';
 
 %% blackrubber
 %

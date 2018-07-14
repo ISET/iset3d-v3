@@ -1,4 +1,4 @@
-function piAddSkymap(thisR,input)
+function thisR = piAddSkymap(thisR,input)
 % Choose a skybox, or random skybox, write this line to thisR.world.
 % 
 % Inputs 
@@ -27,21 +27,25 @@ switch input
     case 'sunset'
     skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset.exr"');
     case'random'
-    skylights = dir(skymaps);
-    index = randi(length(skylights));
-    if ~contains(skylights(index), '.exr')
+        curDir = pwd;
+        cd(skymaps)
+        skylights = dir('*.exr');
         index = randi(length(skylights));
-    else
         skyname = skylights(index).name;
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/%s.exr"',skyname);
-    end
+        cd(curDir);
 end
 
 
 world(1,:) = thisR.world(1);
-world(2,:) = cellstr(skylights);
-for ii=3:(length(thisR.world)+1)
-    world(ii,:)=thisR.world(ii-1);
+world(2,:) = cellstr(sprintf('AttributeBegin'));
+world(3,:) = cellstr(sprintf('Rotate -90 0 1 0'));
+world(4,:) = cellstr(skylights);
+world(5,:) = cellstr(sprintf('AttributeEnd'));
+jj=2;
+for ii=1:(length(thisR.world)-1)
+    world(ii+5,:)=thisR.world(jj);
+    jj=jj+1;
 end
 thisR.world = world;
 end
