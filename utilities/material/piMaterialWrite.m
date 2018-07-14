@@ -78,7 +78,7 @@ for row=1:length(textureLines)
 end
 
 % Add the materials
-if contains(materialTxt{length(materialTxt)},'"paint_base"')
+if contains(materialTxt{length(materialTxt)},'paint_base')
     fprintf(fileID,'%s\n',materialTxt{length(materialTxt)});
     fprintf(fileID,'%s\n',materialTxt{length(materialTxt)-1});
     nmaterialTxt = length(materialTxt)-2;
@@ -185,6 +185,16 @@ end
 
 if ~isempty(materials.spectrumks)
     val_spectrumks = sprintf(' "spectrum Ks" "%s" ',materials.spectrumks);
+    val = strcat(val, val_spectrumks);
+end
+
+if ~isempty(materials.spectrumks)
+    val_spectrumks = sprintf(' "spectrum k" "%s" ',materials.spectrumk);
+    val = strcat(val, val_spectrumks);
+end
+
+if ~isempty(materials.spectrumks)
+    val_spectrumks = sprintf(' "spectrum eta" "%s" ',materials.spectrumeta);
     val = strcat(val, val_spectrumks);
 end
 

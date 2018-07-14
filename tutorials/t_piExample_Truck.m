@@ -22,7 +22,7 @@ thisR.set('pixelsamples',32);
 thisR.integrator.maxdepth.value = 5;
 
 %% Add skymap
-piAddSkymap(thisR,'day')
+thisR = piAddSkymap(thisR,'random');
 
 %% Assign Materials and Color
 % Check materials read from the file
@@ -36,32 +36,36 @@ scene_1 = piGeometryRead(thisR);
 
 %% Create two cars from flywheel
 assets = piAssetsCreate(thisR,'ncars',2);
-
+%% Move objects
+heading = 3;% along x a
+side = 3;
+% translate
+assets(1).geometry = piObjectTranslate(assets(1).geometry,heading,side);
+rotation = -30;
+assets(1).geometry = piObjectRotate(assets(1).geometry,rotation);
 heading = -3;% along x a
 side = -3;
 % translate
-assets(1).geometry = piObjectTranslate(assets(1).geometry,heading,side);
-heading = 5;% along x a
-side = 5;
-% translate
 assets(2).geometry = piObjectTranslate(assets(2).geometry,heading,side);
+rotation = 45;
+assets(2).geometry = piObjectRotate(assets(2).geometry,rotation);
 
 %% Assemble the objects with the scene here
-scene_2 = piAssetsAdd(thisR,scene_1,assets);
+[thisR_scene,scene_2] = piAssetsAdd(thisR,scene_1,assets);
 
 %% Write out scene and materials
 [~,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','scene',[n,e]));
-piWrite(thisR); % 
+thisR_scene.set('outputFile',fullfile(piRootPath,'local','scene',[n,e]));
+piWrite(thisR_scene); % 
 %% Write out geometry -- 
-piGeometryWrite(thisR, scene_2); 
+piGeometryWrite(thisR_scene, scene_2); 
 %% Render irradiance
-tic, irradianceImg = piRender(thisR); toc
+tic, irradianceImg = piRender(thisR_scene); toc
 ieAddObject(irradianceImg); sceneWindow;
 
 %% Label the pixels by mesh of origin
-meshImage = piRender(thisR,'renderType','mesh'); 
-vcNewGraphWin;image(meshImage);colormap(jet);title('Mesh')
+meshImage = piRender(thisR_scene,'renderType','mesh'); 
+vcNewGraphWin;imagesc(meshImage);colormap(jet);title('Mesh')
 
  %% Create a label map
  labelMap(1).name = 'car';
@@ -79,7 +83,7 @@ vcNewGraphWin;image(meshImage);colormap(jet);title('Mesh')
  
 %% Get bounding box
 
- obj = piBBoxExtract(thisR, scene_1, irradianceImg, meshImage, labelMap);
+ obj = piBBoxExtract(thisR_scene, scene_2, irradianceImg, meshImage, labelMap);
  %%
  
 %% Change the camera lens

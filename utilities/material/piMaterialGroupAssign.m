@@ -42,7 +42,7 @@ for ii = 1:length(mlist)
     elseif contains(mlist(ii),'rim')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
-        target = thisR.materials.lib.chrome_spd;
+        target = thisR.materials.lib.uber;
         piMaterialAssign(thisR,material.name,target);
     elseif contains(mlist(ii),'tire')
         name = cell2mat(mlist(ii));

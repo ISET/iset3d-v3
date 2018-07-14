@@ -1,4 +1,4 @@
-function assets = piAssetsCreate(thisR, varargin)
+function assets = piAssetsCreate(thisR_tmp, varargin)
 % Create and combine assets using base information from a recipe
 %
 % Inputs
@@ -28,7 +28,7 @@ p.addParameter('nBuses',0);
 p.addParameter('nCyclist',0);
 p.addParameter('scitran','',@(x)(isa(x,'scitran')));
 
-p.parse(thisR,varargin{:});
+p.parse(thisR_tmp,varargin{:});
 inputs = p.Results;
 st = p.Results.scitran;
 if isempty(st), st = scitran('stanfordlabs'); end
@@ -76,10 +76,10 @@ if inputs.nCars <= nAcqs
         unzip(localFile,localFolder);
         fname = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
         if ~exist(fname,'file'), error('File not found'); end
-        thisR = piRead(fname,'version',3);
-        geometry = piGeometryRead(thisR);
+        thisR_tmp = piRead(fname,'version',3);
+        geometry = piGeometryRead(thisR_tmp);
         assets(jj).class = 'car';
-        assets(jj).material =thisR.materials.list;
+        assets(jj).material =thisR_tmp.materials.list;
         assets(jj).geometry = geometry;
         assets(jj).geometryPath = fullfile(piRootPath,'local',sprintf('Car_%d',jj),...
             'scene','PBRT','pbrt-geometry');

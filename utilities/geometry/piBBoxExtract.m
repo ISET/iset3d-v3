@@ -22,9 +22,9 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
      yIndices = find(ySpread > 0);
      for jj = 1:length(objects)
          if isequal(objects(jj).name, instance{ii}.name)
-             [~,name] = fileparts(thisR.outputFile);
-             tmp = strfind(name,'_');label = name(1:tmp-1);
-%            detections(dd).label = label;
+%              [~,name] = fileparts(thisR.outputFile);
+%              tmp = strfind(name,'_');label = name(1:tmp-1);
+%              detections(dd).label = label;
              detections(dd).index = jj;
          end
      end
@@ -36,7 +36,7 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
      objects(detections(dd).index).bndbox.xmax = detections(dd).bndbox.xmax;
      objects(detections(dd).index).bndbox.ymin = detections(dd).bndbox.ymin;
      objects(detections(dd).index).bndbox.ymax = detections(dd).bndbox.ymax;
-     objects(detections(dd).index).label       = detections(dd).label;
+%      objects(detections(dd).index).label       = detections(dd).label;
      dd = dd+1;
  end
  
@@ -73,4 +73,7 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
      end
      fprintf('%d object instances found \n',dd-1);
  end
+ end
+ function SegmentationMap = instanceSeg(instanceIDs)
+ 
  end
