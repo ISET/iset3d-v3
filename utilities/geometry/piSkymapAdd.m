@@ -1,4 +1,4 @@
-function thisR = piAddSkymap(thisR,input)
+function thisR = piSkymapAdd(thisR,input)
 % Choose a skybox, or random skybox, write this line to thisR.world.
 % 
 % Inputs 
