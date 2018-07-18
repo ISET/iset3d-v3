@@ -17,29 +17,6 @@ placeobject  = p.Results.placeobject;
 for ii = 1:length(objects)
     if material
         nObj  = fieldnames(objects(ii).material);
-        nScene= fieldnames(thisR.materials.list);
-        A = count(nScene,'paint_base');
-        cnt = 0;
-        for dd = 1: length(A)
-            if A(dd)~= 0
-                cnt = cnt+1;
-            end
-        end
-        if cnt~=0 && isfield(objects(ii).material,'paint_base')
-            slotname = sprintf('paint_base%d',cnt);
-            objects(ii).material.(slotname) = objects(ii).material.paint_base;
-            objects(ii).material.(slotname).name = slotname;
-            objects(ii).material = rmfield(objects(ii).material,'paint_base');
-            index = contains(nObj,'carbody');
-            for tt = 1:length(index)
-                if index(tt)==1
-                    slotname_carbody = nObj{tt};
-                    objects(ii).material.(slotname_carbody).stringnamedmaterial2 = slotname;
-                    nObj  = fieldnames(objects(ii).material);
-                end
-            end
-            
-        end
         % add objects.material to thisR.materials.list
         for nn = 1:length(nObj)
             thisR.materials.list.(nObj{nn}) = objects(ii).material.(nObj{nn});

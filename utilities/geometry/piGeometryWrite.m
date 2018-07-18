@@ -65,19 +65,18 @@ for ii = 1: length(obj)
         if ~isequal(obj(ii).rotate,[0 0 0 0])
         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
         end
-        fprintf(fid_obj,'LightSource "point" "color I" [1.0 1.0 1.0] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',from);
+        fprintf(fid_obj,'LightSource "point" "color I" [3 3 3] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',from);
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
     if contains(obj(ii).name,'_lightback')
         from = obj(ii).position;
-        to = obj(ii).position + [-5 0 0];
         obj(ii).position = [0 0 0];
         fprintf(fid_obj,'AttributeBegin \n');
         fprintf(fid_obj,'Translate %f %f %f \n',obj(ii).position);
         if ~isequal(obj(ii).rotate,[0 0 0 0])
         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
         end
-        fprintf(fid_obj,'LightSource "point" "color I" [1.0 1.0 1.0] "rgb scale" [0.5 0.5 0.5] "point from" [%f %f %f] \n',from);
+        fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.5 0.5] "rgb scale" [0.5 0.5 0.5] "point from" [%f %f %f] \n',from);
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
 end

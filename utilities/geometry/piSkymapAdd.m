@@ -7,6 +7,7 @@ function thisR = piSkymapAdd(thisR,input)
 %                'day'
 %                'dusk'
 %                'sunset'
+%                'night'   
 %                'random'- pick a random skymap from skymaps folder
 % retruns 
 %        none;

@@ -8,13 +8,13 @@ if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname,'version',3);
 
 %% Change render quality
-thisR.set('filmresolution',[1080 720]);
-thisR.set('pixelsamples',8);
-thisR.integrator.maxdepth.value = 5;
-thisR.integrator.subtype = 'bdpt';
-thisR.sampler.subtype = 'sobol';
+% thisR.set('filmresolution',[1080 720]);
+% thisR.set('pixelsamples',8);
+% thisR.integrator.maxdepth.value = 5;
+% thisR.integrator.subtype = 'bdpt';
+% thisR.sampler.subtype = 'sobol';
 %% Add skymap
-piAddSkymap(thisR,'day')
+% piSkymapAdd(thisR,'day')
 %% Assign Materials and Color
 piMaterialGroupAssign(thisR);
 piMaterialList(thisR);
