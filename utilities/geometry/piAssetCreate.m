@@ -1,4 +1,4 @@
-function assets = piAssetsCreate(thisR_tmp, varargin)
+function assets = piAssetCreate(thisR_tmp, varargin)
 % Create and combine assets using base information from a recipe
 %
 % Inputs
