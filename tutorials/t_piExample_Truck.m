@@ -1,6 +1,6 @@
 %% Test a pbrtv3 scene with material property modified.
 %
-% Creates an image with glass and a mirror and text and some objects.
+% Creates an image with glass and a mirror and text and some assets.
 % The materials are pulled in from Cinema 4D.  They can be edited for
 % specularity and diffusivity and type.  More explanation of this will
 % appear later.
@@ -8,60 +8,113 @@
 % ZL SCIEN Team, 2018
 
 %% Initialize ISET and Docker
+
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-%% Read pbrt_material files
-FilePath = '/Users/zhenyiliu/Desktop/scene';
+
+%% Read the scene and create a render recipe 
+
 fname = fullfile(piRootPath,'data','V3','checkerboard','checkerboard.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
+
+% The render recipe here loads in the scene file in PBRT.  
 thisR = piRead(fname,'version',3);
 
-%% Change render quality
+%% Set the rendering quality
+
+% The spatial resolution of the film
 thisR.set('filmresolution',[1080 720]);
+
+% The number of rays that we cast per pixel
 thisR.set('pixelsamples',128);
+
+% Algorithms used by PBRT V3 to render
 thisR.integrator.maxdepth.value = 10;
 thisR.integrator.subtype = 'bdpt';
 thisR.sampler.subtype = 'sobol';
 
 %% Add skymap
-thisR = piAddSkymap(thisR,'night');
+
+% Outdoor scenes with a sky map are much more realistic than scenes
+% with a few specific light sources.
+%
+% We are storing sky maps in the ISET3D repository.  At some point we
+% will also put them on Flywheel.
+thisR = piSkymapAdd(thisR,'day');
 
 %% Assign Materials and Color
-% Check materials read from the file
-piMaterialList(thisR);
-% assign all the materials according to its name
-piMaterialGroupAssign(thisR);
+
+% The recipe already includes materials.  This prints out the ones
+% that are in the recipe.
 piMaterialList(thisR);
 
-%% Read a geometry file exported by C4d and extract objects information
+% Assign from the material names to the numerical material properties.
+% These are placed in the recipe.
+piMaterialGroupAssign(thisR);
+
+% Print again just to check.
+piMaterialList(thisR);
+
+%% Read a geometry file exported by C4d and extract asset information
+
+% The return is a struct that contains the position, rotating, size
+% and nested structures defining the asset information.  This can run
+% on any scene exported from Cinema 4D.
 scene_1 = piGeometryRead(thisR);
 
-%% Create two cars from flywheel
-assets = piAssetsCreate(thisR,'ncars',2);
-%% Move objects
-heading = 0;% along x a
-side = 3;
-% translate
-assets(1).geometry = piObjectTranslate(assets(1).geometry,heading,side);
+%% Add two cars from the Flywheel database
+
+assets = piAssetCreate(thisR,'ncars',2);
+
+%% Move assets
+
+% Cars are built into the database with a default orientation and
+% position.  The coordinate frame (x,y,z) is arranged so that the
+% camera is on the z-axis at a negative z value.  The implicit image
+% of the car for the stored asset data is in the (x,y) plane with the
+% car front facing in the positive x direction and the top of the car
+% in the positive y direction. (This is called left hand coordinates).
+%
+% Straight out of the database the asset nodes are centered at (0,0,0).  
+%
+
+% The translation sets up a new position by translating the mesh
+%
+%   current  = [x,y,z] -> [x + heading, y, z + heading]
+%
+
+% Asset 1 - translate
+heading = 0;  % Do we translate the position of the asset?  
+side    = 3;  % Which side is exposed to the camera
+assets(1).geometry = piAssetTranslate(assets(1).geometry,heading,side);
+
+% You could rotate if you like
 % rotation = -30;
 % assets(1).geometry = piObjectRotate(assets(1).geometry,rotation);
-heading = 5;% along x a
+
+% Asset 2 - translate
+heading = 5;
 side = -5;
-% translate
-assets(2).geometry = piObjectTranslate(assets(2).geometry,heading,side);
+assets(2).geometry = piAssetTranslate(assets(2).geometry,heading,side);
+
+% You could rotate if you like
 % rotation = 45;
 % assets(2).geometry = piObjectRotate(assets(2).geometry,rotation);
 
 %% Assemble the objects with the scene here
-[thisR_scene,scene_2] = piAssetsAdd(thisR,scene_1,assets);
+
+[thisR_scene,scene_2] = piAssetAdd(thisR,scene_1,assets);
 
 %% Write out scene and materials
 [~,n,e] = fileparts(fname); 
 thisR_scene.set('outputFile',fullfile(piRootPath,'local','scene',[n,e]));
 piWrite(thisR_scene); % 
+
 %% Write out geometry -- 
 piGeometryWrite(thisR_scene, scene_2); 
+
 %% Render irradiance
+
 tic, irradianceImg = piRender(thisR_scene); toc
 ieAddObject(irradianceImg); sceneWindow;
 

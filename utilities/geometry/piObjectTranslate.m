@@ -3,6 +3,9 @@ function object = piObjectTranslate(object,heading,side)
 % positive x is heading direction
 % default center of the car  is 0 0 0, we adjust the y(up) of the car to
 % place it in a correct position.
+error('deprecated use piAssetTranslate')
+
+%{
 for ii=1:length(object)
 y = 0;
 x = heading;
@@ -16,3 +19,4 @@ end
 % object(ii).size.pmax = object(ii).size.pmax +[x z];
 end
 end
+%}
