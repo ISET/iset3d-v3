@@ -188,12 +188,12 @@ if ~isempty(materials.spectrumks)
     val = strcat(val, val_spectrumks);
 end
 
-if ~isempty(materials.spectrumks)
+if ~isempty(materials.spectrumk)
     val_spectrumks = sprintf(' "spectrum k" "%s" ',materials.spectrumk);
     val = strcat(val, val_spectrumks);
 end
 
-if ~isempty(materials.spectrumks)
+if ~isempty(materials.spectrumeta)
     val_spectrumks = sprintf(' "spectrum eta" "%s" ',materials.spectrumeta);
     val = strcat(val, val_spectrumks);
 end

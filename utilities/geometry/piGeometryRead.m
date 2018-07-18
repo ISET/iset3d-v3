@@ -92,14 +92,16 @@ if ~convertedflag
                     %             Groupobj(hh).concattransform.x = transform(1:4);
                     %             Groupobj(hh).concattransform.y = transform(5:8);
                     %             Groupobj(hh).concattransform.z = transform(9:12);
-%                     groupobj(hh).translate = transform(13:15);
+                    %                     groupobj(hh).translate = transform(13:15);
                     groupobj(hh).rotate    = [0 0 0 0];
                     groupobj(hh).position = transform(13:15);
                     % Add type of the object, get it from the file name,
-                    % could be wrong, but this is how we named the object 
+                    % could be wrong, but this is how we named the object
+                else
+                    groupobj(hh).rotate    = [0 0 0 0];
+                    groupobj(hh).position = [0 0 0];
                 end
-                groupobj(hh).rotate    = [0 0 0 0];
-                groupobj(hh).position = [0 0 0];
+                
             end
             % find child objects
             
@@ -142,7 +144,8 @@ if ~convertedflag
                 if ~exist(output_folder,'dir')
                     mkdir(output_folder);
                 end
-                fid = fopen(output,'w');
+                outputFile = fullfile(Filepath,output);
+                fid = fopen(outputFile,'w');
                 fprintf(fid,'# %s\n',obj(jj).name);
                 currLine = cell2mat(txtLines(ii));
                 % Find 'integer indices'
@@ -161,6 +164,7 @@ if ~convertedflag
         fprintf('Object:%s has %d child object(s) \n',groupobj(hh).name,jj-1);hh = hh+1;
     end
     save(Object_mat,'groupobj');
+    disp('All done.');
 else
     
     groupobj = load(Object_mat);
