@@ -17,12 +17,14 @@ if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname,'version',3);
 
 %% Change render quality
-thisR.set('filmresolution',[640 480]);
-thisR.set('pixelsamples',32);
-thisR.integrator.maxdepth.value = 5;
+thisR.set('filmresolution',[1080 720]);
+thisR.set('pixelsamples',128);
+thisR.integrator.maxdepth.value = 10;
+thisR.integrator.subtype = 'bdpt';
+thisR.sampler.subtype = 'sobol';
 
 %% Add skymap
-thisR = piAddSkymap(thisR,'random');
+thisR = piAddSkymap(thisR,'night');
 
 %% Assign Materials and Color
 % Check materials read from the file
@@ -37,18 +39,18 @@ scene_1 = piGeometryRead(thisR);
 %% Create two cars from flywheel
 assets = piAssetsCreate(thisR,'ncars',2);
 %% Move objects
-heading = 3;% along x a
+heading = 0;% along x a
 side = 3;
 % translate
 assets(1).geometry = piObjectTranslate(assets(1).geometry,heading,side);
-rotation = -30;
-assets(1).geometry = piObjectRotate(assets(1).geometry,rotation);
-heading = -3;% along x a
-side = -3;
+% rotation = -30;
+% assets(1).geometry = piObjectRotate(assets(1).geometry,rotation);
+heading = 5;% along x a
+side = -5;
 % translate
 assets(2).geometry = piObjectTranslate(assets(2).geometry,heading,side);
-rotation = 45;
-assets(2).geometry = piObjectRotate(assets(2).geometry,rotation);
+% rotation = 45;
+% assets(2).geometry = piObjectRotate(assets(2).geometry,rotation);
 
 %% Assemble the objects with the scene here
 [thisR_scene,scene_2] = piAssetsAdd(thisR,scene_1,assets);

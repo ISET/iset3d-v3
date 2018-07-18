@@ -59,14 +59,13 @@ for ii = 1: length(obj)
     % front light point to front, give 10 meters here, might change later
     if contains(obj(ii).name,'_lightfront')
         from = obj(ii).position;
-        to = obj(ii).position + [20 0 0];
         obj(ii).position = [0 0 0];
         fprintf(fid_obj,'AttributeBegin \n');
         fprintf(fid_obj,'Translate %f %f %f \n',obj(ii).position);
         if ~isequal(obj(ii).rotate,[0 0 0 0])
         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
         end
-        fprintf(fid_obj,'LightSource "spot" "color I" [1.0 1.0 1.0] "rgb scale" [100.0 100.0 100.0] "point from" [%f %f %f] "point to" [%f %f %f] "float coneangle" [30] "float conedeltaangle" [5] \n',from,to);
+        fprintf(fid_obj,'LightSource "point" "color I" [1.0 1.0 1.0] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',from);
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
     if contains(obj(ii).name,'_lightback')
@@ -78,7 +77,7 @@ for ii = 1: length(obj)
         if ~isequal(obj(ii).rotate,[0 0 0 0])
         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);
         end
-        fprintf(fid_obj,'LightSource "spot" "color I" [1.0 1.0 1.0] "rgb scale" [100.0 100.0 100.0] "point from" [%f %f %f] "point to" [%f %f %f] "float coneangle" [30] "float conedeltaangle" [5] \n',from,to);
+        fprintf(fid_obj,'LightSource "point" "color I" [1.0 1.0 1.0] "rgb scale" [0.5 0.5 0.5] "point from" [%f %f %f] \n',from);
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
 end

@@ -164,6 +164,10 @@ for ii=1:nLines
                     materials(cnt).spectrumkd = thisLine{ss+1};
                 case 'spectrum Ks'
                     materials(cnt).spectrumks = thisLine{ss+1};
+                case 'spectrum k'
+                    materials(cnt).spectrumk = thisLine{ss+1};
+                case 'spectrum eta'
+                    materials(cnt).spectrumeta = thisLine{ss+1};
                 case 'string namedmaterial1'
                     materials(cnt).stringnamedmaterial1 = thisLine{ss+1};
                 case 'string namedmaterial2'

@@ -4,29 +4,20 @@ function object=piObjectRotate(object,degree)
 
 for ii=1:length(object)
     % rotate car 
-    object(ii).rotate = [degree 0 1 0];
-    if ~isempty(object(ii).child)
-    d = pdist([0,0;object(ii).size.pmin]);
     
-    % rotate pmin and pmax
-    object(2).size.pmin = [-d*cosd(degree) -d*sind(degree)];
+    if ~isempty(object(ii).child) && length(object(ii).child)>1
+        object(ii).rotate = [degree 0 1 0];
+        % rotate object's pmin and pmax for bounding box checking
+        object_position = [object(ii).position(1) object(ii).position(3)];
+        
+        object(ii).size.pmin = piPointRotate(object(ii).size.pmin,object_position,degree);
+        object(ii).size.pmax = piPointRotate(object(ii).size.pmax,object_position,degree);
     end
     % rotate lights
-    if contains(object(ii).name,'lightfront_left')
-        d_lightfront_left = pdist([0,0;object(ii).position(1),object(ii).position(3)]);
-        object(ii).position = [d_lightfront_left*cosd(degree) object(ii).position(2) d_lightfront_left*sind(degree)];
-    end
-    if contains(object(ii).name,'lightfront_right')
-        d_lightfront_right = pdist([0,0;object(ii).position(1),object(ii).position(3)]);
-        object(ii).position = [d_lightfront_right*cosd(degree) object(ii).position(2) -d_lightfront_right*sind(degree)];
-    end
-    if contains(object(ii).name,'lightback_left')
-        d_lightback_left = pdist([0,0;object(ii).position(1),object(ii).position(3)]);
-        object(ii).position = [-d_lightback_left*cosd(degree) object(ii).position(2) d_lightback_left*sind(degree)];
-    end
-    if contains(object(ii).name,'lightback_right')
-        d_lightback_right = pdist([0,0;object(ii).position(1),object(ii).position(3)]);
-        object(ii).position = [-d_lightback_right*cosd(degree) object(ii).position(2) -d_lightback_right*sind(degree)];
+    if contains(object(ii).name,'light')
+        light = [object(ii).position(1) object(ii).position(3)];
+        position = piPointRotate(light,object_position,degree);
+        object(ii).position = [position(1) object(ii).position(2) position(2)];
     end
 end
 end

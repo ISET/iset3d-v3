@@ -26,20 +26,22 @@ switch input
     skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/dusk.exr"');
     case 'sunset'
     skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset.exr"');
+    case 'night'
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
     case'random'
         curDir = pwd;
         cd(skymaps)
         skylights = dir('*.exr');
         index = randi(length(skylights));
         skyname = skylights(index).name;
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/%s.exr"',skyname);
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/%s"',skyname);
         cd(curDir);
 end
 
 
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));
-world(3,:) = cellstr(sprintf('Rotate -90 0 1 0'));
+world(3,:) = cellstr(sprintf('Rotate 90 0 0 1'));
 world(4,:) = cellstr(skylights);
 world(5,:) = cellstr(sprintf('AttributeEnd'));
 jj=2;
