@@ -1,4 +1,4 @@
-function [thisR,scene] = piAssetsAdd(thisR,scene,objects,varargin)
+function [thisR,scene] = piAssetAdd(thisR,scene,objects,varargin)
 % objects = assets;
 % scene = scene_1;
 % Assemble a scene with objects.

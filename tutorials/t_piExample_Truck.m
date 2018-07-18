@@ -86,16 +86,18 @@ assets = piAssetCreate(thisR,'ncars',2);
 % Asset 1 - translate
 heading = 0;  % Do we translate the position of the asset?  
 side    = 3;  % Which side is exposed to the camera
-assets(1).geometry = piAssetTranslate(assets(1).geometry,heading,side);
+Translation_1 = [heading 0 side];
+assets(1).geometry = piAssetTranslate(assets(1).geometry,Translation_1);
 
 % You could rotate if you like
 % rotation = -30;
 % assets(1).geometry = piObjectRotate(assets(1).geometry,rotation);
 
 % Asset 2 - translate
-heading = 5;
-side = -5;
-assets(2).geometry = piAssetTranslate(assets(2).geometry,heading,side);
+heading = 0; 
+side    = 3;
+Translation_2 = [heading 0 side];
+assets(2).geometry = piAssetTranslate(assets(2).geometry,Translation_2);
 
 % You could rotate if you like
 % rotation = 45;

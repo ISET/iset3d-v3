@@ -1,6 +1,6 @@
 %% Initialize ISET and Docker
 ieInit;
-if ~piDockerExists, piDockerConfig; end
+%if ~piDockerExists, piDockerConfig; end
 %% Read pbrt_material files
 FilePath = '/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/car/Car_2';
 fname = fullfile(FilePath,'Car_2.pbrt');
