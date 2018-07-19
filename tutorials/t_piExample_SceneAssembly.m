@@ -64,7 +64,7 @@ scene_1 = piGeometryRead(thisR);
 
 %% Add two cars from the Flywheel database
 
-assets = piAssetCreate(thisR,'ncars',2);
+assets = piAssetCreate('ncars',2);
 
 %% Move assets
 
@@ -108,8 +108,9 @@ assets(2).geometry = piAssetTranslate(assets(2).geometry,Translation_2);
 [thisR_scene,scene_2] = piAssetAdd(thisR,scene_1,assets);
 
 %% Write out scene and materials
+
 [~,n,e] = fileparts(fname); 
-thisR_scene.set('outputFile',fullfile(piRootPath,'local','scene',[n,e]));
+thisR_scene.set('outputFile',fullfile(piRootPath,'local','cartest',[n,e]));
 piWrite(thisR_scene); % 
 
 %% Write out geometry -- 

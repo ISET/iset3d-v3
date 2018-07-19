@@ -1,4 +1,4 @@
-function asset = piAssetCreate(thisR_tmp, varargin)
+function asset = piAssetCreate(varargin)
 % Create and combine assets using base information from a recipe
 %
 % Inputs
@@ -17,70 +17,101 @@ function asset = piAssetCreate(thisR_tmp, varargin)
 %
 % Zhenyi, Vistasoft Team, 2018
 
-%%
+%% Parse input parameters
 p = inputParser;
+varargin = ieParamFormat(varargin);
 
-p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
-p.addParameter('nCars',1);
-p.addParameter('nTrucks',0);
-p.addParameter('nPeople',0);
-p.addParameter('nBuses',0);
-p.addParameter('nCyclist',0); % Cyclist contains two class: rider and bike.
+p.addParameter('ncars',1);
+p.addParameter('ntrucks',0);
+p.addParameter('npeople',0);
+p.addParameter('nbuses',0);
+p.addParameter('ncyclist',0); % Cyclist contains two class: rider and bike.
 p.addParameter('scitran','',@(x)(isa(x,'scitran')));
 
-p.parse(thisR_tmp,varargin{:});
+p.parse(varargin{:});
+
 inputs = p.Results;
-st = p.Results.scitran;
+st     = p.Results.scitran;
 if isempty(st), st = scitran('stanfordlabs'); end
 
-hierarchy = st.projectHierarchy('Graphics assets','project id','5b3eac08d294db0016bb1a2b');
-% projects = st.search('project','project label exact','Computer Graphics')
+%%  Store up the asset information
+
+hierarchy = st.projectHierarchy('Graphics assets');
+
+projects     = hierarchy.project;
+sessions     = hierarchy.sessions;
+acquisitions = hierarchy.acquisitions;
+
 asset = [];
-% cnt = 1;
-projects = st.search('project','project label exact','Graphics assets');
-sessions = st.list('sessions',idGet(projects{1},'data type','project'));
-%% Cars
-% Create Assets obj struct
-% Download random cars from flywheel
- 
-% Find how many cars we have in our session
-whichSession = 1;
-stPrint(hierarchy.acquisitions{whichSession},'label','') % will be disable 
 
-carSession = st.search('session',...
-    'project label exact','Graphics assets',...
-    'session label exact','car');
-% These files are within an acquisition (dataFile)
-zipFiles = st.fileDataList('session',...
-    idGet(carSession{1},'data type','session'),...
-    'archive');
+%% Find the cars in the database
 
-nAcqs = length(hierarchy.acquisitions{whichSession});
-if inputs.nCars <= nAcqs
-    p = randperm(nAcqs,inputs.nCars);
-    for jj = 1: length(p)
-        [~,n,e] = fileparts(zipFiles{p(jj)}{1}.name);
-        fname = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
-        % download 
-        % zipFiles{p{jj}} is a FileEntry, not a searchresponse as requried.
-        localFile = st.fileDownload(zipFiles{p(jj)}{1},'destination',fname);
-        localFolder = fullfile(piRootPath,'local');
-        unzip(localFile,localFolder);
-        fname = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
-        if ~exist(fname,'file'), error('File not found'); end
-        thisR_tmp = piRead(fname,'version',3);
-        geometry = piGeometryRead(thisR_tmp);
-        asset(jj).class = 'car';
-        asset(jj).material =thisR_tmp.materials.list;
-        asset(jj).geometry = geometry;
-        asset(jj).geometryPath = fullfile(piRootPath,'local',sprintf('Car_%d',p(jj)),...
-            'scene','PBRT','pbrt-geometry');
-        fprintf('%d car created \n',jj);
+if p.Results.ncars > 0
+    % Find the session with the label car
+    for ii=1:length(sessions)
+        if isequal(lower(sessions{ii}.label),'car')
+            carSession = sessions{ii};
+            break;
+        end
     end
-    disp('All done!')
-else
-    disp('NOT ENOUGH CARS.');
-    % we might create object instance in the future.
+    
+    % Create Assets obj struct
+    % Download random cars from flywheel
+    
+    % Find how many cars are in the database?
+    % stPrint(hierarchy.acquisitions{whichSession},'label','') % will be disable
+    
+    % These files are within an acquisition (dataFile)
+    containerID = idGet(carSession,'data type','session');
+    fileType    = 'archive';
+    [zipFiles, acqID] = st.fileDataList('session', containerID, fileType, ...
+        'asset','car');
+    
+    nDatabaseCars = length(zipFiles);
+    
+    fname = cell(inputs.ncars,1);
+    if inputs.ncars <= nDatabaseCars
+        carList = randperm(nDatabaseCars,inputs.ncars);
+        for jj = 1:inputs.ncars
+            [~,n,e] = fileparts(zipFiles{carList(jj)}{1}.name);
+            
+            % Download the scene to a destination zip file
+            destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
+            st.fileDownload(zipFiles{carList(jj)}{1}.name,...
+                'container type', 'acquisition' , ...
+                'container id',  acqID{carList(jj)} ,...
+                'unzip', true, ...
+                'destination',destName);
+            
+            % Unzip the file
+            % localFolder = fullfile(piRootPath,'local');
+            % unzip(localFile,localFolder);
+            
+            % Save the file name of the scene in the folder
+            localFolder = fileparts(destName);
+            fname{jj}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
+            if ~exist(fname{jj},'file'), error('File not found'); end
+            
+        end
+    else
+        disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
+    end
 end
+
+%% Analyze the downloaded scenes in fname and create the returned asset
+
+for jj=1:length(fname)
+    thisR = piRead(fname{jj},'version',3);
+    geometry = piGeometryRead(thisR);
+    asset(jj).geometry = geometry;
+    
+    asset(jj).class = 'car';
+    asset(jj).material = thisR.materials.list;
+    
+    localFolder = fileparts(fname{jj});
+    asset(jj).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
+    fprintf('%d car created \n',jj);
+end
+disp('All done!')
 
 end

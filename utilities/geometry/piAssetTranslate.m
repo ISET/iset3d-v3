@@ -1,21 +1,27 @@
 function asset = piAssetTranslate(asset,translation)
-% translte car and lights
-% positive x is heading direction
-% default center of the car  is 0 0 0, we adjust the y(up) of the car to
-% place it in a correct position.
-
+% Translation for assets, also updates a bounding box.
+%
+% When an asset (say a car) comes from the database, the positive x is
+% the heading direction.  The default center of the car is 0 0 0.  If
+% the position slot of the asset is not present, we assume the value
+% is [0,0,0]. 
+%
+% ZL, Vistasoft Team, 2018
 
 for ii=1:length(asset)
-    x = translation(1);
-    y = translation(2);
-    z = translation(3);
+
     if isempty(asset(ii).position)
-        asset(ii).position = [x y z];
+        % Assume position is 0,0,0
+        asset(ii).position = translation;
     else
-        asset(ii).position = asset(ii).position + [x y z];
+        % Add the translation
+        asset(ii).position = asset(ii).position + translation;
     end
-    % x-z 2d box of the asset
-    asset(ii).size.pmin = asset(ii).size.pmin +[x z];
-    asset(ii).size.pmax = asset(ii).size.pmax +[x z];
+    
+    % Update the position of the x-z 2d box of the asset that we use
+    % for machine learning identification.
+    asset(ii).size.pmin = asset(ii).size.pmin + [translation(1) translation(3)];
+    asset(ii).size.pmax = asset(ii).size.pmax + [translation(1) translation(3)];
 end
+
 end
