@@ -1,9 +1,13 @@
 %% Initialize ISET and Docker
 ieInit;
 %if ~piDockerExists, piDockerConfig; end
+
+%%
+assetname = 'Car_7';
+
 %% Read pbrt_material files
-FilePath = '/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/car/Car_2';
-fname = fullfile(FilePath,'Car_2.pbrt');
+FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/car',assetname);
+fname = fullfile(FilePath,sprintf('%s.pbrt',assetname));
 if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname,'version',3);
 
@@ -18,6 +22,8 @@ thisR = piRead(fname,'version',3);
 %% Assign Materials and Color
 piMaterialGroupAssign(thisR);
 piMaterialList(thisR);
+% use piColorPick to wisely choose a black color.
+% thisR.materials.list.NissanTitan_carbody_black_paint_base.colorkd = piColorPick('black');
 
 %% Read a geometry file exported by C4d and extract objects information
 car = piGeometryRead(thisR);
@@ -25,13 +31,13 @@ car = piGeometryRead(thisR);
 %% Write out
 
 [~,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','Car_2',[n,e]));
+thisR.set('outputFile',fullfile(piRootPath,'local',assetname,[n,e]));
 piWrite(thisR);
 %%
 piGeometryWrite(thisR, car);
 
 %% zip the folder
-folder = fullfile(piRootPath,'local','Car_2');
+folder = fullfile(piRootPath,'local',assetname);
 cd(fullfile(piRootPath,'local'));
 zip(sprintf('%s.zip',n),folder);
 
