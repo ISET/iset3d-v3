@@ -10,6 +10,7 @@ function piMaterialWrite(thisR)
 %% 
 p = inputParser;
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
+p.parse(thisR);
 
 %% 
 workingDir = fileparts(thisR.outputFile);
