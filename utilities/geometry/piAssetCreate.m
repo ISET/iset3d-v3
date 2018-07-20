@@ -54,64 +54,14 @@ if p.Results.ncars > 0
             break;
         end
     end
-    
     % Create Assets obj struct
     % Download random cars from flywheel
+    fname = piAssetDownload(carSession,'session name','car','ncars',inputs.ncars);
     
-    % Find how many cars are in the database?
-    % stPrint(hierarchy.acquisitions{whichSession},'label','') % will be disable
-    
-    % These files are within an acquisition (dataFile)
-    containerID = idGet(carSession,'data type','session');
-    fileType    = 'archive';
-    [zipFiles, acqID] = st.fileDataList('session', containerID, fileType, ...
-        'asset','car');
-    
-    nDatabaseCars = length(zipFiles);
-    
-    fname = cell(inputs.ncars,1);
-    if inputs.ncars <= nDatabaseCars
-        carList = randperm(nDatabaseCars,inputs.ncars);
-        for jj = 1:inputs.ncars
-            [~,n,e] = fileparts(zipFiles{carList(jj)}{1}.name);
-            
-            % Download the scene to a destination zip file
-            destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
-            st.fileDownload(zipFiles{carList(jj)}{1}.name,...
-                'container type', 'acquisition' , ...
-                'container id',  acqID{carList(jj)} ,...
-                'unzip', true, ...
-                'destination',destName);
-            
-            % Unzip the file
-            % localFolder = fullfile(piRootPath,'local');
-            % unzip(localFile,localFolder);
-            
-            % Save the file name of the scene in the folder
-            localFolder = fileparts(destName);
-            fname{jj}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
-            if ~exist(fname{jj},'file'), error('File not found'); end
-            
-        end
-    else
-        disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
-    end
+    %% Analyze the downloaded scenes in fname and create the returned asset
+    asset = piAssetAssign(fname);
 end
 
-%% Analyze the downloaded scenes in fname and create the returned asset
-
-for jj=1:length(fname)
-    thisR = piRead(fname{jj},'version',3);
-    geometry = piGeometryRead(thisR);
-    asset(jj).geometry = geometry;
-    
-    asset(jj).class = 'car';
-    asset(jj).material = thisR.materials.list;
-    
-    localFolder = fileparts(fname{jj});
-    asset(jj).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
-    fprintf('%d car created \n',jj);
-end
 disp('All done!')
 
 end

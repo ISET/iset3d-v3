@@ -23,10 +23,10 @@ thisR = piRead(fname,'version',3);
 %% Set the rendering quality
 
 % The spatial resolution of the film
-thisR.set('filmresolution',[1080 720]);
+thisR.set('filmresolution',[640 480]);
 
 % The number of rays that we cast per pixel
-thisR.set('pixelsamples',128);
+thisR.set('pixelsamples',64);
 
 % Algorithms used by PBRT V3 to render
 thisR.integrator.maxdepth.value = 10;
@@ -64,7 +64,7 @@ scene_1 = piGeometryRead(thisR);
 
 %% Add two cars from the Flywheel database
 
-assets = piAssetCreate('ncars',2);
+assets = piAssetCreate('ncars',9);
 
 %% Move assets
 
@@ -84,24 +84,25 @@ assets = piAssetCreate('ncars',2);
 %
 
 % Asset 1 - translate
-heading = 0;  % Do we translate the position of the asset?  
-side    = 3;  % Which side is exposed to the camera
+heading = -7;  % Do we translate the position of the asset?  
+side    = 7;  % Which side is exposed to the camera
 Translation_1 = [heading 0 side];
-assets(1).geometry = piAssetTranslate(assets(1).geometry,Translation_1);
+
+assets(9).geometry = piAssetTranslate(assets(9).geometry,Translation_1);
 
 % You could rotate if you like
-% rotation = -30;
-% assets(1).geometry = piObjectRotate(assets(1).geometry,rotation);
-
-% Asset 2 - translate
-heading = 0; 
-side    = 3;
-Translation_2 = [heading 0 side];
-assets(2).geometry = piAssetTranslate(assets(2).geometry,Translation_2);
-
-% You could rotate if you like
-% rotation = 45;
-% assets(2).geometry = piObjectRotate(assets(2).geometry,rotation);
+% rotation = -45;
+% assets(1).geometry = piAssetRotate(assets(1).geometry,rotation);
+% 
+% % Asset 2 - translate
+% heading = 5; 
+% side    = -5;
+% Translation_2 = [heading 0 side];
+% assets(2).geometry = piAssetTranslate(assets(2).geometry,Translation_2);
+% 
+% % You could rotate if you like
+% rotation = 30;
+% assets(2).geometry = piAssetRotate(assets(2).geometry,rotation);
 
 %% Assemble the objects with the scene here
 
@@ -126,22 +127,25 @@ meshImage = piRender(thisR_scene,'renderType','mesh');
 vcNewGraphWin;imagesc(meshImage);colormap(jet);title('Mesh')
 
  %% Create a label map
+ labelMap(1).name = 'road';
+ labelMap(1).id = 1;
  labelMap(1).name = 'car';
- labelMap(1).id = 7;
+ labelMap(1).id = 2;
  labelMap(1).color = [0 0 1];
  labelMap(2).name='person';
- labelMap(2).id = 8;
+ labelMap(2).id = 3;
  labelMap(2).color = [0 1 0];
  labelMap(3).name='truck';
- labelMap(3).id = 9;
+ labelMap(3).id = 4;
  labelMap(3).color = [1 0 0];
  labelMap(4).name='bus';
- labelMap(4).id = 1;
+ labelMap(4).id = 5;
  labelMap(4).color = [1 0 1];
+ 
  
 %% Get bounding box
 
- obj = piBBoxExtract(thisR_scene, scene_2, irradianceImg, meshImage, labelMap);
+ obj = piBBoxExtract(thisR_scene, scene_2, assets,irradianceImg, meshImage, labelMap);
  %%
  
 %% Change the camera lens

@@ -77,3 +77,12 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
  function SegmentationMap = instanceSeg(instanceIDs)
  
  end
+ 
+function ClassMap = classSeg(instanceIDs,labelMap)
+ 
+end
+ 
+  
+ 
+ 
+ 
