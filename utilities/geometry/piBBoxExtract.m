@@ -2,6 +2,10 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
  % Read primitive ID from _mesh.txt
  % Add class information here: convert meshImage(instanceSeg) to A
  % classSeg.
+ %
+ % ZL, Vistasoft Team, 2018
+ 
+ %%
  labelMap;
  instanceIDs = unique(meshImage);% Find index of labeled object
  instanceIDs = instanceIDs(instanceIDs > 0);

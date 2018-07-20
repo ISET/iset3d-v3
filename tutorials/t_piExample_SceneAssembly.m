@@ -23,10 +23,10 @@ thisR = piRead(fname,'version',3);
 %% Set the rendering quality
 
 % The spatial resolution of the film
-thisR.set('filmresolution',[640 480]);
+thisR.set('film resolution',[640 480]);
 
 % The number of rays that we cast per pixel
-thisR.set('pixelsamples',8);
+thisR.set('pixel samples',8);
 
 % Algorithms used by PBRT V3 to render
 thisR.integrator.maxdepth.value = 10;
@@ -64,7 +64,7 @@ scene_1 = piGeometryRead(thisR);
 
 %% Add two cars from the Flywheel database
 
-assets = piAssetCreate('ncars',2,'nbuses',2);
+assets = piAssetCreate('ncars',2,'nbuses',1);
 
 
 %% Move assets
@@ -89,7 +89,7 @@ heading = -7;  % Do we translate the position of the asset?
 side    = 7;  % Which side is exposed to the camera
 Translation_1 = [heading 0 side];
 
-assets(9).geometry = piAssetTranslate(assets(9).geometry,Translation_1);
+assets(1).geometry = piAssetTranslate(assets(1).geometry,Translation_1);
 
 % You could rotate if you like
 % rotation = -45;
@@ -127,27 +127,27 @@ ieAddObject(irradianceImg); sceneWindow;
 meshImage = piRender(thisR_scene,'renderType','mesh'); 
 vcNewGraphWin;imagesc(meshImage);colormap(jet);title('Mesh')
 
- %% Create a label map
- labelMap(1).name = 'road';
- labelMap(1).id = 1;
- labelMap(1).name = 'car';
- labelMap(1).id = 2;
- labelMap(1).color = [0 0 1];
- labelMap(2).name='person';
- labelMap(2).id = 3;
- labelMap(2).color = [0 1 0];
- labelMap(3).name='truck';
- labelMap(3).id = 4;
- labelMap(3).color = [1 0 0];
- labelMap(4).name='bus';
- labelMap(4).id = 5;
- labelMap(4).color = [1 0 1];
- 
- 
+%% Create a label map
+labelMap(1).name = 'road';
+labelMap(1).id = 1;
+labelMap(1).name = 'car';
+labelMap(1).id = 2;
+labelMap(1).color = [0 0 1];
+labelMap(2).name='person';
+labelMap(2).id = 3;
+labelMap(2).color = [0 1 0];
+labelMap(3).name='truck';
+labelMap(3).id = 4;
+labelMap(3).color = [1 0 0];
+labelMap(4).name='bus';
+labelMap(4).id = 5;
+labelMap(4).color = [1 0 1];
+
 %% Get bounding box
 
- obj = piBBoxExtract(thisR_scene, scene_2, assets,irradianceImg, meshImage, labelMap);
- %%
+obj = piBBoxExtract(thisR_scene, scene_2, irradianceImg, meshImage, labelMap);
+
+% obj = piBBoxExtract(thisR_scene, scene_2, assets, irradianceImg, meshImage, labelMap);
  
 %% Change the camera lens
 %{ 

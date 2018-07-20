@@ -57,7 +57,7 @@ if p.Results.ncars > 0
     
     % Create Assets obj struct
     % Download random cars from flywheel
-    fname = piAssetDownload(carSession,'session name','car','ncars',inputs.ncars);
+    fname = piAssetDownload(carSession,'car',inputs.ncars,'scitran',st);
     
     %% Analyze the downloaded scenes in fname and create the returned asset
     asset = piAssetAssign(fname);

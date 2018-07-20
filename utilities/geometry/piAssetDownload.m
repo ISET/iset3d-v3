@@ -1,13 +1,34 @@
-function fname = piAssetDownload(session,sessionname,nassets)
-%% Download assets from a flywheel session
+function fname = piAssetDownload(session,sessionname,nassets,varargin)
+% Download assets from a flywheel session
 %
+%  fname = piAssetDownload(session,sessionname,nassets,varargin)
 %
-% Example: 
+% Description
+%
+% Inputs
+% Optional key/value parameters
+% Outputs
+%
+
+% Examples: 
 %{
 fname = piAssetDownload(session,sessionname,ncars);
 %}
-%%
-% p = inputParser;
+
+%% Parse the inputs
+
+p = inputParser;
+p.addRequired('session',@(x)(isa(x,'flywheel.model.Session')));
+p.addRequired('sessionname',@ischar);
+p.addRequired('nassets',@isnumeric);
+p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
+
+p.parse(session, sessionname, nassets, varargin{:});
+st = p.Results.scitran;
+
+if isempty(st)
+    st = scitran('stanfordlabs');
+end
 % varargin = ieParamFormat(varargin);
 % 
 % vFunc = @(x)(strncmp(class(x),'flywheel.model',14) || ...
@@ -20,11 +41,10 @@ fname = piAssetDownload(session,sessionname,ncars);
 % p.addParameter('npeople',0);
 % p.addParameter('nbuses',0);
 % p.addParameter('ncyclist',0); 
-% p.parse(session, varargin{:});
 % sessionName = p.Results.sessionname;
 % ncars = p.Results.ncars;
 %%
-st = scitran('stanfordlabs');
+
 %%
 % Create Assets obj struct
 % Download random cars from flywheel
@@ -90,7 +110,7 @@ else
         end
     end 
 end
-fprintf('%d Files downloaded',nassets);
+fprintf('%d Files downloaded.\n',nassets);
 end
 
 
