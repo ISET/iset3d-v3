@@ -1,28 +1,28 @@
-function fname = piAssetDownload(session, varargin)
+function fname = piAssetDownload(session,sessionname,nassets)
 %% Download assets from a flywheel session
 %
 %
 % Example: 
 %{
-piAssetDownload(session,'sessionname','car','ncars',ncars);
+fname = piAssetDownload(session,sessionname,ncars);
 %}
 %%
-p = inputParser;
-varargin = ieParamFormat(varargin);
-
-vFunc = @(x)(strncmp(class(x),'flywheel.model',14) || ...
-            (iscell(x) && strncmp(class(x{1}),'flywheel.model',14)));
-p.addRequired('session',vFunc);
-
-p.addParameter('sessionname','car')
-p.addParameter('ncars',1)
-p.addParameter('ntrucks',0);
-p.addParameter('npeople',0);
-p.addParameter('nbuses',0);
-p.addParameter('ncyclist',0); 
-p.parse(session, varargin{:});
-sessionName = p.Results.sessionname;
-ncars = p.Results.ncars;
+% p = inputParser;
+% varargin = ieParamFormat(varargin);
+% 
+% vFunc = @(x)(strncmp(class(x),'flywheel.model',14) || ...
+%             (iscell(x) && strncmp(class(x{1}),'flywheel.model',14)));
+% p.addRequired('session',vFunc);
+% 
+% p.addParameter('sessionname','car')
+% p.addParameter('ncars',1)
+% p.addParameter('ntrucks',0);
+% p.addParameter('npeople',0);
+% p.addParameter('nbuses',0);
+% p.addParameter('ncyclist',0); 
+% p.parse(session, varargin{:});
+% sessionName = p.Results.sessionname;
+% ncars = p.Results.ncars;
 %%
 st = scitran('stanfordlabs');
 %%
@@ -36,21 +36,21 @@ st = scitran('stanfordlabs');
 containerID = idGet(session,'data type','session');
 fileType    = 'archive';
 [zipFiles, acqID] = st.fileDataList('session', containerID, fileType, ...
-    'asset',sessionName);
+    'asset',sessionname);
 
-nDatabaseCars = length(zipFiles);
+nDatabaseAssets = length(zipFiles);
 
-fname = cell(ncars,1);
-if ncars <= nDatabaseCars
-    carList = randperm(nDatabaseCars,ncars);
-    for jj = 1:ncars
-        [~,n,e] = fileparts(zipFiles{carList(jj)}{1}.name);
+fname = cell(nassets,1);
+if nassets <= nDatabaseAssets
+    assetList = randperm(nDatabaseAssets,nassets);
+    for jj = 1:nassets
+        [~,n,e] = fileparts(zipFiles{assetList(jj)}{1}.name);
         
         % Download the scene to a destination zip file
         destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
-        st.fileDownload(zipFiles{carList(jj)}{1}.name,...
+        st.fileDownload(zipFiles{assetList(jj)}{1}.name,...
             'container type', 'acquisition' , ...
-            'container id',  acqID{carList(jj)} ,...
+            'container id',  acqID{assetList(jj)} ,...
             'unzip', true, ...
             'destination',destName);
         
@@ -62,11 +62,40 @@ if ncars <= nDatabaseCars
         localFolder = fileparts(destName);
         fname{jj}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
         if ~exist(fname{jj},'file'), error('File not found'); 
-        end
-        
+        end 
     end
 else
-    disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
+%     disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
+%   New car geometry will overwrite the old one, thus two cars are created 
+%   with shared geometry, but different materials.
+    nRequired = nassets-nDatabaseAssets;
+    for jj = 1:nRequired
+        assetList = randperm(nDatabaseAssets,nRequired);
+        [~,n,e] = fileparts(zipFiles{assetList(jj)}{1}.name);
+        % Download the scene to a destination zip file
+        destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
+        st.fileDownload(zipFiles{assetList(jj)}{1}.name,...
+            'container type', 'acquisition' , ...
+            'container id',  acqID{assetList(jj)} ,...
+            'unzip', true, ...
+            'destination',destName);
+        % Unzip the file
+        % localFolder = fullfile(piRootPath,'local');
+        % unzip(localFile,localFolder);
+        
+        % Save the file name of the scene in the folder
+        localFolder = fileparts(destName);
+        fname{jj}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
+        if ~exist(fname{jj},'file'), error('File not found');
+        end
+    end 
 end
-fprintf('%d Files downloaded',ncars);
+fprintf('%d Files downloaded',nassets);
 end
+
+
+
+
+
+
+

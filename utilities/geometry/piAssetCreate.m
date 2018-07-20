@@ -54,6 +54,7 @@ if p.Results.ncars > 0
             break;
         end
     end
+    
     % Create Assets obj struct
     % Download random cars from flywheel
     fname = piAssetDownload(carSession,'session name','car','ncars',inputs.ncars);

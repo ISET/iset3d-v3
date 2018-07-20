@@ -26,7 +26,7 @@ thisR = piRead(fname,'version',3);
 thisR.set('filmresolution',[640 480]);
 
 % The number of rays that we cast per pixel
-thisR.set('pixelsamples',64);
+thisR.set('pixelsamples',8);
 
 % Algorithms used by PBRT V3 to render
 thisR.integrator.maxdepth.value = 10;
@@ -64,7 +64,8 @@ scene_1 = piGeometryRead(thisR);
 
 %% Add two cars from the Flywheel database
 
-assets = piAssetCreate('ncars',9);
+assets = piAssetCreate('ncars',2,'nbuses',2);
+
 
 %% Move assets
 

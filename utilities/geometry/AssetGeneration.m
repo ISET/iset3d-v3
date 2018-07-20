@@ -3,10 +3,10 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 
 %%
-assetname = 'Car_12';
+assetname = 'Bus_1';
 
 %% Read pbrt_material files
-FilePath = fullfile('/Volumes/wandell/data/NN_Camera_Generalization/pbrt_assets/car',assetname);
+FilePath = fullfile('/Volumes/wandell/data/NN_Camera_Generalization/pbrt_assets/bus',assetname);
 fname = fullfile(FilePath,sprintf('%s.pbrt',assetname));
 if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname,'version',3);
