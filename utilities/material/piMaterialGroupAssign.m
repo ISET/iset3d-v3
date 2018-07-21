@@ -34,8 +34,8 @@ for ii = 1:length(mlist)
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % 
-        rgbkd = piColorPick('random');
-        piMaterialAssign(thisR,material.name,target,'rgbkd',rgbkd);
+        colorkd = piColorPick('random');
+        piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
     elseif contains(mlist(ii),'window')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
