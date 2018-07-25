@@ -42,6 +42,10 @@ for jj = 1:ntxtLines
     if ~isempty(contains(str,'jpg'))
         thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
     end
+    % photoshop exports texture format with ".JPG "(with extra space) ext.
+    if ~isempty(contains(str,'JPG'))
+        thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
+    end
 end
 
 %% Empty any line that contains MakeNamedMaterial

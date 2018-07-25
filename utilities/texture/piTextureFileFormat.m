@@ -22,14 +22,24 @@ end
 if ~isempty(jpgFiles)
     nfiles = length(jpgFiles);
     for ii=1:nfiles
-        currentfilename = jpgFiles(ii).name;
-        currentimage    = imread(currentfilename);
-        currentname = erase(jpgFiles(ii).name,'.jpg');
-        output = sprintf('%s.png',currentname);
-        imwrite(currentimage,output);
-        % After writing the pngs, we erase the jpg file.
-        original = sprintf('%s.jpg',currentname);
-        delete(original);
+        % some hidden files might appear in dir as '._xxxxx.jpg', which we 
+        % will delete.
+        if isequal(jpgFiles(ii).name(1),'.')
+            delete(jpgFiles(ii).name);
+        else
+            currentfilename = jpgFiles(ii).name;
+            currentimage = imread(currentfilename);
+            if contains(jpgFiles(ii).name,'.JPG')
+                currentname  = erase(jpgFiles(ii).name,'.JPG');
+            elseif contains(jpgFiles(ii).name,'.jpg')
+                currentname  = erase(jpgFiles(ii).name,'.jpg');
+            end
+            output = sprintf('%s.png',currentname);
+            imwrite(currentimage,output);
+            % After writing the pngs, we erase the jpg file.
+            original = sprintf('%s.jpg',currentname);
+            delete(original);
+        end
     end
     fprintf('Converted %d jpg files.\n',numel(jpgFiles));
 end

@@ -59,9 +59,12 @@ if p.Results.ncars > 0
     % Download random cars from flywheel
     fname = piAssetDownload(carSession,'car',inputs.ncars,'scitran',st);
     
-    %% Analyze the downloaded scenes in fname and create the returned asset
+    % Analyze the downloaded scenes in fname and create the returned asset
     asset = piAssetAssign(fname);
 end
+%% Find the buses in the database
+
+
 
 disp('All done!')
 
