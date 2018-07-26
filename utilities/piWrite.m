@@ -34,6 +34,7 @@ piWrite(thisR);
 %%
 p = inputParser;
 
+varargin =ieParamFormat(varargin);
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
 % Format the parameters by removing spaces and forcing lower case.

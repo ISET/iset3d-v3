@@ -21,7 +21,7 @@ function asset = piAssetCreate(varargin)
 p = inputParser;
 varargin = ieParamFormat(varargin);
 
-p.addParameter('ncars',1);
+p.addParameter('ncars',0);
 p.addParameter('ntrucks',0);
 p.addParameter('npeople',0);
 p.addParameter('nbuses',0);
@@ -45,7 +45,6 @@ acquisitions = hierarchy.acquisitions;
 asset = [];
 
 %% Find the cars in the database
-
 if p.Results.ncars > 0
     % Find the session with the label car
     for ii=1:length(sessions)
@@ -56,16 +55,67 @@ if p.Results.ncars > 0
     end
     
     % Create Assets obj struct
-    % Download random cars from flywheel
+    % Download random assets from flywheel
     fname = piAssetDownload(carSession,'car',inputs.ncars,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(fname);
+    asset = piAssetAssign(fname,'label','car');
 end
 %% Find the buses in the database
+if p.Results.nbuses > 0
+    % Find the session with the label car
+    for ii=1:length(sessions)
+        if isequal(lower(sessions{ii}.label),'bus')
+            busSession = sessions{ii};
+            break;
+        end
+    end
+    
+    % Create Assets obj struct
+    % Download random assets from flywheel
+    fname = piAssetDownload(busSession,'bus',inputs.nbuses,'scitran',st);
+    
+    % Analyze the downloaded scenes in fname and create the returned asset
+    asset = piAssetAssign(fname,'label','bus');
+end
 
+%% Find the buses in the database
+if p.Results.ntrucks > 0
+    % Find the session with the label car
+    for ii=1:length(sessions)
+        if isequal(lower(sessions{ii}.label),'truck')
+            truckSession = sessions{ii};
+            break;
+        end
+    end
+    
+    % Create Assets obj struct
+    % Download random assets from flywheel
+    fname = piAssetDownload(truckSession,'truck',inputs.ntrucks,'scitran',st);
+    
+    % Analyze the downloaded scenes in fname and create the returned asset
+    asset = piAssetAssign(fname,'label','truck');
+end
 
+%% Find the people in the database
+if p.Results.npeople > 0
+    % Find the session with the label car
+    for ii=1:length(sessions)
+        if isequal(lower(sessions{ii}.label),'people')
+            peopleSession = sessions{ii};
+            break;
+        end
+    end
+    
+    % Create Assets obj struct
+    % Download random assets from flywheel
+    fname = piAssetDownload(peopleSession,'people',inputs.npeople,'scitran',st);
+    
+    % Analyze the downloaded scenes in fname and create the returned asset
+    asset = piAssetAssign(fname,'label','people');
+end
 
+%%
 disp('All done!')
 
 end

@@ -61,55 +61,40 @@ fileType    = 'archive';
 nDatabaseAssets = length(zipFiles);
 
 fname = cell(nassets,1);
+
 if nassets <= nDatabaseAssets
     assetList = randperm(nDatabaseAssets,nassets);
-    for jj = 1:nassets
-        [~,n,e] = fileparts(zipFiles{assetList(jj)}{1}.name);
-        
-        % Download the scene to a destination zip file
-        destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
-        st.fileDownload(zipFiles{assetList(jj)}{1}.name,...
-            'container type', 'acquisition' , ...
-            'container id',  acqID{assetList(jj)} ,...
-            'unzip', true, ...
-            'destination',destName);
-        
-        % Unzip the file
-        % localFolder = fullfile(piRootPath,'local');
-        % unzip(localFile,localFolder);
-        
-        % Save the file name of the scene in the folder
-        localFolder = fileparts(destName);
-        fname{jj}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
-        if ~exist(fname{jj},'file'), error('File not found'); 
-        end 
+    nDownloads = nassets;
+else 
+    nDownloads = nDatabaseAssets;
+    nRequired = nassets-nDatabaseAssets;
+    assetList = randperm(nDatabaseAssets,nDatabaseAssets);
+    assetList_required = randperm(nDatabaseAssets,nRequired);
+end
+
+for ii = 1:nDownloads
+    [~,n,e] = fileparts(zipFiles{assetList(ii)}{1}.name);
+    % Download the scene to a destination zip file
+    destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
+    st.fileDownload(zipFiles{assetList(ii)}{1}.name,...
+        'container type', 'acquisition' , ...
+        'container id',  acqID{assetList(ii)} ,...
+        'unzip', true, ...
+        'destination',destName);
+    % Save the file name of the scene in the folder
+    localFolder = fileparts(destName);
+    fname{ii}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
+    if ~exist(fname{ii},'file'), error('File not found');
     end
-else
-%     disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
+end
+%   disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
 %   New car geometry will overwrite the old one, thus two cars are created 
 %   with shared geometry, but different materials.
-    nRequired = nassets-nDatabaseAssets;
-    for jj = 1:nRequired
-        assetList = randperm(nDatabaseAssets,nRequired);
-        [~,n,e] = fileparts(zipFiles{assetList(jj)}{1}.name);
-        % Download the scene to a destination zip file
-        destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
-        st.fileDownload(zipFiles{assetList(jj)}{1}.name,...
-            'container type', 'acquisition' , ...
-            'container id',  acqID{assetList(jj)} ,...
-            'unzip', true, ...
-            'destination',destName);
-        % Unzip the file
-        % localFolder = fullfile(piRootPath,'local');
-        % unzip(localFile,localFolder);
-        
-        % Save the file name of the scene in the folder
-        localFolder = fileparts(destName);
-        fname{jj}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
-        if ~exist(fname{jj},'file'), error('File not found');
-        end
-    end 
+for jj = 1:nRequired
+    [~,n,~] = fileparts(zipFiles{assetList_required(jj)}{1}.name);
+    fname{nDownloads+jj} = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
 end
+
 fprintf('%d Files downloaded.\n',nassets);
 end
 

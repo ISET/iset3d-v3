@@ -64,7 +64,7 @@ scene_1 = piGeometryRead(thisR);
 
 %% Add two cars from the Flywheel database
 
-assets = piAssetCreate('ncars',2,'nbuses',2);
+assets = piAssetCreate('ncars',2,'nbuses',1);
 
 
 %% Move assets
@@ -85,25 +85,25 @@ assets = piAssetCreate('ncars',2,'nbuses',2);
 %
 
 % Asset 1 - translate
-heading = -7;  % Do we translate the position of the asset?  
-side    = 7;  % Which side is exposed to the camera
+heading = 2.55;  % Do we translate the position of the asset?  
+side    = 0;  % Which side is exposed to the camera
 Translation_1 = [heading 0 side];
 
 assets(1).geometry = piAssetTranslate(assets(1).geometry,Translation_1);
 
 % You could rotate if you like
-% rotation = -45;
-% assets(1).geometry = piAssetRotate(assets(1).geometry,rotation);
+rotation = -90;
+assets(1).geometry = piAssetRotate(assets(1).geometry,rotation);
 % 
-% % Asset 2 - translate
-% heading = 5; 
-% side    = -5;
-% Translation_2 = [heading 0 side];
-% assets(2).geometry = piAssetTranslate(assets(2).geometry,Translation_2);
-% 
-% % You could rotate if you like
-% rotation = 30;
-% assets(2).geometry = piAssetRotate(assets(2).geometry,rotation);
+% Asset 2 - translate
+heading = -2.55; 
+side    = 10;
+Translation_2 = [heading 0 side];
+assets(2).geometry = piAssetTranslate(assets(2).geometry,Translation_2);
+
+% You could rotate if you like
+rotation = 90;
+assets(2).geometry = piAssetRotate(assets(2).geometry,rotation);
 
 %% Assemble the objects with the scene here
 
@@ -113,10 +113,11 @@ assets(1).geometry = piAssetTranslate(assets(1).geometry,Translation_1);
 
 [~,n,e] = fileparts(fname); 
 thisR_scene.set('outputFile',fullfile(piRootPath,'local','cartest',[n,e]));
-piWrite(thisR_scene); % 
+piWrite(thisR_scene); 
 
 %% Write out geometry -- 
-piGeometryWrite(thisR_scene, scene_2); 
+% lights are turned off for default.
+piGeometryWrite(thisR_scene, scene_2,'lightsFlag',false); 
 
 %% Render irradiance
 

@@ -39,11 +39,11 @@ if(~status), error('Failed to copy brdfs directory to docker working directory.'
 ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
     str = thisR.materials.txtLines(jj);
-    if ~isempty(contains(str,'jpg'))
+    if contains(str,'jpg')
         thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
     end
     % photoshop exports texture format with ".JPG "(with extra space) ext.
-    if ~isempty(contains(str,'JPG'))
+    if contains(str,'JPG')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
     end
 end

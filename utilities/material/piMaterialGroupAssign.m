@@ -30,7 +30,7 @@ case contains(mList(ii),'carbody')
 %}
 
 for ii = 1:length(mlist)
-    if  contains(mlist(ii),'carbody')
+    if  contains(mlist(ii),'carbody') && ~contains(mlist(ii),'paint_base')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % 
