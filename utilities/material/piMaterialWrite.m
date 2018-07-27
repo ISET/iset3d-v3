@@ -65,6 +65,25 @@ end
 % textures here. 
 textureLines = txtLines(~cellfun('isempty',txtLines));
 
+for jj = 1: length(textureLines)
+    textureLines_tmp = [];
+    thisLine_tmp = textscan(textureLines{jj},'%q');
+    thisLine_tmp = thisLine_tmp{1};
+    for ii = 1:length(thisLine_tmp)
+        if contains(thisLine_tmp{ii},'.png')
+            filename = thisLine_tmp{ii};
+            thisLine_tmp{ii} = fullfile('texture',filename);
+        end
+        if ii == 1
+            textureLines_tmp = strcat(textureLines_tmp,thisLine_tmp{ii});
+        else
+            string = sprintf('"%s"',thisLine_tmp{ii});
+            textureLines_tmp = strcat(textureLines_tmp,{' '},string);
+        end 
+    end
+    textureLines{jj} = textureLines_tmp{1};
+end
+
 %% Create txtLines for the material struct array
 field =fieldnames(thisR.materials.list);
 materialTxt = cell(1,length(field));
@@ -99,17 +118,9 @@ else
 end
 fclose(fileID);
 
-[f,n,e] = fileparts(output);
+[~,n,e] = fileparts(output);
 fprintf('Material file %s written successfully.\n', [n,e]);
-%% Copy necessary rendering resources to output folder
-workdir = fullfile(f,n);
-% from data/spds to local/workdir
 
-% from data/brdfs to local/brdfs
-
-% skymaps
-
-% lens
 end
 
 %% function that converts the struct to text

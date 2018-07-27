@@ -1,4 +1,4 @@
-function groupobj = piGeometryRead(renderRecipe)
+function [renderRecipe,groupobj] = piGeometryRead(renderRecipe)
 %% Read a geometry file exported by C4d and extract objects information
 %
 %Input
@@ -21,8 +21,8 @@ end
 %
 [Filepath,scene_fname] = fileparts(renderRecipe.inputFile);
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));
-% save output obj struct to scenename.mat file
-Object_mat = fullfile(Filepath,sprintf('%s.mat',scene_fname));
+% save output obj struct to scenename.json file
+AssetInfo = fullfile(Filepath,sprintf('%s.json',scene_fname));
 %% open it
 fileID = fopen(fname);
 tmp = textscan(fileID,'%s','Delimiter','\n');
@@ -163,12 +163,13 @@ if ~convertedflag
         end
         fprintf('Object:%s has %d child object(s) \n',groupobj(hh).name,jj-1);hh = hh+1;
     end
-    save(Object_mat,'groupobj');
+    renderRecipe.assets = groupobj;
+    jsonwrite(AssetInfo,renderRecipe);
     disp('All done.');
 else
     
-    groupobj = load(Object_mat);
-    groupobj = groupobj.groupobj;
+    renderRecipe = jsonread(AssetInfo);
+    groupobj = renderRecipe.assets.groupobj;
     
 end
 end

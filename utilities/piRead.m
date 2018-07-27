@@ -288,6 +288,7 @@ end
 [p,n,~] = fileparts(fname);
 fname_materials = sprintf('%s_materials.pbrt',n);
 inputFile_materials=fullfile(p,fname_materials);
+
 fileID = fopen(inputFile_materials);
 tmp = textscan(fileID,'%s','Delimiter','\n');
 headerCheck = tmp{1};
@@ -311,5 +312,10 @@ elseif contains(headerCheck{1}, 'Exported by piMaterialWrite')
     thisR.materials.inputFile_materials = inputFile_materials;
     % Call material lib
     thisR.materials.lib = piMateriallib;
+end
+
+%% Read geometry.pbrt file if pbrt file is exported by C4D
+if exporterFlag 
+    [thisR,~] = piGeometryRead(thisR); 
 end
 end

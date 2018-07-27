@@ -14,7 +14,7 @@ for ii = 1: length(fname)
     % assign random color for carpaint of cloth, 
     piMaterialGroupAssign(thisR);
     asset(ii).class = label;
-    geometry = piGeometryRead(thisR);
+    geometry = thisR.assets;
     for jj = 1:length(geometry)
         if ~isequal(lower(geometry(jj).name),'camera')
             index = strfind(geometry(jj).name,'_');

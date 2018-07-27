@@ -3,13 +3,13 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 
 %%
-assetname = 'female_1_walk';
+assetname = 'Car_7';
 
 %% Read pbrt_material files
-% FilePath = fullfile('/Volumes/wandell/data/NN_Camera_Generalization/pbrt_assets/bus',assetname);
+FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car',assetname);
 % FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/people',lower(assetname));
-fname = '/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/people/female_1_walk/female_1.pbrt';
-% fname = fullfile(FilePath,sprintf('%s.pbrt',assetname));
+% fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
+fname = fullfile(FilePath,sprintf('%s.pbrt',assetname));
 if ~exist(fname,'file'), error('File not found'); end
 thisR = piRead(fname,'version',3);
 
@@ -27,24 +27,20 @@ piMaterialList(thisR);
 % use piColorPick to wisely choose a black color.
 % thisR.materials.list.NissanTitan_carbody_black_paint_base.colorkd = piColorPick('black');
 
-%% Read a geometry file exported by C4d and extract objects information
-human = piGeometryRead(thisR);
-
 %% Write out
-
 [~,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local',assetname,[n,e]));
 piWrite(thisR);
-%%
-piGeometryWrite(thisR, human);
-
+%% Upload to Car acquisition on Flywheel
+st = scitran('stanfordlabs');
 %% zip the folder
 folder = fullfile(piRootPath,'local',assetname);
-cd(fullfile(piRootPath,'local'));
-zip(sprintf('%s.zip',n),folder);
+cd(folder);
+zip('RenderResource.zip',{'texture','spds','skymaps','scene','brdfs'});
 
-%% Upload to Car acquisition on Flywheel
+% upload Car_7.json
 
+% upload render resources (spds,skymaps,scene, brdfs) as a zip.
 
 %% Render irradiance
 % tic, scene = piRender(thisR); toc

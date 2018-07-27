@@ -51,6 +51,7 @@ for ii = 1:length(objects)
     end
     end
     %% add objects.geometry to scene(geometry struct)
+    scene = thisR.assets;
     if geometry
         numScene = length(scene);
         numObj   = length(objects(ii).geometry);

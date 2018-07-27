@@ -54,7 +54,8 @@ p.addParameter('overwritematerials',true,@islogical);
 
 % Create a new materials.pbrt
 p.addParameter('creatematerials',false,@islogical);
-
+% control lighting in geomtery.pbrt
+p.addParameter('lightsFlag',false,@islogical);
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
@@ -63,7 +64,7 @@ overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
 creatematerials  = p.Results.creatematerials;
-
+lightsFlag = p.Results.lightsFlag;
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
@@ -330,5 +331,9 @@ if contains(renderRecipe.exporter, 'C4D')
         renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
         piMaterialWrite(renderRecipe);
     end
+end
+%% Overwirte geometry.pbrt
+if contains(renderRecipe.exporter, 'C4D')
+    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
 end
 end

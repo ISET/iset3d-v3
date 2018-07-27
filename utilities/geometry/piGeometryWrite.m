@@ -1,4 +1,4 @@
-function  piGeometryWrite(thisR,obj,varargin)
+function  piGeometryWrite(thisR,varargin)
 
 %% Wirte out a new geometry file which matchs the format we used to label object instances
 % Input: 
@@ -12,15 +12,14 @@ function  piGeometryWrite(thisR,obj,varargin)
 p = inputParser;
 varargin =ieParamFormat(varargin);
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
-p.addRequired('obj',@(x)isequal(class(x),'struct'));
 % default is flase, will turn on for night scene
 p.addParameter('lightsFlag',false,@islogical);
-p.parse(thisR,obj,varargin{:});
+p.parse(thisR,varargin{:});
 lightsFlag = p.Results.lightsFlag;
 %%
 [Filepath,scene_fname] = fileparts(thisR.outputFile);
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));[~,n,e]=fileparts(fname);
-
+obj = thisR.assets;
 %% Make parent obj files which includes all the child obj files
 
 fname_obj = fullfile(Filepath,sprintf('%s%s',n,e));

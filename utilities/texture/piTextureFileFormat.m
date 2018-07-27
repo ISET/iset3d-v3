@@ -13,10 +13,6 @@ cd(directory)
 
 %% Find any jpg file
 jpgFiles = dir('*.jpg');
-if isempty(jpgFiles)
-    fprintf('No jpg files to be converted \n');
-    return;
-end
 
 %% Convert the jpg files to png
 if ~isempty(jpgFiles)
@@ -42,8 +38,18 @@ if ~isempty(jpgFiles)
         end
     end
     fprintf('Converted %d jpg files.\n',numel(jpgFiles));
+else
+    fprintf('No jpg files to be converted \n');
 end
-
+%% Put all texture files in a seperate folder.
+mkdir('texture');
+texturePath = 'texture';
+textureFiles=dir('*.png');
+for i=1:length(textureFiles)
+    textureFileName=textureFiles(i).name;
+    textureFilePath=textureFileName;
+    movefile(textureFilePath,fullfile(texturePath,textureFileName));
+end
 %%
 cd(currentfolder)
 
