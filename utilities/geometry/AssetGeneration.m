@@ -7,6 +7,7 @@ assetname = 'Car_7';
 
 %% Read pbrt_material files
 FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car',assetname);
+FilePath = pwd;
 % FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/people',lower(assetname));
 % fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
 fname = fullfile(FilePath,sprintf('%s.pbrt',assetname));
@@ -39,7 +40,7 @@ cd(folder);
 zip('RenderResource.zip',{'texture','spds','skymaps','scene','brdfs'});
 
 % upload Car_7.json
-
+ 
 % upload render resources (spds,skymaps,scene, brdfs) as a zip.
 
 %% Render irradiance

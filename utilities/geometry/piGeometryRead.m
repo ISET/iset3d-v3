@@ -169,7 +169,7 @@ if ~convertedflag
 else
     
     renderRecipe = jsonread(AssetInfo);
-    groupobj = renderRecipe.assets.groupobj;
+    groupobj = renderRecipe.assets;
     
 end
 end
