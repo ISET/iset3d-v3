@@ -336,4 +336,9 @@ end
 if contains(renderRecipe.exporter, 'C4D')
     piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
 end
+
+%% Overwrite xxx.json
+[~,scene_fname,~] = fileparts(renderRecipe.outputFile);
+jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
+jsonwrite(jsonFile,renderRecipe);
 end

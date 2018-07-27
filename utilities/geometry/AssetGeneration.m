@@ -3,11 +3,11 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 
 %%
-assetname = 'Car_7';
+assetname = 'Car_8';
 
 %% Read pbrt_material files
 FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car',assetname);
-FilePath = pwd;
+% FilePath = pwd;
 % FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/people',lower(assetname));
 % fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
 fname = fullfile(FilePath,sprintf('%s.pbrt',assetname));
