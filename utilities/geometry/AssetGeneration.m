@@ -73,6 +73,13 @@ st.verify;
 hierarchy = st.projectHierarchy('Graphics assets');
 %% Set the modality and some info data
 
+modality = flywheel.model.Modality('id', 'CG', 'classification', struct('Aspect1', {{'value1', 'value2'}}))
+fw.addModality(modality);
+
+Then you should be able to do this:
+st.fw.modifyAcquisitionFile(id, fileList{1}.name, struct('modality', 'CG'));
+
+
 % The reosurce file should be Car_1.cgresource.zip
 hierarchy = st.projectHierarchy('Graphics assets');
 id = hierarchy.acquisitions{1}{1}.id;
