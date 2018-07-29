@@ -55,7 +55,7 @@ end
 % These files are within an acquisition (dataFile)
 containerID = idGet(session,'data type','session');
 fileType    = 'archive';
-[zipFiles, acqID] = st.fileDataList('session', containerID, fileType, ...
+[zipFiles, acqID] = st.dataFileList('session', containerID, fileType, ...
     'asset',sessionname);
 
 nDatabaseAssets = length(zipFiles);
