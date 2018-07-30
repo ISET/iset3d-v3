@@ -46,6 +46,9 @@ for jj = 1:ntxtLines
     if contains(str,'JPG')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
     end
+    if contains(str,'bmp')
+        thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
+    end
 end
 
 %% Empty any line that contains MakeNamedMaterial
@@ -102,10 +105,24 @@ for row=1:length(textureLines)
 end
 
 % Add the materials
-if contains(materialTxt{length(materialTxt)},'paint_base')
-    fprintf(fileID,'%s\n',materialTxt{length(materialTxt)});
-    fprintf(fileID,'%s\n',materialTxt{length(materialTxt)-1});
-    nmaterialTxt = length(materialTxt)-2;
+nPaintLines = {};
+gg = 1;
+for dd = 1:length(materialTxt)
+    if contains(materialTxt{dd},'paint_base') &&...
+            ~contains(materialTxt{dd},'mix')||...
+        contains(materialTxt{dd},'paint_mirror') &&...
+            ~contains(materialTxt{dd},'mix')   
+        nPaintLines{gg} = dd;
+        gg = gg+1;
+    end
+end
+
+% Find material names contains 'paint_base' or 'paint_mirror'
+if ~isempty(nPaintLines)
+    for hh = 1:length(nPaintLines)
+    fprintf(fileID,'%s\n',materialTxt{nPaintLines{hh}});
+    end
+    nmaterialTxt = length(materialTxt)-length(nPaintLines);
     for row=1:nmaterialTxt
         fprintf(fileID,'%s\n',materialTxt{row});
         

@@ -1,4 +1,4 @@
-function fname = piAssetDownload(session,sessionname,nassets,varargin)
+function assetRecipe = piAssetDownload(session,sessionname,nassets,varargin)
 % Download assets from a flywheel session
 %
 %  fname = piAssetDownload(session,sessionname,nassets,varargin)
@@ -61,11 +61,11 @@ fileType_json ='source code'; % json
 
 nDatabaseAssets = length(resourceFiles);
 
-fname = cell(nassets,1);
-
+assetRecipe = cell(nassets,1);
 if nassets <= nDatabaseAssets
     assetList = randperm(nDatabaseAssets,nassets);
     nDownloads = nassets;
+    nRequired = 0;
 else 
     nDownloads = nDatabaseAssets;
     nRequired = nassets-nDatabaseAssets;
@@ -75,10 +75,12 @@ end
 
 for ii = 1:nDownloads
     [~,n,~] = fileparts(resourceFiles{assetList(ii)}{1}.name);
-    [~,n,~] = fileparts(n); % remove'.cgresource'
+    [~,n,~] = fileparts(n); % extract file name
     % Download the scene to a destination zip file
-    destName_recipe = fullfile(piRootPath,'local',sprintf('%s.json',n));
-    destName_resource = fullfile(piRootPath,'local',sprintf('%s.zip',n));
+    localFolder = fullfile(piRootPath,'local',n);
+    if ~exist(localFolder,'dir'), mkdir(localFolder);end
+    destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
+    destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
     
     st.fileDownload(recipeFiles{assetList(ii)}{1}.name,...
         'container type', 'acquisition' , ...
@@ -90,19 +92,16 @@ for ii = 1:nDownloads
         'container id',  resource_acqID{assetList(ii)} ,...
         'unzip', true, ...
         'destination',destName_resource);
-    % Save the file name of the scene in the folder
-    %%%%%%%%%%%% need to fix%%%%%%%%%%%%%%% 07/29
-    localFolder = fileparts(destName);
-    fname{ii}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
-    if ~exist(fname{ii},'file'), error('File not found');
-    end
+    assetRecipe{ii}   = destName_recipe;
+    if ~exist(assetRecipe{ii},'file'), error('File not found');end 
 end
 %   disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
 %   New car geometry will overwrite the old one, thus two cars are created 
 %   with shared geometry, but different materials.
 for jj = 1:nRequired
     [~,n,~] = fileparts(resourceFiles{assetList_required(jj)}{1}.name);
-    fname{nDownloads+jj} = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
+    assetRecipe{nDownloads+jj} = fullfile(localFolder, sprintf('%s.json',n));
+    if ~exist(assetRecipe{ii},'file'), error('File not found');end 
 end
 
 fprintf('%d Files downloaded.\n',nassets);

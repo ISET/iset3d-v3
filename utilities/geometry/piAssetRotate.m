@@ -18,7 +18,7 @@ for jj=1:length(object)
     if contains(object(jj).name,'light')
         light = [object(jj).position(1) object(jj).position(3)];
 %         plot([object_position(1) light(1)],[object_position(2) light(2)]);hold on
-        axis([-15 15 -15 15]);
+%         axis([-15 15 -15 15]);
         position = piPointRotate(light,object_position,-degree);
 %         plot([object_position(1) position(1)],[object_position(2) position(2)]);
         object(jj).position = [position(1) object(jj).position(2) position(2)];

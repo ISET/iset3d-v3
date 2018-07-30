@@ -12,10 +12,14 @@ for ii=1:length(asset)
 
     if isempty(asset(ii).position)
         % Assume position is 0,0,0
-        asset(ii).position = translation;
+        asset(ii).position(1) = translation(1);
+        asset(ii).position(2) = translation(2);
+        asset(ii).position(3) = translation(3);
     else
         % Add the translation
-        asset(ii).position = asset(ii).position + translation;
+        asset(ii).position(1) = asset(ii).position(1) + translation(1);
+        asset(ii).position(2) = asset(ii).position(2) + translation(2);
+        asset(ii).position(3) = asset(ii).position(3) + translation(3);
     end
     
     % Update the position of the x-z 2d box of the asset that we use

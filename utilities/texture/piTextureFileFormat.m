@@ -52,8 +52,9 @@ if ~isempty(bmpFiles)
         else
             currentfilename = bmpFiles(ii).name;
             currentimage = imread(currentfilename);
-            contains(bmpFiles(ii).name,'.bmp')
-                currentname  = erase(bmpFiles(ii).name,'.bmp');
+        if contains(bmpFiles(ii).name,'.bmp')
+            currentname  = erase(bmpFiles(ii).name,'.bmp');
+        end
             output = sprintf('%s.png',currentname);
             imwrite(currentimage,output);
             % After writing the pngs, we erase the jpg file.

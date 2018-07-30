@@ -43,7 +43,7 @@ for ii = 1: length(obj)
             if isempty(obj(ii).position)
                 fprintf(fid_obj,'Translate 0 0 0 \n');
             else
-                fprintf(fid_obj,'Translate %f %f %f \n',obj(ii).position);
+                fprintf(fid_obj,'Translate %f %f %f \n',obj(ii).position(1),obj(ii).position(2),obj(ii).position(3));
             end
             if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0 0 0 0])
                 fprintf(fid_obj,'Rotate %f %f %f %f \n',obj(ii).rotate);

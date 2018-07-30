@@ -1,4 +1,4 @@
-function [thisR,scene] = piAssetAdd(thisR,scene,objects,varargin)
+function [thisR] = piAssetAdd(thisR,objects,varargin)
 % objects = assets;
 % scene = scene_1;
 % Assemble a scene with objects.
@@ -62,6 +62,7 @@ for ii = 1:length(objects)
         [f,~,~]=fileparts(thisR.inputFile);
         copyfile(objects(ii).geometryPath,fullfile(f,'scene','PBRT','pbrt-geometry'));
     end
+    thisR.assets = scene;
 end
 end
 

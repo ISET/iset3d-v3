@@ -168,9 +168,14 @@ if ~convertedflag
     disp('All done.');
 else
     
-    renderRecipe = jsonread(AssetInfo);
+    renderRecipe_tmp = jsonread(AssetInfo);
+    fds = fieldnames(renderRecipe_tmp);
+    renderRecipe = recipe;
+    % assign the struct to a recipe class
+    for dd = 1:length(fds)
+        renderRecipe.(fds{dd})= renderRecipe_tmp.(fds{dd});
+    end
     groupobj = renderRecipe.assets;
-    
 end
 end
 

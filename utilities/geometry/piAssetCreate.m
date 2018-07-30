@@ -56,10 +56,10 @@ if p.Results.ncars > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    fname = piAssetDownload(carSession,'car',inputs.ncars,'scitran',st);
+    assetRecipe = piAssetDownload(carSession,'car',inputs.ncars,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(fname,'label','car');
+    asset = piAssetAssign(assetRecipe,'label','car');
 end
 %% Find the buses in the database
 if p.Results.nbuses > 0
@@ -73,10 +73,10 @@ if p.Results.nbuses > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    fname = piAssetDownload(busSession,'bus',inputs.nbuses,'scitran',st);
+    assetRecipe = piAssetDownload(busSession,'bus',inputs.nbuses,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(fname,'label','bus');
+    asset = piAssetAssign(assetRecipe,'label','bus');
 end
 
 %% Find the buses in the database
@@ -91,10 +91,10 @@ if p.Results.ntrucks > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    fname = piAssetDownload(truckSession,'truck',inputs.ntrucks,'scitran',st);
+    assetRecipe = piAssetDownload(truckSession,'truck',inputs.ntrucks,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(fname,'label','truck');
+    asset = piAssetAssign(assetRecipe,'label','truck');
 end
 
 %% Find the people in the database
@@ -109,10 +109,10 @@ if p.Results.npeople > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    fname = piAssetDownload(peopleSession,'people',inputs.npeople,'scitran',st);
+    assetRecipe = piAssetDownload(peopleSession,'people',inputs.npeople,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(fname,'label','people');
+    asset = piAssetAssign(assetRecipe,'label','people');
 end
 
 %%
