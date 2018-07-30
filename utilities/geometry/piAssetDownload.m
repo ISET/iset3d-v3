@@ -55,10 +55,11 @@ end
 % These files are within an acquisition (dataFile)
 containerID = idGet(session,'data type','session');
 fileType    = 'archive';
-[zipFiles, acqID] = st.dataFileList('session', containerID, fileType, ...
-    'asset',sessionname);
+[resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
+fileType_json ='source code'; % json
+[recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
 
-nDatabaseAssets = length(zipFiles);
+nDatabaseAssets = length(resourceFiles);
 
 fname = cell(nassets,1);
 
@@ -73,15 +74,24 @@ else
 end
 
 for ii = 1:nDownloads
-    [~,n,e] = fileparts(zipFiles{assetList(ii)}{1}.name);
+    [~,n,~] = fileparts(resourceFiles{assetList(ii)}{1}.name);
+    [~,n,~] = fileparts(n); % remove'.cgresource'
     % Download the scene to a destination zip file
-    destName = fullfile(piRootPath,'local',sprintf('%s%s',n,e));
-    st.fileDownload(zipFiles{assetList(ii)}{1}.name,...
+    destName_recipe = fullfile(piRootPath,'local',sprintf('%s.json',n));
+    destName_resource = fullfile(piRootPath,'local',sprintf('%s.zip',n));
+    
+    st.fileDownload(recipeFiles{assetList(ii)}{1}.name,...
         'container type', 'acquisition' , ...
-        'container id',  acqID{assetList(ii)} ,...
+        'container id',  recipe_acqID{assetList(ii)} ,...
+        'destination',destName_recipe);
+    
+    st.fileDownload(resourceFiles{assetList(ii)}{1}.name,...
+        'container type', 'acquisition' , ...
+        'container id',  resource_acqID{assetList(ii)} ,...
         'unzip', true, ...
-        'destination',destName);
+        'destination',destName_resource);
     % Save the file name of the scene in the folder
+    %%%%%%%%%%%% need to fix%%%%%%%%%%%%%%% 07/29
     localFolder = fileparts(destName);
     fname{ii}   = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
     if ~exist(fname{ii},'file'), error('File not found');
@@ -91,7 +101,7 @@ end
 %   New car geometry will overwrite the old one, thus two cars are created 
 %   with shared geometry, but different materials.
 for jj = 1:nRequired
-    [~,n,~] = fileparts(zipFiles{assetList_required(jj)}{1}.name);
+    [~,n,~] = fileparts(resourceFiles{assetList_required(jj)}{1}.name);
     fname{nDownloads+jj} = fullfile(localFolder, sprintf('%s/%s.pbrt',n,n));
 end
 

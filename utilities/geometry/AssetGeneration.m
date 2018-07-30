@@ -4,18 +4,19 @@
 % to FLywheel to serve as assets for later scene assembly.
 %
 % ZL, BW Vistasoft Team, 2018
-
-
 %% Initialize ISETCAM and Docker
 ieInit;
 %if ~piDockerExists, piDockerConfig; end
-
 %%
-
+tic
+for dd = 13:15
+%%
+% index = ii;
 % The students have been producing these files on SNI shared storage
-mainPath = '/Volumes/group/wandell/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets';
+mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
 assetType = 'car';
-assetname = 'Car_8';
+assetname = sprintf('Car_%03d',dd);
+
 
 %{
 FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car',assetname);
@@ -126,20 +127,42 @@ end
 % First check whether an acquisition with this name exists
 
 % st.fileUpload(...,'modality','CG');
-
+current_acquisitions = assetname;
 acquisitions = st.list('acquisition',carSession.id);
+Acq_index = [];
 for ii=1:length(acquisitions)
-    if isequal(lower(acquisitions{ii}.label),'car_8')
+    if isequal(lower(acquisitions{ii}.label),lower(current_acquisitions))
+        Acq_index = ii;
         % Upload the two files and set their modality.
         st.fileUpload(recipeFile,'acquisition',acquisitions{ii}.id);
         st.fw.modifyAcquisitionFile(acquisitions{ii}.id, recipeFile, struct('modality', 'CG'));
-        
+        fprintf('%s uploaded \n',recipeFile);
         st.fileUpload(resourceFile,'acquisition',acquisitions{ii}.id);
         st.fw.modifyAcquisitionFile(acquisitions{ii}.id, resourceFile, struct('modality', 'CG'));
-        break;
+        fprintf('%s uploaded \n',resourceFile);
+    break;
+       
+       
     end
 end
-
+% create an acquisition
+if isempty(Acq_index)
+    current_id = st.containerCreate('Wandell Lab', 'Graphics assets',...
+        'session','car','acquisition',current_acquisitions);
+    if ~isempty(current_id.acquisition)
+        fprintf('%s acquisition created \n',current_acquisitions);
+    end
+    st.fileUpload(recipeFile,'acquisition',current_id.acquisition);
+    st.fw.modifyAcquisitionFile(current_id.acquisition, recipeFile, struct('modality', 'CG'));
+    fprintf('%s uploaded \n',recipeFile);
+    st.fileUpload(resourceFile,'acquisition',current_id.acquisition);
+    st.fw.modifyAcquisitionFile(current_id.acquisition, resourceFile, struct('modality', 'CG'));
+    fprintf('%s uploaded \n',resourceFile);
+end
+fprintf('%d asset uploaded \n',dd);
+end
+disp('>>>>>>>>>>>>>>Done!<<<<<<<<<<<<<<<<<<')
+toc
 %%
 
 %{

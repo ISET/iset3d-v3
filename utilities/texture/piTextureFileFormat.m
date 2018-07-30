@@ -13,7 +13,7 @@ cd(directory)
 
 %% Find any jpg file
 jpgFiles = dir('*.jpg');
-
+bmpFiles  = dir('*.bmp');
 %% Convert the jpg files to png
 if ~isempty(jpgFiles)
     nfiles = length(jpgFiles);
@@ -38,8 +38,30 @@ if ~isempty(jpgFiles)
         end
     end
     fprintf('Converted %d jpg files.\n',numel(jpgFiles));
-else
-    fprintf('No jpg files to be converted \n');
+% else
+%     fprintf('No jpg files to be converted \n');
+end
+%% Convert the bump files to png
+if ~isempty(bmpFiles)
+    nfiles = length(bmpFiles);
+    for ii=1:nfiles
+        % some hidden files might appear in dir as '._xxxxx.jpg', which we 
+        % will delete.
+        if isequal(bmpFiles(ii).name(1),'.')
+            delete(bmpFiles(ii).name);
+        else
+            currentfilename = bmpFiles(ii).name;
+            currentimage = imread(currentfilename);
+            contains(bmpFiles(ii).name,'.bmp')
+                currentname  = erase(bmpFiles(ii).name,'.bmp');
+            output = sprintf('%s.png',currentname);
+            imwrite(currentimage,output);
+            % After writing the pngs, we erase the jpg file.
+            original = sprintf('%s.bmp',currentname);
+            delete(original);
+        end
+    end
+    fprintf('Converted %d bmp files.\n',numel(bmpFiles));
 end
 %% Put all texture files in a seperate folder.
 mkdir('texture');
