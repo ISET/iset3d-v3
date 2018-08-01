@@ -34,5 +34,6 @@ m.spectrumk = '';
 m.spectrumeta ='';
 m.stringnamedmaterial1 = '';
 m.stringnamedmaterial2 = '';
+m.texturebumpmap = '';
 
 end

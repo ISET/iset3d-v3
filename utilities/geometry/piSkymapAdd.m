@@ -7,7 +7,8 @@ function thisR = piSkymapAdd(thisR,input)
 %                'day'
 %                'dusk'
 %                'sunset'
-%                'night'   
+%                'night' 
+%                'cloudy'
 %                'random'- pick a random skymap from skymaps folder
 % retruns 
 %        none;
@@ -17,7 +18,7 @@ function thisR = piSkymapAdd(thisR,input)
 % Zhenyi,2018
 %%
 skymaps = fullfile(piRootPath,'data','skymaps');
-
+input = lower(input);
 switch input
     case 'morning'
     skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr"');
@@ -29,6 +30,8 @@ switch input
     skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset.exr"');
     case 'night'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
+    case 'cloudy'
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr"');        
     case'random'
         curDir = pwd;
         cd(skymaps)

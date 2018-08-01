@@ -103,6 +103,9 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.substrate;
         piMaterialAssign(thisR,material.name,target);
+    elseif contains(mlist(ii),'wall')
+        name = cell2mat(mlist(ii));
+        thisR.materials.list.(name).texturebumpmap = 'windy_bump';
     else
         %otherwise, assign an default matte material.
         name = cell2mat(mlist(ii));

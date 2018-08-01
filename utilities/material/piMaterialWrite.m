@@ -27,11 +27,11 @@ if ~exist(desdir,'dir'), mkdir(desdir);end
 status = copyfile(skymaps_path,desdir);
 if(~status), error('Failed to copy skymaps directory to docker working directory.');end
 % copy brdfs to working directroy
-brdfs_path = fullfile(piRootPath,'data','brdfs');
-desdir = fullfile(workingDir,'brdfs');
+brdfs_path = fullfile(piRootPath,'data','bsdfs');
+desdir = fullfile(workingDir,'bsdfs');
 if ~exist(desdir,'dir'), mkdir(desdir);end
 status = copyfile(brdfs_path,desdir);
-if(~status), error('Failed to copy brdfs directory to docker working directory.');end
+if(~status), error('Failed to copy bsdfs directory to docker working directory.');end
 
 %% Parse the output file, working directory, stuff like that.
 
@@ -86,7 +86,7 @@ for jj = 1: length(textureLines)
     end
     textureLines{jj} = textureLines_tmp{1};
 end
-
+textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy"';
 %% Create txtLines for the material struct array
 field =fieldnames(thisR.materials.list);
 materialTxt = cell(1,length(field));
@@ -239,6 +239,11 @@ end
 if ~isempty(materials.stringnamedmaterial2)
     val_stringnamedmaterial2 = sprintf(' "string namedmaterial2" "%s" ',materials.stringnamedmaterial2);
     val = strcat(val, val_stringnamedmaterial2);
+end
+
+if ~isempty(materials.texturebumpmap)
+    val_texturekr = sprintf(' "texture bumpmap" "%s" ',materials.texturebumpmap);
+    val = strcat(val, val_texturekr);
 end
 
 end

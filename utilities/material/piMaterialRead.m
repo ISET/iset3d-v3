@@ -172,6 +172,8 @@ for ii=1:nLines
                     materials(cnt).stringnamedmaterial1 = thisLine{ss+1};
                 case 'string namedmaterial2'
                     materials(cnt).stringnamedmaterial2 = thisLine{ss+1};
+                case 'texture bumpmap'
+                    materials(cnt).texturebumpmap = thisLine{ss+1};
                     
                 otherwise
                     % fprintf('Unknown case %s\n',thisLine{ss});

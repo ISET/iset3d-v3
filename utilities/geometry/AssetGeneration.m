@@ -9,13 +9,15 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 13:15
+% for dd = 13:15
 %%
 % index = ii;
 % The students have been producing these files on SNI shared storage
-mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
-assetType = 'car';
-assetname = sprintf('Car_%03d',dd);
+% mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
+% % assetType = 'car';
+% assetType = 'traffic_signs';
+% assetname = sprintf('Car_%03d',dd);
+assetname = 'city_block_3';
 
 
 %{
@@ -30,7 +32,8 @@ FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/pe
 fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
 %}
 
-fname = fullfile(mainPath,assetType,assetname,sprintf('%s.pbrt',assetname));
+% fname = fullfile(mainPath,assetType,assetname,'pbrt',sprintf('%s.pbrt',assetname));
+fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/city/city_block_3/city_block_3.pbrt';
 if ~exist(fname,'file'), error('File not found'); end
 
 % When we read, we also write a JSON recipe.
@@ -42,14 +45,14 @@ thisR = piRead(fname,'version',3);
 % people could relatively quickly have a look at the rendered object.
 
 thisR.set('filmresolution',[1080 720]);
-thisR.set('pixelsamples',8);
+thisR.set('pixelsamples',64);
 thisR.integrator.maxdepth.value = 5;
 thisR.integrator.subtype = 'bdpt';
 thisR.sampler.subtype = 'sobol';
 
 %% Add skymap a default day time sky map
 
-piSkymapAdd(thisR,'day');
+piSkymapAdd(thisR,'morning');
  
 %% Assign Materials and Color
 
@@ -160,7 +163,7 @@ if isempty(Acq_index)
     fprintf('%s uploaded \n',resourceFile);
 end
 fprintf('%d asset uploaded \n',dd);
-end
+% end
 disp('>>>>>>>>>>>>>>Done!<<<<<<<<<<<<<<<<<<')
 toc
 %%

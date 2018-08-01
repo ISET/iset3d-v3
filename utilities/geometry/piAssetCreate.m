@@ -7,7 +7,7 @@ function asset = piAssetCreate(varargin)
 % Optional key/value parameters
 %   nCars
 %   nTrucks
-%   nPeople
+%   nPed
 %   nBuses
 %   nCyclist
 %   scitran
@@ -23,7 +23,7 @@ varargin = ieParamFormat(varargin);
 
 p.addParameter('ncars',0);
 p.addParameter('ntrucks',0);
-p.addParameter('npeople',0);
+p.addParameter('nPed',0);
 p.addParameter('nbuses',0);
 p.addParameter('ncyclist',0); % Cyclist contains two class: rider and bike.
 p.addParameter('scitran','',@(x)(isa(x,'scitran')));
@@ -98,21 +98,21 @@ if p.Results.ntrucks > 0
 end
 
 %% Find the people in the database
-if p.Results.npeople > 0
+if p.Results.nPed > 0
     % Find the session with the label car
     for ii=1:length(sessions)
-        if isequal(lower(sessions{ii}.label),'people')
-            peopleSession = sessions{ii};
+        if isequal(lower(sessions{ii}.label),'pedestrian')
+            pedestrianSession = sessions{ii};
             break;
         end
     end
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    assetRecipe = piAssetDownload(peopleSession,'people',inputs.npeople,'scitran',st);
+    assetRecipe = piAssetDownload(pedestrianSession,'pedestrian',inputs.npeople,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(assetRecipe,'label','people');
+    asset = piAssetAssign(assetRecipe,'label','pedestrian');
 end
 
 %%
