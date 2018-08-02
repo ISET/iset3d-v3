@@ -103,7 +103,7 @@ f1 = st.fw.getAcquisitionFileInfo(id, fileList{1}.name)
 folder = fullfile(piRootPath,'local',assetname);
 chdir(folder);
 resourceFile = sprintf('%s.cgresource.zip',assetname);
-zip(resourceFile,{'texture','spds','skymaps','scene','brdfs'});
+zip(resourceFile,{'texture','spds','skymaps','scene','bsdfs'});
 
 %%
 oldRecipeFile = sprintf('%s.json',assetname);
