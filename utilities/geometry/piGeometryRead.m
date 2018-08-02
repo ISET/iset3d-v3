@@ -67,8 +67,8 @@ if ~convertedflag
         ll = 1; jj = 1;
         for ii = nestbegin(dd): nestend(dd)
             % Find the name of a grouped object
-            if contains(txtLines{nestbegin(dd)+1}, "#ObjectName ")
-                GroupObj_name_tmp = erase(txtLines{nestbegin(dd)+1},"#ObjectName ");
+            if contains(txtLines{nestbegin(dd)+1}, '#ObjectName ')
+                GroupObj_name_tmp = erase(txtLines{nestbegin(dd)+1},'#ObjectName ');
                 index = strfind(GroupObj_name_tmp, ':');
                 Groupobj_name = GroupObj_name_tmp(1:(index-1));
                 Groupobj_size = GroupObj_name_tmp((index+8):end);
@@ -84,7 +84,7 @@ if ~convertedflag
                 %         %
                 %         Groupobj(hh).center = mean(Groupobj(hh).box);
                 groupobj(hh).name = sprintf('%s',Groupobj_name);
-                if contains(txtLines{nestbegin(dd)+2}, "ConcatTransform")
+                if contains(txtLines{nestbegin(dd)+2}, 'ConcatTransform')
                     tmp = txtLines{nestbegin(dd)+2};
                     tmp  = textscan(tmp, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
                     values = cell2mat(tmp(2:end));
@@ -110,13 +110,13 @@ if ~convertedflag
                 % Name is created by a pattern: '#ObjectName' + 'objname' + ':' +'Vector' + '(width(x), height(y), lenght(z))'
                 % Check if concattranform is contained in a child attribute.
                 if contains(txtLines(ii-1),':Vector(')
-                    name = erase(txtLines(ii-1),"#ObjectName ");
+                    name = erase(txtLines(ii-1),'#ObjectName ');
                 elseif contains(txtLines(ii-3),':Vector(')
-                    name = erase(txtLines(ii-3),"#ObjectName ");
+                    name = erase(txtLines(ii-3),'#ObjectName ');
                 elseif contains(txtLines(ii-4),':Vector(')
-                    name = erase(txtLines(ii-4),"#ObjectName ");
+                    name = erase(txtLines(ii-4),'#ObjectName ');
                 else
-                    name = erase(txtLines(obj(jj-1).index-4),"#ObjectName ");
+                    name = erase(txtLines(obj(jj-1).index-4),'#ObjectName ');
                 end
                 name = name{1};
                 index = strfind(name, ':');

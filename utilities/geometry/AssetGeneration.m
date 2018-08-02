@@ -33,7 +33,7 @@ fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbr
 %}
 
 % fname = fullfile(mainPath,assetType,assetname,'pbrt',sprintf('%s.pbrt',assetname));
-fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/city/city_block_3/city_block_3.pbrt';
+fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/city_rebuild/city_block_3/city_block_3.pbrt';
 if ~exist(fname,'file'), error('File not found'); end
 
 % When we read, we also write a JSON recipe.
