@@ -240,10 +240,10 @@ if ~isempty(materials.stringnamedmaterial2)
     val_stringnamedmaterial2 = sprintf(' "string namedmaterial2" "%s" ',materials.stringnamedmaterial2);
     val = strcat(val, val_stringnamedmaterial2);
 end
-
+if isfield(materials,'texturebumpmap')
 if ~isempty(materials.texturebumpmap)
     val_texturekr = sprintf(' "texture bumpmap" "%s" ',materials.texturebumpmap);
     val = strcat(val, val_texturekr);
 end
-
+end
 end

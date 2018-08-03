@@ -45,7 +45,7 @@ end
 
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));
-world(3,:) = cellstr(sprintf('#Rotate 90 0 0 1'));
+world(3,:) = cellstr(sprintf('Rotate 180 0 0 1'));
 world(4,:) = cellstr(skylights);
 world(5,:) = cellstr(sprintf('AttributeEnd'));
 jj=2;

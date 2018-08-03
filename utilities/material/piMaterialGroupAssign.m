@@ -108,10 +108,12 @@ for ii = 1:length(mlist)
         thisR.materials.list.(name).texturebumpmap = 'windy_bump';
     else
         %otherwise, assign an default matte material.
+        if ~contains(mlist(ii),'paint_base')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.uber;
         piMaterialAssign(thisR,material.name,target);
+        end
     end
 end
 

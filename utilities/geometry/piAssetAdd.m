@@ -22,34 +22,6 @@ for ii = 1:length(objects)
             thisR.materials.list.(nObj{nn}) = objects(ii).material.(nObj{nn});
         end
     end
-    %% place objects in a scene
-    if placeobject
-    % Find car obj
-    % Check the size
-    overlap = false;
-    
-    % rotate
-    degree = randi([-180,180]);
-    piObjectRotate(objects(ii).geometry,degree)
-    
-    % check intersection of bndbox
-    % will change to global variables
-    heading = randi([-50,50]);
-    side = randi ([-10,10]);
-    % translate
-    piObjectTranslate(objects(ii).geometry,heading,side)
-    if ii>1
-        % check current obj and previous objs overlap area,
-        curr_box = [objects(ii).geometry(2).size.pmin objects(ii).geometry(2).size.l objects(ii).geometry(2).size.w];
-        for jj = 1:ii-1
-            prev_box = [objects(jj).geometry(2).size.pmin objects(jj).geometry(2).size.l objects(jj).geometry(2).size.w];
-            overlap = rectint(curr_box,prev_box);
-            overlap(jj) = overlap(overlap>0);
-        end
-        if size(overlap)>1, overlap = true;
-        end
-    end
-    end
     %% add objects.geometry to scene(geometry struct)
     scene = thisR.assets;
     if geometry
