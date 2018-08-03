@@ -225,7 +225,13 @@ switch ieParamFormat(param)
         
     case {'raysperpixel'}
         val = thisR.sampler.pixelsamples.value;
-
+    
+    case {'cropwindow','crop window'}
+        if(isfield(thisR.film,'cropwindow'))
+            val = thisR.film.cropwindow.value;
+        else
+            val = [0 1 0 1];
+        end
     otherwise
         error('Unknown parameter %s\n',param);
 end
