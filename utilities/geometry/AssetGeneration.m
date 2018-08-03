@@ -9,15 +9,15 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-% for dd = 13:15
+for dd = 1:15
 %%
 % index = ii;
 % The students have been producing these files on SNI shared storage
-% mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
-% % assetType = 'car';
+mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
+assetType = 'car';
 % assetType = 'traffic_signs';
-% assetname = sprintf('Car_%03d',dd);
-assetname = 'city_block_3';
+assetname = sprintf('Car_%03d',dd);
+
 
 
 %{
@@ -32,8 +32,8 @@ FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/pe
 fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
 %}
 
-% fname = fullfile(mainPath,assetType,assetname,'pbrt',sprintf('%s.pbrt',assetname));
-fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/city_rebuild/city_block_3/city_block_3.pbrt';
+fname = fullfile(mainPath,assetType,assetname,'pbrt',sprintf('%s.pbrt',assetname));
+
 if ~exist(fname,'file'), error('File not found'); end
 
 % When we read, we also write a JSON recipe.
@@ -163,7 +163,7 @@ if isempty(Acq_index)
     fprintf('%s uploaded \n',resourceFile);
 end
 fprintf('%d asset uploaded \n',dd);
-% end
+end
 disp('>>>>>>>>>>>>>>Done!<<<<<<<<<<<<<<<<<<')
 toc
 %%
