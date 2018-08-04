@@ -9,7 +9,7 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 1:15
+for dd = 18:34
 %%
 % index = ii;
 % The students have been producing these files on SNI shared storage
@@ -32,7 +32,7 @@ FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/pe
 fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
 %}
 
-fname = fullfile(mainPath,assetType,assetname,'pbrt',sprintf('%s.pbrt',assetname));
+fname = fullfile(mainPath,assetType,assetname,sprintf('%s.pbrt',assetname));
 
 if ~exist(fname,'file'), error('File not found'); end
 
@@ -57,7 +57,7 @@ piSkymapAdd(thisR,'morning');
 %% Assign Materials and Color
 
 piMaterialGroupAssign(thisR);
-piMaterialList(thisR);
+% piMaterialList(thisR);
 
 % use piColorPick to wisely choose a black color.
 % thisR.materials.list.NissanTitan_carbody_black_paint_base.colorkd = piColorPick('black');
