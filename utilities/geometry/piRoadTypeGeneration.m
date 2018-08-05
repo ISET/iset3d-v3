@@ -17,8 +17,11 @@ RoadType.nlane = p.Results.nlane;
 % RoadType.trafficlight = p.Results.trafficlight;
 switch RoadType.name
     case 'straight'
+        
     case 'cross'
+        
     case 'merge'
+        
     case 'roundabout'
     case 'right turn'
     case 'left turn'

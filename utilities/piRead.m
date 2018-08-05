@@ -149,8 +149,6 @@ if exist(inputFile_materials,'file')
     if contains(headerCheck_material{1}, 'Exported by piMaterialWrite')
         exporterFlag   = true;
         thisR.exporter = 'C4D';
-    else
-        exporterFlag = false;
     end
 end
 %% It would be nice to identify every block

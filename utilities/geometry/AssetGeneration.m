@@ -9,29 +9,22 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 18:34
+for dd = 33:34
 %%
 % index = ii;
+dd=3;
 % The students have been producing these files on SNI shared storage
 mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
-assetType = 'car';
-% assetType = 'traffic_signs';
-assetname = sprintf('Car_%03d',dd);
+% assetType = 'car';
+assetType = 'people';
+assetname = sprintf('female_%03d_walk',dd);
 
 
 
 %{
-FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car',assetname);
-% FilePath = pwd;
-% FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/people',lower(assetname));
-% fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
-fname = fullfile(FilePath,sprintf('%s.pbrt',assetname));
-
-FilePath = pwd;
-FilePath = fullfile('/Volumes/group/data/NN_Camera_Generalization/pbrt_assets/people',lower(assetname));
 fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
 %}
-
+fname = '/Users/zhenyiliu/Desktop/cross/cross.pbrt';
 fname = fullfile(mainPath,assetType,assetname,sprintf('%s.pbrt',assetname));
 
 if ~exist(fname,'file'), error('File not found'); end
@@ -46,7 +39,7 @@ thisR = piRead(fname,'version',3);
 
 thisR.set('filmresolution',[1080 720]);
 thisR.set('pixelsamples',64);
-thisR.integrator.maxdepth.value = 5;
+thisR.integrator.maxdepth.value = 10;
 thisR.integrator.subtype = 'bdpt';
 thisR.sampler.subtype = 'sobol';
 
@@ -63,7 +56,7 @@ piMaterialGroupAssign(thisR);
 % thisR.materials.list.NissanTitan_carbody_black_paint_base.colorkd = piColorPick('black');
 
 %% Write out the 
-
+% assetname = 'Road_cross';
 [~,n,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local',assetname,[n,e]));
 
@@ -100,10 +93,12 @@ f1 = st.fw.getAcquisitionFileInfo(id, fileList{1}.name)
 %}
 
 %% zip the folder
+% assetname = 'cross';
 folder = fullfile(piRootPath,'local',assetname);
 chdir(folder);
 resourceFile = sprintf('%s.cgresource.zip',assetname);
-zip(resourceFile,{'texture','spds','skymaps','scene','bsdfs'});
+% zip(resourceFile,{'texture','spds','skymaps','scene','bsdfs'});
+zip(resourceFile,{'texture'});
 
 %%
 oldRecipeFile = sprintf('%s.json',assetname);

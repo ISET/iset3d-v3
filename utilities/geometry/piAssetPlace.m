@@ -1,7 +1,10 @@
-function assetsPosList = piAssetPlace(trafficflow,assets,varargin)
+function assetsPosList = piAssetPlace(trafficflow,varargin)
 %%
 % Place assets with the Sumo trafficflow information
-%
+% Sumo generates trafficflow with timesteps, we choose one or multiple 
+% timestamps, find the number and the class of vehicles for this/these 
+% timestamp(s) on the road. Download assets with respect to the number and 
+% class. 
 %
 %
 %
@@ -21,7 +24,22 @@ p.parse(varargin{:});
 nScene =p.Results.nScene;
 timestamp = p.Results.timestamp;
 trafficlight = p.Results.trafficlight;
-% objects positions are classified by class.
+
+%% Download asssets with respect to the number and class of Sumo output.
+if isfield(trafficflow(timestamp).objects,'Car')
+ncars = length(trafficflow(timestamp).objects.Car);
+else ncars = 0;end
+
+if isfield(trafficflow(timestamp).objects,'Pedestrian')
+nped = length(trafficflow(timestamp).objects.Pedestrian);
+else nped = 0;end
+
+assets = piAssetCreate('ncars',ncars,'nped',nped);
+
+% if isfield(lower(trafficflow(timestamp).objects),'bus')
+% nBuses = trafficflow(timestamp).objects.Bus;
+% assets_bus = piAssetCreate('nbus',nbuses);end
+%% objects positions are classified by class.
 assets_updated = assets;
 if nScene == 1
     for ii = 1: length(assets)

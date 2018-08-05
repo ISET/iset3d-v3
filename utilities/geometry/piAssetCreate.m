@@ -59,7 +59,7 @@ if p.Results.ncars > 0
     assetRecipe = piAssetDownload(carSession,'car',inputs.ncars,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(assetRecipe,'label','car');
+    asset.car = piAssetAssign(assetRecipe,'label','car');
 end
 %% Find the buses in the database
 if p.Results.nbuses > 0
@@ -76,7 +76,7 @@ if p.Results.nbuses > 0
     assetRecipe = piAssetDownload(busSession,'bus',inputs.nbuses,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(assetRecipe,'label','bus');
+    asset.bus = piAssetAssign(assetRecipe,'label','bus');
 end
 
 %% Find the buses in the database
@@ -94,7 +94,7 @@ if p.Results.ntrucks > 0
     assetRecipe = piAssetDownload(truckSession,'truck',inputs.ntrucks,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(assetRecipe,'label','truck');
+    asset.truck = piAssetAssign(assetRecipe,'label','truck');
 end
 
 %% Find the people in the database
@@ -109,10 +109,10 @@ if p.Results.nPed > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    assetRecipe = piAssetDownload(pedestrianSession,'pedestrian',inputs.npeople,'scitran',st);
+    assetRecipe = piAssetDownload(pedestrianSession,'pedestrian',inputs.nPed,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
-    asset = piAssetAssign(assetRecipe,'label','pedestrian');
+    asset.pedestrian = piAssetAssign(assetRecipe,'label','pedestrian');
 end
 
 %%

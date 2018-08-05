@@ -60,8 +60,11 @@ fileType_json ='source code'; % json
 [recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
 
 nDatabaseAssets = length(resourceFiles);
-
 assetRecipe = cell(nassets,1);
+assetList = randi(nDatabaseAssets,nassets,1);
+downloadList = piObjectInstanceCount(assetList)
+
+
 if nassets <= nDatabaseAssets
     assetList = randperm(nDatabaseAssets,nassets);
     nDownloads = nassets;
