@@ -60,24 +60,25 @@ fileType_json ='source code'; % json
 [recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
 
 nDatabaseAssets = length(resourceFiles);
-assetRecipe = cell(nassets,1);
+
 assetList = randi(nDatabaseAssets,nassets,1);
-downloadList = piObjectInstanceCount(assetList)
-
-
-if nassets <= nDatabaseAssets
-    assetList = randperm(nDatabaseAssets,nassets);
-    nDownloads = nassets;
-    nRequired = 0;
-else 
-    nDownloads = nDatabaseAssets;
-    nRequired = nassets-nDatabaseAssets;
-    assetList = randperm(nDatabaseAssets,nDatabaseAssets);
-    assetList_required = randperm(nDatabaseAssets,nRequired);
-end
+% count objectInstance
+downloadList = piObjectInstanceCount(assetList);
+nDownloads = length(downloadList);
+assetRecipe = cell(nDownloads,1);
+% if nassets <= nDatabaseAssets
+%     assetList = randperm(nDatabaseAssets,nassets);
+%     nDownloads = nassets;
+%     nRequired = 0;
+% else 
+%     nDownloads = nDatabaseAssets;
+%     nRequired = nassets-nDatabaseAssets;
+%     assetList = randperm(nDatabaseAssets,nDatabaseAssets);
+%     assetList_required = randperm(nDatabaseAssets,nRequired);
+% end
 
 for ii = 1:nDownloads
-    [~,n,~] = fileparts(resourceFiles{assetList(ii)}{1}.name);
+    [~,n,~] = fileparts(resourceFiles{downloadList(ii).index}{1}.name);
     [~,n,~] = fileparts(n); % extract file name
     % Download the scene to a destination zip file
     localFolder = fullfile(piRootPath,'local',n);
@@ -85,29 +86,28 @@ for ii = 1:nDownloads
     destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
     destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
     
-    st.fileDownload(recipeFiles{assetList(ii)}{1}.name,...
+    st.fileDownload(recipeFiles{downloadList(ii).index}{1}.name,...
         'container type', 'acquisition' , ...
-        'container id',  recipe_acqID{assetList(ii)} ,...
+        'container id',  recipe_acqID{downloadList(ii).index} ,...
         'destination',destName_recipe);
     
-    st.fileDownload(resourceFiles{assetList(ii)}{1}.name,...
+    st.fileDownload(resourceFiles{downloadList(ii).index}{1}.name,...
         'container type', 'acquisition' , ...
-        'container id',  resource_acqID{assetList(ii)} ,...
+        'container id',  resource_acqID{downloadList(ii).index} ,...
         'unzip', true, ...
         'destination',destName_resource);
-    assetRecipe{ii}   = destName_recipe;
-    if ~exist(assetRecipe{ii},'file'), error('File not found');end 
-end
-%   disp('NOT YET IMPLEMENTED. WE WANT MORE CARS.');
-%   New car geometry will overwrite the old one, thus two cars are created 
-%   with shared geometry, but different materials.
-for jj = 1:nRequired
-    [~,n,~] = fileparts(resourceFiles{assetList_required(jj)}{1}.name);
-    assetRecipe{nDownloads+jj} = fullfile(localFolder, sprintf('%s.json',n));
-    if ~exist(assetRecipe{ii},'file'), error('File not found');end 
+    assetRecipe{ii}.name   = destName_recipe;
+    assetRecipe{ii}.count  = downloadList(ii).count;
+    if ~exist(assetRecipe{ii}.name,'file'), error('File not found');end 
 end
 
-fprintf('%d Files downloaded.\n',nassets);
+% for jj = 1:nRequired
+%     [~,n,~] = fileparts(resourceFiles{assetList_required(jj)}{1}.name);
+%     assetRecipe{nDownloads+jj} = fullfile(localFolder, sprintf('%s.json',n));
+%     if ~exist(assetRecipe{ii},'file'), error('File not found');end 
+% end
+
+fprintf('%d Files downloaded.\n',nDownloads);
 end
 
 

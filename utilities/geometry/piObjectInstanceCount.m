@@ -10,9 +10,9 @@ function downloadList = piObjectInstanceCount(assetList)
 ListCheck = unique(assetList);
 for kk = 1:length(ListCheck)
     count = 1;
-    for jj = 1: length(PosList)
-        if isequal(ListCheck(kk),PosList(jj))
-            downloadList(kk).name = ListCheck(kk);
+    for jj = 1: length(assetList)
+        if isequal(ListCheck(kk),assetList(jj))
+            downloadList(kk).index = ListCheck(kk);
             downloadList(kk).count = count;
             count = count+1;
         end

@@ -37,7 +37,7 @@ for ii = 1: length(obj)
                 fprintf(fid_obj, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
             end
             fprintf(fid_obj,'ObjectEnd \n \n');
-
+%             count = obj(ii).count;
         for kk = 1:length(obj(ii))
             fprintf(fid_obj,'AttributeBegin \n');
             if isempty(obj(ii).position)
