@@ -16,7 +16,7 @@ function trafficflow = piSumoRead(filename)
 %
 %   scene---|---timestamp:
 %           |                 |---class:vehicle/pedestrian
-%           |---objects--Car--|---name: sumo assigned ID
+%           |---objects--car--|---name: sumo assigned ID
 %                         |   |---type: police/emergency/...
 %                         |   |---pos : 3d position;
 %                         |   |---speed : m/s
@@ -25,11 +25,11 @@ function trafficflow = piSumoRead(filename)
 %                         |               degrees, going clockwise with 0 
 %                         |               at the 12'o clock position)
 %                         |
-%                 Pedestrian--|---name: sumo assigned ID
+%                 pedestrian--|---name: sumo assigned ID
 %                             |---type: []
 %                             |---pos : 3d position;
 %                             |---speed : m/s
-%                             |---orientation:same as 'Car' class
+%                             |---orientation:same as 'car' class
 %
 % P.S. In Sumo, pedestrian class doesn't have 'type', type of pedestrian is empty.
 % Jiaqi Zhang, VISTALAB, 2018
@@ -55,24 +55,24 @@ for i = 1:sum
         for j = 1:size(xChildren(i).Children, 2)
             if strcmpi(xChildren(i).Children(j).Name, 'vehicle')    % transfer all the car class
                 obj_car = obj_car + 1;
-                trafficflow(step).objects.Car(obj_car).class = 'Car';
-                trafficflow(step).objects.Car(obj_car).name = xChildren(i).Children(j).Attributes(2).Value;
-                trafficflow(step).objects.Car(obj_car).type = xChildren(i).Children(j).Attributes(7).Value;
-                trafficflow(step).objects.Car(obj_car).pos = [str2double(xChildren(i).Children(j).Attributes(8).Value),...
+                trafficflow(step).objects.car(obj_car).class = 'car';
+                trafficflow(step).objects.car(obj_car).name = xChildren(i).Children(j).Attributes(2).Value;
+                trafficflow(step).objects.car(obj_car).type = xChildren(i).Children(j).Attributes(7).Value;
+                trafficflow(step).objects.car(obj_car).pos = [str2double(xChildren(i).Children(j).Attributes(8).Value),...
                     0, str2double(xChildren(i).Children(j).Attributes(9).Value)];
-                trafficflow(step).objects.Car(obj_car).speed = str2double(xChildren(i).Children(j).Attributes(6).Value);
-                trafficflow(step).objects.Car(obj_car).orientation = str2double(xChildren(i).Children(j).Attributes(1).Value);
+                trafficflow(step).objects.car(obj_car).speed = str2double(xChildren(i).Children(j).Attributes(6).Value);
+                trafficflow(step).objects.car(obj_car).orientation = str2double(xChildren(i).Children(j).Attributes(1).Value);
             end
             
             if strcmpi(xChildren(i).Children(j).Name, 'person')     % transfer all the pedestrian class
                 obj_ped = obj_ped + 1;
-                trafficflow(step).objects.Pedestrian(obj_ped).class = 'Pedestrian';
-                trafficflow(step).objects.Pedestrian(obj_ped).name = xChildren(i).Children(j).Attributes(3).Value;
-                trafficflow(step).objects.Pedestrian(obj_ped).type = [];
-                trafficflow(step).objects.Pedestrian(obj_ped).pos = [str2double(xChildren(i).Children(j).Attributes(7).Value),...
+                trafficflow(step).objects.pedestrian(obj_ped).class = 'pedestrian';
+                trafficflow(step).objects.pedestrian(obj_ped).name = xChildren(i).Children(j).Attributes(3).Value;
+                trafficflow(step).objects.pedestrian(obj_ped).type = [];
+                trafficflow(step).objects.pedestrian(obj_ped).pos = [str2double(xChildren(i).Children(j).Attributes(7).Value),...
                     0, str2double(xChildren(i).Children(j).Attributes(8).Value)];
-                trafficflow(step).objects.Pedestrian(obj_ped).speed = str2double(xChildren(i).Children(j).Attributes(6).Value);
-                trafficflow(step).objects.Pedestrian(obj_ped).orientation = str2double(xChildren(i).Children(j).Attributes(1).Value);
+                trafficflow(step).objects.pedestrian(obj_ped).speed = str2double(xChildren(i).Children(j).Attributes(6).Value);
+                trafficflow(step).objects.pedestrian(obj_ped).orientation = str2double(xChildren(i).Children(j).Attributes(1).Value);
             end
         end
             

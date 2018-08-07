@@ -121,9 +121,11 @@ end
 if ~isempty(nPaintLines)
     for hh = 1:length(nPaintLines)
     fprintf(fileID,'%s\n',materialTxt{nPaintLines{hh}});
+    materialTxt{nPaintLines{hh}} = [];
     end
-    nmaterialTxt = length(materialTxt)-length(nPaintLines);
-    for row=1:nmaterialTxt
+    materialTxt = materialTxt(~cellfun('isempty',materialTxt));
+%     nmaterialTxt = length(materialTxt)-length(nPaintLines);
+    for row=1:length(materialTxt)
         fprintf(fileID,'%s\n',materialTxt{row});
         
     end

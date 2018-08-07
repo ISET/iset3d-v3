@@ -5,10 +5,10 @@ function piTrafficflowDisplay(trafficflow)
 for ii = 1: length(trafficflow)
     
     % check object.class and plot by class
-    if isfield(trafficflow(ii).objects,'Car')
+    if isfield(trafficflow(ii).objects,'car')
     Car = plot(ii,length(trafficflow(ii).objects.Car),'+');hold on
     end
-    if isfield(trafficflow(ii).objects,'Pedestrian')
+    if isfield(trafficflow(ii).objects,'pedestrian')
     Ped = plot(ii,length(trafficflow(ii).objects.Pedestrian),'o');hold on
     end
    
