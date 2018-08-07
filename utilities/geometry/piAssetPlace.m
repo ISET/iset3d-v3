@@ -54,7 +54,7 @@ if nScene == 1
             rotation=cell(n,1);
             for gg = 1:n
                 position{gg} = trafficflow(timestamp).objects.(assetClass)(index).pos;
-                rotation{gg} = -trafficflow(timestamp).objects.(assetClass)(index).orientation-90;
+                rotation{gg} = trafficflow(timestamp).objects.(assetClass)(index).orientation-90;
                 index = index+1;
             end
             assets_updated.(assetClass)(ii).geometry = piAssetTranslate(assets.(assetClass)(ii).geometry,position,'Pos_demention',n);
