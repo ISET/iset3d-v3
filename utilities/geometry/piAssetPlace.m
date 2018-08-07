@@ -42,40 +42,61 @@ assets = piAssetCreate('ncars',ncars,'nped',nped);
 %% objects positions are classified by class.
 assets_updated = assets;
 if nScene == 1
-    for ii = 1: length(assets)
-        if isequal(lower(assets(ii).class), 'car')
-            position = trafficflow(timestamp).objects.Car(ii).pos;
-            assets_updated(ii).geometry = piAssetTranslate(assets(ii).geometry,position);
-            rotation = -trafficflow(timestamp).objects.Car(ii).orientation-90;
-            assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,rotation);
-        end
-        if isequal(lower(assets(ii).class), 'pedestrian')
-            position = trafficflow(timestamp).objects.Pedestrian(ii).pos;
-            assets_updated(ii).geometry = piAssetTranslate(assets(ii).geometry,position);
-            rotation = -trafficflow(timestamp).objects.Pedestrian(ii).orientation-90;
-            assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,rotation);
+    if isfield(assets, 'car')
+        for ii = 1: length(assets.car)
+            
+            [~,n] = size(assets.car(ii).geometry(1).position);
+            position=cell(n,1);
+            rotation=cell(n,1);
+            for gg = 1:n
+                position{gg} = trafficflow(timestamp).objects.Car(ii+gg-1).pos;
+                rotation{gg} = -trafficflow(timestamp).objects.Car(ii).orientation-90;
+            end
+            %             carPos = assets.car(ii).geometry.position(:,n);
+            assets_updated.car(ii).geometry = piAssetTranslate(assets.car(ii).geometry,position,'Pos_demention',n);
+            assets_updated.car(ii).geometry = piAssetRotate(assets_updated.car(ii).geometry,rotation,'Pos_demention',n);
         end
     end
-    assetsPosList{1} = assets_updated;
+
+    if isfield(assets, 'pedestrian')
+        for ii = 1: length(assets.pedestrian)
+            [~,n] = size(assets.pedestrian(ii).geometry(1).position);
+            position=cell(n,1);
+            rotation=cell(n,1);
+            for gg = 1:n
+                position{gg} = trafficflow(timestamp).objects.Pedestrian(ii+gg-1).pos;
+                rotation{gg} = -trafficflow(timestamp).objects.Pedestrian(ii).orientation-90;
+            end
+            %             carPos = assets.car(ii).geometry.position(:,n);
+            assets_updated.pedestrian(ii).geometry = piAssetTranslate(assets.pedestrian(ii).geometry,position,'Pos_demention',n);
+            assets_updated.pedestrian(ii).geometry = piAssetRotate(assets_updated.pedestrian(ii).geometry,rotation,'Pos_demention',n);
+        end
+    end
+% end
+assetsPosList{1} = assets_updated;
 else
-    % Generate random multiple scenes
-    timestampList = randperm(length(trafficflow),nScene);
-    for jj = 1: length(nScene)
-        if isequal(lower(assets(ii).class), 'car')
-            position = trafficflow(timestamp).objects.Car(ii).pos;
-            assets_updated(ii).geometry = piAssetTranslate(assets(ii).geometry,position);
-            rotation = -trafficflow(timestamp).objects.Car(ii).orientation-90;
-            assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,rotation);
+% Generate random multiple scenes
+timestampList = randperm(length(trafficflow),nScene);
+for kk = 1: length(timestampList)
+    if isfield(assets, 'car')
+        for ii = 1: length(assets.car)
+            position = trafficflow(timestampList(kk)).objects.Car(ii).pos;
+            assets_updated.car(ii).geometry = piAssetTranslate(assets.car(ii).geometry,position);
+            rotation = -trafficflow(timestampList(kk)).objects.Car(ii).orientation-90;
+            assets_updated.car(ii).geometry = piAssetRotate(assets_updated.car(ii).geometry,rotation);
         end
-        if isequal(lower(assets(ii).class), 'pedestrian')
-            position = trafficflow(timestamp).objects.Pedestrian(ii).pos;
-            assets_updated(ii).geometry = piAssetTranslate(assets(ii).geometry,position);
-            rotation = -trafficflow(timestamp).objects.Pedestrian(ii).orientation-90;
-            assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,rotation);
+    end
+    if isfield(assets, 'pedestrian')
+        for ii = 1: length(assets.pedestrian)
+            position = trafficflow(timestampList(kk)).objects.Pedestrian(ii).pos;
+            assets_updated.pedestrian(ii).geometry = piAssetTranslate(assets.pedestrian(ii).geometry,position);
+            rotation = -trafficflow(timestampList(kk)).objects.Pedestrian(ii).orientation-90;
+            assets_updated.pedestrian(ii).geometry = piAssetRotate(assets_updated.pedestrian(ii).geometry,rotation);
         end
-        assetsPosList{jj} = assets_updated;
     end
 end
 end
+end
+
 
 

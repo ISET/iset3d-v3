@@ -35,10 +35,13 @@ for ii = 1: length(assetRecipe)
     if ~isequal(assetRecipe{ii}.count,1)
         for hh = 1: length(asset(ii).geometry)
             pos = asset(ii).geometry(hh).position;
+            rot = asset(ii).geometry(hh).rotate;
             asset(ii).geometry(hh).position = repmat(pos,1,uint8(assetRecipe{ii}.count));
+            asset(ii).geometry(hh).rotate = repmat(rot,1,uint8(assetRecipe{ii}.count));
         end
     end
-    asset(ii).material = thisR.materials.list;
+    asset(ii).material.list = thisR.materials.list;
+    asset(ii).material.txtLines = thisR.materials.txtLines;
     
     localFolder = fileparts(assetRecipe{ii}.name);
     asset(ii).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');

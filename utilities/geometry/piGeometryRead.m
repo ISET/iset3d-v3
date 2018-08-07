@@ -44,7 +44,7 @@ if ~convertedflag
     %% Check if a nested structure is exsited:
     % if exsited
     % Check pattern in names
-    % obj.child = obj;
+    % obj.children = obj;
     % else
     % obj = obj
     % Find AttributeBegin/End Line Number.
@@ -60,7 +60,7 @@ if ~convertedflag
     end
     %%
     disp('Starting...')
-    %% Extract objects information and write out child objects
+    %% Extract objects information and write out children objects
     
     hh = 1;
     for dd = 1:length(nestbegin)
@@ -88,27 +88,27 @@ if ~convertedflag
                     tmp = txtLines{nestbegin(dd)+2};
                     tmp  = textscan(tmp, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
                     values = cell2mat(tmp(2:end));
-                    transform = reshape(values,[4 4]);
+                    transform = reshape(values,[4,4]);
                     %             Groupobj(hh).concattransform.x = transform(1:4);
                     %             Groupobj(hh).concattransform.y = transform(5:8);
                     %             Groupobj(hh).concattransform.z = transform(9:12);
                     %                     groupobj(hh).translate = transform(13:15);
-                    groupobj(hh).rotate    = [0 0 0 0];
-                    groupobj(hh).position = transform(13:15);
+                    groupobj(hh).rotate    = [0;0;0;0];
+                    groupobj(hh).position = reshape(transform(13:15),[3,1]);
                     % Add type of the object, get it from the file name,
                     % could be wrong, but this is how we named the object
                 else
-                    groupobj(hh).rotate    = [0 0 0 0];
-                    groupobj(hh).position = [0 0 0];
+                    groupobj(hh).rotate    = [0;0;0;0];
+                    groupobj(hh).position = [0;0;0];
                 end
                 
             end
-            % find child objects
+            % find children objects
             
             if contains(txtLines(ii),'Shape')
                 obj(jj).index = ii;
                 % Name is created by a pattern: '#ObjectName' + 'objname' + ':' +'Vector' + '(width(x), height(y), lenght(z))'
-                % Check if concattranform is contained in a child attribute.
+                % Check if concattranform is contained in a children attribute.
                 if contains(txtLines(ii-1),':Vector(')
                     name = erase(txtLines(ii-1),'#ObjectName ');
                 elseif contains(txtLines(ii-3),':Vector(')
@@ -157,11 +157,11 @@ if ~convertedflag
                 fprintf(fid,'  %s\n',currLine(point:(normal-1)));
                 fprintf(fid,'  %s\n',currLine(normal:end));
                 fclose(fid);
-                groupobj(hh).child(ll) = obj(jj);jj= jj+1;ll=ll+1;
+                groupobj(hh).children(ll) = obj(jj);jj= jj+1;ll=ll+1;
                 
             end
         end
-        fprintf('Object:%s has %d child object(s) \n',groupobj(hh).name,jj-1);hh = hh+1;
+        fprintf('Object:%s has %d children object(s) \n',groupobj(hh).name,jj-1);hh = hh+1;
     end
     renderRecipe.assets = groupobj;
     jsonwrite(AssetInfo,renderRecipe);

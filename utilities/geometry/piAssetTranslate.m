@@ -1,4 +1,4 @@
-function asset = piAssetTranslate(asset,translation)
+function asset = piAssetTranslate(asset, translation,varargin)
 % Translation for assets, also updates a bounding box.
 %
 % When an asset (say a car) comes from the database, the positive x is
@@ -7,25 +7,21 @@ function asset = piAssetTranslate(asset,translation)
 % is [0,0,0]. 
 %
 % ZL, Vistasoft Team, 2018
-
-for ii=1:length(asset)
-
-    if isempty(asset(ii).position)
-        % Assume position is 0,0,0
-        asset(ii).position(1) = translation(1);
-        asset(ii).position(2) = translation(2);
-        asset(ii).position(3) = translation(3);
-    else
+%% 
+p = inputParser;
+p.addParameter('Pos_demention',1)
+p.parse(varargin{:})
+pos_d = p.Results.Pos_demention;
+%%
+for dd = 1:pos_d
+    for ii=1:length(asset)
         % Add the translation
-        asset(ii).position(1) = asset(ii).position(1) + translation(1);
-        asset(ii).position(2) = asset(ii).position(2) + translation(2);
-        asset(ii).position(3) = asset(ii).position(3) + translation(3);
+        translation{dd} = reshape(translation{dd},3,1);
+        asset(ii).position(:,dd) = asset(ii).position(:,dd) + translation{dd};
+        % Update the position of the x-z 2d box of the asset that we use
+        % for machine learning identification.
+        %     asset(ii).size.pmin = asset(ii).size.pmin + [translation(1) translation(3)];
+        %     asset(ii).size.pmax = asset(ii).size.pmax + [translation(1) translation(3)];
     end
-    
-    % Update the position of the x-z 2d box of the asset that we use
-    % for machine learning identification.
-    asset(ii).size.pmin = asset(ii).size.pmin + [translation(1) translation(3)];
-    asset(ii).size.pmax = asset(ii).size.pmax + [translation(1) translation(3)];
 end
-
 end

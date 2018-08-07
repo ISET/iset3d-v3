@@ -9,22 +9,18 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 33:34
+for dd = 3:10
 %%
 % index = ii;
-dd=3;
+
 % The students have been producing these files on SNI shared storage
 mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
-% assetType = 'car';
-assetType = 'people';
-assetname = sprintf('female_%03d_walk',dd);
+assetType = 'car';
+assetname = sprintf('Car_%03d',dd);
+% assetType = 'people';
+% assetname = sprintf('female_%03d_walk',dd);
 
-
-
-%{
-fname = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/car/Car_5/Car_5.pbrt';
-%}
-fname = '/Users/zhenyiliu/Desktop/cross/cross.pbrt';
+% fname = '/Users/zhenyiliu/Desktop/cross/cross.pbrt';
 fname = fullfile(mainPath,assetType,assetname,sprintf('%s.pbrt',assetname));
 
 if ~exist(fname,'file'), error('File not found'); end
@@ -37,16 +33,16 @@ thisR = piRead(fname,'version',3);
 % We might decide to make a funciton that sets some defaults so that
 % people could relatively quickly have a look at the rendered object.
 
-thisR.set('filmresolution',[1080 720]);
-thisR.set('pixelsamples',64);
-thisR.integrator.maxdepth.value = 10;
-thisR.integrator.subtype = 'bdpt';
-thisR.sampler.subtype = 'sobol';
+% thisR.set('filmresolution',[1080 720]);
+% thisR.set('pixelsamples',64);
+% thisR.integrator.maxdepth.value = 10;
+% thisR.integrator.subtype = 'bdpt';
+% thisR.sampler.subtype = 'sobol';
 
 %% Add skymap a default day time sky map
 
-piSkymapAdd(thisR,'morning');
- 
+% piSkymapAdd(thisR,'morning');
+%  
 %% Assign Materials and Color
 
 piMaterialGroupAssign(thisR);
@@ -98,7 +94,7 @@ folder = fullfile(piRootPath,'local',assetname);
 chdir(folder);
 resourceFile = sprintf('%s.cgresource.zip',assetname);
 % zip(resourceFile,{'texture','spds','skymaps','scene','bsdfs'});
-zip(resourceFile,{'texture'});
+zip(resourceFile,{'texture','scene'});
 
 %%
 oldRecipeFile = sprintf('%s.json',assetname);
