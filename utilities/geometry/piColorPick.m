@@ -3,8 +3,17 @@ function rgb = piColorPick(color)
 if contains(color,'random')
     colorlist = {'brown','white','black','red',...
         'grey','blue','green','yellow','silver'};
-    index = randi(9);
-    color = colorlist{index};
+    index = rand;
+%     color = colorlist{index};
+if index  < 0.15, color = 'white';end
+if index>0.15&&index<0.3, color = 'black';end
+if index>0.3&&index<0.45, color = 'silver';end
+if index>0.45&&index<0.55, color = 'grey';end
+if index>0.55&&index<0.65, color = 'red';end
+if index>0.65&&index<0.75, color = 'green';end
+if index>0.75&&index<0.85, color = 'blue';end
+if index>0.85&&index<0.9, color = 'yellow';end
+if index>0.9&&index<1, color = 'brwon';end
     rgb = colorswitch(color);
 else
     rgb = colorswitch(color);

@@ -1,5 +1,5 @@
 function rotpoint = piPointRotate(point, center, theta)
-% point is [x, y]
+% point is 2d [x, y]
 % center is where the point rotate around
 % theta is the rotation degree
 
