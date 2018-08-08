@@ -56,6 +56,10 @@ end
 containerID = idGet(session,'data type','session');
 fileType    = 'archive';
 [resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
+if isempty(resourceFiles{1})
+    fileType = 'CG Resource';
+    [resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
+end
 fileType_json ='source code'; % json
 [recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
 

@@ -29,7 +29,7 @@
 %
 %
 % Jiaqi Zhang
-% 08.01.2018
+% 08.08.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [buildingPosList] = piBuildingPosList(buildingList, objects)
 buildingPosList = struct;
@@ -39,6 +39,7 @@ for ii = 1:size(buildingList, 2)
     building_list.name{ii} = buildingList(ii).geometry.name;
 end
 count = 0;
+tmp = 0;
 buildingPosList_tmp = struct;
 
 for kk = 1:size(objects.assets, 2)
@@ -60,7 +61,7 @@ for kk = 1:size(objects.assets, 2)
             buildingPosList(jj).rotate = buildingPosList_tmp(jj).rotate;
         end
 %% test algotithm. Comment this part when using.
-        
+        figure(1);hold on;xlim([-130, 130]);ylim([-30, 280]);hold on;
 switch type
     case 'front'
         % test algorithm for 'front' situation
@@ -110,7 +111,9 @@ switch type
                 rectangle('Position',[buildingPosList_tmp(jj).position-[xx,yy],xx,yy]);title('back');
             end
 end
-close(figure(1))
+tmp = tmp + 1;
+disp(tmp);
+%close(figure(1))
 
     end
 

@@ -9,16 +9,16 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 3:10
+for dd = 1:10
 %%
 % index = ii;
 
 % The students have been producing these files on SNI shared storage
-mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/';
-assetType = 'car';
-assetname = sprintf('Car_%03d',dd);
-% assetType = 'people';
-% assetname = sprintf('female_%03d_walk',dd);
+mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/';
+% assetType = 'car';
+% assetname = sprintf('Car_%03d',dd);
+assetType = 'pedestrian';
+assetname = sprintf('pedestrian_%03d',dd);
 
 % fname = '/Users/zhenyiliu/Desktop/cross/cross.pbrt';
 fname = fullfile(mainPath,assetType,assetname,sprintf('%s.pbrt',assetname));
@@ -100,6 +100,7 @@ zip(resourceFile,{'texture','scene'});
 oldRecipeFile = sprintf('%s.json',assetname);
 recipeFile = sprintf('%s.recipe.json',assetname);
 movefile(oldRecipeFile,recipeFile);
+objFile = sprintf('%s.obj',assetname);
 
 %%  We upload the .cgresource.zip and the .json file
 
@@ -110,7 +111,7 @@ sessions = hierarchy.sessions;
 modality = st.fw.getModality('CG');
 
 for ii=1:length(sessions)
-    if isequal(lower(sessions{ii}.label),'car')
+    if isequal(lower(sessions{ii}.label),'pedestrian')
         carSession = sessions{ii};
         break;
     end
@@ -129,11 +130,11 @@ for ii=1:length(acquisitions)
         Acq_index = ii;
         % Upload the two files and set their modality.
         st.fileUpload(recipeFile,'acquisition',acquisitions{ii}.id);
-        st.fw.modifyAcquisitionFile(acquisitions{ii}.id, recipeFile, struct('modality', 'CG'));
         fprintf('%s uploaded \n',recipeFile);
         st.fileUpload(resourceFile,'acquisition',acquisitions{ii}.id);
-        st.fw.modifyAcquisitionFile(acquisitions{ii}.id, resourceFile, struct('modality', 'CG'));
         fprintf('%s uploaded \n',resourceFile);
+%         st.fileUpload(objFile,'acquisition',acquisitions{ii}.id);
+%         fprintf('%s uploaded \n',objFile);
     break;
        
        
@@ -142,16 +143,16 @@ end
 % create an acquisition
 if isempty(Acq_index)
     current_id = st.containerCreate('Wandell Lab', 'Graphics assets',...
-        'session','car','acquisition',current_acquisitions);
+        'session','pedestrian','acquisition',current_acquisitions);
     if ~isempty(current_id.acquisition)
         fprintf('%s acquisition created \n',current_acquisitions);
     end
     st.fileUpload(recipeFile,'acquisition',current_id.acquisition);
-    st.fw.modifyAcquisitionFile(current_id.acquisition, recipeFile, struct('modality', 'CG'));
     fprintf('%s uploaded \n',recipeFile);
     st.fileUpload(resourceFile,'acquisition',current_id.acquisition);
-    st.fw.modifyAcquisitionFile(current_id.acquisition, resourceFile, struct('modality', 'CG'));
-    fprintf('%s uploaded \n',resourceFile);
+    fprintf('%s uploaded \n',objFile);
+%     st.fileUpload(objFile,'acquisition',current_id.acquisition);
+%     fprintf('%s uploaded \n',objFile);
 end
 fprintf('%d asset uploaded \n',dd);
 end
