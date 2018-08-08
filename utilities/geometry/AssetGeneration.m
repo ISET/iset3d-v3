@@ -9,7 +9,7 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 1:10
+for dd = 43:47
 %%
 % index = ii;
 

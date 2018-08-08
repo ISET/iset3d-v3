@@ -13,7 +13,7 @@ if index>0.55&&index<0.65, color = 'red';end
 if index>0.65&&index<0.75, color = 'green';end
 if index>0.75&&index<0.85, color = 'blue';end
 if index>0.85&&index<0.9, color = 'yellow';end
-if index>0.9&&index<1, color = 'brwon';end
+if index>0.9&&index<1, color = 'brown';end
     rgb = colorswitch(color);
 else
     rgb = colorswitch(color);
