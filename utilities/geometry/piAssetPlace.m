@@ -1,4 +1,4 @@
-function assetsPosList = piAssetPlace(trafficflow,varargin)
+function [assetsPosList,assets] = piAssetPlace(trafficflow,varargin)
 %%
 % Place assets with the Sumo trafficflow information
 % Sumo generates trafficflow with timesteps, we choose one or multiple

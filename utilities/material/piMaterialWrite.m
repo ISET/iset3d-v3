@@ -49,6 +49,9 @@ for jj = 1:ntxtLines
     if contains(str,'bmp')
         thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
     end
+    if contains(str,'tif')
+        thisR.materials.txtLines(jj) = strrep(str,'tif','png');
+    end
 end
 
 %% Empty any line that contains MakeNamedMaterial

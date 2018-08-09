@@ -14,6 +14,7 @@ cd(directory)
 %% Find any jpg file
 jpgFiles = dir('*.jpg');
 bmpFiles  = dir('*.bmp');
+tifFiles  = dir('*.tif');
 %% Convert the jpg files to png
 if ~isempty(jpgFiles)
     nfiles = length(jpgFiles);

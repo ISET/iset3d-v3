@@ -9,16 +9,16 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 43:47
+for dd = 24
 %%
 % index = ii;
 
 % The students have been producing these files on SNI shared storage
-mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/';
-% assetType = 'car';
-% assetname = sprintf('Car_%03d',dd);
-assetType = 'pedestrian';
-assetname = sprintf('pedestrian_%03d',dd);
+mainPath = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets';
+assetType = 'car';
+assetname = sprintf('Car_%03d',dd);
+% assetType = 'pedestrian';
+% assetname = sprintf('pedestrian_%03d',dd);
 
 % fname = '/Users/zhenyiliu/Desktop/cross/cross.pbrt';
 fname = fullfile(mainPath,assetType,assetname,sprintf('%s.pbrt',assetname));
@@ -111,7 +111,7 @@ sessions = hierarchy.sessions;
 modality = st.fw.getModality('CG');
 
 for ii=1:length(sessions)
-    if isequal(lower(sessions{ii}.label),'pedestrian')
+    if isequal(lower(sessions{ii}.label),'car')
         carSession = sessions{ii};
         break;
     end
@@ -143,7 +143,7 @@ end
 % create an acquisition
 if isempty(Acq_index)
     current_id = st.containerCreate('Wandell Lab', 'Graphics assets',...
-        'session','pedestrian','acquisition',current_acquisitions);
+        'session','car','acquisition',current_acquisitions);
     if ~isempty(current_id.acquisition)
         fprintf('%s acquisition created \n',current_acquisitions);
     end
