@@ -2,6 +2,7 @@ function piTrafficflowDisplay(trafficflow)
 %%
 % plot number of objects with timestep
 %%
+figure;
 for ii = 1: length(trafficflow)
     
     % check object.class and plot by class

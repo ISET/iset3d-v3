@@ -10,7 +10,7 @@ for dd = 1:pos_d
     for ii=1:length(object)
         % rotate car
         if isfield(object(ii),'children')
-            if length(object(ii).children)>2
+            if length(object(ii).children) >= 2
                 object(ii).rotate(:,dd) = [degree{dd};0;1;0];
                 % find car position
                 %         object_position = [object(ii).position(1) object(ii).position(3)];

@@ -31,7 +31,7 @@ switch input
     case 'night'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
     case 'cloudy'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr"');        
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr" "rgb L" [3 3 3]');        
     case'random'
         curDir = pwd;
         cd(skymaps)
@@ -46,11 +46,12 @@ end
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));
 world(3,:) = cellstr(sprintf('Rotate 180 0 0 1'));
-world(4,:) = cellstr(skylights);
-world(5,:) = cellstr(sprintf('AttributeEnd'));
+world(4,:) = cellstr(sprintf('Scale 0.1 0.1 1'));
+world(5,:) = cellstr(skylights);
+world(6,:) = cellstr(sprintf('AttributeEnd'));
 jj=2;
 for ii=1:(length(thisR.world)-1)
-    world(ii+5,:)=thisR.world(jj);
+    world(ii+6,:)=thisR.world(jj);
     jj=jj+1;
 end
 thisR.world = world;

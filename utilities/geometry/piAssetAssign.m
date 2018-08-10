@@ -18,7 +18,7 @@ for ii = 1: length(assetRecipe)
         thisR.(fds{dd})= thisR_tmp.(fds{dd});
     end
     % assign random color for carpaint of cloth, 
-    piMaterialGroupAssign(thisR);
+%     piMaterialGroupAssign(thisR);
     asset(ii).class = label;
     geometry = thisR.assets;
     for jj = 1:length(geometry)

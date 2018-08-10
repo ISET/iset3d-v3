@@ -13,15 +13,15 @@ geometry  = p.Results.geometry;
 %% Combine them with Main Scene thisR and Geometry Struct
 assetsnameList = fieldnames(assets);
 for ll = 1: length(assetsnameList)
-    if isfield(assets,'car')
+    if isequal(assetsnameList{ll},'car')
         assetname = 'car';
-    elseif isfield(assets,'pedestrian')
+    elseif isequal(assetsnameList{ll},'pedestrian')
         assetname = 'pedestrian';
-    elseif isfield(assets,'tree')
+    elseif isequal(assetsnameList{ll},'tree')
         assetname = 'tree';
-    elseif isfield(assets,'streetlight')
+    elseif isequal(assetsnameList{ll},'streetlight')
         assetname = 'streetlight';
-    elseif isfield(assets, 'building')
+    elseif isequal(assetsnameList{ll}, 'building')
         assetname = 'building';
     end
     %{

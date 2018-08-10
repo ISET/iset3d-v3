@@ -9,7 +9,7 @@ ieInit;
 %if ~piDockerExists, piDockerConfig; end
 %%
 tic
-for dd = 24
+for dd =34
 %%
 % index = ii;
 
@@ -36,7 +36,7 @@ thisR = piRead(fname,'version',3);
 % thisR.set('filmresolution',[1080 720]);
 % thisR.set('pixelsamples',64);
 % thisR.integrator.maxdepth.value = 10;
-% thisR.integrator.subtype = 'bdpt';
+% thisR.integrator.subtype = 'path';
 % thisR.sampler.subtype = 'sobol';
 
 %% Add skymap a default day time sky map
@@ -200,5 +200,5 @@ st.fw.replaceAcquisitionFileClassification(thisAcquisition.id, files.name, struc
 % st.fw.modifyAcquisitionFileClassification(f.id, f.files{1}.name, cInput);
 
 %% Render irradiance
-% tic, scene = piRender(thisR); toc
-% ieAddObject(scene); sceneWindow;
+% tic, oi = piRender(thisR); toc
+% ieAddObject(oi); oiWindow;
