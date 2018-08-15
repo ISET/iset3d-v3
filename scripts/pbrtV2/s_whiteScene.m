@@ -11,7 +11,7 @@ if ~piDockerExists, piDockerConfig; end
 % This scene consists of an infinite light source and a white disk placed 1
 % meter away from the camera. The disk itself has a radius of 1 meter as
 % well.
-fname = fullfile(piRootPath,'data','whiteScene','whiteScene.pbrt');
+fname = fullfile(piRootPath,'data','whiteScene','whiteSceneV3.pbrt');
 
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
@@ -47,11 +47,12 @@ copyfile(p,workingDirectory);
 thisR.outputFile = fullfile(workingDirectory,[n,e]);
 
 % oname = fullfile(workingDirectory,'whiteScene.pbrt');
-piWrite(thisR, 'overwrite', true);
+% piWrite(thisR, 'overwrite', true);
+piWrite(thisR);
 
 %% Render with the Docker container
 
-oi = piRender(oname);
+oi = piRender(thisR);
 
 % Show it in ISET
 ieAddObject(oi); oiWindow;   

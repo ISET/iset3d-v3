@@ -10,6 +10,7 @@ function piMaterialWrite(thisR)
 %% 
 p = inputParser;
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
+p.parse(thisR);
 
 %% 
 workingDir = fileparts(thisR.outputFile);
@@ -26,11 +27,11 @@ if ~exist(desdir,'dir'), mkdir(desdir);end
 status = copyfile(skymaps_path,desdir);
 if(~status), error('Failed to copy skymaps directory to docker working directory.');end
 % copy brdfs to working directroy
-brdfs_path = fullfile(piRootPath,'data','brdfs');
-desdir = fullfile(workingDir,'brdfs');
+brdfs_path = fullfile(piRootPath,'data','bsdfs');
+desdir = fullfile(workingDir,'bsdfs');
 if ~exist(desdir,'dir'), mkdir(desdir);end
 status = copyfile(brdfs_path,desdir);
-if(~status), error('Failed to copy brdfs directory to docker working directory.');end
+if(~status), error('Failed to copy bsdfs directory to docker working directory.');end
 
 %% Parse the output file, working directory, stuff like that.
 
@@ -38,8 +39,18 @@ if(~status), error('Failed to copy brdfs directory to docker working directory.'
 ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
     str = thisR.materials.txtLines(jj);
-    if ~isempty(contains(str,'jpg'))
+    if contains(str,'jpg')
         thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
+    end
+    % photoshop exports texture format with ".JPG "(with extra space) ext.
+    if contains(str,'JPG')
+        thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
+    end
+    if contains(str,'bmp')
+        thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
+    end
+    if contains(str,'tif')
+        thisR.materials.txtLines(jj) = strrep(str,'tif','png');
     end
 end
 
@@ -47,6 +58,8 @@ end
 % The remaining lines have a texture definition.
 
 output = thisR.materials.outputFile_materials;
+[~,materials_fname,~]=fileparts(output);
+thisR.world{length(thisR.world)-2} = sprintf('Include "%s.pbrt" ',materials_fname);
 txtLines = thisR.materials.txtLines;
 for i = 1:size(txtLines)
     if ~isempty(txtLines(i))
@@ -60,6 +73,31 @@ end
 % textures here. 
 textureLines = txtLines(~cellfun('isempty',txtLines));
 
+for jj = 1: length(textureLines)
+    textureLines_tmp = [];
+    thisLine_tmp = textscan(textureLines{jj},'%q');
+    thisLine_tmp = thisLine_tmp{1};
+    for ii = 1:length(thisLine_tmp)
+        if contains(thisLine_tmp{ii},'.png')
+            filename = thisLine_tmp{ii};
+<<<<<<< HEAD
+            if ~contains(filename,'textures/')
+            thisLine_tmp{ii} = fullfile('textures',filename);
+            end
+=======
+            thisLine_tmp{ii} = fullfile('texture',filename);
+>>>>>>> 43f04499c00bd60aa7927c0894809adf069d375d
+        end
+        if ii == 1
+            textureLines_tmp = strcat(textureLines_tmp,thisLine_tmp{ii});
+        else
+            string = sprintf('"%s"',thisLine_tmp{ii});
+            textureLines_tmp = strcat(textureLines_tmp,{' '},string);
+        end 
+    end
+    textureLines{jj} = textureLines_tmp{1};
+end
+textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy"';
 %% Create txtLines for the material struct array
 field =fieldnames(thisR.materials.list);
 materialTxt = cell(1,length(field));
@@ -78,11 +116,27 @@ for row=1:length(textureLines)
 end
 
 % Add the materials
-if contains(materialTxt{length(materialTxt)},'paint_base')
-    fprintf(fileID,'%s\n',materialTxt{length(materialTxt)});
-    fprintf(fileID,'%s\n',materialTxt{length(materialTxt)-1});
-    nmaterialTxt = length(materialTxt)-2;
-    for row=1:nmaterialTxt
+nPaintLines = {};
+gg = 1;
+for dd = 1:length(materialTxt)
+    if contains(materialTxt{dd},'paint_base') &&...
+            ~contains(materialTxt{dd},'mix')||...
+        contains(materialTxt{dd},'paint_mirror') &&...
+            ~contains(materialTxt{dd},'mix')   
+        nPaintLines{gg} = dd;
+        gg = gg+1;
+    end
+end
+
+% Find material names contains 'paint_base' or 'paint_mirror'
+if ~isempty(nPaintLines)
+    for hh = 1:length(nPaintLines)
+    fprintf(fileID,'%s\n',materialTxt{nPaintLines{hh}});
+    materialTxt{nPaintLines{hh}} = [];
+    end
+    materialTxt = materialTxt(~cellfun('isempty',materialTxt));
+%     nmaterialTxt = length(materialTxt)-length(nPaintLines);
+    for row=1:length(materialTxt)
         fprintf(fileID,'%s\n',materialTxt{row});
         
     end
@@ -94,17 +148,9 @@ else
 end
 fclose(fileID);
 
-[f,n,e] = fileparts(output);
+[~,n,e] = fileparts(output);
 fprintf('Material file %s written successfully.\n', [n,e]);
-%% Copy necessary rendering resources to output folder
-workdir = fullfile(f,n);
-% from data/spds to local/workdir
 
-% from data/brdfs to local/brdfs
-
-% skymaps
-
-% lens
 end
 
 %% function that converts the struct to text
@@ -207,5 +253,10 @@ if ~isempty(materials.stringnamedmaterial2)
     val_stringnamedmaterial2 = sprintf(' "string namedmaterial2" "%s" ',materials.stringnamedmaterial2);
     val = strcat(val, val_stringnamedmaterial2);
 end
-
+if isfield(materials,'texturebumpmap')
+if ~isempty(materials.texturebumpmap)
+    val_texturekr = sprintf(' "texture bumpmap" "%s" ',materials.texturebumpmap);
+    val = strcat(val, val_texturekr);
+end
+end
 end

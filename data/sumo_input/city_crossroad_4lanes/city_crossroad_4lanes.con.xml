@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Sun Aug 12 15:08:25 2018 by Netedit Version 0.32.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="crossroad.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="crossroad.net.xml"/>
+        <plain-output-prefix value="/Users/minghaoshen/Desktop/crossroad/crossroad"/>
+    </output>
+
+    <processing>
+        <no-internal-links value="false"/>
+        <no-turnarounds value="true"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+        <junctions.corner-detail value="0"/>
+        <rectangular-lane-cut value="false"/>
+        <walkingareas value="false"/>
+    </processing>
+
+</configuration>
+-->
+
+<connections version="0.27" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/connections_file.xsd">
+    <connection from="0t1" to="1t4" fromLane="1" toLane="1"/>
+    <connection from="0t1" to="1t2" fromLane="1" toLane="1"/>
+    <connection from="0t1" to="1t2" fromLane="2" toLane="2"/>
+    <connection from="0t1" to="1t3" fromLane="2" toLane="2"/>
+    <connection from="0t1" to="1t0" fromLane="2" toLane="2"/>
+
+    <connection from="1t0" to="0t1" fromLane="2" toLane="2"/>
+
+    <connection from="1t2" to="2t6" fromLane="1" toLane="1"/>
+    <connection from="1t2" to="2t6" fromLane="2" toLane="2"/>
+    <connection from="1t2" to="2t5" fromLane="2" toLane="2"/>
+    <connection from="1t2" to="2t1" fromLane="2" toLane="2"/>
+
+    <connection from="1t3" to="3t1" fromLane="2" toLane="2"/>
+
+    <connection from="1t4" to="4t1" fromLane="2" toLane="2"/>
+
+    <connection from="2t1" to="1t3" fromLane="1" toLane="1"/>
+    <connection from="2t1" to="1t0" fromLane="1" toLane="1"/>
+    <connection from="2t1" to="1t0" fromLane="2" toLane="2"/>
+    <connection from="2t1" to="1t4" fromLane="2" toLane="2"/>
+    <connection from="2t1" to="1t2" fromLane="2" toLane="2"/>
+
+    <connection from="2t5" to="5t2" fromLane="2" toLane="2"/>
+
+    <connection from="2t6" to="6t2" fromLane="2" toLane="2"/>
+
+    <connection from="3t1" to="1t0" fromLane="1" toLane="1"/>
+    <connection from="3t1" to="1t4" fromLane="1" toLane="1"/>
+    <connection from="3t1" to="1t4" fromLane="2" toLane="2"/>
+    <connection from="3t1" to="1t2" fromLane="2" toLane="2"/>
+    <connection from="3t1" to="1t3" fromLane="2" toLane="2"/>
+
+    <connection from="4t1" to="1t2" fromLane="1" toLane="1"/>
+    <connection from="4t1" to="1t3" fromLane="1" toLane="1"/>
+    <connection from="4t1" to="1t3" fromLane="2" toLane="2"/>
+    <connection from="4t1" to="1t0" fromLane="2" toLane="2"/>
+    <connection from="4t1" to="1t4" fromLane="2" toLane="2"/>
+
+    <connection from="5t2" to="2t1" fromLane="1" toLane="1"/>
+    <connection from="5t2" to="2t6" fromLane="1" toLane="1"/>
+    <connection from="5t2" to="2t6" fromLane="2" toLane="2"/>
+    <connection from="5t2" to="2t5" fromLane="2" toLane="2"/>
+
+    <connection from="6t2" to="2t5" fromLane="1" toLane="1"/>
+    <connection from="6t2" to="2t5" fromLane="2" toLane="2"/>
+    <connection from="6t2" to="2t1" fromLane="2" toLane="2"/>
+    <connection from="6t2" to="2t6" fromLane="2" toLane="2"/>
+
+    <crossing node="1" edges="1t2 2t1" priority="1" width="4.00" linkIndex="20"/>
+    <crossing node="1" edges="1t4 4t1" priority="1" width="4.00" linkIndex="21"/>
+    <crossing node="1" edges="1t0 0t1" priority="1" width="4.00" linkIndex="22"/>
+    <crossing node="1" edges="1t3 3t1" priority="1" width="4.00" linkIndex="23"/>
+    <crossing node="2" edges="2t6 6t2" priority="1" width="4.00" linkIndex="12"/>
+    <crossing node="2" edges="2t1 1t2" priority="1" width="4.00" linkIndex="13"/>
+    <crossing node="2" edges="2t5 5t2" priority="1" width="4.00" linkIndex="14"/>
+</connections>

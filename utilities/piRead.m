@@ -128,15 +128,29 @@ txtLines = txtLines(1:(worldBeginIndex-1));
 % header. 
 fileID = fopen(fname);
 tmp = textscan(fileID,'%s','Delimiter','\n');
-headerCheck = tmp{1};
+headerCheck_scene = tmp{1};
 fclose(fileID);
-if contains(headerCheck{1}, 'Exported by PBRT exporter for Cinema 4D')
+if contains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
     exporterFlag   = true;
     thisR.exporter = 'C4D';
 else
     exporterFlag = false;
 end
-    
+%% Material file header check
+[p,n,~] = fileparts(fname);
+fname_materials = sprintf('%s_materials.pbrt',n);
+inputFile_materials=fullfile(p,fname_materials);
+
+if exist(inputFile_materials,'file')
+    fileID = fopen(inputFile_materials);
+    tmp = textscan(fileID,'%s','Delimiter','\n');
+    headerCheck_material = tmp{1};
+    fclose(fileID);
+    if contains(headerCheck_material{1}, 'Exported by piMaterialWrite')
+        exporterFlag   = true;
+        thisR.exporter = 'C4D';
+    end
+end
 %% It would be nice to identify every block
 
 %% Extract camera  block
@@ -284,14 +298,7 @@ end
 if(flip)
     thisR.scale = [-1 1 1];
 end
-%% Material file header check
-[p,n,~] = fileparts(fname);
-fname_materials = sprintf('%s_materials.pbrt',n);
-inputFile_materials=fullfile(p,fname_materials);
-fileID = fopen(inputFile_materials);
-tmp = textscan(fileID,'%s','Delimiter','\n');
-headerCheck = tmp{1};
-fclose(fileID);
+
 %% Read Material.pbrt file if pbrt file is exported by C4D.
 % Is the read materials flag necessary?  Can't we just check if this
 % is an exporterFlag case and see if there is a file?
@@ -306,10 +313,15 @@ if exporterFlag
         % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
         piTextureFileFormat(thisR);
     end
-elseif contains(headerCheck{1}, 'Exported by piMaterialWrite')
-    [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
-    thisR.materials.inputFile_materials = inputFile_materials;
-    % Call material lib
-    thisR.materials.lib = piMateriallib;
+% elseif contains(headerCheck{1}, 'Exported by piMaterialWrite')
+%     [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
+%     thisR.materials.inputFile_materials = inputFile_materials;
+%     % Call material lib
+%     thisR.materials.lib = piMateriallib;
+end
+
+%% Read geometry.pbrt file if pbrt file is exported by C4D
+if exporterFlag 
+    [thisR,~] = piGeometryRead(thisR); 
 end
 end

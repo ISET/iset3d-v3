@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on Sun Aug 12 15:08:25 2018 by Netedit Version 0.32.0
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="crossroad.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="crossroad.net.xml"/>
+        <plain-output-prefix value="/Users/minghaoshen/Desktop/crossroad/crossroad"/>
+    </output>
+
+    <processing>
+        <no-internal-links value="false"/>
+        <no-turnarounds value="true"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+        <junctions.corner-detail value="0"/>
+        <rectangular-lane-cut value="false"/>
+        <walkingareas value="false"/>
+    </processing>
+
+</configuration>
+-->
+
+<nodes version="0.27" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/nodes_file.xsd">
+    <location netOffset="0.00,0.00" convBoundary="-60.88,0.00,60.88,213.05" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
+
+    <node id="0" x="0.00" y="0.00" type="priority"/>
+    <node id="1" x="0.00" y="72.38" type="traffic_light" tl="1"/>
+    <node id="2" x="0.00" y="213.05" type="traffic_light" tl="2"/>
+    <node id="3" x="-60.88" y="72.38" type="priority"/>
+    <node id="4" x="60.88" y="72.38" type="priority"/>
+    <node id="5" x="-31.60" y="213.05" type="priority"/>
+    <node id="6" x="31.60" y="213.05" type="priority"/>
+</nodes>

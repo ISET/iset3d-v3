@@ -1,3 +1,4 @@
+
 function workingDir = piWrite(renderRecipe,varargin)
 % Write a PBRT scene file based on its renderRecipe
 %
@@ -34,6 +35,7 @@ piWrite(thisR);
 %%
 p = inputParser;
 
+varargin =ieParamFormat(varargin);
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
 % Format the parameters by removing spaces and forcing lower case.
@@ -53,7 +55,8 @@ p.addParameter('overwritematerials',true,@islogical);
 
 % Create a new materials.pbrt
 p.addParameter('creatematerials',false,@islogical);
-
+% control lighting in geomtery.pbrt
+p.addParameter('lightsFlag',false,@islogical);
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
@@ -62,7 +65,7 @@ overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
 creatematerials  = p.Results.creatematerials;
-
+lightsFlag = p.Results.lightsFlag;
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
@@ -126,6 +129,24 @@ if isequal(renderRecipe.get('optics type'),'lens')
     % Verify that the input lens is a full path
     if ~strcmp(inputLensFile(1),'/')
         error('You must specify an absolute path for the lens file.');
+
+
+    end
+    
+    % Figure out the working lens file directory and name
+    [~,name,ext] = fileparts(inputLensFile);
+    workingLensDir = fullfile(workingDir,'lens');
+    if ~exist(workingLensDir,'dir'), mkdir(workingLensDir); end
+    workingLensFile = fullfile(workingLensDir,[name,ext]);
+    
+    % If the working copy doesn't exist, copy it.  If it exists but there
+    % is a force overwrite, delete and copy.
+    if ~exist(workingLensFile,'file')
+        copyfile(inputLensFile,workingLensFile);
+    elseif overwritelensfile
+        delete(workingLensFile);
+        copyfile(inputLensFile,workingLensFile);
+
     end
     
     % Figure out the working lens file directory and name
@@ -148,6 +169,39 @@ end
 
 renderingDir = fullfile(workingDir,'renderings');
 if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
+
+%% Overwrite Materials.pbrt
+if contains(renderRecipe.exporter, 'C4D')
+    if ~creatematerials
+    if overwritematerials
+        [~,n] = fileparts(renderRecipe.inputFile);
+        fname_materials = sprintf('%s_materials.pbrt',n);
+        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+        piMaterialWrite(renderRecipe);
+    end
+    else
+        [~,n] = fileparts(renderRecipe.outputFile);
+        fname_materials = sprintf('%s_materials.pbrt',n);
+        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+        piMaterialWrite(renderRecipe);
+    end
+end
+%% Overwirte geometry.pbrt
+if contains(renderRecipe.exporter, 'C4D')
+    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
+end
+
+
+%% Overwrite xxx.json
+[~,scene_fname,~] = fileparts(renderRecipe.outputFile);
+jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
+jsonwrite(jsonFile,renderRecipe);
+
+%% Make sure there is a renderings sub-directory of the working directory
+
+renderingDir = fullfile(workingDir,'renderings');
+if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
+
 
 %% OK, we are good to go. Open up the file.
 
@@ -294,6 +348,19 @@ end
 
 
 %% Write out WorldBegin/WorldEnd
+
+% if creatematerials
+%     for ii = 1:length(renderRecipe.world)
+%         currLine = renderRecipe.world{ii};
+%         if contains(currLine, 'materials.pbrt')
+%             [~,n] = fileparts(renderRecipe.outputFile);
+%             currLine = sprintf('Include "%s_materials.pbrt"',n);
+%         end
+%         fprintf(fileID,'%s \n',currLine);
+%     end
+% 
+% else
+
 if creatematerials
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
@@ -305,11 +372,14 @@ if creatematerials
     end
 
 else
+
     for ii = 1:length(renderRecipe.world)
     currLine = renderRecipe.world{ii};
     fprintf(fileID,'%s \n',currLine);
     end
+
 end
+
 %% Close file
 
 fclose(fileID);
@@ -330,4 +400,13 @@ if contains(renderRecipe.exporter, 'C4D')
         piMaterialWrite(renderRecipe);
     end
 end
+%% Overwirte geometry.pbrt
+if contains(renderRecipe.exporter, 'C4D')
+    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
+end
+
+%% Overwrite xxx.json
+[~,scene_fname,~] = fileparts(renderRecipe.outputFile);
+jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
+jsonwrite(jsonFile,renderRecipe);
 end

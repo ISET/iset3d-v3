@@ -30,11 +30,12 @@ case contains(mList(ii),'carbody')
 %}
 
 for ii = 1:length(mlist)
-    if  contains(mlist(ii),'carbody')
+    if  contains(mlist(ii),'carbody') && ~contains(mlist(ii),'paint_base')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % 
-        piMaterialAssign(thisR,material.name,target);
+        colorkd = piColorPick('random');
+        piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
     elseif contains(mlist(ii),'window')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
@@ -97,12 +98,22 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.retroreflective;
         piMaterialAssign(thisR,material.name,target);
-    else
-        %otherwise, assign an default matte material.
+    elseif contains(mlist(ii),'Bodymat')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
-        target = thisR.materials.lib.matte;
+        target = thisR.materials.lib.substrate;
         piMaterialAssign(thisR,material.name,target);
+    elseif contains(mlist(ii),'wall')
+        name = cell2mat(mlist(ii));
+        thisR.materials.list.(name).texturebumpmap = 'windy_bump';
+    else
+        %otherwise, assign an default matte material.
+        if ~contains(mlist(ii),'paint_base')
+        name = cell2mat(mlist(ii));
+        material = thisR.materials.list.(name);
+        target = thisR.materials.lib.uber;
+        piMaterialAssign(thisR,material.name,target);
+        end
     end
 end
 
