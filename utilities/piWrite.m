@@ -1,4 +1,3 @@
-
 function workingDir = piWrite(renderRecipe,varargin)
 % Write a PBRT scene file based on its renderRecipe
 %
@@ -129,8 +128,6 @@ if isequal(renderRecipe.get('optics type'),'lens')
     % Verify that the input lens is a full path
     if ~strcmp(inputLensFile(1),'/')
         error('You must specify an absolute path for the lens file.');
-
-
     end
     
     % Figure out the working lens file directory and name
@@ -146,7 +143,6 @@ if isequal(renderRecipe.get('optics type'),'lens')
     elseif overwritelensfile
         delete(workingLensFile);
         copyfile(inputLensFile,workingLensFile);
-
     end
     
     % Figure out the working lens file directory and name
@@ -169,6 +165,7 @@ end
 
 renderingDir = fullfile(workingDir,'renderings');
 if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
+
 
 %% Overwrite Materials.pbrt
 if contains(renderRecipe.exporter, 'C4D')
@@ -348,7 +345,15 @@ end
 
 
 %% Write out WorldBegin/WorldEnd
-
+if creatematerials
+    for ii = 1:length(renderRecipe.world)
+        currLine = renderRecipe.world{ii};
+        if contains(currLine, 'materials.pbrt')
+            [~,n] = fileparts(renderRecipe.outputFile);
+            currLine = sprintf('Include "%s_materials.pbrt"',n);
+        end
+        fprintf(fileID,'%s \n',currLine);
+    end
 % if creatematerials
 %     for ii = 1:length(renderRecipe.world)
 %         currLine = renderRecipe.world{ii};
@@ -377,9 +382,7 @@ else
     currLine = renderRecipe.world{ii};
     fprintf(fileID,'%s \n',currLine);
     end
-
 end
-
 %% Close file
 
 fclose(fileID);

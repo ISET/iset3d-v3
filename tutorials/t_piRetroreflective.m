@@ -42,7 +42,6 @@ thisR.camera = struct('type','Camera','subtype','realistic');
 % of the lens file, so our lens files have to be slightly modified.
 lensFile = fullfile(piRootPath,'data','lens','wide.56deg.12.5mm.dat');
 thisR.camera.lensfile.value = lensFile;
-
 % Attach the lens
 thisR.camera.lensfile.value = lensFile; % mm
 thisR.camera.lensfile.type = 'string';

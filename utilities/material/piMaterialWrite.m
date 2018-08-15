@@ -80,13 +80,9 @@ for jj = 1: length(textureLines)
     for ii = 1:length(thisLine_tmp)
         if contains(thisLine_tmp{ii},'.png')
             filename = thisLine_tmp{ii};
-<<<<<<< HEAD
             if ~contains(filename,'textures/')
             thisLine_tmp{ii} = fullfile('textures',filename);
             end
-=======
-            thisLine_tmp{ii} = fullfile('texture',filename);
->>>>>>> 43f04499c00bd60aa7927c0894809adf069d375d
         end
         if ii == 1
             textureLines_tmp = strcat(textureLines_tmp,thisLine_tmp{ii});
