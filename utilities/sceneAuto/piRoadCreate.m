@@ -11,10 +11,24 @@ function [road,thisR] = piRoadCreate(varargin)
 %%
 p = inputParser;
 varargin = ieParamFormat(varargin);
-p.addParameter('name','crossroad');
+p.addParameter('type','crossroad');
 p.addParameter('sceneType','city');
 p.addParameter('trafficflowDensity','medium');
 p.addParameter('sessions',[]);
+p.addParameter('scitran',[]);
+
+inputs = p.parse(varargin{:});
+
+sessions = p.Results.sessions;
+sceneType = p.Results.sceneType;
+trafficflowDensity = p.Results.trafficflowDensity;
+roadtype = p.Results.type;
+
+st = p.Results.scitran;
+
+if isempty(st)
+    st = scitran('stanfordlabs');
+end
 for ii=1:length(sessions)
     if isequal(lower(sessions{ii}.label),'road')
         roadSession = sessions{ii};
@@ -28,11 +42,11 @@ load(fullfile(piRootPath,'configuration','roadInfo.mat'),'roadinfo');
 %%
 vTypes={'pedestrian','passenger','bus','truck'};
 
-road.name = p.Results.name;
 randm = randi(2,1);
-switch inputs.sceneType
+switch sceneType
     case 'city'
-        if randm ==1,road.nlanes = 4;else, road.nlanes = 8;end
+%         if randm ==1,road.nlanes = 4;else, road.nlanes = 8;end
+        if randm ==1,road.nlanes = 4;else, road.nlanes = 4;end % temp 08/15
         interval=[1,2,10,20];
     case 'suburb'
         if randm ==1,road.nlanes = 4;else, road.nlanes = 2;end
@@ -44,16 +58,18 @@ switch inputs.sceneType
         interval=[200,0.5,5,5];
 end
 % check the road type and get road assets from flywheel
-for ii = 1: length(roadinfo.(road.name))
-    if isequal(roadinfo.(road.name)(ii).scenetype,inputs.sceneType) &&...
-            isequal(roadinfo.(road.name)(ii).nlanes,road.nlanes)
-        road.roadinfo = roadinfo.(road.name)(ii);
+for jj = 1: length(roadinfo.(roadtype))
+    if isequal(roadinfo.(roadtype)(jj).scenetype,sceneType) &&...
+            isequal(roadinfo.(roadtype)(jj).nlanes,road.nlanes)
+        road.roadinfo = roadinfo.(roadtype)(jj);
         break;
     end
 end
-assetRecipe = piAssetDownload(roadSession,road.name,1,'scitran',st);
+roadname = sprintf('%s_%s_%dlanes',roadtype,sceneType,road.nlanes);
+road.name = roadname;
+assetRecipe = piAssetDownload(roadSession,'road',1,'acquisition',roadname,'scitran',st);
 
-switch inputs.trafficflowDensity
+switch trafficflowDensity
     case 'low'
         interval=interval*1.2;
     case 'high'
@@ -61,8 +77,8 @@ switch inputs.trafficflowDensity
     otherwise
 end
 
-vTypes=vTypes(2:end);
-interval=interval(2:end);
+
+
 
 % Map key/value pairs
 road.vTypes=containers.Map(vTypes,interval);
@@ -74,5 +90,4 @@ thisR = recipe;
 for dd = 1:length(fds)
     thisR.(fds{dd})= thisR_tmp.(fds{dd});
 end
-piMaterialGroupAssign(thisR_road);
 end

@@ -56,11 +56,11 @@ intersections=inputs.intersections;
 % vTypes={'pedestrian','passenger','bus','truck'};
 % probs=[1,2,10,20];
 
-vType_interval=road.vType;
-vTypes=vType_interval.key;
-interval=vType_interval.value;
+vType_interval=road.vTypes;
+vTypes=keys(vType_interval);
+% interval=values(vType_interval);
 %% Define a Path for sumo output by given scenetype and roadtype.
-netfileName=strcat(sceneType,'_',roadType.name,'_',roadtype.lane,'lanes');
+netfileName=road.name;
 netPath=fullfile(piRootPath,'data','sumo_input',netfileName,strcat(netfileName,'.net.xml'));
 outputPath=fullfile(piRootPath,'local');
 chdir(outputPath);
@@ -96,7 +96,7 @@ for ii=1:vType_interval.Count
     outcfg=strcat(outSymbol," ",vTypes{ii},'.trips.xml');
     if strcmp(vTypes{ii},'pedestrian')
         vehcfg=' --pedestrians';
-    else 
+    else
         vehcfg=strcat(' --vehicle-class'," ",vTypes{ii});
     end
     tripsCmd=strcat(pycmd,randomTrips,netcfg,timecfg,outcfg,probcfg,vehcfg);
@@ -124,30 +124,30 @@ for ii=1:vType_interval.Count
     routeid=fopen(route_name,'wt+');
     fprintf(routeid,route_append_file);
     fclose(routeid);
-        
+    
     % Return to original directory
     chdir('..');
 end
 
 %% Write .add.xml
 if ~isempty(intersections)
-    addid=fopen(strcat(roadType,'.add.xml'),'wt');
+    addid=fopen(strcat(netfileName,'.add.xml'),'wt');
     fprintf(addid,'<tlsStates>\n');
     for ii=1:length(intersections)
-        fprintf(addid,strcat('    <timedEvent type="SaveTLSStates" source="',intersections{ii},'" dest="',roadType,'_traffic_light.xml"/>\n'));
+        fprintf(addid,strcat('    <timedEvent type="SaveTLSStates" source="',intersections{ii},'" dest="',netfileName,'_traffic_light.xml"/>\n'));
     end
     fprintf(addid,'</tlsStates>');
     fclose(addid);
 end
 
 %% Write .sumocfg
-cfgid=fopen(strcat(roadType,'.sumocfg'),'wt');
+cfgid=fopen(strcat(netfileName,'.sumocfg'),'wt');
 fprintf(cfgid,'<configuration>\n    <input>\n');
 fprintf(cfgid,strcat('        <net-file value="',netPath,'"/>\n'));
 fprintf(cfgid,strcat('        <route-files value="',route_collect,'"/>\n'));
 if ~isempty(intersections)
     fprintf(cfgid,strcat('        <additional-files value="',...
-        roadType,'.add.xml"/>\n'));
+        netfileName,'.add.xml"/>\n'));
 end
 fprintf(cfgid,'    </input>\n');
 fprintf(cfgid,'    <time>\n');
@@ -158,7 +158,11 @@ fclose(cfgid);
 
 %% run sumo-simulation to generate a trafficflow .xml file
 tic
-sumocmd=strcat(sumohome,'/bin/sumo -c'," ",roadType,'.sumocfg --fcd-output'," ",roadType,'_state.xml');
+sumocmd=strcat(sumohome,'/bin/sumo -c'," ",netfileName,'.sumocfg --fcd-output'," ",netfileName,'_state.xml');
 system(sumocmd);
-trafficflow=piSumoRead(strcat(roadType,'_state.xml')); toc
+if ~isempty(intersections)
+    trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'),'lightfile',strcat(netfileName,'_traffic_light.xml'));
+else
+    trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'));
+end
 end

@@ -94,7 +94,7 @@ folder = fullfile(piRootPath,'local',assetname);
 chdir(folder);
 resourceFile = sprintf('%s.cgresource.zip',assetname);
 % zip(resourceFile,{'texture','spds','skymaps','scene','bsdfs'});
-zip(resourceFile,{'texture','scene'});
+zip(resourceFile,{'textures','scene'});
 
 %%
 oldRecipeFile = sprintf('%s.json',assetname);

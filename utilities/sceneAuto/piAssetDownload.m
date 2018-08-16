@@ -21,9 +21,11 @@ p = inputParser;
 p.addRequired('session',@(x)(isa(x,'flywheel.model.Session')));
 p.addRequired('sessionname',@ischar);
 p.addRequired('nassets',@isnumeric);
+p.addParameter('acquisition','',@ischar);
 p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
 
 p.parse(session, sessionname, nassets, varargin{:});
+acqname = p.Results.acquisition;
 st = p.Results.scitran;
 
 if isempty(st)
@@ -44,7 +46,13 @@ end
 % sessionName = p.Results.sessionname;
 % ncars = p.Results.ncars;
 %%
-
+containerID = idGet(session,'data type','session');
+fileType = 'CG Resource';
+[resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
+fileType_json ='source code'; % json
+[recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
+%%
+if isempty(acqname)
 %%
 % Create Assets obj struct
 % Download random cars from flywheel
@@ -53,15 +61,7 @@ end
 % stPrint(hierarchy.acquisitions{whichSession},'label','') % will be disable
 
 % These files are within an acquisition (dataFile)
-containerID = idGet(session,'data type','session');
-fileType    = 'archive';
-[resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
-if isempty(resourceFiles{1})
-    fileType = 'CG Resource';
-    [resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
-end
-fileType_json ='source code'; % json
-[recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
+
 
 nDatabaseAssets = length(resourceFiles);
 
@@ -114,6 +114,34 @@ end
 % end
 
 fprintf('%d Files downloaded.\n',nDownloads);
+else
+    % download acquisition by given name;
+    for jj = 1:length(recipeFiles)
+        if contains(recipeFiles{jj}{1}.name,acqname)
+            [~,n,~] = fileparts(resourceFiles{jj}{1}.name);
+    [~,n,~] = fileparts(n); % extract file name
+    % Download the scene to a destination zip file
+    localFolder = fullfile(piRootPath,'local',n);    
+    destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
+    % we might not need to download zip files every time, use
+    % resourceCombine.m 08/14 --zhenyi
+    destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
+    if ~exist(localFolder,'dir'), mkdir(localFolder)
+    st.fileDownload(recipeFiles{jj}{1}.name,...
+        'container type', 'acquisition' , ...
+        'container id',  recipe_acqID{jj} ,...
+        'destination',destName_recipe);
+    
+    st.fileDownload(resourceFiles{jj}{1}.name,...
+        'container type', 'acquisition' , ...
+        'container id',  resource_acqID{jj} ,...
+        'unzip', true, ...
+        'destination',destName_resource);
+    end
+    assetRecipe.name   = destName_recipe;
+    assetRecipe.count  = 1;
+        end
+    end
 end
 
 

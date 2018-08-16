@@ -67,8 +67,6 @@ end
 %% Put all texture files in a seperate folder.
 mkdir('textures');
 texturePath = 'textures';
-mkdir('texture');
-texturePath = 'texture';
 textureFiles=dir('*.png');
 for i=1:length(textureFiles)
     textureFileName=textureFiles(i).name;
