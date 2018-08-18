@@ -1,5 +1,16 @@
 function thisR_scene = piSceneAuto(varargin)
-%% Automatically generate scene(s) for Autonomous driving scenarios for Automotives.
+% Automatically generate scene(s) for Autonomous driving scenarios for Automotives.
+%    
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
 p = inputParser;
 varargin = ieParamFormat(varargin);
 p.addParameter('sceneType','city',@ischar);
@@ -31,6 +42,7 @@ hierarchy = st.projectHierarchy('Graphics assets');
 projects     = hierarchy.project;
 sessions     = hierarchy.sessions;
 acquisitions = hierarchy.acquisitions;
+
 %% Create a road
 [road,thisR_road] = piRoadCreate('type',roadType,'trafficflowDensity',trafficflowDensity,...
     'sessions',sessions,'sceneType',sceneType,'scitran',st);
@@ -48,8 +60,23 @@ end
 
 % for jj = 1:inputs.nScene
 %% todo: create building and tree lib
+tic
+% Check how many subtypes there is in One type of scene;
+index = 1; % will give a random number
+sceneName = sprintf('%s_%d',sceneType,index);
+buildingLib = piAssetLibCreate('building',sceneName,st);
+buildingPosList = piBuildingPosList(buildingLib,thisR_road);
+buildingPlaced = piBuildingPlace(buildingLib,buildingPosList);
+% Add placed building
+thisR_road = piAssetAdd(thisR_road, buildingPlaced);
+% Place tree/streelights/trashcan/others at resonable positions in a
+% scene.
 asset = piSidewalkPlan(road,'addTree',false);
-% Combine building/tree/streetlights place function
+% Add placed tree
+thisR_road = piAssetAdd(thisR_road, asset.treePlaced);
+% Add placed trafficlights
+thisR_road = piAssetAdd(thisR_road, asset.streetlightPlaced);toc
+% Download and Combine all building/tree/streetlights resouces
 
 %% Place vehicles/pedestrians
 [assetsPlaced,assetsunPlaced] = piAssetPlace(trafficflow,'timestamp',timestamp);

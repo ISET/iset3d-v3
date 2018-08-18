@@ -279,4 +279,5 @@ if ~isempty(lightFile)
         end
     end
 end
+toc
 end

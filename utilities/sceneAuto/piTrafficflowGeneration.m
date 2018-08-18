@@ -163,6 +163,6 @@ system(sumocmd);
 if ~isempty(intersections)
     trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'),'lightfile',strcat(netfileName,'_traffic_light.xml'));
 else
-    trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'));
+    trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'));toc
 end
 end

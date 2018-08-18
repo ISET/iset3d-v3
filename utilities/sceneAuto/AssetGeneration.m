@@ -22,7 +22,7 @@ assetname = sprintf('Car_%03d',dd);
 
 % fname = '/Users/zhenyiliu/Desktop/cross/cross.pbrt';
 fname = fullfile(mainPath,assetType,assetname,sprintf('%s.pbrt',assetname));
-
+% fname = '/Users/zhenyiliu/Desktop/building_test/building_test.pbrt';
 if ~exist(fname,'file'), error('File not found'); end
 
 % When we read, we also write a JSON recipe.
@@ -33,15 +33,15 @@ thisR = piRead(fname,'version',3);
 % We might decide to make a funciton that sets some defaults so that
 % people could relatively quickly have a look at the rendered object.
 
-% thisR.set('filmresolution',[1080 720]);
-% thisR.set('pixelsamples',64);
-% thisR.integrator.maxdepth.value = 10;
-% thisR.integrator.subtype = 'path';
-% thisR.sampler.subtype = 'sobol';
+thisR.set('filmresolution',[1280 720]);
+thisR.set('pixelsamples',64);
+thisR.integrator.maxdepth.value = 10;
+thisR.integrator.subtype = 'bdpt';
+thisR.sampler.subtype = 'sobol';
 
 %% Add skymap a default day time sky map
 
-% piSkymapAdd(thisR,'morning');
+piSkymapAdd(thisR,'day');
 %  
 %% Assign Materials and Color
 

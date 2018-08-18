@@ -1,4 +1,4 @@
-function [objectPosition_list] = objectRandomPlan(sidewalk_list,object_list, object_number, offset)
+function [objectPosition_list] = piObjectRandomPlan(sidewalk_list,object_list, object_number, offset)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Function: This function randomly places objects on sidewalks
 %

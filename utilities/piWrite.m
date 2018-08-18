@@ -345,15 +345,7 @@ end
 
 
 %% Write out WorldBegin/WorldEnd
-if creatematerials
-    for ii = 1:length(renderRecipe.world)
-        currLine = renderRecipe.world{ii};
-        if contains(currLine, 'materials.pbrt')
-            [~,n] = fileparts(renderRecipe.outputFile);
-            currLine = sprintf('Include "%s_materials.pbrt"',n);
-        end
-        fprintf(fileID,'%s \n',currLine);
-    end
+
 % if creatematerials
 %     for ii = 1:length(renderRecipe.world)
 %         currLine = renderRecipe.world{ii};

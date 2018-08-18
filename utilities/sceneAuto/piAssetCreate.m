@@ -5,11 +5,11 @@ function asset = piAssetCreate(varargin)
 %  thisR - A rendering recipe
 %
 % Optional key/value parameters
-%   nCars
-%   nTrucks
-%   nPed
-%   nBuses
-%   nCyclist
+%   ncars
+%   ntrucks
+%   nped
+%   nbuses
+%   ncyclist
 %   scitran
 %
 % Returns
@@ -23,9 +23,8 @@ varargin = ieParamFormat(varargin);
 
 p.addParameter('ncars',0);
 p.addParameter('ntrucks',0);
-p.addParameter('nPed',0);
+p.addParameter('nped',0);
 p.addParameter('nbuses',0);
-p.addParameter('nbuilding',0);
 p.addParameter('ncyclist',0); % Cyclist contains two class: rider and bike.
 p.addParameter('scitran','',@(x)(isa(x,'scitran')));
 
@@ -99,7 +98,7 @@ if p.Results.ntrucks > 0
 end
 
 %% Get the people from the database
-if p.Results.nPed > 0
+if p.Results.nped > 0
     % Find the session with the label car
     for ii=1:length(sessions)
         if isequal(lower(sessions{ii}.label),'pedestrian')
@@ -110,29 +109,13 @@ if p.Results.nPed > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    assetRecipe = piAssetDownload(pedestrianSession,'pedestrian',inputs.nPed,'scitran',st);
+    assetRecipe = piAssetDownload(pedestrianSession,'pedestrian',inputs.nped,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
     asset.pedestrian = piAssetAssign(assetRecipe,'label','pedestrian');
 end
 
-%% Get building from the database
-if p.Results.nbuilding > 0
-    % Find the session with the label car
-    for ii=1:length(sessions)
-        if isequal(lower(sessions{ii}.label),'building')
-            pedestrianSession = sessions{ii};
-            break;
-        end
-    end
-    
-    % Create Assets obj struct
-    % Download random assets from flywheel
-    assetRecipe = piAssetDownload(pedestrianSession,'building',inputs.nbuilding,'scitran',st);
-    
-    % Analyze the downloaded scenes in fname and create the returned asset
-    asset.building = piAssetAssign(assetRecipe,'label','building');
-end
+
 %%
 disp('All done!')
 

@@ -28,13 +28,30 @@ trafficlight = p.Results.trafficlight;
 %% Download asssets with respect to the number and class of Sumo output.
 if isfield(trafficflow(timestamp).objects,'car')
     ncars = length(trafficflow(timestamp).objects.car);
-else ncars = 0;end
+else
+    ncars = 0;
+end
 
 if isfield(trafficflow(timestamp).objects,'pedestrian')
     nped = length(trafficflow(timestamp).objects.pedestrian);
-else nped = 0;end
+else
+    nped = 0;
+end
 
-assets = piAssetCreate('ncars',ncars,'nped',nped);
+if isfield(trafficflow(timestamp).objects,'bus')
+    nbuses = length(trafficflow(timestamp).objects.car);
+else
+    nbuses = 0;
+end
+
+if isfield(trafficflow(timestamp).objects,'truck')
+    ntrucks = length(trafficflow(timestamp).objects.pedestrian);
+else
+    ntrucks = 0;
+end
+
+assets = piAssetCreate('ncars',ncars,'nped',nped,...
+                       'nbuses',nbuses,'ntrucks',ntrucks);
 
 % if isfield(lower(trafficflow(timestamp).objects),'bus')
 % nBuses = trafficflow(timestamp).objects.Bus;

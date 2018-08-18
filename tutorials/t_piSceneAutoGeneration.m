@@ -1,8 +1,20 @@
-%% Test a pbrtv3 scene with material property modified.
+%% Automatically generate a scene.
 
 %% Initialize ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
+if ~mcGcloudExists, mcGcloudConfig; end 
+
+%% Initialize your cluster, we will upload all necessary resources to cloud buckets in advance
+tic
+gcp = gCloud('configuration','gcp-pbrtv3-central-32');
+toc
+
+% Show where
+gcp.targets =[];
+
+% Show where we stand
+str = gcp.configList;
 %% Scene Autogeneration by parameters
 sceneType = 'city';
 roadType = 'crossroad';
@@ -17,11 +29,6 @@ thisR_scene = piSceneAuto('sceneType',sceneType,...
                          'dayTime',dayTime,...
                          'timeStamp',timestamp,...
                           'nScene',nScene);
-
-
-
-
-
 
 %% Render irradiance
 

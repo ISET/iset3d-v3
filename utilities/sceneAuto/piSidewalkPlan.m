@@ -69,17 +69,23 @@ trashcan_number = inputs.trashcan_number;
 trashcan_offset = inputs.trashcan_offset;
 station_number = inputs.station_number;
 station_offset = inputs.station_offset;
+%% Flywheel init
+st = scitran('stanfordlabs');
+hierarchy = st.projectHierarchy('Graphics assets');
+sessions = hierarchy.sessions;
+
 
 %% load sidewalk information according to the type of road
 
 sidewalk_list = road.roadinfo.sidewalk_list;
 %% generate list of assets(not finished) from flywheel, unfinished
 if (addStreetlight ==true)
-streetlight_list = piStreetlightListCreate();
+    streetlight_list = piStreetlightListCreate();
 end
 
 if (addTree ==true)
-tree_list = piTreeListCreate();
+    tree_list = piInfoListGet('tree','tree',st);
+    % tree_list = piTreeListCreate();
 end
 
 % offset_garbage= 0.8;
@@ -133,9 +139,14 @@ else
 end
 
 %% consider overlap and obtain the position list of each object
-[asset.treePosition_list, total_list] = piCalOverlap(treePosition, asset.streetlightPosition_list);
-[asset.trashcanPosition_list, total_list] = piCalOverlap(trashcanPosition, total_list);
-[asset.stationPosition_list, total_list] = piCalOverlap(stationPosition, total_list);
+[treePosition_list, total_list] = piCalOverlap(treePosition, asset.streetlightPosition_list);
+[trashcanPosition_list, total_list] = piCalOverlap(trashcanPosition, total_list);
+[stationPosition_list, total_list] = piCalOverlap(stationPosition, total_list);
+%% Place them
+asset.treePlaced = piBuildingPlace(tree_list,treePosition_list);
+asset.streetlightPlaced = piStreetlightPlace(streetlight_list,streetlightPosition_list);
+end
+
 
 
 
