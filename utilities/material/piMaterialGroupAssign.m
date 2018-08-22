@@ -47,12 +47,12 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.mirror;
         piMaterialAssign(thisR,material.name,target);
-    elseif contains(mlist(ii),'lightsfront')
+    elseif contains(mlist(ii),'lightsfront') || contains(mlist(ii),'lightfront')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         piMaterialAssign(thisR,material.name,target);
-    elseif contains(mlist(ii),'lightsback')
+    elseif contains(mlist(ii),'lightsback') || contains(mlist(ii),'lightback')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;

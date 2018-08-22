@@ -21,9 +21,9 @@ skymaps = fullfile(piRootPath,'data','skymaps');
 input = lower(input);
 switch input
     case 'morning'
-    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr" [2 2 2]');
+    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr" "rgb L" [2 2 2]');
     case 'day'
-    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr" "rgb L" [3 3 3]');
+    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr" "rgb L" [2 2 2]');
     case 'dusk'
     skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/dusk.exr" ');
     case 'sunset'
@@ -49,7 +49,7 @@ world(3,:) = cellstr(sprintf('Rotate 180 0 0 1'));
 world(4,:) = cellstr(sprintf('Scale 0.1 0.1 1'));
 world(5,:) = cellstr(skylights);
 world(6,:) = cellstr(sprintf('AttributeEnd'));
-world(7,:) = cellstr(sprintf('LightSource "distant"  "point from" [ -30 40  100 ] "blackbody L" [6500 3]'));
+world(7,:) = cellstr(sprintf('LightSource "distant"  "point from" [ -30 40  100 ] "blackbody L" [6500 2]'));
 jj=4;% skip materials and lightsource which are exported from C4D.
 for ii=1:(length(thisR.world)-3)
     world(ii+7,:)=thisR.world(jj);
