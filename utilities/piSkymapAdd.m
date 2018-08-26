@@ -1,37 +1,46 @@
 function thisR = piSkymapAdd(thisR,input)
 % Choose a skybox, or random skybox, write this line to thisR.world.
-% 
-% Inputs 
-%        thisR - A rendering recipe 
-%        skymap: 'morning'                                   
-%                'day'
-%                'dusk'
-%                'sunset'
-%                'night' 
-%                'cloudy'
-%                'random'- pick a random skymap from skymaps folder
-% retruns 
-%        none;
 %
-% example: piAddSkymap(thisR,'day');
+% Inputs
+%   thisR - A rendering recipe
+%   skymap options:
+%        'morning'
+%        'day'
+%        'dusk'
+%        'sunset'
+%        'night'
+%        'cloudy'
+%        'random'- pick a random skymap from skymaps folder
+%
+% Returns
+%   none, but thisR.world is modified.
+%
+% Example: 
+%    piAddSkymap(thisR,'day');
 %
 % Zhenyi,2018
+
+%% Programming TODO
+%  We need to check whether we are replacing a skymap or adding a new
+%  one.  If one exists, then we are replacing it!
+%
+
 %%
 skymaps = fullfile(piRootPath,'data','skymaps');
 input = lower(input);
 switch input
     case 'morning'
-    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr" "rgb L" [2 2 2]');
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr" "rgb L" [2 2 2]');
     case 'day'
-    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr" "rgb L" [2 2 2]');
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr" "rgb L" [2 2 2]');
     case 'dusk'
-    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/dusk.exr" ');
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/dusk.exr" ');
     case 'sunset'
-    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset_1.exr"');
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset_1.exr"');
     case 'night'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
     case 'cloudy'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr" "rgb L" [2 2 2]');        
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr" "rgb L" [2 2 2]');
     case'random'
         curDir = pwd;
         cd(skymaps)
