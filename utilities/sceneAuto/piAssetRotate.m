@@ -11,7 +11,9 @@ for dd = 1:pos_d
         % rotate car
         if isfield(object(ii),'children')
             if length(object(ii).children) >= 2
-                object(ii).rotate(:,dd) = [degree{dd};0;1;0];
+                object(ii).rotate(:,dd*3-1) = [0;1;0;0];
+                object(ii).rotate(:,dd*3-2) = [degree{dd};0;1;0];
+                object(ii).rotate(:,dd*3)   = [0;0;0;1];
                 % find car position
                 %         object_position = [object(ii).position(1) object(ii).position(3)];
                 % rotate object's pmin and pmax for bounding box checking

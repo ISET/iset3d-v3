@@ -53,10 +53,11 @@ for ii = 1: length(obj)
                             obj_position(2),obj_position(3));
                     end
                     if ~isempty(obj(ii).rotate)
-                        obj_rotate = obj(ii).rotate(:,gg);
+                        obj_rotate = obj(ii).rotate(gg:gg*12);
                         if ~isequal(obj_rotate,[0;0;0;0])
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
-                            obj_rotate(2),obj_rotate(3),obj_rotate(4));
+                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1:4));
+                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(5:8));
+                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(9:12));
                         end
                     end
                     fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);

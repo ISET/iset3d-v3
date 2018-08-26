@@ -12,7 +12,7 @@ currentfolder = pwd;
 cd(directory)
 
 %% Find any jpg file
-jpgFiles = [dir('*.jpg');dir('*.JPG')];
+jpgFiles =  dir('*.jpg');
 bmpFiles  = dir('*.bmp');
 %% Convert the jpg files to png
 if ~isempty(jpgFiles)

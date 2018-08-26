@@ -45,6 +45,7 @@ for jj = 1:ntxtLines
     % photoshop exports texture format with ".JPG "(with extra space) ext.
     if contains(str,'JPG')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
+        thisR.materials.txtLines(jj) = strrep(str,'JPG','png');
     end
     if contains(str,'bmp')
         thisR.materials.txtLines(jj) = strrep(str,'bmp','png');

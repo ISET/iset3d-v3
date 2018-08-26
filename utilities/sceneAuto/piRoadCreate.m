@@ -77,9 +77,6 @@ switch trafficflowDensity
     otherwise
 end
 
-
-
-
 % Map key/value pairs
 road.vTypes=containers.Map(vTypes,interval);
 %% Read out a road render recipe
