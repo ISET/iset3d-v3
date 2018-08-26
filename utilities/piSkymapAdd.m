@@ -27,7 +27,7 @@ switch input
     case 'dusk'
     skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/dusk.exr" ');
     case 'sunset'
-    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset.exr"');
+    skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset_1.exr"');
     case 'night'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
     case 'cloudy'
@@ -45,8 +45,8 @@ end
 
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));
-world(3,:) = cellstr(sprintf('Rotate 180 0 0 1'));
-world(4,:) = cellstr(sprintf('Scale 0.1 0.1 1'));
+world(3,:) = cellstr(sprintf('Rotate -90 1 0 0'));
+world(4,:) = cellstr(sprintf('Scale 1 1 1'));
 world(5,:) = cellstr(skylights);
 world(6,:) = cellstr(sprintf('AttributeEnd'));
 world(7,:) = cellstr(sprintf('LightSource "distant" "point from" [ -30 40  100 ] "blackbody L" [6500 2]'));
