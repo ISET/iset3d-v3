@@ -51,19 +51,25 @@ switch input
         cd(curDir);
 end
 
+index_m = find(contains(thisR.world,'_materials.pbrt'));
+index_sky = find(contains(thisR.world,'mapname'), 1);
 
-world(1,:) = thisR.world(1);
-world(2,:) = cellstr(sprintf('AttributeBegin'));
-world(3,:) = cellstr(sprintf('Rotate -90 1 0 0'));
-world(4,:) = cellstr(sprintf('Scale 1 1 1'));
-world(5,:) = cellstr(skylights);
-world(6,:) = cellstr(sprintf('AttributeEnd'));
-world(7,:) = cellstr(sprintf('LightSource "distant" "point from" [ -30 40  100 ] "blackbody L" [6500 2]'));
-jj=4;% skip materials and lightsource which are exported from C4D.
-for ii=1:(length(thisR.world)-3)
-    world(ii+7,:)=thisR.world(jj);
-    jj=jj+1;
+if isempty(index_sky)
+    if contains(thisR.world,'mapname')
+        world(1,:) = thisR.world(1);
+        world(2,:) = cellstr(sprintf('AttributeBegin'));
+        world(3,:) = cellstr(sprintf('Rotate -90 1 0 0'));
+        world(4,:) = cellstr(sprintf('Scale 1 1 1'));
+        world(5,:) = cellstr(skylights);
+        world(6,:) = cellstr(sprintf('AttributeEnd'));
+        jj=1;% skip materials and lightsource which are exported from C4D.
+        for ii=index_m:length(thisR.world)
+            world(jj+6,:)=thisR.world(ii);
+            jj=jj+1;
+        end
+    end
+    thisR.world = world;
+else
+    thisR.world{index_sky} = skylights;
 end
-
-thisR.world = world;
 end

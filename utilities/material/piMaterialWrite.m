@@ -39,14 +39,19 @@ if(~status), error('Failed to copy bsdfs directory to docker working directory.'
 ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
     str = thisR.materials.txtLines(jj);
-    if contains(str,'jpg')
+    if contains(str,'.jpg"')
         thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
     end
+    if contains(str,'.jpg "')
+        thisR.materials.txtLines(jj) = strrep(str,'jpg ','png');
+    end    
     % photoshop exports texture format with ".JPG "(with extra space) ext.
-    if contains(str,'JPG')
+    if contains(str,'.JPG "')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
-        thisR.materials.txtLines(jj) = strrep(str,'JPG','png');
     end
+    if contains(str,'.JPG"')
+        thisR.materials.txtLines(jj) = strrep(str,'JPG','png');
+    end    
     if contains(str,'bmp')
         thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
     end
