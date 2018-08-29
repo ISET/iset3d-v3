@@ -55,7 +55,6 @@ index_m = find(contains(thisR.world,'_materials.pbrt'));
 index_sky = find(contains(thisR.world,'mapname'), 1);
 
 if isempty(index_sky)
-    if contains(thisR.world,'mapname')
         world(1,:) = thisR.world(1);
         world(2,:) = cellstr(sprintf('AttributeBegin'));
         world(3,:) = cellstr(sprintf('Rotate -90 1 0 0'));
@@ -67,7 +66,6 @@ if isempty(index_sky)
             world(jj+6,:)=thisR.world(ii);
             jj=jj+1;
         end
-    end
     thisR.world = world;
 else
     thisR.world{index_sky} = skylights;
