@@ -31,6 +31,8 @@ input = lower(input);
 switch input
     case 'morning'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr" "rgb L" [2 2 2]');
+    case 'sunny_park'
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunny_park.exr"');        
     case 'day'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr" "rgb L" [2 2 2]');
     case 'dusk'
@@ -41,6 +43,14 @@ switch input
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
     case 'cloudy'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr" "rgb L" [2 2 2]');
+    case 'city'
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/city.exr"');
+    case 'grass'
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/grass.exr"');
+    case 'cityscape'
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cityscape.exr"');
+    case 'park'
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/park.exr"');
     case'random'
         curDir = pwd;
         cd(skymaps)
@@ -54,7 +64,7 @@ end
 index_m = find(contains(thisR.world,'_materials.pbrt'));
 index_sky = find(contains(thisR.world,'mapname'), 1);
 
-if isempty(index_sky)
+if isempty(index_sky) 
         world(1,:) = thisR.world(1);
         world(2,:) = cellstr(sprintf('AttributeBegin'));
         world(3,:) = cellstr(sprintf('Rotate -90 1 0 0'));
