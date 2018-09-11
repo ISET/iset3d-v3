@@ -1,12 +1,18 @@
 %% t_occlusionExample.m
 %
-% Render a slanted bar where the black plane is at a different depth from
-% the white plane. This creates an edge where there is a depth
-% discontinuity.
+% Render a slanted bar where there  are two planes at depth depths,
+% and each plane has a texture. This creates an edge where there is a
+% depth discontinuity.
 %
-% Depends on: pbrt2ISET, ISETBIO, Docker, ISET
+% We would like to compare the ray-traced rendering with a simpler
+% version in which we simply convolve the two images with different
+% blur functions and then add them.s
 %
 % TL ISETBIO Team, 2018
+%
+% See also
+%   iset3d, isetbio, Docker
+%
 
 %% Initialize ISETBIO
 ieInit;
@@ -28,10 +34,15 @@ k = 1; % For subplots on figure
 for ii = 1:length(blackDepth)
     
     % Create the scene
-    % Scene is lit by EqualEnergy.spd by default.
+    
+    % Scene is illuminated by EqualEnergy.spd by default.
     scene3d = sceneEye('slantedBarAdjustable',...
+        'planeTexture',...
         'whiteDepth',whiteDepth,...
         'blackDepth',blackDepth(ii)); % in meters
+    
+    % We would like to place a texture on the two planes.  How do we
+    % do that?
     
     % Set eye parameters
     scene3d.accommodation = whiteDepthDpt; % Accommodate to white plane
@@ -69,6 +80,8 @@ for ii = 1:length(blackDepth)
     title(sprintf('%0.1f dpt vs %0.1f dpt ',...
         blackDepthDpt(ii),whiteDepthDpt))
     k = k+1;
-    
-    
+     
 end
+
+
+%%
