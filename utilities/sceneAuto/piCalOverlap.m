@@ -26,27 +26,27 @@ for jj = 1:size(delete_list,2)
         length_total(mm) = total_list(mm).size.l;
     end
 %   Use affine transformation to calculate the coordinate after rotation 
-    Ax2 = delete_list(jj).position(1)+cos(-delete_list(jj).rotate*pi/180)*width_delete(jj)/2+sin(-delete_list(jj).rotate*pi/180)*length_delete(jj)/2;
-    Bx2 = delete_list(jj).position(1)+cos(-delete_list(jj).rotate*pi/180)*width_delete(jj)/2+sin(-delete_list(jj).rotate*pi/180)*(-length_delete(jj)/2);
-    Cx2 = delete_list(jj).position(1)+cos(-delete_list(jj).rotate*pi/180)*(-width_delete(jj)/2)+sin(-delete_list(jj).rotate*pi/180)*(-length_delete(jj)/2);
-    Dx2 = delete_list(jj).position(1)+cos(-delete_list(jj).rotate*pi/180)*(-width_delete(jj)/2)+sin(-delete_list(jj).rotate*pi/180)*length_delete(jj)/2;
+    Ax2 = delete_list(jj).position(1)+cosd(-delete_list(jj).rotate)*width_delete(jj)/2+sind(-delete_list(jj).rotate)*length_delete(jj)/2;
+    Bx2 = delete_list(jj).position(1)+cosd(-delete_list(jj).rotate)*width_delete(jj)/2+sind(-delete_list(jj).rotate)*(-length_delete(jj)/2);
+    Cx2 = delete_list(jj).position(1)+cosd(-delete_list(jj).rotate)*(-width_delete(jj)/2)+sind(-delete_list(jj).rotate)*(-length_delete(jj)/2);
+    Dx2 = delete_list(jj).position(1)+cosd(-delete_list(jj).rotate)*(-width_delete(jj)/2)+sind(-delete_list(jj).rotate)*length_delete(jj)/2;
     
-    Ay2 = delete_list(jj).position(3)+cos(-delete_list(jj).rotate*pi/180)*length_delete(jj)/2-sin(-delete_list(jj).rotate*pi/180)*width_delete(jj)/2;
-    By2 = delete_list(jj).position(3)+cos(-delete_list(jj).rotate*pi/180)*(-length_delete(jj))/2-sin(-delete_list(jj).rotate*pi/180)*width_delete(jj)/2;
-    Cy2 = delete_list(jj).position(3)+cos(-delete_list(jj).rotate*pi/180)*(-length_delete(jj))/2-sin(-delete_list(jj).rotate*pi/180)*(-width_delete(jj))/2;
-    Dy2 = delete_list(jj).position(3)+cos(-delete_list(jj).rotate*pi/180)*length_delete(jj)/2-sin(-delete_list(jj).rotate*pi/180)*(-width_delete(jj))/2;
+    Ay2 = delete_list(jj).position(3)+cosd(-delete_list(jj).rotate)*length_delete(jj)/2-sind(-delete_list(jj).rotate)*width_delete(jj)/2;
+    By2 = delete_list(jj).position(3)+cosd(-delete_list(jj).rotate)*(-length_delete(jj))/2-sind(-delete_list(jj).rotate)*width_delete(jj)/2;
+    Cy2 = delete_list(jj).position(3)+cosd(-delete_list(jj).rotate)*(-length_delete(jj))/2-sind(-delete_list(jj).rotate)*(-width_delete(jj))/2;
+    Dy2 = delete_list(jj).position(3)+cosd(-delete_list(jj).rotate)*length_delete(jj)/2-sind(-delete_list(jj).rotate)*(-width_delete(jj))/2;
     p2 = polyshape([Ax2 Bx2 Cx2 Dx2], [Ay2 By2 Cy2 Dy2]);
 % Calculate whether the object in delete_list overlaps objects in total_list
     for ii = 1:size(total_list,2)
-        Ax1 = total_list(ii).position(1)+cos(-total_list(ii).rotate*pi/180)*width_total(ii)/2+sin(-total_list(ii).rotate*pi/180)*length_total(ii)/2;
-        Bx1 = total_list(ii).position(1)+cos(-total_list(ii).rotate*pi/180)*width_total(ii)/2+sin(-total_list(ii).rotate*pi/180)*(-length_total(ii)/2);
-        Cx1 = total_list(ii).position(1)+cos(-total_list(ii).rotate*pi/180)*(-width_total(ii)/2)+sin(-total_list(ii).rotate*pi/180)*(-length_total(ii)/2);
-        Dx1 = total_list(ii).position(1)+cos(-total_list(ii).rotate*pi/180)*(-width_total(ii)/2)+sin(-total_list(ii).rotate*pi/180)*length_total(ii)/2;
+        Ax1 = total_list(ii).position(1)+cosd(-total_list(ii).rotate)*width_total(ii)/2+sind(-total_list(ii).rotate)*length_total(ii)/2;
+        Bx1 = total_list(ii).position(1)+cosd(-total_list(ii).rotate)*width_total(ii)/2+sind(-total_list(ii).rotate)*(-length_total(ii)/2);
+        Cx1 = total_list(ii).position(1)+cosd(-total_list(ii).rotate)*(-width_total(ii)/2)+sind(-total_list(ii).rotate)*(-length_total(ii)/2);
+        Dx1 = total_list(ii).position(1)+cosd(-total_list(ii).rotate)*(-width_total(ii)/2)+sind(-total_list(ii).rotate)*length_total(ii)/2;
         
-        Ay1 = total_list(ii).position(3)+cos(-total_list(ii).rotate*pi/180)*length_total(ii)/2-sin(-total_list(ii).rotate*pi/180)*width_total(ii)/2;
-        By1 = total_list(ii).position(3)+cos(-total_list(ii).rotate*pi/180)*(-length_total(ii))/2-sin(-total_list(ii).rotate*pi/180)*width_total(ii)/2;
-        Cy1 = total_list(ii).position(3)+cos(-total_list(ii).rotate*pi/180)*(-length_total(ii))/2-sin(-total_list(ii).rotate*pi/180)*(-width_total(ii))/2;
-        Dy1 = total_list(ii).position(3)+cos(-total_list(ii).rotate*pi/180)*length_total(ii)/2-sin(-total_list(ii).rotate*pi/180)*(-width_total(ii))/2;
+        Ay1 = total_list(ii).position(3)+cosd(-total_list(ii).rotate)*length_total(ii)/2-sind(-total_list(ii).rotate)*width_total(ii)/2;
+        By1 = total_list(ii).position(3)+cosd(-total_list(ii).rotate)*(-length_total(ii))/2-sind(-total_list(ii).rotate)*width_total(ii)/2;
+        Cy1 = total_list(ii).position(3)+cosd(-total_list(ii).rotate)*(-length_total(ii))/2-sind(-total_list(ii).rotate)*(-width_total(ii))/2;
+        Dy1 = total_list(ii).position(3)+cosd(-total_list(ii).rotate)*length_total(ii)/2-sind(-total_list(ii).rotate)*(-width_total(ii))/2;
         p1 = polyshape([Ax1 Bx1 Cx1 Dx1], [Ay1 By1 Cy1 Dy1]); 
         ployvec = [p1 p2];
 %         figure;

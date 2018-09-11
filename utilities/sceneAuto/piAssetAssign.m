@@ -38,7 +38,7 @@ for ii = 1: length(assetRecipe)
             break;
         end
     end
-    [f,n,e] = fileparts(assetRecipe{ii}.name);
+    [~,n,~] = fileparts(assetRecipe{ii}.name);
     asset(ii).name = name;
     asset(ii).index = n;
     asset(ii).geometry = geometry;

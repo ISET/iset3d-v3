@@ -18,7 +18,7 @@ function [objectPosition_list] = piObjectRandomPlan(sidewalk_list,object_list, o
 %       object_list: generated from function
 %       object_number: the number of objects on each sidewalk
 %       offset: the distance from object to edge AB
-% 
+%
 % Output:
 %       objectPosition_list: include name, position, rotate and size of each object
 % by SL, 2018.8
@@ -26,26 +26,26 @@ function [objectPosition_list] = piObjectRandomPlan(sidewalk_list,object_list, o
 %% generate the list of objects' position information
 x = size(sidewalk_list,2);
 count = 0;
+remain_length=9;
 num = size(object_list,2);
 for jj = 1 : x
-    start_point = sidewalk_list(jj).coordinate - [cos(sidewalk_list(jj).direction*pi/180)*offset, -sin(sidewalk_list(jj).direction*pi/180)*offset];  
+    start_point = sidewalk_list(jj).coordinate - [cos(sidewalk_list(jj).direction*pi/180)*offset, -sin(sidewalk_list(jj).direction*pi/180)*offset];
     for ii = 1 : object_number
-        count = count + 1;
-        %randomly choose position 
-        rand_length = randi(floor(sidewalk_list(jj).length));
+        
+        %randomly choose position
+        rand_length = randi(floor(sidewalk_list(jj).length-2*remain_length))+remain_length;
         coordinate_rand(1,1) = (rand_length * sin(sidewalk_list(jj).direction * pi/180));
         coordinate_rand(1,2) = (cos(sidewalk_list(jj).direction * pi/180) * rand_length);
-        %randomly choose serial number of objects 
-        objectPosition_list(count).name = sprintf('%s_%03d', object_list(1).name, randi(num));
+        %randomly choose serial number of objects
+        rand_num = randi(num);
         %got the list  of specific objects
-        for kk = 1: num
-            if (object_list(kk).geometry.name == objectPosition_list(count).name)
-            break;
-            end
+        for kk = 1: size(object_list(rand_num).geometry,2)
+            count = count + 1;
+            objectPosition_list(count).name=object_list(rand_num).geometry(kk).name;
+            objectPosition_list(count).size = object_list(rand_num).geometry(kk).size;
+            objectPosition_list(count).position = [start_point(1) + coordinate_rand(1), sidewalk_list(jj).height, start_point(2) + coordinate_rand(2)];
+            objectPosition_list(count).rotate = sidewalk_list(jj).direction;
         end
-        objectPosition_list(count).size = object_list(kk).geometry.size;
-        objectPosition_list(count).position = [start_point(1) + coordinate_rand(1), sidewalk_list(jj).height, start_point(2) + coordinate_rand(2)];
-        objectPosition_list(count).rotate = sidewalk_list(jj).direction;
     end
 end
 

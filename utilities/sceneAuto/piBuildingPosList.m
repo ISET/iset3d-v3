@@ -33,7 +33,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [buildingPosList] = piBuildingPosList(buildingList, objects)
 buildingPosList = struct;
-for ii = 1:size(buildingList, 2)
+for ii = 1:length(buildingList)
     building_list.size(ii, 1) = buildingList(ii).geometry.size.l;
     building_list.size(ii, 2) = buildingList(ii).geometry.size.w;
     building_list.name{ii} = buildingList(ii).geometry.name;
@@ -42,7 +42,7 @@ count = 0;
 tmp = 0;
 buildingPosList_tmp = struct;
 
-for kk = 1:size(objects.assets, 2)
+for kk = 1:length(objects.assets)
     name = strsplit(objects.assets(kk).name, '_'); 
     if strcmp(name{1}, 'Plane') % if the object is a building region.
         count_before = count+1;

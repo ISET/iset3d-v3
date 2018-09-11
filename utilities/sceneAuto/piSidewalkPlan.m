@@ -1,4 +1,4 @@
-function asset = piSidewalkPlan(road,varargin)
+function assetsplaced = piSidewalkPlan(road,st,varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Function: Place objects at equal intervals on sidewalks.
 % use ABCD to represent a sidewalk
@@ -38,6 +38,10 @@ function asset = piSidewalkPlan(road,varargin)
 %
 % by SL, 2018.8
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% load sidewalk information according to the type of road
+
+sidewalk_list = road.roadinfo.sidewalk_list;
+
 %% Parse input parameters
 p = inputParser;
 p.addParameter('addTree',true);
@@ -48,15 +52,25 @@ p.addParameter('streetlight_interval',12);
 p.addParameter('streetlight_offset',1);
 p.addParameter('streetlight_type','T');
 p.addParameter('addStreetlight',true);
-p.addParameter('trashcan_number',2);
+p.addParameter('trashcan_number',0);
 p.addParameter('trashcan_offset',1);
 p.addParameter('station_number',1);
-p.addParameter('station_offset',3);
+p.addParameter('station_offset',sidewalk_list(1).width/2);
+
+p.addParameter('bikerack_number',1);
+p.addParameter('bikerack_offset',sidewalk_list(1).width/2);
+p.addParameter('bench_number',1);
+p.addParameter('bench_offset',1);
+p.addParameter('billboard_number',1);
+p.addParameter('billboard_offset',2);
+p.addParameter('callbox_number',1);
+p.addParameter('callbox_offset',3);
+
+
 
 p.parse(varargin{:});
 inputs = p.Results;
 
-road_type = road.roadinfo.roadtype;
 addTree = inputs.addTree;
 tree_interval = inputs.tree_interval;
 tree_offset = inputs.tree_offset;
@@ -69,84 +83,195 @@ trashcan_number = inputs.trashcan_number;
 trashcan_offset = inputs.trashcan_offset;
 station_number = inputs.station_number;
 station_offset = inputs.station_offset;
+
+bikerack_number = inputs.bikerack_number;
+bikerack_offset = inputs.bikerack_offset;
+bench_number = inputs.bench_number;
+bench_offset = inputs.bench_offset;
+billboard_number = inputs.billboard_number;
+billboard_offset = inputs.billboard_offset;
+callbox_number = inputs.callbox_number;
+callbox_offset = inputs.callbox_offset;
+
 %% Flywheel init
-st = scitran('stanfordlabs');
+if isempty(st)
+    st = scitran('stanfordlabs');
+end
 hierarchy = st.projectHierarchy('Graphics assets');
 sessions = hierarchy.sessions;
 
 
-%% load sidewalk information according to the type of road
-
-sidewalk_list = road.roadinfo.sidewalk_list;
 %% generate list of assets(not finished) from flywheel, unfinished
 if (addStreetlight ==true)
-    streetlight_list = piStreetlightListCreate();
+    streetlight_listPath = fullfile(piRootPath,'local','AssetLists','streetlight_list.mat');
+    if ~exist(streetlight_listPath,'file')
+        streetlight_list = piAssetListCreate('class','others',...
+                                             'subclass','streetlight_tall',...
+                                             'scitran',st);
+        save(streetlight_listPath,'streetlight_list')
+    else
+        load(streetlight_listPath,'streetlight_list');
+    end
 end
 
 if (addTree ==true)
-    tree_list = piInfoListGet('tree','tree',st);
-    % tree_list = piTreeListCreate();
+    tree_listPath = fullfile(piRootPath,'local','AssetLists','tree_list.mat');
+    if ~exist(tree_listPath,'file')
+        tree_list = piAssetListCreate('class','tree',...
+                                      'scitran',st);
+        save(tree_listPath,'tree_list');
+    else
+        load(tree_listPath,'tree_list');
+    end
 end
 
 % offset_garbage= 0.8;
 if ~(trashcan_number==0)
-trashcanlist = struct;
-trashcanlist.name = 'garbage';
-trashcanlist.geometry.size.l=4;
-trashcanlist.geometry.size.w=5;
-trashcanlist.geometry.name='garbage_001';
-
-trashcanlist(2).name = 'garbage';
-trashcanlist(2).geometry.name='garbage_002';
-trashcanlist(2).geometry.size.l=3;
-trashcanlist(2).geometry.size.w=5;
+    trashcan_listPath = fullfile(piRootPath,'local','AssetLists','trashcan_list.mat');
+    if ~exist(trashcan_listPath,'file')
+        trashcan_list = piAssetListCreate('class','others',...
+                                          'subclass','trashcan',...
+                                          'scitran',st);
+        save(trashcan_listPath,'trashcan_list');
+    else
+        load(trashcan_listPath,'trashcan_list');
+    end
 end
-%%%%%%%%%%%%%%%%
-if ~(station_number==0)
-stationlist.name='station';
-stationlist.geometry.name='station_001';
-stationlist.geometry.size.l=3;
-stationlist.geometry.size.w=1;
 
-stationlist(2).name='station';
-stationlist(2).geometry.name='station_002';
-stationlist(2).geometry.size.l=4;
-stationlist(2).geometry.size.w=1;
+if ~(station_number==0)
+    station_listPath = fullfile(piRootPath,'local','AssetLists','station_list.mat');
+    if ~exist(station_listPath,'file')
+        station_list = piAssetListCreate('class','others',...
+                                         'subclass','station',...
+                                         'scitran',st);
+        save(station_listPath,'station_list');
+    else
+        load(station_listPath,'station_list');
+    end
+end
+
+if ~(bench_number==0)
+    bench_listPath = fullfile(piRootPath,'local','AssetLists','bench_list.mat');
+    if ~exist(bench_listPath,'file')
+        bench_list = piAssetListCreate('class','others',...
+                                       'subclass','bench',...
+                                       'scitran',st);
+        save(bench_listPath,'bench_list');
+    else
+        load(bench_listPath,'bench_list');
+    end
+end
+
+if ~(billboard_number==0)
+    billboard_listPath = fullfile(piRootPath,'local','AssetLists','billboard_list.mat');
+    if ~exist(billboard_listPath,'file')
+        billboard_list = piAssetListCreate('class','others',...
+                                           'subclass','billboard',...
+                                           'scitran',st);
+        save(billboard_listPath,'billboard_list');
+    else
+        load(billboard_listPath,'billboard_list');
+    end
+end
+
+if ~(callbox_number==0)
+    callbox_listPath = fullfile(piRootPath,'local','AssetLists','callbox_list.mat');
+    if ~exist(callbox_listPath,'file')
+        callbox_list = piAssetListCreate('class','others',...
+                                         'subclass','callbox',...
+                                         'scitran',st);
+        save(callbox_listPath,'callbox_list');
+    else
+        load(callbox_listPath,'callbox_list');
+    end
+end
+
+if ~(bikerack_number==0)
+    bikerack_listPath = fullfile(piRootPath,'local','AssetLists','bikerack_list.mat');
+    if ~exist(bikerack_listPath,'file')    
+    bikerack_list = piAssetListCreate('class','others',...
+                                         'subclass','bikerack',...
+                                         'scitran',st);
+        save(bikerack_listPath,'bikerack_list');
+    else
+        load(bikerack_listPath,'bikerack_list');
+    end                                     
 end
 %% place objects on sidewalks
 if (addTree ==true)
-    treePosition = objectIntervalPlan(sidewalk_list, tree_list, tree_interval, tree_offset, tree_type);
+    treePosition = piObjectIntervalPlan(sidewalk_list, tree_list, tree_interval, tree_offset, tree_type);
 else
     treePosition = struct;
 end
 
 if (addStreetlight ==true)
-    asset.streetlightPosition_list = objectIntervalPlan(sidewalk_list, streetlight_list, streetlight_interval, streetlight_offset, streetlight_type);
+   streetlightPosition_list = piObjectIntervalPlan(sidewalk_list, streetlight_list, streetlight_interval, streetlight_offset, streetlight_type);
 else
-    asset.streetlightPosition_list = struct;
+    streetlightPosition_list = struct;
 end
 
 if(trashcan_number==0)
     trashcanPosition=struct;
 else
-trashcanPosition = objectRandomPlan(sidewalk_list, trashcanlist, trashcan_number, trashcan_offset);
+trashcanPosition = piObjectRandomPlan(sidewalk_list, trashcan_list, trashcan_number, trashcan_offset);
 end
 
 if(station_number==0)
     stationPosition=struct;
 else
-    stationPosition = objectRandomPlan(sidewalk_list, stationlist, station_number, station_offset);
+    stationPosition = piObjectRandomPlan(sidewalk_list, station_list, station_number, station_offset);
 end
 
+if(bikerack_number==0)
+    bikerackPosition=struct;
+else
+    bikerackPosition = piObjectRandomPlan(sidewalk_list, bikerack_list, bikerack_number, bikerack_offset);
+end
+
+if(bench_number==0)
+    benchPosition=struct;
+else
+    benchPosition = piObjectRandomPlan(sidewalk_list, bench_list, bench_number, bench_offset);
+end
+
+if(billboard_number==0)
+    billboardPosition=struct;
+else
+    billboardPosition = piObjectRandomPlan(sidewalk_list, billboard_list, billboard_number, billboard_offset);
+end
+
+if(callbox_number==0)
+    callboxPosition=struct;
+else
+    callboxPosition = piObjectRandomPlan(sidewalk_list, callbox_list, callbox_number, callbox_offset);
+end
+    
 %% consider overlap and obtain the position list of each object
-[treePosition_list, total_list] = piCalOverlap(treePosition, asset.streetlightPosition_list);
+[treePosition_list, total_list] = piCalOverlap(treePosition, streetlightPosition_list);
+[bikerackPosition_list, total_list] = piCalOverlap(bikerackPosition, total_list);
+[callboxPosition_list, total_list] = piCalOverlap(callboxPosition, total_list);
+[billboardPosition_list, total_list] = piCalOverlap(billboardPosition, total_list);
+[benchPosition_list, total_list] = piCalOverlap(benchPosition, total_list);
 [trashcanPosition_list, total_list] = piCalOverlap(trashcanPosition, total_list);
 [stationPosition_list, total_list] = piCalOverlap(stationPosition, total_list);
 %% Place them
-asset.treePlaced = piBuildingPlace(tree_list,treePosition_list);
-asset.streetlightPlaced = piStreetlightPlace(streetlight_list,streetlightPosition_list);
+if addTree ==true
+    assetsplaced.tree = piSidewalkPlace(tree_list,treePosition_list);end
+if billboard_number ~= 0
+    assetsplaced.billboard = piSidewalkPlace(billboard_list,billboardPosition_list);end
+if callbox_number ~= 0
+assetsplaced.callbox = piSidewalkPlace(callbox_list,callboxPosition_list);end
+if bench_number ~=0
+    assetsplaced.bench = piSidewalkPlace(bench_list,benchPosition_list);end
+if trashcan_number ~=0
+    assetsplaced.trashcan = piSidewalkPlace(trashcan_list,trashcanPosition_list);end
+if station_number ~=0
+    assetsplaced.station = piSidewalkPlace(station_list,stationPosition_list);end
+if bikerack_number ~=0
+    assetsplaced.bikerack = piStreetlightPlace(bikerack_list,bikerackPosition_list);end % Change bikerackPlace
+if addStreetlight ==true
+    assetsplaced.streetlight= piStreetlightPlace(streetlight_list,streetlightPosition_list);end
 end
-
 
 
 

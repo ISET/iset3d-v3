@@ -1,4 +1,4 @@
-function trafficflow=piTrafficflowGeneration(sceneType,road,varargin)
+function trafficflow=piTrafficflowGeneration(road,varargin)
 % piTrafficGeneration Return a struct that contains the
 % states(position, orientation) of traffic participants at each simulation
 % time stamp;
@@ -14,7 +14,6 @@ function trafficflow=piTrafficflowGeneration(sceneType,road,varargin)
 %   'generationTime'     - The duration of time that will generate vehicles;
 %   'iterMax'            - number of iteration in duaIterate.py;
 %   'trafficflowDensity' - describes the traffic flow density;
-%   'intersections'      - What intersection we need;
 %
 % Output
 %
@@ -42,14 +41,12 @@ varargin = ieParamFormat(varargin);
 
 p.addParameter('generationTime',180);
 p.addParameter('iterMax',1);
-p.addParameter('intersections',{'1','2'});
 p.addParameter('pedestrian',true);
 
 p.parse(varargin{:});
 inputs=p.Results;
 generationTime=inputs.generationTime;
 iterMax=inputs.iterMax;
-intersections=inputs.intersections;
 % density : 'low' 'medium' 'high'
 
 % original
@@ -60,7 +57,7 @@ vType_interval=road.vTypes;
 vTypes=keys(vType_interval);
 % interval=values(vType_interval);
 %% Define a Path for sumo output by given scenetype and roadtype.
-netfileName=road.name;
+netfileName=road.roadinfo.name;
 netPath=fullfile(piRootPath,'data','sumo_input',netfileName,strcat(netfileName,'.net.xml'));
 outputPath=fullfile(piRootPath,'local');
 chdir(outputPath);
@@ -73,9 +70,10 @@ outputPath=fullfile(outputPath,'sumo_output',currentTime);
 chdir(outputPath);
 
 %% Sumo Commands Definition: vehicle type/pedestrian/ simulation parameters
-randomTrips=strcat(" ",sumohome,'/tools/randomTrips.py');
+tic
+randomTrips=fullfile(piRootPath,'data','sumo_input','generateTrips.py');
 duaIterate=strcat(" ",sumohome,'/tools/assign/duaIterate.py');
-pycmd='python';
+pycmd="python ";
 netcfg=strcat(' -n'," ",netPath);
 outSymbol=strcat(' -o');
 
@@ -93,7 +91,7 @@ for ii=1:vType_interval.Count
     %randomTrips
     probcfg=strcat(' -p'," ",num2str(vType_interval(vTypes{ii})));
     timecfg=strcat(' -e'," ",num2str(generationTime));
-    outcfg=strcat(outSymbol," ",vTypes{ii},'.trips.xml');
+    outcfg=strcat(outSymbol," ",vTypes{ii});
     if strcmp(vTypes{ii},'pedestrian')
         vehcfg=' --pedestrians';
     else
@@ -107,7 +105,7 @@ for ii=1:vType_interval.Count
     % expression='(?<=id=")(\w*)(?=" type="\w*")';
     
     % duaIterate
-    tripscfg=strcat(' -t'," ",vTypes{ii},'.trips.xml');
+    tripscfg=strcat(' -t'," ",vTypes{ii},".trips.xml");
     itercfg=strcat(' -l'," ",num2str(iterMax));
     duaCmd=strcat(pycmd,duaIterate,netcfg,tripscfg,itercfg);
     system(duaCmd);
@@ -130,37 +128,34 @@ for ii=1:vType_interval.Count
 end
 
 %% Write .add.xml
-if ~isempty(intersections)
-    addid=fopen(strcat(netfileName,'.add.xml'),'wt');
-    fprintf(addid,'<tlsStates>\n');
-    for ii=1:length(intersections)
-        fprintf(addid,strcat('    <timedEvent type="SaveTLSStates" source="',intersections{ii},'" dest="',netfileName,'_traffic_light.xml"/>\n'));
-    end
-    fprintf(addid,'</tlsStates>');
-    fclose(addid);
-end
+writeIntersection=fullfile(piRootPath,'data','sumo_input','writeIntersection.py');
+addcfg=strcat(" -o ",convertCharsToStrings(netfileName));
+addCmd=strcat(pycmd,writeIntersection,netcfg,addcfg);
+system(addCmd);
 
 %% Write .sumocfg
 cfgid=fopen(strcat(netfileName,'.sumocfg'),'wt');
 fprintf(cfgid,'<configuration>\n    <input>\n');
 fprintf(cfgid,strcat('        <net-file value="',netPath,'"/>\n'));
 fprintf(cfgid,strcat('        <route-files value="',route_collect,'"/>\n'));
-if ~isempty(intersections)
+addcheck = dir('*.add.xml');
+if isempty(addcheck)
+% if ~isempty(intersections)
     fprintf(cfgid,strcat('        <additional-files value="',...
         netfileName,'.add.xml"/>\n'));
 end
 fprintf(cfgid,'    </input>\n');
 fprintf(cfgid,'    <time>\n');
 fprintf(cfgid,'        <begin value="0"/>\n');
+fprintf(cfgid,strcat('        <end value="',num2str(2*generationTime),'"/>\n'));
 fprintf(cfgid,'    </time>\n');
 fprintf(cfgid,'</configuration>');
 fclose(cfgid);
 
 %% run sumo-simulation to generate a trafficflow .xml file
-tic
 sumocmd=strcat(sumohome,'/bin/sumo -c'," ",netfileName,'.sumocfg --fcd-output'," ",netfileName,'_state.xml');
 system(sumocmd);
-if ~isempty(intersections)
+if isempty(addcheck)
     trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'),'lightfile',strcat(netfileName,'_traffic_light.xml'));
 else
     trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'));toc

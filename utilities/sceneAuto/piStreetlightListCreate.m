@@ -3,7 +3,7 @@ function StreetlightList = piStreetlightListCreate()
 % Download from flywheel
 % Test now
 currentPath = pwd;
-BuildingFolder = '/Volumes/group/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/streetlight';
+BuildingFolder = '/Volumes/group/wandell/data/NN_Camera_Generalization/Pbrt_Assets_Generation/pbrt_assets/streetlight';
 cd(BuildingFolder)
 count=0;
 % for ii = 1:2
@@ -59,13 +59,13 @@ fname = fullfile(BuildingFolder,sprintf('streetlight_short_%03d',ii),sprintf('st
         end
     end
     
-    TreeList(count).name = name;
+    StreetlightList(count).name = name;
     
-    TreeList(count).geometry = geometry;
-    TreeList(count).material.list = thisR.materials.list;
-    TreeList(count).material.txtLines = thisR.materials.txtLines;
+    StreetlightList(count).geometry = geometry;
+    StreetlightList(count).material.list = thisR.materials.list;
+    StreetlightList(count).material.txtLines = thisR.materials.txtLines;
     localFolder = fileparts(fname);
-    TreeList(count).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
+    StreetlightList(count).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
 end
 fprintf('%d streetlights created \n',count); 
 cd(currentPath);

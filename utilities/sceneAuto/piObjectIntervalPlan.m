@@ -1,4 +1,4 @@
-function [objectPosition_list] = piObjectIntervalPlan(sidewalk_list, object_list, interval, offset, type, TreeorStreetlight)
+function [objectPosition_list] = piObjectIntervalPlan(sidewalk_list, object_list, interval, offset, type)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Function: Place objects at equal intervals on sidewalks.
 % Input:
@@ -39,90 +39,115 @@ edgeSize=0.3;
 x = size(sidewalk_list,2);
 num1=0;
 num2=0;
-type1_name = sprintf('%s_tall',object_list(1).name);
-type2_name = sprintf('%s_short',object_list(1).name);
+objname_idx = strfind(object_list(1).name,'_');
+objname = object_list(1).name(1:objname_idx(1)-1);
+type1_name = sprintf('%s_tall',objname);
+type2_name = sprintf('%s_short',objname);
 for mm=1:size(object_list,2)
     for nn=1:size(object_list(mm).geometry,2)
         tmp1=strfind(object_list(mm).geometry(nn).name, type1_name);
         tmp2=strfind(object_list(mm).geometry(nn).name, type2_name);
         if (tmp1)
             num1=num1+1;
-        elseif(tmp2)
-            num2=num2+1;
+        else if(tmp2)
+                num2=num2+1;
+            end
         end
     end
 end
 
-%% generate the list of objects' position information
-
-% generate random number for streetlight_list
-if (num1==1)
-    rand1=1;
-else if (num1>1)
-        rand1=randi(num1);
-    end
-end
-if (num2==1)
-    rand2=1;
-else if (num2>1)
-        rand2=randi(num2);
-    end
-end
-count = 0;
-for jj = 1 : x
-    %number of lights
-    num = round((sidewalk_list(jj).length-(2*remain_length))/interval);
-    % 'start_point' represents the beginning place of the object in a sidewalk
-    start_point = sidewalk_list(jj).coordinate - [cos(sidewalk_list(jj).direction*pi/180)*offset, -sin(sidewalk_list(jj).direction*pi/180)*offset];
-    % 'coordinate_interval' represents the coordinate interval of each object
-    coordinate_interval(1,1) = (interval * sin(sidewalk_list(jj).direction * pi/180));
-    coordinate_interval(1,2) = (cos(sidewalk_list(jj).direction * pi/180) * interval);
-    for ii = 1 : num
-        count = count + 1;
-        start_point = start_point + coordinate_interval;
-        objectPosition_list(count).position = [start_point(1), sidewalk_list(jj).height, start_point(2)];
-        objectPosition_list(count).size.w = edgeSize;
-        objectPosition_list(count).size.l = edgeSize;
-        objectPosition_list(count).rotate = sidewalk_list(jj).direction;
-        % generate random number for tree_list
-        if (num1==1)
-            randnum1=1;
-        else if (num1>1)
-                randnum1=randi(num1);
+%% script used for tree
+if contains(object_list(1).name,'tree')
+    % generate the list of objects' position information
+    count = 0;
+    x = size(sidewalk_list,2);
+    for jj = 1 : x
+        %number of objects
+        num = round((sidewalk_list(jj).length-(2*remain_length))/interval);
+        % 'start_point' represents the beginning place of the object in a sidewalk
+        start_point = sidewalk_list(jj).coordinate - [cos(sidewalk_list(jj).direction*pi/180)*offset, -sin(sidewalk_list(jj).direction*pi/180)*offset];
+        % 'coordinate_interval' represents the coordinate interval of each object
+        coordinate_interval(1,1) = (interval * sind(sidewalk_list(jj).direction));
+        coordinate_interval(1,2) = (cosd(sidewalk_list(jj).direction) * interval);
+        for ii = 1 : num
+            count = count + 1;
+            start_point = start_point + coordinate_interval;
+            objectPosition_list(count).position = [start_point(1), sidewalk_list(jj).height, start_point(2)];
+            objectPosition_list(count).size.w = edgeSize;
+            objectPosition_list(count).size.l = edgeSize;
+            objectPosition_list(count).rotate = sidewalk_list(jj).direction;
+            % generate random number for tree_list
+            if (num1==1)
+                randnum1=1;
+            else if (num1>1)
+                    randnum1=randi(num1);
+                end
             end
-        end
-        if (num2==1)
-            randnum2=1;
-        else if (num2>1)
-                randnum2=randi(num2);
+            if (num2==1)
+                randnum2=1;
+            else if (num2>1)
+                    randnum2=randi(num2);
+                end
             end
-        end
-        if strcmpi(TreeorStreetlight,'Tree')
             switch(type)
                 case 'T'
-                    objectPosition_list(count).name = sprintf('%s_tall_%03d',object_list(1).name, randnum1);
+                    objectPosition_list(count).name = sprintf('%s_tall_%03d',objname, randnum1);
                 case 'S'
-                    objectPosition_list(count).name = sprintf('%s_short_%03d',object_list(1).name, randnum2);
+                    objectPosition_list(count).name = sprintf('%s_short_%03d',objname, randnum2);
                 case 'MIX'
                     tmp=randi(2);
                     if (tmp==1)
-                        objectPosition_list(count).name = sprintf('%s_tall_%03d',object_list(1).name, randnum1);
+                        objectPosition_list(count).name = sprintf('%s_tall_%03d',objname, randnum1);
                     else if (tmp==2)
-                            objectPosition_list(count).name = sprintf('%s_short_%03d',object_list(1).name, randnum2);
+                            objectPosition_list(count).name = sprintf('%s_short_%03d',objname, randnum2);
                         end
                     end
             end
         end
-        if strcmpi(TreeorStreetlight,'Streetlight')
-            switch(type)
-                case 'T'
-                    objectPosition_list(count).name = sprintf('%s_tall_%03d',object_list(1).name, rand1);
-                case 'S'
-                    objectPosition_list(count).name = sprintf('%s_short_%03d',object_list(1).name, rand2);
-            end
-        end
-        
     end
 end
+
+
+%% script used for streetlight
+if contains(object_list(1).name,'streetlight')
+    count = 0;
+    x = size(sidewalk_list,2);
+    for jj = 1 : x
+        %number of lights
+        num = round((sidewalk_list(jj).length-(2*remain_length))/interval);
+        % 'start_point' represents the beginning place of the object in a sidewalk
+        start_point = sidewalk_list(jj).coordinate - [cos(sidewalk_list(jj).direction*pi/180)*offset, -sin(sidewalk_list(jj).direction*pi/180)*offset];
+        % 'coordinate_interval' represents the coordinate interval of each object
+        coordinate_interval(1,1) = (interval * sin(sidewalk_list(jj).direction * pi/180));
+        coordinate_interval(1,2) = (cos(sidewalk_list(jj).direction * pi/180) * interval);
+        for ii = 1 : num
+            start_point = start_point + coordinate_interval;
+            for kk=1:size(object_list(mm).geometry,2)
+                count = count + 1;
+                objectPosition_list(count).name = object_list(mm).geometry(kk).name;
+                if ~contains(object_list(mm).geometry(kk).name,'_light')
+                    objectPosition_list(count).position = [start_point(1), sidewalk_list(jj).height, start_point(2)];
+                    objectPosition_list(count).rotate = sidewalk_list(jj).direction;
+                    objectPosition_list(count).size.w = edgeSize;
+                    objectPosition_list(count).size.l = edgeSize;
+                else
+                    center = start_point;
+                    point = start_point+[object_list(mm).geometry(kk).position(1),object_list(mm).geometry(kk).position(3)];
+                    theta = sidewalk_list(jj).direction;
+                    tmp = piPointRotate(point, center, theta);
+                    objectPosition_list(count).position = [tmp(1), sidewalk_list(jj).height+object_list(mm).geometry(kk).position(2), tmp(2)];
+                    objectPosition_list(count).rotate = sidewalk_list(jj).direction;
+                    objectPosition_list(count).size.w = 0;
+                    objectPosition_list(count).size.l = 0;
+                    
+                end
+                
+                
+            end
+        end
+    end
+end
+
+
 end
 

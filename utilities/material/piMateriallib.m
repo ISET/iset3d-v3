@@ -95,6 +95,12 @@ materiallib.retroreflective.string = 'retroreflective';
 
 materiallib.uber.string = 'uber';
 
+%% translucent
+%
+% Standard glass appearance
+
+materiallib.translucent.string = 'translucent';
+
 %% substrate
 % Human skin is assigned with this material.
 materiallib.substrate.string = 'substrate';

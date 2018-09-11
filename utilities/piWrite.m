@@ -52,6 +52,9 @@ p.addParameter('overwritelensfile',true,@islogical);
 % Overwrite materials.pbrt
 p.addParameter('overwritematerials',true,@islogical);
 
+% Overwrite geometry.pbrt
+p.addParameter('overwritegeometry',true,@islogical);
+
 % Create a new materials.pbrt
 p.addParameter('creatematerials',false,@islogical);
 % control lighting in geomtery.pbrt
@@ -63,6 +66,7 @@ overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
+overwritegeometry   = p.Results.overwritegeometry;
 creatematerials  = p.Results.creatematerials;
 lightsFlag = p.Results.lightsFlag;
 %% Copy the input directory to the Docker working directory
@@ -165,34 +169,6 @@ end
 
 renderingDir = fullfile(workingDir,'renderings');
 if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
-
-
-%% Overwrite Materials.pbrt
-if contains(renderRecipe.exporter, 'C4D')
-    if ~creatematerials
-    if overwritematerials
-        [~,n] = fileparts(renderRecipe.inputFile);
-        fname_materials = sprintf('%s_materials.pbrt',n);
-        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
-        piMaterialWrite(renderRecipe);
-    end
-    else
-        [~,n] = fileparts(renderRecipe.outputFile);
-        fname_materials = sprintf('%s_materials.pbrt',n);
-        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
-        piMaterialWrite(renderRecipe);
-    end
-end
-%% Overwirte geometry.pbrt
-if contains(renderRecipe.exporter, 'C4D')
-    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
-end
-
-
-%% Overwrite xxx.json
-[~,scene_fname,~] = fileparts(renderRecipe.outputFile);
-jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
-jsonwrite(jsonFile,renderRecipe);
 
 %% Make sure there is a renderings sub-directory of the working directory
 
@@ -346,18 +322,6 @@ end
 
 %% Write out WorldBegin/WorldEnd
 
-% if creatematerials
-%     for ii = 1:length(renderRecipe.world)
-%         currLine = renderRecipe.world{ii};
-%         if contains(currLine, 'materials.pbrt')
-%             [~,n] = fileparts(renderRecipe.outputFile);
-%             currLine = sprintf('Include "%s_materials.pbrt"',n);
-%         end
-%         fprintf(fileID,'%s \n',currLine);
-%     end
-% 
-% else
-
 if creatematerials
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
@@ -365,14 +329,20 @@ if creatematerials
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
         end
+        if overwritegeometry
+            if contains(currLine, 'geometry.pbrt')
+                [~,n] = fileparts(renderRecipe.outputFile);
+                currLine = sprintf('Include "%s_geometry.pbrt"',n);
+            end
+        end
         fprintf(fileID,'%s \n',currLine);
     end
-
+    
 else
-
+    
     for ii = 1:length(renderRecipe.world)
-    currLine = renderRecipe.world{ii};
-    fprintf(fileID,'%s \n',currLine);
+        currLine = renderRecipe.world{ii};
+        fprintf(fileID,'%s \n',currLine);
     end
 end
 %% Close file
@@ -397,8 +367,11 @@ if contains(renderRecipe.exporter, 'C4D')
 end
 %% Overwirte geometry.pbrt
 if contains(renderRecipe.exporter, 'C4D')
+    if overwritegeometry
     piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
+    end
 end
+
 
 %% Overwrite xxx.json
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);

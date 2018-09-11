@@ -1,5 +1,5 @@
 function thisR = piSkymapAdd(thisR,input)
-% Choose a skybox, or random skybox, write this line to thisR.world.
+% Choose a skymap, or random skybox, write this line to thisR.world.
 %
 % Inputs
 %   thisR - A rendering recipe
@@ -10,6 +10,11 @@ function thisR = piSkymapAdd(thisR,input)
 %        'sunset'
 %        'night'
 %        'cloudy'
+%        'sunny_park'
+%        'grass'
+%        'city'
+%        'cityscape'
+%        'park'
 %        'random'- pick a random skymap from skymaps folder
 %
 % Returns
@@ -30,11 +35,11 @@ skymaps = fullfile(piRootPath,'data','skymaps');
 input = lower(input);
 switch input
     case 'morning'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr" "rgb L" [2 2 2]');
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr"');
     case 'sunny_park'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunny_park.exr"');        
     case 'day'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr" "rgb L" [2 2 2]');
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr"');
     case 'dusk'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/dusk.exr" ');
     case 'sunset'
@@ -42,7 +47,7 @@ switch input
     case 'night'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
     case 'cloudy'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr" "rgb L" [2 2 2]');
+        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudy.exr"');
     case 'city'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/city.exr"');
     case 'grass'

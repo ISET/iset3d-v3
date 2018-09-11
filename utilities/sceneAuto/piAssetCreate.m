@@ -25,13 +25,20 @@ p.addParameter('ncars',0);
 p.addParameter('ntrucks',0);
 p.addParameter('nped',0);
 p.addParameter('nbuses',0);
-p.addParameter('ncyclist',0); % Cyclist contains two class: rider and bike.
+p.addParameter('nbikes',0); % Cyclist contains two class: rider and bike.
+p.addParameter('resources',true)
 p.addParameter('scitran','',@(x)(isa(x,'scitran')));
 
 p.parse(varargin{:});
 
 inputs = p.Results;
 st     = p.Results.scitran;
+resources = p.Results.resources;
+if resources== 0
+    resources = false;
+else
+    resources = true;
+end
 if isempty(st), st = scitran('stanfordlabs'); end
 
 %%  Store up the asset information
@@ -46,7 +53,6 @@ asset = [];
 
 %% Find the cars in the database
 if p.Results.ncars > 0
-    % Find the session with the label car
     for ii=1:length(sessions)
         if isequal(lower(sessions{ii}.label),'car')
             carSession = sessions{ii};
@@ -56,14 +62,13 @@ if p.Results.ncars > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    assetRecipe = piAssetDownload(carSession,'car',inputs.ncars,'scitran',st);
+    assetRecipe = piAssetDownload(carSession,inputs.ncars,'resources',resources,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
     asset.car = piAssetAssign(assetRecipe,'label','car');
 end
 %% Find the buses in the database
 if p.Results.nbuses > 0
-    % Find the session with the label car
     for ii=1:length(sessions)
         if isequal(lower(sessions{ii}.label),'bus')
             busSession = sessions{ii};
@@ -73,7 +78,7 @@ if p.Results.nbuses > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    assetRecipe = piAssetDownload(busSession,'bus',inputs.nbuses,'scitran',st);
+    assetRecipe = piAssetDownload(busSession,inputs.nbuses,'resources',resources,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
     asset.bus = piAssetAssign(assetRecipe,'label','bus');
@@ -91,7 +96,7 @@ if p.Results.ntrucks > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    assetRecipe = piAssetDownload(truckSession,'truck',inputs.ntrucks,'scitran',st);
+    assetRecipe = piAssetDownload(truckSession,inputs.ntrucks,'resources',resources,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
     asset.truck = piAssetAssign(assetRecipe,'label','truck');
@@ -109,10 +114,27 @@ if p.Results.nped > 0
     
     % Create Assets obj struct
     % Download random assets from flywheel
-    assetRecipe = piAssetDownload(pedestrianSession,'pedestrian',inputs.nped,'scitran',st);
+    assetRecipe = piAssetDownload(pedestrianSession,inputs.nped,'resources',resources,'scitran',st);
     
     % Analyze the downloaded scenes in fname and create the returned asset
     asset.pedestrian = piAssetAssign(assetRecipe,'label','pedestrian');
+end
+%% Get the bikes from the database
+if p.Results.nbikes > 0
+    % Find the session with the label car
+    for ii=1:length(sessions)
+        if isequal(lower(sessions{ii}.label),'bike')
+            bikeSession = sessions{ii};
+            break;
+        end
+    end
+    
+    % Create Assets obj struct
+    % Download random assets from flywheel
+    assetRecipe = piAssetDownload(bikeSession,inputs.nbikes,'resources',resources,'scitran',st);
+    
+    % Analyze the downloaded scenes in fname and create the returned asset
+    asset.bicycle = piAssetAssign(assetRecipe,'label','bike');
 end
 
 

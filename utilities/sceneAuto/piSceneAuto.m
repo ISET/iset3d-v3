@@ -1,15 +1,6 @@
-function thisR_scene = piSceneAuto(varargin)
+function [thisR_scene,road] = piSceneAuto(varargin)
 % Automatically generate scene(s) for Autonomous driving scenarios for Automotives.
 %    
-%
-%
-%
-%
-%
-%
-%
-%
-%
 %
 p = inputParser;
 varargin = ieParamFormat(varargin);
@@ -19,8 +10,9 @@ p.addParameter('roadType','crossroad',@ischar);
 p.addParameter('trafficflowDensity','medium',@ischar);
 p.addParameter('weatherType','clear',@ischar);
 p.addParameter('dayTime','day',@ischar);
-p.addParameter('timestamp',50);
-p.addParameter('nScene',1);
+p.addParameter('timestamp',50,@isnumeric);
+p.addParameter('nScene',1,@isnumeric);
+p.addParameter('cloudRender',1);
 p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
 inputs = p.parse(varargin{:});
 
@@ -32,59 +24,73 @@ weatherType    = p.Results.weatherType;
 dayTime        = p.Results.dayTime;
 timestamp      = p.Results.timestamp;
 st             = p.Results.scitran;
-
-
+cloudRenderFlag= p.Results.cloudRender;
 
 %% flywheel init
 if isempty(st), st = scitran('stanfordlabs'); end
 hierarchy = st.projectHierarchy('Graphics assets');
-
-projects     = hierarchy.project;
 sessions     = hierarchy.sessions;
-acquisitions = hierarchy.acquisitions;
-
 %% Create a road
-[road,thisR_road] = piRoadCreate('type',roadType,'trafficflowDensity',trafficflowDensity,...
-    'sessions',sessions,'sceneType',sceneType,'scitran',st);
+[road,thisR_road] = piRoadCreate('type',roadType,...
+                                 'trafficflowDensity',trafficflowDensity,...
+                                 'sessions',sessions,...
+                                 'sceneType',sceneType,...
+                                 'cloudRender',cloudRenderFlag,...
+                                 'scitran',st);
 % Add a skymap
-thisR_road = piSkymapAdd(thisR_road,dayTime);
-trafficflowPath = fullfile(piRootPath,'local','trafficflow.mat');
+
+% It takes about 6 mins to generate a trafficflow, so for each scene, we'd
+% like generate the trafficflow only once.
+trafficflowPath = fullfile(piRootPath,'local','trafficflow',sprintf('%s_trafficflow.mat',road.roadinfo.name));
+trafficflowFolder = fileparts(trafficflowPath);
+if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
 if ~exist(trafficflowPath,'file')
-    trafficflow = piTrafficflowGeneration(sceneType,road);
-    save('trafficflow.mat','trafficflow');
-    movefile('trafficflow.mat',fullfile(piRootPath,'local'));
+    trafficflow = piTrafficflowGeneration(road);
+    save(trafficflowPath,'trafficflow');
 else
-    load(trafficflowPath,'-mat');
+    load(trafficflowPath,'trafficflow');
 end
 
 
 % for jj = 1:inputs.nScene
 %% todo: create building and tree lib
+
 tic
 % Check how many subtypes there is in One type of scene;
-index = 1; % will give a random number
-sceneName = sprintf('%s_%d',sceneType,index);
-buildingLib = piAssetLibCreate('building',sceneName,st);
-buildingPosList = piBuildingPosList(buildingLib,thisR_road);
-buildingPlaced = piBuildingPlace(buildingLib,buildingPosList);
-% Add placed building
-thisR_road = piAssetAdd(thisR_road, buildingPlaced);
-% Place tree/streelights/trashcan/others at resonable positions in a
-% scene.
-asset = piSidewalkPlan(road,'addTree',false);
-% Add placed tree
-thisR_road = piAssetAdd(thisR_road, asset.treePlaced);
-% Add placed trafficlights
-thisR_road = piAssetAdd(thisR_road, asset.streetlightPlaced);toc
+% index = 1; % will give a random number
+% sceneName = sprintf('%s_%d',sceneType,index);
+% Create building library list
+assetsPlaced = piSidewalkPlan(road,st);
+
+building_listPath = fullfile(piRootPath,'local','AssetLists','building_list.mat');
+if ~exist(building_listPath,'file')
+    building_list = piAssetListCreate('class','city_2',...
+        'scitran',st);
+    save(building_listPath,'building_list')
+else
+    load(building_listPath,'building_list');
+end
+buildingPosList = piBuildingPosList(building_list,thisR_road);
+assetsPlaced.building = piBuildingPlace(building_list,buildingPosList);
+
+
+% Add All placed assets
+thisR_road = piAssetAdd(thisR_road, assetsPlaced);
+
+toc
 % Download and Combine all building/tree/streetlights resouces
 
 %% Place vehicles/pedestrians
-[assetsPlaced,assetsunPlaced] = piAssetPlace(trafficflow,'timestamp',timestamp);
-for ii = 1: length(assetsPlaced)
+% piTrafficPlace
+[trafficPlaced,~] = piTrafficPlace(trafficflow,...
+                                               'timestamp',timestamp,...
+                                               'resources',~cloudRenderFlag,...
+                                               'scitran',st);
+for ii = 1: length(trafficPlaced)
     % thisR_scene{ii} = piAssetAdd(thisR_treeAndSL,assetsPlaced{ii});
-    thisR_scene{ii} = piAssetAdd(thisR_road,assetsPlaced{ii});
+    thisR_scene = piAssetAdd(thisR_road,trafficPlaced{ii});
 end
-% end
+
 end
     
     
