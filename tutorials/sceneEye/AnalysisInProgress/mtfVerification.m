@@ -1,11 +1,4 @@
-%% t_LCA_cloud.m
-%
-% Render a slanted bar while moving the retina along the optical axis. We
-% can use the images generated here to calculate the amount of LCA present
-% in the eye
-%
-% Depends on: iset3d, isetbio, Docker, isetcloud
-%
+%% mtfVerification.m
 % TL ISETBIO Team, 2017
 
 %% Initialize ISETBIO
@@ -17,7 +10,7 @@ if ~mcGcloudExists, mcGcloudConfig; end % check whether we can use google cloud 
 % Since rendering these images often takes a while, we will save out the
 % optical images into a folder for later processing.
 currDate = datestr(now,'mm-dd-yy_HH_MM');
-saveDirName = sprintf('LCA_%s',currDate);
+saveDirName = sprintf('mtfVer_%s',currDate);
 saveDir = fullfile(isetbioRootPath,'local',saveDirName);
 if(~exist(saveDir,'dir'))
     mkdir(saveDir);
@@ -31,7 +24,7 @@ projectid = 'renderingfrl';
 dockerImage = 'gcr.io/renderingfrl/pbrt-v3-spectral-gcloud';
 cloudBucket = 'gs://renderingfrl';
 
-clusterName = 'lca';
+clusterName = 'trisha';
 zone         = 'us-central1-a';    
 instanceType = 'n1-highcpu-32';
 
@@ -50,51 +43,30 @@ gcp.renderDepth = true;
 % Clear the target operations
 gcp.targets = [];
 
-%% Turn on chromatic aberration to show color fringing.
+%% Render a fast image of the slanted bar first
 
-distToPlane = 0.2;
+% The slanted bar scene consists of a square plane (1x1 m) that is
+% split in half diagonally. The bottom left half is white while the top
+% right half is black. By default the plane is placed at [0 0 1] meters,
+% but we can change that by given sceneEye an optional 'planeDistance'
+% input. 
+myScene = sceneEye('slantedBar','planeDistance',50); 
+myScene.name = 'mtfVerification';
+myScene.numRays = 2048;
+myScene.resolution = 512; 
 
-% Move the retina plane 
-retinaDistance = 16.00:0.05:16.60;
-% retinaDistance = [16.3 16.2];
-retinaRadius = 10000; % Make it flat
-retinaSemiDiam = 0.15;
+myScene.numBounces = 1;
+myScene.numCABands = 16;
 
-for ii = 1:length(retinaDistance)
-    
-    % Load scene with plane at a specific distance
-    myScene = sceneEye('slantedBar','planeDistance',distToPlane);
-    
-    myScene.name = sprintf('slantedBar_LCA_%0.3fmm',retinaDistance(ii));
-    
-    % Calculate FOV needed to get the same image size
-    myScene.fov = 2*atand(retinaSemiDiam/retinaDistance(ii));
-    
-    myScene.retinaDistance = retinaDistance(ii);
-    myScene.accommodation = 1/distToPlane;
-    myScene.pupilDiameter = 4;
+myScene.accommodation = 0;
+myScene.pupilDiameter = 4;
+myScene.fov = 0.5;
 
-    myScene.numCABands = 16;
-    myScene.numRays = 1024;
-    myScene.resolution = 512;
-%    myScene.numRays = 128;
-%    myScene.resolution = 128;
-    
-    if(ii == length(retinaDistance))
-        fprintf('Uploading zip... \n');
-        uploadFlag = true;
-    else
-        uploadFlag = false;
-    end
-    [cloudFolder,zipFileName] =  ...
-        sendToCloud(gcp,myScene,'uploadZip',uploadFlag);
+[cloudFolder,zipFileName] =  ...
+    sendToCloud(gcp,myScene,'uploadZip',true);
 
-    % Normal render
-%     [oi, results] = myScene.render();
-%     ieAddObject(oi);
-%     oiWindow;
-    
-end
+% vcAddObject(oi);
+% oiWindow;
 
 %% Render
 gcp.render();
@@ -128,4 +100,28 @@ for ii=1:length(oiAll)
     
 end
 
+%% Calculate MTF
 
+close all
+
+wavelengths = [400 450 550 650 680 700];
+
+for ii = 1:length(wavelengths)
+
+[freq,mtf] = calculateMTFeye(oi,wavelengths(ii));
+
+plot(freq,mtf); hold on;
+
+end
+
+legendCell = cellstr(num2str(wavelengths', '%d'));
+legend(legendCell);
+
+xlabel('Spatial Frequency (cycles/deg)');
+ylabel('Contrast Reduction (SFR)');
+grid on;
+axis([0 60 0 1])
+title('MTF (632 nm, 4 mm, 0 dpt)')
+
+set(findall(gcf,'-property','FontSize'),'FontSize',18)
+set(findall(gcf,'-property','LineWidth'),'LineWidth',2)

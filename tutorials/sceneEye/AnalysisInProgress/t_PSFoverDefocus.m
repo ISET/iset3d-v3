@@ -1,10 +1,6 @@
-%% t_LCA_cloud.m
+%% t_PSFoverDefocus.m
 %
-% Render a slanted bar while moving the retina along the optical axis. We
-% can use the images generated here to calculate the amount of LCA present
-% in the eye
-%
-% Depends on: iset3d, isetbio, Docker, isetcloud
+% Depends on: iset3d, isetbio, Docker, RemoteDataToolbox
 %
 % TL ISETBIO Team, 2017
 
@@ -17,7 +13,7 @@ if ~mcGcloudExists, mcGcloudConfig; end % check whether we can use google cloud 
 % Since rendering these images often takes a while, we will save out the
 % optical images into a folder for later processing.
 currDate = datestr(now,'mm-dd-yy_HH_MM');
-saveDirName = sprintf('LCA_%s',currDate);
+saveDirName = sprintf('defocusPSF_%s',currDate);
 saveDir = fullfile(isetbioRootPath,'local',saveDirName);
 if(~exist(saveDir,'dir'))
     mkdir(saveDir);
@@ -31,7 +27,7 @@ projectid = 'renderingfrl';
 dockerImage = 'gcr.io/renderingfrl/pbrt-v3-spectral-gcloud';
 cloudBucket = 'gs://renderingfrl';
 
-clusterName = 'lca';
+clusterName = 'defocus';
 zone         = 'us-central1-a';    
 instanceType = 'n1-highcpu-32';
 
@@ -50,37 +46,60 @@ gcp.renderDepth = true;
 % Clear the target operations
 gcp.targets = [];
 
-%% Turn on chromatic aberration to show color fringing.
 
-distToPlane = 0.2;
+%% Generate a PSF at focus using the eye model
 
-% Move the retina plane 
-retinaDistance = 16.00:0.05:16.60;
-% retinaDistance = [16.3 16.2];
-retinaRadius = 10000; % Make it flat
-retinaSemiDiam = 0.15;
+% Load scene
+% A black disk located 100 meters away (on the y-axis) and spanning 120 deg FOV.
+myScene = sceneEye('blackBackdrop');
 
-for ii = 1:length(retinaDistance)
-    
-    % Load scene with plane at a specific distance
-    myScene = sceneEye('slantedBar','planeDistance',distToPlane);
-    
-    myScene.name = sprintf('slantedBar_LCA_%0.3fmm',retinaDistance(ii));
-    
-    % Calculate FOV needed to get the same image size
-    myScene.fov = 2*atand(retinaSemiDiam/retinaDistance(ii));
-    
-    myScene.retinaDistance = retinaDistance(ii);
-    myScene.accommodation = 1/distToPlane;
-    myScene.pupilDiameter = 4;
+pixelFOV = 0.0020; % Essentially a point. See calculation in s_comparePSF.m
 
-    myScene.numCABands = 16;
-    myScene.numRays = 1024;
-    myScene.resolution = 512;
-%    myScene.numRays = 128;
-%    myScene.resolution = 128;
+pointDistance = 1/5; % In meters
+pointWidth = 2*pointDistance*tand(pixelFOV/2);
+
+% Add equal energy sphere on the optical axis. We will make it the same size as the
+% pixel above.
+myScene.recipe = piAddSphere(myScene.recipe,...
+    'spectrum',[400 1 800 1],...
+    'radius',pointWidth/2,...
+    'location',[0 pointDistance 0]);
+
+% Set rendering parameters
+% Drop FOV to have higher chance of hitting the point
+fovScale = 0.2;
+oiFOV = 1.2500; % From s_comparePSF.m
+myScene.fov = oiFOV*fovScale;
+
+% Calculate new resolution
+oiSS = 5.7952e-07; % From s_comparePSF.m
+myScene.resolution = round(myScene.width/(oiSS*10^3));
+myScene.numRays = 2^15; % This needs to be high, since the point is small and hard to hit!  
+% scene3d.numRays = 256; % Test for now
+
+% Add chromatic aberration
+myScene.numCABands = 16;
+
+% Set pupil diameter
+myScene.pupilDiameter = 4;
+
+pedestalDefocus = 1/pointDistance;
+deltaDefocus = [-1 -0.5 0 0.5 1];
+% deltaDefocus = [-1 0 1]; % Test
+
+nRenders = length(deltaDefocus);
+
+% Loop over accommodations
+for ii = 1:nRenders
     
-    if(ii == length(retinaDistance))
+    % Change accommodation
+    myScene.accommodation = pedestalDefocus + deltaDefocus(ii);
+    
+    % Set name
+    myScene.name = sprintf('psf_3deye_%0.2fdpt',myScene.accommodation);
+    
+    % Render with cloud
+    if(ii == nRenders)
         fprintf('Uploading zip... \n');
         uploadFlag = true;
     else
@@ -88,10 +107,10 @@ for ii = 1:length(retinaDistance)
     end
     [cloudFolder,zipFileName] =  ...
         sendToCloud(gcp,myScene,'uploadZip',uploadFlag);
-
-    % Normal render
-%     [oi, results] = myScene.render();
-%     ieAddObject(oi);
+    
+    % Render (Local)
+%     [oi_3d, result] = scene3d.render;
+%     ieAddObject(oi_3d);
 %     oiWindow;
     
 end
@@ -127,5 +146,4 @@ for ii=1:length(oiAll)
     save(saveFilename,'oi','myScene');
     
 end
-
 

@@ -1,8 +1,10 @@
-%% t_LCA_cloud.m
+%% t_accommodationMTF.m
 %
-% Render a slanted bar while moving the retina along the optical axis. We
-% can use the images generated here to calculate the amount of LCA present
-% in the eye
+% Render a slanted bar through space. Accommodate always at the plane.
+% Measure the MTF as the plane moves. We would expect the curves to always
+% be the same. 
+%
+% This can help verify the accommodation modeling. 
 %
 % Depends on: iset3d, isetbio, Docker, isetcloud
 %
@@ -17,7 +19,7 @@ if ~mcGcloudExists, mcGcloudConfig; end % check whether we can use google cloud 
 % Since rendering these images often takes a while, we will save out the
 % optical images into a folder for later processing.
 currDate = datestr(now,'mm-dd-yy_HH_MM');
-saveDirName = sprintf('LCA_%s',currDate);
+saveDirName = sprintf('defocus_%s',currDate);
 saveDir = fullfile(isetbioRootPath,'local',saveDirName);
 if(~exist(saveDir,'dir'))
     mkdir(saveDir);
@@ -31,7 +33,7 @@ projectid = 'renderingfrl';
 dockerImage = 'gcr.io/renderingfrl/pbrt-v3-spectral-gcloud';
 cloudBucket = 'gs://renderingfrl';
 
-clusterName = 'lca';
+clusterName = 'defocus';
 zone         = 'us-central1-a';    
 instanceType = 'n1-highcpu-32';
 
@@ -50,37 +52,41 @@ gcp.renderDepth = true;
 % Clear the target operations
 gcp.targets = [];
 
-%% Turn on chromatic aberration to show color fringing.
+%% Loop through accommodations
 
-distToPlane = 0.2;
+pedestalD = 5;
+deltaD = -1.5:0.5:1.5;
+%accommodations = [0 5 9]; % Test ver.
+nRenders = length(deltaD);
 
-% Move the retina plane 
-retinaDistance = 16.00:0.05:16.60;
-% retinaDistance = [16.3 16.2];
-retinaRadius = 10000; % Make it flat
-retinaSemiDiam = 0.15;
-
-for ii = 1:length(retinaDistance)
+for ii = 1:nRenders
+    
+    currAccomm = pedestalD + deltaD(ii);
+    
+    % Set plane distance
+    distToPlane = 1/pedestalD;
     
     % Load scene with plane at a specific distance
     myScene = sceneEye('slantedBar','planeDistance',distToPlane);
     
-    myScene.name = sprintf('slantedBar_LCA_%0.3fmm',retinaDistance(ii));
+    myScene.name = sprintf('mtf_accom_%0.2fdp',currAccomm);
     
-    % Calculate FOV needed to get the same image size
-    myScene.fov = 2*atand(retinaSemiDiam/retinaDistance(ii));
-    
-    myScene.retinaDistance = retinaDistance(ii);
-    myScene.accommodation = 1/distToPlane;
+    myScene.accommodation = currAccomm;
     myScene.pupilDiameter = 4;
-
-    myScene.numCABands = 16;
-    myScene.numRays = 1024;
-    myScene.resolution = 512;
-%    myScene.numRays = 128;
-%    myScene.resolution = 128;
     
-    if(ii == length(retinaDistance))
+    myScene.fov = 2;
+    
+    % HQ version
+    myScene.numCABands = 16;
+    myScene.numRays = 512;
+    myScene.resolution = 512;
+
+    % LQ version
+%     myScene.numCABands = 6;
+%     myScene.numRays = 128;
+%     myScene.resolution = 128;
+    
+    if(ii == nRenders)
         fprintf('Uploading zip... \n');
         uploadFlag = true;
     else
