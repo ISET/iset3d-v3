@@ -1,6 +1,15 @@
 ## Sumo installation
 Go to this [site](http://sumo.dlr.de/wiki/Installing/MacOS_Build_w_Homebrew), and follow the instructions.
 
+### Note:
+To  enable the direct linking of python, change
+
+`./configure CXX=clang++ CXXFLAGS="-stdlib=libc++ -std=gnu++11" --with-xerces=/usr/local --with-proj-gdal=/usr/local` 
+
+with
+
+`./configure CXX=clang++ CXXFLAGS="-stdlib=libc++ -std=gnu++11" --with-xerces=/usr/local --with-proj-gdal=/usr/local --with-python`
+
 ### Check your installation:
 Type: `sumo-gui` in your terminal, a xQuartz based GUI will show up.
 
