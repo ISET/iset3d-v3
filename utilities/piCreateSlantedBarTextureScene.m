@@ -1,8 +1,13 @@
 function recipe = piCreateSlantedBarTextureScene(varargin)
 %CREATESIMPLEPOINT 
 % Create a recipe for a slanted bar texture scene. 
-
-% OPTIONAL input parameter/val
+%
+%   recipe = piCreateSlantedBarTextureScene(varargin)
+%
+% Required:
+%   None
+%
+% Optional key/value parameters
 %   blackDepth - distance from the camera to the black side of the slanted
 %                bar (in meters)
 %   whiteDepth - distance from the camera to the white side of the slanted
@@ -18,26 +23,22 @@ function recipe = piCreateSlantedBarTextureScene(varargin)
 
 %% Parse inputs
 parser = inputParser();
-parser.addParameter('blackDepth',1, @isnumeric);
-parser.addParameter('whiteDepth',1, @isnumeric);
-parser.addParameter('planeDepth',[], @isnumeric);
+
+% Depth in meters
+parser.addParameter('backDepth', 2, @isnumeric);
+parser.addParameter('frontDepth',1, @isnumeric);
 parser.addParameter('illumination', 'EqualEnergy.spd', @ischar);
 
 parser.parse(varargin{:});
-blackDepth = parser.Results.blackDepth;
-whiteDepth = parser.Results.whiteDepth;
-planeDepth = parser.Results.planeDepth;
+backDepth    = parser.Results.backDepth;
+frontDepth   = parser.Results.frontDepth;
 illumination = parser.Results.illumination;
 
 %% Read in base scene
-scenePath = fullfile(piRootPath,'data','V3','slantedBarAdjustableDepth');
+scenePath = fullfile(piRootPath,'data','V3','slantedBarTexture');
 
 % Check plane order
-if(whiteDepth <= blackDepth)
-    sceneName = 'slantedBarTexture.pbrt';
-else
-    sceneName = 'slantedBarTexture.pbrt';
-end
+sceneName = 'slantedBarTexture.pbrt';
 
 recipe = piRead(fullfile(scenePath,sceneName),'version',3);
 %% Make adjustments to the point
@@ -47,17 +48,10 @@ recipe = piRead(fullfile(scenePath,sceneName),'version',3);
 % piClearObjectTransforms(recipe,'BlackPlane');
 
 % Add given transforms
-if(isempty(planeDepth))
-    recipe = piObjectTransform(recipe, 'WhitePlane', ...
-        'Translate', [0 0 whiteDepth]);
-    recipe = piObjectTransform(recipe, 'BlackPlane', ...
-        'Translate', [0 0 blackDepth]);
-else
-    recipe = piObjectTransform(recipe, 'WhitePlane', ...
-        'Translate', [0 0 planeDepth]);
-    recipe = piObjectTransform(recipe, 'BlackPlane', ...
-        'Translate', [0 0 planeDepth]);
-end
+recipe = piObjectTransform(recipe, 'FrontPlane', ...
+    'Translate', [0 0 frontDepth]);
+recipe = piObjectTransform(recipe, 'BackPlane', ...
+    'Translate', [0 0 backDepth]);
 
 %% Make adjustments to the light
 

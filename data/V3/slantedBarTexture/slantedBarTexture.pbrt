@@ -1,0 +1,27 @@
+Transform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 0.0 0.0 1]
+
+Camera "perspective"
+ "float fov" [30]
+
+Sampler "lowdiscrepancy" 
+  "integer pixelsamples" [128] 
+
+PixelFilter "gaussian" 
+  "float alpha" [2] 
+  "float xwidth" [2] 
+  "float ywidth" [2] 
+
+Film "image"
+ "integer xresolution" [256]
+ "integer yresolution" [256]
+
+Integrator "path"
+ "integer maxdepth" [5]
+
+WorldBegin
+
+  LightSource "infinite" "integer nsamples" [8] "spectrum L" "EqualEnergy.spd"
+  Include "slantedBarTexture_materials.pbrt"
+  Include "slantedBarTexture_geometry.pbrt"
+
+WorldEnd

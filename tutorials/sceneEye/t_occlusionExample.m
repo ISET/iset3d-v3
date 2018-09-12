@@ -36,24 +36,20 @@ for ii = 1:length(blackDepth)
     % Create the scene
     
     % Scene is illuminated by EqualEnergy.spd by default.
-    %{
+
     scene3d = sceneEye('slantedBarAdjustable',...
-        'whiteDepth',whiteDepth,...
-        'blackDepth',blackDepth(ii)); % in meters
-    %}
-    scene3d = sceneEye('slantedBarTexture',...
         'whiteDepth',whiteDepth,...
         'blackDepth',blackDepth(ii)); % in meters
     
     % Set eye parameters
     scene3d.accommodation = whiteDepthDpt; % Accommodate to white plane
-    scene3d.numCABands = 6; % Can increase to 16 or 32 at the cost of render speed. 
+    scene3d.numCABands = 8; % Can increase to 16 or 32 at the cost of render speed. 
     scene3d.numBounces = 3;
     
     % Set size parameters
-    scene3d.fov = 2; % The smaller the fov the more the LCA is visible.
+    scene3d.fov        = 2; % The smaller the fov the more the LCA is visible.
     scene3d.resolution = 128; % Low quality
-    scene3d.numRays = 256; % Low quality
+    scene3d.numRays    = 128; % Low quality
     
     % Render
     scene3d.name = sprintf('%0.2f_%0.2f_slantedBar',...
