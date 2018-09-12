@@ -59,6 +59,9 @@ p.addParameter('overwritegeometry',true,@islogical);
 p.addParameter('creatematerials',false,@islogical);
 % control lighting in geomtery.pbrt
 p.addParameter('lightsFlag',false,@islogical);
+
+% Read trafficflow variable
+p.addParameter('trafficflow',[]);
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
@@ -67,8 +70,9 @@ overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
 overwritegeometry   = p.Results.overwritegeometry;
-creatematerials  = p.Results.creatematerials;
-lightsFlag = p.Results.lightsFlag;
+creatematerials     = p.Results.creatematerials;
+lightsFlag          = p.Results.lightsFlag;
+trafficflow         = p.Results.trafficflow;
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
@@ -368,7 +372,7 @@ end
 %% Overwirte geometry.pbrt
 if contains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
-    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
+    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'trafficflow',trafficflow); 
     end
 end
 

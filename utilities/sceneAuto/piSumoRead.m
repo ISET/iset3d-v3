@@ -75,8 +75,7 @@ end
 %% Get all the information of vehicles and persons and store them as a struct
 tic
 % read xml file
-% isetL3 and isetauto include 3rd-party functions with the same name, here
-% we use the matlab build-in one.
+
 xmlstruct = xml2struct(flowFile);toc
 xChildren = xmlstruct(2).Children;
 step = 0;   % count the timestamp
@@ -166,6 +165,7 @@ for i = 1:sum
     obj_bicycle = 0;
     obj_motorcycle = 0;
 end
+
 %% Get all the information of traffic lights and store them into the struct
 tic
 if ~isempty(lightFile)
@@ -173,7 +173,7 @@ if ~isempty(lightFile)
     lightChildren = lightstruct(2).Children;
     sum = size(lightChildren, 2);
     for i = 1:sum
-        if strcmpi(lightChildren(i).Name, 'tlsState') && strcmpi(lightChildren(i).Attributes(1).Value, '1')
+        if strcmpi(lightChildren(i).Name, 'tlsState') 
             count = str2double(lightChildren(i).Attributes(5).Value)+1;
             trafficflow(count).light(1).Name = 'trafficlight_001_1';    % the name end of 1 is light for pedestrian
             trafficflow(count).light(2).Name = 'trafficlight_002_1';

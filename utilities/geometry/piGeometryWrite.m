@@ -14,8 +14,11 @@ varargin =ieParamFormat(varargin);
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 % default is flase, will turn on for night scene
 p.addParameter('lightsFlag',false,@islogical);
+p.addParameter('trafficflow',[]);
+
 p.parse(thisR,varargin{:});
-lightsFlag = p.Results.lightsFlag;
+lightsFlag  = p.Results.lightsFlag;
+trafficflow = p.Results.trafficflow;
 %%
 [Filepath,scene_fname] = fileparts(thisR.outputFile);
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));[~,n,e]=fileparts(fname);
@@ -112,7 +115,10 @@ for ii = 1: length(obj)
                 fprintf(fid_obj,'AttributeEnd \n \n');
             end
         end
-        if contains(obj(ii).name,'trafficlight') && isempty(obj(ii).children)
+    end
+    %{
+    %% To add new parser for xml2struct
+        if contains(obj(ii).name,'trafficlight') && isempty(obj(ii).children) && isfield(trafficflow,light)
             if contains(obj(ii).name,'green')
                 from = obj(ii).position;
                 obj(ii).position = [0 0 0];
@@ -128,7 +134,7 @@ for ii = 1: length(obj)
                         obj_rotate = obj(ii).rotate(:,gg);
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
                             obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                    fprintf(fid_obj,'LightSource "point" "color I" [0.1 3 0.1] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
+                    fprintf(fid_obj,'LightSource "point" "color I" [0.01 0.5 0.01] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
                         from(1),from(2),from(3));
                     fprintf(fid_obj,'AttributeEnd \n \n');
                     end
@@ -148,7 +154,7 @@ for ii = 1: length(obj)
                         obj_rotate = obj(ii).rotate(:,gg);
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
                             obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                    fprintf(fid_obj,'LightSource "point" "color I" [3 3 0.1] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
+                    fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.5 0.01] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
                         from(1),from(2),from(3));
                     fprintf(fid_obj,'AttributeEnd \n \n');
                     end
@@ -168,13 +174,13 @@ for ii = 1: length(obj)
                         obj_rotate = obj(ii).rotate(:,gg);
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
                             obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                    fprintf(fid_obj,'LightSource "point" "color I" [3 0.1 0.1] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
+                    fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.01 0.01] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
                         from(1),from(2),from(3));
                     fprintf(fid_obj,'AttributeEnd \n \n');
                     end
             end
         end
-    end
+    %}
 end
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);

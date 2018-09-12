@@ -139,7 +139,7 @@ fprintf(cfgid,'<configuration>\n    <input>\n');
 fprintf(cfgid,strcat('        <net-file value="',netPath,'"/>\n'));
 fprintf(cfgid,strcat('        <route-files value="',route_collect,'"/>\n'));
 addcheck = dir('*.add.xml');
-if isempty(addcheck)
+if ~isempty(addcheck)
 % if ~isempty(intersections)
     fprintf(cfgid,strcat('        <additional-files value="',...
         netfileName,'.add.xml"/>\n'));
@@ -155,7 +155,7 @@ fclose(cfgid);
 %% run sumo-simulation to generate a trafficflow .xml file
 sumocmd=strcat(sumohome,'/bin/sumo -c'," ",netfileName,'.sumocfg --fcd-output'," ",netfileName,'_state.xml');
 system(sumocmd);
-if isempty(addcheck)
+if ~isempty(addcheck)
     trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'),'lightfile',strcat(netfileName,'_traffic_light.xml'));
 else
     trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'));toc

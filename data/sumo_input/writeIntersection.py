@@ -16,6 +16,7 @@ else:
 import sumolib
 
 ADD_SUFFIX=".add.xml"
+OUTPUT_SUFFIX="_traffic_light.xml"
 
 def get_options(args=None):
     # add options for matlab calls
@@ -36,7 +37,7 @@ def writeAddXml(sumoNet,options):
         with open(options.sceneType+ADD_SUFFIX,'w') as adds:
             print("<tlsStates>",file=adds)
             for tl in tls:
-                print("    <timedEvent type=\"SaveTLSStates\" source=\""+tl.getID(),"\" dest=\""+options.sceneType+ADD_SUFFIX+"\"/>",file=adds)
+                print("    <timedEvent type=\"SaveTLSStates\" source=\""+tl.getID()+"\" dest=\""+options.sceneType+OUTPUT_SUFFIX+"\"/>",file=adds)
             print("</tlsStates>",file=adds)
             adds.close()
 

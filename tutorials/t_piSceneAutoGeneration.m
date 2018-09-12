@@ -49,18 +49,14 @@ load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_trafficflow.mat',road
 % % from = from+ [100;0;0];
 % to = from+[-20;0;0]; % look from Camera 2
 % % bundle a camera on a random Car
-
+thisTrafficflow = trafficflow(timestamp);
 % CamOrientation = 180;
-[from,to,ori] = piCamPlace('trafficflow',trafficflow,...
-                           'timestamp',timestamp);
-% position
-% from = thisR_scene.get('from');
-% to   = thisR_scene.get('to');
+[from,to,ori] = piCamPlace('trafficflow',thisTrafficflow);
+
 thisR_scene.lookAt.from = from;
 thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
-% thisR_scene.set('from',from + [0 50 -20]);
-% thisR_scene.set('to',to + [0 0 100]);
+
 
 %% Render parameter
 % Default is a relatively low resolution (256).
@@ -74,7 +70,6 @@ thisR_scene.film.diagonal.type = 'float';
 thisR_scene.integrator.maxdepth.value = 10;
 thisR_scene.integrator.subtype = 'path';
 thisR_scene.sampler.subtype = 'sobol';
-% Set up data for upload
 
 %% Write out the scene
 outputDir = fullfile(piRootPath,'local','city2_cross_4lanes_002');
@@ -85,7 +80,9 @@ filename = sprintf('%s_%s_%s_ts%d.pbrt',sceneType,roadType,dayTime,timestamp);
 outputFile = fullfile(outputDir,filename);
 thisR_scene.set('outputFile',outputFile);
 %%
-piWrite(thisR_scene,'creatematerials',true,'overwriteresources',false,'lightsFlag',false); 
+piWrite(thisR_scene,'creatematerials',true,...
+    'overwriteresources',false,'lightsFlag',false,...
+    'trafficflow',thisTrafficflow); 
 
 %% Set parameters for multiple scenes, same geometry and materials
 gcp.uploadPBRT(thisR_scene,'material',true,'geometry',true,'resources',false);
