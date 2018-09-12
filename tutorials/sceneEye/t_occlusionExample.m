@@ -36,13 +36,14 @@ for ii = 1:length(blackDepth)
     % Create the scene
     
     % Scene is illuminated by EqualEnergy.spd by default.
+    %{
     scene3d = sceneEye('slantedBarAdjustable',...
-        'planeTexture',...
         'whiteDepth',whiteDepth,...
         'blackDepth',blackDepth(ii)); % in meters
-    
-    % We would like to place a texture on the two planes.  How do we
-    % do that?
+    %}
+    scene3d = sceneEye('slantedBarTexture',...
+        'whiteDepth',whiteDepth,...
+        'blackDepth',blackDepth(ii)); % in meters
     
     % Set eye parameters
     scene3d.accommodation = whiteDepthDpt; % Accommodate to white plane
@@ -51,8 +52,8 @@ for ii = 1:length(blackDepth)
     
     % Set size parameters
     scene3d.fov = 2; % The smaller the fov the more the LCA is visible.
-    scene3d.resolution = 128; % Pretty LQ
-    scene3d.numRays = 256; % Pretty LQ
+    scene3d.resolution = 128; % Low quality
+    scene3d.numRays = 256; % Low quality
     
     % Render
     scene3d.name = sprintf('%0.2f_%0.2f_slantedBar',...
