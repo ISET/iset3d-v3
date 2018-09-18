@@ -18,7 +18,7 @@ Type: `sumo-gui` in your terminal, a xQuartz based GUI will show up.
 Temporary Solution
 To set an environment variable temporarily, you can use the following command in your terminal:
 
-export SUMO_HOME="/your/path/to/sumo/"
+`export SUMO_HOME="/your/path/to/sumo/"`
 
 This sets the environment variable to be used by any program or script you start in your current shell session. This does not affect any other shell session and only works until you end the session.
 
