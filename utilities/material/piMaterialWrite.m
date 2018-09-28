@@ -67,10 +67,10 @@ output = thisR.materials.outputFile_materials;
 [~,materials_fname,~]=fileparts(output);
 thisR.world{length(thisR.world)-2} = sprintf('Include "%s.pbrt" ',materials_fname);
 txtLines = thisR.materials.txtLines;
-for i = 1:size(txtLines)
-    if ~isempty(txtLines(i))
-        if contains(txtLines(i),'MakeNamedMaterial')
-            txtLines{i}=[];
+for ii = 1:size(txtLines)
+    if ~isempty(txtLines(ii))
+        if contains(txtLines(ii),'MakeNamedMaterial')
+            txtLines{ii}=[];
         end
     end
 end
@@ -87,6 +87,7 @@ for jj = 1: length(textureLines)
         for nn= length(thisLine_tmp):-1:1
         if strcmp(thisLine_tmp{nn}(1),'"')
             % combine all the string from nn to end;
+            thisLine_tmp{nn} = strcat(thisLine_tmp{nn});
             break;
         end
         end

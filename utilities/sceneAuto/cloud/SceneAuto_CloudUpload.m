@@ -11,7 +11,7 @@
 % roadname = 'city_cross_4lanes_construct_001';
 % roadname = 'city_cross_6lanes_construct_001';
 % roadname = 'city_cross_6lanes_001';
-sessionname = 'city4';
+sessionname = 'city3';
 % downloadbikes = 1;
 % downloadcars   = 1;
 % downloadtrucks = 1;
@@ -38,12 +38,12 @@ piAssetsDownload_cloud('session',sessionname);
 %%
 % roadnamelist{1} = 'city_cross_4lanes_001';
 % roadnamelist{1} = 'city_cross_4lanes_002';
-% roadnamelist{2} = 'city_cross_6lanes_001';
+roadnamelist{1} = 'city_cross_6lanes_001';
 % % roadnamelist{4} = 'city_cross_4lanes_001_construct';
 % roadnamelist{3} = 'city_cross_4lanes_002_construct';
-% roadnamelist{4} = 'city_cross_6lanes_001_construct';
-roadnamelist{1} = 'curve_6lanes_001';
-roadnamelist{2} = 'straight_2lanes_parking';
+roadnamelist{2} = 'city_cross_6lanes_001_construct';
+% roadnamelist{1} = 'curve_6lanes_001';
+roadnamelist{3} = 'straight_2lanes_parking';
 
 %% Download Road
 for jj = 1:length(roadnamelist)
@@ -66,13 +66,18 @@ cityname = sessionname;
 tic
 % about 90 seconds
 % roadname = strcat('suburb_',roadname);
-resourcesCombine(roadname,cityname,20);toc
+resourcesCombine(roadname,cityname,52);toc
 
 %% Zip and upload them to google cloud, only upload once.
 % about 350 seconds
 tic
 % zipFileName = strrep(roadname,'suburb',cityname);
-zipFileName = strcat(sessionname,'_',roadname);
+if ~contains(roadname,'city')
+    zipFileName = strcat(sessionname,'_',roadname);
+else
+    zipFileName = strrep(roadname,'city',cityname);
+end
+    
 sceneFolder = fullfile(piRootPath,'local',zipFileName);
 chdir(sceneFolder);
 allFiles = dir(sceneFolder);

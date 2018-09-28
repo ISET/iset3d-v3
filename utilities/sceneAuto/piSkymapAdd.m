@@ -48,8 +48,8 @@ switch input
     case 'night'
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
     case 'cloudy'
-        cloud = randi(3,1);
-%         cloud = 3; % tmp
+%         cloud = randi(3,1);
+        cloud = 2; % tmp
         if cloud ==1, cloud = 'cloudy';elseif cloud==2, cloud = 'cloudy_1'; else cloud = 'cloudy_large'; end
         skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/%s.exr"',cloud);
     case 'city'

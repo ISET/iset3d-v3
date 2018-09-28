@@ -1,0 +1,13 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [1.0 0 0.0 0  0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 0.0 0.0 1]
+Camera "perspective" "float fov" [30]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "integer xresolution" [256] "integer yresolution" [256]
+Integrator "directlighting" "integer maxdepth" [1]
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	LightSource "infinite" "integer nsamples" [8] "spectrum L" "EqualEnergy.spd"
+    Include "slantedBarTexture_materials.pbrt"
+	Include "slantedBarTexture_geometry.pbrt"
+WorldEnd

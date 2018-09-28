@@ -23,7 +23,7 @@ if ~piDockerExists, piDockerConfig; end
 % Try different depths
 % Depth to the two textured planes in meters
 topDepth = 1;
-bottomDepth =  2;
+bottomDepth =  1;
 
 scene3d = sceneEye('slantedBarTexture',...
     'topDepth',topDepth,...

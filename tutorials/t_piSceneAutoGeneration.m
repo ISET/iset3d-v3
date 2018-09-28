@@ -29,10 +29,10 @@ roadType = 'cross';
 % sceneType = 'suburb1';
 % roadType = 'straight_2lanes_parking';
 % roadType = 'curve_6lanes_001';
-trafficflowDensity = 'high';
+trafficflowDensity = 'medium';
 dayTime = 'cloudy';
 % Choose a timestamp(1~360)  
-timestamp = 120;
+timestamp = 90;
 % Normally we want only one scene per generation. 
 nScene = 1;
 % Choose whether we want to enable cloudrender 
@@ -71,7 +71,7 @@ thisR_scene.lookAt.up = [0;1;0];
 % thisR_scene.set('camera','realistic');
 % thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
 thisR_scene.set('film resolution',[1280 720]);
-thisR_scene.set('pixel samples',8);
+thisR_scene.set('pixel samples',1024);
 thisR_scene.set('fov',45);
 thisR_scene.film.diagonal.value=10;
 thisR_scene.film.diagonal.type = 'float';
@@ -95,8 +95,8 @@ piWrite(thisR_scene,'creatematerials',true,...
     'overwriteresources',false,'lightsFlag',false,...
     'thistrafficflow',thisTrafficflow); 
 %% tmp
-meshImage = piRender(thisR_scene,'renderType','mesh'); 
-vcNewGraphWin;imagesc(meshImage);colormap(jet);title('Mesh')
+% meshImage = piRender(thisR_scene,'renderType','mesh'); 
+% vcNewGraphWin;imagesc(meshImage);colormap(jet);title('Mesh')
 %% Set parameters for multiple scenes, same geometry and materials
 gcp.uploadPBRT(thisR_scene,'material',true,'geometry',true,'resources',false);
 addPBRTTarget(gcp,thisR_scene);
@@ -136,13 +136,20 @@ disp('Data downloaded');
 tt=1;
 for ii = 1:length(scene)
     scene_oi{ii} = piWhitepixelsRemove(scene{ii});
-    ieAddObject(scene_oi{ii});
-    sceneName = strsplit(scene_oi{ii}.name,'-');
+    scene_crop{ii} = oiCrop(scene_oi{ii},[160 90 1279 719]);
+    ieAddObject(scene_crop{ii});
+    sceneName = strsplit(scene_crop{ii}.name,'-');
     sceneName = sceneName{1};% get first cell
-    oiSet(scene_oi{ii},'gamma',0.7);
-    pngFigure = oiGet(scene_oi{ii},'rgb image');
-    Folder = fileparts(gcp.targets(tt).local);
-    obj = piSceneAnnotate(gcp.targets(tt), thisR_scene, scene_oi{ii}, scene_mesh{ii});
+    
+    oiSet(scene_crop{ii},'gamma',0.7);
+    pngFigure = oiGet(scene_crop{ii},'rgb image');
+    for tt = tt:tt+2
+        if gcp.targets(tt).meshFlag && gcp.targets(tt).depthFlag
+            Folder = fileparts(gcp.targets(tt).local);
+            obj = piSceneAnnotate(gcp.targets(tt), thisR_scene, scene_crop{ii}, scene_mesh{ii});
+        end
+    end
+    tt= tt+1;
     irradiancefile = sprintf('%s_ir.png',sceneName);
     imwrite(pngFigure,irradiancefile); % Save this scene file
     % process meshImage to label map
@@ -152,9 +159,6 @@ for ii = 1:length(scene)
     
     % 2d Bounding box
     vcNewGraphWin;imagesc(scene_mesh{ii});colormap(jet);title('Mesh');
-    if gcp.renderDepth,  tt = tt+1; end
-    if gcp.renderMesh,   tt = tt+1; end
-    tt=tt+1;
 end
 % oiWindow;oiSet(scene,'gamma',0.7);
 oiWindow;
