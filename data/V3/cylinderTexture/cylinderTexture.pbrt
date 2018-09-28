@@ -1,0 +1,13 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 0.0 0.0 1]
+Camera "perspective" "float fov" [30.0] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["cylinderTexture.exr"] "integer xresolution" [128] "integer yresolution" [128]
+Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	LightSource "distant" "rgb L" [1 1 1] "point from" [0 0 0] "point to" [0.258819 0.0 0.9659258]
+	Include "cylinderTexture_materials.pbrt"
+	Include "cylinderTexture_geometry.pbrt"
+WorldEnd

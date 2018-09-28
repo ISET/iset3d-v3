@@ -41,10 +41,10 @@ for jj = 1 : x
         %got the list  of specific objects
         for kk = 1: size(object_list(rand_num).geometry,2)
             count = count + 1;
-            objectPosition_list(count).name=object_list(rand_num).geometry(kk).name;
-            objectPosition_list(count).size = object_list(rand_num).geometry(kk).size;
+            objectPosition_list(count).name     =object_list(rand_num).geometry(kk).name;
+            objectPosition_list(count).size     = object_list(rand_num).geometry(kk).size;
             objectPosition_list(count).position = [start_point(1) + coordinate_rand(1), sidewalk_list(jj).height, start_point(2) + coordinate_rand(2)];
-            objectPosition_list(count).rotate = sidewalk_list(jj).direction;
+            objectPosition_list(count).rotate   = sidewalk_list(jj).direction;
         end
     end
 end

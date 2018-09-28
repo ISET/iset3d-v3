@@ -100,6 +100,8 @@ materiallib.uber.string = 'uber';
 % Standard glass appearance
 
 materiallib.translucent.string = 'translucent';
+materiallib.translucent.colorreflect = [0.5 0.5 0.5];
+materiallib.translucent.colortransmit = [0.5 0.5 0.5];
 
 %% substrate
 % Human skin is assigned with this material.

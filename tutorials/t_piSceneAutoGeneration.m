@@ -9,6 +9,7 @@ if ~mcGcloudExists, mcGcloudConfig; end
 tic
 % gcp = gCloud('configuration','gcp-pbrtv3-central-32');
 gcp = gCloud('configuration','gcp-pbrtv3-central-32cpu-120m');
+% gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
 
 toc
 % test
@@ -20,13 +21,18 @@ str = gcp.configList;
 
 gcp.targets =[];
 %% Scene Autogeneration by parameters
+clearvars -except gcp 
+%%
 tic
-sceneType = 'city2';
+sceneType = 'city4';
 roadType = 'cross';
-trafficflowDensity = 'medium';
+% sceneType = 'suburb1';
+% roadType = 'straight_2lanes_parking';
+% roadType = 'curve_6lanes_001';
+trafficflowDensity = 'high';
 dayTime = 'cloudy';
 % Choose a timestamp(1~360)  
-timestamp = 12;
+timestamp = 120;
 % Normally we want only one scene per generation. 
 nScene = 1;
 % Choose whether we want to enable cloudrender 
@@ -40,50 +46,57 @@ cloudRender = 1;
                                  'timeStamp',timestamp,...
                                  'nScene',nScene,...
                                  'cloudRender',cloudRender);
-toc                      
-thisR_scene = piSkymapAdd(thisR_scene,'cloudy');
+toc
+%%
+dayTime = 'cloudy';
+thisR_scene = piSkymapAdd(thisR_scene,dayTime);
+
+% thisR_scene = piSkymapAdd(thisR_scene,'day');
+%%
 %% Add Camera
 % load in trafficflow
 load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_trafficflow.mat',road.roadinfo.name)),'trafficflow');
 % from = thisR_scene.assets(3).position;
-% % from = from+ [100;0;0];
-% to = from+[-20;0;0]; % look from Camera 2
-% % bundle a camera on a random Car
 thisTrafficflow = trafficflow(timestamp);
-% CamOrientation = 180;
-[from,to,ori] = piCamPlace('trafficflow',thisTrafficflow);
+CamOrientation = 270;
+[from,to,ori] = piCamPlace('trafficflow',thisTrafficflow,...
+                            'CamOrientation',CamOrientation);
 
 thisR_scene.lookAt.from = from;
 thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
-
 
 %% Render parameter
 % Default is a relatively low resolution (256).
 % thisR_scene.set('camera','realistic');
 % thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
 thisR_scene.set('film resolution',[1280 720]);
-thisR_scene.set('pixel samples',128);
+thisR_scene.set('pixel samples',8);
 thisR_scene.set('fov',45);
 thisR_scene.film.diagonal.value=10;
 thisR_scene.film.diagonal.type = 'float';
 thisR_scene.integrator.maxdepth.value = 10;
-thisR_scene.integrator.subtype = 'path';
+thisR_scene.integrator.subtype = 'bdpt';
 thisR_scene.sampler.subtype = 'sobol';
 
 %% Write out the scene
-outputDir = fullfile(piRootPath,'local','city2_cross_4lanes_002');
+if contains(sceneType,'city')
+    outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
+else
+    outputDir = fullfile(piRootPath,'local',strcat(sceneType,'_',road.roadinfo.name));
+end
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-% [p,n,e] = fileparts(fname); 
-% thisR_scene.outputFile = fullfile(outputDir,sprintf('%s-wide56deg6mm-%d%s',n,time,e));
-filename = sprintf('%s_%s_%s_ts%d.pbrt',sceneType,roadType,dayTime,timestamp);
+filename = sprintf('%s_%s_%s_ts%d_%i_%i_%i_%i_%i_%0.0f.pbrt',sceneType,roadType,dayTime,timestamp,clock);
 outputFile = fullfile(outputDir,filename);
 thisR_scene.set('outputFile',outputFile);
+
 %%
 piWrite(thisR_scene,'creatematerials',true,...
     'overwriteresources',false,'lightsFlag',false,...
-    'trafficflow',thisTrafficflow); 
-
+    'thistrafficflow',thisTrafficflow); 
+%% tmp
+meshImage = piRender(thisR_scene,'renderType','mesh'); 
+vcNewGraphWin;imagesc(meshImage);colormap(jet);title('Mesh')
 %% Set parameters for multiple scenes, same geometry and materials
 gcp.uploadPBRT(thisR_scene,'material',true,'geometry',true,'resources',false);
 addPBRTTarget(gcp,thisR_scene);
@@ -92,14 +105,21 @@ fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 %% Describe the targets
 
 gcp.targetsList;
+%%
+
 
 %% This invokes the PBRT-V3 docker image
 gcp.render();
 %%
+[podnames,result] = gcp.Podslist('print',false);
+nPODS = length(result.items);
 cnt = 0;
-while cnt < length(gcp.targets)
+time = 0;
+while cnt < length(nPODS)
     cnt = podSucceeded(gcp);
-    pause(5);
+    pause(60);
+    time = time+1;
+    fprintf('******Elapsed Time: %d mins****** \n',time);
 end
 %{
 %  You can get a lot of information about the job this way
@@ -109,41 +129,45 @@ gcp.Podlog(podname{2});
 %}
 % Keep checking for the data, every 15 sec, and download it is there
 %% Download files from gcloud bucket
-[scene,scene_mesh]   = gcp.downloadPBRT(thisR_scene);
+[scene,scene_mesh]   = gcp.downloadPBRT();
 disp('Data downloaded');
 
 % Show it in ISET
+tt=1;
 for ii = 1:length(scene)
-    ieAddObject(scene{ii});
+    scene_oi{ii} = piWhitepixelsRemove(scene{ii});
+    ieAddObject(scene_oi{ii});
+    sceneName = strsplit(scene_oi{ii}.name,'-');
+    sceneName = sceneName{1};% get first cell
+    oiSet(scene_oi{ii},'gamma',0.7);
+    pngFigure = oiGet(scene_oi{ii},'rgb image');
+    Folder = fileparts(gcp.targets(tt).local);
+    obj = piSceneAnnotate(gcp.targets(tt), thisR_scene, scene_oi{ii}, scene_mesh{ii});
+    irradiancefile = sprintf('%s_ir.png',sceneName);
+    imwrite(pngFigure,irradiancefile); % Save this scene file
+    % process meshImage to label map
+    % class map
+    
+    % Instance map
+    
+    % 2d Bounding box
+    vcNewGraphWin;imagesc(scene_mesh{ii});colormap(jet);title('Mesh');
+    if gcp.renderDepth,  tt = tt+1; end
+    if gcp.renderMesh,   tt = tt+1; end
+    tt=tt+1;
 end
 % oiWindow;oiSet(scene,'gamma',0.7);
-sceneWindow;
-sceneSet(scene,'gamma',0.7);
+oiWindow;
+truesize;
 
-vcNewGraphWin;imagesc(scene_mesh);colormap(jet);title('Mesh')
 
 %% Remove all jobs
 % gcp.JobsRmAll();
 
-%% Create a label map
-labelMap(1).name = 'road';
-labelMap(1).id = 1;
-labelMap(1).name = 'car';
-labelMap(1).id = 2;
-labelMap(1).color = [0 0 1];
-labelMap(2).name='person';
-labelMap(2).id = 3;
-labelMap(2).color = [0 1 0];
-labelMap(3).name='truck';
-labelMap(3).id = 4;
-labelMap(3).color = [1 0 0];
-labelMap(4).name='bus';
-labelMap(4).id = 5;
-labelMap(4).color = [1 0 1];
 
 %% Get bounding box
 
-obj = piBBoxExtract(thisR_scene, scene_mesh, irradianceImg, meshImage, labelMap);
+obj = piSceneAnnotate(thisR_scene, scene_mesh, irradianceImg, meshImage);
 
 % obj = piBBoxExtract(thisR_scene, scene_2, assets, irradianceImg, meshImage, labelMap);
  

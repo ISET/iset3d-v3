@@ -78,6 +78,7 @@ if isempty(acquisitionname)
 %     end
         assetRecipe{ii}.name   = destName_recipe;
         assetRecipe{ii}.count  = downloadList(ii).count;
+        assetRecipe{ii}.fwInfo = [resource_acqID{downloadList(ii).index},' ',resourceFiles{downloadList(ii).index}{1}.name];
         %     if ~exist(assetRecipe{ii}.name,'file'), error('File not found');end
     end
     
@@ -116,6 +117,7 @@ else
                 'destination',destName_resource);
         end
         assetRecipe.name = destName_recipe;
+        assetRecipe.fwInfo = [thisResourceID,' ',thisResource.name];
     fprintf('%s downloaded.\n',n);
 end
 end

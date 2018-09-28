@@ -2,20 +2,23 @@
 % To Do: upload resouces to cloud bucket by pre defined scene types
 %       
 %%
-ieInit;
-
-if ~mcGcloudExists, mcGcloudConfig; end
+% ieInit;
+% 
+% if ~mcGcloudExists, mcGcloudConfig; end
 
 %% Create a download list
-roadname = 'city_cross_4lanes_002';
-sessionname = 'city_1';
-downloadbikes = 1;
-downloadcars   = 1;
-downloadtrucks = 1;
-downloadbuses   = 1;
-downloadpedestrians = 1;
-downloadtrees_tall = 1;
-downloadothers = 1;
+% roadname = 'city_cross_4lanes_002';
+% roadname = 'city_cross_4lanes_construct_001';
+% roadname = 'city_cross_6lanes_construct_001';
+% roadname = 'city_cross_6lanes_001';
+sessionname = 'city4';
+% downloadbikes = 1;
+% downloadcars   = 1;
+% downloadtrucks = 1;
+% downloadbuses   = 1;
+% downloadpedestrians = 1;
+% downloadtrees_tall = 1;
+% downloadothers = 1;
 %% Download all required assets
 % piAssetsDownload_cloud('session','car');
 % piAssetsDownload_cloud('session','bike');
@@ -32,12 +35,44 @@ downloadothers = 1;
 %% Download building
 
 piAssetsDownload_cloud('session',sessionname);
+%%
+% roadnamelist{1} = 'city_cross_4lanes_001';
+% roadnamelist{1} = 'city_cross_4lanes_002';
+% roadnamelist{2} = 'city_cross_6lanes_001';
+% % roadnamelist{4} = 'city_cross_4lanes_001_construct';
+% roadnamelist{3} = 'city_cross_4lanes_002_construct';
+% roadnamelist{4} = 'city_cross_6lanes_001_construct';
+roadnamelist{1} = 'curve_6lanes_001';
+roadnamelist{2} = 'straight_2lanes_parking';
+
+%% Download Road
+for jj = 1:length(roadnamelist)
+    roadname = roadnamelist{jj};
+st = scitran('stanfordlabs');
+hierarchy = st.projectHierarchy('Graphics assets');
+sessions     = hierarchy.sessions;
+for ii=1:length(sessions)
+    if isequal(lower(sessions{ii}.label),'road')
+        roadSession = sessions{ii};
+        break;
+    end
+end
+assetRecipe = piAssetDownload(roadSession,1,...
+                              'acquisition',roadname,...
+                              'resources',1,...
+                              'scitran',st);
 %% Combine resources together(iset3d/data, textures, scene)
-cityname = 'city1';
-resourcesCombine(roadname,cityname,25);
+cityname = sessionname;
+tic
+% about 90 seconds
+% roadname = strcat('suburb_',roadname);
+resourcesCombine(roadname,cityname,20);toc
 
 %% Zip and upload them to google cloud, only upload once.
-zipFileName = 'city1_cross_4lanes_002';
+% about 350 seconds
+tic
+% zipFileName = strrep(roadname,'suburb',cityname);
+zipFileName = strcat(sessionname,'_',roadname);
 sceneFolder = fullfile(piRootPath,'local',zipFileName);
 chdir(sceneFolder);
 allFiles = dir(sceneFolder);
@@ -60,6 +95,7 @@ cmd = sprintf('gsutil cp %s %s/',  ...
     zipFileFullPath,...
     cloudFolder);
 system(cmd);
-
-
+disp('ALL DONE!!!');
+toc
+end
 

@@ -31,6 +31,7 @@ if isempty(st), st = scitran('stanfordlabs'); end
 hierarchy = st.projectHierarchy('Graphics assets');
 sessions     = hierarchy.sessions;
 %% Create a road
+% return a road contains road information and Flyweel asset list: road.fwList;
 [road,thisR_road] = piRoadCreate('type',roadType,...
                                  'trafficflowDensity',trafficflowDensity,...
                                  'sessions',sessions,...
@@ -41,7 +42,10 @@ sessions     = hierarchy.sessions;
 
 % It takes about 6 mins to generate a trafficflow, so for each scene, we'd
 % like generate the trafficflow only once.
-trafficflowPath = fullfile(piRootPath,'local','trafficflow',sprintf('%s_trafficflow.mat',road.roadinfo.name));
+roadFolder = fileparts(thisR_road.inputFile);
+roadFolder = strsplit(roadFolder,'/');
+roadName = roadFolder{length(roadFolder)};
+trafficflowPath = fullfile(piRootPath,'local','trafficflow',sprintf('%s_trafficflow.mat',roadName));
 trafficflowFolder = fileparts(trafficflowPath);
 if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
 if ~exist(trafficflowPath,'file')
@@ -51,20 +55,21 @@ else
     load(trafficflowPath,'trafficflow');
 end
 
-
-% for jj = 1:inputs.nScene
 %% todo: create building and tree lib
 
 tic
-% Check how many subtypes there is in One type of scene;
-% index = 1; % will give a random number
-% sceneName = sprintf('%s_%d',sceneType,index);
-% Create building library list
-assetsPlaced = piSidewalkPlan(road,st);
+tree_interval = rand(1)*20+2;
 
-building_listPath = fullfile(piRootPath,'local','AssetLists','building_list.mat');
+%% tmp
+assetsPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+% place parked cars
+if contains(roadType,'parking')
+    trafficflow = piParkingPlace(road, trafficflow);
+end
+building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));
+
 if ~exist(building_listPath,'file')
-    building_list = piAssetListCreate('class','city_2',...
+    building_list = piAssetListCreate('class',sceneType,...
         'scitran',st);
     save(building_listPath,'building_list')
 else
@@ -72,23 +77,37 @@ else
 end
 buildingPosList = piBuildingPosList(building_list,thisR_road);
 assetsPlaced.building = piBuildingPlace(building_list,buildingPosList);
-
-
+%% Cat fwInfo str with road.fwList
+road = fwInfoCat(road,assetsPlaced);
+%% Assign label to geometry name, so that we can have consistent names in label.txt
+for jj = 1:length(assetsPlaced.building)
+    if ~isequal(lower(assetsPlaced.building(jj).geometry.name),'camera') && ...
+            ~contains(lower(assetsPlaced.building(jj).geometry.name),'light')
+        assetsPlaced.building(jj).geometry.name = 'building';
+    end
+end
 % Add All placed assets
 thisR_road = piAssetAdd(thisR_road, assetsPlaced);
-
+% thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
 toc
-% Download and Combine all building/tree/streetlights resouces
-
 %% Place vehicles/pedestrians
-% piTrafficPlace
 [trafficPlaced,~] = piTrafficPlace(trafficflow,...
                                                'timestamp',timestamp,...
                                                'resources',~cloudRenderFlag,...
                                                'scitran',st);
 for ii = 1: length(trafficPlaced)
-    % thisR_scene{ii} = piAssetAdd(thisR_treeAndSL,assetsPlaced{ii});
     thisR_scene = piAssetAdd(thisR_road,trafficPlaced{ii});
+end
+
+road = fwInfoCat(road,trafficPlaced{1});
+end
+function road = fwInfoCat(road,assets)
+%% cat selected fwInfo str with road.fwList
+assetFields = fieldnames(assets);
+for jj = 1:length(assetFields)
+    for kk = 1: length(assets.(assetFields{jj}))
+        road.fwList = [road.fwList,' ',assets.(assetFields{jj})(kk).fwInfo];
+    end
 end
 
 end

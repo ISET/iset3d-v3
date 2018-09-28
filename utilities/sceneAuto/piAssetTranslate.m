@@ -16,7 +16,11 @@ pos_d = p.Results.Pos_demention;
 for dd = 1:pos_d
     for ii=1:length(asset)
         % Add the translation
+        if ~isempty(translation{dd})
         translation{dd} = reshape(translation{dd},3,1);
+        else
+            translation{dd} = [0;0;0];
+        end
         asset(ii).position(:,dd) = asset(ii).position(:,dd) + translation{dd};
         % Update the position of the x-z 2d box of the asset that we use
         % for machine learning identification.

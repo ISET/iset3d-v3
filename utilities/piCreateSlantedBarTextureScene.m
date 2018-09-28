@@ -25,34 +25,37 @@ function recipe = piCreateSlantedBarTextureScene(varargin)
 parser = inputParser();
 
 % Depth in meters
-parser.addParameter('backDepth', 2, @isnumeric);
-parser.addParameter('frontDepth',1, @isnumeric);
+parser.addParameter('topDepth', 2, @isnumeric);
+parser.addParameter('bottomDepth',1, @isnumeric);
+parser.addParameter('nchecks',512,@isscalar);
 parser.addParameter('illumination', 'EqualEnergy.spd', @ischar);
 
 parser.parse(varargin{:});
-backDepth    = parser.Results.backDepth;
-frontDepth   = parser.Results.frontDepth;
+topDepth    = parser.Results.topDepth;
+bottomDepth   = parser.Results.bottomDepth;
 illumination = parser.Results.illumination;
+nchecks     = parser.Results.nchecks;
 
 %% Read in base scene
 scenePath = fullfile(piRootPath,'data','V3','slantedBarTexture');
-
-% Check plane order
 sceneName = 'slantedBarTexture.pbrt';
 
 recipe = piRead(fullfile(scenePath,sceneName),'version',3);
+
+%% Add Checkerboard texture
+recipe = piMaterialTextureAdd(recipe,'TopPlane','checkerboard','uscale',nchecks,'vscale',nchecks);
+recipe = piMaterialTextureAdd(recipe,'BottomPlane','checkerboard','uscale',nchecks,'vscale',nchecks);
+
 %% Make adjustments to the point
 
-% Clear previous transforms
-% piClearObjectTransforms(recipe,'WhitePlane');
-% piClearObjectTransforms(recipe,'BlackPlane');
-
-% Add given transforms
-recipe = piObjectTransform(recipe, 'FrontPlane', ...
-    'Translate', [0 0 frontDepth]);
-recipe = piObjectTransform(recipe, 'BackPlane', ...
-    'Translate', [0 0 backDepth]);
-
+for ii = 1:length(recipe.assets)
+    if strcmp(recipe.assets(ii).name,'TopPlane')
+        recipe.assets(ii).position = [recipe.assets(ii).position(1);recipe.assets(ii).position(2); topDepth];
+    end
+    if strcmp(recipe.assets(ii).name,'BottomPlane')
+        recipe.assets(ii).position = [recipe.assets(ii).position(1);recipe.assets(ii).position(2); bottomDepth];
+    end
+end
 %% Make adjustments to the light
 
 % Check illumination file

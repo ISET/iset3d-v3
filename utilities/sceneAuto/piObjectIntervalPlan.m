@@ -94,7 +94,7 @@ if contains(object_list(1).name,'tree')
                     objectPosition_list(count).name = sprintf('%s_tall_%03d',objname, randnum1);
                 case 'S'
                     objectPosition_list(count).name = sprintf('%s_short_%03d',objname, randnum2);
-                case 'MIX'
+                case 'Mix'
                     tmp=randi(2);
                     if (tmp==1)
                         objectPosition_list(count).name = sprintf('%s_tall_%03d',objname, randnum1);

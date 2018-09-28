@@ -1,4 +1,4 @@
-function assetsplaced = piSidewalkPlan(road,st,varargin)
+function assetsplaced = piSidewalkPlan(road,st,trafficflow,varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Function: Place objects at equal intervals on sidewalks.
 % use ABCD to represent a sidewalk
@@ -197,7 +197,11 @@ if ~(bikerack_number==0)
         load(bikerack_listPath,'bikerack_list');
     end                                     
 end
-%% place objects on sidewalks
+
+
+
+
+%% get position lists of objects
 if (addTree ==true)
     treePosition = piObjectIntervalPlan(sidewalk_list, tree_list, tree_interval, tree_offset, tree_type);
 else
@@ -205,9 +209,9 @@ else
 end
 
 if (addStreetlight ==true)
-   streetlightPosition_list = piObjectIntervalPlan(sidewalk_list, streetlight_list, streetlight_interval, streetlight_offset, streetlight_type);
+   streetlightPosition = piObjectIntervalPlan(sidewalk_list, streetlight_list, streetlight_interval, streetlight_offset, streetlight_type);
 else
-    streetlightPosition_list = struct;
+    streetlightPosition = struct;
 end
 
 if(trashcan_number==0)
@@ -223,9 +227,9 @@ else
 end
 
 if(bikerack_number==0)
-    bikerackPosition=struct;
+    bikerackPosition_list=struct;
 else
-    bikerackPosition = piObjectRandomPlan(sidewalk_list, bikerack_list, bikerack_number, bikerack_offset);
+    bikerackPosition_list = piObjectRandomPlan(sidewalk_list, bikerack_list, bikerack_number, bikerack_offset);
 end
 
 if(bench_number==0)
@@ -245,31 +249,51 @@ if(callbox_number==0)
 else
     callboxPosition = piObjectRandomPlan(sidewalk_list, callbox_list, callbox_number, callbox_offset);
 end
-    
+
+
+
+%% get the position list of pedstrian
+if isfield(trafficflow.objects,'pedestrian')
+    pedestrianPosition=struct;
+    PedNum = size(trafficflow.objects.pedestrian,2);
+    if PedNum~=0
+        for ii = 1:length(trafficflow.objects.pedestrian)
+            pedestrianPosition(ii).name = trafficflow.objects.pedestrian(ii).name;
+            pedestrianPosition(ii).position = trafficflow.objects.pedestrian(ii).pos;
+            pedestrianPosition(ii).size.w = 1;
+            pedestrianPosition(ii).size.l = 1;
+            pedestrianPosition(ii).rotate = trafficflow.objects.pedestrian(ii).orientation;
+        end
+    end
+    [~, total_list] = piCalOverlap(pedestrianPosition, bikerackPosition_list);
+else
+    PedNum = 0;
+    total_list = bikerackPosition_list;
+end
 %% consider overlap and obtain the position list of each object
-[treePosition_list, total_list] = piCalOverlap(treePosition, streetlightPosition_list);
-[bikerackPosition_list, total_list] = piCalOverlap(bikerackPosition, total_list);
+[streetlightPosition_list, total_list] = piCalOverlap(streetlightPosition, total_list);
+[treePosition_list, total_list] = piCalOverlap(treePosition, total_list);
 [callboxPosition_list, total_list] = piCalOverlap(callboxPosition, total_list);
 [billboardPosition_list, total_list] = piCalOverlap(billboardPosition, total_list);
 [benchPosition_list, total_list] = piCalOverlap(benchPosition, total_list);
 [trashcanPosition_list, total_list] = piCalOverlap(trashcanPosition, total_list);
 [stationPosition_list, total_list] = piCalOverlap(stationPosition, total_list);
 %% Place them
-if addTree ==true
+if addTree ==true && ~isempty(treePosition_list)
     assetsplaced.tree = piSidewalkPlace(tree_list,treePosition_list);end
-if billboard_number ~= 0
+if billboard_number ~= 0 && ~isempty(billboardPosition_list)
     assetsplaced.billboard = piSidewalkPlace(billboard_list,billboardPosition_list);end
-if callbox_number ~= 0
-assetsplaced.callbox = piSidewalkPlace(callbox_list,callboxPosition_list);end
-if bench_number ~=0
+if callbox_number ~= 0 && ~isempty(callboxPosition_list)
+    assetsplaced.callbox = piSidewalkPlace(callbox_list,callboxPosition_list);end
+if bench_number ~=0 && ~isempty(callboxPosition_list)
     assetsplaced.bench = piSidewalkPlace(bench_list,benchPosition_list);end
-if trashcan_number ~=0
+if trashcan_number ~=0 && ~isempty(trashcanPosition_list)
     assetsplaced.trashcan = piSidewalkPlace(trashcan_list,trashcanPosition_list);end
-if station_number ~=0
+if station_number ~=0 && ~isempty(stationPosition_list)
     assetsplaced.station = piSidewalkPlace(station_list,stationPosition_list);end
-if bikerack_number ~=0
+if bikerack_number ~=0 && ~isempty(bikerackPosition_list)
     assetsplaced.bikerack = piStreetlightPlace(bikerack_list,bikerackPosition_list);end % Change bikerackPlace
-if addStreetlight ==true
+if addStreetlight ==true && ~isempty(streetlightPosition_list)
     assetsplaced.streetlight= piStreetlightPlace(streetlight_list,streetlightPosition_list);end
 end
 

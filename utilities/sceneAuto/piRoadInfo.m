@@ -159,6 +159,90 @@ roadinfo(3).sidewalk_list(8).direction = 270;
 roadinfo(3).sidewalk_list(8).coordinate = [-15.182, 107.986+6.6];
 roadinfo(3).sidewalk_list(8).height = 0;
 roadinfo(3).sidewalk_list(8).width = 6.6;
+
+
+roadinfo(4).roadtype='straight';
+roadinfo(4).name='straight_2lanes_parking';
+roadinfo(4).scenetype='surburb';
+roadinfo(4).nlanes  =2;
+roadinfo(4).sidewalk_list(1).length = 230;
+roadinfo(4).sidewalk_list(1).direction = 0;
+roadinfo(4).sidewalk_list(1).coordinate = [-8.5140, 0.545];
+roadinfo(4).sidewalk_list(1).height = 0;
+roadinfo(4).sidewalk_list(1).width = 6.6;
+
+roadinfo(4).sidewalk_list(2).length = 230;
+roadinfo(4).sidewalk_list(2).direction = 180;
+roadinfo(4).sidewalk_list(2).coordinate = [8.5820, 233];
+roadinfo(4).sidewalk_list(2).height = 0;
+roadinfo(4).sidewalk_list(2).width = 6.6;
+
+roadinfo(4).parking_list(1).length = 230;
+roadinfo(4).parking_list(1).direction = 0;
+roadinfo(4).parking_list(1).coordinate = [-5.9, 0.545];
+roadinfo(4).parking_list(1).height = 0;
+roadinfo(4).parking_list(1).width = 2.58;
+
+roadinfo(4).parking_list(2).length = 230;
+roadinfo(4).parking_list(2).direction = 180;
+roadinfo(4).parking_list(2).coordinate = [6, 233];
+roadinfo(4).parking_list(2).height = 0;
+roadinfo(4).parking_list(2).width = 2.58;
+
+
+roadinfo(5).roadtype='curve';
+roadinfo(5).name='curve_6lanes_001';
+roadinfo(5).scenetype='surburb';
+roadinfo(5).nlanes  =6;
+roadinfo(5).sidewalk_list(1).length = 74.143;
+roadinfo(5).sidewalk_list(1).direction = 8.487;
+roadinfo(5).sidewalk_list(1).coordinate = [-16.19, 0.279];
+roadinfo(5).sidewalk_list(1).height = 0.15;
+roadinfo(5).sidewalk_list(1).width = 5;
+
+roadinfo(5).sidewalk_list(2).length = 99.253;
+roadinfo(5).sidewalk_list(2).direction = 25.708;
+roadinfo(5).sidewalk_list(2).coordinate = [-5.671, 73.846];
+roadinfo(5).sidewalk_list(2).height = 0.15;
+roadinfo(5).sidewalk_list(2).width = 5;
+
+roadinfo(5).sidewalk_list(3).length = 81.119;
+roadinfo(5).sidewalk_list(3).direction = 58.93;
+roadinfo(5).sidewalk_list(3).coordinate = [42.329, 155.429];
+roadinfo(5).sidewalk_list(3).height = 0.15;
+roadinfo(5).sidewalk_list(3).width = 5;
+
+roadinfo(5).sidewalk_list(4).length = 76.661;
+roadinfo(5).sidewalk_list(4).direction = 83.08;
+roadinfo(5).sidewalk_list(4).coordinate = [111.797, 197.193];
+roadinfo(5).sidewalk_list(4).height = 0.15;
+roadinfo(5).sidewalk_list(4).width = 5;
+
+roadinfo(5).sidewalk_list(5).length = 76.896;
+roadinfo(5).sidewalk_list(5).direction = 190.655;
+roadinfo(5).sidewalk_list(5).coordinate = [27.582, 75.686];
+roadinfo(5).sidewalk_list(5).height = 0.15;
+roadinfo(5).sidewalk_list(5).width = 5;
+
+roadinfo(5).sidewalk_list(6).length = 30.899;
+roadinfo(5).sidewalk_list(6).direction = 207.1570;
+roadinfo(5).sidewalk_list(6).coordinate = [41.464, 102.723];
+roadinfo(5).sidewalk_list(6).height = 0.15;
+roadinfo(5).sidewalk_list(6).width = 5;
+
+roadinfo(5).sidewalk_list(7).length = 73.202;
+roadinfo(5).sidewalk_list(7).direction = 225.3800;
+roadinfo(5).sidewalk_list(7).coordinate = [93.501, 154.31];
+roadinfo(5).sidewalk_list(7).height = 0.15;
+roadinfo(5).sidewalk_list(7).width = 5;
+
+roadinfo(5).sidewalk_list(8).length = 95.53;
+roadinfo(5).sidewalk_list(8).direction = 255.774;
+roadinfo(5).sidewalk_list(8).coordinate = [186.991, 177.976];
+roadinfo(5).sidewalk_list(8).height = 0.15;
+roadinfo(5).sidewalk_list(8).width = 5;
+
+
 %% straight
 currdir = pwd;
 filepath = fullfile(piRootPath,'configuration');

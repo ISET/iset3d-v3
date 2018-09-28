@@ -81,20 +81,45 @@ textureLines = txtLines(~cellfun('isempty',txtLines));
 
 for jj = 1: length(textureLines)
     textureLines_tmp = [];
-    thisLine_tmp = textscan(textureLines{jj},'%q');
-    thisLine_tmp = thisLine_tmp{1};
+%     thisLine_tmp = textscan(textureLines{jj},'%q');
+    thisLine_tmp= strsplit(textureLines{jj},' ');
+    if ~strcmp(thisLine_tmp{length(thisLine_tmp)}(1),'"')
+        for nn= length(thisLine_tmp):-1:1
+        if strcmp(thisLine_tmp{nn}(1),'"')
+            % combine all the string from nn to end;
+            break;
+        end
+        end
+    end
+%     thisLine_tmp = thisLine_tmp{1};
     for ii = 1:length(thisLine_tmp)
-        if contains(thisLine_tmp{ii},'.png')
+        if contains(thisLine_tmp{ii},'filename')
+            index = ii;
+        end
+    end
+    for ii = 1:length(thisLine_tmp)
+        if contains(thisLine_tmp{ii},'.png') 
+            if contains(thisLine_tmp{ii-1},'filename')
             filename = thisLine_tmp{ii};
-            if ~contains(filename,'textures/')
-            thisLine_tmp{ii} = fullfile('textures',filename);
+            if ~contains(filename,'"textures/')
+            thisLine_tmp{ii} = fullfile('"textures',filename(2:length(filename)));
+            end
+            else
+                thisLine_tmp{index+1} = thisLine_tmp{ii};
+                thisLine_tmp(index+2:ii)   = '';
+                filename = thisLine_tmp{index+1};
+            if ~contains(filename,'"textures/')
+            thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
+            end                
             end
         end
+    end
+    for ii = 1:length(thisLine_tmp)
         if ii == 1
             textureLines_tmp = strcat(textureLines_tmp,thisLine_tmp{ii});
         else
-            string = sprintf('"%s"',thisLine_tmp{ii});
-            textureLines_tmp = strcat(textureLines_tmp,{' '},string);
+%             string = sprintf('%s"',thisLine_tmp{ii});
+            textureLines_tmp = strcat(textureLines_tmp,{' '},thisLine_tmp{ii});
         end 
     end
     textureLines{jj} = textureLines_tmp{1};
@@ -196,6 +221,11 @@ if ~isempty(materials.rgbks)
     val = strcat(val, val_rgbks);
 end
 
+if ~isempty(materials.rgbkt)
+    val_rgbkt = sprintf(' "rgb Kt" [%0.5f %0.5f %0.5f] ',materials.rgbkt);
+    val = strcat(val, val_rgbkt);
+end
+
 if ~isempty(materials.rgbkd)
     val_rgbkd = sprintf(' "rgb Kd" [%0.5f %0.5f %0.5f] ',materials.rgbkd);
     val = strcat(val, val_rgbkd);
@@ -210,7 +240,16 @@ if ~isempty(materials.colorks)
     val_colorks = sprintf(' "color Ks" [%0.5f %0.5f %0.5f] ',materials.colorks);
     val = strcat(val, val_colorks);
 end
-
+if isfield(materials, 'colorreflect')
+    if ~isempty(materials.colorreflect)
+        val_colorreflect = sprintf(' "color reflect" [%0.5f %0.5f %0.5f] ',materials.colorreflect);
+        val = strcat(val, val_colorreflect);
+    end
+    if ~isempty(materials.colortransmit)
+        val_colortransmit = sprintf(' "color transmit" [%0.5f %0.5f %0.5f] ',materials.colortransmit);
+        val = strcat(val, val_colortransmit);
+    end
+end
 if ~isempty(materials.floaturoughness)
     val_floaturoughness = sprintf(' "float uroughness" [%0.5f] ',materials.floaturoughness);
     val = strcat(val, val_floaturoughness);

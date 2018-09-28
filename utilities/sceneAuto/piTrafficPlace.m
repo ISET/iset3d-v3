@@ -33,7 +33,7 @@ if isempty(st)
     st = scitran('stanfordlabs');
 end
 %% Download asssets with respect to the number and class of Sumo output.
-if isfield(trafficflow(timestamp).objects,'car')
+if isfield(trafficflow(timestamp).objects,'car') || isfield(trafficflow(timestamp).objects,'passenger')
     ncars = length(trafficflow(timestamp).objects.car);
 %     [~,carList] = piAssetListCreate('class','car',...
 %                                       'scitran',st);
@@ -83,15 +83,14 @@ assets = piAssetCreate('ncars',ncars,...
 %% objects positions are classified by class, building/trees might be different.
 assets_updated = assets;
 
-
 if nScene == 1
     assetClassList = fieldnames(assets);
     for hh = 1: length(assetClassList)
         assetClass = assetClassList{hh};
         index = 1;
         order = randperm(numel(trafficflow(timestamp).objects.(assetClass)));
-        for ii = 1:numel(trafficflow(timestamp).objects.(assetClass)) 
-            assets_shuffled.(assetClass)(ii) = trafficflow(timestamp).objects.(assetClass)(order(ii));
+        for jj = 1:numel(trafficflow(timestamp).objects.(assetClass)) 
+            assets_shuffled.(assetClass)(jj) = trafficflow(timestamp).objects.(assetClass)(order(jj));
         end
         for ii = 1: length(assets.(assetClass))
             
@@ -103,6 +102,7 @@ if nScene == 1
                 rotation{gg} = assets_shuffled.(assetClass)(index).orientation-90;
                 index = index+1;
             end
+            fprintf('%s: ii = %d;jj = %d \n',assetClass,ii,jj);
             assets_updated.(assetClass)(ii).geometry = piAssetTranslate(assets.(assetClass)(ii).geometry,position,'Pos_demention',n);
             assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,rotation,'Pos_demention',n);
         end

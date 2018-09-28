@@ -14,11 +14,11 @@ varargin =ieParamFormat(varargin);
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 % default is flase, will turn on for night scene
 p.addParameter('lightsFlag',false,@islogical);
-p.addParameter('trafficflow',[]);
+p.addParameter('thistrafficflow',[]);
 
 p.parse(thisR,varargin{:});
 lightsFlag  = p.Results.lightsFlag;
-trafficflow = p.Results.trafficflow;
+thistrafficflow = p.Results.thistrafficflow;
 %%
 [Filepath,scene_fname] = fileparts(thisR.outputFile);
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));[~,n,e]=fileparts(fname);
@@ -116,71 +116,23 @@ for ii = 1: length(obj)
             end
         end
     end
-    %{
-    %% To add new parser for xml2struct
-        if contains(obj(ii).name,'trafficlight') && isempty(obj(ii).children) && isfield(trafficflow,light)
-            if contains(obj(ii).name,'green')
-                from = obj(ii).position;
-                obj(ii).position = [0 0 0];
-                fprintf(fid_obj,'AttributeBegin \n');
-                    if isempty(obj(ii).position)
-                        fprintf(fid_obj,'Translate 0 0 0 \n');
-                    else
-                        obj_position = obj(ii).position;
-                        fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                            obj_position(2),obj_position(3));
-                    end
-                    if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0;0;0;0])
-                        obj_rotate = obj(ii).rotate(:,gg);
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
-                            obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                    fprintf(fid_obj,'LightSource "point" "color I" [0.01 0.5 0.01] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
-                        from(1),from(2),from(3));
-                    fprintf(fid_obj,'AttributeEnd \n \n');
-                    end
-            end
-            if contains(obj(ii).name,'yellow')
-                from = obj(ii).position;
-                obj(ii).position = [0 0 0];
-                fprintf(fid_obj,'AttributeBegin \n');
-                    if isempty(obj(ii).position)
-                        fprintf(fid_obj,'Translate 0 0 0 \n');
-                    else
-                        obj_position = obj(ii).position;
-                        fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                            obj_position(2),obj_position(3));
-                    end
-                    if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0;0;0;0])
-                        obj_rotate = obj(ii).rotate(:,gg);
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
-                            obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                    fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.5 0.01] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
-                        from(1),from(2),from(3));
-                    fprintf(fid_obj,'AttributeEnd \n \n');
-                    end
-            end
-            if contains(obj(ii).name,'red')
-                from = obj(ii).position;
-                obj(ii).position = [0 0 0];
-                fprintf(fid_obj,'AttributeBegin \n');
-                    if isempty(obj(ii).position)
-                        fprintf(fid_obj,'Translate 0 0 0 \n');
-                    else
-                        obj_position = obj(ii).position;
-                        fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                            obj_position(2),obj_position(3));
-                    end
-                    if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0;0;0;0])
-                        obj_rotate = obj(ii).rotate(:,gg);
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
-                            obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                    fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.01 0.01] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
-                        from(1),from(2),from(3));
-                    fprintf(fid_obj,'AttributeEnd \n \n');
-                    end
+    if ~isempty(thistrafficflow)
+        for jj = 1:8
+            for mm = 1: length(obj)
+                if mod(jj,4)~=0
+                    num = mod(jj,4);
+                else num = 4;
+                end
+                order = floor((jj+3)/4);
+                if contains(obj(mm).name,sprintf('trafficlight_%03d',num))...
+                        && contains(obj(mm).name,sprintf('_%d_',order)) ...
+                        &&contains(obj(mm).name,thistrafficflow.light(jj).State)...
+                        &&isempty(obj(mm).children) && isfield(thistrafficflow,'light')
+                    piTrafficlightAssign(fid_obj,obj(mm));
+                end
             end
         end
-    %}
+    end
 end
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);

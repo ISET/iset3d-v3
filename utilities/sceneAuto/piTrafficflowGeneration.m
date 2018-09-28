@@ -22,18 +22,21 @@ function trafficflow=piTrafficflowGeneration(road,varargin)
 % Minghao Shen, VISTALAB, 2018
 %% SUMO_HOME environment variable
 if ismac
-    [~,sumohome]=system("source ~/.bash_profile;echo $SUMO_HOME");
+    setenv('SUMO_HOME','/Users/zhenyiliu/Documents/sumo/sumo-1.0.0');
+    sumohome = getenv('SUMO_HOME');
 elseif isunix
     [~,sumohome]=system("source ~/.bashrc;echo $SUMO_HOME");
+    sumohome=sumohome(1:length(sumohome)-1);
 else
     [~,sumohome]=system("echo $SUMO_HOME");
+    sumohome=sumohome(1:length(sumohome)-1);
 end
 
 if length(sumohome)<2
     error(sprintf("Please add SUMO_HOME to your system path.\n")+...
         "Refer to http://sumo.dlr.de/wiki/Basics/Basic_Computer_Skills");
 end
-sumohome=sumohome(1:length(sumohome)-1);
+
 
 %% Parameter Definition
 p=inputParser;
@@ -113,7 +116,14 @@ for ii=1:vType_interval.Count
     % because duaIterate generates vehicle id from 0 to end;
     % so vehicles share the same id if you run duaIterate multiple times;
     % separating id among vehicle types is needed;
-    route_collect=strcat(route_collect," ",vTypes{ii},'/',vTypes{ii},'_',sprintf("%03d",iterMax-1),'.rou.xml');
+    if ~isempty(route_collect)
+        route_collect=strcat(route_collect,", ");
+    end
+    route_collect=strcat(route_collect,vTypes{ii},'/',vTypes{ii},'_',sprintf("%03d",iterMax-1),'.rou.xml');
+    
+    
+    
+    
     route_name=strcat(vTypes{ii},'_',sprintf("%03d",iterMax-1),'.rou.xml');
     route_file=fileread(route_name);
     expression='(?<=id=")(\w*)(?=" type="\w*")';

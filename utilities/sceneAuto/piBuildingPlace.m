@@ -1,4 +1,4 @@
-function assetsPlaced = piSidewalkPlace(assetsList,buildingPosList)
+function assetsPlaced = piBuildingPlace(assetsList,buildingPosList)
 %% For building assets, place the assets exactly by names
 %
 %
@@ -22,7 +22,7 @@ end
 %asset = buildingList.building;
 asset = assetsList;
 for ii = 1: length(buildingPosList_tmp)
-    gg=1;
+%     gg=1;
     % if ~isequal(buildingPosList_tmp(ii).count,1)
     n = buildingPosList_tmp(ii).count;
     for hh = 1: length(asset(ii).geometry)
@@ -36,6 +36,7 @@ for ii = 1: length(buildingPosList_tmp)
                 asset(dd).geometry(hh).rotate = repmat(rot,1,uint8(buildingPosList_tmp(ii).count));
                 position=cell(n,1);
                 rotation=cell(n,1);
+                gg=1;
                 for jj = 1:length(buildingPosList)
                     if isequal(buildingPosList_tmp(ii).name{1},buildingPosList(jj).name)
                         position{gg} = buildingPosList(jj).position;

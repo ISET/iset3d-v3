@@ -105,7 +105,9 @@ if ~convertedflag
                     % Add type of the object, get it from the file name,
                     % could be wrong, but this is how we named the object
                 else
-                    groupobj(hh).rotate    = [];
+                    groupobj(hh).rotate(:,1) = [0;1;0;0];
+                    groupobj(hh).rotate(:,2) = [0;0;1;0];
+                    groupobj(hh).rotate(:,3) = [0;0;0;1];
                     groupobj(hh).position = [0;0;0];
                 end
                 

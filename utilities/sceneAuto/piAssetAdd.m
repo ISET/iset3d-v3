@@ -1,13 +1,15 @@
-function [thisR] = piAssetAdd(thisR,assets,varargin)
+function [thisR] = piAssetAdd(renderRecipe,assets,varargin)
 % objects = assets;
 % scene = scene_1;
 % Assemble a scene with objects.
 % Objects added by piAssetsCreate.m.
 %%
 p = inputParser;
+p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 p.addParameter('material',true);
 p.addParameter('geometry',true);
-p.parse(varargin{:});
+p.parse(renderRecipe,varargin{:});
+thisR     = p.Results.renderRecipe;
 material  = p.Results.material;
 geometry  = p.Results.geometry;
 %% Combine them with Main Scene thisR and Geometry Struct

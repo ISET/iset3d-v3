@@ -29,30 +29,62 @@
 %
 %
 % Jiaqi Zhang
-% 08.08.2018
+% 09.21.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [buildingPosList] = piBuildingPosList(buildingList, objects)
+function [buildingPosList] = piBuildingPosList_jiaqi0920(buildingList, objects)
 buildingPosList = struct;
 for ii = 1:length(buildingList)
     building_list.size(ii, 1) = buildingList(ii).geometry.size.l;
     building_list.size(ii, 2) = buildingList(ii).geometry.size.w;
     building_list.name{ii} = buildingList(ii).geometry.name;
 end
-count = 0;
+count = 1;  % initial parameters
 tmp = 0;
 buildingPosList_tmp = struct;
 
 for kk = 1:length(objects.assets)
     name = strsplit(objects.assets(kk).name, '_'); 
     if strcmp(name{1}, 'Plane') % if the object is a building region.
-        count_before = count+1;
+        count_before = count;
         type = name{2};     % extract region information
         lenx_tmp = objects.assets(kk).size.l;
         leny_tmp = objects.assets(kk).size.w;
         coordination = objects.assets(kk).position;
         y_up = coordination(2);
         coordination = [coordination(1),coordination(3)];
-        [buildingPosList_tmp, count] = buildingPlan(building_list, lenx_tmp, leny_tmp, coordination, buildingPosList_tmp, count, type);
+        switch type
+            case 'front'
+                if coordination(1)<0
+                    ankor = coordination + [lenx_tmp, 0];
+                else
+                    ankor = coordination;
+                end
+            case 'back'
+                if coordination(1)>0
+                    ankor = coordination - [lenx_tmp, 0];
+                else
+                    ankor = coordination;
+                end
+            otherwise
+                ankor = coordination;
+        end
+        [buildingPosList_tmp, count] = buildingPlan(building_list, ...
+            lenx_tmp, leny_tmp, coordination, buildingPosList_tmp, count, type, ankor);
+% %% Delete unnecessary buildings from building list
+% if initialStruct == 1   % if it's first time use struct, initial it
+%     FieldName = fieldnames(buildingPosList_tmp)';
+%     FieldName{2,1} = {};
+%     buildingPosListDeleted = struct(FieldName{:});
+%     initialStruct = 0;
+% end
+%     finalCount = count_before;
+%     margin = 10;
+%     for ll = count_before:count
+%         if (abs(coordination(1)-buildingPosList_tmp(ll).position(1))<(lenx_tmp/margin))||(abs(coordination(2)-buildingPosList_tmp(ll).position(2))<(leny_tmp/margin))
+%             buildingPosListDeleted(finalCount) = buildingPosList_tmp(ll);
+%             finalCount = finalCount + 1;
+%         end
+%     end
 %% change the structure of the output data
         for jj = count_before:length(buildingPosList_tmp)
             buildingPosList(jj).name = buildingPosList_tmp(jj).name;
@@ -60,55 +92,56 @@ for kk = 1:length(objects.assets)
             buildingPosList_tmp(jj).position(2)];
             buildingPosList(jj).rotate = buildingPosList_tmp(jj).rotate;
         end
+
 %% test algotithm. Comment this part when using.
         figure(1);hold on;xlim([-130, 130]);ylim([-30, 280]);hold on;
 switch type
     case 'front'
         % test algorithm for 'front' situation
 
-            for jj = count_before:length(buildingPosList_tmp)
+            for jj = count_before:length(buildingPosList)
                 for ii = 1:size(building_list.name, 2)
-                    if strcmpi(building_list.name(ii), buildingPosList_tmp(jj).name)
+                    if strcmpi(building_list.name(ii), buildingPosList(jj).name)
                         xx = building_list.size(ii, 1);
                         yy = building_list.size(ii, 2);
                     end
                 end
-                rectangle('Position',[buildingPosList_tmp(jj).position,xx,yy]);title('front');
+                rectangle('Position',[buildingPosList(jj).position(1),buildingPosList(jj).position(3),xx,yy]);title('front');
             end
     case 'right'
         % test algorithm for 'right' situation
 
-            for jj = count_before:length(buildingPosList_tmp)
+            for jj = count_before:length(buildingPosList)
                 for ii = 1:size(building_list.name, 2)
-                    if strcmpi(building_list.name(ii), buildingPosList_tmp(jj).name)
+                    if strcmpi(building_list.name(ii), buildingPosList(jj).name)
                         xx = building_list.size(ii, 1);
                         yy = building_list.size(ii, 2);
                     end
                 end
-                rectangle('Position',[buildingPosList_tmp(jj).position-[0, xx],yy,xx]);title('right');
+                rectangle('Position',[buildingPosList(jj).position(1),buildingPosList(jj).position(3)-xx,yy,xx]);title('right');
             end
     case 'left'
         % test algorithm for 'left' situation
 
-            for jj = count_before:length(buildingPosList_tmp)
+            for jj = count_before:length(buildingPosList)
                 for ii = 1:size(building_list.name, 2)
-                    if strcmpi(building_list.name(ii), buildingPosList_tmp(jj).name)
+                    if strcmpi(building_list.name(ii), buildingPosList(jj).name)
                         xx = building_list.size(ii, 1);
                         yy = building_list.size(ii, 2);
                     end
                 end
-                rectangle('Position',[buildingPosList_tmp(jj).position-[yy,0],yy,xx]);title('left');
+                rectangle('Position',[buildingPosList(jj).position(1)-yy,buildingPosList(jj).position(3),yy,xx]);title('left');
             end
         % test algorithm for 'back' situation
     case 'back'
-            for jj = count_before:length(buildingPosList_tmp)
+            for jj = count_before:length(buildingPosList)
                 for ii = 1:size(building_list.name, 2)
-                    if strcmpi(building_list.name(ii), buildingPosList_tmp(jj).name)
+                    if strcmpi(building_list.name(ii), buildingPosList(jj).name)
                         xx = building_list.size(ii, 1);
                         yy = building_list.size(ii, 2);
                     end
                 end
-                rectangle('Position',[buildingPosList_tmp(jj).position-[xx,yy],xx,yy]);title('back');
+                rectangle('Position',[buildingPosList(jj).position(1)-xx,buildingPosList(jj).position(3)-yy,xx,yy]);title('back');
             end
 end
 tmp = tmp + 1;
@@ -118,12 +151,15 @@ disp(tmp);
     end
 
 end
+%%
 
 end
 
 
-function [settle_list, count] = buildingPlan(building_list, lenx_tmp, leny_tmp, coordination, settle_list, count, type)
-offset = 2; % adjust the interval berween the buildings.
+function [settle_list, count] = buildingPlan(building_list, lenx_tmp, ...
+    leny_tmp, coordination, settle_list, count, type, ankor)
+offset = 3; % adjust the interval berween the buildings. Don't too big! Or might cause problem!
+
 %% calculate the parameter in spare region.
 switch type
     case 'front'
@@ -172,7 +208,7 @@ sel = intersect(selectx, selecty);  % sel record the index of buildings that can
 % the building in spare region. And update the new spare region, then recursion.
 
 if ~isempty(sel)    % it is possible to put a new building on spare region
-    count = count + 1;  % count the building amount
+    
     building_idx = sel(randi([1,size(sel,1)],1,1)); % randomly get index of proper building
     id = building_list.name{building_idx}; % get name and size of the proper building
     build_x = building_list.size(building_idx, 1) + offset;
@@ -196,14 +232,26 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
             next_y2 = D2(2) - C2(2);
     
             % record the info of new biulding, including id, x and y coordinates
-            settle_list(count).name = id;
-            settle_list(count).position(1, 1) = B(1);
-            settle_list(count).position(1, 2) = B(2);
-            settle_list(count).rotate = 0;
+            % only record the building's info that confirm our requirments
+            if B(1)<0
+                marginX = 24; marginY = 5;
+            else
+                marginX = 5; marginY = 5;
+            end
+            
+            if (abs(ankor(1)-B(1))<marginX)||(abs(ankor(2)-B(2))<marginY)
+            
+                settle_list(count).name = id;
+                settle_list(count).position(1, 1) = B(1);
+                settle_list(count).position(1, 2) = B(2);
+                settle_list(count).rotate = 0;
+                count = count + 1;  % count the buildings amount
+            end
+
     
             % recursion, spare region 1 is priority
-            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type);
-            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type);
+            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type, ankor);
+            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type, ankor);
             
         case 'right'
             A1 = A; 
@@ -219,14 +267,17 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
             D2 = D;
             next_x2 = C2(1) - B2(1);
             next_y2 = C2(2) - D2(2);
-    
+            
+            if abs(ankor(1)-B(1))<5%||(abs(ankor(2)-B(2))<11)
             settle_list(count).name = id;
             settle_list(count).position(1, 1) = B(1);
             settle_list(count).position(1, 2) = B(2);
             settle_list(count).rotate = 90;
+            count = count + 1;  % count the buildings amount
+            end
             % recursion, spare region 1 is priority
-            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type);
-            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type);
+            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type, ankor);
+            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type, ankor);
             
         case 'left'
             % calculate info of spare region 1
@@ -244,16 +295,19 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
             D2 = D;
             next_x2 = C2(1) - D2(1);
             next_y2 = C2(2) - B2(2);
-    
+            
+            if abs(ankor(1)-B(1))<5%||(abs(ankor(2)-B(2))<11)
             % record the info of new biulding, including id, x and y coordinates
             settle_list(count).name = id;
             settle_list(count).position(1, 1) = B(1);
             settle_list(count).position(1, 2) = B(2);
             settle_list(count).rotate = 270;
+            count = count + 1;  % count the buildings amount
+            end
     
             % recursion, spare region 1 is priority
-            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type);
-            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type);
+            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type, ankor);
+            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type, ankor);
         case 'back'
             % calculate info of spare region 1
             A1 = A; 
@@ -270,16 +324,25 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
             D2 = D;
             next_x2 = B2(1) - C2(1);
             next_y2 = C2(2) - D2(2);
-    
+            
+            if B(1)>0
+                marginX = 24; marginY = 5;
+            else
+                marginX = 5; marginY = 5;
+            end
+            
+            if (abs(ankor(1)-B(1))<marginX)||(abs(ankor(2)-B(2))<marginY)
             % record the info of new biulding, including id, x and y coordinates
             settle_list(count).name = id;
             settle_list(count).position(1, 1) = B(1);
             settle_list(count).position(1, 2) = B(2);
             settle_list(count).rotate = 180;
+            count = count + 1;  % count the buildings amount
+            end
 
             % recursion, spare region 1 is priority
-            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type);
-            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type);
+            [settle_list, count] = buildingPlan(building_list, next_x1, next_y1, B1, settle_list, count, type, ankor);
+            [settle_list, count] = buildingPlan(building_list, next_x2, next_y2, B2, settle_list, count, type, ankor);
             
     end
 else

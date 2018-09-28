@@ -61,7 +61,7 @@ p.addParameter('creatematerials',false,@islogical);
 p.addParameter('lightsFlag',false,@islogical);
 
 % Read trafficflow variable
-p.addParameter('trafficflow',[]);
+p.addParameter('thistrafficflow',[]);
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
@@ -72,7 +72,7 @@ overwritematerials  = p.Results.overwritematerials;
 overwritegeometry   = p.Results.overwritegeometry;
 creatematerials     = p.Results.creatematerials;
 lightsFlag          = p.Results.lightsFlag;
-trafficflow         = p.Results.trafficflow;
+thistrafficflow         = p.Results.thistrafficflow;
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
@@ -372,7 +372,7 @@ end
 %% Overwirte geometry.pbrt
 if contains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
-    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'trafficflow',trafficflow); 
+    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'thistrafficflow',thistrafficflow); 
     end
 end
 

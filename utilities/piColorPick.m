@@ -5,15 +5,13 @@ if contains(color,'random')
         'blue','silver',''};
     index = rand;
 %     color = colorlist{index};
-if index  <= 0.2, color = 'white';end
-if index>0.2&&index<=0.4, color = 'black';end
-if index>0.4&&index<=0.6, color = 'red';end
-if index>0.6&&index<=0.8, color = 'blue';end
-if index>0.8&&index<=0.84, color = 'silver';end
-if index>0.84&&index<=0.88, color = 'grey';end
-if index>0.88&&index<=0.91, color = 'green';end
-if index>0.91&&index<=0.94, color = 'yellow';end
-if index>0.94&&index<=1, color = 'brown';end
+if index  <= 0.3, color = 'white';end
+if index>0.3&&index<=0.5, color = 'black';end
+if index>0.5&&index<=0.65, color = 'red';end
+if index>0.65&&index<=0.8, color = 'blue';end
+if index>0.8&&index<=0.85, color = 'green';end
+if index>0.85&&index<=0.90, color = 'yellow';end
+if index>0.90&&index<=1, color = 'silver';end
      rgb = colorswitch(color);
 else
     rgb = colorswitch(color);
@@ -28,23 +26,23 @@ switch color
         b = g;
         rgb = [r/255 g/255 b/255];
     case 'white'
-        r = 254.9;
+        r = 250;
         g = r;
         b = g;
         rgb = [r/255 g/255 b/255];
     case 'black'
-        r = 1;
+        r = 10;
         g = r;
         b = g;
         rgb = [r/255 g/255 b/255];
     case 'red'
-        r = 254.9;
+        r = 220;
         g = 1;
         b = 1;
         rgb = [r/255 g/255 b/255];
     case 'blue'
         r = 1;
-        b = 254.9;
+        b = 220;
         g = 1;
         rgb = [r/255 g/255 b/255];
     case 'green'
@@ -53,17 +51,17 @@ switch color
         b = 91;
         rgb = [r/255 g/255 b/255];
     case 'yellow'
-        r = 254.9;
-        g = 254.9;
-        b = g-80;
+        r = 249;
+        g = 184;
+        b = 68;
         rgb = [r/255 g/255 b/255];
     case 'silver'
-        r = 220;
+        r = 179;
         g = r;
         b = g;
         rgb = [r/255 g/255 b/255];
     case 'grey'
-        r = 128;
+        r = 104;
         g = r;
         b = g;
         rgb = [r/255 g/255 b/255];

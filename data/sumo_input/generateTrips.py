@@ -96,30 +96,22 @@ def writeTripXml(sumoNet, options):
         for t in range(int(options.end)):
             for edge in sumoNet.getEdges():
                 reachableDict = reachable_edge(sumoNet, edge.getID())
-                if reachableDict:
-                    for reachableEdge in reachableDict:
-                        # trip generation probability
-                        # defined here
-                        if random.uniform(0, 1) < options.probability:
-                            if options.pedestrians:
-                                print("    <person id=\"{}\" depart=\"{}\" departPos=\"random\">".format('ped'+str(objNum), t), file=trips)
-                                print("        <walk from=\"{}\" to=\"{}\" arrivalPos=\"random\"/>".format(edge.getID(), reachableEdge.getID()), file=trips)
-                                print("    </person>", file=trips)
-                            else:
-                                print("    <trip id=\"{}\" depart=\"{}\" from=\"{}\" to=\"{}\" type=\"{}\"/>".format(
-                                    options.vClass+str(objNum), t, edge.getID(), reachableEdge.getID(), options.vClass), file=trips)
-                            objNum = objNum+1
+                reachableDict[edge]=0
+                for reachableEdge in reachableDict:
+                    # trip generation probability
+                    # defined here
+                    if random.uniform(0, 1) < options.probability:
+                        if options.pedestrians:
+                            print("    <person id=\"{}\" depart=\"{}\" departPos=\"random\">".format('ped'+str(objNum), t), file=trips)
+                            print("        <walk from=\"{}\" to=\"{}\" arrivalPos=\"random\"/>".format(edge.getID(), reachableEdge.getID()), file=trips)
+                            print("    </person>", file=trips)
+                        else:
+                            print("    <trip id=\"{}\" depart=\"{}\" from=\"{}\" to=\"{}\" type=\"{}\"/>".format(
+                                options.vClass+str(objNum), t, edge.getID(), reachableEdge.getID(), options.vClass), file=trips)
+                        objNum = objNum+1
         print("</routes>",file=trips)
         trips.close()
 
-'''
-def test():
-    a={'a':1,'b':2}
-    b={}
-    c={}
-    shit=mergeDictList([a,b,c])
-    print(shit)
-'''
 
 def main(options):
     net = sumolib.net.readNet(options.netFile)

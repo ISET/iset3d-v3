@@ -30,7 +30,19 @@ case contains(mList(ii),'carbody')
 %}
 
 for ii = 1:length(mlist)
-    if  contains(mlist(ii),'carpaint') || contains(mlist(ii),'carbody') && ~contains(mlist(ii),'paint_base')
+    if  contains(mlist(ii),'carbody') && ~contains(mlist(ii),'paint_base')
+        if contains(mlist(ii),'black')
+            colorkd = piColorPick('black');
+        elseif contains(mlist(ii),'white')
+            colorkd = piColorPick('white');
+        else
+            colorkd = piColorPick('random');
+        end
+        name = cell2mat(mlist(ii));
+        material = thisR.materials.list.(name);    % A string labeling the material 
+        target = thisR.materials.lib.carpaintmix;  % 
+        piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
+    elseif contains(mlist(ii),'carpaint') && ~contains(mlist(ii),'paint_base')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % 
@@ -56,8 +68,9 @@ for ii = 1:length(mlist)
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
-        rgbkr = [1 0 0];
+        rgbkr = [1 0.1 0.1];
         piMaterialAssign(thisR,material.name,target,'rgbkr',rgbkr);
+        thisR.materials.list.(name).rgbkt = [0.7 0.1 0.1];
     elseif contains(mlist(ii),'chrome')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
@@ -93,11 +106,11 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         piMaterialAssign(thisR,material.name,target);
-    elseif contains(mlist(ii),'retro')
-        name = cell2mat(mlist(ii));
-        material = thisR.materials.list.(name);
-        target = thisR.materials.lib.retroreflective;
-        piMaterialAssign(thisR,material.name,target);
+%     elseif contains(mlist(ii),'retro')
+%         name = cell2mat(mlist(ii));
+%         material = thisR.materials.list.(name);
+%         target = thisR.materials.lib.retroreflective;
+%         piMaterialAssign(thisR,material.name,target);
     elseif contains(mlist(ii),'Bodymat')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);

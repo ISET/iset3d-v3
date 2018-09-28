@@ -12,12 +12,15 @@ carlist = trafficflow.objects.car;
 idx = [];
 if isempty(CamPos)
     if isfield(trafficflow.objects,'car')
-        for ii = 1:100
-            idx = randi(length(carlist),1);
+        dd=1;
+        for ii = 1:length(carlist)
             if ~isempty(CamOri)
-                orientation = carlist(idx).orientation-90;
-                if (orientation-CamOri) < 2
-                    break;
+                orientation = carlist(ii).orientation-90;
+                if orientation <0
+                    orientation = orientation+360;
+                end
+                if abs(orientation-CamOri) < 20
+                    idx(dd) = ii;dd=dd+1;
                 end
             end
         end
@@ -37,9 +40,15 @@ else
         end
     end
 end
+
 if ~isempty(idx)
+    idx_num = randi(length(idx),1);
+    idx = idx(idx_num);
     from = trafficflow.objects.car(idx).pos;
     orientation = carlist(idx).orientation-90;
+    if orientation <0
+        orientation = orientation+360;
+    end
     if ~isempty(CamOri)
         
     end

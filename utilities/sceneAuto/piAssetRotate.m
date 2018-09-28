@@ -10,7 +10,12 @@ for dd = 1:pos_d
     for ii=1:length(object)
         % rotate car
         if isfield(object(ii),'children')
-            if length(object(ii).children) >= 2
+            if length(object(ii).children) >= 1
+                if isempty(object(ii).rotate)
+                    object(ii).rotate(:,1) = [0;1;0;0];
+                    object(ii).rotate(:,2) = [0;0;1;0];
+                    object(ii).rotate(:,3) = [0;0;0;1];
+                end
                 object(ii).rotate(:,dd*3-1) = [0;1;0;0];
                 object(ii).rotate(:,dd*3-2) = [degree{dd};0;1;0];
                 object(ii).rotate(:,dd*3)   = [0;0;0;1];

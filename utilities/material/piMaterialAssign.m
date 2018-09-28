@@ -35,6 +35,8 @@ p.addParameter('rgbkt',[]);
 p.addParameter('colorkd',[]);
 p.addParameter('colorks',[]);
 
+
+
 p.parse(thisR, material,target,varargin{:});
 
 %% Find which material in the list matches the material string

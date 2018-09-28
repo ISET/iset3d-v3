@@ -38,7 +38,8 @@ end
 containerID = idGet(thisSession,'data type','session');
 fileType_json ='source code'; % json
 [recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
-
+fileType = 'CG Resource';
+[resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
 %%
 nDatabaseAssets = length(recipeFiles);
 % assetList = randi(nDatabaseAssets,nassets,1);
@@ -72,6 +73,7 @@ if isempty(acquisitionname)
         assetlist(ii).material.txtLines = thisR.materials.txtLines;
         assetlist(ii).geometry = thisR.assets;
         assetlist(ii).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
+        assetlist(ii).fwInfo       = [resource_acqID{ii},' ',resourceFiles{ii}{1}.name];
     end
     
     fprintf('%d files added to the list.\n',nDatabaseAssets);
@@ -81,6 +83,8 @@ else
         if contains(lower(recipeFiles{ii}{1}.name),acquisitionname)
             thisAcq{kk} = recipeFiles{ii}{1};
             thisID{kk} =  recipe_acqID{ii};
+            resFile{kk} = resourceFiles{ii}{1};
+            resID{kk} = resource_acqID{ii};
             kk = kk+1;
         end
     end
@@ -102,10 +106,11 @@ else
 %         assetRecipe{dd}.name   = destName_recipe;
 %         assetRecipe{dd}.count  = downloadList(dd).count;
         assetlist(dd).name = n;
-        assetlist(dd).material.list = thisR.materials.list;
+        assetlist(dd).material.list     = thisR.materials.list;
         assetlist(dd).material.txtLines = thisR.materials.txtLines;
-        assetlist(dd).geometry = thisR.assets;
-        assetlist(dd).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
+        assetlist(dd).geometry          = thisR.assets;
+        assetlist(dd).geometryPath      = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
+        assetlist(dd).fwInfo            = [resID{dd},' ',resFile{dd}.name];
     end
     fprintf('%s added to the list.\n',n);
 end
