@@ -95,19 +95,19 @@ if ~convertedflag
                     %                     groupobj(hh).translate = transform(13:15);
                     dcm = [transform(1:3);transform(5:7);transform(9:11)];
                     [rotz,roty,rotx]= dcm2angle(dcm);
-                    rotx = -rotx*180/pi;
-                    roty = -roty*180/pi;
-                    rotz = -rotz*180/pi;
-                    groupobj(hh).rotate(:,1)   = [rotx;1;0;0];
+                    rotx = rotx*180/pi;
+                    roty = roty*180/pi;
+                    rotz = rotz*180/pi;
+                    groupobj(hh).rotate(:,3)   = [rotx;1;0;0];
                     groupobj(hh).rotate(:,2)   = [roty;0;1;0];
-                    groupobj(hh).rotate(:,3)   = [rotz;0;0;1];
+                    groupobj(hh).rotate(:,1)   = [rotz;0;0;1];
                     groupobj(hh).position = reshape(transform(13:15),[3,1]);
                     % Add type of the object, get it from the file name,
                     % could be wrong, but this is how we named the object
                 else
-                    groupobj(hh).rotate(:,1) = [0;1;0;0];
+                    groupobj(hh).rotate(:,3) = [0;1;0;0];
                     groupobj(hh).rotate(:,2) = [0;0;1;0];
-                    groupobj(hh).rotate(:,3) = [0;0;0;1];
+                    groupobj(hh).rotate(:,1) = [0;0;0;1];
                     groupobj(hh).position = [0;0;0];
                 end
                 

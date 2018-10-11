@@ -1,0 +1,32 @@
+AttributeBegin
+	#ObjectName Camera:Vector(0, 0, 0)
+	ConcatTransform [1.0 -0.0 3.46944695195e-16 0  0.0 1.0 0.0 0  -3.46944695195e-16 0.0 1.0 0  0.0 0.0 0.0 1]
+AttributeEnd
+AttributeBegin
+	#ObjectName Cube:Vector(0.25, 0.25, 0.25)
+	ConcatTransform [0.5 -0.5 0.707106781187 0  0.853553390593 0.146446609407 -0.5 0  0.146446609407 0.853553390593 0.5 0  0.0 0.0 3.0 1]
+	AttributeBegin
+		NamedMaterial "YellowMaterial"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-0.25 -0.25 0.25 -0.25 -0.25 -0.25 0.25 -0.25 -0.25 0.25 -0.25 0.25 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 ]
+	AttributeEnd
+	AttributeBegin
+		NamedMaterial "GreenMaterial"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-0.25 -0.25 0.25 -0.25 0.25 0.25 -0.25 0.25 -0.25 -0.25 -0.25 -0.25 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [-1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 ]
+	AttributeEnd
+	AttributeBegin
+		NamedMaterial "BlueMaterial"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [0.25 -0.25 0.25 0.25 0.25 0.25 -0.25 0.25 0.25 -0.25 -0.25 0.25 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 ]
+	AttributeEnd
+	AttributeBegin
+		NamedMaterial "RedMaterial"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [0.25 -0.25 -0.25 0.25 0.25 -0.25 0.25 0.25 0.25 0.25 -0.25 0.25 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 ]
+	AttributeEnd
+	AttributeBegin
+		NamedMaterial "PurpleMaterial"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-0.25 -0.25 -0.25 -0.25 0.25 -0.25 0.25 0.25 -0.25 0.25 -0.25 -0.25 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 ]
+	AttributeEnd
+	AttributeBegin
+		NamedMaterial "CyanMaterial"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-0.25 0.25 -0.25 -0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 -0.25 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [0.0 1.0 1.11022302463e-16 0.0 1.0 1.11022302463e-16 0.0 1.0 1.11022302463e-16 0.0 1.0 1.11022302463e-16 ]
+	AttributeEnd
+AttributeEnd
