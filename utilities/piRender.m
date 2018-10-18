@@ -112,9 +112,20 @@ elseif isa(thisR,'recipe')
         end
         
         metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType);
-        piWrite(metadataRecipe,'overwritepbrtfile',true,...
-            'overwritelensfile',false,...
-            'overwriteresources',false);
+        
+        % Depending on whether we used C4D to export, we create a new
+        % material files that we link with the main pbrt file.
+        if(strcmp(metadataRecipe.exporter,'C4D'))
+            creatematerials = true;
+        else
+            creatematerials = false;
+        end
+        piWrite(metadataRecipe,...
+            'overwritepbrtfile', true,...
+            'overwritelensfile', false, ...
+            'overwriteresources', false,...
+            'creatematerials',creatematerials);
+        
         metadataFile = metadataRecipe.outputFile;
         
     end
