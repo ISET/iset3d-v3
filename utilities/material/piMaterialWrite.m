@@ -86,8 +86,11 @@ for jj = 1: length(textureLines)
     if ~strcmp(thisLine_tmp{length(thisLine_tmp)}(1),'"')
         for nn= length(thisLine_tmp):-1:1
         if strcmp(thisLine_tmp{nn}(1),'"')
-            % combine all the string from nn to end;
-            thisLine_tmp{nn} = strcat(thisLine_tmp{nn});
+            for kk = nn:length(thisLine_tmp)-1
+                % combine all the string from nn to end;
+                thisLine_tmp{nn} = [thisLine_tmp{nn},' ',thisLine_tmp{kk+1}];  
+            end
+            thisLine_tmp((nn+1):length(thisLine_tmp))=[];
             break;
         end
         end

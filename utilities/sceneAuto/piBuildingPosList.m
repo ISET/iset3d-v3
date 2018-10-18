@@ -31,7 +31,7 @@
 % Jiaqi Zhang
 % 09.21.2018
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [buildingPosList] = piBuildingPosList_jiaqi0920(buildingList, objects)
+function [buildingPosList] = piBuildingPosList(buildingList, objects)
 buildingPosList = struct;
 for ii = 1:length(buildingList)
     building_list.size(ii, 1) = buildingList(ii).geometry.size.l;
@@ -158,12 +158,12 @@ end
 
 function [settle_list, count] = buildingPlan(building_list, lenx_tmp, ...
     leny_tmp, coordination, settle_list, count, type, ankor)
-offset = 3; % adjust the interval berween the buildings. Don't too big! Or might cause problem!
+offset = 1; % adjust the interval berween the buildings. Don't too big! Or might cause problem!
 
 %% calculate the parameter in spare region.
 switch type
     case 'front'
-        A = [coordination(1), coordination(2)+leny_tmp];  % ABCD are 4 vertexes of spare region
+        A = [coordination(1), coordination(2)+leny_tmp];  % ABCD are 4 vertices of spare region
         B = coordination;
         C = [coordination(1)+lenx_tmp, coordination(2)];
         D = [coordination(1)+lenx_tmp, coordination(2)+leny_tmp];
@@ -171,7 +171,7 @@ switch type
         leny = leny_tmp;    % leny is the lenth of spare region in y direction
         
     case 'right'
-        A = [coordination(1), coordination(2)-leny_tmp];  % ABCD are 4 vertexes of spare region
+        A = [coordination(1), coordination(2)-leny_tmp];  % ABCD are 4 vertices of spare region
         B = coordination;
         C = [coordination(1)+lenx_tmp, coordination(2)];
         D = [coordination(1)+lenx_tmp, coordination(2)-leny_tmp];
@@ -179,7 +179,7 @@ switch type
         lenx = leny_tmp;    % leny is the lenth of spare region in y direction
         
     case 'left'
-        A = [coordination(1)-lenx_tmp, coordination(2)];  % ABCD are 4 vertexes of spare region
+        A = [coordination(1)-lenx_tmp, coordination(2)];  % ABCD are 4 vertices of spare region
         B = coordination;
         C = [coordination(1), coordination(2)+leny_tmp];
         D = [coordination(1)-lenx_tmp, coordination(2)+leny_tmp];
@@ -187,7 +187,7 @@ switch type
         lenx = leny_tmp;    % leny is the lenth of spare region in y direction
         
     case 'back'
-        A = [coordination(1), coordination(2)-leny_tmp];  % ABCD are 4 vertexes of spare region
+        A = [coordination(1), coordination(2)-leny_tmp];  % ABCD are 4 vertices of spare region
         B = coordination;
         C = [coordination(1)-lenx_tmp, coordination(2)];
         D = [coordination(1)-lenx_tmp, coordination(2)-leny_tmp];

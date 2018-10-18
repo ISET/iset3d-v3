@@ -14,7 +14,7 @@ p.addParameter('timestamp',50,@isnumeric);
 p.addParameter('nScene',1,@isnumeric);
 p.addParameter('cloudRender',1);
 p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
-inputs = p.parse(varargin{:});
+p.parse(varargin{:});
 
 sceneType      = p.Results.sceneType;
 treeDensity    = p.Results.treeDensity;
@@ -38,68 +38,66 @@ sessions     = hierarchy.sessions;
                                  'sceneType',sceneType,...
                                  'cloudRender',cloudRenderFlag,...
                                  'scitran',st);
-% Add a skymap
+
 
 % It takes about 6 mins to generate a trafficflow, so for each scene, we'd
 % like generate the trafficflow only once.
 roadFolder = fileparts(thisR_road.inputFile);
 roadFolder = strsplit(roadFolder,'/');
 roadName = roadFolder{length(roadFolder)};
-trafficflowPath = fullfile(piRootPath,'local','trafficflow',sprintf('%s_trafficflow.mat',roadName));
+trafficflowPath = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadName,trafficflowDensity));
 trafficflowFolder = fileparts(trafficflowPath);
+
 if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
+
 if ~exist(trafficflowPath,'file')
     trafficflow = piTrafficflowGeneration(road);
     save(trafficflowPath,'trafficflow');
 else
     load(trafficflowPath,'trafficflow');
 end
-
-%% todo: create building and tree lib
-
+%% SUSO setting
+%{
 tic
 tree_interval = rand(1)*20+2;
 
-%% tmp
-assetsPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
-% place parked cars
-if contains(roadType,'parking')
-    trafficflow = piParkingPlace(road, trafficflow);
-end
-building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));
-
-if ~exist(building_listPath,'file')
-    building_list = piAssetListCreate('class',sceneType,...
-        'scitran',st);
-    save(building_listPath,'building_list')
-else
-    load(building_listPath,'building_list');
-end
-buildingPosList = piBuildingPosList(building_list,thisR_road);
-assetsPlaced.building = piBuildingPlace(building_list,buildingPosList);
-%% Cat fwInfo str with road.fwList
-road = fwInfoCat(road,assetsPlaced);
-%% Assign label to geometry name, so that we can have consistent names in label.txt
-for jj = 1:length(assetsPlaced.building)
-    if ~isequal(lower(assetsPlaced.building(jj).geometry.name),'camera') && ...
-            ~contains(lower(assetsPlaced.building(jj).geometry.name),'light')
-        assetsPlaced.building(jj).geometry.name = 'building';
+%%
+if contains(sceneType,'city')||contains(sceneType,'suburb')
+    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+    % place parked cars
+    if contains(roadType,'parking')
+        trafficflow = piParkingPlace(road, trafficflow);
     end
+    building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));
+    
+    if ~exist(building_listPath,'file')
+        building_list = piAssetListCreate('class',sceneType,...
+            'scitran',st);
+        save(building_listPath,'building_list')
+    else
+        load(building_listPath,'building_list');
+    end
+    buildingPosList = piBuildingPosList(building_list,thisR_road);
+    susoPlaced.building = piBuildingPlace(building_list,buildingPosList);
+    %% Cat fwInfo str with road.fwList
+    
+    % Add All placed assets
+    thisR_road = piAssetAdd(thisR_road, susoPlaced);
+    % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
+    toc
 end
-% Add All placed assets
-thisR_road = piAssetAdd(thisR_road, assetsPlaced);
-% thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
-toc
+%}
 %% Place vehicles/pedestrians
-[trafficPlaced,~] = piTrafficPlace(trafficflow,...
+[sumoPlaced,~] = piTrafficPlace(trafficflow,...
                                                'timestamp',timestamp,...
                                                'resources',~cloudRenderFlag,...
                                                'scitran',st);
-for ii = 1: length(trafficPlaced)
-    thisR_scene = piAssetAdd(thisR_road,trafficPlaced{ii});
+for ii = 1: length(sumoPlaced)
+    thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
 end
-
-road = fwInfoCat(road,trafficPlaced{1});
+% create a file ID&names string for flywheel to copy selected assets over to VMs.
+% road = fwInfoCat(road,susoPlaced); % static objects
+road = fwInfoCat(road,sumoPlaced{1}); % mobile objects
 end
 function road = fwInfoCat(road,assets)
 %% cat selected fwInfo str with road.fwList

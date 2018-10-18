@@ -60,7 +60,7 @@ vType_interval=road.vTypes;
 vTypes=keys(vType_interval);
 % interval=values(vType_interval);
 %% Define a Path for sumo output by given scenetype and roadtype.
-netfileName=road.roadinfo.name;
+netfileName=road.name;
 netPath=fullfile(piRootPath,'data','sumo_input',netfileName,strcat(netfileName,'.net.xml'));
 outputPath=fullfile(piRootPath,'local');
 chdir(outputPath);
@@ -85,6 +85,7 @@ route_collect='';
 for ii=1:vType_interval.Count
     % store trips/routes for different types of vehicles in different
     % directorys
+    if ~isequal(vType_interval(vTypes{ii}),0)
     fullfilePath= fullfile(pwd,vTypes{ii});
     if ~exist(fullfilePath,'dir')
         mkdir(fullfilePath);
@@ -135,6 +136,7 @@ for ii=1:vType_interval.Count
     
     % Return to original directory
     chdir('..');
+    end
 end
 
 %% Write .add.xml

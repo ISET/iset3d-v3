@@ -341,15 +341,13 @@ if creatematerials
         end
         fprintf(fileID,'%s \n',currLine);
     end
-    
 else
-    
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
-        if contains(currLine, 'geometry.pbrt')
-            [~,n] = fileparts(renderRecipe.outputFile);
-            currLine = sprintf('Include "%s_geometry.pbrt"',n);
-        end
+%         if contains(currLine, 'geometry.pbrt')
+%             [~,n] = fileparts(renderRecipe.outputFile);
+%             currLine = sprintf('Include "%s_geometry.pbrt"',n);
+%         end
         fprintf(fileID,'%s \n',currLine);
     end
 end

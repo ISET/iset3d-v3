@@ -96,15 +96,18 @@ if nScene == 1
             
             [~,n] = size(assets.(assetClass)(ii).geometry(1).position);
             position=cell(n,1);
-            rotation=cell(n,1);
+            rotationY=cell(n,1); % rotationY is RotY
+            slope   =cell(n,1); % Slope is RotZ
             for gg = 1:n
                 position{gg} = assets_shuffled.(assetClass)(index).pos;
-                rotation{gg} = assets_shuffled.(assetClass)(index).orientation-90;
+                rotationY{gg} = assets_shuffled.(assetClass)(index).orientation-90;
+                slope{gg}    = assets_shuffled.(assetClass)(index).slope;
+                if isempty(slope{gg}), slope{gg}=0;end
                 index = index+1;
             end
             fprintf('%s: ii = %d;jj = %d \n',assetClass,ii,jj);
             assets_updated.(assetClass)(ii).geometry = piAssetTranslate(assets.(assetClass)(ii).geometry,position,'Pos_demention',n);
-            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,rotation,'Pos_demention',n);
+            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,'Y',rotationY,'Z',slope,'Pos_demention',n);
         end
     end
     assetsPosList{1} = assets_updated;

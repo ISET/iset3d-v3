@@ -52,7 +52,7 @@ p.addParameter('streetlight_interval',12);
 p.addParameter('streetlight_offset',1);
 p.addParameter('streetlight_type','T');
 p.addParameter('addStreetlight',true);
-p.addParameter('trashcan_number',0);
+p.addParameter('trashcan_number',3);
 p.addParameter('trashcan_offset',1);
 p.addParameter('station_number',1);
 p.addParameter('station_offset',sidewalk_list(1).width/2);

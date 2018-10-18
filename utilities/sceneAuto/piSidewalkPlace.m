@@ -35,17 +35,17 @@ for ii = 1: length(assetPosList_tmp)
                 asset(dd).geometry(hh).position = repmat(pos,1,uint8(assetPosList_tmp(ii).count));
                 asset(dd).geometry(hh).rotate = repmat(rot,1,uint8(assetPosList_tmp(ii).count));
                 position=cell(n,1);
-                rotation=cell(n,1);
+                rotationY=cell(n,1);
                 gg=1;
                 for jj = 1:length(AssetsPosList)
                     if isequal(assetPosList_tmp(ii).name{1},AssetsPosList(jj).name)
                         position{gg} = AssetsPosList(jj).position;
-                        rotation{gg} = AssetsPosList(jj).rotate;
+                        rotationY{gg} = AssetsPosList(jj).rotate;
                         gg = gg+1;
                     end
                 end
                 assets_updated(ii).geometry = piAssetTranslate(asset(dd).geometry,position,'Pos_demention',n);
-                assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,rotation,'Pos_demention',n);
+                assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,'Y',rotationY,'Pos_demention',n);
                 assets_updated(ii).fwInfo   = asset(dd).fwInfo;
             end
         end

@@ -78,4 +78,4 @@ end
 
 
 oi = oiSet(oi,'photons',correctedPhotons);
-ieAddObject(oi); oiWindow;
+end

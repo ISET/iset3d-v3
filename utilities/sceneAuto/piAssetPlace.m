@@ -73,14 +73,18 @@ if nScene == 1
             
             [~,n] = size(assets.(assetClass)(ii).geometry(1).position);
             position=cell(n,1);
-            rotation=cell(n,1);
+            rotationY=cell(n,1);
+            slope=cell(n,1);
             for gg = 1:n
                 position{gg} = assets_shuffled.(assetClass)(index).pos;
-                rotation{gg} = assets_shuffled.(assetClass)(index).orientation-90;
+                rotationY{gg} = assets_shuffled.(assetClass)(index).orientation-90;
+                if isfield(assets_shuffled.(assetClass)(index),'slope')
+                    slope{gg} = assets_shuffled.(assetClass)(index).slope;
+                end
                 index = index+1;
             end
             assets_updated.(assetClass)(ii).geometry = piAssetTranslate(assets.(assetClass)(ii).geometry,position,'Pos_demention',n);
-            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,rotation,'Pos_demention',n);
+            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,'Y',rotationY,'Z',slope,'Pos_demention',n);
         end
     end
     assetsPosList{1} = assets_updated;

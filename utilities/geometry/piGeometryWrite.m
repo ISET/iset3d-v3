@@ -57,9 +57,10 @@ for ii = 1: length(obj)
                     end
                     if ~isempty(obj(ii).rotate)
                         obj_rotate = obj(ii).rotate;
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2));
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1));
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));
+                        % Write out ratationY 
+                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
+                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));% Z
+                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
                     end
                     fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
                     fprintf(fid_obj,'AttributeEnd \n \n');

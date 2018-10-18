@@ -1,3 +1,3 @@
-function piMotionBlur(thisR,shutterspeed,translate,rotate)
+function piMotionBlur(thisR,Fps,translate,rotate)
 % TO DO
 end

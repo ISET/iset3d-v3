@@ -1,10 +1,14 @@
-function object=piAssetRotate(object,degree,varargin)
+function object=piAssetRotate(object,varargin)
 % only rotate around y axis is allowed
 %%
 p = inputParser;
-p.addParameter('Pos_demention',1)
+p.addParameter('Pos_demention',1);
+p.addParameter('Y',[],@iscell);
+p.addParameter('Z',[],@iscell);
 p.parse(varargin{:})
 pos_d = p.Results.Pos_demention;
+Y     = p.Results.Y;
+Z     = p.Results.Z;
 %%
 for dd = 1:pos_d
     for ii=1:length(object)
@@ -12,13 +16,21 @@ for dd = 1:pos_d
         if isfield(object(ii),'children')
             if length(object(ii).children) >= 1
                 if isempty(object(ii).rotate)
-                    object(ii).rotate(:,1) = [0;1;0;0];
-                    object(ii).rotate(:,2) = [0;0;1;0];
-                    object(ii).rotate(:,3) = [0;0;0;1];
+                    object(ii).rotate(:,1) = [0;0;1;0];
+                    object(ii).rotate(:,2) = [0;0;0;1];
+                    object(ii).rotate(:,3) = [0;1;0;0];
                 end
-                object(ii).rotate(:,dd*3-1) = [0;1;0;0];
-                object(ii).rotate(:,dd*3-2) = [degree{dd};0;1;0];
-                object(ii).rotate(:,dd*3)   = [0;0;0;1];
+                if ~isempty(Y)
+                object(ii).rotate(:,dd*3-2) = [Y{dd};0;1;0];
+                else
+                    object(ii).rotate(:,dd*3-2) = [0;0;1;0];
+                end%Y
+                if ~isempty(Z)
+                object(ii).rotate(:,dd*3)   = [Z{dd};0;0;1];
+                else
+                    object(ii).rotate(:,dd*3)   = [0;0;0;1];
+                end%Z
+                object(ii).rotate(:,dd*3-1) = [0;1;0;0];  % X
                 % find car position
                 %         object_position = [object(ii).position(1) object(ii).position(3)];
                 % rotate object's pmin and pmax for bounding box checking
