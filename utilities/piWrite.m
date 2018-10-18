@@ -56,7 +56,7 @@ p.addParameter('overwritematerials',true,@islogical);
 p.addParameter('overwritegeometry',true,@islogical);
 
 % Create a new materials.pbrt
-p.addParameter('creatematerials',true,@islogical);
+p.addParameter('creatematerials',false,@islogical);
 % control lighting in geomtery.pbrt
 p.addParameter('lightsFlag',false,@islogical);
 
@@ -344,10 +344,10 @@ if creatematerials
 else
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
-%         if contains(currLine, 'geometry.pbrt')
-%             [~,n] = fileparts(renderRecipe.outputFile);
-%             currLine = sprintf('Include "%s_geometry.pbrt"',n);
-%         end
+        if contains(currLine, 'geometry.pbrt')
+            [~,n] = fileparts(renderRecipe.inputFile);
+            currLine = sprintf('Include "%s_geometry.pbrt"',n);
+        end
         fprintf(fileID,'%s \n',currLine);
     end
 end
