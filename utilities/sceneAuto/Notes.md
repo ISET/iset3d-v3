@@ -75,3 +75,5 @@ class label color map
     Label(  'bicycle'              , 33 ,       18 , 'vehicle'         , 7       , True         , False        , (119, 11, 32) ),
     Label(  'license plate'        , -1 ,       -1 , 'vehicle'         , 7       , False        , True         , (  0,  0,142) )
 For instances label, we randomize the color for each class,like car, pedestrian, truck and bus, we do not have instances label for static object like builidngs.
+## sumo vehicle type parameters
+Vehicle type are choosen by the [sumo vehicle type default parameter](http://sumo.dlr.de/wiki/Vehicle_Type_Parameter_Defaults).
