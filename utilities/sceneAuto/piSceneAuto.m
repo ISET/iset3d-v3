@@ -1,9 +1,40 @@
 function [thisR_scene,road] = piSceneAuto(varargin)
-% Automatically generate scene(s) for Autonomous driving scenarios for Automotives.
-%    
+% Generate scene(s) for Autonomous driving scenarios using SUMO/SUSO
 %
+% Syntax
+%
+% Description
+%
+% Inputs
+%  N/A
+%
+% Optional key/value pairs
+%   scene type
+%   tree density
+%   road type
+%   traffice flow density (Default 'medium')
+%   weather type
+%   day time
+%   time stamp (Default: 50)
+%   nScene
+%   cloud render
+%   scitran   (Default is 'stanfordlabs')
+%
+% Returns:
+%  thisR_scene - Scene recipe
+%  road  - A struct containing the list of flywheel objects and road
+%          information. To list this out use road.fwList; 
+%
+% Author:
+%   ZL
+%
+% See also
+%
+
+%% Read input parameters
 p = inputParser;
 varargin = ieParamFormat(varargin);
+
 p.addParameter('sceneType','city',@ischar);
 p.addParameter('treeDensity','random',@ischar);
 p.addParameter('roadType','crossroad',@ischar);
@@ -26,37 +57,48 @@ timestamp      = p.Results.timestamp;
 st             = p.Results.scitran;
 cloudRenderFlag= p.Results.cloudRender;
 
-%% flywheel init
+%% Flywheel init
+
 if isempty(st), st = scitran('stanfordlabs'); end
-hierarchy = st.projectHierarchy('Graphics assets');
-sessions     = hierarchy.sessions;
-%% Create a road
+hierarchy  = st.projectHierarchy('Graphics assets');
+sessions   = hierarchy.sessions;
+
+%% Create a road using SUMO
+
 % return a road contains road information and Flyweel asset list: road.fwList;
 [road,thisR_road] = piRoadCreate('type',roadType,...
-                                 'trafficflowDensity',trafficflowDensity,...
-                                 'sessions',sessions,...
-                                 'sceneType',sceneType,...
-                                 'cloudRender',cloudRenderFlag,...
-                                 'scitran',st);
-
+    'trafficflowDensity',trafficflowDensity,...
+    'sessions',sessions,...
+    'sceneType',sceneType,...
+    'cloudRender',cloudRenderFlag,...
+    'scitran',st);
 
 % It takes about 6 mins to generate a trafficflow, so for each scene, we'd
 % like generate the trafficflow only once.
 roadFolder = fileparts(thisR_road.inputFile);
 roadFolder = strsplit(roadFolder,'/');
-roadName = roadFolder{length(roadFolder)};
-trafficflowPath = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadName,trafficflowDensity));
+roadName   = roadFolder{length(roadFolder)};
+trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadName,trafficflowDensity));
 trafficflowFolder = fileparts(trafficflowPath);
 
 if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
 
+% This is where SUMO is called.  Or maybe the file already exists.
 if ~exist(trafficflowPath,'file')
     trafficflow = piTrafficflowGeneration(road);
     save(trafficflowPath,'trafficflow');
 else
     load(trafficflowPath,'trafficflow');
 end
+
 %% SUSO setting
+
+% This places the fixed (static) objects. To speed up debugging, we
+% removed this.  But in actual cases we use it every time.
+%
+% Remove this warning when the code below is uncommented
+warning('No static objects placed');
+
 %{
 tic
 tree_interval = rand(1)*20+2;
@@ -87,20 +129,34 @@ if contains(sceneType,'city')||contains(sceneType,'suburb')
     toc
 end
 %}
-%% Place vehicles/pedestrians
-[sumoPlaced,~] = piTrafficPlace(trafficflow,...
-                                               'timestamp',timestamp,...
-                                               'resources',~cloudRenderFlag,...
-                                               'scitran',st);
+
+%% Place vehicles/pedestrians using the SUMO data
+
+[sumoPlaced, ~] = piTrafficPlace(trafficflow,...
+    'timestamp',timestamp,...
+    'resources',~cloudRenderFlag,...
+    'scitran',st);
+
 for ii = 1: length(sumoPlaced)
     thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
 end
-% create a file ID&names string for flywheel to copy selected assets over to VMs.
+
+% create a file ID & name strings for Flywheel to copy selected assets
+% over to VMs. 
+%
+
+% Uncomment when SUSO runs
 % road = fwInfoCat(road,susoPlaced); % static objects
+%
+
 road = fwInfoCat(road,sumoPlaced{1}); % mobile objects
+
 end
+
+% Maybe a better name and maybe attached to the relevant object.
 function road = fwInfoCat(road,assets)
-%% cat selected fwInfo str with road.fwList
+%% List the selected fwInfo str with road.fwList
+
 assetFields = fieldnames(assets);
 for jj = 1:length(assetFields)
     for kk = 1: length(assets.(assetFields{jj}))
@@ -109,7 +165,5 @@ for jj = 1:length(assetFields)
 end
 
 end
-    
-    
-    
-    
+
+
