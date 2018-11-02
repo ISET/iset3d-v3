@@ -59,7 +59,7 @@ for ii = 1: length(obj)
                         obj_rotate = obj(ii).rotate;
                         % Write out ratationY 
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
-                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));% Z
+                        fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
                     end
                     fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
@@ -117,6 +117,8 @@ for ii = 1: length(obj)
             end
         end
     end
+    % disable trafficlight for now, too many fireflies
+    %{
     if ~isempty(thistrafficflow)
         for jj = 1:8
             for mm = 1: length(obj)
@@ -134,6 +136,7 @@ for ii = 1: length(obj)
             end
         end
     end
+    %}
 end
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);

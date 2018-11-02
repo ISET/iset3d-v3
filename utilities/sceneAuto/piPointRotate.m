@@ -10,7 +10,7 @@ R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
 % Rotate your point(s)
 point = point'; 
 center  = center';
-rotpoint = R*(point-center)+center;
+rotpoint = R*(point+center)'+center';
 rotpoint = rotpoint';
 end
 

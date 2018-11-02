@@ -57,13 +57,14 @@ else
     load(trafficflowPath,'trafficflow');
 end
 %% SUSO setting
-%{
+
 tic
-tree_interval = rand(1)*20+2;
+tree_interval = rand(1)*20+5;
 
 %%
 if contains(sceneType,'city')||contains(sceneType,'suburb')
-    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+    % tmp
+    %susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
     % place parked cars
     if contains(roadType,'parking')
         trafficflow = piParkingPlace(road, trafficflow);
@@ -86,7 +87,7 @@ if contains(sceneType,'city')||contains(sceneType,'suburb')
     % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
     toc
 end
-%}
+
 %% Place vehicles/pedestrians
 [sumoPlaced,~] = piTrafficPlace(trafficflow,...
                                                'timestamp',timestamp,...
@@ -95,8 +96,8 @@ end
 for ii = 1: length(sumoPlaced)
     thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
 end
-% create a file ID&names string for flywheel to copy selected assets over to VMs.
-% road = fwInfoCat(road,susoPlaced); % static objects
+% create a file ID & name strings for flywheel to copy selected assets over to VMs.
+road = fwInfoCat(road,susoPlaced); % static objects
 road = fwInfoCat(road,sumoPlaced{1}); % mobile objects
 end
 function road = fwInfoCat(road,assets)
