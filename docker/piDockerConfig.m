@@ -154,8 +154,8 @@ elseif isunix
 
 % Not MAC or LINUX
 else
-    error('Platform [%s] not supported.', computer);
-    
+    % We need a Windows implementation.
+    warning('Platform [%s] not supported.  No configuration attempted.', computer);
 end
 
 end

@@ -46,6 +46,8 @@ piWrite(thisR);
 
 %% Render
 tic, scene = piRender(thisR,'render type','radiance'); toc
+tic, scene = piRender(thisR); toc % By default, you will have depth map rendered with radiance image;
+
 scene = sceneSet(scene,'name',sprintf('Glass on (%d)',thisR.integrator.maxdepth.value));
 ieAddObject(scene); sceneWindow;
 
@@ -65,7 +67,7 @@ piWrite(thisR,'creatematerials',true);
 
 %% Render again
 
-tic, scene = piRender(thisR,'render type','radiacne'); toc
+tic, scene = piRender(thisR,'render type','radiance'); toc
 scene = sceneSet(scene,'name','Glass off');
 ieAddObject(scene); sceneWindow;
 
