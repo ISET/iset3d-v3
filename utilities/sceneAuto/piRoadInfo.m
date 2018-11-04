@@ -243,7 +243,7 @@ roadinfo(5).sidewalk_list(8).height = 0.15;
 roadinfo(5).sidewalk_list(8).width = 5;
 
 
-%% straight
+%% 
 currdir = pwd;
 filepath = fullfile(piRootPath,'configuration');
 cd(filepath);

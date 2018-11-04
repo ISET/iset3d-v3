@@ -12,26 +12,39 @@ p.parse(renderRecipe,varargin{:});
 thisR     = p.Results.renderRecipe;
 material  = p.Results.material;
 geometry  = p.Results.geometry;
+
 %% Combine them with Main Scene thisR and Geometry Struct
 assetsnameList = fieldnames(assets);
 for ll = 1: length(assetsnameList)
     if isequal(assetsnameList{ll},'car')
         assetname = 'car';
+        if ~isfield(thisR.assets,'motion')
+            [thisR.assets(:).motion] = deal([]);
+        end
         thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR);
     elseif isequal(assetsnameList{ll},'pedestrian')
         assetname = 'pedestrian';
+        if ~isfield(thisR.assets,'motion')
+            [thisR.assets(:).motion] = deal([]);
+        end        
         thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR);
     elseif isequal(assetsnameList{ll},'bus')
         assetname = 'bus';
+        if ~isfield(thisR.assets,'motion')
+            [thisR.assets(:).motion] = deal([]);
+        end        
         thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR);    
-    elseif isequal(assetsnameList{ll},'tree')
-        assetname = 'tree';
-        thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR);
     elseif isequal(assetsnameList{ll},'truck')
         assetname = 'truck';
+        if ~isfield(thisR.assets,'motion')
+            [thisR.assets(:).motion] = deal([]);
+        end        
         thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR);
     elseif isequal(assetsnameList{ll},'bicycle')
         assetname = 'bicycle';
+        if ~isfield(thisR.assets,'motion')
+            [thisR.assets(:).motion] = deal([]);
+        end        
         thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR);
     elseif isequal(assetsnameList{ll},'streetlight')
         assetname = 'streetlight';
@@ -80,6 +93,7 @@ for ii = 1:length(assets.(assetname))
     end
     %% add objects.geometry to scene(geometry struct)
     scene = thisR.assets;
+    % add motion slot
     if geometry
         numScene = length(scene);
         numObj   = length(assets.(assetname)(ii).geometry);

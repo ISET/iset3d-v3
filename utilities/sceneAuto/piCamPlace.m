@@ -1,17 +1,22 @@
-function [from,to,orientation]= piCamPlace(varargin)
+function [thisCar, from,to,orientation]= piCamPlace(varargin)
 %% Find a position for camera by checking the position of cars, place the camera in front of the car.
+%%
 p = inputParser;
-p.addParameter('trafficflow',[]);
+varargin =ieParamFormat(varargin);
+p.addParameter('thistrafficflow',[]);
+p.addParameter('nexttrafficflow',[]);
 p.addParameter('CamPosition',[]);
 p.addParameter('CamOrientation','');
 p.parse(varargin{:});
-trafficflow = p.Results.trafficflow;
+
+thisTrafficflow = p.Results.thistrafficflow;
 CamPos = p.Results.CamPosition;
 CamOri = p.Results.CamOrientation;
-carlist = trafficflow.objects.car;
+carlist = thisTrafficflow.objects.car;
+%%
 idx = [];
 if isempty(CamPos)
-    if isfield(trafficflow.objects,'car')
+    if isfield(thisTrafficflow.objects,'car')
         dd=1;
         for ii = 1:length(carlist)
             if ~isempty(CamOri)
@@ -44,7 +49,8 @@ end
 if ~isempty(idx)
     idx_num = randi(length(idx),1);
     idx = idx(idx_num);
-    from = trafficflow.objects.car(idx).pos;
+    thisCar = carlist(idx);
+    from = carlist(idx).pos;
     orientation = carlist(idx).orientation-90;
     if orientation <0
         orientation = orientation+360;

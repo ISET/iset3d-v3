@@ -11,7 +11,8 @@
 % roadname = 'city_cross_4lanes_construct_001';
 % roadname = 'city_cross_6lanes_construct_001';
 % roadname = 'city_cross_6lanes_001';
-sessionname = 'city3';
+% sessionname = 'city3';
+sessionname = [];
 % downloadbikes = 1;
 % downloadcars   = 1;
 % downloadtrucks = 1;
@@ -38,13 +39,15 @@ piAssetsDownload_cloud('session',sessionname);
 %%
 % roadnamelist{1} = 'city_cross_4lanes_001';
 % roadnamelist{1} = 'city_cross_4lanes_002';
-roadnamelist{1} = 'city_cross_6lanes_001';
+% roadnamelist{1} = 'city_cross_6lanes_001';
 % % roadnamelist{4} = 'city_cross_4lanes_001_construct';
 % roadnamelist{3} = 'city_cross_4lanes_002_construct';
-roadnamelist{2} = 'city_cross_6lanes_001_construct';
+% roadnamelist{2} = 'city_cross_6lanes_001_construct';
 % roadnamelist{1} = 'curve_6lanes_001';
-roadnamelist{3} = 'straight_2lanes_parking';
+% roadnamelist{2} = 'straight_2lanes_parking';
+roadnamelist{1} = 'bridge';
 
+roadnamelist{1} = 'highway_straight_4lanes_001';
 %% Download Road
 for jj = 1:length(roadnamelist)
     roadname = roadnamelist{jj};
@@ -66,8 +69,10 @@ cityname = sessionname;
 tic
 % about 90 seconds
 % roadname = strcat('suburb_',roadname);
-resourcesCombine(roadname,cityname,52);toc
-
+% resourcesCombine(roadname,cityname,52);toc
+tic
+roadname ='highway_straight_4lanes_001';
+resourcesCombineVehiclesOnly(roadname);toc
 %% Zip and upload them to google cloud, only upload once.
 % about 350 seconds
 tic

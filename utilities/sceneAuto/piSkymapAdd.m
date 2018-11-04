@@ -1,4 +1,4 @@
-function thisR = piSkymapAdd(thisR,input)
+function [thisR,skymapInfo] = piSkymapAdd(thisR,input)
 % Choose a skymap, or random skybox, write this line to thisR.world.
 %
 % Inputs
@@ -25,94 +25,50 @@ function thisR = piSkymapAdd(thisR,input)
 %
 % Zhenyi,2018
 
-%% Programming TODO
-%  We need to check whether we are replacing a skymap or adding a new
-%  one.  If one exists, then we are replacing it!
-%
-
 %%
-skymaps = fullfile(piRootPath,'data','skymaps');
-sunlights = sprintf('LightSource "distant" "point from" [ -30 100  100 ] "blackbody L" [6500 1.5]');
+sunlights = sprintf('# LightSource "distant" "point from" [ -30 100  100 ] "blackbody L" [6500 1.5]');
 input = lower(input);
+if isequal(input,'random')
+    index = randi(3,1);
+    skynamelist = {'morning','noon','sunset'};
+    input = skynamelist{index};
+end
 switch input
     case 'morning'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/morn.exr"');
-    case 'sunny_park'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunny_park.exr"');        
-    case 'day'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/day.exr"');
-    case 'dusk'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/dusk.exr" ');
-    case 'sunset'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/sunset_1.exr"');
-    case 'night'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/night.exr"');
-    case 'cloudy'
-%         cloud = randi(3,1);
-        cloud = 2; % tmp
-        if cloud ==1, cloud = 'cloudy';elseif cloud==2, cloud = 'cloudy_1'; else cloud = 'cloudy_large'; end
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/%s.exr"',cloud);
-    case 'city'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/city.exr"');
-    case 'grass'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/grass.exr"');
-    case 'cityscape'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cityscape.exr"');
-    case 'park'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/park.exr"');
-    case 'doge2'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/doge2_latlong.exr"');
+        skyname = sprintf('morning_%03d.exr',randi(4,1));       
     case 'noon'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/noon.exr"');  
-    case 'cloudynoon'
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/cloudynoon.exr"');         
-    case'random'
-        curDir = pwd;
-        cd(skymaps)
-        skylights = dir('*.exr');
-        index = randi(length(skylights));
-        skyname = skylights(index).name;
-        skylights = sprintf('LightSource "infinite" "string mapname" "skymaps/%s"',skyname);
-        cd(curDir);
+        skyname = sprintf('noon_%03d.exr',1); % favorate one, tmp
+%         skyname = sprintf('noon_%03d.exr',randi(10,1));
+    case 'sunset'
+        skyname = sprintf('sunset_%03d.exr',randi(4,1)); 
+    case 'cloudy'
+        skyname = sprintf('cloudy_%03d.exr',randi(2,1));
 end
+skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 
 index_m = find(contains(thisR.world,'_materials.pbrt'));
-index_sky = find(contains(thisR.world,'mapname'), 1);
-switch input
-    case {'morning','sunny_park','day','grass','cloudy','park','cityscape'}
-        if isempty(index_sky)
-            world(1,:) = thisR.world(1);
-            world(2,:) = cellstr(sprintf('AttributeBegin'));
-            world(3,:) = cellstr(sprintf('Rotate -90 1 0 0'));
-            world(4,:) = cellstr(sprintf('Scale 1 1 1'));
-            world(5,:) = cellstr(skylights);
-            world(6,:) = cellstr(sprintf('AttributeEnd'));
-            world(7,:) = cellstr(sunlights); % add sunlight
-            jj=1;% skip materials and lightsource which are exported from C4D.
-            for ii=index_m:length(thisR.world)
-                world(jj+7,:)=thisR.world(ii);
-                jj=jj+1;
-            end
-            thisR.world = world;
-        else
-            thisR.world{index_sky} = skylights;
-        end
-    otherwise
-        if isempty(index_sky)
-            world(1,:) = thisR.world(1);
-            world(2,:) = cellstr(sprintf('AttributeBegin'));
-            world(3,:) = cellstr(sprintf('Rotate -90 1 0 0'));
-            world(4,:) = cellstr(sprintf('Scale 1 1 1'));
-            world(5,:) = cellstr(skylights);
-            world(6,:) = cellstr(sprintf('AttributeEnd'));
-            jj=1;% skip materials and lightsource which are exported from C4D.
-            for ii=index_m:length(thisR.world)
-                world(jj+6,:)=thisR.world(ii);
-                jj=jj+1;
-            end
-            thisR.world = world;
-        else
-            thisR.world{index_sky} = skylights;
-        end
+% skyview = randi(360,1);
+skyview = randi(45,1)+45;% tmp
+world(1,:) = thisR.world(1);
+world(2,:) = cellstr(sprintf('AttributeBegin'));
+world(3,:) = cellstr(sprintf('Rotate %d 0 1 0',skyview));
+world(4,:) = cellstr(sprintf('Rotate -90 1 0 0'));
+world(5,:) = cellstr(sprintf('Scale 1 1 1'));
+world(6,:) = cellstr(skylights);
+world(7,:) = cellstr(sprintf('AttributeEnd'));
+jj=1;% skip materials and lightsource which are exported from C4D.
+for ii=index_m:length(thisR.world)
+    world(jj+7,:)=thisR.world(ii);
+    jj=jj+1;
 end
+thisR.world = world;
+
+st = scitran('stanfordlabs');
+files = st.search('file',...
+   'project label exact','Graphics assets',...
+   'session label exact','data',...
+   'acquisition label exact','skymaps');
+dataId = files{1}.parent.id;
+dataName = skyname;
+skymapInfo = [dataId,' ',dataName];
 end

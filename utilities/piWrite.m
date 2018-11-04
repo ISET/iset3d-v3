@@ -204,7 +204,22 @@ if(~isempty(renderRecipe.scale))
     [renderRecipe.scale(1) renderRecipe.scale(2) renderRecipe.scale(3)]);
     fprintf(fileID,'\n');
 end
-
+% Optional Motion Blur
+% default StartTime and EndTime is 0 to 1;
+if isfield(renderRecipe.camera,'motion') 
+    fprintf(filedID,'ActiveTransform StartTime \n');
+    fprintf(filedID,'Translate %0.2f %0.2f %0.2f\n',...
+        [renderRecipe.camera.motion.activeTransformStart.pos(1),...
+        renderRecipe.camera.motion.activeTransformStart.pos(2),...
+        renderRecipe.camera.motion.activeTransformStart.pos(3)]);
+    fprintf(filedID,'Rotate \n'); % add rotate aroung x, y, z
+    fprintf(filedID,'ActiveTransform EndTime \n');
+    fprintf(filedID,'Translate %0.2f %0.2f %0.2f\n',...
+        [renderRecipe.camera.motion.activeTransformEnd.pos(1),...
+        renderRecipe.camera.motion.activeTransformEnd.pos(2),...
+        renderRecipe.camera.motion.activeTransformEnd.pos(3)]);
+    fprintf(filedID,'ActiveTransform All \n');
+end
 % Required LookAt 
 fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
     [renderRecipe.lookAt.from renderRecipe.lookAt.to renderRecipe.lookAt.up]);
@@ -342,15 +357,9 @@ if creatematerials
         end
         fprintf(fileID,'%s \n',currLine);
     end
-    
 else
-    
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
-        if contains(currLine, 'geometry.pbrt')
-            [~,n] = fileparts(renderRecipe.inputFile);
-            currLine = sprintf('Include "%s_geometry.pbrt"',n);
-        end
         fprintf(fileID,'%s \n',currLine);
     end
 end

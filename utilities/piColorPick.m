@@ -6,8 +6,8 @@ if contains(color,'random')
     index = rand;
 %     color = colorlist{index};
 if index  <= 0.3, color = 'white';end
-if index>0.3&&index<=0.5, color = 'black';end
-if index>0.5&&index<=0.65, color = 'red';end
+if index>0.3&&index<=0.45, color = 'black';end
+if index>0.45&&index<=0.65, color = 'red';end
 if index>0.65&&index<=0.8, color = 'blue';end
 if index>0.8&&index<=0.85, color = 'green';end
 if index>0.85&&index<=0.90, color = 'yellow';end
@@ -20,48 +20,38 @@ end
 
 function rgb = colorswitch(color)
 switch color
-    case 'brown'
-        r = 100;
-        g = r - 20;
-        b = g;
-        rgb = [r/255 g/255 b/255];
     case 'white'
-        r = 250;
+        r = randi(14,1)+240;
         g = r;
-        b = g;
+        b = r;
         rgb = [r/255 g/255 b/255];
     case 'black'
-        r = 10;
-        g = r;
-        b = g;
+        r = randi(50,1);
+        g = randi(20,1);
+        b = randi(20,1);
         rgb = [r/255 g/255 b/255];
     case 'red'
-        r = 220;
-        g = 1;
-        b = 1;
+        r = randi(50,1)+200;
+        g = randi(30,1);
+        b = randi(30,1);
         rgb = [r/255 g/255 b/255];
     case 'blue'
-        r = 1;
-        b = 220;
-        g = 1;
+        r = randi(50,1);
+        g = 50+randi(50,1);
+        b = 205+randi(50,1);
         rgb = [r/255 g/255 b/255];
     case 'green'
-        g = 108;
-        r = 11;
-        b = 91;
+        r = randi(80,1);
+        g = 120+randi(80,1);
+        b = randi(80,1);
         rgb = [r/255 g/255 b/255];
     case 'yellow'
-        r = 249;
-        g = 184;
-        b = 68;
+        r = 170+randi(50,1);
+        g = r-10;
+        b = randi(50,1);
         rgb = [r/255 g/255 b/255];
     case 'silver'
-        r = 179;
-        g = r;
-        b = g;
-        rgb = [r/255 g/255 b/255];
-    case 'grey'
-        r = 104;
+        r = 200;
         g = r;
         b = g;
         rgb = [r/255 g/255 b/255];

@@ -75,3 +75,7 @@ class label color map
     Label(  'bicycle'              , 33 ,       18 , 'vehicle'         , 7       , True         , False        , (119, 11, 32) ),
     Label(  'license plate'        , -1 ,       -1 , 'vehicle'         , 7       , False        , True         , (  0,  0,142) )
 For instances label, we randomize the color for each class,like car, pedestrian, truck and bus, we do not have instances label for static object like builidngs.
+## sumo vehicle type parameters
+Vehicle type are choosen by the [sumo vehicle type default parameter](http://sumo.dlr.de/wiki/Vehicle_Type_Parameter_Defaults).
+## Note to myself
+When we import a model from other 3d vendors to C4D, somehow, some materials are converted to transparency(unfortunately, for the most of the time, the shading for preview does not show us that effect distinctly), and the transparent property(especially for uber material) will cause lots of fireflies in the pbrt rendered image, so it would be a good habit to always check the material property before we convert the 3d model into pbrt format.

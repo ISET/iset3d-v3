@@ -25,7 +25,7 @@ for ii = 1: length(assetPosList_tmp)
         for hh = 1: length(asset(dd).geometry)% change from ii to dd
             gg=1;
             position=cell(n,1);
-            rotation=cell(n,1); 
+            rotationY=cell(n,1); 
             pos = asset(dd).geometry(hh).position;
             rot = asset(dd).geometry(hh).rotate;
             asset(dd).geometry(hh).position = repmat(pos,1,uint8(assetPosList_tmp(ii).count));
@@ -38,11 +38,11 @@ for ii = 1: length(assetPosList_tmp)
             
             for jj = 1:length(streetlightPosList)
                 position{gg} = streetlightPosList(jj).position;
-                rotation{gg} = streetlightPosList(jj).rotate;
+                rotationY{gg} = streetlightPosList(jj).rotate;
                 gg = gg+1;
             end
             assets_updated(dd).geometry(hh) = piAssetTranslate(asset(dd).geometry(hh),position,'Pos_demention',n);
-            assets_updated(dd).geometry(hh) = piAssetRotate(assets_updated(dd).geometry(hh),rotation,'Pos_demention',n);
+            assets_updated(dd).geometry(hh) = piAssetRotate(assets_updated(dd).geometry(hh),'Y',rotationY,'Pos_demention',n);
             assets_updated(dd).fwInfo       = asset(dd).fwInfo;
         end
     end

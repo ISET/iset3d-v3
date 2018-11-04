@@ -1,26 +1,38 @@
 function trafficflow=piTrafficflowGeneration(road,varargin)
-% piTrafficGeneration Return a struct that contains the
-% states(position, orientation) of traffic participants at each simulation
-% time stamp;
+% Return a struct of the states(position, orientation) of traffic participants 
 %
+% Syntax
 %   trafficflow=piTrafficflowGeneration(RoadType,varargin)
 %
-% Input Parameters
+% Description
+%  Invokes the platform-specific SUMO to create the traffic flow.  It
+%  returns the position of cars and status of other items at a
+%  particular moment in time (timestamp).
 %
+% Input Parameters
 %   The Input is the RoadType struct;
 %
 % Optional parameter/values
-%
 %   'generationTime'     - The duration of time that will generate vehicles;
 %   'iterMax'            - number of iteration in duaIterate.py;
 %   'trafficflowDensity' - describes the traffic flow density;
 %
 % Output
-%
 %    trafficflow - state of each traffic participant at each time stamp;
 %
 % Minghao Shen, VISTALAB, 2018
+%
+% See also
+%
+% TODO
+%    SUMO and this Matlab call should be dockerized
+%    The XML read and write activity should be separated into another
+%    function.
+%
+
 %% SUMO_HOME environment variable
+
+% This needs to be generalized!
 if ismac
     setenv('SUMO_HOME','/Users/zhenyiliu/Documents/sumo/sumo-1.0.0');
     sumohome = getenv('SUMO_HOME');
@@ -36,7 +48,6 @@ if length(sumohome)<2
     error(sprintf("Please add SUMO_HOME to your system path.\n")+...
         "Refer to http://sumo.dlr.de/wiki/Basics/Basic_Computer_Skills");
 end
-
 
 %% Parameter Definition
 p=inputParser;
@@ -59,8 +70,9 @@ iterMax=inputs.iterMax;
 vType_interval=road.vTypes;
 vTypes=keys(vType_interval);
 % interval=values(vType_interval);
+
 %% Define a Path for sumo output by given scenetype and roadtype.
-netfileName=road.roadinfo.name;
+netfileName=road.name;
 netPath=fullfile(piRootPath,'data','sumo_input',netfileName,strcat(netfileName,'.net.xml'));
 outputPath=fullfile(piRootPath,'local');
 chdir(outputPath);
@@ -85,6 +97,7 @@ route_collect='';
 for ii=1:vType_interval.Count
     % store trips/routes for different types of vehicles in different
     % directorys
+    if ~isequal(vType_interval(vTypes{ii}),0)
     fullfilePath= fullfile(pwd,vTypes{ii});
     if ~exist(fullfilePath,'dir')
         mkdir(fullfilePath);
@@ -135,6 +148,7 @@ for ii=1:vType_interval.Count
     
     % Return to original directory
     chdir('..');
+    end
 end
 
 %% Write .add.xml
@@ -170,4 +184,5 @@ if ~isempty(addcheck)
 else
     trafficflow=piSumoRead('flowfile',strcat(netfileName,'_state.xml'));toc
 end
+
 end

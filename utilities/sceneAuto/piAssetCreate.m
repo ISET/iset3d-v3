@@ -1,8 +1,14 @@
 function asset = piAssetCreate(varargin)
-% Create and combine assets using base information from a recipe
+% Create a struct of Flywheel assets 
+%
+% Description
+%  The assets are found on Flywheel.  Each asset is stored with a
+%  generic recipe that defines how to render it. The information about
+%  all of the assets in the scene are placed in the returned asset
+%  struct. This has slots like asset.bicycle()
 %
 % Inputs
-%  thisR - A rendering recipe
+%   N/A
 %
 % Optional key/value parameters
 %   ncars
@@ -139,6 +145,6 @@ end
 
 
 %%
-disp('All done!')
+disp('Assets are assembled!')
 
 end
