@@ -351,6 +351,7 @@ switch opticsType
             scaleFactor = mode(newPhotons(:)./oldPhotons(:))';
         else
             warning('Cannot set scale factor for scene.');
+            ieObject = piSceneCreate(photons,'meanLuminance',100);
         end
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(metadataMap))
