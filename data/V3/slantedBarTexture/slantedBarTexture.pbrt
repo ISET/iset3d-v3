@@ -7,7 +7,7 @@ Integrator "directlighting" "integer maxdepth" [1]
 WorldBegin
 	# Default Material
 	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
-	LightSource "infinite" "integer nsamples" [8] "spectrum L" "EqualEnergy.spd"
+	LightSource "distant" "point from" [0 0 0] "point to" [0 0 100]  "spectrum L" "EqualEnergy.spd" 
     Include "slantedBarTexture_materials.pbrt"
 	Include "slantedBarTexture_geometry.pbrt"
 WorldEnd
