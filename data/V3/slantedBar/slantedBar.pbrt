@@ -31,8 +31,6 @@ WorldBegin
   	  ObjectInstance "SlantedBar"   
 	AttributeEnd
 
-	LightSource "infinite" 
-  	"integer nsamples" [8] 
-  	"spectrum L" "EqualEnergy.spd"
+	LightSource "distant" "point from" [0 0 0] "point to" [0 0 100]  "spectrum L" "EqualEnergy.spd" 
 
 WorldEnd

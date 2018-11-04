@@ -11,6 +11,7 @@ if isempty(st), st = scitran('stanfordlabs'); end
 sceneName = strrep(sceneName,'_mesh','');
 destName_recipe = fullfile(sceneFolder,[sceneName,'.json']);
 % find acquisition
+if ~exist(sceneFolder,'dir'),mkdir(sceneFolder);end
 files = st.search('file',...
    'project label exact','Graphics assets',...
    'session label exact','scenes_pbrt',...
@@ -48,7 +49,7 @@ scene_label.seg = labelPath;
 
 %{
 % instanceIDs = unique(meshImage);% Find index of labeled object
-% instanceIDs = instanceIDs(instanceIDs > 0);
+% instanceIDs = instanceIDs(instanceIDs >= 0);
 % 
 % instance = instanceIDSearch(label,instanceIDs);
 % % Search ID in scene_mesh.txt, assign bndbox to the object.
@@ -60,10 +61,10 @@ scene_label.seg = labelPath;
 %     end
 %     
 %     xSpread = sum(indicator);
-%     xIndices = find(xSpread > 0);
+%     xIndices = find(xSpread >= 0);
 %     
 %     ySpread = sum(indicator,2);
-%     yIndices = find(ySpread > 0);
+%     yIndices = find(ySpread >= 0);
 % %     for jj = 1:length(objects)
 % %         if isequal(objects(jj).name, instance{ii}.name)
 % %             %              [~,name] = fileparts(thisR.outputFile);
@@ -90,7 +91,7 @@ function [occluded, truncated,bbox2d] = getBBox(scene_mesh,index,offset)
 if offset==0
     indicator = (scene_mesh==index);
 else
-    indicator = ((scene_mesh<(index+offset))&(scene_mesh>(index-offset)));
+    indicator = ((scene_mesh<=(index+offset))&(scene_mesh>=(index-offset)));
 end    
 xSpread = sum(indicator);
 xIndices = find(xSpread > 0);
@@ -111,7 +112,7 @@ else
 end
 
 % Truncations
-if (bbox2d.xmin == 0 || bbox2d.ymin == 0 || ...
+if (bbox2d.xmin == 1 || bbox2d.ymin == 1 || ...
         bbox2d.xmax == w || bbox2d.ymax == h)
     truncated = 1;
 else
@@ -152,7 +153,7 @@ function [labelPath,objectList] = instanceSeg(scene_mesh,label,objects)
 % objectList: visible objects list
 data=importdata(label);
 s = regexp(data, '\s+', 'split');
-offset=5;
+offset=0;% test offset
 SegmentationMap= ones(size(scene_mesh));
 InstanceMap= ones(size(scene_mesh));
 l=size(scene_mesh,1);
@@ -178,18 +179,18 @@ count_pedestrian=0;
 for ii = 1:size(s,1)
     a=str2double(s{ii}{1});% change from str2num to str2double
     if contains(s{ii}{2},'sky')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=1;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=70;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=130;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=180;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=1;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=70;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=130;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=180;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end
-    if contains(s{ii}{2},'car')||contains(s{ii}{2},'Car')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=2;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=0;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=0;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=142;
-        if ~isempty(C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset))))
+    if contains(lower(s{ii}{2}),'car')
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=2;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=0;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=0;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=142;
+        if ~isempty(C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset))))
             count_car=count_car+1;
             objectList.car{count_car}.name = s{ii}{2};
             [objectList.car{count_car}.occluded,...
@@ -206,20 +207,20 @@ for ii = 1:size(s,1)
             objectList.car{count_car}.rotate   = objects(jj).rotate;
             
         end
-        InstanceMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=2000+count_car;
+        InstanceMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=2000+count_car;
 
-        I_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
-        I_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
-        I_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
+        I_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
+        I_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
+        I_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
 
     end
     
-    if contains(s{ii}{2},'truck')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=3;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=0;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=0;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=70;
-        if ~isempty(C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset))))
+    if contains(lower(s{ii}{2}),'truck')
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=3;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=0;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=0;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=70;
+        if ~isempty(C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset))))
             count_truck=count_truck+1;
             objectList.truck{count_truck}.name = s{ii}{2};
             [objectList.truck{count_truck}.occluded,...
@@ -234,19 +235,19 @@ for ii = 1:size(s,1)
             objectList.truck{count_truck}.position = objects(jj).position;
             objectList.truck{count_truck}.rotate   = objects(jj).rotate;
         end
-        InstanceMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=3000+count_truck;
+        InstanceMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=3000+count_truck;
 
-        I_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
-        I_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
-        I_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
+        I_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
+        I_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
+        I_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
     end
     
-    if contains(s{ii}{2},'bus')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=4;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=0;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=60;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=100;
-        if ~isempty(C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset))))
+    if contains(lower(s{ii}{2}),'bus')
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=4;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=0;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=60;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=100;
+        if ~isempty(C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset))))
             count_bus=count_bus+1;
             objectList.bus{count_bus}.name= s{ii}{2};
             [objectList.bus{count_bus}.occluded,...
@@ -261,13 +262,13 @@ for ii = 1:size(s,1)
             objectList.bus{count_bus}.position = objects(jj).position;
             objectList.bus{count_bus}.rotate   = objects(jj).rotate;           
         end
-        InstanceMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=4000+count_bus;
+        InstanceMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=4000+count_bus;
 
-        I_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
-        I_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
-        I_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=randi(255);
+        I_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
+        I_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
+        I_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=randi(255);
     end
-    if contains(s{ii}{2},'rider')&&contains(s{ii}{2},'people')
+    if contains(lower(s{ii}{2}),'rider')&&contains(lower(s{ii}{2}),'people')
         SegmentationMap(scene_mesh==a)=5;
         C_1(scene_mesh==a)=255;
         C_2(scene_mesh==a)=0;
@@ -293,7 +294,7 @@ for ii = 1:size(s,1)
         I_2(scene_mesh==a)=randi(255);
         I_3(scene_mesh==a)=randi(255);
     end
-    if contains(s{ii}{2},'bicycle')||(contains(s{ii}{2},'bike_')&&~contains(s{ii}{2},'people'))
+    if contains(lower(s{ii}{2}),'bicycle')||(contains(lower(s{ii}{2}),'bike_')&&~contains(lower(s{ii}{2}),'people'))
         SegmentationMap((scene_mesh==a))=6;
         C_1(scene_mesh==a)=119;
         C_2(scene_mesh==a)=11;
@@ -319,7 +320,7 @@ for ii = 1:size(s,1)
         I_2(scene_mesh==a)=randi(255);
         I_3(scene_mesh==a)=randi(255);
     end
-    if contains(s{ii}{2},'motor')
+    if contains(lower(s{ii}{2}),'motor')
         SegmentationMap(scene_mesh==a)=7;
         C_1(scene_mesh==a)=0;
         C_2(scene_mesh==a)=0;
@@ -345,7 +346,7 @@ for ii = 1:size(s,1)
         I_2(scene_mesh==a)=randi(255);
         I_3(scene_mesh==a)=randi(255);
     end
-    if contains(s{ii}{2},'pedestrian')
+    if contains(lower(s{ii}{2}),'pedestrian')
         SegmentationMap(scene_mesh==a)=8;
         C_1(scene_mesh==a)=220;
         C_2(scene_mesh==a)=20;
@@ -353,8 +354,8 @@ for ii = 1:size(s,1)
         if ~isempty(C_1(scene_mesh==a))
             count_pedestrian=count_pedestrian+1;
             objectList.pedestrian{count_pedestrian}.name= s{ii}{2};
-            disp(s{ii}{2});
-            disp(a);
+%             disp(s{ii}{2});
+%             disp(a);
             [objectList.pedestrian{count_pedestrian}.occluded,...
                 objectList.pedestrian{count_pedestrian}.truncated,...
                 objectList.pedestrian{count_pedestrian}.bbox2d] = getBBox(scene_mesh,a,0);
@@ -374,48 +375,48 @@ for ii = 1:size(s,1)
         I_3(scene_mesh==a)=randi(255);
     end
     if contains(s{ii}{2},'tree_')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=9;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=107;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=142;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=35;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=9;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=107;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=142;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=35;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end
     if contains(s{ii}{2},'building')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=10;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=70;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=70;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=70;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=10;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=70;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=70;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=70;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end
     if contains(s{ii}{2},'streetlight')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=11;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=153;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=153;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=153;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=11;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=153;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=153;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=153;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end
     if contains(s{ii}{2},'trafficlight')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=12;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=250;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=170;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=30;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=12;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=250;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=170;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=30;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end
     if contains(s{ii}{2},'trafficsign')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=13;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=220;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=220;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=0;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=13;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=220;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=220;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=0;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end
     if (contains(s{ii}{2},'bikerack')&&~contains(s{ii}{2},'bike'))...
             ||contains(s{ii}{2},'trashcan')||contains(s{ii}{2},'callbox')...
             ||contains(s{ii}{2},'bench')||contains(s{ii}{2},'billboard')...
             ||contains(s{ii}{2},'station')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=14;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=111;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=74;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=0;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=14;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=111;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=74;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=0;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end
     if (contains(s{ii}{2},'city_cross_4lanes_1')...
@@ -428,17 +429,17 @@ for ii = 1:size(s,1)
             ||contains(s{ii}{2},'straight_2lanes_parking')...
             ||contains(s{ii}{2},'highway_straight_4lanes')...
             ||contains(s{ii}{2},'road'))
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=15;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=128;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=64;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=128;
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=15;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=128;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=64;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=128;
         I_1=C_1;I_2=C_2;I_3=C_3;        
     end
-    if contains(s{ii}{2},'plane')||contains(s{ii}{2},'sidewalk')
-        SegmentationMap((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=16;
-        C_1((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=244;
-        C_2((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=35;
-        C_3((scene_mesh<(a+offset))&(scene_mesh>(a-offset)))=232;
+    if contains(lower(s{ii}{2}),'plane')||contains(lower(s{ii}{2}),'sidewalk')
+        SegmentationMap((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=16;
+        C_1((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=244;
+        C_2((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=35;
+        C_3((scene_mesh<=(a+offset))&(scene_mesh>=(a-offset)))=232;
         I_1=C_1;I_2=C_2;I_3=C_3;
     end    
 end

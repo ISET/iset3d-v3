@@ -93,6 +93,8 @@ end
 
 %% SUSO setting
 
+<<<<<<< HEAD
+=======
 % This places the fixed (static) objects. To speed up debugging, we
 % removed this.  But in actual cases we use it every time.
 %
@@ -100,12 +102,14 @@ end
 warning('No static objects placed');
 
 %{
+>>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 tic
-tree_interval = rand(1)*20+2;
+tree_interval = rand(1)*20+5;
 
 %%
 if contains(sceneType,'city')||contains(sceneType,'suburb')
-    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+    % tmp
+    %susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
     % place parked cars
     if contains(roadType,'parking')
         trafficflow = piParkingPlace(road, trafficflow);
@@ -128,6 +132,19 @@ if contains(sceneType,'city')||contains(sceneType,'suburb')
     % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
     toc
 end
+<<<<<<< HEAD
+
+%% Place vehicles/pedestrians
+[sumoPlaced,~] = piTrafficPlace(trafficflow,...
+                                               'timestamp',timestamp,...
+                                               'resources',~cloudRenderFlag,...
+                                               'scitran',st);
+for ii = 1: length(sumoPlaced)
+    thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
+end
+% create a file ID & name strings for flywheel to copy selected assets over to VMs.
+road = fwInfoCat(road,susoPlaced); % static objects
+=======
 %}
 
 %% Place vehicles/pedestrians using the SUMO data
@@ -149,6 +166,7 @@ end
 % road = fwInfoCat(road,susoPlaced); % static objects
 %
 
+>>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 road = fwInfoCat(road,sumoPlaced{1}); % mobile objects
 
 end

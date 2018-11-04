@@ -43,7 +43,7 @@ end
 p.addParameter('print',true,@islogical);
 % p.addParameter('pbrtversion',2,@(x)(x == 2 || x == 3));
 p.addParameter('remotedirectory','/resources/scenes/pbrt',@ischar);
-p.addParameter('version','V2',@ischar);
+p.addParameter('version','V3',@ischar);
 
 p.parse(varargin{:});
 remotedirectory = p.Results.remotedirectory;

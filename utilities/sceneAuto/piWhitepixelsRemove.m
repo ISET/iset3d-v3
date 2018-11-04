@@ -10,7 +10,7 @@ function oi = piWhitepixelsRemove(ieObject)
 
 ieAddObject(ieObject); sceneWindow;
 oi = oiCreate('diffraction limited');
-oi = oiCompute(oi,ieObject);
+oi = oiCompute(ieObject,oi);
 ieAddObject(oi); oiWindow;
 
 
@@ -38,7 +38,7 @@ dLogIlluminance = conv2(logIlluminance,g,'same');
 
 
 %% Find points  more than XX larger than the average of their neighbors 
-brightSpots = (dLogIlluminance > log10(4));
+brightSpots = (dLogIlluminance > log10(3.5));
 [r,c] = find(brightSpots);
 
 vcNewGraphWin;

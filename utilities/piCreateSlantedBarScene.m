@@ -30,33 +30,26 @@ planeDepth = parser.Results.planeDepth;
 illumination = parser.Results.illumination;
 
 %% Read in base scene
-scenePath = fullfile(piRootPath,'data','V3','slantedBarAdjustableDepth');
+scenePath = fullfile(piRootPath,'data','V3','slantedBar');
+sceneName = 'slantedBar.pbrt';
+recipe = piRead(fullfile(scenePath,sceneName),'version',3);
 
-% Check plane order
-if(whiteDepth <= blackDepth)
-    sceneName = 'slantedBarWhiteFront.pbrt';
-else
-    sceneName = 'slantedBarBlackFront.pbrt';
+%% Make adjustments to the plane
+
+if(~isempty(planeDepth))
+    % If the user provides an overall plane depth, override the black and
+    % white depths.
+    whiteDepth = planeDepth;
+    blackDepth = planeDepth;
 end
 
-recipe = piRead(fullfile(scenePath,sceneName),'version',3);
-%% Make adjustments to the point
-
-% Clear previous transforms
-% piClearObjectTransforms(recipe,'WhitePlane');
-% piClearObjectTransforms(recipe,'BlackPlane');
-
-% Add given transforms
-if(isempty(planeDepth))
-    recipe = piObjectTransform(recipe, 'WhitePlane', ...
-        'Translate', [0 0 whiteDepth]);
-    recipe = piObjectTransform(recipe, 'BlackPlane', ...
-        'Translate', [0 0 blackDepth]);
-else
-    recipe = piObjectTransform(recipe, 'WhitePlane', ...
-        'Translate', [0 0 planeDepth]);
-    recipe = piObjectTransform(recipe, 'BlackPlane', ...
-        'Translate', [0 0 planeDepth]);
+for ii = 1:length(recipe.assets)
+    if strcmp(recipe.assets(ii).name,'BlackPlane')
+        recipe.assets(ii).position = [recipe.assets(ii).position(1);recipe.assets(ii).position(2); blackDepth];
+    end
+    if strcmp(recipe.assets(ii).name,'WhitePlane')
+        recipe.assets(ii).position = [recipe.assets(ii).position(1);recipe.assets(ii).position(2); whiteDepth];
+    end
 end
 
 %% Make adjustments to the light

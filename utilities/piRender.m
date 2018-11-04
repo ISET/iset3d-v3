@@ -241,13 +241,11 @@ for ii = 1:length(filesToRender)
         % If we used RGB primaries when rendering, the output should be in energy
         % units not quanta. There is some arbitrariness about this however, so we
         % should fix a standard at some point.
-        if(any(contains(thisR.world,'"bool useSPD" "true"')))
             wave = 400:10:700; % Hard coded in pbrt
             % The scaling factor comes from the display primary units. In
             % PBRT the display primaries are normalized to 1, the scaling
             % factor to convert back to real units is then reapplied here.
             photons = Energy2Quanta(wave,photons)*0.003664;
-        end
     elseif(strcmp(label{ii},'depth') || strcmp(label{ii},'metadata') )
         tmp = piReadDAT(outFile, 'maxPlanes', 31);
         metadataMap = tmp(:,:,1); clear tmp;
@@ -351,6 +349,7 @@ switch opticsType
             scaleFactor = mode(newPhotons(:)./oldPhotons(:))';
         else
             warning('Cannot set scale factor for scene.');
+            ieObject = piSceneCreate(photons,'meanLuminance',100);
         end
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(metadataMap))

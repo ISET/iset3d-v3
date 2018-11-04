@@ -109,31 +109,86 @@ assets = piAssetCreate('ncars',ncars,...
 assets_updated = assets;
 
 if nScene == 1
-    assetClassList = fieldnames(assets);
+    assetClassList = fieldnames(assets);        
     for hh = 1: length(assetClassList)
-        assetClass = assetClassList{hh};
-        index = 1;
+        assetClass = assetClassList{hh};        
         order = randperm(numel(trafficflow(timestamp).objects.(assetClass)));
+<<<<<<< HEAD
+        for jj = 1:numel(trafficflow(timestamp).objects.(assetClass)) 
+            assets_shuffled.(assetClass)(jj) = trafficflow(timestamp).objects.(assetClass)(order(jj));% target assets
+        end
+        index = 1;
+        % In order to correctly add motion blur to the final rendering, we
+        % need to find out the translation and rotation of the object on
+        % the next timestamp, in another words, where the object is going.
+        % And to do that, we need compare the object name of this timestamp
+        % with the object name of next timestamp, extract the start and end
+        % transformation of both.        
+        for jj = 1:length(assets_shuffled.(assetClass))
+            for ii = 1:numel(trafficflow(timestamp+1).objects.(assetClass))
+                assets_shuffled.(assetClass)(jj).motion=[];
+                if strcmp(assets_shuffled.(assetClass)(jj).name,trafficflow(timestamp+1).objects.(assetClass)(ii).name)
+                    assets_shuffled.(assetClass)(jj).motion.pos = trafficflow(timestamp+1).objects.(assetClass)(ii).pos;
+                    assets_shuffled.(assetClass)(jj).motion.orientation = trafficflow(timestamp+1).objects.(assetClass)(ii).orientation;
+                    assets_shuffled.(assetClass)(jj).motion.slope = trafficflow(timestamp+1).objects.(assetClass)(ii).slope;
+                end
+            end
+            if isempty(assets_shuffled.(assetClass)(jj).motion)
+                % there are cases when a car is going out of boundary or
+                % some else reason, sumo decides to kill this car, so in
+                % these cases, the motion info remains empty or we should
+                % estimate by speed information;
+                from = assets_shuffled.(assetClass)(jj).pos;
+                distance = assets_shuffled.(assetClass)(jj).speed;
+                orientation = assets_shuffled.(assetClass)(jj).orientation;
+                to(1)   = from(1)+distance*cosd(orientation);
+                to(2)   = from(2);
+                to(3)   = from(3)-distance*sind(orientation);
+                assets_shuffled.(assetClass)(jj).motion.pos = to;
+                assets_shuffled.(assetClass)(jj).motion.orientation = assets_shuffled.(assetClass)(jj).orientation;
+                assets_shuffled.(assetClass)(jj).motion.slope = assets_shuffled.(assetClass)(jj).slope;
+                
+            end
+=======
         for jj = 1:numel(trafficflow(timestamp).objects.(assetClass))
             assets_shuffled.(assetClass)(jj) = trafficflow(timestamp).objects.(assetClass)(order(jj));
+>>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
         end
         for ii = 1: length(assets.(assetClass))
-            
             [~,n] = size(assets.(assetClass)(ii).geometry(1).position);
-            position=cell(n,1);
-            rotationY=cell(n,1); % rotationY is RotY
-            slope   =cell(n,1); % Slope is RotZ
+            position     =cell(n,1);
+            rotationY    =cell(n,1); % rotationY is RotY
+            slope        =cell(n,1); % Slope is RotZ
+            motionPos    =cell(n,1);
+            motionRotY   =cell(n,1); % rotationY is RotY
+            motioinSlope =cell(n,1); % Slope is RotZ
             for gg = 1:n
-                position{gg} = assets_shuffled.(assetClass)(index).pos;
+                position{gg}  = assets_shuffled.(assetClass)(index).pos;
                 rotationY{gg} = assets_shuffled.(assetClass)(index).orientation-90;
-                slope{gg}    = assets_shuffled.(assetClass)(index).slope;
+                slope{gg}     = assets_shuffled.(assetClass)(index).slope;
                 if isempty(slope{gg}), slope{gg}=0;end
+                motionPos{gg}    = assets_shuffled.(assetClass)(index).motion.pos;
+                motionRotY{gg}   = assets_shuffled.(assetClass)(index).motion.orientation-90;
+                motioinSlope{gg} = assets_shuffled.(assetClass)(index).motion.slope;
+                if isempty(motioinSlope{gg}), motioinSlope{gg}=0;end
                 index = index+1;
             end
-            fprintf('%s: ii = %d;jj = %d \n',assetClass,ii,jj);
+            % Add translation to the asset
             assets_updated.(assetClass)(ii).geometry = piAssetTranslate(assets.(assetClass)(ii).geometry,position,'Pos_demention',n);
-            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,'Y',rotationY,'Z',slope,'Pos_demention',n);
+            
+            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,...
+                                                                    'Y',rotationY,...
+                                                                    'Z',slope,...
+                                                                    'Pos_demention',n);
+            % Add Motion 
+            assets_updated.(assetClass)(ii).geometry = piAssetMotionAdd(assets_updated.(assetClass)(ii).geometry,...
+                                                                        'translation',motionPos,...
+                                                                        'Y',motionRotY,...
+                                                                        'Z',motioinSlope,...
+                                                                        'Pos_demention',n);
+           
         end
+        
     end
     assetsPosList{1} = assets_updated;
 end

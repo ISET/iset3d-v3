@@ -25,10 +25,10 @@ thisR.set('filmresolution',[800 600]);
 thisR.set('pixelsamples',16);
 
 %% List material library
-
+piSkymapAdd(thisR,'noon');
 % it's helpful to check what current material properties are.
-% piMaterialList(thisR);
-
+piMaterialList(thisR);
+piMaterialGroupAssign(thisR);
 fprintf('A library of materials\n\n');  % Needs a nicer print method
 disp(thisR.materials.lib)
 
@@ -45,7 +45,9 @@ thisR.set('outputFile',fullfile(piRootPath,'local','SimpleSceneExport',[n,e]));
 piWrite(thisR);
 
 %% Render
-tic, scene = piRender(thisR); toc
+tic, scene = piRender(thisR,'render type','radiance'); toc
+tic, scene = piRender(thisR); toc % By default, you will have depth map rendered with radiance image;
+
 scene = sceneSet(scene,'name',sprintf('Glass on (%d)',thisR.integrator.maxdepth.value));
 ieAddObject(scene); sceneWindow;
 
@@ -65,7 +67,7 @@ piWrite(thisR,'creatematerials',true);
 
 %% Render again
 
-tic, scene = piRender(thisR); toc
+tic, scene = piRender(thisR,'render type','radiance'); toc
 scene = sceneSet(scene,'name','Glass off');
 ieAddObject(scene); sceneWindow;
 

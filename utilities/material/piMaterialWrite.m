@@ -13,25 +13,25 @@ p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 p.parse(thisR);
 
 %% 
-workingDir = fileparts(thisR.outputFile);
-% copy spds to working directroy
-spds_path = fullfile(piRootPath,'data','spds');
-desdir = fullfile(workingDir,'spds');
-if ~exist(desdir,'dir'), mkdir(desdir);end
-status = copyfile(spds_path,desdir);
-if(~status), error('Failed to copy spds directory to docker working directory.');end
-% copy skymaps to working directroy
-skymaps_path = fullfile(piRootPath,'data','skymaps');
-desdir=fullfile(workingDir,'skymaps');
-if ~exist(desdir,'dir'), mkdir(desdir);end
-status = copyfile(skymaps_path,desdir);
-if(~status), error('Failed to copy skymaps directory to docker working directory.');end
-% copy brdfs to working directroy
-brdfs_path = fullfile(piRootPath,'data','bsdfs');
-desdir = fullfile(workingDir,'bsdfs');
-if ~exist(desdir,'dir'), mkdir(desdir);end
-status = copyfile(brdfs_path,desdir);
-if(~status), error('Failed to copy bsdfs directory to docker working directory.');end
+% workingDir = fileparts(thisR.outputFile);
+% % copy spds to working directroy
+% spds_path = fullfile(piRootPath,'data','spds');
+% desdir = fullfile(workingDir,'spds');
+% if ~exist(desdir,'dir'), mkdir(desdir);end
+% status = copyfile(spds_path,desdir);
+% if(~status), error('Failed to copy spds directory to docker working directory.');end
+% % copy skymaps to working directroy
+% skymaps_path = fullfile(piRootPath,'data','skymaps');
+% desdir=fullfile(workingDir,'skymaps');
+% if ~exist(desdir,'dir'), mkdir(desdir);end
+% status = copyfile(skymaps_path,desdir);
+% if(~status), error('Failed to copy skymaps directory to docker working directory.');end
+% % copy brdfs to working directroy
+% brdfs_path = fullfile(piRootPath,'data','bsdfs');
+% desdir = fullfile(workingDir,'bsdfs');
+% if ~exist(desdir,'dir'), mkdir(desdir);end
+% status = copyfile(brdfs_path,desdir);
+% if(~status), error('Failed to copy bsdfs directory to docker working directory.');end
 
 %% Parse the output file, working directory, stuff like that.
 
