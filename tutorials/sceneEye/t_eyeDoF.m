@@ -45,7 +45,7 @@ myScene.numBounces = 3;
 myScene.numRays = 256;
 myScene.resolution = 256;
     
-pupilDiameter = [2 4 6 8];
+pupilDiameter = [2 4 6];
 for pd = pupilDiameter
     
     myScene.pupilDiameter = pd;

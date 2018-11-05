@@ -62,11 +62,14 @@ myScene
 myScene.name = 'fastExample';
 
 % Let's change the number of rays to render with. 
-myScene.numRays = 256;
+myScene.numRays = 128;
+
+% And the FOV of the retinal image
+myScene.fov = 30;
 
 % Let's also change the resolution of the render. The retinal image is
 % always square, so there is only one parameter for resolution.
-myScene.resolution = 256;
+myScene.resolution = 128;
 
 % Now let's render. This may take a few seconds, depending on the number of
 % cores on your machine. On a machine with 2 cores it takes ~15 seconds. 
@@ -80,21 +83,33 @@ oiWindow;
 
 %% Step through accommodation
 % Now let's render a series of retinal images at different accommodations.
-% This section renders roughly in 30 sec on a machine with 8 cores. 
 
-accomm = [1 5 10]; % in diopters
+% With numRays at 128 and resolution at 128, each image takes around 30
+% second to render on a local machine with 8 cores. If you'd like to bump
+% up the image quality slightly, you can turn the resolution up to 256 and
+% numRays to 256, which will bring rendering time to around 2 min per
+% image.  
+% myScene.resoltuion = 256; 
+% myScene.numRays = 256;
+
+accomm = [3 5 10]; % in diopters
 opticalImages = cell(length(accomm),1);
 for ii = 1:length(accomm)
     
     myScene.accommodation = accomm(ii);
     myScene.name = sprintf('accom_%0.2fdpt',myScene.accommodation);
     
+    % This produces the characteristic LCA of the eye. The higher the
+    % number, the longer the rendering time but the finer the sampling
+    % across the visible spectrum.
+    myScene.numCABands = 6; 
+    
     % When we change accommodation the lens geometry and dispersion curves
     % of the eye will change. ISETBIO automatically generates these new
     % files at rendering time and will output them in your working
     % directory. In general, you may want to periodically clear your
     % working directory to avoid a build up of files.
-    oi = myScene.render;
+    [oi, results] = myScene.render;
     ieAddObject(oi);
     opticalImages{ii} = oi;
 end
