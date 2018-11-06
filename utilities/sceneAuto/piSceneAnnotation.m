@@ -92,7 +92,8 @@ if offset==0
     indicator = (scene_mesh==index);
 else
     indicator = ((scene_mesh<=(index+offset))&(scene_mesh>=(index-offset)));
-end    
+end
+figure;imagesc(indicator);
 xSpread = sum(indicator);
 xIndices = find(xSpread > 0);
 ySpread = sum(indicator,2);
