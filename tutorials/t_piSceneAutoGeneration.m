@@ -34,7 +34,7 @@ st = scitran('stanfordlabs');
 % store certain parameters about the rendering.
 
 tic
-gcp = gCloud('configuration','gcp-pbrtv3-central-32cpu-208m-flywheel');
+gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-32');
 toc
@@ -54,13 +54,14 @@ str = gcp.configList;
 % them into an asset list.  That is managed in piSceneAuto
 
 tic
-sceneType = 'city3';
+sceneType = 'city4';
 % roadType = 'cross';
 % sceneType = 'highway';
-roadType = 'cross';
+% roadType = 'cross';
 % roadType = 'highway_straight_4lanes_001';
+roadType = 'straight_2lanes_parking';
 
-trafficflowDensity = 'medium';
+trafficflowDensity = 'high';
 
 dayTime = 'noon';
 
@@ -131,13 +132,13 @@ thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
 % thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
 xRes = 1280;
 yRes = 720;
-pSamples = 128;
+pSamples = 1024;
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
 thisR_scene.set('fov',45);
 thisR_scene.film.diagonal.value=10;
 thisR_scene.film.diagonal.type = 'float';
-thisR_scene.integrator.maxdepth.value = 10;
+thisR_scene.integrator.maxdepth.value = 5;
 thisR_scene.integrator.subtype = 'bdpt';
 thisR_scene.sampler.subtype = 'sobol';
 thisR_scene.integrator.lightsamplestrategy.type = 'string';
@@ -216,11 +217,15 @@ disp('Data downloaded');
 %
 for ii =1:length(scene)
     scene_corrected{ii} = piFireFliesRemove(scene{ii});
+   
+    
 %     xCrop = oiGet(scene_oi{ii},'cols')-xRes;
 %     yCrop = oiGet(scene_oi{ii},'rows')-yRes;
 %     scene_crop{ii} = oiCrop(scene_oi{ii},[xCrop/2 yCrop/2 xRes-1 yRes-1]);
     %     scene_crop{ii}.depthMap = imcrop(scene_crop{ii}.depthMap,[xCrop/2 yCrop/2 xRes-1 yRes-1]);
-    ieAddObject(scene_corrected{ii});
+    ieAddObject(scene_corrected{ii}); 
+    sceneWindow;
+    sceneSet(scene_corrected{ii},'gamma',0.85);
     %oiSet(scene_corrected{ii},'gamma',0.85);
     pngFigure = oiGet(scene_corrected{ii},'rgb image');
     pngFigure_corrected = pngFigure.^(1/1.5);
@@ -261,7 +266,7 @@ for ii =1:length(scene)
     drawnow;
 
 end
-oiWindow;
+sceneWindow;
 truesize;
 
 %% Remove all jobs.

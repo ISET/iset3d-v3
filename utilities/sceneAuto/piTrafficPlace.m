@@ -124,8 +124,8 @@ if nScene == 1
         % with the object name of next timestamp, extract the start and end
         % transformation of both.
         for jj = 1:length(assets_shuffled.(assetClass))
+             assets_shuffled.(assetClass)(jj).motion=[];
             for ii = 1:numel(trafficflow(timestamp+1).objects.(assetClass))
-                assets_shuffled.(assetClass)(jj).motion=[];
                 if strcmp(assets_shuffled.(assetClass)(jj).name,trafficflow(timestamp+1).objects.(assetClass)(ii).name)
                     assets_shuffled.(assetClass)(jj).motion.pos = trafficflow(timestamp+1).objects.(assetClass)(ii).pos;
                     assets_shuffled.(assetClass)(jj).motion.orientation = trafficflow(timestamp+1).objects.(assetClass)(ii).orientation;

@@ -207,16 +207,17 @@ end
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
 if isfield(renderRecipe.camera,'motion') 
-    motionTransform =renderRecipe.camera.motion.activeTransformStart.pos-renderRecipe.camera.motion.activeTransformEnd.pos;
+    motionTranslate =renderRecipe.camera.motion.activeTransformStart.pos-renderRecipe.camera.motion.activeTransformEnd.pos;
+    motionRotate    =renderRecipe.camera.motion.activeTransformStart.rotate-renderRecipe.camera.motion.activeTransformEnd.rotate;
     fprintf(fileID,'ActiveTransform StartTime \n');
     fprintf(fileID,'Translate 0 0 0 \n');
 %     fprintf(fileID,'Rotate %0.2f 0 1 0\n',renderRecipe.camera.motion.activeTransformStart.rotate); % add rotate aroung x, y, z
     fprintf(fileID,'ActiveTransform EndTime \n');
     fprintf(fileID,'Translate %0.2f %0.2f %0.2f \n',...
-        [motionTransform(1),...
-        motionTransform(2),...
-        motionTransform(3)]);
-%     fprintf(fileID,'Rotate %0.2f 0 1 0\n',renderRecipe.camera.motion.activeTransformEnd.rotate);
+        [motionTranslate(1),...
+        motionTranslate(2),...
+        motionTranslate(3)]);
+    fprintf(fileID,'Rotate %0.2f 0 1 0 \n',motionRotate);
     fprintf(fileID,'ActiveTransform All \n');
 end
 % Required LookAt 

@@ -119,10 +119,12 @@ if contains(sceneType,'city')||contains(sceneType,'suburb')
     thisR_road = piAssetAdd(thisR_road, susoPlaced);
     % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
     toc
+    % create a file ID & name strings for Flywheel to copy selected assets
+    % over to VMs.
+    % static objects
+    road = fwInfoCat(road,susoPlaced);
 end
-% create a file ID & name strings for Flywheel to copy selected assets
-% over to VMs.
-road = fwInfoCat(road,susoPlaced); % static objects
+
 %}
 
 %% Place vehicles/pedestrians using the SUMO data
@@ -137,6 +139,9 @@ for ii = 1: length(sumoPlaced)
 end
 
 road = fwInfoCat(road,sumoPlaced{1}); % mobile objects
+
+
+
 
 end
 

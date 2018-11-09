@@ -55,8 +55,7 @@ for ii = 1: length(assetRecipe)
     [~,scenename] = fileparts(thisR.outputFile);
     for jj = 1:length(geometry)
         if ~isequal(lower(geometry(jj).name),'camera') && ...
-                ~contains(lower(geometry(jj).name),'light') && ...
-                ~contains(lower(geometry(jj).name),'rider_bike')
+                ~contains(lower(geometry(jj).name),'light') 
             name = geometry(jj).name;
             geometry(jj).name = sprintf('%s_%s',label,scenename);% name on 'flywheel_label'
             break;
