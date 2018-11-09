@@ -112,9 +112,20 @@ elseif isa(thisR,'recipe')
         end
         
         metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType);
-        piWrite(metadataRecipe,'overwritepbrtfile',true,...
-            'overwritelensfile',false,...
-            'overwriteresources',false);
+        
+        % Depending on whether we used C4D to export, we create a new
+        % material files that we link with the main pbrt file.
+        if(strcmp(metadataRecipe.exporter,'C4D'))
+            creatematerials = true;
+        else
+            creatematerials = false;
+        end
+        piWrite(metadataRecipe,...
+            'overwritepbrtfile', true,...
+            'overwritelensfile', false, ...
+            'overwriteresources', false,...
+            'creatematerials',creatematerials);
+        
         metadataFile = metadataRecipe.outputFile;
         
     end
@@ -226,6 +237,15 @@ for ii = 1:length(filesToRender)
     % photons or depth map.
     if(strcmp(label{ii},'radiance'))
         photons = piReadDAT(outFile, 'maxPlanes', 31);
+        % Convert photons units, if necessary
+        % If we used RGB primaries when rendering, the output should be in energy
+        % units not quanta. There is some arbitrariness about this however, so we
+        % should fix a standard at some point.
+            wave = 400:10:700; % Hard coded in pbrt
+            % The scaling factor comes from the display primary units. In
+            % PBRT the display primaries are normalized to 1, the scaling
+            % factor to convert back to real units is then reapplied here.
+            photons = Energy2Quanta(wave,photons)*0.003664;
     elseif(strcmp(label{ii},'depth') || strcmp(label{ii},'metadata') )
         tmp = piReadDAT(outFile, 'maxPlanes', 31);
         metadataMap = tmp(:,:,1); clear tmp;
@@ -330,7 +350,15 @@ switch opticsType
         
     case {'pinhole','environment'}
         % In this case, we the radiance describes the scene, not an oi
-        ieObject = piSceneCreate(photons,'meanLuminance',100);
+        if(isempty(scaleFactor))
+            oldPhotons = photons;
+            ieObject = piSceneCreate(photons,'meanLuminance',100);
+            newPhotons = sceneGet(ieObject,'photons');
+            scaleFactor = mode(newPhotons(:)./oldPhotons(:))';
+        else
+            warning('Cannot set scale factor for scene.');
+            ieObject = piSceneCreate(photons,'meanLuminance',100);
+        end
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if(~isempty(metadataMap))
             ieObject = sceneSet(ieObject,'depth map',metadataMap);

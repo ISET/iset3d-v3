@@ -52,10 +52,17 @@ p.addParameter('overwritelensfile',true,@islogical);
 % Overwrite materials.pbrt
 p.addParameter('overwritematerials',true,@islogical);
 
+% Overwrite geometry.pbrt
+p.addParameter('overwritegeometry',true,@islogical);
+
 % Create a new materials.pbrt
 p.addParameter('creatematerials',false,@islogical);
+
 % control lighting in geomtery.pbrt
 p.addParameter('lightsFlag',false,@islogical);
+
+% Read trafficflow variable
+p.addParameter('thistrafficflow',[]);
 p.parse(renderRecipe,varargin{:});
 
 % workingDir          = p.Results.workingdir;
@@ -63,8 +70,10 @@ overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
-creatematerials  = p.Results.creatematerials;
-lightsFlag = p.Results.lightsFlag;
+overwritegeometry   = p.Results.overwritegeometry;
+creatematerials     = p.Results.creatematerials;
+lightsFlag          = p.Results.lightsFlag;
+thistrafficflow         = p.Results.thistrafficflow;
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
@@ -144,12 +153,33 @@ if isequal(renderRecipe.get('optics type'),'lens')
         delete(workingLensFile);
         copyfile(inputLensFile,workingLensFile);
     end
+    
+    % Figure out the working lens file directory and name
+    [~,name,ext] = fileparts(inputLensFile);
+    workingLensDir = fullfile(workingDir,'lens');
+    if ~exist(workingLensDir,'dir'), mkdir(workingLensDir); end
+    workingLensFile = fullfile(workingLensDir,[name,ext]);
+    
+    % If the working copy doesn't exist, copy it.  If it exists but there
+    % is a force overwrite, delete and copy.
+    if ~exist(workingLensFile,'file')
+        copyfile(inputLensFile,workingLensFile);
+    elseif overwritelensfile
+        delete(workingLensFile);
+        copyfile(inputLensFile,workingLensFile);
+    end
 end
 
 %% Make sure there is a renderings sub-directory of the working directory
 
 renderingDir = fullfile(workingDir,'renderings');
 if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
+
+%% Make sure there is a renderings sub-directory of the working directory
+
+renderingDir = fullfile(workingDir,'renderings');
+if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
+
 
 %% OK, we are good to go. Open up the file.
 
@@ -174,7 +204,22 @@ if(~isempty(renderRecipe.scale))
     [renderRecipe.scale(1) renderRecipe.scale(2) renderRecipe.scale(3)]);
     fprintf(fileID,'\n');
 end
-
+% Optional Motion Blur
+% default StartTime and EndTime is 0 to 1;
+if isfield(renderRecipe.camera,'motion') 
+    fprintf(filedID,'ActiveTransform StartTime \n');
+    fprintf(filedID,'Translate %0.2f %0.2f %0.2f\n',...
+        [renderRecipe.camera.motion.activeTransformStart.pos(1),...
+        renderRecipe.camera.motion.activeTransformStart.pos(2),...
+        renderRecipe.camera.motion.activeTransformStart.pos(3)]);
+    fprintf(filedID,'Rotate \n'); % add rotate aroung x, y, z
+    fprintf(filedID,'ActiveTransform EndTime \n');
+    fprintf(filedID,'Translate %0.2f %0.2f %0.2f\n',...
+        [renderRecipe.camera.motion.activeTransformEnd.pos(1),...
+        renderRecipe.camera.motion.activeTransformEnd.pos(2),...
+        renderRecipe.camera.motion.activeTransformEnd.pos(3)]);
+    fprintf(filedID,'ActiveTransform All \n');
+end
 % Required LookAt 
 fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
     [renderRecipe.lookAt.from renderRecipe.lookAt.to renderRecipe.lookAt.up]);
@@ -296,6 +341,7 @@ end
 
 
 %% Write out WorldBegin/WorldEnd
+
 if creatematerials
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
@@ -303,13 +349,18 @@ if creatematerials
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
         end
+        if overwritegeometry
+            if contains(currLine, 'geometry.pbrt')
+                [~,n] = fileparts(renderRecipe.outputFile);
+                currLine = sprintf('Include "%s_geometry.pbrt"',n);
+            end
+        end
         fprintf(fileID,'%s \n',currLine);
     end
-
 else
     for ii = 1:length(renderRecipe.world)
-    currLine = renderRecipe.world{ii};
-    fprintf(fileID,'%s \n',currLine);
+        currLine = renderRecipe.world{ii};
+        fprintf(fileID,'%s \n',currLine);
     end
 end
 %% Close file
@@ -319,12 +370,12 @@ fclose(fileID);
 %% Overwrite Materials.pbrt
 if contains(renderRecipe.exporter, 'C4D')
     if ~creatematerials
-    if overwritematerials
-        [~,n] = fileparts(renderRecipe.inputFile);
-        fname_materials = sprintf('%s_materials.pbrt',n);
-        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
-        piMaterialWrite(renderRecipe);
-    end
+        if overwritematerials
+            [~,n] = fileparts(renderRecipe.inputFile);
+            fname_materials = sprintf('%s_materials.pbrt',n);
+            renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+            piMaterialWrite(renderRecipe);
+        end
     else
         [~,n] = fileparts(renderRecipe.outputFile);
         fname_materials = sprintf('%s_materials.pbrt',n);
@@ -334,8 +385,11 @@ if contains(renderRecipe.exporter, 'C4D')
 end
 %% Overwirte geometry.pbrt
 if contains(renderRecipe.exporter, 'C4D')
-    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag); 
+    if overwritegeometry
+    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'thistrafficflow',thistrafficflow); 
+    end
 end
+
 
 %% Overwrite xxx.json
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);

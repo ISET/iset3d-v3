@@ -24,6 +24,8 @@ m.rgbkt =[];
 
 m.colorkd = [];
 m.colorks = [];
+m.colorreflect = [];
+m.colortransmit = [];
 
 m.floaturoughness = [];
 m.floatvroughness = [];

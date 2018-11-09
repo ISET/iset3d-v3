@@ -3,7 +3,9 @@ function recipe = piWorldFindAndReplace(recipe,oldString,newString,varargin)
 % Syntax
 %   recipe = piFindAndReplace(recipe,oldString,newString)
 %
-% Find a replace a given string. We only do this within the World block. 
+% Find a replace a given string. We only do this within the World block for
+% lights and objects in the base pbrt scene (not xxx_materials.pbrt or
+% xxx_geometry.pbrt).
 %
 % Input
 %   recipe:        a recipe object that includes a WorldBegin/WorldEnd block.

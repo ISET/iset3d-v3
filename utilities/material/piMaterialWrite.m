@@ -13,25 +13,25 @@ p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 p.parse(thisR);
 
 %% 
-workingDir = fileparts(thisR.outputFile);
-% copy spds to working directroy
-spds_path = fullfile(piRootPath,'data','spds');
-desdir = fullfile(workingDir,'spds');
-if ~exist(desdir,'dir'), mkdir(desdir);end
-status = copyfile(spds_path,desdir);
-if(~status), error('Failed to copy spds directory to docker working directory.');end
-% copy skymaps to working directroy
-skymaps_path = fullfile(piRootPath,'data','skymaps');
-desdir=fullfile(workingDir,'skymaps');
-if ~exist(desdir,'dir'), mkdir(desdir);end
-status = copyfile(skymaps_path,desdir);
-if(~status), error('Failed to copy skymaps directory to docker working directory.');end
-% copy brdfs to working directroy
-brdfs_path = fullfile(piRootPath,'data','bsdfs');
-desdir = fullfile(workingDir,'bsdfs');
-if ~exist(desdir,'dir'), mkdir(desdir);end
-status = copyfile(brdfs_path,desdir);
-if(~status), error('Failed to copy bsdfs directory to docker working directory.');end
+% workingDir = fileparts(thisR.outputFile);
+% % copy spds to working directroy
+% spds_path = fullfile(piRootPath,'data','spds');
+% desdir = fullfile(workingDir,'spds');
+% if ~exist(desdir,'dir'), mkdir(desdir);end
+% status = copyfile(spds_path,desdir);
+% if(~status), error('Failed to copy spds directory to docker working directory.');end
+% % copy skymaps to working directroy
+% skymaps_path = fullfile(piRootPath,'data','skymaps');
+% desdir=fullfile(workingDir,'skymaps');
+% if ~exist(desdir,'dir'), mkdir(desdir);end
+% status = copyfile(skymaps_path,desdir);
+% if(~status), error('Failed to copy skymaps directory to docker working directory.');end
+% % copy brdfs to working directroy
+% brdfs_path = fullfile(piRootPath,'data','bsdfs');
+% desdir = fullfile(workingDir,'bsdfs');
+% if ~exist(desdir,'dir'), mkdir(desdir);end
+% status = copyfile(brdfs_path,desdir);
+% if(~status), error('Failed to copy bsdfs directory to docker working directory.');end
 
 %% Parse the output file, working directory, stuff like that.
 
@@ -39,15 +39,24 @@ if(~status), error('Failed to copy bsdfs directory to docker working directory.'
 ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
     str = thisR.materials.txtLines(jj);
-    if contains(str,'jpg')
+    if contains(str,'.jpg"')
         thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
     end
+    if contains(str,'.jpg "')
+        thisR.materials.txtLines(jj) = strrep(str,'jpg ','png');
+    end    
     % photoshop exports texture format with ".JPG "(with extra space) ext.
-    if contains(str,'JPG')
+    if contains(str,'.JPG "')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
     end
+    if contains(str,'.JPG"')
+        thisR.materials.txtLines(jj) = strrep(str,'JPG','png');
+    end    
     if contains(str,'bmp')
         thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
+    end
+    if contains(str,'tif')
+        thisR.materials.txtLines(jj) = strrep(str,'tif','png');
     end
 end
 
@@ -55,11 +64,13 @@ end
 % The remaining lines have a texture definition.
 
 output = thisR.materials.outputFile_materials;
+[~,materials_fname,~]=fileparts(output);
+thisR.world{length(thisR.world)-2} = sprintf('Include "%s.pbrt" ',materials_fname);
 txtLines = thisR.materials.txtLines;
-for i = 1:size(txtLines)
-    if ~isempty(txtLines(i))
-        if contains(txtLines(i),'MakeNamedMaterial')
-            txtLines{i}=[];
+for ii = 1:size(txtLines)
+    if ~isempty(txtLines(ii))
+        if contains(txtLines(ii),'MakeNamedMaterial')
+            txtLines{ii}=[];
         end
     end
 end
@@ -70,18 +81,49 @@ textureLines = txtLines(~cellfun('isempty',txtLines));
 
 for jj = 1: length(textureLines)
     textureLines_tmp = [];
-    thisLine_tmp = textscan(textureLines{jj},'%q');
-    thisLine_tmp = thisLine_tmp{1};
-    for ii = 1:length(thisLine_tmp)
-        if contains(thisLine_tmp{ii},'.png')
-            filename = thisLine_tmp{ii};
-            thisLine_tmp{ii} = fullfile('texture',filename);
+%     thisLine_tmp = textscan(textureLines{jj},'%q');
+    thisLine_tmp= strsplit(textureLines{jj},' ');
+    if ~strcmp(thisLine_tmp{length(thisLine_tmp)}(1),'"')
+        for nn= length(thisLine_tmp):-1:1
+        if strcmp(thisLine_tmp{nn}(1),'"')
+            for kk = nn:length(thisLine_tmp)-1
+                % combine all the string from nn to end;
+                thisLine_tmp{nn} = [thisLine_tmp{nn},' ',thisLine_tmp{kk+1}];  
+            end
+            thisLine_tmp((nn+1):length(thisLine_tmp))=[];
+            break;
         end
+        end
+    end
+%     thisLine_tmp = thisLine_tmp{1};
+    for ii = 1:length(thisLine_tmp)
+        if contains(thisLine_tmp{ii},'filename')
+            index = ii;
+        end
+    end
+    for ii = 1:length(thisLine_tmp)
+        if contains(thisLine_tmp{ii},'.png') 
+            if contains(thisLine_tmp{ii-1},'filename')
+            filename = thisLine_tmp{ii};
+            if ~contains(filename,'"textures/')
+            thisLine_tmp{ii} = fullfile('"textures',filename(2:length(filename)));
+            end
+            else
+                thisLine_tmp{index+1} = thisLine_tmp{ii};
+                thisLine_tmp(index+2:ii)   = '';
+                filename = thisLine_tmp{index+1};
+            if ~contains(filename,'"textures/')
+            thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
+            end                
+            end
+        end
+    end
+    for ii = 1:length(thisLine_tmp)
         if ii == 1
             textureLines_tmp = strcat(textureLines_tmp,thisLine_tmp{ii});
         else
-            string = sprintf('"%s"',thisLine_tmp{ii});
-            textureLines_tmp = strcat(textureLines_tmp,{' '},string);
+%             string = sprintf('%s"',thisLine_tmp{ii});
+            textureLines_tmp = strcat(textureLines_tmp,{' '},thisLine_tmp{ii});
         end 
     end
     textureLines{jj} = textureLines_tmp{1};
@@ -121,9 +163,11 @@ end
 if ~isempty(nPaintLines)
     for hh = 1:length(nPaintLines)
     fprintf(fileID,'%s\n',materialTxt{nPaintLines{hh}});
+    materialTxt{nPaintLines{hh}} = [];
     end
-    nmaterialTxt = length(materialTxt)-length(nPaintLines);
-    for row=1:nmaterialTxt
+    materialTxt = materialTxt(~cellfun('isempty',materialTxt));
+%     nmaterialTxt = length(materialTxt)-length(nPaintLines);
+    for row=1:length(materialTxt)
         fprintf(fileID,'%s\n',materialTxt{row});
         
     end
@@ -181,6 +225,11 @@ if ~isempty(materials.rgbks)
     val = strcat(val, val_rgbks);
 end
 
+if ~isempty(materials.rgbkt)
+    val_rgbkt = sprintf(' "rgb Kt" [%0.5f %0.5f %0.5f] ',materials.rgbkt);
+    val = strcat(val, val_rgbkt);
+end
+
 if ~isempty(materials.rgbkd)
     val_rgbkd = sprintf(' "rgb Kd" [%0.5f %0.5f %0.5f] ',materials.rgbkd);
     val = strcat(val, val_rgbkd);
@@ -195,7 +244,16 @@ if ~isempty(materials.colorks)
     val_colorks = sprintf(' "color Ks" [%0.5f %0.5f %0.5f] ',materials.colorks);
     val = strcat(val, val_colorks);
 end
-
+if isfield(materials, 'colorreflect')
+    if ~isempty(materials.colorreflect)
+        val_colorreflect = sprintf(' "color reflect" [%0.5f %0.5f %0.5f] ',materials.colorreflect);
+        val = strcat(val, val_colorreflect);
+    end
+    if ~isempty(materials.colortransmit)
+        val_colortransmit = sprintf(' "color transmit" [%0.5f %0.5f %0.5f] ',materials.colortransmit);
+        val = strcat(val, val_colortransmit);
+    end
+end
 if ~isempty(materials.floaturoughness)
     val_floaturoughness = sprintf(' "float uroughness" [%0.5f] ',materials.floaturoughness);
     val = strcat(val, val_floaturoughness);

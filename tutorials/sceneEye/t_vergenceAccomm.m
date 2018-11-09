@@ -15,8 +15,8 @@ myScene = sceneEye('chessSet');
 
 %% Set parameters
 
-myScene.resolution = 256; 
-myScene.numRays = 256;
+myScene.resolution = 128; 
+myScene.numRays = 128;
 
 ipd = 64e-3; % Average interpupillary distance
 
@@ -73,7 +73,7 @@ for ii = 1:length(sphereZ)
     
     % Render the right eye
     myScene.eyePos = rightEyePos;
-    myScene.name = sprintf('rightEye%0.2fm',vergenceZ(ii));
+    myScene.name = sprintf('rightEye%0.2fm',sphereZ(ii));
     oi = myScene.render;
     vcAddAndSelectObject(oi);
     oiWindow;

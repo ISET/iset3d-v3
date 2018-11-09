@@ -86,7 +86,16 @@ p.parse(aName,varargin{:});
 destinationFolder = p.Results.destinationfolder;
 zipFlag           = p.Results.unzip;
 deleteFlag        = p.Results.deletezip;
-remotedirectory   = sprintf('%s/v%d',p.Results.remotedirectory,p.Results.pbrtversion');
+if(strcmp(p.Results.remotedirectory,'/resources/scenes/pbrt'))
+    remotedirectory   = sprintf('%s/v%d',p.Results.remotedirectory,p.Results.pbrtversion');
+else
+    remotedirectory = p.Results.remotedirectory;
+end
+
+%% If destination folder does not exist, create it
+if(~exist(destinationFolder,'dir'))
+    mkdir(destinationFolder);
+end
 
 %% Check for RDT
 if(~exist('RdtClient','file'))

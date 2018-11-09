@@ -25,16 +25,23 @@ end
 
 %% Initialize your cluster
 tic
+
 dockerAccount= 'tlian';
-dockerImage = 'gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud';
-cloudBucket = 'gs://primal-surfer-140120.appspot.com';
-clusterName = 'trisha-lca';
-zone         = 'us-central1-a'; %'us-west1-a';    
+projectid = 'renderingfrl';
+dockerImage = 'gcr.io/renderingfrl/pbrt-v3-spectral-gcloud';
+cloudBucket = 'gs://renderingfrl';
+
+clusterName = 'lca';
+zone         = 'us-central1-a';    
 instanceType = 'n1-highcpu-32';
+
 gcp = gCloud('dockerAccount',dockerAccount,...
     'dockerImage',dockerImage,...
     'clusterName',clusterName,...
-    'cloudBucket',cloudBucket,'zone',zone,'instanceType',instanceType);
+    'cloudBucket',cloudBucket,...
+    'zone',zone,...
+    'instanceType',instanceType,...
+    'projectid',projectid);
 toc
 
 % Render depth
@@ -45,17 +52,17 @@ gcp.targets = [];
 
 %% Turn on chromatic aberration to show color fringing.
 
+distToPlane = 0.2;
+
 % Move the retina plane 
-%retinaDistance = 16.00:0.05:16.60;
-retinaDistance = [16.3 16.2];
+retinaDistance = 16.00:0.05:16.60;
+% retinaDistance = [16.3 16.2];
 retinaRadius = 10000; % Make it flat
 retinaSemiDiam = 0.15;
 
 for ii = 1:length(retinaDistance)
     
     % Load scene with plane at a specific distance
-    extraLensDistance = 7.69; % To account for thickness of lens
-    distToPlane = 10 + extraLensDistance*10^-3; % meters
     myScene = sceneEye('slantedBar','planeDistance',distToPlane);
     
     myScene.name = sprintf('slantedBar_LCA_%0.3fmm',retinaDistance(ii));

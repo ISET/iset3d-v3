@@ -40,7 +40,7 @@ thisR.sampler.subtype = 'sobol';
 %
 % We are storing sky maps in the ISET3D repository.  At some point we
 % will also put them on Flywheel.
-thisR = piSkymapAdd(thisR,'day');
+thisR = piSkymapAdd(thisR,'noon');
 
 %% Assign Materials and Color
 

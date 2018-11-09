@@ -1,0 +1,6 @@
+MakeNamedMaterial "YellowMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [1.0 1.0 0.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "GreenMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [0.0 1.0 0.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "BlueMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [0.0 0.0 1.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "RedMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [1.0 0.0 0.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "PurpleMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [1.0 0.0 1.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "CyanMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [0.0 1.0 1.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]

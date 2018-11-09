@@ -46,7 +46,7 @@ switch param
     case {'outputfile'}
         thisR.outputFile = val;
 
-    case {'inputFile'}
+    case {'inputfile'}
         thisR.inputFile = val;   
         % Scene
     case 'objectdistance'

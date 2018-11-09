@@ -1,38 +1,13 @@
-Transform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 0.0 0.0 1]
-
-Camera "perspective"
- "float fov" [30]
-
-Sampler "lowdiscrepancy" 
-  "integer pixelsamples" [128] 
-
-PixelFilter "gaussian" 
-  "float alpha" [2] 
-  "float xwidth" [2] 
-  "float ywidth" [2] 
-
-Film "image"
- "integer xresolution" [256]
- "integer yresolution" [256]
-
-Integrator "path"
- "integer maxdepth" [5]
-
+# Exported by PBRT exporter for Cinema 4D 
+Transform [1.0 0 0.0 0  0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 0.0 0.0 1]
+Camera "perspective" "float fov" [30]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "integer xresolution" [256] "integer yresolution" [256]
+Integrator "directlighting" "integer maxdepth" [1]
 WorldBegin
-
-	MakeNamedMaterial "WhiteMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [1.0 1.0 1.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
-	MakeNamedMaterial "BlackMaterial" "string type" "uber" "float index" [1.333] "rgb Kd" [0.0 0.0 0.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
-
-	ObjectBegin "SlantedBar"
-  	  Include "geometry/slantedBar_geometry.pbrt"
-	ObjectEnd
-
-	AttributeBegin  
-  	  ObjectInstance "SlantedBar"   
-	AttributeEnd
-
-	LightSource "infinite" 
-  	"integer nsamples" [8] 
-  	"spectrum L" "EqualEnergy.spd"
-
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	LightSource "distant" "point from" [0 0 0] "point to" [0 0 100]  "spectrum L" "EqualEnergy.spd" 
+    Include "slantedBar_materials.pbrt"
+	Include "slantedBar_geometry.pbrt"
 WorldEnd

@@ -33,14 +33,10 @@ myScene.numCABands = 6;
 myScene.diffractionEnabled = true;
 
 %% Loop through pupil diameters
-pupilDiameters = [6 5 4 3 2 1];
-
-% HQ version
-% numRays = [1024 1024 1024 2048 4096 4096]; 
-% myScene.resolution = 512; 
+pupilDiameters = [6 4 2];
 
 % Fast test version
-numRays = [128 128 128 128 128];
+numRays = [128 128 128];
 myScene.resolution = 128; 
 
 if(length(numRays) ~= length(pupilDiameters))

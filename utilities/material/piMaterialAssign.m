@@ -35,6 +35,8 @@ p.addParameter('rgbkt',[]);
 p.addParameter('colorkd',[]);
 p.addParameter('colorks',[]);
 
+
+
 p.parse(thisR, material,target,varargin{:});
 
 %% Find which material in the list matches the material string
@@ -51,6 +53,7 @@ end
 if isfield(target,'paint_base') && isfield(target,'paint_mirror')
     % add paint_mirror
     %     nmaterials = length(thisR.materials.list);
+    if ~isfield(thisR.materials.list,'paint_mirror')
     thisR.materials.list.paint_mirror = piMaterialCreate;
     thisR.materials.list.paint_mirror.name = 'paint_mirror';
     thisR.materials.list.paint_mirror = ...
@@ -67,12 +70,45 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
     thisR.materials.list.(materialNames{idx}) = ...
         piCopyMaterial(thisR.materials.list.(materialNames{idx}),target.carpaint);
     % change paint_base to carname_paint_base
-    thisR.materials.list.(materialNames{idx}).stringnamedmaterial2 = sprintf('%s_paint_base',material);
-    
-
+    thisR.materials.list.(materialNames{idx}).stringnamedmaterial2 = sprintf('%s_paint_base',material);    
     %% Assign color
     thisR.materials.list.(slotname1) = ...
         piCopyColor(thisR.materials.list.(slotname1), p);
+    else
+        thispaint_base = sprintf('%s_paint_base',material);
+        for jj = 1:length(materialNames)
+            if isequal(materialNames{jj}, thispaint_base)
+                paint = jj;
+            else
+                paint = 0;
+            end    
+        end
+        if paint
+        thisR.materials.list.(materialNames{paint}) = ...
+            piCopyColor(thisR.materials.list.(materialNames{paint}), p);
+        thisR.materials.list.(materialNames{idx}).stringnamedmaterial2 = sprintf('%s_paint_base',material);
+        else
+            slotname1 = sprintf('%s_paint_base',material);
+            thisR.materials.list.(slotname1) = piMaterialCreate;
+            thisR.materials.list.(slotname1).name = slotname1;
+            
+            % Paint base
+            thisR.materials.list.(slotname1) = ...
+                piCopyMaterial(thisR.materials.list.(slotname1),target.paint_base);
+            
+            % Assign carpaintmix
+            thisR.materials.list.(materialNames{idx}) = ...
+                piCopyMaterial(thisR.materials.list.(materialNames{idx}),target.carpaint);
+            % change paint_base to carname_paint_base
+            thisR.materials.list.(materialNames{idx}).stringnamedmaterial2 = sprintf('%s_paint_base',material);
+            %% Assign color
+            thisR.materials.list.(slotname1) = ...
+                piCopyColor(thisR.materials.list.(slotname1), p);
+        end
+    end
+%     %% Assign color
+%     thisR.materials.list.(slotname1) = ...
+%         piCopyColor(thisR.materials.list.(slotname1), p);
     
 else
     % The original material has every possible type of material slot.
