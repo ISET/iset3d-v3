@@ -34,17 +34,15 @@ st = scitran('stanfordlabs');
 % store certain parameters about the rendering.
 
 tic
-<<<<<<< HEAD
 % gcp = gCloud('configuration','gcp-pbrtv3-central-32');
 gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
 % gcp-pbrtv3-central-high-64cpu-flywheel
 % gcp-pbrtv3-central-32cpu-120m-flywheel
-=======
-gcp = gCloud('configuration','gcp-pbrtv3-central-32cpu-208m-flywheel');
+% gcp = gCloud('configuration','gcp-pbrtv3-central-32cpu-208m-flywheel');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-32');
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
+
 toc
 gcp.renderDepth = 1;  % Create the depth map
 gcp.renderMesh  = 1;  % Create the object mesh for subsequent use

@@ -53,10 +53,6 @@ piWrite(thisR, 'overwrite pbrt file', true,'overwrite resources',true);
 scene = piRender(thisR);
 
 % Show it in ISET
-<<<<<<< HEAD
-ieAddObject(oi); oiWindow;   
-=======
 ieAddObject(scene); sceneWindow;   
 
 %%
->>>>>>> master
