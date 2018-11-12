@@ -313,15 +313,10 @@ if exporterFlag
         % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
         piTextureFileFormat(thisR);
     end
-% elseif contains(headerCheck{1}, 'Exported by piMaterialWrite')
-%     [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
-%     thisR.materials.inputFile_materials = inputFile_materials;
-%     % Call material lib
-%     thisR.materials.lib = piMateriallib;
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
 if exporterFlag 
-    [thisR,~] = piGeometryRead(thisR); 
+    thisR = piGeometryRead(thisR); 
 end
 end
