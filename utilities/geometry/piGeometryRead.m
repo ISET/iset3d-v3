@@ -28,28 +28,24 @@ end
 
 % Best practice is to initalize the ouputFile.  Sometimes people
 % don't.  So we do this as the default behavior.
-if isempty(renderRecipe.outputFile)
-    [~, scene_fname] = fileparts(renderRecipe.inputFile);
-    Filepath = fullfile(piRootPath,'local',scene_fname);
-else
-    [Filepath,scene_fname] = fileparts(renderRecipe.outputFile);
-end
-fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));
+[inFilepath, scene_fname] = fileparts(renderRecipe.inputFile);
+inputFile = fullfile(inFilepath,sprintf('%s_geometry.pbrt',scene_fname));
 
 % Save the JSON file at this location
-AssetInfo = fullfile(Filepath,sprintf('%s.json',scene_fname));
+outFilepath = fullfile(piRootPath,'local',scene_fname);
+AssetInfo = fullfile(outFilepath,sprintf('%s.json',scene_fname));
 
 %% Open the geometry file
 
 % Read all the text in the file.  Read this way the text indents are
 % ignored.
-fileID = fopen(fname);
+fileID = fopen(inputFile);
 tmp = textscan(fileID,'%s','Delimiter','\n');
 txtLines = tmp{1};
 fclose(fileID);
 
 % Read it again, but this time with indents preserved
-fileID = fopen(fname);
+fileID = fopen(inputFile);
 tmp_indent = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 txtLines_indent = tmp_indent{1};
 fclose(fileID);

@@ -14,7 +14,7 @@ fname = fullfile(FilePath,'SimpleScene.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
 % Warnings may appear about filter and Renderer
-thisR = piRead(fname,'version',3);
+thisR = piRead(fname);
 
 %% Change render quality
 

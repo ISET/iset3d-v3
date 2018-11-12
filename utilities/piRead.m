@@ -58,12 +58,8 @@ function thisR = piRead(fname,varargin)
 
 % Examples:
 %{
- fname=fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
- thisR = piRead(fname,'version',2);
-%}
-%{
  fname=fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
- thisR = piRead(fname,'version',3);
+ thisR = piRead(fname);
 %}
 
 %%
