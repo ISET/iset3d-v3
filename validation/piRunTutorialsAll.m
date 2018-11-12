@@ -1,17 +1,26 @@
-function piRunTutorialsAll
-%ieRunTutorialsAll
+function status = piRunTutorialsAll
+% Run all iset3d tutorials and collect up status
 %
 % Syntax
-%    piRunTutorialsAll
+%    status = piRunTutorialsAll
 %
 % Description
-%   Run all of the isetbio tutorials that we think should work, and print
-%   out a report at the end as to whether they threw errors, or not.
-%   Scripts inside of isetbioRootPath/tutorials are run, except that
-%   scripts within the directory 'underDevelopment' are skipped.
+%    Run all of the isetbio tutorials that we think should work, and print
+%    out a report at the end as to whether they threw errors, or not.
+%    Scripts inside of isetbioRootPath/tutorials are run, except that
+%    scripts within the directory 'underDevelopment' are skipped.
 %
+% Inputs:
+%    None
+%
+% Outputs:
+%    status    - Set to true if all tutorials ran OK, false otherwise.
 % 
-% 07/26/17  dhb  Wrote this, because we care.
+% See also: piValidateFullAll
+%
+
+% History:
+%   07/26/17  dhb  Wrote this, because we care.
 
 % User/project specific preferences
 p = struct(...
@@ -28,5 +37,6 @@ scriptsToSkip = {...
     };
 
 %% Use UnitTestToolbox method to do this.
-UnitTest.runProjectTutorials(p, scriptsToSkip, 'All');
+status = UnitTest.runProjectTutorials(p, scriptsToSkip, 'All');
+
 end
