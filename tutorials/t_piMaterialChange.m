@@ -30,7 +30,7 @@ thisR.set('pixel samples',16);
 %}
 
 % Intermediate quality
-thisR.set('film resolution',[800 600]);
+thisR.set('film resolution',[300 150]);
 thisR.set('pixel samples',16);
 
 %% Get the skymap
@@ -97,7 +97,7 @@ rgbkd  = [0.5 0.5 0.5];              % Scatter
 
 piMaterialAssign(thisR, 'GLASS', target,'rgbkd',rgbkd,'rgbkr',rgbkr);
 [p,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','SimpleSceneExport',[n,'1',e]));
+thisR.set('outputFile',fullfile(piRootPath,'local','SimpleScene',[n,'1',e]));
 piWrite(thisR,'creatematerials',true);
 
 %% Render again
