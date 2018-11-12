@@ -1,4 +1,4 @@
-%% t_fwAssets
+%% t_piFWAssets
 %
 %  In which our heroes explore how to upload and download assets to
 %  Flywheel so we can get LMP and the gang to implement more features
@@ -7,7 +7,6 @@
 
 %%
 st = scitran('stanfordlabs');
-st.verify
 
 %% Find the project
 
@@ -17,29 +16,41 @@ stPrint(projectList,'label','');
 
 % Search for the one we are interested in
 project = st.search('project',...
-    'project label exact','Computer Graphics');
+    'project label exact','Graphics assets');
+
+fprintf('\nThe Flywheel search response object is returned\n\n');
 disp(project{1})
 
 %% Find a session called space ship
 
 session = st.search('session',...
-    'project label exact','Computer Graphics',...
+    'project label exact','Graphics assets',...
     'session label exact','spaceship',...
     'summary',true);
 
 %% Create an acquisition for the spaceship session
 
-acquisitionId = st.fw.addAcquisition(struct('session', idGet(session{1}), 'label', 'millenial-falcon'));
+sessions = st.search('session',...
+    'project label exact','Graphics assets',...
+    'session label exact','spaceship',...
+    'summary',true);
+
+sessionID = st.objectParse(sessions{1});
+
+acquisitionId = st.fw.addAcquisition(...
+    struct('session', sessionID),'label', 'millenial-falcon'));
 
 % We found the acquisition by a search.  It's in the right place.  But
 % we could not see it in the browser.  Do we have to put a file in
 % there?  That would be weird.
 
 acquisition = st.search('acquisition',...
-    'project label exact','Computer Graphics',...
+    'project label exact','Graphics assets',...
     'session label exact','spaceship',...
     'summary',true);
 
+% Need to make sure we have these at hand.  Maybe they should go into data
+% within iset3d.
 st.fw.uploadFileToAcquisition(acquisitionId, 'millenium-falcon.obj');
 st.fw.uploadFileToAcquisition(acquisitionId, 'millenium-falcon.mtl');
 
@@ -75,4 +86,4 @@ st.downloadFile(file{1}.file.name,...
     'container type','acquisition',...
     'container id',acquisitionId,...
     'destination',newVersion);
-%%
+
