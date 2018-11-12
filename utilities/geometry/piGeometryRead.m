@@ -108,7 +108,9 @@ if ~convertedflag
                     values = cell2mat(tmp(2:end));
                     transform = reshape(values,[4,4]);
                     dcm = [transform(1:3);transform(5:7);transform(9:11)];
-                    [rotz,roty,rotx]= dcm2angle(dcm);
+                    % [rotz,roty,rotx]= dcm2angle(dcm);   % Version in
+                    % Aerospace toolbox
+                    [rotz,roty,rotx]= piDCM2angle(dcm);
                     rotx = rotx*180/pi;
                     roty = roty*180/pi;
                     rotz = rotz*180/pi;
