@@ -28,7 +28,7 @@ function thisR = piRead(fname,varargin)
 %   fname - a pbrt scene file name
 %
 % Optional parameter/values
-%   'version' - Which version of PBRT, 2 or 3.
+%   'version' - Which version of PBRT, 2 or 3.  Default is Version 3.
 %   'read materials' - When PBRT scene file is exported by cinema4d,
 %        the exporterflag is set and we read the materials file.  If
 %        you do not want to read that file, set this to false.
@@ -72,7 +72,7 @@ p = inputParser;
 varargin =ieParamFormat(varargin);
 
 p.addRequired('fname',@(x)(exist(fname,'file')));
-p.addParameter('version',2,@(x)isnumeric(x));
+p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('readmaterials', true,@islogical);
 p.parse(fname,varargin{:});
 
@@ -224,7 +224,8 @@ if(ver == 2)
         thisR.renderer = rendererStruct;
     end
 else
-    warning('"Renderer" does not exist in the new PBRTv3 format. We leave the field blank .')
+    % Deprecated Nov. 11, 2018.  Delete it if the issue does not comup in a month.
+    % warning('"Renderer" does not exist in the new PBRTv3 format. We leave the field blank .')
 end
 
 %% Read LookAt, Transforms, and ConcatTransform, if they exist
@@ -313,15 +314,10 @@ if exporterFlag
         % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
         piTextureFileFormat(thisR);
     end
-% elseif contains(headerCheck{1}, 'Exported by piMaterialWrite')
-%     [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
-%     thisR.materials.inputFile_materials = inputFile_materials;
-%     % Call material lib
-%     thisR.materials.lib = piMateriallib;
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
 if exporterFlag 
-    [thisR,~] = piGeometryRead(thisR); 
+    thisR = piGeometryRead(thisR); 
 end
 end

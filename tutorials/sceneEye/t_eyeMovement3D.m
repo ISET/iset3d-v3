@@ -47,7 +47,6 @@ end
 % Loop through images like a video
 % TODO: Best way to do this?
 
-
 %% Rotate the eye
 % We can rotate the eye by changing the "eyeTo" point. Another way to say
 % this is that we are changing where the eye is looking.

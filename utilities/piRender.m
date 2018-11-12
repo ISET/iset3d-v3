@@ -292,6 +292,14 @@ switch opticsType
     case 'lens'
         % If we used a lens, the ieObject is an optical image (irradiance).
         
+        % This scaleFactor stuff seems confusing to me.  This comment is
+        % intended to suggest that we change piOICreate() so that we can
+        % send in the mean illuminance for a 1mm^2 aperture.  The aperture
+        % is equal to 
+        %
+        %   focalLength/fNumber = focalLength/(focalLength/aperture) 
+        %
+        
         % See if we can find the optics parameters
         [focalLength, fNumber, filmDiag, ~, success] = ...
             piRecipeFindOpticsParams(thisR);
@@ -323,13 +331,13 @@ switch opticsType
         % value. Otherwise scale the photons to produce a reasonable
         % illuminance.
         if(isempty(scaleFactor))
-            % TL: So ideally we shoudl change oiAdjustIlluminance so that
+            % TL: So ideally we should change oiAdjustIlluminance so that
             % it returns the scaling factor, but I'm a bit afraid to change
             % things in ISETBIO. So for now we can just calculate the scale
             % after the fact.
-            oldPhotons = oiGet(ieObject,'photons');
-            ieObject = oiAdjustIlluminance(ieObject,5);
-            newPhotons = oiGet(ieObject,'photons');
+            oldPhotons  = oiGet(ieObject,'photons');
+            ieObject    = oiAdjustIlluminance(ieObject,5);
+            newPhotons  = oiGet(ieObject,'photons');
             scaleFactor = mode(newPhotons(:)./oldPhotons(:)); % Should be the same value everywhere. 
         else
             photons = oiGet(ieObject,'photons');

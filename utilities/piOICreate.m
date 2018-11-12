@@ -64,10 +64,10 @@ oi = oiSet(oi,'optics fnumber',p.Results.fNumber);
 [r,c] = size(photons(:,:,1)); depthMap = ones(r,c);
 oi = oiSet(oi,'depth map',depthMap);
 
-% Deal with the field of view, which apparently needs to be set for oi to work
-% correctly.  The logic is set to 40 if the person tells you nothing.  If they
-% tell you the fov, use it.  If they don't tell you the fov but they do tell you
-% the filmdiag, compute the fov.
+% Deal with the field of view, which apparently needs to be set for oi to
+% work correctly.  The logic is set to 40 if the person tells you nothing.
+% If they tell you the fov, use it.  If they don't tell you the fov but
+% they do tell you the filmdiag, compute the fov.
 if isempty(p.Results.fov) && isempty(p.Results.filmDiag)
     fov = 40;
 elseif isempty(p.Results.fov)
@@ -87,8 +87,16 @@ else
 end
 oi = oiSet(oi,'fov',fov);
 
-% Set additional parameters the user may have sent in
-% For example, 'mean illuminance'
+% By default we set the mean illuminance to (pupilArea) lux.  So a 1 mm2
+% pupil produces a 1 lux illuminance.
+% Suggested new code is here
+%{
+meanIlluminance = oiGet(oi,'optics aperture area','mm');
+oi = oiSet(oi,'mean illuminance',meanIlluminance);
+%}
+
+% Set additional parameters the user may have sent in. For example, 'mean
+% illuminance' might over-ride the mean illuminance setting above.
 if ~isempty(varargin) 
     for ii=1:2:length(varargin) 
         param = ieParamFormat(varargin{ii});
