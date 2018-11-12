@@ -33,6 +33,8 @@ inputFile = fullfile(inFilepath,sprintf('%s_geometry.pbrt',scene_fname));
 
 % Save the JSON file at this location
 outFilepath = fullfile(piRootPath,'local',scene_fname);
+outputFile  = fullfile(outFilepath,[scene_fname,'.pbrt']);
+renderRecipe.outputFile = outputFile;
 AssetInfo = fullfile(outFilepath,sprintf('%s.json',scene_fname));
 
 %% Open the geometry file
@@ -105,7 +107,8 @@ if ~convertedflag
                     values = cell2mat(tmp(2:end));
                     transform = reshape(values,[4,4]);
                     dcm = [transform(1:3);transform(5:7);transform(9:11)];
-                    [rotz,roty,rotx]= dcm2angle(dcm);
+                    % [rotz,roty,rotx]= dcm2angle(dcm);
+                    [rotz,roty,rotx]= piDCM2angle(dcm);
                     rotx = rotx*180/pi;
                     roty = roty*180/pi;
                     rotz = rotz*180/pi;
@@ -149,14 +152,16 @@ if ~convertedflag
                 
                 % save obj to a pbrt file
                 output_name = sprintf('%s.pbrt', obj(jj).name);
-                output_folder = sprintf(fullfile(Filepath,'scene','PBRT','pbrt-geometry'));
-                output = fullfile('scene','PBRT','pbrt-geometry',output_name);
-                obj(jj).output = output;
+                output_folder = sprintf(fullfile(outFilepath,'scene','PBRT','pbrt-geometry'));
+                outputGeometry = fullfile('scene','PBRT','pbrt-geometry',output_name);
+                fprintf('piGeometryRead: Saving geometry file %s.\n',outputGeometry);
+
+                obj(jj).output = outputGeometry;
 
                 if ~exist(output_folder,'dir')
                     mkdir(output_folder);
                 end
-                outputFile = fullfile(Filepath,output);
+                
                 fid = fopen(outputFile,'w');
                 fprintf(fid,'# %s\n',obj(jj).name);
                 currLine = cell2mat(txtLines(ii));
@@ -176,7 +181,8 @@ if ~convertedflag
                 
             end
         end
-        fprintf('Object:%s has %d children object(s) \n',groupobj(hh).name,jj-1);hh = hh+1;
+        fprintf('Object:%s has %d children object(s) \n',groupobj(hh).name,jj-1);
+        hh = hh+1;
     end
     
     % Save the render recipe, which can save us a lot of time in the
@@ -184,7 +190,7 @@ if ~convertedflag
     % passes this function to the else condition.
     renderRecipe.assets = groupobj;
     jsonwrite(AssetInfo,renderRecipe);
-    fprintf('piGeometryRead done. Saving JSON file %s.',AssetInfo);
+    fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
     
 else
     % The converted flag is true.  So AssetInfo is already a converted

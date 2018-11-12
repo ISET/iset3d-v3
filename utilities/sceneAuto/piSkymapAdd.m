@@ -63,12 +63,22 @@ for ii=index_m:length(thisR.world)
 end
 thisR.world = world;
 
-st = scitran('stanfordlabs');
+% Get the information about the skymap so we can download from
+% Flywheel
+st          = scitran('stanfordlabs');
+acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
+dataId      = acquisition.id;
+dataName    = skyname;
+skymapInfo  = [dataId,' ',dataName];
+
+%{
 files = st.search('file',...
    'project label exact','Graphics assets',...
    'session label exact','data',...
    'acquisition label exact','skymaps');
+
 dataId = files{1}.parent.id;
 dataName = skyname;
 skymapInfo = [dataId,' ',dataName];
+%}
 end

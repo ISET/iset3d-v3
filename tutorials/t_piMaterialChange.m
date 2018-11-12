@@ -18,15 +18,42 @@ thisR = piRead(fname);
 
 %% Change render quality
 
-% [800 600] 32 - takes around 30 seconds to render on a machine with 8 cores.
-% [300 150] 16 -
+%{
+% Higher quality
+thisR.set('film resolution',[800 600]);
+thisR.set('pixel samples',32);
+%}
+%{
+% Lowest quality
+thisR.set('film resolution',[300 150]);
+thisR.set('pixel samples',16);
+%}
 
-thisR.set('filmresolution',[800 600]);
-thisR.set('pixelsamples',16);
+% Intermediate quality
+thisR.set('film resolution',[800 600]);
+thisR.set('pixel samples',16);
+
+%% Get the skymap
+
+% This is the location of the 
+[~, skymapInfo] = piSkymapAdd(thisR,'noon');
+s = split(skymapInfo,' ');
+
+% If it is there already, move on.  Otherwise open up Flywheel and go
+% download it.
+skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
+if ~exist(skyMapFile,'file')
+    st = scitran('stanfordlabs');
+    fName = st.fileDownload(s{2},...
+        'containerType','acquisition',...
+        'containerID',s{1}, ...
+        'destination',skyMapFile);
+    assert(isequal(fName,skyMapFile));
+end
 
 %% List material library
-piSkymapAdd(thisR,'noon');
-% it's helpful to check what current material properties are.
+
+% It's helpful to check what current material properties are.
 piMaterialList(thisR);
 piMaterialGroupAssign(thisR);
 fprintf('A library of materials\n\n');  % Needs a nicer print method
@@ -38,17 +65,25 @@ disp(thisR.materials.lib)
 thisR.integrator.maxdepth.value = 4;
 
 %% Write out the pbrt scene file, based on thisR.
-[p,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local','SimpleSceneExport',[n,e]));
+
+% You could adjust the output directory at this point. The default is
+% OK and puts in the 'local' part of the iset3d repository. But if you
+% want to use a different directory you can 
+%
+%    * move the files that were written out in thisR.outputFile's
+%      directory to your new directory, and 
+%    * then set thisR.outputFile to a name in that new directory.
+%
 
 % material.pbrt is supposed to overwrite itself.
 piWrite(thisR);
 
 %% Render
-tic, scene = piRender(thisR,'render type','radiance'); toc
-tic, scene = piRender(thisR); toc % By default, you will have depth map rendered with radiance image;
+
+[scene, result] = piRender(thisR);
 
 scene = sceneSet(scene,'name',sprintf('Glass on (%d)',thisR.integrator.maxdepth.value));
+
 ieAddObject(scene); sceneWindow;
 
 %% Change the sphere to glass
