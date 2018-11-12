@@ -202,8 +202,9 @@ switch param
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
     case{'maxdepth','bounces'}
+        % Eliminated warning Nov. 11, 2018.
         if(~strcmp(thisR.integrator.subtype,'path'))
-            warning('Changing integrator sub type to "path"');
+            % warning('Changing integrator sub type to "path"');
         end
         thisR.integrator.maxdepth.value = val(1);
         thisR.integrator.maxdepth.type = 'integer';
