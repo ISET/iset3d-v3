@@ -12,7 +12,7 @@
 % See also
 %   piSceneAuto, piSkymapAdd, gCloud, SUMO
 
-%{ 
+%{
 % Example - let's make a small example to run, if possible.  Say two
 cars, no buildings.  If we can make it run in 10 minutes,
 that would be good.
@@ -34,19 +34,13 @@ st = scitran('stanfordlabs');
 % store certain parameters about the rendering.
 
 tic
-% gcp = gCloud('configuration','gcp-pbrtv3-central-32');
 gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
-% gcp-pbrtv3-central-high-64cpu-flywheel
-% gcp-pbrtv3-central-32cpu-120m-flywheel
-% gcp = gCloud('configuration','gcp-pbrtv3-central-32cpu-208m-flywheel');
-% gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-32');
-
 toc
 gcp.renderDepth = 1;  % Create the depth map
 gcp.renderMesh  = 1;  % Create the object mesh for subsequent use
-gcp.targets =[];      % clear job list
+gcp.targets     =[];      % clear job list
 
 % Print out the gcp parameters for the user
 str = gcp.configList;
@@ -60,33 +54,23 @@ str = gcp.configList;
 % them into an asset list.  That is managed in piSceneAuto
 
 tic
-sceneType = 'city3';
+sceneType = 'city4';
 % roadType = 'cross';
 % sceneType = 'highway';
-<<<<<<< HEAD
-roadType = 'cross';
-=======
-
-roadType = 'curve_6lanes_001';
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
+% roadType = 'cross';
 % roadType = 'highway_straight_4lanes_001';
+roadType = 'straight_2lanes_parking';
 
-trafficflowDensity = 'medium';
+trafficflowDensity = 'high';
 
 dayTime = 'noon';
-<<<<<<< HEAD
-% Choose a timestamp(1~360)  
-timestamp = 95;
-% Normally we want only one scene per generation. 
-=======
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 100;
+timestamp = 15;
 
 % Normally we want only one scene per generation.
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 nScene = 1;
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
@@ -112,46 +96,29 @@ dayTime = 'noon';
 [thisR_scene,skymapfwInfo] = piSkymapAdd(thisR_scene,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 
-<<<<<<< HEAD
-%%
-%% Bundle the camera to a ramdom selected car from trafficflow
-% load in trafficflow
-=======
 %% Add a camera to one of the cars
 
 % To place the camera, we find a car and place a camera at the front
 % of the car.  We find the car using the trafficflow information.
 %
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
-% from = thisR_scene.assets(3).position;
-
 thisTrafficflow = trafficflow(timestamp);
-<<<<<<< HEAD
 nextTrafficflow = trafficflow(timestamp+1);
-CamOrientation  = 270;
-[thisCar,from,to,ori] = piCamPlace('thisTrafficflow',thisTrafficflow,...
-                           'CamOrientation',CamOrientation);
-thisR_scene.lookAt.from = from;
-thisR_scene.lookAt.to   = to;
-thisR_scene.lookAt.up   = [0;1;0];
-% Add motion info
-thisR_road  = piMotionBlurEgo(thisR_scene,...
-                              'fps',30,...
-                              'nextTrafficflow',nextTrafficflow,...
-                              'thisCar',thisCar);
+%%
 
-%% Render parameter
-=======
-CamOrientation =100;
-[from,to,ori] = piCamPlace('trafficflow',thisTrafficflow,...
+CamOrientation =270;
+[thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
     'CamOrientation',CamOrientation);
 
 thisR_scene.lookAt.from = from;
 thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
-thisR_scene.lookAt.from
+thisCar.speed
+%%
 
+thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
+                               'thisCar',thisCar,...
+                               'fps',30);
 %% Render parameters
 % This could be set by default, e.g.,
 
@@ -159,33 +126,26 @@ thisR_scene.lookAt.from
 %  autoRender = piAutoRenderParameters;
 %  autoRender.x = y;
 %
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 % Default is a relatively low samples/pixel (256).
 
 % thisR_scene.set('camera','realistic');
 % thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
 xRes = 1280;
 yRes = 720;
-pSamples = 256;
+pSamples = 1024;
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
 thisR_scene.set('fov',45);
 thisR_scene.film.diagonal.value=10;
 thisR_scene.film.diagonal.type = 'float';
-thisR_scene.integrator.maxdepth.value = 10;
+thisR_scene.integrator.maxdepth.value = 5;
 thisR_scene.integrator.subtype = 'bdpt';
 thisR_scene.sampler.subtype = 'sobol';
-<<<<<<< HEAD
-% thisR_scene.integrator.lightsamplestrategy.type = 'string';
-% thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
-% Write out the scene
-=======
 thisR_scene.integrator.lightsamplestrategy.type = 'string';
 thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
 
 %% Write out the scene into a PBRT file
 
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 if contains(sceneType,'city')
     outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
     thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
@@ -197,20 +157,8 @@ end
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-<<<<<<< HEAD
-filename = sprintf('%s_sp%d_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',sceneType,pSamples,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
-sceneInfo.sceneType = sceneType;
-sceneInfo.resolution = [xRes yRes];
-sceneInfo.pSamples  = pSamples;
-sceneInfo.roadType  = roadType;
-sceneInfo.dayTime   = dayTime;
-sceneInfo.timestamp = timestamp;
-sceneInfo.lookAt    = thisR_scene.lookAt;
-sceneInfo.ori       = ori;
-=======
 filename = sprintf('%s_sp%d_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
     sceneType,pSamples,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 outputFile = fullfile(outputDir,filename);
 thisR_scene.set('outputFile',outputFile);
 
@@ -222,13 +170,8 @@ piWrite(thisR_scene,'creatematerials',true,...
 % Upload the information to Flywheel.
 gcp.fwUploadPBRT(thisR_scene,'scitran',st,'road',road);
 
-<<<<<<< HEAD
-%
-addPBRTTarget(gcp,thisR_scene,sceneInfo);
-=======
 % Tell the gcp object about this target scene
 addPBRTTarget(gcp,thisR_scene);
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
 %% Describe the target to the user
@@ -238,6 +181,7 @@ gcp.targetsList;
 %% This invokes the PBRT-V3 docker image
 
 gcp.render();
+%% save gcp.targets
 
 %% Monitor the processes on GCP
 
@@ -266,25 +210,27 @@ gcp.PodDescribe(podname{1})
 [scene,scene_mesh,label]   = gcp.fwDownloadPBRT('scitran',st);
 disp('Data downloaded');
 
-<<<<<<< HEAD
-%% Show it in ISET
-=======
 %% Show the rendered image using ISETCam
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 
 % Some of the images have rendering artifiacts.  These are partially
 % removed using piWhitepixelRemove
 %
 for ii =1:length(scene)
-    scene_oi{ii} = piWhitepixelsRemove(scene{ii});
-    xCrop = oiGet(scene_oi{ii},'cols')-xRes;
-    yCrop = oiGet(scene_oi{ii},'rows')-yRes;
-    scene_crop{ii} = oiCrop(scene_oi{ii},[xCrop/2 yCrop/2 xRes-1 yRes-1]);
-    %     scene_crop{ii}.depthMap = imcrop(scene_crop{ii}.depthMap,[xCrop/2 yCrop/2 xRes-1 yRes-1]);
-    ieAddObject(scene_crop{ii});
-    oiSet(scene_crop{ii},'gamma',0.85);
-    pngFigure = oiGet(scene_crop{ii},'rgb image');
+    scene_corrected{ii} = piFireFliesRemove(scene{ii});
+   
     
+%     xCrop = oiGet(scene_oi{ii},'cols')-xRes;
+%     yCrop = oiGet(scene_oi{ii},'rows')-yRes;
+%     scene_crop{ii} = oiCrop(scene_oi{ii},[xCrop/2 yCrop/2 xRes-1 yRes-1]);
+    %     scene_crop{ii}.depthMap = imcrop(scene_crop{ii}.depthMap,[xCrop/2 yCrop/2 xRes-1 yRes-1]);
+    ieAddObject(scene_corrected{ii}); 
+    sceneWindow;
+    sceneSet(scene_corrected{ii},'gamma',0.85);
+    %oiSet(scene_corrected{ii},'gamma',0.85);
+    pngFigure = oiGet(scene_corrected{ii},'rgb image');
+    pngFigure_corrected = pngFigure.^(1/1.5);
+    figure;
+    imshow(pngFigure_corrected);
     % Get the class labels, depth map, bounding boxes for ground
     % truth. This usually takes about 15 secs
     tic
@@ -293,15 +239,14 @@ for ii =1:length(scene)
     sceneName = strrep(sceneName,'_mesh','');
     irradiancefile = fullfile(sceneFolder,[sceneName,'_ir.png']);
     imwrite(pngFigure,irradiancefile); % Save this scene file
-    
+
     %% Visualization of the ground truth bounding boxes
     vcNewGraphWin;
-    imshow(pngFigure);
+    imshow(pngFigure_corrected);
     fds = fieldnames(scene_label{ii}.bbox2d);
-<<<<<<< HEAD
-    for kk = 5
+    for kk = 3
     detections = scene_label{ii}.bbox2d.(fds{kk});
-    r = rand; g = rand; b = rand;    
+    r = rand; g = rand; b = rand;
     if r< 0.2 && g < 0.2 && b< 0.2
         r = 0.5; g = rand; b = rand;
     end
@@ -309,7 +254,7 @@ for ii =1:length(scene)
         pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
             detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
             detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
-        
+
         rectangle('Position',pos,'EdgeColor',[r g b],'LineWidth',2);
         t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,num2str(jj));
        %t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,fds{kk});
@@ -317,25 +262,11 @@ for ii =1:length(scene)
         t.BackgroundColor = [r g b];
         t.FontSize = 15;
     end
-=======
-    for kk = 3
-        detections = scene_label{ii}.bbox2d.(fds{kk});
-        r = rand;
-        g = rand;
-        b = rand;
-        for jj=1:length(detections)
-            pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
-                detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
-                detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
-            
-            rectangle('Position',pos,'EdgeColor',[r g b]);
-        end
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
     end
     drawnow;
-    
+
 end
-oiWindow;
+sceneWindow;
 truesize;
 
 %% Remove all jobs.
