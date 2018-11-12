@@ -54,7 +54,7 @@ str = gcp.configList;
 % them into an asset list.  That is managed in piSceneAuto
 
 tic
-sceneType = 'city4';
+sceneType = 'city3';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
@@ -68,7 +68,7 @@ dayTime = 'noon';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 15;
+timestamp = 50;
 
 % Normally we want only one scene per generation.
 nScene = 1;
@@ -106,7 +106,7 @@ thisTrafficflow = trafficflow(timestamp);
 nextTrafficflow = trafficflow(timestamp+1);
 %%
 
-CamOrientation =270;
+CamOrientation =90;
 [thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
     'CamOrientation',CamOrientation);
 
@@ -218,11 +218,12 @@ disp('Data downloaded');
 for ii =1:length(scene)
     scene_corrected{ii} = piFireFliesRemove(scene{ii});
    
-    
+%     This is for cropping an optical image where black margins are
+%     created.
 %     xCrop = oiGet(scene_oi{ii},'cols')-xRes;
 %     yCrop = oiGet(scene_oi{ii},'rows')-yRes;
 %     scene_crop{ii} = oiCrop(scene_oi{ii},[xCrop/2 yCrop/2 xRes-1 yRes-1]);
-    %     scene_crop{ii}.depthMap = imcrop(scene_crop{ii}.depthMap,[xCrop/2 yCrop/2 xRes-1 yRes-1]);
+%     scene_crop{ii}.depthMap = imcrop(scene_crop{ii}.depthMap,[xCrop/2 yCrop/2 xRes-1 yRes-1]);
     ieAddObject(scene_corrected{ii}); 
     sceneWindow;
     sceneSet(scene_corrected{ii},'gamma',0.85);

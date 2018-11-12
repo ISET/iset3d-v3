@@ -26,14 +26,13 @@ end
 
 %% give a geometry.pbrt
 
-% Best practice is to initalize the ouputFile.  Sometimes people
-% don't.  So we do this as the default behavior.
-if isempty(renderRecipe.outputFile)
-    [~, scene_fname] = fileparts(renderRecipe.inputFile);
-    Filepath = fullfile(piRootPath,'local',scene_fname);
-else
-    [Filepath,scene_fname] = fileparts(renderRecipe.outputFile);
-end
+% We set a default outputFile for recipe, and later we will check whether
+% a different outputFile is assigned, if so, we will merge the default
+% foler with it.
+
+[~, scene_fname] = fileparts(renderRecipe.inputFile);
+Filepath = fullfile(piRootPath,'local',scene_fname);
+
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));
 
 % Save the JSON file at this location
