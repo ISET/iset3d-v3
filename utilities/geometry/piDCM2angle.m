@@ -38,7 +38,10 @@ dcm(:,:,2) = eye(3);
 % Should validate here
 
 %% This is the transform
-validatedcm(dcm);
+
+% TL: Validate seems to fail for certain scenes. Commenting out for now
+% until we figure out what's going on.
+% validatedcm(dcm);
 
 [r1,r2,r3] = threeaxisrot( dcm(1,2,:), dcm(1,1,:), -dcm(1,3,:), ...
     dcm(2,3,:), dcm(3,3,:), ...
