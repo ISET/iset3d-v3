@@ -30,7 +30,7 @@ myScene.numRays = 256;
 % y-axis by 45 degrees, the other rotates it by 0.5 degrees!
 
 % Shift in the x-direction
-xShift = [-50 -25 0 25 50]; % in mm
+xShift = [-50 -25 0 25 50].*10^-3; % convert from mm to meters
 originalPos = myScene.eyePos;
 imageFrames = cell(length(xShift),1);
 for ii = 1:length(xShift)
@@ -56,7 +56,7 @@ end
 myScene.eyePos = originalPos;
 
 % Scan the scene 
-xShift = [-100 -50 0 50 100];
+xShift = [-100 -50 0 50 100].*10^-3; % convert from mm to meters;
 originalTo = myScene.eyeTo;
 imageFrames = cell(length(xShift),1);
 for ii = 1:length(xShift)
