@@ -17,7 +17,7 @@ function renderRecipe = piGeometryRead(renderRecipe)
 
 %%
 p = inputParser;
-p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
+p.addRequired('renderRecipe',@(x)isequal(claoss(x),'recipe'));
 
 %% Check version number
 if(renderRecipe.version ~= 3)
@@ -150,7 +150,7 @@ if ~convertedflag
                 
                 % save obj to a pbrt file
                 output_name = sprintf('%s.pbrt', obj(jj).name);
-                output_folder = sprintf(fullfile(outFilepath,'scene','PBRT','pbrt-geometry'));
+                output_folder = fullfile(outFilepath,'scene','PBRT','pbrt-geometry');
                 outputGeometry = fullfile('scene','PBRT','pbrt-geometry',output_name);
                 fprintf('piGeometryRead: Saving geometry file %s.\n',outputGeometry);
 
@@ -160,7 +160,9 @@ if ~convertedflag
                     mkdir(output_folder);
                 end
                 
-                fid = fopen(outputFile,'w');
+                outputFileGeometry = fullfile(output_folder,output_name);
+                
+                fid = fopen(outputFileGeometry,'w');
                 fprintf(fid,'# %s\n',obj(jj).name);
                 currLine = cell2mat(txtLines(ii));
                 
