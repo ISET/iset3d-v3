@@ -33,6 +33,7 @@ if isequal(input,'random')
     skynamelist = {'morning','noon','sunset'};
     input = skynamelist{index};
 end
+
 switch input
     case 'morning'
         skyname = sprintf('morning_%03d.exr',randi(4,1));       

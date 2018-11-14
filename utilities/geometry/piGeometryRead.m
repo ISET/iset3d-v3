@@ -31,11 +31,10 @@ end
 [inFilepath, scene_fname] = fileparts(renderRecipe.inputFile);
 inputFile = fullfile(inFilepath,sprintf('%s_geometry.pbrt',scene_fname));
 
-% Save the JSON file at this location
-outFilepath = fullfile(piRootPath,'local',scene_fname);
-outputFile  = fullfile(outFilepath,[scene_fname,'.pbrt']);
-renderRecipe.outputFile = outputFile;
-AssetInfo = fullfile(outFilepath,sprintf('%s.json',scene_fname));
+% Save the JSON file at AssetInfo
+outputFile  = renderRecipe.outputFile;
+outFilepath = fileparts(renderRecipe.outputFile);
+AssetInfo   = fullfile(outFilepath,sprintf('%s.json',scene_fname));
 
 %% Open the geometry file
 
@@ -52,10 +51,9 @@ tmp_indent = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 txtLines_indent = tmp_indent{1};
 fclose(fileID);
 
-%% Check flag
-% This indicates whether the geometry file is was already converted
-% from the C4D format.  If it was converted, we don't need to do much
-% work.
+%% Check whether the geometry have already been converted from C4D
+
+% If it was converted, we don't need to do much work.
 if contains(txtLines(1),'# PBRT geometry file converted from C4D exporter output')
     convertedflag = true;
 else
@@ -193,14 +191,13 @@ if ~convertedflag
     fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
     
 else
-    % The converted flag is true.  So AssetInfo is already a converted
-    % JSON file with the recipe information.  We just copy it into the
+    % The converted flag is true, so AssetInfo is already stored in a
+    % JSON file with the recipe information.  We just copy it isnto the
     % recipe.
     renderRecipe_tmp = jsonread(AssetInfo);
     
     % There may be a utility that accomplishes this.  We should find
     % it and use it here.
-    
     fds = fieldnames(renderRecipe_tmp);
     renderRecipe = recipe;
     
