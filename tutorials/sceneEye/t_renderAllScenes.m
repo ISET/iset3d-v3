@@ -275,20 +275,3 @@ oi = scene3d.render();
 ieAddObject(oi);
 oiWindow;
                   
-
-%% Mannequin/Figure
-% A model of a red mannequin. It's purposefully missing an arm and a leg in
-% order to make it asymmetric (it was originally created to test some
-% rotation scripts).
-
-scene3d = sceneEye('figure');
-
-scene3d.fov = 30;
-scene3d.resolution = 128;
-scene3d.numRays = 128;
-scene3d.numCABands = 0;
-scene3d.accommodation = 1/2.78;
-
-oi = scene3d.render();
-ieAddObject(oi);
-oiWindow;
