@@ -17,7 +17,7 @@ function renderRecipe = piGeometryRead(renderRecipe)
 
 %%
 p = inputParser;
-p.addRequired('renderRecipe',@(x)isequal(claoss(x),'recipe'));
+p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
 %% Check version number
 if(renderRecipe.version ~= 3)
@@ -159,15 +159,11 @@ if ~convertedflag
                 if ~exist(output_folder,'dir')
                     mkdir(output_folder);
                 end
-<<<<<<< HEAD
-
-                fid = fopen(outputFile,'w');
-=======
                 
                 outputFileGeometry = fullfile(output_folder,output_name);
                 
                 fid = fopen(outputFileGeometry,'w');
->>>>>>> e213f0da56baa58690cce6d1ef052d574402f226
+
                 fprintf(fid,'# %s\n',obj(jj).name);
                 currLine = cell2mat(txtLines(ii));
 
@@ -205,10 +201,6 @@ else
 
     % There may be a utility that accomplishes this.  We should find
     % it and use it here.
-<<<<<<< HEAD
-
-=======
->>>>>>> e213f0da56baa58690cce6d1ef052d574402f226
     fds = fieldnames(renderRecipe_tmp);
     renderRecipe = recipe;
 
