@@ -7,6 +7,11 @@
 % 
 % TL SCIEN 2017
 %
+% You should generally check that you have the updated docker image by
+% running
+%
+%   docker pull vistalab/pbrt-v3-spectral
+%
 % See also
 %
 

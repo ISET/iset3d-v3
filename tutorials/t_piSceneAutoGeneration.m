@@ -54,21 +54,21 @@ str = gcp.configList;
 % them into an asset list.  That is managed in piSceneAuto
 
 tic
-sceneType = 'city3';
+sceneType = 'city2';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
 % roadType = 'highway_straight_4lanes_001';
-roadType = 'straight_2lanes_parking';
+roadType = 'cross';
 
-trafficflowDensity = 'high';
+trafficflowDensity = 'low';
 
 dayTime = 'noon';
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 50;
+timestamp = 60;
 
 % Normally we want only one scene per generation.
 nScene = 1;
@@ -106,14 +106,14 @@ thisTrafficflow = trafficflow(timestamp);
 nextTrafficflow = trafficflow(timestamp+1);
 %%
 
-CamOrientation =90;
+CamOrientation =270;
 [thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
     'CamOrientation',CamOrientation);
 
 thisR_scene.lookAt.from = from;
 thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
-thisCar.speed
+thisVelocity = thisCar.speed
 %%
 
 thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
@@ -132,7 +132,7 @@ thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
 % thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
 xRes = 1280;
 yRes = 720;
-pSamples = 1024;
+pSamples = 256;
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
 thisR_scene.set('fov',45);
@@ -157,8 +157,8 @@ end
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-filename = sprintf('%s_sp%d_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
-    sceneType,pSamples,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
+filename = sprintf('%s_sp%d_vel%0.1f_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
+    sceneType,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
 outputFile = fullfile(outputDir,filename);
 thisR_scene.set('outputFile',outputFile);
 
@@ -206,32 +206,24 @@ gcp.PodDescribe(podname{1})
 % Keep checking for the data, every 15 sec, and download it is there
 
 %% Download files from Flywheel
-
+disp('*** Data downloading...');
 [scene,scene_mesh,label]   = gcp.fwDownloadPBRT('scitran',st);
-disp('Data downloaded');
+disp('*** Data downloaded');
 
 %% Show the rendered image using ISETCam
 
 % Some of the images have rendering artifiacts.  These are partially
-% removed using piWhitepixelRemove
+% removed using piFireFliesRemove
 %
 for ii =1:length(scene)
     scene_corrected{ii} = piFireFliesRemove(scene{ii});
-   
-%     This is for cropping an optical image where black margins are
-%     created.
-%     xCrop = oiGet(scene_oi{ii},'cols')-xRes;
-%     yCrop = oiGet(scene_oi{ii},'rows')-yRes;
-%     scene_crop{ii} = oiCrop(scene_oi{ii},[xCrop/2 yCrop/2 xRes-1 yRes-1]);
-%     scene_crop{ii}.depthMap = imcrop(scene_crop{ii}.depthMap,[xCrop/2 yCrop/2 xRes-1 yRes-1]);
     ieAddObject(scene_corrected{ii}); 
     sceneWindow;
     sceneSet(scene_corrected{ii},'gamma',0.85);
     %oiSet(scene_corrected{ii},'gamma',0.85);
     pngFigure = oiGet(scene_corrected{ii},'rgb image');
-    pngFigure_corrected = pngFigure.^(1/1.5);
     figure;
-    imshow(pngFigure_corrected);
+    imshow(pngFigure);
     % Get the class labels, depth map, bounding boxes for ground
     % truth. This usually takes about 15 secs
     tic
@@ -243,9 +235,9 @@ for ii =1:length(scene)
 
     %% Visualization of the ground truth bounding boxes
     vcNewGraphWin;
-    imshow(pngFigure_corrected);
+    imshow(pngFigure);
     fds = fieldnames(scene_label{ii}.bbox2d);
-    for kk = 3
+    for kk = 1
     detections = scene_label{ii}.bbox2d.(fds{kk});
     r = rand; g = rand; b = rand;
     if r< 0.2 && g < 0.2 && b< 0.2

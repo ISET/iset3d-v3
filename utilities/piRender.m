@@ -204,7 +204,10 @@ for ii = 1:length(filesToRender)
     
     if status
         warning('Docker did not run correctly');
-        disp(result)
+        % The status may contain a useful error message that we should
+        % look up.  The ones we understand should offer help here.
+        fprintf('Status:\n'); disp(status)
+        fprintf('Result:\n'); disp(result)
         pause;
     end
     % Used to have an else condition here

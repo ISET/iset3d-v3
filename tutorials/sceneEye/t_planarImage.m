@@ -42,7 +42,14 @@ myScene = sceneEye('texturedPlane',...
                    'planeDistance',distance,...
                    'planeSize',size,...
                    'planeTexture',imageTexture);
-               
+
+%% Keep the quality low so we can render quickly!
+myScene.resolution = 128;
+myScene.numRays = 128;
+
+% For speed purposes, we will not render chromatic aberration in the lens.
+myScene.numCABands = 0; 
+
 %% Accommodate to the plane
 
 % We can have the display image approximately cover the entire retinal

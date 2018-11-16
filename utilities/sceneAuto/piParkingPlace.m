@@ -25,7 +25,7 @@ x = size(parking_list,2);
 remain_length=2+randi(3);
 offset = parking_list(1).width/2;
 % interval distance between positions of cars
-interval=8;
+interval=12;
 
 for jj = 1 : x
     start_point = parking_list(jj).coordinate - [cos(parking_list(jj).direction*pi/180)*offset, -sin(parking_list(jj).direction*pi/180)*offset];
