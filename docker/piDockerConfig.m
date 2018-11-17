@@ -146,18 +146,13 @@ elseif isunix
     
     % Check for docker
     [status, result] = system('docker ps -a');
-    if (args.debug); fprintf('Docker status: %d\n',status); end
     if status == 0
         if args.debug; disp('Docker configured successfully!'); end
     else
-        [status, result] = system('/usr/local/bin/docker ps -a');
-        if (args.debug); fprintf('Docker status full path invoke: %d\n',status); end
-        if status == 0
-            if args.debug; disp('Docker configured successfully!'); end
-        else
-            error('Docker not configured: %s', result);
-        end
+        if (args.debug); fprintf('Docker status: %d\n',status); end
+        error('Docker not configured: %s', result);
     end
+end
 
 % Not MAC or LINUX
 else
