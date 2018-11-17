@@ -14,13 +14,13 @@ catch
     error('At least one validation script failed');
 end
 
-try
-    status = piRunTutorialsAll;
-    if (~status)
-        error('At least on tutorial script failed.');
-    end
-catch
-    error('Run all tutorials script failed.')
-end
+% try
+%     status = piRunTutorialsAll;
+%     if (~status)
+%         error('At least on tutorial script failed.');
+%     end
+% catch
+%     error('Run all tutorials script failed.')
+% end
 
 end
