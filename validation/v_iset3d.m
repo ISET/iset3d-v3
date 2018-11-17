@@ -7,6 +7,7 @@
 %% Basic V2 basic testing
 disp('Teapot:  Takes one minute or so')
 s_piReadRenderLookat
+disp('Teapot:  Done');
 
 %%  Version 2 slightly more complex
 % disp('ChessSet:  Takes a couple of minutes')
