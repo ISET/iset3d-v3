@@ -33,6 +33,7 @@ if ~exist(fname,'file'), error('File not found'); end
 disp('Got data file');
 
 % Read the main scene pbrt file.  Return it as a recipe
+disp('Trying read');
 thisR = piRead(fname);
 disp('Read data file');
 

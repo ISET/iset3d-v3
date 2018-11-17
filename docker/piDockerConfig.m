@@ -145,14 +145,18 @@ elseif isunix
     % system('export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6');
     
     % Check for docker
-    disp('Runing docker via system');
     [status, result] = system('docker ps -a');
-    fprintf('Docker status: %d\n',status);
-    result
+    if (args.debug); fprintf('Docker status: %d\n',status); end
     if status == 0
         if args.debug; disp('Docker configured successfully!'); end
     else
-        error('Docker not configured: %s', result);
+        [status, result] = system('/usr/local/bin/docker ps -a');
+        if (args.debug); fprintf('Docker status full path invoke: %d\n',status); end
+        if status == 0
+            if args.debug; disp('Docker configured successfully!'); end
+        else
+            error('Docker not configured: %s', result);
+        end
     end
 
 % Not MAC or LINUX

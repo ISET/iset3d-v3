@@ -81,6 +81,7 @@ thisR.inputFile = fname;
 readmaterials   = p.Results.readmaterials;
 
 % Set the output directory default
+disp('Setting output path');
 [~,scene_fname] = fileparts(fname);
 outFilepath = fullfile(piRootPath,'local',scene_fname);
 outputFile  = fullfile(outFilepath,[scene_fname,'.pbrt']);
@@ -96,14 +97,19 @@ end
 %% Read PBRT file
 
 % Open, read, close
+fprintf('Opening %s\n');
 fileID = fopen(fname);
+fprintf('Open OK\n');
 
 % I don't understand why the spaces or tabs at the beginning of the line are not
 % returned here. (BW).
+fprintf('Reading\n');
 tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
 txtLines = tmp{1};
 
+fprintf('Closing\n');
 fclose(fileID);
+fprintf('Closed\n');
 
 %% Split text lines into pre-WorldBegin and WorldBegin sections
 
