@@ -145,7 +145,10 @@ elseif isunix
     % system('export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6');
     
     % Check for docker
+    disp('Runing docker via system');
     [status, result] = system('docker ps -a');
+    fprintf('Docker status: %d\n',status);
+    result
     if status == 0
         if args.debug; disp('Docker configured successfully!'); end
     else
