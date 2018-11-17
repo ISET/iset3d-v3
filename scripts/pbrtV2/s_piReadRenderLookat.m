@@ -14,7 +14,13 @@
 %% Set up ISET and Docker
 disp('Initializing');
 ieInit;
-if ~piDockerExists, piDockerConfig; end
+disp('Checking docker exists');
+dockerExistsStatus = piDockerExists;
+if (~dockerExistsStatus)
+    disp('No docker, configuring');
+    piDockerConfig;
+    disp('Docker configured');
+end
 disp('Got through docker config');
 
 
