@@ -112,6 +112,8 @@ fclose(fileID);
 fprintf('Closed\n');
 
 %% Split text lines into pre-WorldBegin and WorldBegin sections
+fprintf('Parsing text\n');
+which('contains')
 worldBeginIndex = 0;
 for ii = 1:length(txtLines)
     currLine = txtLines{ii};
@@ -120,6 +122,7 @@ for ii = 1:length(txtLines)
         break;
     end
 end
+fprintf('Through the loop\n');
 if(worldBeginIndex == 0)
     warning('Cannot find WorldBegin.');
     worldBeginIndex = ii;
