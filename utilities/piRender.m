@@ -216,6 +216,9 @@ for ii = 1:length(filesToRender)
         ls(outFile)
     end
     try
+        ls('/mjs/toolboxes/iset3D/local/chess')
+    end
+    try
         ls('/mjs/toolboxes/iset3D/local/chess/renderings')
     end
     
