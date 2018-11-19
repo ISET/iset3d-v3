@@ -239,8 +239,7 @@ else
     % Deprecated Nov. 11, 2018.  Delete it if the issue does not comup in a month.
     % warning('"Renderer" does not exist in the new PBRTv3 format. We leave the field blank .')
 end
-
-fprinf('Extracted all the blocks\n');
+% fprintf('Extracted all the blocks\n');
 
 %% Read LookAt, Transforms, and ConcatTransform, if they exist
 % TODO: In the future we should move all these Transforms into
