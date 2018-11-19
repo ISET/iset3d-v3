@@ -214,12 +214,18 @@ for ii = 1:length(filesToRender)
     fprintf('Outfile file: %s.\n',outFile);
     try
         ls(outFile)
+    catch
+        fprintf('Error on ls of outfile\n');
     end
     try
-        ls('/mjs/toolboxes/iset3D/local/chess')
+        ls('l','/mjs/toolboxes/iset3D/local/chess')
+    catch
+        fprintf('Error on ls of chess subdir\n');
     end
     try
-        ls('/mjs/toolboxes/iset3D/local/chess/renderings')
+        ls('-l','/mjs/toolboxes/iset3D/local/chess/r*')
+    catch
+        fprintf('Error on ls of r* subdir\n');
     end
     
     %% Convert the radiance.dat to an ieObject
