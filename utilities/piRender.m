@@ -201,7 +201,6 @@ for ii = 1:length(filesToRender)
     elapsedTime = toc; 
     
     %% Check the return
-    
     if status
         warning('Docker did not run correctly');
         % The status may contain a useful error message that we should
@@ -211,17 +210,15 @@ for ii = 1:length(filesToRender)
         pause;
     end
     % Used to have an else condition here
-    % fprintf('Docker run status %d, seems OK.\n',status);
-    % fprintf('Outfile file: %s.\n',outFile);
-    
+    fprintf('Docker run status %d, seems OK.\n',status);
+    fprintf('Outfile file: %s.\n',outFile);
     
     %% Convert the radiance.dat to an ieObject
-
+    ls outfile
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
         thisR = piRead(pbrtFile);
-        
         if(isfield(thisR.film,'filename'))
             name = thisR.film.filename.value;
             [~,name,~] = fileparts(name); % Strip the extension (often EXR)
@@ -229,12 +226,14 @@ for ii = 1:length(filesToRender)
             
             [path,~,~] = fileparts(pbrtFile);
             outFile = fullfile(path,strcat(name,'.dat'));
-            
+            fprintf('New outfile file: %s.\n',outFile);
         else
+            fprintf('Blowing out with an error\n');
             error('Cannot find output file. \n');
         end
         
     end
+    fprintf('Found output file\n');
         
     % Depending on what we rendered, we assign the output data to
     % photons or depth map.
