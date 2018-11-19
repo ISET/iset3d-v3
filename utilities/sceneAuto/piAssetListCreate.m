@@ -80,7 +80,7 @@ if isempty(acquisitionname)
 else
     kk=1;
     for ii=1:length(recipeFiles)
-        if contains(lower(recipeFiles{ii}{1}.name),acquisitionname)
+        if strfind(lower(recipeFiles{ii}{1}.name),acquisitionname)
             thisAcq{kk} = recipeFiles{ii}{1};
             thisID{kk} =  recipe_acqID{ii};
             resFile{kk} = resourceFiles{ii}{1};

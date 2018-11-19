@@ -72,7 +72,7 @@ for ii = 1: length(obj)
     end
     % add a lightsFlag, we dont use lights for day scene.
     if lightsFlag
-        if contains(obj(ii).name,'_lightfront')
+        if strfind(obj(ii).name,'_lightfront')
             from = obj(ii).position;
             obj(ii).position = [0 0 0];
             for gg = 1:n
@@ -94,7 +94,7 @@ for ii = 1: length(obj)
                 fprintf(fid_obj,'AttributeEnd \n \n');
             end
         end
-        if contains(obj(ii).name,'_lightback')
+        if strfind(obj(ii).name,'_lightback')
             from = obj(ii).position;
             obj(ii).position = [0;0;0];
             for gg = 1:n
@@ -127,9 +127,9 @@ for ii = 1: length(obj)
                 else num = 4;
                 end
                 order = floor((jj+3)/4);
-                if contains(obj(mm).name,sprintf('trafficlight_%03d',num))...
-                        && contains(obj(mm).name,sprintf('_%d_',order)) ...
-                        &&contains(obj(mm).name,thistrafficflow.light(jj).State)...
+                if strfind(obj(mm).name,sprintf('trafficlight_%03d',num))...
+                        && strfind(obj(mm).name,sprintf('_%d_',order)) ...
+                        &&strfind(obj(mm).name,thistrafficflow.light(jj).State)...
                         &&isempty(obj(mm).children) && isfield(thistrafficflow,'light')
                     piTrafficlightAssign(fid_obj,obj(mm));
                 end
