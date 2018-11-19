@@ -9,6 +9,7 @@ close all;
 
 %% Validation scripts
 try
+    fprintf('Validating\n');
     v_iset3d;
 catch
     error('At least one validation script failed');
