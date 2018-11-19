@@ -214,6 +214,8 @@ for ii = 1:length(filesToRender)
     fprintf('Outfile file: %s.\n',outFile);
     try
         ls(outFile)
+    end
+    try
         ls('/mjs/toolboxes/iset3D/local/chess/renderings')
     end
     
@@ -221,7 +223,7 @@ for ii = 1:length(filesToRender)
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
-        thisR = piRead(pbrtFile);
+        thisR = piRead(pbrtFile)
         if(isfield(thisR.film,'filename'))
             name = thisR.film.filename.value;
             [~,name,~] = fileparts(name); % Strip the extension (often EXR)
