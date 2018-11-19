@@ -214,7 +214,7 @@ for ii = 1:length(filesToRender)
     fprintf('Outfile file: %s.\n',outFile);
     
     %% Convert the radiance.dat to an ieObject
-    ls outfile
+    ls outFile
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
