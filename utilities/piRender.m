@@ -219,7 +219,7 @@ for ii = 1:length(filesToRender)
         fprintf('Error on ls of outfile\n');
     end
     try
-        fprintf(ls of local subdir\n');
+        fprintf('ls of local subdir\n');
         ls('-l','/mjs/toolboxes/iset3d/local')
     catch
         fprintf('error on ls of local subdir\n');
