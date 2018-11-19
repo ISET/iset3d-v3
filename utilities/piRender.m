@@ -213,16 +213,25 @@ for ii = 1:length(filesToRender)
     fprintf('Docker run status %d, seems OK.\n',status);
     fprintf('Outfile file: %s.\n',outFile);
     try
+        fprintf('ls of outfile\n');
         ls(outFile)
     catch
         fprintf('Error on ls of outfile\n');
     end
     try
-        ls('l','/mjs/toolboxes/iset3D/local/chess')
+        fprintf(ls of local subdir\n');
+        ls('-l','/mjs/toolboxes/iset3d/local')
+    catch
+        fprintf('error on ls of local subdir\n');
+    end
+    try
+        fprintf('ls of ch* subdir\n');
+        ls('-l','/mjs/toolboxes/iset3D/local/ch*')
     catch
         fprintf('Error on ls of chess subdir\n');
     end
     try
+        fprintf('ls of r* subdir\n');
         ls('-l','/mjs/toolboxes/iset3D/local/chess/r*')
     catch
         fprintf('Error on ls of r* subdir\n');
