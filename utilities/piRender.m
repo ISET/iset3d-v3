@@ -212,9 +212,12 @@ for ii = 1:length(filesToRender)
     % Used to have an else condition here
     fprintf('Docker run status %d, seems OK.\n',status);
     fprintf('Outfile file: %s.\n',outFile);
+    try
+        ls(outFile)
+        ls('/mjs/toolboxes/iset3D/local/chess/renderings')
+    end
     
     %% Convert the radiance.dat to an ieObject
-    ls outFile
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
@@ -230,8 +233,7 @@ for ii = 1:length(filesToRender)
         else
             fprintf('Blowing out with an error\n');
             error('Cannot find output file. \n');
-        end
-        
+        end    
     end
     fprintf('Found output file\n');
         
