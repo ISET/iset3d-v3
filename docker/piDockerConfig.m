@@ -1,28 +1,28 @@
 function status = piDockerConfig(varargin)
 % Configure the Matlab environment and initiate the docker-machine
 %
-%   status = piDockerConfig(varargin) 
-% 
-% INPUTS: 
-%    'machine' - [Optional, type=char, default='default'] 
+%   status = piDockerConfig(varargin)
+%
+% INPUTS:
+%    'machine' - [Optional, type=char, default='default']
 %                Name of the docker-machine on OSX. Should exist.
-%    'debug'   - [Optional, type=logical, default=false] 
+%    'debug'   - [Optional, type=logical, default=false]
 %                If true then messages are displayed throughout the
 %                process, otherwise we're quiet save for an error.
-%       
+%
 % OUTPUTS:
 %    status    - boolean where 0=success and >0 denotes failure.
-% 
+%
 % EXAMPLE:
-%    [status] = piDockerConfig('machine', 'default', 'debug', true); 
-% 
-% (C) Stanford VISTA Lab, 2016 
+%    [status] = piDockerConfig('machine', 'default', 'debug', true);
+%
+% (C) Stanford VISTA Lab, 2016
 
 %% Parse input arguments
 
 p = inputParser;
 p.addParameter('machine', 'default', @ischar);
-p.addOptional('debug', false, @islogical); 
+p.addOptional('debug', false, @islogical);
 p.parse(varargin{:})
 
 args = p.Results;
@@ -56,33 +56,33 @@ if ismac
         end
         [s, ~] = system('open /Applications/Docker.app');
         [status, ~] = system('which docker', '-echo');
-        if s==0 && status==0     
+        if s==0 && status==0
             if args.debug
                 disp('Docker configured successfully!');
                 system('docker -v', '-echo');
             end
         end
-        return        
+        return
     end
     
     % Check that docker machine is installed
     [status, version] = system('docker-machine -v');
-    if status == 0 
+    if status == 0
         if args.debug
-            fprintf('Found %s\n', version); 
+            fprintf('Found %s\n', version);
         end
     else
-        error('%s \nIs docker-machine installed?', version); 
+        error('%s \nIs docker-machine installed?', version);
     end
     
     % Check that the machine is running
     [~, result] = system(sprintf('docker-machine status %s', args.machine));
     if strcmp(strtrim(result),'Running')
-        if args.debug 
-            fprintf('docker-machine ''%s'' is running.\n', args.machine); 
+        if args.debug
+            fprintf('docker-machine ''%s'' is running.\n', args.machine);
         end
-    
-    % Start the machine
+        
+        % Start the machine
     else
         fprintf('Starting docker-machine ''%s'' ... \n', args.machine);
         [status, result] = system(sprintf('docker-machine start %s', args.machine), '-echo');
@@ -117,8 +117,8 @@ if ismac
             docker_env_vars{end+1} = docker_env{ii}; %#ok<AGROW>
         end
     end
-    if args.debug  
-        fprintf('Configuring docker-machine env for machine: [%s] ...\n', args.machine); 
+    if args.debug
+        fprintf('Configuring docker-machine env for machine: [%s] ...\n', args.machine);
     end
     for jj = 1:numel(docker_env_vars)
         env_var = strsplit(docker_env_vars{jj},'"');
@@ -138,7 +138,7 @@ if ismac
         error('Docker could not be configured: %s', result);
     end
     
-% LINUX
+    % LINUX
 elseif isunix
     
     % This is needed for assimp library issues.  See the mexximp Readme.
@@ -152,12 +152,8 @@ elseif isunix
         if (args.debug); fprintf('Docker status: %d\n',status); end
         error('Docker not configured: %s', result);
     end
-end
-
-% Not MAC or LINUX
 else
+    % Not MAC or LINUX
     % We need a Windows implementation.
     warning('Platform [%s] not supported.  No configuration attempted.', computer);
-end
-
 end
