@@ -197,6 +197,9 @@ for ii = 1:length(filesToRender)
     
     cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
     
+    %% Try chmodding so everything can be read
+   system(['chmod a+rw /mjs/toolboxes/iset3D/local/chess/*']);
+   
     %% Look at dirs before render command run in docker
     try
         fprintf('ls of infile before\n');
