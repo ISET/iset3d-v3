@@ -238,7 +238,7 @@ for ii = 1:length(filesToRender)
     
     %% Invoke the Docker command with or without capturing results.
     tic
-    [status, result] = piRunCommand(cmd)
+    [status, result] = piRunCommand(cmd);
     elapsedTime = toc; 
     
     %% Check the return
