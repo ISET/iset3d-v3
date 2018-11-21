@@ -180,7 +180,7 @@ for ii = 1:length(filesToRender)
     % Make sure renderings folder exists
     if(~exist(fullfile(workingFolder,'renderings'),'dir'))
         mkdir(fullfile(workingFolder,'renderings'));
-        system(['chmod a+rw ' fullfile(workingFolder,'renderings')]);
+        %system(['chmod a+rw ' fullfile(workingFolder,'renderings')]);
     end
     
     outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
