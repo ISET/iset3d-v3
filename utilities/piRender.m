@@ -186,7 +186,7 @@ for ii = 1:length(filesToRender)
     outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
     renderCommand = sprintf('pbrt --outfile %s %s', ...
         outFile, currFile);
-    renderCommand = sprintf('ls -l /mjs/toolboxes/iset3d');
+    renderCommand = sprintf('ls -l /');
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
