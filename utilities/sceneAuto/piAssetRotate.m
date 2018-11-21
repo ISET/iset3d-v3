@@ -41,7 +41,7 @@ for dd = 1:pos_d
     end
     % rotate lights
     %     for jj=1:length(object)
-    %         if strfind(object(jj).name,'light')
+    %         if contains(object(jj).name,'light')
     %             light = [object(jj).position(1) object(jj).position(3)];
     %             %         plot([object_position(1) light(1)],[object_position(2) light(2)]);hold on
     %             %         axis([-15 15 -15 15]);

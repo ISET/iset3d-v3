@@ -35,7 +35,7 @@ if ismac
     % By default, docker-machine and docker for mac are installed in
     % /usr/local/bin:
     initPath = getenv('PATH');
-    if ~strfind(initPath, '/usr/local/bin')
+    if ~contains(initPath, '/usr/local/bin')
         if args.debug
             disp('Adding ''/usr/local/bin'' to PATH.');
         end
@@ -86,7 +86,7 @@ if ismac
     else
         fprintf('Starting docker-machine ''%s'' ... \n', args.machine);
         [status, result] = system(sprintf('docker-machine start %s', args.machine), '-echo');
-        if status && strfind(strtrim(result), 'not exist')
+        if status && contains(strtrim(result), 'not exist')
             
             % Prompt to create the machine
             resp = input('Would you like to create the machine now? (y/n): ', 's');

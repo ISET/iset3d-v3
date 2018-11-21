@@ -22,10 +22,10 @@ fid = fopen(fName);
 tline = fgetl(fid);
 
 while ischar(tline)    
-    if strfind(tline, 'Transform') ||strfind(tline, 'ConcatTransform')
+    if contains(tline, 'Transform') ||contains(tline, 'ConcatTransform')
         line = tline;
     end
-    if strfind(tline, 'WorldBegin')
+    if contains(tline, 'WorldBegin')
         break;
     end
     tline = fgetl(fid);

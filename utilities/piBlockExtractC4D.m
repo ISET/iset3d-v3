@@ -35,7 +35,7 @@ for ii=1:nLines
         s = struct('type',blockType,'subtype',blockSubtype);
         dd = 3;
         while dd <= nStrings
-            if strfind(thisLine{dd},' ')
+            if contains(thisLine{dd},' ')
                 C = strsplit(thisLine{dd},' ');
                 valueType = C{1};
                 valueName = C{2};

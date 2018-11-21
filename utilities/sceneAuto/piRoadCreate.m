@@ -49,7 +49,7 @@ switch sceneType
         sceneType_tmp = 'city';
         if randm ==1,road.nlanes = 4;else, road.nlanes = 6;end
         interval=[0.1,0.5,0.05,0.05,0.05];
-        if strfind(roadtype,'cross')
+        if contains(roadtype,'cross')
             roadname = sprintf('%s_%s_%dlanes',sceneType_tmp,roadtype,road.nlanes);
         else
             roadname = roadtype;
@@ -91,7 +91,7 @@ thisRoad_randm = randi(length(thisRoad),1);
 roadname_update = thisRoad(thisRoad_randm);
 roadname_tmp = strsplit(roadname_update{1},'.');
 for ii = 1: length(roadinfo)
-    if strfind(roadname_tmp{1},'construct') % will change name from ***_construct_001 to ***_001_construct
+    if contains(roadname_tmp{1},'construct') % will change name from ***_construct_001 to ***_001_construct
         roadname=strrep(roadname_tmp{1},'_construct','');
     else 
         roadname = roadname_tmp{1};
@@ -125,7 +125,7 @@ for dd = 1:length(fds)
     thisR.(fds{dd})= thisR_tmp.(fds{dd});
 end
 [f,n,~]=fileparts(assetRecipe.name);
-if strfind(sceneType,'city')
+if contains(sceneType,'city')
     filename = strrep(n,sceneType_tmp,sceneType);
 else
     filename = strcat(sceneType,'_',n);
