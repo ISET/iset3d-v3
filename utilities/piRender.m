@@ -186,6 +186,7 @@ for ii = 1:length(filesToRender)
     outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
     renderCommand = sprintf('pbrt --outfile %s %s', ...
         outFile, currFile);
+    renderCommand = sprintf('ls -l %s',currFile);
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
@@ -213,6 +214,12 @@ for ii = 1:length(filesToRender)
     % Used to have an else condition here
     fprintf('Docker run status %d, seems OK.\n',status);
     fprintf('Outfile file: %s.\n',outFile);
+    try
+        fprintf('ls of infile\n');
+        ls('-l','/mjs/toolboxes/iset3D/local/chess/teapot-area-light.pbrt')
+    catch
+        fprintf('Error on ls of infile\n');
+    end
     try
         fprintf('ls of outfile\n');
         ls(outFile)
