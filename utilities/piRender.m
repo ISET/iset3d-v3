@@ -186,7 +186,7 @@ for ii = 1:length(filesToRender)
     outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
     renderCommand = sprintf('pbrt --outfile %s %s', ...
         outFile, currFile);
-    renderCommand = sprintf('ls -la /mjs/toolboxes/iset3D/local/chess/*');
+    %renderCommand = sprintf('ls -la /mjs/toolboxes/iset3D/local/chess/*');
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
@@ -196,6 +196,38 @@ for ii = 1:length(filesToRender)
     dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, workingFolder, workingFolder);
     
     cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
+    
+    %% Look at dirs before render command run in docker
+    try
+        fprintf('ls of infile before\n');
+        ls('-l','/mjs/toolboxes/iset3D/local/chess/teapot-area-light.pbrt')
+    catch
+        fprintf('Error on ls of infile\n');
+    end
+    try
+        fprintf('ls of outfile\n');
+        ls(outFile)
+    catch
+        fprintf('Error on ls of outfile\n');
+    end
+    try
+        fprintf('ls of local subdir\n');
+        ls('-l','/mjs/toolboxes/iset3D/local')
+    catch
+        fprintf('error on ls of local subdir\n');
+    end
+    try
+        fprintf('ls of chess subdir\n');
+        ls('-l','/mjs/toolboxes/iset3D/local/chess')
+    catch
+        fprintf('Error on ls of chess subdir\n');
+    end
+    try
+        fprintf('ls of r* subdir\n');
+        ls('-l','/mjs/toolboxes/iset3D/local/chess/r*')
+    catch
+        fprintf('Error on ls of r* subdir\n');
+    end
     
     %% Invoke the Docker command with or without capturing results.
     tic
@@ -218,7 +250,7 @@ for ii = 1:length(filesToRender)
         fprintf('ls of infile\n');
         ls('-l','/mjs/toolboxes/iset3D/local/chess/teapot-area-light.pbrt')
     catch
-        fprintf('Error on ls of infile\n');
+        fprintf('Error on ls of infile after\n');
     end
     try
         fprintf('ls of outfile\n');
@@ -228,13 +260,13 @@ for ii = 1:length(filesToRender)
     end
     try
         fprintf('ls of local subdir\n');
-        ls('-l','/mjs/toolboxes/iset3d/local')
+        ls('-l','/mjs/toolboxes/iset3D/local')
     catch
         fprintf('error on ls of local subdir\n');
     end
     try
-        fprintf('ls of ch* subdir\n');
-        ls('-l','/mjs/toolboxes/iset3D/local/ch*')
+        fprintf('ls of chess subdir\n');
+        ls('-l','/mjs/toolboxes/iset3D/local/chess')
     catch
         fprintf('Error on ls of chess subdir\n');
     end
