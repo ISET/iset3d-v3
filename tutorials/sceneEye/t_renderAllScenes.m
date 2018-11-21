@@ -1,5 +1,7 @@
 %% t_renderAllScenes.m
 %
+% Works with ISETBio (not ISETCam)
+%
 % This tutorial will run quick renders of all available scenes. It will
 % also give examples on how to set certain parameters for certain scenes
 % (e.g. the distance to a textured plane.)
