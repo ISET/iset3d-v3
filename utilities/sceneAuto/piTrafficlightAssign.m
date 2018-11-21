@@ -1,5 +1,5 @@
 function piTrafficlightAssign(fid_obj,obj)
-if contains(obj.name,'green')
+if strfind(obj.name,'green')
     from = obj.position;
     obj.position = [0 0 0];
     fprintf(fid_obj,'AttributeBegin \n');
@@ -19,7 +19,7 @@ if contains(obj.name,'green')
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
 end
-if contains(obj.name,'yellow')
+if strfind(obj.name,'yellow')
     from = obj.position;
     obj.position = [0 0 0];
     fprintf(fid_obj,'AttributeBegin \n');
@@ -39,7 +39,7 @@ if contains(obj.name,'yellow')
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
 end
-if contains(obj.name,'red')
+if strfind(obj.name,'red')
     from = obj.position;
     obj.position = [0 0 0];
     fprintf(fid_obj,'AttributeBegin \n');

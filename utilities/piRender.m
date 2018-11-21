@@ -180,11 +180,15 @@ for ii = 1:length(filesToRender)
     % Make sure renderings folder exists
     if(~exist(fullfile(workingFolder,'renderings'),'dir'))
         mkdir(fullfile(workingFolder,'renderings'));
+        %system(['chmod a+rw ' fullfile(workingFolder,'renderings')]);
     end
     
     outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
     renderCommand = sprintf('pbrt --outfile %s %s', ...
         outFile, currFile);
+
+% THIS IS DHB DEBUGGING CODE FOR JENKINS.
+%    renderCommand = sprintf('ls -la /mjs/toolboxes/iset3D/local/chess');
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
@@ -195,13 +199,49 @@ for ii = 1:length(filesToRender)
     
     cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
     
+% THIS IS DHB DEBUGGING CODE FOR JENKINS.
+%   % Try chmodding so everything can be read
+%   system(['chmod a+rw /mjs/toolboxes/iset3D/local/chess/*']);
+
+% THIS IS DHB DEBUGGING CODE FOR JENKINS.
+%     %% Look at dirs before render command run in docker
+%     try
+%         fprintf('ls of infile before\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local/chess/teapot-area-light.pbrt')
+%     catch
+%         fprintf('Error on ls of infile\n');
+%     end
+%     try
+%         fprintf('ls of outfile\n');
+%         ls(outFile)
+%     catch
+%         fprintf('Error on ls of outfile\n');
+%     end
+%     try
+%         fprintf('ls of local subdir\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local')
+%     catch
+%         fprintf('error on ls of local subdir\n');
+%     end
+%     try
+%         fprintf('ls of chess subdir\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local/chess')
+%     catch
+%         fprintf('Error on ls of chess subdir\n');
+%     end
+%     try
+%         fprintf('ls of r* subdir\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local/chess/r*')
+%     catch
+%         fprintf('Error on ls of r* subdir\n');
+%     end
+    
     %% Invoke the Docker command with or without capturing results.
     tic
     [status, result] = piRunCommand(cmd);
     elapsedTime = toc; 
     
     %% Check the return
-    
     if status
         warning('Docker did not run correctly');
         % The status may contain a useful error message that we should
@@ -210,18 +250,48 @@ for ii = 1:length(filesToRender)
         fprintf('Result:\n'); disp(result)
         pause;
     end
-    % Used to have an else condition here
-    % fprintf('Docker run status %d, seems OK.\n',status);
-    % fprintf('Outfile file: %s.\n',outFile);
     
+    % Used to have an else condition here
+    %fprintf('Docker run status %d, seems OK.\n',status);
+    %fprintf('Outfile file: %s.\n',outFile);
+    
+% THIS IS DHB DEBUGGING CODE FOR JENKINS.
+%     try
+%         fprintf('ls of infile\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local/chess/teapot-area-light.pbrt')
+%     catch
+%         fprintf('Error on ls of infile after\n');
+%     end
+%     try
+%         fprintf('ls of outfile\n');
+%         ls(outFile)
+%     catch
+%         fprintf('Error on ls of outfile\n');
+%     end
+%     try
+%         fprintf('ls of local subdir\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local')
+%     catch
+%         fprintf('error on ls of local subdir\n');
+%     end
+%     try
+%         fprintf('ls of chess subdir\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local/chess')
+%     catch
+%         fprintf('Error on ls of chess subdir\n');
+%     end
+%     try
+%         fprintf('ls of r* subdir\n');
+%         ls('-l','/mjs/toolboxes/iset3D/local/chess/r*')
+%     catch
+%         fprintf('Error on ls of r* subdir\n');
+%     end
     
     %% Convert the radiance.dat to an ieObject
-
     if ~exist(outFile,'file')
         warning('Cannot find output file %s. Searching pbrt file for output name... \n',outFile);
         
         thisR = piRead(pbrtFile);
-        
         if(isfield(thisR.film,'filename'))
             name = thisR.film.filename.value;
             [~,name,~] = fileparts(name); % Strip the extension (often EXR)
@@ -229,12 +299,13 @@ for ii = 1:length(filesToRender)
             
             [path,~,~] = fileparts(pbrtFile);
             outFile = fullfile(path,strcat(name,'.dat'));
-            
+            fprintf('New outfile file: %s.\n',outFile);
         else
+            %fprintf('Blowing out with an error\n');
             error('Cannot find output file. \n');
-        end
-        
+        end    
     end
+    %fprintf('Found output file\n');
         
     % Depending on what we rendered, we assign the output data to
     % photons or depth map.

@@ -55,8 +55,10 @@ switch param
                 % Sometimes the output directory has not been created yet.
                 mkdir(dirdest);
             end
-            copyfile(dirsource,dirdest);
-            rmdir(dirsource,'s');
+            if(dirdest ~= dirdest)
+                copyfile(dirsource,dirdest);
+                rmdir(dirsource,'s');
+            end
         end
         thisR.outputFile = val;
         

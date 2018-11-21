@@ -100,7 +100,7 @@ tree_interval = rand(1)*20+5;
 if contains(sceneType,'city')||contains(sceneType,'suburb')
     susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
     % place parked cars
-    if contains(roadType,'parking')
+    if strfind(roadType,'parking')
         trafficflow = piParkingPlace(road, trafficflow);
     end
     building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));
