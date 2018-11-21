@@ -54,14 +54,14 @@ str = gcp.configList;
 % them into an asset list.  That is managed in piSceneAuto
 
 tic
-sceneType = 'city2';
+sceneType = 'city3';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
 % roadType = 'highway_straight_4lanes_001';
 roadType = 'cross';
 
-trafficflowDensity = 'low';
+trafficflowDensity = 'medium';
 
 dayTime = 'noon';
 
@@ -106,7 +106,7 @@ thisTrafficflow = trafficflow(timestamp);
 nextTrafficflow = trafficflow(timestamp+1);
 %%
 
-CamOrientation =270;
+CamOrientation =180;
 [thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
     'CamOrientation',CamOrientation);
 
@@ -159,8 +159,7 @@ end
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
 filename = sprintf('%s_sp%d_vel%0.1f_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
     sceneType,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
-outputFile = fullfile(outputDir,filename);
-thisR_scene.set('outputFile',outputFile);
+thisR_scene.outputFile = fullfile(outputDir,filename);
 
 % Do the writing
 piWrite(thisR_scene,'creatematerials',true,...

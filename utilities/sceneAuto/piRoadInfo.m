@@ -246,6 +246,7 @@ roadinfo(5).sidewalk_list(8).width = 5;
 %% 
 currdir = pwd;
 filepath = fullfile(piRootPath,'local','configuration');
+if ~exist(filepath,'dir'), mkdir(filepath);end
 cd(filepath);
 save('roadInfo.mat','roadinfo');cd(currdir)
 filefullpath = fullfile(filepath, 'roadInfo.mat');

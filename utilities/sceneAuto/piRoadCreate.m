@@ -38,7 +38,7 @@ end
 %% write out
 piRoadInfo;
 % load it
-load(fullfile(piRootPath,'configuration','roadInfo.mat'),'roadinfo');
+load(fullfile(piRootPath,'local','configuration','roadInfo.mat'),'roadinfo');
 %%
 vTypes={'pedestrian','passenger','bus','truck','bicycle'};
 
