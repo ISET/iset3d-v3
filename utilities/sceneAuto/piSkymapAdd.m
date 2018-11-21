@@ -47,7 +47,7 @@ switch input
 end
 skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 
-index_m = find(contains(thisR.world,'_materials.pbrt'));
+index_m = find(piContains(thisR.world,'_materials.pbrt'));
 % skyview = randi(360,1);
 skyview = randi(45,1)+45;% tmp
 world(1,:) = thisR.world(1);

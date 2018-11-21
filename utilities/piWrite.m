@@ -345,12 +345,12 @@ end
 if creatematerials
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
-        if contains(currLine, 'materials.pbrt')
+        if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
         end
         if overwritegeometry
-            if contains(currLine, 'geometry.pbrt')
+            if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(renderRecipe.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
@@ -368,7 +368,7 @@ end
 fclose(fileID);
 
 %% Overwrite Materials.pbrt
-if contains(renderRecipe.exporter, 'C4D')
+if piContains(renderRecipe.exporter, 'C4D')
     if ~creatematerials
         if overwritematerials
             [~,n] = fileparts(renderRecipe.inputFile);
@@ -384,7 +384,7 @@ if contains(renderRecipe.exporter, 'C4D')
     end
 end
 %% Overwirte geometry.pbrt
-if contains(renderRecipe.exporter, 'C4D')
+if piContains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
     piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'thistrafficflow',thistrafficflow); 
     end
