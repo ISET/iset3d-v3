@@ -7,9 +7,9 @@ if strfind(color,'random')
 %     color = colorlist{index};
 if index  <= 0.3, color = 'white';end
 if index>0.3&&index<=0.45, color = 'black';end
-if index>0.45&&index<=0.6, color = 'red';end
-if index>0.6&&index<=0.75, color = 'blue';end
-if index>0.75&&index<=0.85, color = 'green';end
+if index>0.45&&index<=0.65, color = 'red';end
+if index>0.65&&index<=0.8, color = 'blue';end
+if index>0.8&&index<=0.85, color = 'green';end
 if index>0.85&&index<=0.90, color = 'yellow';end
 if index>0.90&&index<=1, color = 'silver';end
      rgb = colorswitch(color);

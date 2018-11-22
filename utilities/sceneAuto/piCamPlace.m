@@ -21,9 +21,9 @@ if isempty(CamPos)
         for ii = 1:length(carlist)
             if ~isempty(CamOri)
                 orientation = carlist(ii).orientation-90;
-                % Wrap angles to [0,360]
-                orientation = wrapTo360(orientation);
-                CamOri = wrapTo360(CamOri);
+                if orientation <0
+                    orientation = orientation+360;
+                end
                 if abs(orientation-CamOri) < 20
                     idx(dd) = ii;dd=dd+1;
                 end
