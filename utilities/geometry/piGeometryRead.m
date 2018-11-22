@@ -54,7 +54,7 @@ fclose(fileID);
 %% Check whether the geometry have already been converted from C4D
 
 % If it was converted, we don't need to do much work.
-if strfind(txtLines(1),'# PBRT geometry file converted from C4D exporter output')
+if contains(txtLines(1),'# PBRT geometry file converted from C4D exporter output')
     convertedflag = true;
 else
     convertedflag = false;
@@ -84,7 +84,7 @@ if ~convertedflag
         ll = 1; jj = 1;
         for ii = nestbegin(dd): nestend(dd)
             % Find the name of a grouped object
-            if strfind(txtLines{nestbegin(dd)+1}, '#ObjectName ')
+            if contains(txtLines{nestbegin(dd)+1}, '#ObjectName ')
                 GroupObj_name_tmp = erase(txtLines{nestbegin(dd)+1},'#ObjectName ');
                 index = strfind(GroupObj_name_tmp, ':');
                 Groupobj_name = GroupObj_name_tmp(1:(index-1));
@@ -99,7 +99,7 @@ if ~convertedflag
                 groupobj(hh).size.pmax = [size_num(1) size_num(3)];
 
                 groupobj(hh).name = sprintf('%s',Groupobj_name);
-                if strfind(txtLines{nestbegin(dd)+2}, 'ConcatTransform')
+                if contains(txtLines{nestbegin(dd)+2}, 'ConcatTransform')
                     tmp = txtLines{nestbegin(dd)+2};
                     tmp  = textscan(tmp, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
                     values = cell2mat(tmp(2:end));
@@ -126,15 +126,15 @@ if ~convertedflag
             end
             % find children objects
 
-            if strfind(txtLines(ii),'Shape')
+            if contains(txtLines(ii),'Shape')
                 obj(jj).index = ii;
                 % Name is created by a pattern: '#ObjectName' + 'objname' + ':' +'Vector' + '(width(x), height(y), lenght(z))'
                 % Check if concattranform is contained in a children attribute.
-                if strfind(txtLines(ii-1),':Vector(')
+                if contains(txtLines(ii-1),':Vector(')
                     name = erase(txtLines(ii-1),'#ObjectName ');
-                elseif strfind(txtLines(ii-3),':Vector(')
+                elseif contains(txtLines(ii-3),':Vector(')
                     name = erase(txtLines(ii-3),'#ObjectName ');
-                elseif strfind(txtLines(ii-4),':Vector(')
+                elseif contains(txtLines(ii-4),':Vector(')
                     name = erase(txtLines(ii-4),'#ObjectName ');
                 else
                     name = erase(txtLines(obj(jj-1).index-4),'#ObjectName ');
@@ -144,7 +144,7 @@ if ~convertedflag
                 obj_name = name(1:(index-1));
                 obj(jj).name = sprintf('%d_%s',jj,groupobj(hh).name);
                 % for the case there is no material assigned.
-                if strfind(txtLines(ii-1),'NamedMaterial')
+                if contains(txtLines(ii-1),'NamedMaterial')
                     obj(jj).material = sprintf('%s',cell2mat(txtLines(ii-1)));
                 end
 
@@ -159,9 +159,9 @@ if ~convertedflag
                 if ~exist(output_folder,'dir')
                     mkdir(output_folder);
                 end
-
+                
                 outputFileGeometry = fullfile(output_folder,output_name);
-
+                
                 fid = fopen(outputFileGeometry,'w');
 
                 fprintf(fid,'# %s\n',obj(jj).name);

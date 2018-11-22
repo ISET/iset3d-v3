@@ -1,6 +1,6 @@
 function rgb = piColorPick(color)
 %% choose a pre-defined color or randomly pick one
-if strfind(color,'random')
+if contains(color,'random')
     colorlist = {'white','black','red',...
         'blue','silver',''};
     index = rand;

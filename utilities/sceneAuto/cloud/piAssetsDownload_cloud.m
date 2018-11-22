@@ -53,7 +53,7 @@ if isempty(acquisitionname)
     fprintf('%d Files downloaded.\n',nDatabaseAssets);
 else
     for ii=1:length(resourceFiles)
-        if strfind(lower(resourceFiles{ii}{1}.name),acquisitionname)
+        if contains(lower(resourceFiles{ii}{1}.name),acquisitionname)
             thisAcq = resourceFiles{ii}{1};
             thisID =  resource_acqID{ii};
             break;
