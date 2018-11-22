@@ -35,7 +35,7 @@ if ismac
     % By default, docker-machine and docker for mac are installed in
     % /usr/local/bin:
     initPath = getenv('PATH');
-    if ~strfind(initPath, '/usr/local/bin')
+    if isempty(strfind(initPath, '/usr/local/bin')) %#ok<STREMP>
         if args.debug
             disp('Adding ''/usr/local/bin'' to PATH.');
         end
