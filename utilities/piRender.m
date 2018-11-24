@@ -189,7 +189,7 @@ for ii = 1:length(filesToRender)
         outFile, currFile);
 
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
-   renderCommand = sprintf('ls -la /opt/toolboxes/iset3d')
+%   renderCommand = sprintf('ls -la /opt/toolboxes/iset3d')
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
