@@ -8,7 +8,13 @@ function rootPath=piRootPath()
 % Example:
 %   fullfile(p2iRootPath,'data')
 
-rootPath=which('piRootPath');
+rootPath=which('piRootPath')
+try
+    ls('-la','/opt/toolboxes')
+catch
+    error('Error on ls of /opt/toolboxes');
+end
+tbLocateToolbox('iset3d')
 
 [rootPath,fName,ext]=fileparts(rootPath);
 
