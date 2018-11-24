@@ -23,7 +23,7 @@ function [thisR_scene,road] = piSceneAuto(varargin)
 % Returns:
 %  thisR_scene - Scene recipe
 %  road  - A struct containing the list of flywheel objects and road
-%          information. To list this out use road.fwList; 
+%          information. To list this out use road.fwList;
 %
 % Author:
 %   ZL
@@ -93,29 +93,18 @@ end
 
 %% SUSO setting
 
-<<<<<<< HEAD
-=======
-% This places the fixed (static) objects. To speed up debugging, we
-% removed this.  But in actual cases we use it every time.
+% Uncomment when SUSO runs
 %
-% Remove this warning when the code below is uncommented
-warning('No static objects placed');
-
-%{
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 tic
 tree_interval = rand(1)*20+5;
-
-%%
-if piContains(sceneType,'city')||piContains(sceneType,'suburb')
-    % tmp
-    %susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+if contains(sceneType,'city')||contains(sceneType,'suburb')
+    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
     % place parked cars
-    if piContains(roadType,'parking')
+    if contains(roadType,'parking')
         trafficflow = piParkingPlace(road, trafficflow);
     end
     building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));
-    
+
     if ~exist(building_listPath,'file')
         building_list = piAssetListCreate('class',sceneType,...
             'scitran',st);
@@ -125,26 +114,17 @@ if piContains(sceneType,'city')||piContains(sceneType,'suburb')
     end
     buildingPosList = piBuildingPosList(building_list,thisR_road);
     susoPlaced.building = piBuildingPlace(building_list,buildingPosList);
-    %% Cat fwInfo str with road.fwList
-    
+
     % Add All placed assets
     thisR_road = piAssetAdd(thisR_road, susoPlaced);
     % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
     toc
+    % create a file ID & name strings for Flywheel to copy selected assets
+    % over to VMs.
+    % static objects
+    road = fwInfoCat(road,susoPlaced);
 end
-<<<<<<< HEAD
 
-%% Place vehicles/pedestrians
-[sumoPlaced,~] = piTrafficPlace(trafficflow,...
-                                               'timestamp',timestamp,...
-                                               'resources',~cloudRenderFlag,...
-                                               'scitran',st);
-for ii = 1: length(sumoPlaced)
-    thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
-end
-% create a file ID & name strings for flywheel to copy selected assets over to VMs.
-road = fwInfoCat(road,susoPlaced); % static objects
-=======
 %}
 
 %% Place vehicles/pedestrians using the SUMO data
@@ -158,16 +138,10 @@ for ii = 1: length(sumoPlaced)
     thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
 end
 
-% create a file ID & name strings for Flywheel to copy selected assets
-% over to VMs. 
-%
-
-% Uncomment when SUSO runs
-% road = fwInfoCat(road,susoPlaced); % static objects
-%
-
->>>>>>> 4349713c169e324aee8340eefe7644b9138f0e35
 road = fwInfoCat(road,sumoPlaced{1}); % mobile objects
+
+
+
 
 end
 
@@ -183,5 +157,3 @@ for jj = 1:length(assetFields)
 end
 
 end
-
-

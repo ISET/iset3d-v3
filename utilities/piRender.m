@@ -167,6 +167,7 @@ for ii = 1:length(filesToRender)
     currFile = filesToRender{ii};
     
     %% Build the docker command
+    %dockerCommand   = 'docker run -ti --rm --user="0":"0"';
     dockerCommand   = 'docker run -ti --rm';
     
     if(thisR.version == 3 || version == 3)
