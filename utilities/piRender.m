@@ -189,7 +189,7 @@ for ii = 1:length(filesToRender)
         outFile, currFile);
 
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
-%   renderCommand = sprintf('ls -la /opt/toolboxes/iset3d')
+    renderCommand = sprintf('ls -la /opt/toolboxes/iset3d/local ; ls -la /opt/toolboxes/iset3d/local/chess ; cat /opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
@@ -205,37 +205,37 @@ for ii = 1:length(filesToRender)
 %   system(['chmod a+rw /opt/toolboxes/iset3d/local/chess/*']);
 
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
-    %% Look at dirs before render command run in docker
-    try
-        fprintf('ls of infile before\n');
-        ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
-    catch
-        fprintf('Error on ls of infile\n');
-    end
-    try
-        fprintf('ls of outfile\n');
-        ls(outFile)
-    catch
-        fprintf('Error on ls of outfile\n');
-    end
-    try
-        fprintf('ls of local subdir\n');
-        ls('-l','/opt/toolboxes/iset3d/local')
-    catch
-        fprintf('error on ls of local subdir\n');
-    end
-    try
-        fprintf('ls of chess subdir\n');
-        ls('-l','/opt/toolboxes/iset3d/local/chess')
-    catch
-        fprintf('Error on ls of chess subdir\n');
-    end
-    try
-        fprintf('ls of r* subdir\n');
-        ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
-    catch
-        fprintf('Error on ls of r* subdir\n');
-    end
+%     %% Look at dirs before render command run in docker
+%     try
+%         fprintf('ls of infile before\n');
+%         ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
+%     catch
+%         fprintf('Error on ls of infile\n');
+%     end
+%     try
+%         fprintf('ls of outfile\n');
+%         ls(outFile)
+%     catch
+%         fprintf('Error on ls of outfile\n');
+%     end
+%     try
+%         fprintf('ls of local subdir\n');
+%         ls('-l','/opt/toolboxes/iset3d/local')
+%     catch
+%         fprintf('error on ls of local subdir\n');
+%     end
+%     try
+%         fprintf('ls of chess subdir\n');
+%         ls('-l','/opt/toolboxes/iset3d/local/chess')
+%     catch
+%         fprintf('Error on ls of chess subdir\n');
+%     end
+%     try
+%         fprintf('ls of r* subdir\n');
+%         ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
+%     catch
+%         fprintf('Error on ls of r* subdir\n');
+%     end
     
     %% Invoke the Docker command with or without capturing results.
     tic
@@ -257,42 +257,42 @@ for ii = 1:length(filesToRender)
     %fprintf('Outfile file: %s.\n',outFile);
     
 % THIS IS DHB DEBUGGING CODE FOR JENKINS. 
-    try
-        fprintf('ls of /var/lib/jenkins/workspace\n');
-        ls('-l','/var/lib/jenkins/workspace')
-    catch
-        fprintf('Error on ls of /var/lib\n');
-    end
-    try
-        fprintf('ls of infile\n');
-        ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
-    catch
-        fprintf('Error on ls of infile after\n');
-    end
-    try
-        fprintf('ls of outfile\n');
-        ls(outFile)
-    catch
-        fprintf('Error on ls of outfile\n');
-    end
-    try
-        fprintf('ls of local subdir\n');
-        ls('-l','/opt/toolboxes/iset3d/local')
-    catch
-        fprintf('error on ls of local subdir\n');
-    end
-    try
-        fprintf('ls of chess subdir\n');
-        ls('-l','/opt/toolboxes/iset3d/local/chess')
-    catch
-        fprintf('Error on ls of chess subdir\n');
-    end
-    try
-        fprintf('ls of r* subdir\n');
-        ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
-    catch
-        fprintf('Error on ls of r* subdir\n');
-    end
+%     try
+%         fprintf('ls of /var/lib/jenkins/workspace\n');
+%         ls('-l','/var/lib/jenkins/workspace')
+%     catch
+%         fprintf('Error on ls of /var/lib/jenkins/workspace\n');
+%     end
+%     try
+%         fprintf('ls of infile\n');
+%         ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
+%     catch
+%         fprintf('Error on ls of infile after\n');
+%     end
+%     try
+%         fprintf('ls of outfile\n');
+%         ls(outFile)
+%     catch
+%         fprintf('Error on ls of outfile\n');
+%     end
+%     try
+%         fprintf('ls of local subdir\n');
+%         ls('-l','/opt/toolboxes/iset3d/local')
+%     catch
+%         fprintf('error on ls of local subdir\n');
+%     end
+%     try
+%         fprintf('ls of chess subdir\n');
+%         ls('-l','/opt/toolboxes/iset3d/local/chess')
+%     catch
+%         fprintf('Error on ls of chess subdir\n');
+%     end
+%     try
+%         fprintf('ls of r* subdir\n');
+%         ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
+%     catch
+%         fprintf('Error on ls of r* subdir\n');
+%     end
     
     %% Convert the radiance.dat to an ieObject
     if ~exist(outFile,'file')
