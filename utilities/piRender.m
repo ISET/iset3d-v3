@@ -239,7 +239,7 @@ for ii = 1:length(filesToRender)
     
     %% Invoke the Docker command with or without capturing results.
     tic
-    [status, result] = piRunCommand(cmd);
+    [status, result] = piRunCommand(cmd)
     elapsedTime = toc; 
     
     %% Check the return
@@ -258,8 +258,8 @@ for ii = 1:length(filesToRender)
     
 % THIS IS DHB DEBUGGING CODE FOR JENKINS. 
     try
-        fprintf('ls of /var/lib\n');
-        ls('-l','/var/lib')
+        fprintf('ls of /var/lib/jenkins/workspace\n');
+        ls('-l','/var/lib/jenkins/workspace')
     catch
         fprintf('Error on ls of /var/lib\n');
     end
