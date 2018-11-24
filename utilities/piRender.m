@@ -256,7 +256,13 @@ for ii = 1:length(filesToRender)
     %fprintf('Docker run status %d, seems OK.\n',status);
     %fprintf('Outfile file: %s.\n',outFile);
     
-% THIS IS DHB DEBUGGING CODE FOR JENKINS.
+% THIS IS DHB DEBUGGING CODE FOR JENKINS. 
+    try
+        fprintf('ls of /var/lib\n');
+        ls('-l','/var/lib')
+    catch
+        fprintf('Error on ls of /var/lib\n');
+    end
     try
         fprintf('ls of infile\n');
         ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
