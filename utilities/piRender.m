@@ -79,7 +79,7 @@ if ischar(thisR)
         renderType = 'radiance';
     end
     
-    [workingFolder, name, ~] = fileparts(pbrtFile);
+    [workingFolder, name, ~] = fileparts(pbrtFile)
     if(isempty(workingFolder))
         error('Absolute path required for the working folder.');
     end
@@ -189,7 +189,7 @@ for ii = 1:length(filesToRender)
         outFile, currFile);
 
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
-%    renderCommand = sprintf('ls -la /mjs/toolboxes/iset3D/local/chess');
+   renderCommand = sprintf('ls -la /opt/toolboxes/iset3D/local/chess')
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
