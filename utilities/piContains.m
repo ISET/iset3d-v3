@@ -1,12 +1,12 @@
-function tf = piContains(str,pattern)
+function tf = pipiContains(str,pattern)
 % Returns 1 (true) if str contains pattern, and returns 0 (false) otherwise.
 %
 % Synopsis:
-%    tf = piContains(str,pattern)
+%    tf = pipiContains(str,pattern)
 %
 % Description:
 %    Workalike for contains, in its simple calling form.  Written so that
-%    work with Matlab versions prior to those with contains().
+%    work with Matlab versions prior to those with piContains().
 %
 % See also: contains, strfind
 

@@ -77,7 +77,7 @@ resourcesCombineVehiclesOnly(roadname);toc
 % about 350 seconds
 tic
 % zipFileName = strrep(roadname,'suburb',cityname);
-if ~strfind(roadname,'city')
+if ~piContains(roadname,'city')
     zipFileName = strcat(sessionname,'_',roadname);
 else
     zipFileName = strrep(roadname,'city',cityname);

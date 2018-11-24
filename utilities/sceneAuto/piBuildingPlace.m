@@ -58,7 +58,7 @@ assetsPlaced = assets_updated;
 % debug --09/30
 for jj = 1:length(assetsPlaced)
     if ~isequal(lower(assetsPlaced(jj).geometry.name),'camera') && ...
-            ~strfind(lower(assetsPlaced(jj).geometry.name),'light')
+            ~piContains(lower(assetsPlaced(jj).geometry.name),'light')
         name = assetsPlaced(jj).geometry.name;
         assetsPlaced(jj).geometry.name = sprintf('building_%s',name);
     end

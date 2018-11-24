@@ -116,7 +116,7 @@ fclose(fileID);
 worldBeginIndex = 0;
 for ii = 1:length(txtLines)
     currLine = txtLines{ii};
-    if(strfind(currLine,'WorldBegin'))
+    if(piContains(currLine,'WorldBegin'))
         worldBeginIndex = ii;
         break;
     end
@@ -145,7 +145,7 @@ tmp = textscan(fileID,'%s','Delimiter','\n');
 headerCheck_scene = tmp{1};
 fclose(fileID);
 % fprintf('Second read done\n');
-if strfind(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
+if piContains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
     exporterFlag   = true;
     thisR.exporter = 'C4D';
 else
@@ -162,7 +162,7 @@ if exist(inputFile_materials,'file')
     tmp = textscan(fileID,'%s','Delimiter','\n');
     headerCheck_material = tmp{1};
     fclose(fileID);
-    if strfind(headerCheck_material{1}, 'Exported by piMaterialWrite')
+    if piContains(headerCheck_material{1}, 'Exported by piMaterialWrite')
         exporterFlag   = true;
         thisR.exporter = 'C4D';
     end

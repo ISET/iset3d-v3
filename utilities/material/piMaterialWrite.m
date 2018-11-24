@@ -39,23 +39,23 @@ p.parse(thisR);
 ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
     str = thisR.materials.txtLines(jj);
-    if strfind(str,'.jpg"')
+    if piContains(str,'.jpg"')
         thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
     end
-    if strfind(str,'.jpg "')
+    if piContains(str,'.jpg "')
         thisR.materials.txtLines(jj) = strrep(str,'jpg ','png');
     end    
     % photoshop exports texture format with ".JPG "(with extra space) ext.
-    if strfind(str,'.JPG "')
+    if piContains(str,'.JPG "')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
     end
-    if strfind(str,'.JPG"')
+    if piContains(str,'.JPG"')
         thisR.materials.txtLines(jj) = strrep(str,'JPG','png');
     end    
-    if strfind(str,'bmp')
+    if piContains(str,'bmp')
         thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
     end
-    if strfind(str,'tif')
+    if piContains(str,'tif')
         thisR.materials.txtLines(jj) = strrep(str,'tif','png');
     end
 end
@@ -69,7 +69,7 @@ thisR.world{length(thisR.world)-2} = sprintf('Include "%s.pbrt" ',materials_fnam
 txtLines = thisR.materials.txtLines;
 for ii = 1:size(txtLines)
     if ~isempty(txtLines(ii))
-        if strfind(txtLines(ii),'MakeNamedMaterial')
+        if piContains(txtLines(ii),'MakeNamedMaterial')
             txtLines{ii}=[];
         end
     end
@@ -97,22 +97,22 @@ for jj = 1: length(textureLines)
     end
 %     thisLine_tmp = thisLine_tmp{1};
     for ii = 1:length(thisLine_tmp)
-        if strfind(thisLine_tmp{ii},'filename')
+        if piContains(thisLine_tmp{ii},'filename')
             index = ii;
         end
     end
     for ii = 1:length(thisLine_tmp)
-        if strfind(thisLine_tmp{ii},'.png') 
-            if strfind(thisLine_tmp{ii-1},'filename')
+        if piContains(thisLine_tmp{ii},'.png') 
+            if piContains(thisLine_tmp{ii-1},'filename')
             filename = thisLine_tmp{ii};
-            if ~strfind(filename,'"textures/')
+            if ~piContains(filename,'"textures/')
             thisLine_tmp{ii} = fullfile('"textures',filename(2:length(filename)));
             end
             else
                 thisLine_tmp{index+1} = thisLine_tmp{ii};
                 thisLine_tmp(index+2:ii)   = '';
                 filename = thisLine_tmp{index+1};
-            if ~strfind(filename,'"textures/')
+            if ~piContains(filename,'"textures/')
             thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
             end                
             end
@@ -150,10 +150,10 @@ end
 nPaintLines = {};
 gg = 1;
 for dd = 1:length(materialTxt)
-    if strfind(materialTxt{dd},'paint_base') &&...
-            ~strfind(materialTxt{dd},'mix')||...
-        strfind(materialTxt{dd},'paint_mirror') &&...
-            ~strfind(materialTxt{dd},'mix')   
+    if piContains(materialTxt{dd},'paint_base') &&...
+            ~piContains(materialTxt{dd},'mix')||...
+        piContains(materialTxt{dd},'paint_mirror') &&...
+            ~piContains(materialTxt{dd},'mix')   
         nPaintLines{gg} = dd;
         gg = gg+1;
     end

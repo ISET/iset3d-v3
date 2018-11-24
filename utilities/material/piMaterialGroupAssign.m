@@ -26,14 +26,14 @@ mlist = fieldnames(thisR.materials.list);
 %{
 % Suppose mList(ii) is 'car_body_subaru' we would like this to be
 % 'carbodysubaru'.
-case strfind(mList(ii),'carbody')
+case piContains(mList(ii),'carbody')
 %}
 
 for ii = 1:length(mlist)
-    if  strfind(mlist(ii),'carbody') && ~strfind(mlist(ii),'paint_base')
-        if strfind(mlist(ii),'black')
+    if  piContains(mlist(ii),'carbody') && ~piContains(mlist(ii),'paint_base')
+        if piContains(mlist(ii),'black')
             colorkd = piColorPick('black');
-        elseif strfind(mlist(ii),'white')
+        elseif piContains(mlist(ii),'white')
             colorkd = piColorPick('white');
         else
             colorkd = piColorPick('random');
@@ -42,91 +42,91 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % 
         piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
-    elseif strfind(mlist(ii),'carpaint') && ~strfind(mlist(ii),'paint_base')
+    elseif piContains(mlist(ii),'carpaint') && ~piContains(mlist(ii),'paint_base')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % 
         colorkd = piColorPick('random');
         piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
-    elseif strfind(mlist(ii),'window')
+    elseif piContains(mlist(ii),'window')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         rgbkr = [0.5 0.5 0.5];
         piMaterialAssign(thisR,material.name,target,'rgbkr',rgbkr);
-    elseif strfind(mlist(ii),'mirror')
+    elseif piContains(mlist(ii),'mirror')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.mirror;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'lightsfront') || strfind(mlist(ii),'lightfront')
+    elseif piContains(mlist(ii),'lightsfront') || piContains(mlist(ii),'lightfront')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'lightsback') || strfind(mlist(ii),'lightback')
+    elseif piContains(mlist(ii),'lightsback') || piContains(mlist(ii),'lightback')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         rgbkr = [1 0.1 0.1];
         piMaterialAssign(thisR,material.name,target,'rgbkr',rgbkr);
         thisR.materials.list.(name).rgbkt = [0.7 0.1 0.1];
-    elseif strfind(mlist(ii),'chrome')
+    elseif piContains(mlist(ii),'chrome')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.chrome_spd;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'wheel')
+    elseif piContains(mlist(ii),'wheel')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.uber;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'rim')
+    elseif piContains(mlist(ii),'rim')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.chrome_spd;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'tire')
+    elseif piContains(mlist(ii),'tire')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.blackrubber;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'plastic')
+    elseif piContains(mlist(ii),'plastic')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.plastic;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'metal')
+    elseif piContains(mlist(ii),'metal')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.uber;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'glass')
+    elseif piContains(mlist(ii),'glass')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         piMaterialAssign(thisR,material.name,target);
-%     elseif strfind(mlist(ii),'retro')
+%     elseif piContains(mlist(ii),'retro')
 %         name = cell2mat(mlist(ii));
 %         material = thisR.materials.list.(name);
 %         target = thisR.materials.lib.retroreflective;
 %         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'Bodymat')
+    elseif piContains(mlist(ii),'Bodymat')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.substrate;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'translucent')
+    elseif piContains(mlist(ii),'translucent')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.translucent;
         piMaterialAssign(thisR,material.name,target);
-    elseif strfind(mlist(ii),'wall')
+    elseif piContains(mlist(ii),'wall')
         name = cell2mat(mlist(ii));
         thisR.materials.list.(name).texturebumpmap = 'windy_bump';
     else
         %otherwise, assign an default matte material.
-        if ~strfind(mlist(ii),'paint_base')
+        if ~piContains(mlist(ii),'paint_base')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.uber;

@@ -57,7 +57,7 @@ for mm=1:size(object_list,2)
 end
 
 %% script used for tree
-if strfind(object_list(1).name,'tree')
+if piContains(object_list(1).name,'tree')
     % generate the list of objects' position information
     count = 0;
     x = size(sidewalk_list,2);
@@ -109,7 +109,7 @@ end
 
 
 %% script used for streetlight
-if strfind(object_list(1).name,'streetlight')
+if piContains(object_list(1).name,'streetlight')
     count = 0;
     x = size(sidewalk_list,2);
     for jj = 1 : x
@@ -125,7 +125,7 @@ if strfind(object_list(1).name,'streetlight')
             for kk=1:size(object_list(mm).geometry,2)
                 count = count + 1;
                 objectPosition_list(count).name = object_list(mm).geometry(kk).name;
-                if ~strfind(object_list(mm).geometry(kk).name,'_light')
+                if ~piContains(object_list(mm).geometry(kk).name,'_light')
                     objectPosition_list(count).position = [start_point(1), sidewalk_list(jj).height, start_point(2)];
                     objectPosition_list(count).rotate = sidewalk_list(jj).direction;
                     objectPosition_list(count).size.w = edgeSize;

@@ -87,7 +87,7 @@ else
     
     % download acquisition by given name;
     for ii=1:length(recipeFiles)
-        if strfind(lower(recipeFiles{ii}{1}.name),acquisitionname)
+        if piContains(lower(recipeFiles{ii}{1}.name),acquisitionname)
             thisRecipe = recipeFiles{ii}{1};
             thisResource = resourceFiles{ii}{1};
             thisRecipeID =  recipe_acqID{ii};

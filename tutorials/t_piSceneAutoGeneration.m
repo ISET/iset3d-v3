@@ -146,7 +146,7 @@ thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
 
 %% Write out the scene into a PBRT file
 
-if strfind(sceneType,'city')
+if piContains(sceneType,'city')
     outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
     thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
 else
