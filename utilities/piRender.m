@@ -185,6 +185,8 @@ for ii = 1:length(filesToRender)
     end
     
     outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
+
+% THIS IS DHB DEBUGGING CODE FOR JENKINS.
     outFile = fullfile(workingFolder,[currName,'.dat']);
         
     renderCommand = sprintf('pbrt --outfile %s %s', ...
@@ -241,7 +243,7 @@ for ii = 1:length(filesToRender)
     
     %% Invoke the Docker command with or without capturing results.
     tic
-    [status, result] = piRunCommand(cmd);
+    [status, result] = piRunCommand(cmd)
     elapsedTime = toc; 
     
     %% Check the return
@@ -259,42 +261,42 @@ for ii = 1:length(filesToRender)
     %fprintf('Outfile file: %s.\n',outFile);
     
 % THIS IS DHB DEBUGGING CODE FOR JENKINS. 
-%     try
-%         fprintf('ls of /var/lib/jenkins/workspace\n');
-%         ls('-l','/var/lib/jenkins/workspace')
-%     catch
-%         fprintf('Error on ls of /var/lib/jenkins/workspace\n');
-%     end
-%     try
-%         fprintf('ls of infile\n');
-%         ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
-%     catch
-%         fprintf('Error on ls of infile after\n');
-%     end
-%     try
-%         fprintf('ls of outfile\n');
-%         ls(outFile)
-%     catch
-%         fprintf('Error on ls of outfile\n');
-%     end
-%     try
-%         fprintf('ls of local subdir\n');
-%         ls('-l','/opt/toolboxes/iset3d/local')
-%     catch
-%         fprintf('error on ls of local subdir\n');
-%     end
-%     try
-%         fprintf('ls of chess subdir\n');
-%         ls('-l','/opt/toolboxes/iset3d/local/chess')
-%     catch
-%         fprintf('Error on ls of chess subdir\n');
-%     end
-%     try
-%         fprintf('ls of r* subdir\n');
-%         ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
-%     catch
-%         fprintf('Error on ls of r* subdir\n');
-%     end
+    try
+        fprintf('ls of /var/lib/jenkins/workspace\n');
+        ls('-l','/var/lib/jenkins/workspace')
+    catch
+        fprintf('Error on ls of /var/lib/jenkins/workspace\n');
+    end
+    try
+        fprintf('ls of infile\n');
+        ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
+    catch
+        fprintf('Error on ls of infile after\n');
+    end
+    try
+        fprintf('ls of outfile\n');
+        ls(outFile)
+    catch
+        fprintf('Error on ls of outfile\n');
+    end
+    try
+        fprintf('ls of local subdir\n');
+        ls('-l','/opt/toolboxes/iset3d/local')
+    catch
+        fprintf('error on ls of local subdir\n');
+    end
+    try
+        fprintf('ls of chess subdir\n');
+        ls('-l','/opt/toolboxes/iset3d/local/chess')
+    catch
+        fprintf('Error on ls of chess subdir\n');
+    end
+    try
+        fprintf('ls of r* subdir\n');
+        ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
+    catch
+        fprintf('Error on ls of r* subdir\n');
+    end
     
     %% Convert the radiance.dat to an ieObject
     if ~exist(outFile,'file')
