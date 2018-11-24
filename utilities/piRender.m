@@ -189,7 +189,7 @@ for ii = 1:length(filesToRender)
         outFile, currFile);
 
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
-    % renderCommand = sprintf('ls -la /opt/toolboxes/iset3d/local ; ls -la /opt/toolboxes/iset3d/local/chess ; cp /opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt renderings/foo.pbrt' )
+    renderCommand = sprintf('ls -la /opt/toolboxes/iset3d/local ; ls -la /opt/toolboxes/iset3d/local/chess ; cp /opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt foo.pbrt' )
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
@@ -239,7 +239,7 @@ for ii = 1:length(filesToRender)
     
     %% Invoke the Docker command with or without capturing results.
     tic
-    [status, result] = piRunCommand(cmd);
+    [status, result] = piRunCommand(cmd)
     elapsedTime = toc; 
     
     %% Check the return
