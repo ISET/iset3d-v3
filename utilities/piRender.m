@@ -189,7 +189,7 @@ for ii = 1:length(filesToRender)
         outFile, currFile);
 
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
-   renderCommand = sprintf('ls -la /opt/toolboxes/iset3D')
+   renderCommand = sprintf('ls -la /opt/toolboxes/iset3d')
     
     if ~isempty(workingFolder)
         if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
@@ -202,13 +202,13 @@ for ii = 1:length(filesToRender)
     
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
 %   % Try chmodding so everything can be read
-%   system(['chmod a+rw /opt/toolboxes/iset3D/local/chess/*']);
+%   system(['chmod a+rw /opt/toolboxes/iset3d/local/chess/*']);
 
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
     %% Look at dirs before render command run in docker
     try
         fprintf('ls of infile before\n');
-        ls('-l','/opt/toolboxes/iset3D/local/chess/teapot-area-light.pbrt')
+        ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
     catch
         fprintf('Error on ls of infile\n');
     end
@@ -220,19 +220,19 @@ for ii = 1:length(filesToRender)
     end
     try
         fprintf('ls of local subdir\n');
-        ls('-l','/opt/toolboxes/iset3D/local')
+        ls('-l','/opt/toolboxes/iset3d/local')
     catch
         fprintf('error on ls of local subdir\n');
     end
     try
         fprintf('ls of chess subdir\n');
-        ls('-l','/opt/toolboxes/iset3D/local/chess')
+        ls('-l','/opt/toolboxes/iset3d/local/chess')
     catch
         fprintf('Error on ls of chess subdir\n');
     end
     try
         fprintf('ls of r* subdir\n');
-        ls('-l','/opt/toolboxes/iset3D/local/chess/r*')
+        ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
     catch
         fprintf('Error on ls of r* subdir\n');
     end
@@ -259,7 +259,7 @@ for ii = 1:length(filesToRender)
 % THIS IS DHB DEBUGGING CODE FOR JENKINS.
     try
         fprintf('ls of infile\n');
-        ls('-l','/opt/toolboxes/iset3D/local/chess/teapot-area-light.pbrt')
+        ls('-l','/opt/toolboxes/iset3d/local/chess/teapot-area-light.pbrt')
     catch
         fprintf('Error on ls of infile after\n');
     end
@@ -271,19 +271,19 @@ for ii = 1:length(filesToRender)
     end
     try
         fprintf('ls of local subdir\n');
-        ls('-l','/opt/toolboxes/iset3D/local')
+        ls('-l','/opt/toolboxes/iset3d/local')
     catch
         fprintf('error on ls of local subdir\n');
     end
     try
         fprintf('ls of chess subdir\n');
-        ls('-l','/opt/toolboxes/iset3D/local/chess')
+        ls('-l','/opt/toolboxes/iset3d/local/chess')
     catch
         fprintf('Error on ls of chess subdir\n');
     end
     try
         fprintf('ls of r* subdir\n');
-        ls('-l','/opt/toolboxes/iset3D/local/chess/r*')
+        ls('-l','/opt/toolboxes/iset3d/local/chess/r*')
     catch
         fprintf('Error on ls of r* subdir\n');
     end
