@@ -97,7 +97,7 @@ oiWindow;
 % sceneEye has a parameter for the angular support; this let's us plot the
 % image in units of visual angle:
 figure();
-image(x_full,x_full,rgb); % These variables were saved earlier in the script.
+image(x_full,x_full,rgb_full); % These variables were saved earlier in the script.
 axis image; xlabel('deg'); ylabel('deg');
 
 % However, when using the crop window the angular support still matches the

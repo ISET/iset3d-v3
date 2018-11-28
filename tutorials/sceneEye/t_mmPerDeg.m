@@ -10,6 +10,10 @@
 %
 %   06/08/18 dhb Process outcome, loop over separation.
 
+%% Warning
+% This tutorial may be outdated. I would suggest using it only as reference
+% at the moment.
+
 %% Initialize ISETBIO
 ieInit;
 clear; close all;
