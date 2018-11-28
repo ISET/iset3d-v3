@@ -10,18 +10,25 @@ function tf = piContains(str,pattern)
 %
 % See also: contains, strfind
 
-% Sometimes the str is a cell. This is no good for isempty. Let's check and
-% fix, if possible.
 if(iscell(str))
-    if((length(str) == 1))
-        str = str{1};
-    else
-        error('String given to piContains is a cell matrix with multiple entries.');
+    
+    % If cell loop through all entries.
+    for ii = 1:length(str)
+        currStr = str{ii};
+        if (~isempty(strfind(currStr,pattern)))
+            tf = 1;
+            break;
+        else
+            tf = 0;
+        end
     end
-end
-
-if (~isempty(strfind(str,pattern)))
-    tf = 1;
+    
 else
-    tf = 0;
+    
+    if (~isempty(strfind(str,pattern)))
+        tf = 1;
+    else
+        tf = 0;
+    end
+    
 end
