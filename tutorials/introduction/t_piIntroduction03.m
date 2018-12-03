@@ -11,17 +11,27 @@
 % It also uses piMaterialsGroupAssign() to set a list of materials (in
 % this case a mirror) that are part of the scene.
 %
-% You should generally check that you have the updated docker image by
-% running
+% Dependencies:
+%
+%    ISET3d, ISETCam, JSONio, SCITRAN, Flywheel Add-On (at least version 4.1.0)
+%
+%  Check that you have the updated docker image by running
 %
 %   docker pull vistalab/pbrt-v3-spectral
 %
-% ZL SCIEN Team, 2018
+% ZL, BW SCIEN 2018
+%
+% See also
+%   t_piIntroduction01, t_piIntroduction02
+
 
 %% Initialize ISET and Docker
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
+if isempty(which('scitran'))
+    error('You must have scitran with a stanfordlabs Flywheel account');
+end
 
 %% Read pbrt files
 

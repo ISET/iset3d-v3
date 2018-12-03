@@ -48,8 +48,10 @@ end
 skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 
 index_m = find(piContains(thisR.world,'_materials.pbrt'));
+
 % skyview = randi(360,1);
-skyview = randi(45,1)+45;% tmp
+skyview = randi(45,1)+45;  % tmp
+
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));
 world(3,:) = cellstr(sprintf('Rotate %d 0 1 0',skyview));
@@ -64,15 +66,35 @@ for ii=index_m:length(thisR.world)
 end
 thisR.world = world;
 
+%% Scitran download
+
 % Get the information about the skymap so we can download from
 % Flywheel
 st          = scitran('stanfordlabs');
-acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
-dataId      = acquisition.id;
+
+% lookup is a new command, after 4.1.0.  When we upgrade the requirements
+% on scitran and Flywheel Add-On, we can use this command.  
+%{
+   acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
+   dataId = acquisition.id;
+%}
+acquisition = st.search('acquisitions',...
+    'project label exact','Graphics assets',...
+    'session label exact','data',...
+    'acquisition label exact','skymaps');
+if isempty(acquisition)
+    error('stanfordlabs search failed.  Check permissions.');
+end
+
+dataId = st.objectParse(acquisition{1});
+
+% This is set up according to standards LM Perry wanted for his Python
+% methods.  We accept this and use it for the Matlab coding, too.
 dataName    = skyname;
 skymapInfo  = [dataId,' ',dataName];
 
 %{
+% Another approach
 files = st.search('file',...
    'project label exact','Graphics assets',...
    'session label exact','data',...

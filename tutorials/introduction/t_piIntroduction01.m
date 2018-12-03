@@ -1,16 +1,20 @@
 %% This is the first in a series of scripts introducing iset3d calulcations
 %
 % Brief description:
-%  This introduction works with a local file that is part of the data
-%  directory.  It sets up a very simple recipe, runs the docker
-%  command, and loads the result into an ISET scene structure.
-% 
-% TL SCIEN 2017
 %
-% You should generally check that you have the updated docker image by
-% running
+%  This introduction renders a local file in the data directory of the
+%  ISET3d repository. This introduction sets up a very simple recipe, runs
+%  the docker command, and loads the result into an ISET scene structure.
+% 
+% Dependencies:
+%
+%    ISET3d, ISETCam, JSONio
+%
+%  Check that you have the updated docker image by running
 %
 %   docker pull vistalab/pbrt-v3-spectral
+%
+% TL, BW, ZL SCIEN 2017
 %
 % See also
 %
