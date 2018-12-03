@@ -72,7 +72,7 @@ thisR.world = world;
 % Flywheel
 st          = scitran('stanfordlabs');
 
-% lookup is a new command, after 4.1.0.  When we upgrade the requirements
+% lookup is a new command, with 4.3.2.  When we upgrade the requirements
 % on scitran and Flywheel Add-On, we can use this command.  
 %{
    acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
