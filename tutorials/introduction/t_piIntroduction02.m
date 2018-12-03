@@ -13,7 +13,7 @@
 % 
 % Dependencies
 %
-%    ISET3d, ISETCam, JSONio, RemoteDataToolbox
+%    ISET3d, ISETCam or ISETBio, JSONio, RemoteDataToolbox
 %
 %  Check that you have the updated docker image by running
 %

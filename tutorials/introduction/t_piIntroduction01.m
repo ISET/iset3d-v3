@@ -8,7 +8,7 @@
 % 
 % Dependencies:
 %
-%    ISET3d, ISETCam, JSONio
+%    ISET3d, ISETCam or ISETBio, JSONio
 %
 %  Check that you have the updated docker image by running
 %

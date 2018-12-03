@@ -70,14 +70,18 @@ thisR.world = world;
 
 % Get the information about the skymap so we can download from
 % Flywheel
-st          = scitran('stanfordlabs');
+st = scitran('stanfordlabs');
+thisVersion = stFlywheelSDK('installed version');
+if thisVersion <= 413
+    error('Please update your Flywheel Add-On Toolbox.');
+end
 
-% lookup is a new command, with 4.3.2.  When we upgrade the requirements
-% on scitran and Flywheel Add-On, we can use this command.  
+
+% lookup is a new command, with 4.3.2
+acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
+dataId = acquisition.id;
 %{
-   acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
-   dataId = acquisition.id;
-%}
+% Earlier versions can use this command.
 acquisition = st.search('acquisitions',...
     'project label exact','Graphics assets',...
     'session label exact','data',...
@@ -87,6 +91,7 @@ if isempty(acquisition)
 end
 
 dataId = st.objectParse(acquisition{1});
+%}
 
 % This is set up according to standards LM Perry wanted for his Python
 % methods.  We accept this and use it for the Matlab coding, too.

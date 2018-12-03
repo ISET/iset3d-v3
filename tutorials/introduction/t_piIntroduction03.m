@@ -13,11 +13,12 @@
 %
 % Dependencies:
 %
-%    ISET3d, ISETCam, JSONio, SCITRAN, Flywheel Add-On (at least version 4.1.0)
+%    ISET3d, ISETCam or ISETBio, JSONio, SCITRAN, Flywheel Add-On (at
+%    least version 4.3.2) 
 %
 %  Check that you have the updated docker image by running
 %
-%   docker pull vistalab/pbrt-v3-spectral
+%    docker pull vistalab/pbrt-v3-spectral
 %
 % ZL, BW SCIEN 2018
 %
@@ -29,9 +30,7 @@
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-if isempty(which('scitran'))
-    error('You must have scitran with a stanfordlabs Flywheel account');
-end
+if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
 
