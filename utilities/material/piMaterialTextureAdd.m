@@ -30,16 +30,16 @@ switch texture
         if isempty(find(piContains(thisR.materials.txtLines,'"checkerboard"'), 1)) &&...
                 isempty(thisR.materials.list.(materialName).texturekd)
             checkerName = 'checker_1';
-            thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [1 1 1] "rgb tex2" [0 0 0] "float uscale" [%d] "float vscale" [%d]',...
-                checkerName,uscale,vscale);
+            thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [%f %f %f] "rgb tex2" [%f %f %f] "float uscale" [%d] "float vscale" [%d]',...
+                checkerName,color1,color2,uscale,vscale);
             thisR.materials.txtLines{length(thisR.materials.txtLines)+1} = thisTexLine;
             thisR.materials.list.(materialName).texturekd = checkerName;
             thisR.materials.list.(materialName).rgbkd = [];
         else
             index = randi(100,1);
             checkerName = sprintf('checker_%d',index);
-            thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [1 1 1] "rgb tex2" [0 0 0] "float uscale" [%d] "float vscale" [%d]',...
-                checkerName,uscale,vscale);
+            thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [%f %f %f] "rgb tex2" [%f %f %f] "float uscale" [%d] "float vscale" [%d]',...
+                checkerName,color1,color2,uscale,vscale);
             thisR.materials.txtLines{length(thisR.materials.txtLines)+1} = thisTexLine;
             thisR.materials.list.(materialName).texturekd = checkerName;
             thisR.materials.list.(materialName).rgbkd = [];

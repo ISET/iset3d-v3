@@ -47,7 +47,10 @@ for ii = 1: length(obj)
             [m, n]= size(obj(ii).position);
             if m ==3 && n >= 1
                 for gg = 1:n
+                    
                     fprintf(fid_obj,'AttributeBegin \n');
+                    
+                    % Write out translation
                     if isempty(obj(ii).position(:,gg))
                         fprintf(fid_obj,'Translate 0 0 0 \n');
                     else
@@ -55,13 +58,24 @@ for ii = 1: length(obj)
                         fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                             obj_position(2),obj_position(3));
                     end
+                    
+                    % Write out rotation
                     if ~isempty(obj(ii).rotate)
                         obj_rotate = obj(ii).rotate;
-                        % Write out ratationY 
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
                         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
                     end
+                    
+                    % Write out scaling
+                    % How to do this? If there's a scaling factor, use
+                    % that.
+                    if ~isempty(obj(ii).scale)
+                        obj_scale = obj(ii).scale(:,gg);
+                        fprintf(fid_obj,'Scale %f %f %f\n',obj_scale(1),...
+                            obj_scale(2),obj_scale(3)); % Y
+                    end
+                    
                     fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
                     fprintf(fid_obj,'AttributeEnd \n \n');
                 end

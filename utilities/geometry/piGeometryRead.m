@@ -91,12 +91,16 @@ if ~convertedflag
                 Groupobj_size = GroupObj_name_tmp((index+8):end);
                 Groupobj_size = erase(Groupobj_size, ')');
                 size_num = str2num(Groupobj_size);
+                
                 % size
                 groupobj(hh).size.l = size_num(1)*2;
                 groupobj(hh).size.h = size_num(2)*2;
                 groupobj(hh).size.w = size_num(3)*2;
                 groupobj(hh).size.pmin = [-size_num(1) -size_num(3)];
                 groupobj(hh).size.pmax = [size_num(1) size_num(3)];
+                
+                % Always add a scaling factor
+                groupobj(hh).scale = [1;1;1];
                 
                 groupobj(hh).name = sprintf('%s',Groupobj_name);
                 if piContains(txtLines{nestbegin(dd)+2}, 'ConcatTransform')
@@ -122,6 +126,7 @@ if ~convertedflag
                     groupobj(hh).rotate(:,1) = [0;0;0;1];
                     groupobj(hh).position = [0;0;0];
                 end
+                
                 
             end
             % find children objects
