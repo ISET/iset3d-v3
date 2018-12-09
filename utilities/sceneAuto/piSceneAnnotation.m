@@ -12,11 +12,13 @@ sceneName = strrep(sceneName,'_mesh','');
 destName_recipe = fullfile(sceneFolder,[sceneName,'.json']);
 % find acquisition
 if ~exist(sceneFolder,'dir'),mkdir(sceneFolder);end
-files = st.search('file',...
-   'project label exact','Graphics assets',...
-   'session label exact','scenes_pbrt',...
-   'acquisition label exact',sceneName);
-dataId = files{1}.parent.id;
+% search is still not working 12/05/2018
+% files = st.search('file',...
+%    'project label exact','Graphics assets',...
+%    'session label exact','scenes_pbrt',...
+%    'acquisition label exact',sceneName);
+acquisition = st.fw.lookup(sprintf('wandell/Graphics assets/scenes_pbrt/%s',sceneName));
+dataId = acquisition.id;
 % download the file
 st.fileDownload([sceneName,'.json'],...
     'container type', 'acquisition' , ...
@@ -93,7 +95,7 @@ if offset==0
 else
     indicator = ((scene_mesh<=(index+offset))&(scene_mesh>=(index-offset)));
 end
-figure;imagesc(indicator);
+% figure;imagesc(indicator);
 xSpread = sum(indicator);
 xIndices = find(xSpread > 0);
 ySpread = sum(indicator,2);

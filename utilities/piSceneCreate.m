@@ -28,7 +28,6 @@ p.KeepUnmatched = true;
 p.addRequired('photons',@isnumeric);
 p.addParameter('fov',40,@isscalar)               % Horizontal fov, degrees
 p.addParameter('meanluminance',100,@isscalar);
-
 if ~isempty(varargin), varargin = ieParamFormat(varargin); end
 
 p.parse(photons,varargin{:});

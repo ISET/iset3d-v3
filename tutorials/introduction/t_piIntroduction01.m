@@ -44,7 +44,7 @@ piWrite(recipe);
 
 %%  This is a pinhole case.  So we are rendering a scene.
 
-[scene, result] = piRender(recipe);
+[scene, result] = piRender_test(recipe);
 
 ieAddObject(scene); sceneWindow;
 scene = sceneSet(scene,'gamma',0.5);

@@ -119,8 +119,7 @@ for ii = 1: length(obj)
                     error('Position should be a 3 by n matrix \n')
                 end
             end
-        end
-        
+        end 
     end
     % add a lightsFlag, we dont use lights for day scene.
     if lightsFlag
@@ -169,26 +168,23 @@ for ii = 1: length(obj)
             end
         end
     end
-    % disable trafficlight for now, too many fireflies
-    %
-    if ~isempty(thistrafficflow)
-        for jj = 1:8
-            for mm = 1: length(obj)
-                if mod(jj,4)~=0
-                    num = mod(jj,4);
-                else num = 4;
-                end
-                order = floor((jj+3)/4);
-                if contains(obj(mm).name,sprintf('trafficlight_%03d',num))...
-                        && contains(obj(mm).name,sprintf('_%d_',order)) ...
-                        &&contains(obj(mm).name,thistrafficflow.light(jj).State)...
-                        &&isempty(obj(mm).children) && isfield(thistrafficflow,'light')
-                    piTrafficlightAssign(fid_obj,obj(mm));
-                end
+end
+if ~isempty(thistrafficflow)
+    for jj = 1:8
+        for mm = 1: length(obj)
+            if mod(jj,4)~=0
+                num = mod(jj,4);
+            else num = 4;
+            end
+            order = floor((jj+3)/4);
+            if contains(obj(mm).name,sprintf('trafficlight_%03d',num))...
+                    && contains(obj(mm).name,sprintf('_%d_',order)) ...
+                    &&contains(obj(mm).name,thistrafficflow.light(jj).State)...
+                    &&isempty(obj(mm).children) && isfield(thistrafficflow,'light')
+                piTrafficlightAssign(fid_obj,obj(mm));
             end
         end
     end
-    %
 end
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);

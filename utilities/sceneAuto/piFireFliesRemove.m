@@ -65,6 +65,9 @@ g= ones(5,5)/24;
 g(3,3) = 0;
 g(3,4)=0;
 g(3,2)=0;
+g(2,3)=0;
+g(4,3)=0;
+
 photons = oiGet(oi,'photons');
 localSurround = zeros(size(photons));
 nWave = oiGet(oi,'nwave');
