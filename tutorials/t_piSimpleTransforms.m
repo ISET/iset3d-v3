@@ -1,4 +1,4 @@
-%% t_slantedBarMTF.m
+%% t_piSimpleTransforms.m
 %
 % This tutorial shows how you can rotate an object using iset3D. The object
 % here is a cube with different colored sides. 

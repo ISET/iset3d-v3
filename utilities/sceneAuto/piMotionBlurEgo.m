@@ -29,7 +29,7 @@ thisR.camera.shutterclose.type = 'float';
 thisR.camera.shutterclose.value = shutterclosed;
 %%
 motion = [];
-% Find the
+
 for ii = 1:numel(nextTrafficflow.objects.car)
     if strcmp(thisCar.name,nextTrafficflow.objects.car(ii).name)
         motion.pos = nextTrafficflow.objects.car(ii).pos;

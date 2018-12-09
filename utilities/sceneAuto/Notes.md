@@ -1,3 +1,6 @@
+## Get Sumo source code
+`git clone --recursive https://github.com/eclipse/sumo`
+
 ## Sumo installation
 Go to this [site](http://sumo.dlr.de/wiki/Installing/MacOS_Build_w_Homebrew), and follow the instructions.
 

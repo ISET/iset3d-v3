@@ -7,6 +7,11 @@
 % 
 % TL SCIEN 2017
 %
+% You should generally check that you have the updated docker image by
+% running
+%
+%   docker pull vistalab/pbrt-v3-spectral
+%
 % See also
 %
 
@@ -39,7 +44,7 @@ piWrite(recipe);
 
 %%  This is a pinhole case.  So we are rendering a scene.
 
-[scene, result] = piRender(recipe);
+[scene, result] = piRender_test(recipe);
 
 ieAddObject(scene); sceneWindow;
 scene = sceneSet(scene,'gamma',0.5);

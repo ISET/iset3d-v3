@@ -44,8 +44,22 @@ switch param
     
     % Rendering and Docker related
     case {'outputfile'}
+        % Is there already an output file set? If so, copy all directories
+        % over to the new directory.
+        if(~strcmp(thisR.outputFile,val) && strcmp(thisR.exporter,'C4D'))
+            [dirsource,~,~] = fileparts(thisR.outputFile);
+            [dirdest,~,~] = fileparts(val);
+            fprintf('Output directory changed! Copying files from %s to %s \n',...
+                dirsource,dirdest);
+            if(~exist(dirdest,'dir'))
+                % Sometimes the output directory has not been created yet.
+                mkdir(dirdest);
+            end
+            copyfile(dirsource,dirdest);
+            rmdir(dirsource,'s');
+        end
         thisR.outputFile = val;
-
+        
     case {'inputfile'}
         thisR.inputFile = val;   
         % Scene

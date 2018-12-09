@@ -25,7 +25,7 @@ function thisR = piRead(fname,varargin)
 %  Google Cloud Platform (see isetcloud).
 %
 % Required inputs
-%   fname - a pbrt scene file name
+%   fname - a full path to a pbrt scene file
 %
 % Optional parameter/values
 %   'version' - Which version of PBRT, 2 or 3.  Default is Version 3.
@@ -58,12 +58,8 @@ function thisR = piRead(fname,varargin)
 
 % Examples:
 %{
- fname=fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
- thisR = piRead(fname,'version',2);
-%}
-%{
  fname=fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
- thisR = piRead(fname,'version',3);
+ thisR = piRead(fname);
 %}
 
 %%
@@ -74,13 +70,22 @@ varargin =ieParamFormat(varargin);
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('readmaterials', true,@islogical);
+% We could add - p.addParameter('outputFile') some day and over-ride
+% the code below.
 p.parse(fname,varargin{:});
 
 ver = p.Results.version;
 
 thisR = recipe;
 thisR.inputFile = fname;
-readmaterials  = p.Results.readmaterials;
+readmaterials   = p.Results.readmaterials;
+
+% Set the output directory default
+[~,scene_fname] = fileparts(fname);
+outFilepath = fullfile(piRootPath,'local',scene_fname);
+outputFile  = fullfile(outFilepath,[scene_fname,'.pbrt']);
+thisR.outputFile = outputFile;
+
 %% Check version number
 if(ver ~= 2 && ver ~=3)
     error('PBRT version number incorrect. Possible versions are 2 or 3.');
@@ -192,7 +197,7 @@ end
 
 pfStruct = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
 if(isempty(pfStruct))
-    warning('Cannot find "filter" in PBRT file.');
+    %     warning('Cannot find "filter" in PBRT file.');
     thisR.filter = struct([]); % Return empty.
 else
     thisR.filter = pfStruct;
@@ -320,4 +325,5 @@ end
 if exporterFlag 
     thisR = piGeometryRead(thisR); 
 end
+
 end

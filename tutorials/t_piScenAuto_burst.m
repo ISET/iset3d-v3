@@ -59,7 +59,7 @@ sceneType = 'city4';
 % sceneType = 'highway';
 % roadType = 'cross';
 % roadType = 'highway_straight_4lanes_001';
-roadType = 'cross';
+roadType = 'straight_2lanes_parking';
 
 trafficflowDensity = 'medium';
 
@@ -68,7 +68,7 @@ dayTime = 'noon';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 45;
+timestamp = 21;
 
 % Normally we want only one scene per generation.
 nScene = 1;
@@ -95,6 +95,30 @@ toc
 dayTime = 'noon';
 [thisR_scene,skymapfwInfo] = piSkymapAdd(thisR_scene,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
+
+%% Add a camera to one of the cars
+
+% To place the camera, we find a car and place a camera at the front
+% of the car.  We find the car using the trafficflow information.
+%
+load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
+thisTrafficflow = trafficflow(timestamp);
+nextTrafficflow = trafficflow(timestamp+1);
+%%
+
+CamOrientation =270;
+[thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
+    'CamOrientation',CamOrientation);
+
+thisR_scene.lookAt.from = from;
+thisR_scene.lookAt.to   = to;
+thisR_scene.lookAt.up = [0;1;0];
+thisVelocity = thisCar.speed
+%%
+
+thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
+                               'thisCar',thisCar,...
+                               'fps',125); % set shutter time 8ms.
 %% Render parameters
 % This could be set by default, e.g.,
 
@@ -106,8 +130,8 @@ road.fwList = [road.fwList,' ',skymapfwInfo];
 
 % thisR_scene.set('camera','realistic');
 % thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
-xRes = 900;% for testing lens
-yRes = 600;
+xRes = 1280;% for poster
+yRes = 720;
 pSamples = 128;
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
@@ -119,57 +143,66 @@ thisR_scene.integrator.subtype = 'bdpt';
 thisR_scene.sampler.subtype = 'sobol';
 thisR_scene.integrator.lightsamplestrategy.type = 'string';
 thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
-
-
-%% create a realistic camera
-lensfiles = dir('*.dat');
 %%
-for ii = 1:35
-    lensname = lensfiles(ii).name;
-thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
-
-%% Add a camera to one of the cars
-
-% To place the camera, we find a car and place a camera at the front
-% of the car.  We find the car using the trafficflow information.
-%
-%{
-load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
-thisTrafficflow = trafficflow(timestamp);
-nextTrafficflow = trafficflow(timestamp+1);
-%
-CamOrientation =270;
-[thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
-    'CamOrientation',CamOrientation);
-
-thisR_scene.lookAt.from = from;
-thisR_scene.lookAt.to   = to;
-thisR_scene.lookAt.up = [0;1;0];
-% Will write a function to select a certain speed, now just manually check
-thisVelocity = thisCar.speed
-%%
-
-thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
-                               'thisCar',thisCar,...
-                               'shutter Speed',60);
-%}                           
-
+nimages = 8;
+% for the first image we do nothing
+% start from the second image, we update the status of the car by a time of
+% 0.033s, the activetranform will be
+% incremented by amount of (posTo-posFrom)/30;
+t_readOut = 1/30;
+for ii = 1:nimages
+    egoFrom.pos    = thisR_scene.camera.motion.activeTransformStart.pos;
+    egoFrom.rotate = thisR_scene.camera.motion.activeTransformStart.rotate;
+    egoTo.pos      = thisR_scene.camera.motion.activeTransformEnd.pos;
+    egoTo.rotate   = thisR_scene.camera.motion.activeTransformEnd.rotate;
+    %% update the status of the ego vehicle
+    egoAdd.pos  = t_readOut*(egoTo.pos - egoFrom.pos);
+    egoAdd.rotate = t_readOut* (egoTo.rotate - egoFrom.rotate);
+%     thisR_scene.camera.motion.activeTransformStart.pos    = ...
+%         thisR_scene.camera.motion.activeTransformStart.pos + egoAdd.pos;
+%     thisR_scene.camera.motion.activeTransformStart.rotate = ...
+%         thisR_scene.camera.motion.activeTransformStart.rotate + egoAdd.rotate;
+%     thisR_scene.camera.motion.activeTransformEnd.pos      = ...
+%         thisR_scene.camera.motion.activeTransformEnd.pos + egoAdd.pos;
+%     thisR_scene.camera.motion.activeTransformEnd.rotate   = ...
+%         thisR_scene.camera.motion.activeTransformEnd.rotate + egoAdd.rotate;
+    thisR_scene.lookAt.from = thisR_scene.lookAt.from + egoAdd.pos;
+    %% deal with other moving objects 
+    for jj = 1: length(thisR_scene.assets)
+        if ~isempty(thisR_scene.assets(jj).motion)
+           objFrom.pos = thisR_scene.assets(jj).position;
+           objTo.pos = thisR_scene.assets(jj).motion.position;
+           objAdd.pos  = t_readOut*(objTo.pos - objFrom.pos);
+           thisR_scene.assets(jj).position = ...
+               thisR_scene.assets(jj).position + objAdd.pos;
+           thisR_scene.assets(jj).motion.position = ...
+               thisR_scene.assets(jj).motion.position + objAdd.pos;
+           
+           if isfield(thisR_scene.assets(jj).motion,'rotate') 
+           objFrom.rotate = thisR_scene.assets(jj).rotate;
+           objTo.rotate   = thisR_scene.assets(jj).motion.rotate;
+           objAdd.rotate  = t_readOut*(objTo.rotate - objFrom.rotate);
+           thisR_scene.assets(jj).rotate = ...
+               thisR_scene.assets(jj).rotate + objAdd.rotate;
+           thisR_scene.assets(jj).motion.rotate = ...
+               thisR_scene.assets(jj).motion.rotate + objAdd.rotate;
+           end
+        end
+    end
 %% Write out the scene into a PBRT file
 
-% if contains(sceneType,'city')
-%     outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
-%     thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
-% else
-%     outputDir = fullfile(piRootPath,'local',strcat(sceneType,'_',road.name));
-%     thisR_scene.inputFile = fullfile(outputDir,[strcat(sceneType,'_',road.name),'.pbrt']);
-% end
+if contains(sceneType,'city')
+    outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
+    thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
+else
+    outputDir = fullfile(piRootPath,'local',strcat(sceneType,'_',road.name));
+    thisR_scene.inputFile = fullfile(outputDir,[strcat(sceneType,'_',road.name),'.pbrt']);
+end
 
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-% filename = sprintf('%s_sp%d_vel%0.1f_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
-%     sceneType,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
-filename = sprintf('%s_lensTest.pbrt',lensname);
+filename = sprintf('burst_%d.pbrt',ii);
 thisR_scene.outputFile = fullfile(outputDir,filename);
 
 
@@ -198,7 +231,7 @@ gcp.render();
 
 [podnames,result] = gcp.Podslist('print',false);
 nPODS = length(result.items);
-cnt  = 0;
+cnt = 0;
 time = 0;
 while cnt < length(nPODS)
     cnt = podSucceeded(gcp);
@@ -218,7 +251,7 @@ gcp.PodDescribe(podname{1})
 
 %% Download files from Flywheel
 disp('*** Data downloading...');
-[oi,scene_mesh,label]   = gcp.fwDownloadPBRT('scitran',st);
+[scene,scene_mesh,label]   = gcp.fwDownloadPBRT('scitran',st);
 disp('*** Data downloaded');
 
 %% Show the rendered image using ISETCam
@@ -226,46 +259,46 @@ disp('*** Data downloaded');
 % Some of the images have rendering artifiacts.  These are partially
 % removed using piFireFliesRemove
 %
-for ii =1:length(oi)
-    oi_corrected{ii} = piFireFliesRemove(oi{ii});
-    ieAddObject(oi_corrected{ii}); 
+for ii =1:length(scene)
+    scene_corrected{ii} = piFireFliesRemove(scene{ii});
+    ieAddObject(scene_corrected{ii}); 
     sceneWindow;
-    oiSet(oi_corrected{ii},'gamma',0.75);
-%     oiSet(scene_corrected{ii},'gamma',0.85);
-    pngFigure = oiGet(oi_corrected{ii},'rgb image');
+    sceneSet(scene_corrected{ii},'gamma',0.75);
+    %oiSet(scene_corrected{ii},'gamma',0.85);
+    pngFigure = oiGet(scene_corrected{ii},'rgb image');
     figure;
     imshow(pngFigure);
     % Get the class labels, depth map, bounding boxes for ground
     % truth. This usually takes about 15 secs
     tic
-%     scene_label{ii} = piSceneAnnotation(scene_mesh{ii},label{ii},st);toc
+    scene_label{ii} = piSceneAnnotation(scene_mesh{ii},label{ii},st);toc
     [sceneFolder,sceneName]=fileparts(label{ii});
     sceneName = strrep(sceneName,'_mesh','');
     irradiancefile = fullfile(sceneFolder,[sceneName,'_ir.png']);
     imwrite(pngFigure,irradiancefile); % Save this scene file
 
-    %% Visualization of the ground truth bounding boxes
+%     % Visualization of the ground truth bounding boxes
 %     vcNewGraphWin;
 %     imshow(pngFigure);
 %     fds = fieldnames(scene_label{ii}.bbox2d);
 %     for kk = 1
-%     detections = scene_label{ii}.bbox2d.(fds{kk});
-%     r = rand; g = rand; b = rand;
-%     if r< 0.2 && g < 0.2 && b< 0.2
-%         r = 0.5; g = rand; b = rand;
-%     end
-%     for jj=1:length(detections)
-%         pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
-%             detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
-%             detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
-% 
-%         rectangle('Position',pos,'EdgeColor',[r g b],'LineWidth',2);
-%         t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,num2str(jj));
-%        %t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,fds{kk});
-%         t.Color = [0 0 0];
-%         t.BackgroundColor = [r g b];
-%         t.FontSize = 15;
-%     end
+%         detections = scene_label{ii}.bbox2d.(fds{kk});
+%         r = rand; g = rand; b = rand;
+%         if r< 0.2 && g < 0.2 && b< 0.2
+%             r = 0.5; g = rand; b = rand;
+%         end
+%         for jj=1:length(detections)
+%             pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
+%                 detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
+%                 detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
+%             
+%             rectangle('Position',pos,'EdgeColor',[r g b],'LineWidth',2);
+%             t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,num2str(jj));
+%             t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,fds{kk});
+%             t.Color = [0 0 0];
+%             t.BackgroundColor = [r g b];
+%             t.FontSize = 15;
+%         end
 %     end
 %     drawnow;
 
