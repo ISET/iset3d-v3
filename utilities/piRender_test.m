@@ -208,30 +208,29 @@ for ii = 1:length(filesToRender)
     % fprintf('Outfile file: %s.\n',outFile);
     
     fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
+    
     %% Convert the radiance.dat to an ieObject
     switch label{ii}
         case 'radiance'
             [ieObject,scaleFactor] = piDat2ISET(outFile,...
                 'label','radiance','recipe',thisR,'scale factor',scaleFactor);
         case 'mesh'
-            meshImage    = piDat2ISET(outFile,'label','mesh');
-            ieObject = meshImage;
+            meshImage = piDat2ISET(outFile,'label','mesh');
+            ieObject   = meshImage;
         case 'depth'
-            depthImage   = piDat2ISET(outFile,'label','depth');
+            depthImage = piDat2ISET(outFile,'label','depth');
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject,'depth map',depthImage);
             else
                 ieObject = depthImage;
             end
         case 'coordinates'
-            coordMap      = piDat2ISET(outFile,'label','coordinates');
+            coordMap = piDat2ISET(outFile,'label','coordinates');
             ieObject = coordMap;
         case 'material'
             materialMap  = piDat2ISET(outFile,'label','material');
             ieObject = materialMap;
     end
-    
-    
     
 end
 

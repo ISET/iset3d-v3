@@ -72,18 +72,20 @@ thisR.integrator.maxdepth.value = 4;
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-thisR.camera = piCameraCreate('realistic','lensFile','dgauss.22deg.50.0mm.dat','pbrtVersion',3);
+%  thisR.camera = piCameraCreate('realistic','lensFile','dgauss.22deg.50.0mm.dat','pbrtVersion',3);
 
 piWrite(thisR);
 
 %% Render mesh
-[meshImage,result] = piRender(thisR, 'render type','mesh');
-figure;
+%{
+[meshImage,result] = piRender_test(thisR, 'render type','mesh');
+vcNewGraphWin;
 imagesc(meshImage);
+%}
 %% Render.  
 
 % Maybe we should speed this up by only returning radiance.
-[scene, result] = piRender(thisR);
+[scene, result] = piRender_test(thisR);
 
 scene = sceneSet(scene,'name',sprintf('Glass (%d)',thisR.integrator.maxdepth.value));
 ieAddObject(scene); sceneWindow;
