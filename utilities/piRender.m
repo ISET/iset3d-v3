@@ -322,16 +322,20 @@ for ii = 1:length(filesToRender)
     % Depending on what we rendered, we assign the output data to
     % photons or depth map.
     if(strcmp(label{ii},'radiance'))
+        
         photons = piReadDAT(outFile, 'maxPlanes', 31);
-        % Convert photons units, if necessary
-        % If we used RGB primaries when rendering, the output should be in energy
-        % units not quanta. There is some arbitrariness about this however, so we
-        % should fix a standard at some point.
-            wave = 400:10:700; % Hard coded in pbrt
-            % The scaling factor comes from the display primary units. In
-            % PBRT the display primaries are normalized to 1, the scaling
-            % factor to convert back to real units is then reapplied here.
-            photons = Energy2Quanta(wave,photons)*0.003664;
+        
+        % Convert from energy units to photon units. Typically the light
+        % spectrum we use are defined in energy units (?) but the optical
+        % image uses photon units. 
+        wave = 400:10:700; % Hard coded in pbrt
+        photons = Energy2Quanta(wave,photons);
+        
+        % If we use the flag "useDisplaySPD", PBRT uses display primaries
+        % that are normalized to 1. The scaling factor to convert back to
+        % real units is then reapplied here. 
+        % photons = Energy2Quanta(wave,photons)*0.003664;
+        
     elseif(strcmp(label{ii},'depth') || strcmp(label{ii},'metadata') )
         tmp = piReadDAT(outFile, 'maxPlanes', 31);
         metadataMap = tmp(:,:,1); clear tmp;
