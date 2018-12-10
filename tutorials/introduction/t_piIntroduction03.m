@@ -78,14 +78,14 @@ piWrite(thisR);
 
 %% Render mesh
 %{
-[meshImage,result] = piRender_test(thisR, 'render type','mesh');
+[meshImage,result] = piRender(thisR, 'render type','mesh');
 vcNewGraphWin;
 imagesc(meshImage);
 %}
 %% Render.  
 
 % Maybe we should speed this up by only returning radiance.
-[scene, result] = piRender_test(thisR);
+[scene, result] = piRender(thisR);
 
 scene = sceneSet(scene,'name',sprintf('Glass (%d)',thisR.integrator.maxdepth.value));
 ieAddObject(scene); sceneWindow;
