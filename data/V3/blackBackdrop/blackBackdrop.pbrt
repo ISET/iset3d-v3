@@ -1,4 +1,4 @@
-LookAt 0 0 0 0 1 0 0 0 1
+LookAt 0 0 0 0 0 1 0 1 0
 
 Film "image"
   "integer xresolution" [256 ] 
@@ -28,8 +28,8 @@ AttributeEnd
 # Add a disk
 AttributeBegin
 Material "matte" "spectrum Kd" [300 0 800 0]
-Translate 0 1000 0
-Rotate 90 1 0 0
+Translate 0 0 1000
+Rotate 90 0 0 1
 Shape "disk"
   "float radius" [2000]
 AttributeEnd
