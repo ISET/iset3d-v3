@@ -207,18 +207,18 @@ end
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
 if isfield(renderRecipe.camera,'motion') 
-    motionTranslate =renderRecipe.camera.motion.activeTransformStart.pos-renderRecipe.camera.motion.activeTransformEnd.pos;
-    motionRotate    =renderRecipe.camera.motion.activeTransformStart.rotate-renderRecipe.camera.motion.activeTransformEnd.rotate;
-    fprintf(fileID,'ActiveTransform StartTime \n');
-    fprintf(fileID,'Translate 0 0 0 \n');
-%     fprintf(fileID,'Rotate %0.2f 0 1 0\n',renderRecipe.camera.motion.activeTransformStart.rotate); % add rotate aroung x, y, z
-    fprintf(fileID,'ActiveTransform EndTime \n');
-    fprintf(fileID,'Translate %0.2f %0.2f %0.2f \n',...
-        [motionTranslate(1),...
-        motionTranslate(2),...
-        motionTranslate(3)]);
-    fprintf(fileID,'Rotate %0.2f 0 1 0 \n',motionRotate);
-    fprintf(fileID,'ActiveTransform All \n');
+    fprintf(filedID,'ActiveTransform StartTime \n');
+    fprintf(filedID,'Translate %0.2f %0.2f %0.2f\n',...
+        [renderRecipe.camera.motion.activeTransformStart.pos(1),...
+        renderRecipe.camera.motion.activeTransformStart.pos(2),...
+        renderRecipe.camera.motion.activeTransformStart.pos(3)]);
+    fprintf(filedID,'Rotate \n'); % add rotate aroung x, y, z
+    fprintf(filedID,'ActiveTransform EndTime \n');
+    fprintf(filedID,'Translate %0.2f %0.2f %0.2f\n',...
+        [renderRecipe.camera.motion.activeTransformEnd.pos(1),...
+        renderRecipe.camera.motion.activeTransformEnd.pos(2),...
+        renderRecipe.camera.motion.activeTransformEnd.pos(3)]);
+    fprintf(filedID,'ActiveTransform All \n');
 end
 % Required LookAt 
 fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
@@ -271,8 +271,7 @@ for ofns = outerFields'
             if(strcmp(ifn,'type') || ...
                     strcmp(ifn,'subtype') || ...
                     strcmp(ifn,'subpixels_h') || ...
-                    strcmp(ifn,'subpixels_w') || ...
-                    strcmp(ifn,'motion'))
+                    strcmp(ifn,'subpixels_w'))
                 continue;
             end
             
@@ -346,12 +345,12 @@ end
 if creatematerials
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
-        if contains(currLine, 'materials.pbrt')
+        if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
         end
         if overwritegeometry
-            if contains(currLine, 'geometry.pbrt')
+            if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(renderRecipe.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
@@ -369,7 +368,7 @@ end
 fclose(fileID);
 
 %% Overwrite Materials.pbrt
-if contains(renderRecipe.exporter, 'C4D')
+if piContains(renderRecipe.exporter, 'C4D')
     if ~creatematerials
         if overwritematerials
             [~,n] = fileparts(renderRecipe.inputFile);
@@ -385,7 +384,7 @@ if contains(renderRecipe.exporter, 'C4D')
     end
 end
 %% Overwirte geometry.pbrt
-if contains(renderRecipe.exporter, 'C4D')
+if piContains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
     piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'thistrafficflow',thistrafficflow); 
     end

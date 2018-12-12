@@ -59,10 +59,16 @@ for ii = 1: length(obj)
                         end
                         if ~isempty(obj(ii).rotate)
                             obj_rotate = obj(ii).rotate;
-                            % Write out ratationY
+                            % Write out rotation
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-2)); % Y
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3));   % Z
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
+                        end
+                        % Write out scaling
+                        if ~isempty(obj(ii).scale)
+                            obj_scale = obj(ii).scale(:,gg);
+                            fprintf(fid_obj,'Scale %f %f %f\n',obj_scale(1),...
+                                obj_scale(2),obj_scale(3)); % Y
                         end
                         fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
                         fprintf(fid_obj,'AttributeEnd \n \n');
@@ -91,10 +97,16 @@ for ii = 1: length(obj)
                         end
                         if ~isempty(obj(ii).rotate)
                             obj_rotate = obj(ii).rotate;
-                            % Write out ratationY
+                            % Write out rotation
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-2)); % Y
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3));   % Z
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
+                        end
+                        % Write out scaling
+                        if ~isempty(obj(ii).scale)
+                            obj_scale = obj(ii).scale(:,gg);
+                            fprintf(fid_obj,'Scale %f %f %f\n',obj_scale(1),...
+                                obj_scale(2),obj_scale(3)); % Y
                         end
                         % ActiveTranform End
                         fprintf(fid_obj,'ActiveTransform EndTime \n');
@@ -107,7 +119,7 @@ for ii = 1: length(obj)
                         end
                         if ~isempty(obj(ii).motion.rotate)
                             obj_rotate = obj(ii).motion.rotate;
-                            % Write out ratationY
+                            % Write out rotation
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-2)); % Y
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3));   % Z
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
@@ -119,11 +131,11 @@ for ii = 1: length(obj)
                     error('Position should be a 3 by n matrix \n')
                 end
             end
-        end 
+        end
     end
     % add a lightsFlag, we dont use lights for day scene.
     if lightsFlag
-        if contains(obj(ii).name,'_lightfront')
+        if piContains(obj(ii).name,'_lightfront')
             from = obj(ii).position;
             obj(ii).position = [0 0 0];
             for gg = 1:n
@@ -145,7 +157,7 @@ for ii = 1: length(obj)
                 fprintf(fid_obj,'AttributeEnd \n \n');
             end
         end
-        if contains(obj(ii).name,'_lightback')
+        if piContains(obj(ii).name,'_lightback')
             from = obj(ii).position;
             obj(ii).position = [0;0;0];
             for gg = 1:n

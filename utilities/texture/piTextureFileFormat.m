@@ -25,9 +25,9 @@ if ~isempty(jpgFiles)
         else
             currentfilename = jpgFiles(ii).name;
             currentimage = imread(currentfilename);
-            if contains(jpgFiles(ii).name,'.JPG')
+            if piContains(jpgFiles(ii).name,'.JPG')
                 currentname  = erase(jpgFiles(ii).name,'.JPG');
-            elseif contains(jpgFiles(ii).name,'.jpg')
+            elseif piContains(jpgFiles(ii).name,'.jpg')
                 currentname  = erase(jpgFiles(ii).name,'.jpg');
             end
             output = sprintf('%s.png',currentname);
@@ -52,7 +52,7 @@ if ~isempty(bmpFiles)
         else
             currentfilename = bmpFiles(ii).name;
             currentimage = imread(currentfilename);
-        if contains(bmpFiles(ii).name,'.bmp')
+        if piContains(bmpFiles(ii).name,'.bmp')
             currentname  = erase(bmpFiles(ii).name,'.bmp');
         end
             output = sprintf('%s.png',currentname);

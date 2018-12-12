@@ -25,26 +25,26 @@ for ii = 1: length(assetRecipe)
     %% assign random color for carpaint
     mlist = fieldnames(thisR.materials.list);
     for kk = 1:length(mlist)
-        if  contains(mlist{kk},'paint_base') && ~contains(mlist{kk},'paint_mirror')
+        if  piContains(mlist{kk},'paint_base') && ~piContains(mlist{kk},'paint_mirror')
             name = mlist{kk};
             material = thisR.materials.list.(name);    % A string labeling the material
             target = thisR.materials.lib.carpaintmix.paint_base;  %
             colorkd = piColorPick('random');
             piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
-        elseif contains(mlist{kk},'carpaint') && ~contains(mlist{kk},'paint_base')
+        elseif piContains(mlist{kk},'carpaint') && ~piContains(mlist{kk},'paint_base')
             name = cell2mat(mlist(kk));
             material = thisR.materials.list.(name);    % A string labeling the material
             target = thisR.materials.lib.carpaintmix;  %
             colorkd = piColorPick('random');
             piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
-        elseif contains(mlist(kk),'lightsback') || contains(mlist(kk),'lightback')
+        elseif piContains(mlist(kk),'lightsback') || piContains(mlist(kk),'lightback')
             name = cell2mat(mlist(kk));
             material = thisR.materials.list.(name);
             target = thisR.materials.lib.glass;
             rgbkr = [1 0.1 0.1];
             piMaterialAssign(thisR,material.name,target,'rgbkr',rgbkr);
             thisR.materials.list.(name).rgbkt = [0.7 0.1 0.1];
-        elseif contains(mlist(kk),'tire') % empty the slot if there is a texture assigned
+        elseif piContains(mlist(kk),'tire') % empty the slot if there is a texture assigned
             name = cell2mat(mlist(kk));
             thisR.materials.list.(name).texturekd = [];
         end
@@ -55,7 +55,8 @@ for ii = 1: length(assetRecipe)
     [~,scenename] = fileparts(thisR.outputFile);
     for jj = 1:length(geometry)
         if ~isequal(lower(geometry(jj).name),'camera') && ...
-                ~contains(lower(geometry(jj).name),'light') 
+                ~piContains(lower(geometry(jj).name),'light') && ...
+                ~piContains(lower(geometry(jj).name),'rider_bike')
             name = geometry(jj).name;
             geometry(jj).name = sprintf('%s_%s',label,scenename);% name on 'flywheel_label'
             break;

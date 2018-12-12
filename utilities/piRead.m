@@ -81,6 +81,7 @@ thisR.inputFile = fname;
 readmaterials   = p.Results.readmaterials;
 
 % Set the output directory default
+% fprintf('Setting output path\n');
 [~,scene_fname] = fileparts(fname);
 outFilepath = fullfile(piRootPath,'local',scene_fname);
 outputFile  = fullfile(outFilepath,[scene_fname,'.pbrt']);
@@ -96,70 +97,81 @@ end
 %% Read PBRT file
 
 % Open, read, close
+% fprintf('Opening %s\n');
 fileID = fopen(fname);
+% fprintf('Open OK\n');
 
 % I don't understand why the spaces or tabs at the beginning of the line are not
 % returned here. (BW).
+% fprintf('Reading\n');
 tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
 txtLines = tmp{1};
 
+% fprintf('Closing\n');
 fclose(fileID);
+% fprintf('Closed\n');
 
 %% Split text lines into pre-WorldBegin and WorldBegin sections
-
+% fprintf('Parsing text\n');
 worldBeginIndex = 0;
-
 for ii = 1:length(txtLines)
     currLine = txtLines{ii};
-    if(contains(currLine,'WorldBegin'))
+    if(piContains(currLine,'WorldBegin'))
         worldBeginIndex = ii;
         break;
     end
 end
+% fprintf('Through the loop\n');
 if(worldBeginIndex == 0)
     warning('Cannot find WorldBegin.');
     worldBeginIndex = ii;
 end
 
 % Store the text from WorldBegin to the end here
+% fprintf('Storing WorldBegin to end\n');
 thisR.world = txtLines(worldBeginIndex:end);
 
 % Store the text lines from before WorldBegin here
+% fprintf('Storing pre WorldBegin\n');
 txtLines = txtLines(1:(worldBeginIndex-1));
 
 %% Check if header indicates this is an exported Cinema 4D file
-
+%
 % Unfortunately we have to re-read the text file in order to check the
 % header. 
+% fprintf('Second read\n');
 fileID = fopen(fname);
 tmp = textscan(fileID,'%s','Delimiter','\n');
 headerCheck_scene = tmp{1};
 fclose(fileID);
-if contains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
+% fprintf('Second read done\n');
+if piContains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
     exporterFlag   = true;
     thisR.exporter = 'C4D';
 else
     exporterFlag = false;
 end
+
 %% Material file header check
 [p,n,~] = fileparts(fname);
 fname_materials = sprintf('%s_materials.pbrt',n);
 inputFile_materials=fullfile(p,fname_materials);
-
 if exist(inputFile_materials,'file')
+    % fprintf('Reading materials file %s\n',inputFile_materials');
     fileID = fopen(inputFile_materials);
     tmp = textscan(fileID,'%s','Delimiter','\n');
     headerCheck_material = tmp{1};
     fclose(fileID);
-    if contains(headerCheck_material{1}, 'Exported by piMaterialWrite')
+    if piContains(headerCheck_material{1}, 'Exported by piMaterialWrite')
         exporterFlag   = true;
         thisR.exporter = 'C4D';
     end
+    % fprintf('Done with materials read\n');
 end
+
 %% It would be nice to identify every block
 
 %% Extract camera  block
-
 cameraStruct = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
 if(isempty(cameraStruct))
     warning('Cannot find "camera" in PBRT file.');
@@ -169,7 +181,6 @@ else
 end
 
 %% Extract sampler block
-
 samplerStruct = piBlockExtract(txtLines,'blockName','Sampler','exporterFlag',exporterFlag);
 if(isempty(samplerStruct))
     warning('Cannot find "sampler" in PBRT file.');
@@ -179,7 +190,6 @@ else
 end
 
 %% Extract film block
-
 filmStruct = piBlockExtract(txtLines,'blockName','Film','exporterFlag',exporterFlag);
 if(isempty(filmStruct))
     warning('Cannot find "film" in PBRT file.');
@@ -194,7 +204,6 @@ else
 end
 
 %% Extract surface pixel filter block
-
 pfStruct = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
 if(isempty(pfStruct))
     %     warning('Cannot find "filter" in PBRT file.');
@@ -204,7 +213,6 @@ else
 end
 
 %% Extract (surface) integrator block
-
 if(ver == 2)
     sfStruct = piBlockExtract(txtLines,'blockName','SurfaceIntegrator','exporterFlag',exporterFlag);
 elseif(ver == 3)
@@ -219,7 +227,6 @@ else
 end
 
 %% Extract renderer block
-
 if(ver == 2)
     rendererStruct = piBlockExtract(txtLines,'blockName','Renderer','exporterFlag',exporterFlag);
     if(isempty(rendererStruct))
@@ -232,6 +239,7 @@ else
     % Deprecated Nov. 11, 2018.  Delete it if the issue does not comup in a month.
     % warning('"Renderer" does not exist in the new PBRTv3 format. We leave the field blank .')
 end
+% fprintf('Extracted all the blocks\n');
 
 %% Read LookAt, Transforms, and ConcatTransform, if they exist
 % TODO: In the future we should move all these Transforms into
@@ -290,6 +298,7 @@ thisR.lookAt = struct('from',from,'to',to,'up',up);
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
 % is already in the PBRT file, we want to keep it around.
+% fprintf('Reading scale\n');
 [~, scaleBlock] = piBlockExtract(txtLines,'blockName','Scale','exporterFlag',exporterFlag);
 if(isempty(scaleBlock))
     thisR.scale = [];
@@ -323,7 +332,9 @@ end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
 if exporterFlag 
+    % fprintf('Reading geometry\n');
     thisR = piGeometryRead(thisR); 
+    % fprintf('Done with geometry read\n');
 end
 
 end

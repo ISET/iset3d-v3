@@ -39,23 +39,23 @@ p.parse(thisR);
 ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
     str = thisR.materials.txtLines(jj);
-    if contains(str,'.jpg"')
+    if piContains(str,'.jpg"')
         thisR.materials.txtLines(jj) = strrep(str,'jpg','png');
     end
-    if contains(str,'.jpg "')
+    if piContains(str,'.jpg "')
         thisR.materials.txtLines(jj) = strrep(str,'jpg ','png');
     end    
     % photoshop exports texture format with ".JPG "(with extra space) ext.
-    if contains(str,'.JPG "')
+    if piContains(str,'.JPG "')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
     end
-    if contains(str,'.JPG"')
+    if piContains(str,'.JPG"')
         thisR.materials.txtLines(jj) = strrep(str,'JPG','png');
     end    
-    if contains(str,'bmp')
+    if piContains(str,'bmp')
         thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
     end
-    if contains(str,'tif')
+    if piContains(str,'tif')
         thisR.materials.txtLines(jj) = strrep(str,'tif','png');
     end
 end
@@ -69,7 +69,7 @@ thisR.world{length(thisR.world)-2} = sprintf('Include "%s.pbrt" ',materials_fnam
 txtLines = thisR.materials.txtLines;
 for ii = 1:size(txtLines)
     if ~isempty(txtLines(ii))
-        if contains(txtLines(ii),'MakeNamedMaterial')
+        if piContains(txtLines(ii),'MakeNamedMaterial')
             txtLines{ii}=[];
         end
     end
@@ -77,7 +77,7 @@ end
 
 % Squeeze out the empty lines. Some day we might get the parsed
 % textures here. 
-textureLines = unique(txtLines(~cellfun('isempty',txtLines)));
+textureLines = txtLines(~cellfun('isempty',txtLines));
 
 for jj = 1: length(textureLines)
     textureLines_tmp = [];
@@ -97,22 +97,22 @@ for jj = 1: length(textureLines)
     end
 %     thisLine_tmp = thisLine_tmp{1};
     for ii = 1:length(thisLine_tmp)
-        if contains(thisLine_tmp{ii},'filename')
+        if piContains(thisLine_tmp{ii},'filename')
             index = ii;
         end
     end
     for ii = 1:length(thisLine_tmp)
-        if contains(thisLine_tmp{ii},'.png') 
-            if contains(thisLine_tmp{ii-1},'filename')
+        if piContains(thisLine_tmp{ii},'.png') 
+            if piContains(thisLine_tmp{ii-1},'filename')
             filename = thisLine_tmp{ii};
-            if ~contains(filename,'"textures/')
+            if ~piContains(filename,'"textures/')
             thisLine_tmp{ii} = fullfile('"textures',filename(2:length(filename)));
             end
             else
                 thisLine_tmp{index+1} = thisLine_tmp{ii};
                 thisLine_tmp(index+2:ii)   = '';
                 filename = thisLine_tmp{index+1};
-            if ~contains(filename,'"textures/')
+            if ~piContains(filename,'"textures/')
             thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
             end                
             end
@@ -150,10 +150,10 @@ end
 nPaintLines = {};
 gg = 1;
 for dd = 1:length(materialTxt)
-    if contains(materialTxt{dd},'paint_base') &&...
-            ~contains(materialTxt{dd},'mix')||...
-        contains(materialTxt{dd},'paint_mirror') &&...
-            ~contains(materialTxt{dd},'mix')   
+    if piContains(materialTxt{dd},'paint_base') &&...
+            ~piContains(materialTxt{dd},'mix')||...
+        piContains(materialTxt{dd},'paint_mirror') &&...
+            ~piContains(materialTxt{dd},'mix')   
         nPaintLines{gg} = dd;
         gg = gg+1;
     end
@@ -177,7 +177,6 @@ else
         
     end
 end
-
 fclose(fileID);
 
 [~,n,e] = fileparts(output);
@@ -196,87 +195,62 @@ val = val_name;
 val_string = sprintf(' "string type" "%s" ',materials.string);
 val = strcat(val, val_string);
 
-% if ~isempty(materials.floatindex)
-%     val_floatindex = sprintf(' "float index" [%0.5f] ',materials.floatindex);
-%     val = strcat(val, val_floatindex);
-% end
+if ~isempty(materials.floatindex)
+    val_floatindex = sprintf(' "float index" [%0.5f] ',materials.floatindex);
+    val = strcat(val, val_floatindex);
+end
 
-if ~isempty(materials.texturekd) ...
-        && ~strcmp(materials.string,'metal')...
-        && ~strcmp(materials.string,'glass')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.texturekd)
     val_texturekd = sprintf(' "texture Kd" "%s" ',materials.texturekd);
     val = strcat(val, val_texturekd);
 end
 
-if ~isempty(materials.texturekr) ...
-        && ~strcmp(materials.string,'matte')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.texturekr)
     val_texturekr = sprintf(' "texture Kr" "%s" ',materials.texturekr);
     val = strcat(val, val_texturekr);
 end
 
-if ~isempty(materials.textureks)...
-        && ~strcmp(materials.string,'matte')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.textureks)
     val_textureks = sprintf(' "texture Ks" "%s" ',materials.textureks);
     val = strcat(val, val_textureks);
 end
 
-if ~isempty(materials.rgbkr)...
-        && ~strcmp(materials.string,'matte')...
-        && ~strcmp(materials.string,'mix')...
-        && ~strcmp(materials.string,'translucent')...
-        && ~strcmp(materials.string,'substrate')
+if ~isempty(materials.rgbkr)
     val_rgbkr = sprintf(' "rgb Kr" [%0.5f %0.5f %0.5f] ',materials.rgbkr);
     val = strcat(val, val_rgbkr);
 end
 
-if ~isempty(materials.rgbks)...
-        && ~strcmp(materials.string,'matte')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.rgbks)
     val_rgbks = sprintf(' "rgb Ks" [%0.5f %0.5f %0.5f] ',materials.rgbks);
     val = strcat(val, val_rgbks);
 end
 
-if ~isempty(materials.rgbkt)...
-        && ~strcmp(materials.string,'matte')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.rgbkt)
     val_rgbkt = sprintf(' "rgb Kt" [%0.5f %0.5f %0.5f] ',materials.rgbkt);
     val = strcat(val, val_rgbkt);
 end
 
-if ~isempty(materials.rgbkd)...
-        && ~strcmp(materials.string,'metal')...
-        && ~strcmp(materials.string,'glass')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.rgbkd)
     val_rgbkd = sprintf(' "rgb Kd" [%0.5f %0.5f %0.5f] ',materials.rgbkd);
     val = strcat(val, val_rgbkd);
 end
 
-if ~isempty(materials.colorkd)...
-        && ~strcmp(materials.string,'metal')...
-        && ~strcmp(materials.string,'glass')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.colorkd)
     val_colorkd = sprintf(' "color Kd" [%0.5f %0.5f %0.5f] ',materials.colorkd);
     val = strcat(val, val_colorkd);
 end
 
-if ~isempty(materials.colorks)...
-        && ~strcmp(materials.string,'matte')...
-        && ~strcmp(materials.string,'mix')
+if ~isempty(materials.colorks)
     val_colorks = sprintf(' "color Ks" [%0.5f %0.5f %0.5f] ',materials.colorks);
     val = strcat(val, val_colorks);
 end
 if isfield(materials, 'colorreflect')
     if ~isempty(materials.colorreflect)
-        val_colorreflect = sprintf(' "color reflect" [%0.5f %0.5f %0.5f] ',...
-                                    materials.colorreflect);
+        val_colorreflect = sprintf(' "color reflect" [%0.5f %0.5f %0.5f] ',materials.colorreflect);
         val = strcat(val, val_colorreflect);
     end
     if ~isempty(materials.colortransmit)
-        val_colortransmit = sprintf(' "color transmit" [%0.5f %0.5f %0.5f] ',...
-                                    materials.colortransmit);
+        val_colortransmit = sprintf(' "color transmit" [%0.5f %0.5f %0.5f] ',materials.colortransmit);
         val = strcat(val, val_colortransmit);
     end
 end
@@ -295,26 +269,22 @@ if ~isempty(materials.floatroughness)
     val = strcat(val, val_floatroughness);
 end
 
-if ~isempty(materials.spectrumkd)...
-        && ~strcmp(materials.string,'metal')...
-        && ~strcmp(materials.string,'glass')
+if ~isempty(materials.spectrumkd)
     val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
     val = strcat(val, val_spectrumkd);
 end
 
-if ~isempty(materials.spectrumks) && ~strcmp(materials.string,'matte')
+if ~isempty(materials.spectrumks)
     val_spectrumks = sprintf(' "spectrum Ks" "%s" ',materials.spectrumks);
     val = strcat(val, val_spectrumks);
 end
 
-if ~isempty(materials.spectrumk)...
-        && ~strcmp(materials.string,'matte')
+if ~isempty(materials.spectrumk)
     val_spectrumks = sprintf(' "spectrum k" "%s" ',materials.spectrumk);
     val = strcat(val, val_spectrumks);
 end
 
-if ~isempty(materials.spectrumeta)...
-        && ~strcmp(materials.string,'matte')
+if ~isempty(materials.spectrumeta)
     val_spectrumks = sprintf(' "spectrum eta" "%s" ',materials.spectrumeta);
     val = strcat(val, val_spectrumks);
 end

@@ -10,6 +10,9 @@ function val = piLensGet(param,varargin)
 % BW  Scitran Team 2017
 
 %%
+error('deprecated');
+
+%%
 p = inputParser;
 p.addRequired('param',@ischar);
 p.addParameter('lenstype','*',@ischar);

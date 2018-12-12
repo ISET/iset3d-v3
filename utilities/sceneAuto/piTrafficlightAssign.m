@@ -1,5 +1,5 @@
 function piTrafficlightAssign(fid_obj,obj)
-if contains(obj.name,'green')
+if piContains(obj.name,'green')
     from = obj.position;
     obj.position = [0 0 0];
     fprintf(fid_obj,'AttributeBegin \n');
@@ -14,12 +14,12 @@ if contains(obj.name,'green')
         obj_rotate = obj.rotate;
         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
             obj_rotate(2),obj_rotate(3),obj_rotate(4));
-        fprintf(fid_obj,'LightSource "point" "color I" [0.01 0.5 0.01] "rgb scale" [0.5 0.5 0.5] "point from" [%f %f %f] \n',...
+        fprintf(fid_obj,'LightSource "point" "color I" [0.01 0.5 0.01] "rgb scale" [0.45 0.45 0.45] "point from" [%f %f %f] \n',...
             from(1),from(2),from(3));
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
 end
-if contains(obj.name,'yellow')
+if piContains(obj.name,'yellow')
     from = obj.position;
     obj.position = [0 0 0];
     fprintf(fid_obj,'AttributeBegin \n');
@@ -34,12 +34,12 @@ if contains(obj.name,'yellow')
         obj_rotate = obj.rotate;
         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
             obj_rotate(2),obj_rotate(3),obj_rotate(4));
-        fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.5 0.01] "rgb scale" [0.5 0.5 0.5] "point from" [%f %f %f] \n',...
+        fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.5 0.01] "rgb scale" [0.45 0.45 0.45] "point from" [%f %f %f] \n',...
             from(1),from(2),from(3));
         fprintf(fid_obj,'AttributeEnd \n \n');
     end
 end
-if contains(obj.name,'red')
+if piContains(obj.name,'red')
     from = obj.position;
     obj.position = [0 0 0];
     fprintf(fid_obj,'AttributeBegin \n');
@@ -54,7 +54,7 @@ if contains(obj.name,'red')
         obj_rotate = obj.rotate;
         fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
             obj_rotate(2),obj_rotate(3),obj_rotate(4));
-        fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.01 0.01] "rgb scale" [0.35 0.35 0.35] "point from" [%f %f %f] \n',...
+        fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.01 0.01] "rgb scale" [0.4 0.4 0.4] "point from" [%f %f %f] \n',...
             from(1),from(2),from(3));
         fprintf(fid_obj,'AttributeEnd \n \n');
     end

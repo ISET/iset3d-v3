@@ -1,5 +1,7 @@
 %% t_renderAllScenes.m
 %
+% Works with ISETBio (not ISETCam)
+%
 % This tutorial will run quick renders of all available scenes. It will
 % also give examples on how to set certain parameters for certain scenes
 % (e.g. the distance to a textured plane.)
@@ -176,7 +178,7 @@ oiWindow;
 % Let's attach a resolution chart image on the plane, place it 1 meter
 % away, and make it 1x1 meters large.
 textureFile = fullfile(piRootPath,...
-    'Data','imageTextures','squareResolutionChart.png');
+    'data','imageTextures','squareResolutionChart.png');
 scene3d = sceneEye('texturedPlane',...
                     'planeTexture',textureFile,...
                     'planeSize',[1 1],...

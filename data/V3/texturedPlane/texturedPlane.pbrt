@@ -52,4 +52,12 @@ LightSource "infinite"
   "integer nsamples" [8] 
   "spectrum L" "EqualEnergy.spd" 
 
+# Add a disk
+AttributeBegin 
+Material "matte" "spectrum Kd" [300 0 800 0] 
+Translate 0 0 1000 
+Shape "disk" 
+"float radius" [2000] 
+AttributeEnd 
+
 WorldEnd
