@@ -30,7 +30,7 @@
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-if ~piScitranExists, error('scitran installation required'); end
+% if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
 
