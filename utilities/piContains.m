@@ -11,18 +11,17 @@ function tf = piContains(str,pattern)
 % See also: contains, strfind
 
 if(iscell(str))
-    
+    tf = boolean(zeros(length(str),1));
     % If cell loop through all entries.
     for ii = 1:length(str)
         currStr = str{ii};
         if (~isempty(strfind(currStr,pattern)))
-            tf = 1;
+            tf(ii) = 1;
             break;
         else
-            tf = 0;
+            tf(ii) = 0;
         end
     end
-    
 else
     
     if (~isempty(strfind(str,pattern)))
