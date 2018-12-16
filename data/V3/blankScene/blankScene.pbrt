@@ -1,4 +1,4 @@
-LookAt 0 0 0 0 0 1 0 1 0
+LookAt 0 0 0 0 1 0 0 0 1
 
 Camera "perspective"
  "float fov" [30] 
@@ -20,11 +20,15 @@ Integrator "path"
  "integer maxdepth" [1] 
 
 WorldBegin
-
-# Default Material
-Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
-	
-LightSource "infinite" 
-  "spectrum L" "D65.spd"
+# Add a disk
+AttributeBegin
+Material "matte" "spectrum Kd" ["Auto039_data.spd"]
+#Material "matte" "rgb Kd" [1 1 1]
+Translate 0 1000 0
+Rotate 90 1 0 0
+Shape "disk"
+  "float radius" [2000]
+AttributeEnd
+LightSource "distant" "spectrum L" ["EqualEnergy.spd"] "point to" [0 100 0] "point from" [0 0 0]
 
 WorldEnd

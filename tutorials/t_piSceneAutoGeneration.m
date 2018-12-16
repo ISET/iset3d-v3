@@ -34,7 +34,7 @@ st = scitran('stanfordlabs');
 % store certain parameters about the rendering.
 
 tic
-gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
+gcp = gCloud('configuration','cloudRendering-pbrtv3-west1b-standard-32cpu-120m-flywheel');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-32');
 toc
@@ -53,8 +53,10 @@ str = gcp.configList;
 % This is where we pull down the assets from Flywheel and assemble
 % them into an asset list.  That is managed in piSceneAuto
 
+% Not sure if this is a bug, will keep this in mind;(piSidewalkplan->piCalOverlap(ln. 63)->polyshape)
+warning('off', 'MATLAB:polyshape:repairedBySimplify');
 tic
-sceneType = 'city4';
+sceneType = 'city3';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
@@ -68,7 +70,7 @@ dayTime = 'noon';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 45;
+timestamp = 48;
 
 % Normally we want only one scene per generation.
 nScene = 1;
@@ -122,10 +124,10 @@ thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
 
 
 %% create a realistic camera
-lensfiles = dir('*.dat');
+% lensfiles = dir('*.dat');
 %%
-for ii = 1:35
-    lensname = lensfiles(ii).name;
+% for ii = 1:35
+lensname = 'dgauss.22deg.12.5mm.dat';
 thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
 
 %% Add a camera to one of the cars
@@ -133,7 +135,7 @@ thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion
 % To place the camera, we find a car and place a camera at the front
 % of the car.  We find the car using the trafficflow information.
 %
-%{
+
 load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
 thisTrafficflow = trafficflow(timestamp);
 nextTrafficflow = trafficflow(timestamp+1);
@@ -151,25 +153,25 @@ thisVelocity = thisCar.speed
 
 thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
                                'thisCar',thisCar,...
-                               'shutter Speed',60);
+                               'fps',30);
 %}                           
 
 %% Write out the scene into a PBRT file
 
-% if contains(sceneType,'city')
-%     outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
-%     thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
-% else
-%     outputDir = fullfile(piRootPath,'local',strcat(sceneType,'_',road.name));
-%     thisR_scene.inputFile = fullfile(outputDir,[strcat(sceneType,'_',road.name),'.pbrt']);
-% end
+if contains(sceneType,'city')
+    outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
+    thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
+else
+    outputDir = fullfile(piRootPath,'local',strcat(sceneType,'_',road.name));
+    thisR_scene.inputFile = fullfile(outputDir,[strcat(sceneType,'_',road.name),'.pbrt']);
+end
 
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-% filename = sprintf('%s_sp%d_vel%0.1f_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
-%     sceneType,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
-filename = sprintf('%s_lensTest.pbrt',lensname);
+filename = sprintf('%s_%s_sp%d_vel%0.1f_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
+     sceneType,lensname,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
+% filename = sprintf('%s_lensTest.pbrt',lensname);
 thisR_scene.outputFile = fullfile(outputDir,filename);
 
 
@@ -184,7 +186,7 @@ gcp.fwUploadPBRT(thisR_scene,'scitran',st,'road',road);
 % Tell the gcp object about this target scene
 addPBRTTarget(gcp,thisR_scene);
 fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
-end
+
 %% Describe the target to the user
 
 gcp.targetsList;

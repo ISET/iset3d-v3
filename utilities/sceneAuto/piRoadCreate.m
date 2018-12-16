@@ -38,7 +38,7 @@ end
 %% write out
 piRoadInfo;
 % load it
-load(fullfile(piRootPath,'configuration','roadInfo.mat'),'roadinfo');
+load(fullfile(piRootPath,'local','configuration','roadInfo.mat'),'roadinfo');
 %%
 vTypes={'pedestrian','passenger','bus','truck','bicycle'};
 
@@ -138,11 +138,19 @@ if exist(fileFolder,'dir'),mkdir(fileFolder);end
 thisR.outputFile = fullfile(fileFolder,[filename,'.pbrt']);
 
 % Add rendering resources
+%{
+files = st.search('acquisition',...
+% Add rendering resources
 files = st.search('file',...
    'project label exact','Graphics assets',...
    'session label exact','data',...
    'acquisition label exact','others');
 dataId = files{1}.parent.id;
+%}
+% Add rendering resources
+st          = scitran('stanfordlabs');
+acquisition = st.fw.lookup('wandell/Graphics assets/data/others');
+dataId      = acquisition.id;
 dataName = 'data.zip';
 
 road.fwList = [dataId,' ',dataName,' ',resource_acqID{index{thisRoad_randm}},' ',resourceFiles{index{thisRoad_randm}}{1}.name];

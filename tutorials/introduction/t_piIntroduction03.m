@@ -30,7 +30,7 @@
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-% if ~piScitranExists, error('scitran installation required'); end
+if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
 
@@ -81,12 +81,19 @@ thisR.integrator.maxdepth.value = 4;
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-%  thisR.camera = piCameraCreate('realistic','lensFile','dgauss.22deg.50.0mm.dat','pbrtVersion',3);
-
+thisR.camera = piCameraCreate('realistic','lensFile','dgauss.22deg.6.0mm.dat','pbrtVersion',3);
+% thisR.set('fov',45);
+% thisR.film.diagonal.value=10;
+% thisR.film.diagonal.type = 'float';
+thisR.integrator.maxdepth.value = 5;
+thisR.integrator.subtype = 'bdpt';
+thisR.sampler.subtype = 'sobol';
+% thisR.integrator.lightsamplestrategy.type = 'string';
+% thisR.integrator.lightsamplestrategy.value = 'spatial';
 piWrite(thisR);
 
 %% Render mesh
-%{
+
 [meshImage,result] = piRender(thisR, 'render type','mesh');
 vcNewGraphWin;
 imagesc(meshImage);
@@ -97,6 +104,8 @@ imagesc(meshImage);
 [scene, result] = piRender(thisR);
 
 scene = sceneSet(scene,'name',sprintf('Glass (%d)',thisR.integrator.maxdepth.value));
-ieAddObject(scene); sceneWindow;
+ieAddObject(scene); 
+% oiwindow;
+sceneWindow;
 
 %% END

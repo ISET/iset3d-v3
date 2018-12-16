@@ -17,7 +17,7 @@ function renderRecipe = piGeometryRead(renderRecipe)
 
 %%
 p = inputParser;
-p.addRequired('renderRecipe',@(x)isequal(claoss(x),'recipe'));
+p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
 %% Check version number
 if(renderRecipe.version ~= 3)

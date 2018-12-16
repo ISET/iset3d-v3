@@ -163,7 +163,7 @@ for ii = 1:length(filesToRender)
     dockerCommand   = 'docker run -ti --rm';
     
     if(thisR.version == 3 || version == 3)
-        dockerImageName = 'vistalab/pbrt-v3-spectral';
+        dockerImageName = 'vistalab/pbrt-v3-spectral:test';
     else
         dockerImageName = 'vistalab/pbrt-v2-spectral';
     end
@@ -214,22 +214,17 @@ for ii = 1:length(filesToRender)
         case 'radiance'
             [ieObject,scaleFactor] = piDat2ISET(outFile,...
                 'label','radiance','recipe',thisR,'scale factor',scaleFactor);
-        case 'mesh'
-            meshImage = piDat2ISET(outFile,'label','mesh');
-            ieObject   = meshImage;
+        case {'metadata'}
+            metadata = piDat2ISET(outFile,'label','mesh');
+            ieObject   = metadata;
         case 'depth'
             depthImage = piDat2ISET(outFile,'label','depth');
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject,'depth map',depthImage);
-            else
-                ieObject = depthImage;
             end
         case 'coordinates'
             coordMap = piDat2ISET(outFile,'label','coordinates');
             ieObject = coordMap;
-        case 'material'
-            materialMap  = piDat2ISET(outFile,'label','material');
-            ieObject = materialMap;
     end
     
 end

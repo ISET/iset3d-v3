@@ -65,10 +65,12 @@ for ii = 1: length(obj)
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
                         end
                         % Write out scaling
+                        if isfield(obj(ii),'scale')
                         if ~isempty(obj(ii).scale)
                             obj_scale = obj(ii).scale(:,gg);
                             fprintf(fid_obj,'Scale %f %f %f\n',obj_scale(1),...
                                 obj_scale(2),obj_scale(3)); % Y
+                        end
                         end
                         fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
                         fprintf(fid_obj,'AttributeEnd \n \n');
@@ -103,10 +105,12 @@ for ii = 1: length(obj)
                             fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
                         end
                         % Write out scaling
+                        if isfield(obj(ii),'scale')
                         if ~isempty(obj(ii).scale)
                             obj_scale = obj(ii).scale(:,gg);
                             fprintf(fid_obj,'Scale %f %f %f\n',obj_scale(1),...
                                 obj_scale(2),obj_scale(3)); % Y
+                        end
                         end
                         % ActiveTranform End
                         fprintf(fid_obj,'ActiveTransform EndTime \n');
