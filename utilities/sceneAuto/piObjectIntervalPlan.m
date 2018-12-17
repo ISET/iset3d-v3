@@ -130,15 +130,15 @@ if piContains(object_list(1).name,'streetlight')
                     objectPosition_list(count).rotate = sidewalk_list(jj).direction;
                     objectPosition_list(count).size.w = edgeSize;
                     objectPosition_list(count).size.l = edgeSize;
-                else
-                    center = start_point;
-                    point = start_point+[object_list(mm).geometry(kk).position(1),object_list(mm).geometry(kk).position(3)];
-                    theta = sidewalk_list(jj).direction;
-                    tmp = piPointRotate(point, center, theta);
-                    objectPosition_list(count).position = [tmp(1), sidewalk_list(jj).height+object_list(mm).geometry(kk).position(2), tmp(2)];
-                    objectPosition_list(count).rotate = sidewalk_list(jj).direction;
-                    objectPosition_list(count).size.w = 0;
-                    objectPosition_list(count).size.l = 0;
+%                 else
+%                     center = start_point;
+%                     point = start_point+[object_list(mm).geometry(kk).position(1),object_list(mm).geometry(kk).position(3)];
+%                     theta = sidewalk_list(jj).direction;
+%                     tmp = piPointRotate(point, center, theta);
+%                     objectPosition_list(count).position = [tmp(1), sidewalk_list(jj).height+object_list(mm).geometry(kk).position(2), tmp(2)];
+%                     objectPosition_list(count).rotate = sidewalk_list(jj).direction;
+%                     objectPosition_list(count).size.w = 0;
+%                     objectPosition_list(count).size.l = 0;
                     
                 end
                 

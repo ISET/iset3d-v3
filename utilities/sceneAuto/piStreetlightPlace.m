@@ -20,8 +20,8 @@ for ii = 1: length(assetPosList_tmp)
     
     % if ~isequal(buildingPosList_tmp(ii).count,1)
     n = assetPosList_tmp(ii).count;
+    assets_updated(ii) = asset(ii);
     for dd = 1: length(asset)
-        assets_updated(dd) = asset(dd);
         for hh = 1: length(asset(dd).geometry)% change from ii to dd
             gg=1;
             position=cell(n,1);
@@ -41,9 +41,9 @@ for ii = 1: length(assetPosList_tmp)
                 rotationY{gg} = streetlightPosList(jj).rotate;
                 gg = gg+1;
             end
-            assets_updated(dd).geometry(hh) = piAssetTranslate(asset(dd).geometry(hh),position,'Pos_demention',n);
-            assets_updated(dd).geometry(hh) = piAssetRotate(assets_updated(dd).geometry(hh),'Y',rotationY,'Pos_demention',n);
-            assets_updated(dd).fwInfo       = asset(dd).fwInfo;
+            assets_updated(ii).geometry(hh) = piAssetTranslate(asset(dd).geometry(hh),position,'Pos_demention',n);
+            assets_updated(ii).geometry(hh) = piAssetRotate(assets_updated(dd).geometry(hh),'Y',rotationY,'Pos_demention',n);
+            assets_updated(ii).fwInfo       = asset(dd).fwInfo;
         end
     end
 end

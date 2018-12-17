@@ -54,7 +54,7 @@ str = gcp.configList;
 % them into an asset list.  That is managed in piSceneAuto
 
 % Not sure if this is a bug, will keep this in mind;(piSidewalkplan->piCalOverlap(ln. 63)->polyshape)
-warning('off', 'MATLAB:polyshape:repairedBySimplify');
+% warning('off', 'MATLAB:polyshape:repairedBySimplify');
 tic
 sceneType = 'city3';
 % roadType = 'cross';
@@ -70,7 +70,7 @@ dayTime = 'noon';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 48;
+timestamp = 21;
 
 % Normally we want only one scene per generation.
 nScene = 1;
@@ -231,7 +231,7 @@ disp('*** Data downloaded');
 for ii =1:length(oi)
     oi_corrected{ii} = piFireFliesRemove(oi{ii});
     ieAddObject(oi_corrected{ii}); 
-    sceneWindow;
+    oiWindow;
     oiSet(oi_corrected{ii},'gamma',0.75);
 %     oiSet(scene_corrected{ii},'gamma',0.85);
     pngFigure = oiGet(oi_corrected{ii},'rgb image');
@@ -240,36 +240,36 @@ for ii =1:length(oi)
     % Get the class labels, depth map, bounding boxes for ground
     % truth. This usually takes about 15 secs
     tic
-%     scene_label{ii} = piSceneAnnotation(scene_mesh{ii},label{ii},st);toc
+    scene_label{ii} = piSceneAnnotation(scene_mesh{ii},label{ii},st);toc
     [sceneFolder,sceneName]=fileparts(label{ii});
     sceneName = strrep(sceneName,'_mesh','');
     irradiancefile = fullfile(sceneFolder,[sceneName,'_ir.png']);
     imwrite(pngFigure,irradiancefile); % Save this scene file
 
     %% Visualization of the ground truth bounding boxes
-%     vcNewGraphWin;
-%     imshow(pngFigure);
-%     fds = fieldnames(scene_label{ii}.bbox2d);
-%     for kk = 1
-%     detections = scene_label{ii}.bbox2d.(fds{kk});
-%     r = rand; g = rand; b = rand;
-%     if r< 0.2 && g < 0.2 && b< 0.2
-%         r = 0.5; g = rand; b = rand;
-%     end
-%     for jj=1:length(detections)
-%         pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
-%             detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
-%             detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
-% 
-%         rectangle('Position',pos,'EdgeColor',[r g b],'LineWidth',2);
-%         t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,num2str(jj));
-%        %t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,fds{kk});
-%         t.Color = [0 0 0];
-%         t.BackgroundColor = [r g b];
-%         t.FontSize = 15;
-%     end
-%     end
-%     drawnow;
+    vcNewGraphWin;
+    imshow(pngFigure);
+    fds = fieldnames(scene_label{ii}.bbox2d);
+    for kk = 4
+    detections = scene_label{ii}.bbox2d.(fds{kk});
+    r = rand; g = rand; b = rand;
+    if r< 0.2 && g < 0.2 && b< 0.2
+        r = 0.5; g = rand; b = rand;
+    end
+    for jj=1:length(detections)
+        pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
+            detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
+            detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
+
+        rectangle('Position',pos,'EdgeColor',[r g b],'LineWidth',2);
+        t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,num2str(jj));
+       %t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,fds{kk});
+        t.Color = [0 0 0];
+        t.BackgroundColor = [r g b];
+        t.FontSize = 15;
+    end
+    end
+    drawnow;
 
 end
 sceneWindow;
