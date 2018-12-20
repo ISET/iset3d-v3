@@ -1,12 +1,12 @@
-%% Get SkyMap from Flywheel - and use glass in the scene
+%% Uses Flywheel to get a skymap; also uses special scene materials
 %
-% Shows how to download a file from Flywheel.  This technique is used
-% much more extensively (and hidden from the user) in creating the
-% complex driving scenes.
+% We store many graphics assets in the Flywheel database.  This script
+% shows how to download a file from Flywheel.  This technique is used
+% much more extensively in creating complex driving scenes.
 %
-% This scene has glass and also materials that were created for
-% driving scenes.  The script sets up the glass material and number of
-% bounces to make the glass appear reasonable.
+% This example scene also includes glass and other materials that
+% were created for driving scenes.  The script sets up the glass
+% material and number of bounces to make the glass appear reasonable.
 %
 % It also uses piMaterialsGroupAssign() to set a list of materials (in
 % this case a mirror) that are part of the scene.
@@ -42,11 +42,14 @@ thisR = piRead(fname);
 
 %% Set render quality
 
-% This is a relatively low resolution for speed.
-thisR.set('film resolution',[800 600]);
-thisR.set('pixel samples',64);
+% This is a low resolution for speed.
+thisR.set('film resolution',[400 300]);
+thisR.set('pixel samples',16);
 
-%% Get the skymap from Flywheel
+%% Get a sky map from Flywheel, and use it in the scene
+
+% We will put a skymap in the local directory so people without
+% Flywheel can see the output
 
 % Use a small skymap.  We should make all the skymaps small, but
 % 'noon' is not small!
@@ -56,16 +59,19 @@ thisR.set('pixel samples',64);
 % to Matlab format here.
 s = split(skymapInfo,' ');
 
-% If the skymap is there already, move on.  Otherwise open up Flywheel
-% and download it.
+% If the skymap is there already, move on.  
 skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
+
+% Otherwise open up Flywheel and download it.
 if ~exist(skyMapFile,'file')
-    fprintf('Downloading Skymap ... ');
+    fprintf('Downloading Skymap from Flywheel ... ');
     st = scitran('stanfordlabs');
+    
     fName = st.fileDownload(s{2},...
         'containerType','acquisition',...
         'containerID',s{1}, ...
         'destination',skyMapFile);
+    
     assert(isequal(fName,skyMapFile));
     fprintf('complete\n');
 end
@@ -81,42 +87,23 @@ thisR.integrator.maxdepth.value = 4;
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-%
-lensfile = 'fisheye.87deg.6.0mm.dat';
-% thisR.camera = piCameraCreate('realistic','lensFile','dgauss.22deg.50.0mm.dat','pbrtVersion',3);
-thisR.camera = piCameraCreate('realistic','lensFile',lensfile,'pbrtVersion',3);
 
-% thisR.set('fov',45);
-thisR.film.diagonal.value=10;
-thisR.film.diagonal.type = 'float';
-thisR.camera.focusdistance.value = 5;
-thisR.camera.aperturediameter.value = 5.5;
-%}
-thisR.integrator.subtype = 'bdpt';
-thisR.sampler.subtype = 'sobol';
-% thisR.integrator.lightsamplestrategy.type = 'string';
-% thisR.integrator.lightsamplestrategy.value = 'spatial';
+thisR.set('fov',45);
+thisR.film.diagonal.value = 10;
+thisR.film.diagonal.type  = 'float';
+
 sceneName = 'simpleTest';
-outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_%s_scene.pbrt',thisR.integrator.subtype,lensfile));
+outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_scene.pbrt',thisR.integrator.subtype));
 thisR.set('outputFile',outFile);
-thisR.lookAt.to(3) = 0;
-% thisR.lookAt.from(1) = 3;
+
 piWrite(thisR,'creatematerials',true);
 
-% Render mesh
-
-% [meshImage,result] = piRender(thisR, 'render type','mesh');
-% vcNewGraphWin;
-% imagesc(meshImage);
-%}
-% Render.  
+%% Render.  
 
 % Maybe we should speed this up by only returning radiance.
-[oi, result] = piRender(thisR,'render type','radiance');
+[scene, result] = piRender(thisR,'render type','radiance');
 
-oi = sceneSet(oi,'name',sprintf('%s_%s',thisR.integrator.subtype,lensfile));
-ieAddObject(oi); 
-oiWindow;
-% sceneWindow;
+scene = sceneSet(scene,'name',sprintf('%s',thisR.integrator.subtype));
+ieAddObject(scene); sceneWindow;
 
 %% END

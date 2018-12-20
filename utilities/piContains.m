@@ -2,22 +2,40 @@ function tf = piContains(str,pattern)
 % Returns 1 (true) if str contains pattern, and returns 0 (false) otherwise.
 %
 % Synopsis:
-%    tf = pipiContains(str,pattern)
+%    tf = piContains(str,pattern)
 %
 % Description:
-%    Workalike for contains, in its simple calling form.  Written so that
-%    work with Matlab versions prior to those with piContains().
+%    Work around for the contains function. Written so that it will
+%    work with Matlab versions prior to those with contains().
+%
+% Inputs
+%   str -  A cell array of strings (or a string)
+%   pattern -  A string
+%
+% Returns
+%   tf    A logical array for each entry in the cell array, according
+%         to whether it contains the pattern
+%
+% DHB/ZL ISETBIO Team
 %
 % See also: contains, strfind
+%   
+
+% Examples
+%{
+   piContains('help','he')
+   piContains('help','m')
+   piContains({'help','he','lp'},'he')
+%}
 
 if(iscell(str))
-    tf = boolean(zeros(length(str),1));
+    tf = zeros(1,length(str));
+    
     % If cell loop through all entries.
     for ii = 1:length(str)
         currStr = str{ii};
-        if (~isempty(strfind(currStr,pattern)))
+        if (~isempty(strfind(currStr,pattern))) %#ok<*STREMP>
             tf(ii) = 1;
-            break;
         else
             tf(ii) = 0;
         end
@@ -31,3 +49,8 @@ else
     end
     
 end
+
+tf = logical(tf);
+
+end
+

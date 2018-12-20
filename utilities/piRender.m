@@ -52,9 +52,6 @@ function [ieObject, result, scaleFactor] = piRender(thisR,varargin)
 
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
-% TODO:  Replace scaleFactor with a mean luminance or illuminance.  If
-% an illuminance, then it should be specified for a 1mm2 aperture
-
 p = inputParser;
 p.KeepUnmatched = true;
 
@@ -66,18 +63,20 @@ varargin = ieParamFormat(varargin);
 
 rTypes = {'radiance','depth','both','coordinates','material','mesh'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes)));
-% p.addParameter('scaleFactor',[],@(x)isnumeric(x));
 p.addParameter('version',3,@(x)isnumeric(x));
+p.addParameter('meanluminance',100,@inumeric);
+p.addParameter('meanilluminancepermm2',5,@isnumeric);
 
 % If you are insisting on using V2, then set dockerImageName to
-% 'vistalab/pbrt-v2-spectral'; 
-p.addParameter('dockerImageName','vistalab/pbrt-v3-spectral',@ischar);
+% 'vistalab/pbrt-v2-spectral';
+% We were testing this one.
+% 'vistalab/pbrt-v3-spectral:test';
+p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral',@ischar);
 
 p.parse(thisR,varargin{:});
 renderType      = p.Results.rendertype;
 version         = p.Results.version;
-% scaleFactor     = p.Results.scaleFactor;
-dockerImageName = p.Results.dockerImageName;
+dockerImageName = p.Results.dockerimagename;
 
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build
@@ -206,6 +205,9 @@ for ii = 1:length(filesToRender)
     fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
     
     %% Convert the returned data to an ieObject
+    
+    % We should add in the mean luminance and mean illuminance here
+    % when we are ready.  piDat2ISET already handles those inputs.
     switch label{ii}
         case 'radiance'
             ieObject = piDat2ISET(outFile,...
