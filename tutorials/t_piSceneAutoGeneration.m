@@ -34,7 +34,7 @@ st = scitran('stanfordlabs');
 % store certain parameters about the rendering.
 
 tic
-gcp = gCloud('configuration','cloudRendering-pbrtv3-west1b-standard-32cpu-120m-flywheel');
+gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
 % gcp = gCloud('configuration','gcp-pbrtv3-central-32');
 toc
@@ -56,21 +56,21 @@ str = gcp.configList;
 % Not sure if this is a bug, will keep this in mind;(piSidewalkplan->piCalOverlap(ln. 63)->polyshape)
 % warning('off', 'MATLAB:polyshape:repairedBySimplify');
 tic
-sceneType = 'city3';
+sceneType = 'city2';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
 % roadType = 'highway_straight_4lanes_001';
 roadType = 'cross';
 
-trafficflowDensity = 'medium';
+trafficflowDensity = 'high';
 
 dayTime = 'noon';
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 21;
+timestamp = 30;
 
 % Normally we want only one scene per generation.
 nScene = 1;
@@ -106,14 +106,12 @@ road.fwList = [road.fwList,' ',skymapfwInfo];
 %
 % Default is a relatively low samples/pixel (256).
 
-% thisR_scene.set('camera','realistic');
-% thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
-xRes = 900;% for testing lens
-yRes = 600;
-pSamples = 128;
+xRes = 1920;
+yRes =  800;
+pSamples = 1024;
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
-thisR_scene.set('fov',45);
+% thisR_scene.set('fov',45);
 thisR_scene.film.diagonal.value=10;
 thisR_scene.film.diagonal.type = 'float';
 thisR_scene.integrator.maxdepth.value = 5;
@@ -127,8 +125,9 @@ thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
 % lensfiles = dir('*.dat');
 %%
 % for ii = 1:35
-lensname = 'dgauss.22deg.12.5mm.dat';
+lensname = 'wide.56deg.6.0mm.dat';
 thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
+% thisR_scene.camera = piCameraCreate('perspective','pbrtVersion',3);
 
 %% Add a camera to one of the cars
 
@@ -149,12 +148,12 @@ thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
 % Will write a function to select a certain speed, now just manually check
 thisVelocity = thisCar.speed
-%%
 
+%%
 thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
                                'thisCar',thisCar,...
-                               'fps',30);
-%}                           
+                               'fps',60);
+                          
 
 %% Write out the scene into a PBRT file
 
@@ -169,9 +168,8 @@ end
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-filename = sprintf('%s_%s_sp%d_vel%0.1f_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
-     sceneType,lensname,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
-% filename = sprintf('%s_lensTest.pbrt',lensname);
+filename = sprintf('%s_%s_%s_sp%d_v%0.1f_%s_%s_t%d_f%0.2f_%0.2f_%0.2f_o%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
+     sceneType,thisR_scene.camera.subtype,thisR_scene.integrator.subtype,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
 thisR_scene.outputFile = fullfile(outputDir,filename);
 
 
@@ -190,12 +188,12 @@ fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 %% Describe the target to the user
 
 gcp.targetsList;
-
+%% save gcp.targets as a txt file so that I can read from gcp
+filePath_record = '/Users/zhenyiliu/Google Drive (zhenyi27@stanford.edu)/rendering_record/';
+DateString=strrep(strrep(strrep(datestr(datetime('now')),' ','_'),':','_'),'-','_');
+save([filePath_record,'gcp',DateString,'.mat'],'gcp');
 %% This invokes the PBRT-V3 docker image
-
 gcp.render();
-%% save gcp.targets
-
 %% Monitor the processes on GCP
 
 [podnames,result] = gcp.Podslist('print',false);
@@ -228,6 +226,7 @@ disp('*** Data downloaded');
 % Some of the images have rendering artifiacts.  These are partially
 % removed using piFireFliesRemove
 %
+
 for ii =1:length(oi)
     oi_corrected{ii} = piFireFliesRemove(oi{ii});
     ieAddObject(oi_corrected{ii}); 

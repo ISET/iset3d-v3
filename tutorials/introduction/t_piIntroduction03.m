@@ -43,8 +43,8 @@ thisR = piRead(fname);
 %% Set render quality
 
 % This is a relatively low resolution for speed.
-thisR.set('film resolution',round(1.5*[300 200]));
-thisR.set('pixel samples',16);
+thisR.set('film resolution',[800 600]);
+thisR.set('pixel samples',64);
 
 %% Get the skymap from Flywheel
 
@@ -81,31 +81,42 @@ thisR.integrator.maxdepth.value = 4;
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-thisR.camera = piCameraCreate('realistic','lensFile','dgauss.22deg.6.0mm.dat','pbrtVersion',3);
+%
+lensfile = 'fisheye.87deg.6.0mm.dat';
+% thisR.camera = piCameraCreate('realistic','lensFile','dgauss.22deg.50.0mm.dat','pbrtVersion',3);
+thisR.camera = piCameraCreate('realistic','lensFile',lensfile,'pbrtVersion',3);
+
 % thisR.set('fov',45);
-% thisR.film.diagonal.value=10;
-% thisR.film.diagonal.type = 'float';
-thisR.integrator.maxdepth.value = 5;
+thisR.film.diagonal.value=10;
+thisR.film.diagonal.type = 'float';
+thisR.camera.focusdistance.value = 5;
+thisR.camera.aperturediameter.value = 5.5;
+%}
 thisR.integrator.subtype = 'bdpt';
 thisR.sampler.subtype = 'sobol';
 % thisR.integrator.lightsamplestrategy.type = 'string';
 % thisR.integrator.lightsamplestrategy.value = 'spatial';
-piWrite(thisR);
+sceneName = 'simpleTest';
+outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_%s_scene.pbrt',thisR.integrator.subtype,lensfile));
+thisR.set('outputFile',outFile);
+thisR.lookAt.to(3) = 0;
+% thisR.lookAt.from(1) = 3;
+piWrite(thisR,'creatematerials',true);
 
-%% Render mesh
+% Render mesh
 
-[meshImage,result] = piRender(thisR, 'render type','mesh');
-vcNewGraphWin;
-imagesc(meshImage);
+% [meshImage,result] = piRender(thisR, 'render type','mesh');
+% vcNewGraphWin;
+% imagesc(meshImage);
 %}
-%% Render.  
+% Render.  
 
 % Maybe we should speed this up by only returning radiance.
-[scene, result] = piRender(thisR);
+[oi, result] = piRender(thisR,'render type','radiance');
 
-scene = sceneSet(scene,'name',sprintf('Glass (%d)',thisR.integrator.maxdepth.value));
-ieAddObject(scene); 
-% oiwindow;
-sceneWindow;
+oi = sceneSet(oi,'name',sprintf('%s_%s',thisR.integrator.subtype,lensfile));
+ieAddObject(oi); 
+oiWindow;
+% sceneWindow;
 
 %% END
