@@ -29,18 +29,13 @@ st = scitran('stanfordlabs');
 
 %% Initialize your GCP cluster
 
-% The Google cloud platform (gcp) includes a large number of
-% parameters that define the cluster. We also use the gcp object to
-% store certain parameters about the rendering.
-
 tic
 gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
-% gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
-% gcp = gCloud('configuration','gcp-pbrtv3-central-32');
+
 toc
 gcp.renderDepth = 1;  % Create the depth map
 gcp.renderMesh  = 1;  % Create the object mesh for subsequent use
-gcp.targets     =[];      % clear job list
+gcp.targets     =[];  % clear job list
 
 % Print out the gcp parameters for the user
 str = gcp.configList;
@@ -52,11 +47,8 @@ str = gcp.configList;
 %
 % This is where we pull down the assets from Flywheel and assemble
 % them into an asset list.  That is managed in piSceneAuto
-
-% Not sure if this is a bug, will keep this in mind;(piSidewalkplan->piCalOverlap(ln. 63)->polyshape)
-% warning('off', 'MATLAB:polyshape:repairedBySimplify');
 tic
-sceneType = 'city2';
+sceneType = 'city1';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
@@ -77,7 +69,7 @@ nScene = 1;
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
 % Return an array of render recipe according to given number of scenes.
-% takes about 150 seconds
+% takes about 100 seconds
 [thisR_scene,road] = piSceneAuto('sceneType',sceneType,...
     'roadType',roadType,...
     'trafficflowDensity',trafficflowDensity,...
@@ -87,13 +79,10 @@ cloudRender = 1;
     'cloudRender',cloudRender,...
     'scitran',st);
 toc
-
+thisR_scene.metadata.sumo.trafficflowdensity = trafficflowDensity;
+thisR_scene.metadata.sumo.timestamp          = timestamp;
 %% Add a skymap and add SkymapFwInfor to fwList
 
-% fwList contains information about objects in Flywheel that you will
-% use to render this scene.  It is a long string of the container IDS
-% and file names.
-%
 dayTime = 'noon';
 [thisR_scene,skymapfwInfo] = piSkymapAdd(thisR_scene,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
@@ -134,7 +123,6 @@ thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion
 % To place the camera, we find a car and place a camera at the front
 % of the car.  We find the car using the trafficflow information.
 %
-
 load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
 thisTrafficflow = trafficflow(timestamp);
 nextTrafficflow = trafficflow(timestamp+1);
@@ -148,7 +136,7 @@ thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
 % Will write a function to select a certain speed, now just manually check
 thisVelocity = thisCar.speed
-
+% give me z axis smaller than 110;
 %%
 thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
                                'thisCar',thisCar,...
@@ -168,10 +156,9 @@ end
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-filename = sprintf('%s_%s_%s_sp%d_v%0.1f_%s_%s_t%d_f%0.2f_%0.2f_%0.2f_o%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
-     sceneType,thisR_scene.camera.subtype,thisR_scene.integrator.subtype,pSamples,thisVelocity,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
+filename = sprintf('%s_v%0.1f_f%0.2fo%0.2f_%i%i%i%i%i%0.0f.pbrt',...
+     sceneType,thisVelocity,thisR_scene.lookAt.from(3),ori,clock);
 thisR_scene.outputFile = fullfile(outputDir,filename);
-
 
 % Do the writing
 piWrite(thisR_scene,'creatematerials',true,...

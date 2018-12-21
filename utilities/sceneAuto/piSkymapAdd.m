@@ -33,7 +33,7 @@ if isequal(input,'random')
     skynamelist = {'morning','noon','sunset'};
     input = skynamelist{index};
 end
-
+thisR.metadata.daytime = input;
 switch input
     case 'morning'
         skyname = sprintf('morning_%03d.exr',randi(4,1));       
