@@ -38,12 +38,12 @@ end
 %% write out
 piRoadInfo;
 % load it
-load(fullfile(piRootPath,'configuration','roadInfo.mat'),'roadinfo');
+load(fullfile(piRootPath,'local','configuration','roadInfo.mat'),'roadinfo');
 %%
 vTypes={'pedestrian','passenger','bus','truck','bicycle'};
 
-% randm = randi(2,1);
-randm = 2;% tmp 0915 zhenyi
+randm = randi(2,1);
+% randm = 2;% tmp 0915 zhenyi
 switch sceneType
     case {'city','city2','city1','city3','city4'}
         sceneType_tmp = 'city';
@@ -87,7 +87,6 @@ for dd = 1:length(recipeFiles)
    end
 end
 thisRoad_randm = randi(length(thisRoad),1);
-% thisRoad_randm = 1;% tmp for test 09/07
 roadname_update = thisRoad(thisRoad_randm);
 roadname_tmp = strsplit(roadname_update{1},'.');
 for ii = 1: length(roadinfo)
@@ -138,11 +137,19 @@ if exist(fileFolder,'dir'),mkdir(fileFolder);end
 thisR.outputFile = fullfile(fileFolder,[filename,'.pbrt']);
 
 % Add rendering resources
+%{
+files = st.search('acquisition',...
+% Add rendering resources
 files = st.search('file',...
    'project label exact','Graphics assets',...
    'session label exact','data',...
    'acquisition label exact','others');
 dataId = files{1}.parent.id;
+%}
+% Add rendering resources
+st          = scitran('stanfordlabs');
+acquisition = st.fw.lookup('wandell/Graphics assets/data/others');
+dataId      = acquisition.id;
 dataName = 'data.zip';
 
 road.fwList = [dataId,' ',dataName,' ',resource_acqID{index{thisRoad_randm}},' ',resourceFiles{index{thisRoad_randm}}{1}.name];

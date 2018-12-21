@@ -43,6 +43,7 @@ thisR.set('film resolution',[300 150]);
 thisR.set('pixel samples',16);
 %}
 
+
 %% Get the skymap
 
 % Use a small skymap.  We should make all the skymaps small, but
@@ -102,6 +103,7 @@ rgbkr  = [0.5 0.5 0.5];               % Reflection
 rgbkd  = [0.5 0.5 0.5];               % Scatter
 
 piMaterialAssign(thisR, 'GLASS', target,'rgbkd',rgbkd,'rgbkr',rgbkr);
+
 
 % Write out the modified scene in the same folder but put a '1' into
 % the output name.

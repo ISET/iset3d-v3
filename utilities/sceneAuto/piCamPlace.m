@@ -58,9 +58,10 @@ if ~isempty(idx)
     if ~isempty(CamOri)
         
     end
-    from(1) = from(1)+2*cosd(orientation);
+    % the pivot point is at the the front of the car
+    from(1) = from(1);
     from(2) = rand*0.5 + 1.5; % random height from 1.5m to 2m;
-    from(3) = from(3)-2*sind(orientation);
+    from(3) = from(3);
     to(1)   = from(1)+30*cosd(orientation);
     to(2)   = from(2);
     to(3)   = from(3)-30*sind(orientation);

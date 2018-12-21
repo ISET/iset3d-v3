@@ -135,7 +135,7 @@ if nScene == 1
             if isempty(assets_shuffled.(assetClass)(jj).motion)
                 % there are cases when a car is going out of boundary or
                 % some else reason, sumo decides to kill this car, so in
-                % these cases, the motion info remains empty or we should
+                % these cases, the motion info remains empty so we should
                 % estimate by speed information;
                 from = assets_shuffled.(assetClass)(jj).pos;
                 distance = assets_shuffled.(assetClass)(jj).speed;

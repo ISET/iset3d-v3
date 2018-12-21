@@ -122,8 +122,11 @@ for ii=1:vType_interval.Count
     
     % duaIterate
     tripscfg=strcat(' -t'," ",vTypes{ii},".trips.xml");
+    outfilecfg = strcat(' -o'," ",vTypes{ii},"_000.rou.xml");
     itercfg=strcat(' -l'," ",num2str(iterMax));
-    duaCmd=strcat(pycmd,duaIterate,netcfg,tripscfg,itercfg);
+%     duaCmd=strcat(pycmd,duaIterate,netcfg,tripscfg,itercfg);
+    duaCmd=strcat('duarouter',netcfg,tripscfg,outfilecfg,itercfg);
+
     system(duaCmd);
     
     % because duaIterate generates vehicle id from 0 to end;

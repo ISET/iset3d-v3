@@ -29,18 +29,13 @@ st = scitran('stanfordlabs');
 
 %% Initialize your GCP cluster
 
-% The Google cloud platform (gcp) includes a large number of
-% parameters that define the cluster. We also use the gcp object to
-% store certain parameters about the rendering.
-
 tic
 gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
-% gcp = gCloud('configuration','gcp-pbrtv3-central-64cpu-120m');
-% gcp = gCloud('configuration','gcp-pbrtv3-central-32');
+
 toc
 gcp.renderDepth = 1;  % Create the depth map
 gcp.renderMesh  = 1;  % Create the object mesh for subsequent use
-gcp.targets     =[];      % clear job list
+gcp.targets     =[];  % clear job list
 
 % Print out the gcp parameters for the user
 str = gcp.configList;
@@ -52,14 +47,13 @@ str = gcp.configList;
 %
 % This is where we pull down the assets from Flywheel and assemble
 % them into an asset list.  That is managed in piSceneAuto
-
 tic
-sceneType = 'city4';
+sceneType = 'city1';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
 % roadType = 'highway_straight_4lanes_001';
-roadType = 'straight_2lanes_parking';
+roadType = 'cross';
 
 trafficflowDensity = 'high';
 
@@ -68,14 +62,14 @@ dayTime = 'noon';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 15;
+timestamp = 30;
 
 % Normally we want only one scene per generation.
 nScene = 1;
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
 % Return an array of render recipe according to given number of scenes.
-% takes about 150 seconds
+% takes about 100 seconds
 [thisR_scene,road] = piSceneAuto('sceneType',sceneType,...
     'roadType',roadType,...
     'trafficflowDensity',trafficflowDensity,...
@@ -85,40 +79,13 @@ cloudRender = 1;
     'cloudRender',cloudRender,...
     'scitran',st);
 toc
-
+thisR_scene.metadata.sumo.trafficflowdensity = trafficflowDensity;
+thisR_scene.metadata.sumo.timestamp          = timestamp;
 %% Add a skymap and add SkymapFwInfor to fwList
 
-% fwList contains information about objects in Flywheel that you will
-% use to render this scene.  It is a long string of the container IDS
-% and file names.
-%
 dayTime = 'noon';
 [thisR_scene,skymapfwInfo] = piSkymapAdd(thisR_scene,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
-
-%% Add a camera to one of the cars
-
-% To place the camera, we find a car and place a camera at the front
-% of the car.  We find the car using the trafficflow information.
-%
-load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
-thisTrafficflow = trafficflow(timestamp);
-nextTrafficflow = trafficflow(timestamp+1);
-%%
-
-CamOrientation =270;
-[thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
-    'CamOrientation',CamOrientation);
-
-thisR_scene.lookAt.from = from;
-thisR_scene.lookAt.to   = to;
-thisR_scene.lookAt.up = [0;1;0];
-thisCar.speed
-%%
-
-thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
-                               'thisCar',thisCar,...
-                               'fps',30);
 %% Render parameters
 % This could be set by default, e.g.,
 
@@ -128,14 +95,12 @@ thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
 %
 % Default is a relatively low samples/pixel (256).
 
-% thisR_scene.set('camera','realistic');
-% thisR_scene.set('lensfile',fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat'));
-xRes = 1280;
-yRes = 720;
+xRes = 1920;
+yRes =  800;
 pSamples = 1024;
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
-thisR_scene.set('fov',45);
+% thisR_scene.set('fov',45);
 thisR_scene.film.diagonal.value=10;
 thisR_scene.film.diagonal.type = 'float';
 thisR_scene.integrator.maxdepth.value = 5;
@@ -144,9 +109,43 @@ thisR_scene.sampler.subtype = 'sobol';
 thisR_scene.integrator.lightsamplestrategy.type = 'string';
 thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
 
+
+%% create a realistic camera
+% lensfiles = dir('*.dat');
+%%
+% for ii = 1:35
+lensname = 'wide.56deg.6.0mm.dat';
+thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
+% thisR_scene.camera = piCameraCreate('perspective','pbrtVersion',3);
+
+%% Add a camera to one of the cars
+
+% To place the camera, we find a car and place a camera at the front
+% of the car.  We find the car using the trafficflow information.
+%
+load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
+thisTrafficflow = trafficflow(timestamp);
+nextTrafficflow = trafficflow(timestamp+1);
+%
+CamOrientation =270;
+[thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
+    'CamOrientation',CamOrientation);
+
+thisR_scene.lookAt.from = from;
+thisR_scene.lookAt.to   = to;
+thisR_scene.lookAt.up = [0;1;0];
+% Will write a function to select a certain speed, now just manually check
+thisVelocity = thisCar.speed
+% give me z axis smaller than 110;
+%%
+thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
+                               'thisCar',thisCar,...
+                               'fps',60);
+                          
+
 %% Write out the scene into a PBRT file
 
-if piContains(sceneType,'city')
+if contains(sceneType,'city')
     outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
     thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
 else
@@ -157,10 +156,9 @@ end
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-filename = sprintf('%s_sp%d_%s_%s_ts%d_from_%0.2f_%0.2f_%0.2f_ori_%0.2f_%i_%i_%i_%i_%i_%0.0f.pbrt',...
-    sceneType,pSamples,roadType,dayTime,timestamp,thisR_scene.lookAt.from,ori,clock);
-outputFile = fullfile(outputDir,filename);
-thisR_scene.set('outputFile',outputFile);
+filename = sprintf('%s_v%0.1f_f%0.2fo%0.2f_%i%i%i%i%i%0.0f.pbrt',...
+     sceneType,thisVelocity,thisR_scene.lookAt.from(3),ori,clock);
+thisR_scene.outputFile = fullfile(outputDir,filename);
 
 % Do the writing
 piWrite(thisR_scene,'creatematerials',true,...
@@ -177,17 +175,17 @@ fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 %% Describe the target to the user
 
 gcp.targetsList;
-
+%% save gcp.targets as a txt file so that I can read from gcp
+filePath_record = '/Users/zhenyiliu/Google Drive (zhenyi27@stanford.edu)/rendering_record/';
+DateString=strrep(strrep(strrep(datestr(datetime('now')),' ','_'),':','_'),'-','_');
+save([filePath_record,'gcp',DateString,'.mat'],'gcp');
 %% This invokes the PBRT-V3 docker image
-
 gcp.render();
-%% save gcp.targets
-
 %% Monitor the processes on GCP
 
 [podnames,result] = gcp.Podslist('print',false);
 nPODS = length(result.items);
-cnt = 0;
+cnt  = 0;
 time = 0;
 while cnt < length(nPODS)
     cnt = podSucceeded(gcp);
@@ -206,31 +204,25 @@ gcp.PodDescribe(podname{1})
 % Keep checking for the data, every 15 sec, and download it is there
 
 %% Download files from Flywheel
-
-[scene,scene_mesh,label]   = gcp.fwDownloadPBRT('scitran',st);
-disp('Data downloaded');
+disp('*** Data downloading...');
+[oi,scene_mesh,label]   = gcp.fwDownloadPBRT('scitran',st);
+disp('*** Data downloaded');
 
 %% Show the rendered image using ISETCam
 
 % Some of the images have rendering artifiacts.  These are partially
-% removed using piWhitepixelRemove
+% removed using piFireFliesRemove
 %
-for ii =1:length(scene)
-    scene_corrected{ii} = piFireFliesRemove(scene{ii});
-   
-    
-%     xCrop = oiGet(scene_oi{ii},'cols')-xRes;
-%     yCrop = oiGet(scene_oi{ii},'rows')-yRes;
-%     scene_crop{ii} = oiCrop(scene_oi{ii},[xCrop/2 yCrop/2 xRes-1 yRes-1]);
-    %     scene_crop{ii}.depthMap = imcrop(scene_crop{ii}.depthMap,[xCrop/2 yCrop/2 xRes-1 yRes-1]);
-    ieAddObject(scene_corrected{ii}); 
-    sceneWindow;
-    sceneSet(scene_corrected{ii},'gamma',0.85);
-    %oiSet(scene_corrected{ii},'gamma',0.85);
-    pngFigure = oiGet(scene_corrected{ii},'rgb image');
-    pngFigure_corrected = pngFigure.^(1/1.5);
+
+for ii =1:length(oi)
+    oi_corrected{ii} = piFireFliesRemove(oi{ii});
+    ieAddObject(oi_corrected{ii}); 
+    oiWindow;
+    oiSet(oi_corrected{ii},'gamma',0.75);
+%     oiSet(scene_corrected{ii},'gamma',0.85);
+    pngFigure = oiGet(oi_corrected{ii},'rgb image');
     figure;
-    imshow(pngFigure_corrected);
+    imshow(pngFigure);
     % Get the class labels, depth map, bounding boxes for ground
     % truth. This usually takes about 15 secs
     tic
@@ -242,9 +234,9 @@ for ii =1:length(scene)
 
     %% Visualization of the ground truth bounding boxes
     vcNewGraphWin;
-    imshow(pngFigure_corrected);
+    imshow(pngFigure);
     fds = fieldnames(scene_label{ii}.bbox2d);
-    for kk = 3
+    for kk = 4
     detections = scene_label{ii}.bbox2d.(fds{kk});
     r = rand; g = rand; b = rand;
     if r< 0.2 && g < 0.2 && b< 0.2
@@ -277,34 +269,3 @@ truesize;
 
 %% END
 
-%% Change the camera lens
-%{
-% TODO: We need to put the following into piCameraCreate, but how do we
-% differentiate between a version 2 vs a version 3 camera? The
-% thisR.version can tell us, but piCameraCreate does not take a thisR as
-% input. For now let's put things in manually.
-
-thisR.camera = struct('type','Camera','subtype','realistic');
-
-% PBRTv3 will throw an error if there is the extra focal length on the top
-% of the lens file, so our lens files have to be slightly modified.
-lensFile = fullfile(piRootPath,'data','lens','wide.56deg.6.0mm_v3.dat');
-thisR.camera.lensfile.value = lensFile;
-% exist(lensFile,'file')
-
-% Attach the lens
-thisR.camera.lensfile.value = lensFile; % mm
-thisR.camera.lensfile.type = 'string';
-
-% Set the aperture to be the largest possible.
-thisR.camera.aperturediameter.value = 1; % mm
-thisR.camera.aperturediameter.type = 'float';
-
-% Focus at roughly meter away.
-thisR.camera.focusdistance.value = 1; % meter
-thisR.camera.focusdistance.type = 'float';
-
-% Use a 1" sensor size
-thisR.film.diagonal.value = 16;
-thisR.film.diagonal.type = 'float';
-%}

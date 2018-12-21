@@ -55,14 +55,15 @@ if isempty(acquisitionname)
         [~,n,~] = fileparts(resourceFiles{downloadList(ii).index}{1}.name);
         [~,n,~] = fileparts(n); % extract file name
         % Download the scene to a destination zip file
+        
         localFolder = fullfile(piRootPath,'local',n);
         destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
         % we might not need to download zip files every time, use
         % resourceCombine.m 08/14 --zhenyi
         destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
-        if ~exist(localFolder,'dir')
-            mkdir(localFolder) 
-        end
+        % if file exists, skip
+        if ~exist(localFolder,'dir') && ~exist(destName_recipe,'file')
+            mkdir(localFolder)
             
             st.fileDownload(recipeFiles{downloadList(ii).index}{1}.name,...
                 'container type', 'acquisition' , ...
@@ -75,11 +76,15 @@ if isempty(acquisitionname)
                     'unzip', true, ...
                     'destination',destName_resource);
             end
-%     end
+            
+        else
+            fprintf('%s found \n',n);
+        end
         assetRecipe{ii}.name   = destName_recipe;
         assetRecipe{ii}.count  = downloadList(ii).count;
         assetRecipe{ii}.fwInfo = [resource_acqID{downloadList(ii).index},' ',resourceFiles{downloadList(ii).index}{1}.name];
         %     if ~exist(assetRecipe{ii}.name,'file'), error('File not found');end
+        
     end
     
     fprintf('%d Files downloaded.\n',nDownloads);
@@ -95,29 +100,29 @@ else
             break;
         end
     end
-        [~,n,~] = fileparts(thisRecipe.name);
-        [~,n,~] = fileparts(n); % extract file name
-        % Download the scene to a destination zip file
-        localFolder = fullfile(piRootPath,'local',n);
-        
-        destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
-        destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
-        if ~exist(localFolder,'dir')
-            mkdir(localFolder)
-        end
-        st.fileDownload(thisRecipe.name,...
+    [~,n,~] = fileparts(thisRecipe.name);
+    [~,n,~] = fileparts(n); % extract file name
+    % Download the scene to a destination zip file
+    localFolder = fullfile(piRootPath,'local',n);
+    
+    destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
+    destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
+    if ~exist(localFolder,'dir')
+        mkdir(localFolder)
+    end
+    st.fileDownload(thisRecipe.name,...
+        'container type', 'acquisition' , ...
+        'container id',  thisRecipeID ,...
+        'destination',destName_recipe);
+    if resourcesFlag
+        st.fileDownload(thisResource.name,...
             'container type', 'acquisition' , ...
-            'container id',  thisRecipeID ,...
-            'destination',destName_recipe);
-        if resourcesFlag
-            st.fileDownload(thisResource.name,...
-                'container type', 'acquisition' , ...
-                'container id',  thisResourceID,...
-                'unzip', true, ...
-                'destination',destName_resource);
-        end
-        assetRecipe.name = destName_recipe;
-        assetRecipe.fwInfo = [thisResourceID,' ',thisResource.name];
+            'container id',  thisResourceID,...
+            'unzip', true, ...
+            'destination',destName_resource);
+    end
+    assetRecipe.name = destName_recipe;
+    assetRecipe.fwInfo = [thisResourceID,' ',thisResource.name];
     fprintf('%s downloaded.\n',n);
 end
 end

@@ -275,6 +275,7 @@ end
 [treePosition_list, total_list] = piCalOverlap(treePosition, total_list);
 [callboxPosition_list, total_list] = piCalOverlap(callboxPosition, total_list);
 [billboardPosition_list, total_list] = piCalOverlap(billboardPosition, total_list);
+
 [benchPosition_list, total_list] = piCalOverlap(benchPosition, total_list);
 [trashcanPosition_list, total_list] = piCalOverlap(trashcanPosition, total_list);
 [stationPosition_list, total_list] = piCalOverlap(stationPosition, total_list);
@@ -292,7 +293,7 @@ if trashcan_number ~=0 && ~isempty(trashcanPosition_list)
 if station_number ~=0 && ~isempty(stationPosition_list)
     assetsplaced.station = piSidewalkPlace(station_list,stationPosition_list);end
 if bikerack_number ~=0 && ~isempty(bikerackPosition_list)
-    assetsplaced.bikerack = piStreetlightPlace(bikerack_list,bikerackPosition_list);end % Change bikerackPlace
+    assetsplaced.bikerack = piBikerackPlace(bikerack_list,bikerackPosition_list);end % Change bikerackPlace
 if addStreetlight ==true && ~isempty(streetlightPosition_list)
     assetsplaced.streetlight= piStreetlightPlace(streetlight_list,streetlightPosition_list);end
 end

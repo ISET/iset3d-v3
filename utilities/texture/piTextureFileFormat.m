@@ -65,12 +65,13 @@ if ~isempty(bmpFiles)
     fprintf('Converted %d bmp files.\n',numel(bmpFiles));
 end
 %% Put all texture files in a seperate folder.
-if ~exist('textures','dir')
-    mkdir('textures');
-end
+
 
 texturePath = 'textures';
 textureFiles=dir('*.png');
+if ~exist('textures','dir')
+    mkdir('textures');
+end
 for i=1:length(textureFiles)
     textureFileName=textureFiles(i).name;
     textureFilePath=textureFileName;
