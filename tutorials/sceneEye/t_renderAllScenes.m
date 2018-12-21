@@ -261,7 +261,7 @@ oi = scene3d.render();
 ieAddObject(oi);
 oiWindow;
 
-% You can rotate the cube like this:
+%% You can rotate the cube like this:
 
 % Rotate 10 degrees clockwise around cube's y-axis
 % Loop through all assets and rotate the one called "Cube"
@@ -277,3 +277,4 @@ oi = scene3d.render();
 ieAddObject(oi);
 oiWindow;
                   
+%% END
