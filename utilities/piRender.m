@@ -1,8 +1,8 @@
-function [ieObject, result, scaleFactor] = piRender_test(thisR,varargin)
+function [ieObject, result, scaleFactor] = piRender(thisR,varargin)
 % Read a PBRT scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
-%  [oi or scene or depth map] = piRender(thisR,varargin)
+%  [oi or scene or metadata] = piRender(thisR,varargin)
 %
 % REQUIRED input
 %  thisR - A recipe, whose outputFile specifies the file, OR a string that
@@ -25,7 +25,7 @@ function [ieObject, result, scaleFactor] = piRender_test(thisR,varargin)
 %
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
-%   result - PBRT output from the terminal, vital for debugging!
+%   result   - PBRT output from the terminal, vital for debugging!
 %   scaleFactor - the scaling factor for the photons (see scaleFactor in
 %                 OPTIONAL inputs)
 %
@@ -35,9 +35,18 @@ function [ieObject, result, scaleFactor] = piRender_test(thisR,varargin)
 
 % Examples
 %{
-   % Render an existing pbrt file
-   pbrtFile = '/Users/wandell/Documents/MATLAB/pbrt2ISET/local/teapot-area-light.pbrt';
+   % Renders both radiance and depth
+   pbrtFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
    scene = piRender(pbrtFile);
+   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+%}
+%{
+   % Render radiance and depth separately
+   pbrtFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
+   scene = piRender(pbrtFile,'render type','radiance');
+   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+   dmap = piRender(pbrtFile,'render type','depth');
+   scene = sceneSet(scene,'depth map',dmap);
    ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
 %}
 
@@ -50,87 +59,81 @@ p.KeepUnmatched = true;
 p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
 
 % Squeeze out spaces and force lower case
-for ii=1:2:length(varargin)
-    varargin{ii} = ieParamFormat(varargin{ii});
-end
+varargin = ieParamFormat(varargin);
 
 rTypes = {'radiance','depth','both','coordinates','material','mesh'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes)));
-p.addParameter('scaleFactor',[],@(x)isnumeric(x));
-p.addParameter('version',2,@(x)isnumeric(x));
+p.addParameter('version',3,@(x)isnumeric(x));
+p.addParameter('meanluminance',100,@inumeric);
+p.addParameter('meanilluminancepermm2',5,@isnumeric);
+
+% If you are insisting on using V2, then set dockerImageName to
+% 'vistalab/pbrt-v2-spectral';
+% We were testing this one.
+% 'vistalab/pbrt-v3-spectral:test';
+p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral',@ischar);
 
 p.parse(thisR,varargin{:});
-renderType = p.Results.rendertype;
-version    = p.Results.version;
-scaleFactor = p.Results.scaleFactor;
+renderType      = p.Results.rendertype;
+version         = p.Results.version;
+dockerImageName = p.Results.dockerimagename;
 
 if ischar(thisR)
-    % In this case, we are just rendering a pbrt file.  No depthFile.
-    % We could do more/better in the future.  The directory containing the
-    % pbrtFile will be mounted.
-    pbrtFile = thisR;
+    % In this case, we only have a string to the pbrt file.  We build
+    % the PBRT recipe and default the metadata type to a depth map.
     
-    % Figure out this optics type of the file
+    % Read the pbrt file and produce the recipe.  A full path is
+    % required.
+    pbrtFile = which(thisR);
     thisR = piRead(pbrtFile,'version',version);
     
-    if ~strcmp(renderType,'radiance')
-        warning('For a file as input only radiance is rendered.');
-        renderType = 'radiance';
-    end
+    % Stash the file in the local output
+    piWrite(thisR);
     
-    workingFolder = fileparts(pbrtFile);
-    if(isempty(workingFolder))
-        error('Absolute path required for the working folder.');
-    end
-    
-elseif isa(thisR,'recipe')
-    %% Set up the working folder that will be mounted by the Docker image
-    
-    
-    % Set up the radiance file
-    workingFolder = fileparts(thisR.outputFile);
-    if(~exist(workingFolder,'dir'))
-        error('We need an absolute path for the working folder.');
-    end
-    pbrtFile = thisR.outputFile;
-    
-    % Set up any metadata render. By default, we do "both" which includes
-    % both the radiance and the depth map.
-    if (~strcmp(renderType,'radiance'))
-        
-        % Do some checks for the renderType.
-        if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
-            error('Coordinates metadata render only available right now for pbrt-v3-spectral.');
-        end
-        
-        if(strcmp(renderType,'both'))
-            metadataType = 'depth';
-        else
-            metadataType = renderType;
-        end
-        
-        metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType);
-        
-        % Depending on whether we used C4D to export, we create a new
-        % material files that we link with the main pbrt file.
-        if(strcmp(metadataRecipe.exporter,'C4D'))
-            creatematerials = true;
-        else
-            creatematerials = false;
-        end
-        piWrite(metadataRecipe,...
-            'overwritepbrtfile', true,...
-            'overwritelensfile', false, ...
-            'overwriteresources', false,...
-            'creatematerials',creatematerials);
-        
-        metadataFile = metadataRecipe.outputFile;
-        
-    end
-    
-else
-    error('A full path to a scene pbrt file or a recipe class is required\n');
 end
+
+%% We have a radiance recipe and we have written the pbrt radiance file
+
+% Set up the output folder.  This folder will be mounted by the Docker
+% image
+outputFolder = fileparts(thisR.outputFile);
+if(~exist(outputFolder,'dir'))
+    error('We need an absolute path for the working folder.');
+end
+pbrtFile = thisR.outputFile;
+
+% Set up any metadata render.
+if (~strcmp(renderType,'radiance'))  % If radiance, no metadata
+    
+    % Do some checks for the renderType.
+    if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
+        error('Coordinates metadata render only available right now for pbrt-v3-spectral.');
+    end
+    
+    if(strcmp(renderType,'both')), metadataType = 'depth';
+    else,                          metadataType = renderType;
+    end
+    
+    metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType);
+    
+    % Depending on whether we used C4D to export, we create a new
+    % material files that we link with the main pbrt file.
+    if(strcmp(metadataRecipe.exporter,'C4D'))
+        creatematerials = true;
+    else
+        creatematerials = false;
+    end
+    piWrite(metadataRecipe,...
+        'overwritepbrtfile', true,...
+        'overwritelensfile', false, ...
+        'overwriteresources', false,...
+        'creatematerials',creatematerials);
+    
+    metadataFile = metadataRecipe.outputFile;
+
+end
+
+%% Set up files we will render
 
 filesToRender = {};
 label = {};
@@ -155,6 +158,7 @@ switch renderType
         error('Cannot recognize render type.');
 end
 
+%% Call the Docker contains for rendering
 for ii = 1:length(filesToRender)
     
     currFile = filesToRender{ii};
@@ -162,33 +166,27 @@ for ii = 1:length(filesToRender)
     %% Build the docker command
     dockerCommand   = 'docker run -ti --rm';
     
-    if(thisR.version == 3 || version == 3)
-        dockerImageName = 'vistalab/pbrt-v3-spectral:test';
-    else
-        dockerImageName = 'vistalab/pbrt-v2-spectral';
-    end
-    
     [~,currName,~] = fileparts(currFile);
     
     % Make sure renderings folder exists
-    if(~exist(fullfile(workingFolder,'renderings'),'dir'))
-        mkdir(fullfile(workingFolder,'renderings'));
+    if(~exist(fullfile(outputFolder,'renderings'),'dir'))
+        mkdir(fullfile(outputFolder,'renderings'));
     end
     
-    outFile = fullfile(workingFolder,'renderings',[currName,'.dat']);
+    outFile = fullfile(outputFolder,'renderings',[currName,'.dat']);
     renderCommand = sprintf('pbrt --outfile %s %s', ...
         outFile, currFile);
     
-    if ~isempty(workingFolder)
-        if ~exist(workingFolder,'dir'), error('Need full path to %s\n',workingFolder); end
-        dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, workingFolder);
+    if ~isempty(outputFolder)
+        if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
+        dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
     end
     
-    dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, workingFolder, workingFolder);
+    dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
     
     cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
     
-    %% Invoke the Docker command with or without capturing results.
+    %% Invoke the Docker command
     tic
     [status, result] = piRunCommand(cmd);
     elapsedTime = toc;
@@ -203,17 +201,17 @@ for ii = 1:length(filesToRender)
         fprintf('Result:\n'); disp(result)
         pause;
     end
-    % Used to have an else condition here
-    % fprintf('Docker run status %d, seems OK.\n',status);
-    % fprintf('Outfile file: %s.\n',outFile);
     
     fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
     
-    %% Convert the radiance.dat to an ieObject
+    %% Convert the returned data to an ieObject
+    
+    % We should add in the mean luminance and mean illuminance here
+    % when we are ready.  piDat2ISET already handles those inputs.
     switch label{ii}
         case 'radiance'
-            [ieObject,scaleFactor] = piDat2ISET(outFile,...
-                'label','radiance','recipe',thisR,'scale factor',scaleFactor);
+            ieObject = piDat2ISET(outFile,...
+                'label','radiance','recipe',thisR);
         case {'metadata'}
             metadata = piDat2ISET(outFile,'label','mesh');
             ieObject   = metadata;
@@ -229,9 +227,7 @@ for ii = 1:length(filesToRender)
     
 end
 
-
 end
-
 
 
 

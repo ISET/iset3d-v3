@@ -33,7 +33,7 @@ if isequal(input,'random')
     skynamelist = {'morning','noon','sunset'};
     input = skynamelist{index};
 end
-
+thisR.metadata.daytime = input;
 switch input
     case 'morning'
         skyname = sprintf('morning_%03d.exr',randi(4,1));       
@@ -43,7 +43,8 @@ switch input
     case 'sunset'
         skyname = sprintf('sunset_%03d.exr',randi(4,1)); 
     case 'cloudy'
-        skyname = sprintf('cloudy_%03d.exr',randi(2,1));
+%         skyname = sprintf('cloudy_%03d.exr',randi(2,1));
+        skyname = sprintf('cloudy_%03d.exr',2);
 end
 skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 

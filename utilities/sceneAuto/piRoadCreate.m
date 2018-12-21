@@ -42,8 +42,8 @@ load(fullfile(piRootPath,'local','configuration','roadInfo.mat'),'roadinfo');
 %%
 vTypes={'pedestrian','passenger','bus','truck','bicycle'};
 
-% randm = randi(2,1);
-randm = 2;% tmp 0915 zhenyi
+randm = randi(2,1);
+% randm = 2;% tmp 0915 zhenyi
 switch sceneType
     case {'city','city2','city1','city3','city4'}
         sceneType_tmp = 'city';
@@ -87,7 +87,6 @@ for dd = 1:length(recipeFiles)
    end
 end
 thisRoad_randm = randi(length(thisRoad),1);
-% thisRoad_randm = 1;% tmp for test 09/07
 roadname_update = thisRoad(thisRoad_randm);
 roadname_tmp = strsplit(roadname_update{1},'.');
 for ii = 1: length(roadinfo)

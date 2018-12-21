@@ -44,7 +44,7 @@ thisR = piRead(fname);
 
 % This is a low resolution for speed.
 thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',64);
+thisR.set('pixel samples',8);
 
 %% Get a sky map from Flywheel, and use it in the scene
 
@@ -103,7 +103,34 @@ piWrite(thisR,'creatematerials',true);
 % Maybe we should speed this up by only returning radiance.
 [scene, result] = piRender(thisR,'render type','radiance');
 
-scene = sceneSet(scene,'name',sprintf('%s',thisR.integrator.subtype));
+scene = sceneSet(scene,'name','original');
 ieAddObject(scene); sceneWindow;
+%% Now remove a person
+fprintf('****remove %s****\n',thisR.assets(3).name);
+thisR.assets(3) = [];
+piWrite(thisR,'creatematerials',true);
+%% Render again.  
 
+[scene, result] = piRender(thisR,'render type','radiance');
+scene = sceneSet(scene,'name','objRemoved');
+ieAddObject(scene); sceneWindow;
+%% move a obj
+fprintf('****move %s to the right side****\n',thisR.assets(3).name);
+% horizontally 
+% position is saved as x,y,z; z represents depth. x represents
+% horizontal position.
+thisR.assets(3).position(1) = 2;
+piWrite(thisR,'creatematerials',true);
+%% Render again.  
+
+[scene, result] = piRender(thisR,'render type','radiance');
+scene = sceneSet(scene,'name','objmoved to the right');
+ieAddObject(scene); sceneWindow;
 %% END
+
+
+
+
+
+
+

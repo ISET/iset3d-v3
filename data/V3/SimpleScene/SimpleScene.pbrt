@@ -1,5 +1,5 @@
 # Exported by PBRT exporter for Cinema 4D 
-Transform [0.99999856506 -4.68158173336e-05 -0.00169342453439 0  0.0 0.999618078002 -0.027635088776 0  0.00169407153757 0.0276350491213 0.99961664361 0  -119.46256115 23.2894981041 2917.47105033 1]
+Transform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 -0.5 15.0 1]
 Camera "perspective" "float fov" [28.841546255] "float focaldistance" [2000.0] "float lensradius" [0]
 Sampler "halton" "integer pixelsamples" [32]
 Film "image" "string filename" ["SimpleScene.exr"] "integer xresolution" [1920] "integer yresolution" [1080]
@@ -7,7 +7,12 @@ Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"
 WorldBegin
 	# Default Material
 	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
-	LightSource "distant" "rgb L" [1 1 1] "point from" [0 0 0] "point to" [0.257182906162 -0.026693445234 0.965993964073]
+    AttributeBegin 
+    Rotate 180 0 1 0 
+    Rotate -90 1 0 0 
+    Scale 1 1 1 
+    LightSource "infinite" "string mapname" "environment_Reflection.exr" 
+    AttributeEnd 
 	Include "SimpleScene_materials.pbrt"
 	Include "SimpleScene_geometry.pbrt"
 WorldEnd
