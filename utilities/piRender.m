@@ -1,4 +1,4 @@
-function [ieObject, result, scaleFactor] = piRender(thisR,varargin)
+function [ieObject, result] = piRender(thisR,varargin)
 % Read a PBRT scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
@@ -18,16 +18,10 @@ function [ieObject, result, scaleFactor] = piRender(thisR,varargin)
 %               have depth, mesh, and material. For pbrt-v3 we have depth
 %               and coordinates at the moment.
 %  version    - PBRT version, 2 or 3
-%  scaleFactor - photons are scaled by a value in order to produce
-%               reasonable illuminance. Here, you can manually input a
-%               scale factor to apply to this particular render. If empty,
-%               a default value is used
 %
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
 %   result   - PBRT output from the terminal, vital for debugging!
-%   scaleFactor - the scaling factor for the photons (see scaleFactor in
-%                 OPTIONAL inputs)
 %
 % See also s_piReadRender*.m
 %
