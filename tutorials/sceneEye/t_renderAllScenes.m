@@ -19,6 +19,10 @@
 
 %% Initialize
 
+if ~strcmp(piCamBio,'isetbio')
+    error('ISETBio required.  You have %s\n',iset); 
+end
+
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
