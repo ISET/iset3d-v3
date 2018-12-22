@@ -39,6 +39,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1; 
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Chess Set');
 ieAddObject(oi);
 oiWindow;
 
@@ -55,10 +56,9 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/0.3; % Accommodate to the white pawn 
 
 oi = scene3d.render();
-oi = oiSet(oi,'name','Chess Set');
+oi = oiSet(oi,'name','Chess Set scaled');
 
-ieAddObject(oi);
-oiWindow;
+ieAddObject(oi); oiWindow;
 
 %% Snellen Single
 % A single letter E placed at a certain depth. The background is a black
@@ -76,8 +76,7 @@ scene3d.accommodation = 1/2.78;
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','One Snellen E');
-ieAddObject(oi);
-oiWindow;
+ieAddObject(oi); oiWindow;
 
 %% Snellen "at depth"
 % A series of E's placed at fixed distances away (check depth map for
@@ -93,16 +92,15 @@ scene3d.accommodation = 1/0.8;
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Snellen at depth');
-ieAddObject(oi);
-oiWindow;
+ieAddObject(oi); oiWindow;
 
 %% Black backdrop and blank scene
-% Exactly what it says on the tin. A black wall, or an empty scene with
-% nothing in it. Ideally used when adding objects in (see below).
+
+% A black wall, or an empty scene with nothing in it. Used when adding
+% objects in (see below).
 
 % Load scene
 scene3d = sceneEye('blankScene');
-%scene3d = sceneEye('blackBackdrop');
 
 scene3d.fov = 30;
 scene3d.resolution = 128;
@@ -110,6 +108,10 @@ scene3d.numRays = 128;
 scene3d.numCABands = 0;
 scene3d.accommodation = 1/10;
 
+%
+% BW asks:  But these do not show up.  What is going on here?  Please
+% explain the intention.
+%
 % Add red and green sphere in the scene. They will have a radius of 0.3
 % meter and a distance of 10 meters,and be separated by a meter.
 scene3d.recipe = piAddSphere(scene3d.recipe,...
@@ -123,13 +125,12 @@ scene3d.recipe = piAddSphere(scene3d.recipe,...
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Black OI');
-ieAddObject(oi);
-oiWindow;
+ieAddObject(oi); oiWindow;
 
 %% Numbers at depth
-% Similar to snellen at depth, but with colored numbers instead. The number
-% represents the distance away in millimeters.
 
+% Similar to Snellen at depth, but with colored numbers instead. The number
+% represents the distance away in millimeters.
 scene3d = sceneEye('numbersAtDepth');
 
 scene3d.fov = 30;
@@ -140,10 +141,10 @@ scene3d.accommodation = 1/(200e-3); % Accommodate to "200"
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Numbers at depth');
-ieAddObject(oi);
-oiWindow;
+ieAddObject(oi); oiWindow;
 
 %% Slanted bar
+
 % A very large plane with a diagonal line through it. The bottom half of
 % the plane is black while the top half is white. Primarily used to
 % calculate the MTF of the system using ISO12233.
@@ -159,8 +160,7 @@ scene3d.accommodation = 1/3; % Accommodate to the plane
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Slanted edge');
-ieAddObject(oi);
-oiWindow;
+ieAddObject(oi); oiWindow;
 
 %% Slanted bar (texture ver.)
 % Similar the previous scene, except the two planes now have checkerboard
