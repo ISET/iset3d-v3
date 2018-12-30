@@ -42,8 +42,8 @@ load(fullfile(piRootPath,'local','configuration','roadInfo.mat'),'roadinfo');
 %%
 vTypes={'pedestrian','passenger','bus','truck','bicycle'};
 
-randm = randi(2,1);
-% randm = 2;% tmp 0915 zhenyi
+% randm = randi(2,1);
+randm = 1;% tmp 0915 zhenyi
 switch sceneType
     case {'city','city2','city1','city3','city4'}
         sceneType_tmp = 'city';
@@ -54,7 +54,7 @@ switch sceneType
         else
             roadname = roadtype;
         end
-    case {'suburb','suburb1'}
+    case {'suburb'}
         sceneType_tmp = sceneType;
         interval=[0.05,0.1,0.01,0.01,0.03];
         roadname = roadtype;
