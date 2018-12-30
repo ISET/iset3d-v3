@@ -99,7 +99,9 @@ for kk = 1:length(objects.assets)
             buildingPosList(jj).rotate = buildingPosList_tmp(jj).rotate;
         end
         
+        
         %% test algotithm. Comment this part when using.
+        %{
         figure(1);hold on;xlim([-130, 130]);ylim([-30, 280]);hold on;
         switch type
             case 'front'
@@ -153,7 +155,7 @@ for kk = 1:length(objects.assets)
         tmp = tmp + 1;
         disp(tmp);
         %close(figure(1))
-        
+        %}
     end
     
 end

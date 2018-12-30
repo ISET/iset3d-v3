@@ -25,12 +25,20 @@ if isempty(CamPos)
                     orientation = orientation+360;
                 end
                 if abs(orientation-CamOri) < 20
-                    idx(dd) = ii;dd=dd+1;
+                    from = carlist(ii).pos;
+                    if CamOri==270
+                        if from(3)<170
+                            idx(dd) = ii;
+                            dd=dd+1;
+                        end
+                    else
+                        idx(dd)=ii;dd=dd+1;
+                    end
                 end
             end
         end
     else
-        disp('Can not find a position for camera');
+        error('no car found');
     end
 else
     % Check if there is a Car nearby
@@ -65,14 +73,15 @@ if ~isempty(idx)
     to(1)   = from(1)+30*cosd(orientation);
     to(2)   = from(2);
     to(3)   = from(3)-30*sind(orientation);
-    
+    from = reshape(from,[3,1]);
+    to   = reshape(to,[3,1]);
 else
-    from = CamPos;
-    to(1)   = from(1)+30*cosd(CamOri);
-    to(2)   = from(2);
-    to(3)   = from(3)-30*sind(CamOri);
-    orientation = CamOri;
+    thisCar = [];
+    from = 0;
+    to(1)   = 0;
+    to(2)   = 0;
+    to(3)   = 0;
+    orientation = 0;
 end
-from = reshape(from,[3,1]);
-to   = reshape(to,[3,1]);
+
 end

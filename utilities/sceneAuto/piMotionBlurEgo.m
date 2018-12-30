@@ -11,7 +11,7 @@ function thisR = piMotionBlurEgo(thisR,varargin)
 %%
 p = inputParser;
 p.addRequired('thisR',@(x)(isequal(class(x),'recipe')));
-p.addParameter('fps',30,@isnumeric);
+p.addParameter('fps',60,@isnumeric);
 % pass in trafficflow with given timestamp
 p.addParameter('nextTrafficflow',[]);
 p.addParameter('thisCar',@isstruct);
@@ -22,7 +22,7 @@ fps   = p.Results.fps;
 nextTrafficflow = p.Results.nextTrafficflow;
 thisCar = p.Results.thisCar;
 %% Add shutter open time
-shutterclosed = 1/fps;
+shutterclosed = 1/fps/2;
 thisR.camera.shutteropen.type = 'float';
 thisR.camera.shutteropen.value = 0;
 thisR.camera.shutterclose.type = 'float';

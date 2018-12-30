@@ -1,20 +1,12 @@
-function [thisR,skymapInfo] = piSkymapAdd(thisR,input)
+function [thisR,skymapInfo] = piSkymapAdd(thisR,skyName)
 % Choose a skymap, or random skybox, write this line to thisR.world.
 %
 % Inputs
 %   thisR - A rendering recipe
 %   skymap options:
 %        'morning'
-%        'day'
-%        'dusk'
 %        'sunset'
-%        'night'
 %        'cloudy'
-%        'sunny_park'
-%        'grass'
-%        'city'
-%        'cityscape'
-%        'park'
 %        'random'- pick a random skymap from skymaps folder
 %
 % Returns
@@ -27,24 +19,22 @@ function [thisR,skymapInfo] = piSkymapAdd(thisR,input)
 
 %%
 sunlights = sprintf('# LightSource "distant" "point from" [ -30 100  100 ] "blackbody L" [6500 1.5]');
-input = lower(input);
-if isequal(input,'random')
+skyName = lower(skyName);
+if isequal(skyName,'random')
     index = randi(3,1);
     skynamelist = {'morning','noon','sunset'};
-    input = skynamelist{index};
+    skyName = skynamelist{index};
 end
-thisR.metadata.daytime = input;
-switch input
+thisR.metadata.daytime = skyName;
+switch skyName
     case 'morning'
         skyname = sprintf('morning_%03d.exr',randi(4,1));       
     case 'noon'
-        skyname = sprintf('noon_%03d.exr',1); % favorate one, tmp
-%         skyname = sprintf('noon_%03d.exr',randi(10,1));
+         skyname = sprintf('noon_%03d.exr',randi(10,1));
     case 'sunset'
         skyname = sprintf('sunset_%03d.exr',randi(4,1)); 
     case 'cloudy'
-%         skyname = sprintf('cloudy_%03d.exr',randi(2,1));
-        skyname = sprintf('cloudy_%03d.exr',2);
+        skyname = sprintf('cloudy_%03d.exr',randi(2,1));
 end
 skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 
@@ -83,5 +73,5 @@ catch
     dataId = st.objectParse(acquisition{1});
 end
 skymapInfo = [dataId,' ',skyname];
-%}
+
 end
