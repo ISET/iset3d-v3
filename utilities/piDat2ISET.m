@@ -110,7 +110,7 @@ switch opticsType
         else
             % We could not find the optics parameters. Using default.
             ieObject = piOICreate(photons);
-            aperture = oiGet(ieObject,'optics aperture');
+            aperture = oiGet(ieObject,'optics aperture diameter');
         end
         
         ieObject = oiSet(ieObject,'name',ieObjName);
@@ -123,7 +123,11 @@ switch opticsType
             warning('Render recipe is not specified.');
         end
         
-        meanIlluminance = meanIlluminance/aperture;
+        % We always set meanIlluminance per square millimeter of the
+        % lens aperture
+        lensArea = pi*(aperture/2)^2;
+        meanIlluminance = meanIlluminance/lensArea;
+        
         ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
         ieObject.data.illuminance = oiCalculateIlluminance(ieObject);     
         

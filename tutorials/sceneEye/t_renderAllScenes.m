@@ -51,6 +51,8 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/0.3; % Accommodate to the white pawn 
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Chess Set');
+
 ieAddObject(oi);
 oiWindow;
 
@@ -69,6 +71,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/2.78;
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','One Snellen E');
 ieAddObject(oi);
 oiWindow;
 
@@ -85,6 +88,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/0.8;
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Snellen at depth');
 ieAddObject(oi);
 oiWindow;
 
@@ -114,6 +118,7 @@ scene3d.recipe = piAddSphere(scene3d.recipe,...
     'location',[1 0 10]);
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Black OI');
 ieAddObject(oi);
 oiWindow;
 
@@ -130,6 +135,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/(200e-3); % Accommodate to "200"
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Numbers at depth');
 ieAddObject(oi);
 oiWindow;
 
@@ -148,6 +154,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/3; % Accommodate to the plane
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Slanted edge');
 ieAddObject(oi);
 oiWindow;
 
@@ -167,6 +174,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/2; % Accommodate to the bottom plane
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Slanted edge texture');
 ieAddObject(oi);
 oiWindow;
 
@@ -191,6 +199,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1; % Accommodate to the plane 
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Textured plane');
 ieAddObject(oi);
 oiWindow;
 
@@ -217,6 +226,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1; % Accommodate to the point 
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Point');
 ieAddObject(oi);
 oiWindow;                
 
@@ -240,6 +250,7 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1; % Accommodate to the point 
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Letters at depth');
 ieAddObject(oi);
 oiWindow;   
 
@@ -258,10 +269,12 @@ scene3d.numCABands = 0;
 scene3d.accommodation = 1/2.78;
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Colored cube 1');
+
 ieAddObject(oi);
 oiWindow;
 
-% You can rotate the cube like this:
+%% You can rotate the cube like this:
 
 % Rotate 10 degrees clockwise around cube's y-axis
 % Loop through all assets and rotate the one called "Cube"
@@ -274,6 +287,8 @@ for ii = 1:length(scene3d.recipe.assets)
 end
 
 oi = scene3d.render();
+oi = oiSet(oi,'name','Colored cube 2');
 ieAddObject(oi);
 oiWindow;
                   
+%% END
