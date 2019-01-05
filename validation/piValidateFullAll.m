@@ -16,11 +16,11 @@ end
 
 try
     status = piRunTutorialsAll;
-    if (~status)
-        error('At least on tutorial script failed.');
-    end
 catch
     error('Run all tutorials script failed.')
+end
+if (~status)
+    error('At least on tutorial script failed.');
 end
 
 end

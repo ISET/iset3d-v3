@@ -13,8 +13,7 @@ s_piReadRenderLookat
 % s_ChessSet
 
 %%  Version 3
-
-disp('t_piMaterials: Takes a minute or two')
-t_piMaterials
+% disp('t_piMaterials: Takes a minute or two')
+% t_piMaterials
 
 %%
