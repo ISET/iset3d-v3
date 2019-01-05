@@ -11,7 +11,7 @@
 % this tutorial.
 %
 % 01/05/19 dhb  This broken because it calls a function
-%               CalculateMTFFromSlantedBar that does not
+%               calculateMTFFromSlantedBar that does not
 %               exist in iset3d or isetbio.
 %
 % Depends on: pbrt2ISET, ISETBIO, Docker, ISET
