@@ -1,0 +1,5 @@
+MakeNamedMaterial "Blue" "string type" "uber" "float index" [1.333] "rgb Kd" [0.0 0.0 0.132868325731] "rgb Ks" [0.0508760881716 0.0508760881716 0.0508760881716] "rgb Kr" [0.0508760881716 0.0508760881716 0.0508760881716] "float roughness" [0.676553474636]
+MakeNamedMaterial "Red" "string type" "uber" "float index" [1.333] "rgb Kd" [0.132868325731 0.0 0.0] "rgb Ks" [0.0508760881716 0.0508760881716 0.0508760881716] "rgb Kr" [0.0508760881716 0.0508760881716 0.0508760881716] "float roughness" [0.676553474636]
+Texture "checker_1" "spectrum" "checkerboard" "rgb tex1" [0.3 0.3 0.3] "rgb tex2" [0 0 0] "float uscale" [32] "float vscale" [32]
+MakeNamedMaterial "PlaneMaterial" "string type" "uber" "float index" [1.333] "texture Kd" "checker_1" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Green" "string type" "uber" "float index" [1.333] "rgb Kd" [0.0 0.132868325731 0.0] "rgb Ks" [0.0508760881716 0.0508760881716 0.0508760881716] "rgb Kr" [0.0508760881716 0.0508760881716 0.0508760881716] "float roughness" [0.676553474636]

@@ -1,0 +1,26 @@
+Transform [1.0 0.0 1.94707189038e-07 0  -0.0 1.0 0.0 0  -1.94707189038e-07 -0.0 1.0 0  -9.73535870917e-08 -0.0699999952316 0.499999961853 1]
+
+Camera "perspective"
+ "float fov" [11.328589598]
+ "float focaldistance" [20.0]
+ "float lensradius" [0]
+
+Sampler "halton"
+ "integer pixelsamples" [32]
+
+Film "image"
+ "integer xresolution" [128]
+ "integer yresolution" [128]
+
+Integrator "path"
+ "integer maxdepth" [5]
+
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	Include "chessSetScaled_materials.pbrt"
+	Include "chessSetScaled_geometry.pbrt"
+
+	# Add an environment light
+	LightSource "infinite" "rgb scale" [1.0 1.0 1.0]
+WorldEnd
