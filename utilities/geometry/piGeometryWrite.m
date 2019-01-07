@@ -28,7 +28,7 @@ obj = thisR.assets;
 
 fname_obj = fullfile(Filepath,sprintf('%s%s',n,e));
 fid_obj = fopen(fname_obj,'w');
-fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%i/%i %i:%i:%0.2f \n  \n',clock);
+fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%i/%i %i:%i:%f \n  \n',clock);
 for ii = 1: length(obj)
     % If empty, the obj is a camera, which we do not write out.
     if ~isempty(obj(ii).children)
@@ -54,15 +54,15 @@ for ii = 1: length(obj)
                             fprintf(fid_obj,'Translate 0 0 0 \n');
                         else
                             obj_position = obj(ii).position(:,gg);
-                            fprintf(fid_obj,'Translate %0.2f %0.2f %0.2f \n',obj_position(1),...
+                            fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                                 obj_position(2),obj_position(3));
                         end
                         if ~isempty(obj(ii).rotate)
                             obj_rotate = obj(ii).rotate;
                             % Write out rotation
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-2)); % Y
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3));   % Z
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
                         end
                         % Write out scaling
                         if isfield(obj(ii),'scale')
@@ -94,15 +94,15 @@ for ii = 1: length(obj)
                             fprintf(fid_obj,'Translate 0 0 0 \n');
                         else
                             obj_position = obj(ii).position(:,gg);
-                            fprintf(fid_obj,'Translate %0.2f %0.2f %0.2f \n',obj_position(1),...
+                            fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                                 obj_position(2),obj_position(3));
                         end
                         if ~isempty(obj(ii).rotate)
                             obj_rotate = obj(ii).rotate;
                             % Write out rotation
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-2)); % Y
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3));   % Z
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
                         end
                         % Write out scaling
                         if isfield(obj(ii),'scale')
@@ -118,15 +118,15 @@ for ii = 1: length(obj)
                             fprintf(fid_obj,'Translate 0 0 0 \n');
                         else
                             obj_position = obj(ii).motion.position(:,gg);
-                            fprintf(fid_obj,'Translate %0.2f %0.2f %0.2f \n',obj_position(1),...
+                            fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                                 obj_position(2),obj_position(3));
                         end
                         if ~isempty(obj(ii).motion.rotate)
                             obj_rotate = obj(ii).motion.rotate;
                             % Write out rotation
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-2)); % Y
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3));   % Z
-                            fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(:,gg*3-1)); % X
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
                         end
                         fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
                         fprintf(fid_obj,'AttributeEnd \n \n');
@@ -148,12 +148,12 @@ for ii = 1: length(obj)
                     fprintf(fid_obj,'Translate 0 0 0 \n');
                 else
                     obj_position = obj(ii).position(:,gg);
-                    fprintf(fid_obj,'Translate %0.2f %0.2f %0.2f \n',obj_position(1),...
+                    fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                         obj_position(2),obj_position(3));
                 end
                 if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0;0;0;0])
                     obj_rotate = obj(ii).rotate(:,gg);
-                    fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(1),...
+                    fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
                         obj_rotate(2),obj_rotate(3),obj_rotate(4));
                 end
                 fprintf(fid_obj,'LightSource "point" "color I" [3 3 3] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
@@ -170,12 +170,12 @@ for ii = 1: length(obj)
                     fprintf(fid_obj,'Translate 0 0 0 \n');
                 else
                     obj_position = obj(ii).position(:,gg);
-                    fprintf(fid_obj,'Translate %0.2f %0.2f %0.2f \n',obj_position(1),...
+                    fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                         obj_position(2),obj_position(3));
                 end
                 if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0;0;0;0])
                     obj_rotate = obj(ii).rotate(:,gg);
-                    fprintf(fid_obj,'Rotate %0.2f %0.2f %0.2f %0.2f \n',obj_rotate(1),...
+                    fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
                         obj_rotate(2),obj_rotate(3),obj_rotate(4));
                 end
                 fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.5 0.5] "rgb scale" [0.5 0.5 0.5] "point from" [%f %f %f] \n',...
