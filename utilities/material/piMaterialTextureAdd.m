@@ -39,25 +39,18 @@ switch texture
             thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [%f %f %f] "rgb tex2" [%f %f %f] "float uscale" [%d] "float vscale" [%d]',...
                 checkerName,color1,color2,uscale,vscale);
             thisR.materials.txtLines{length(thisR.materials.txtLines)+1} = thisTexLine;
-            
-            % The list here has to have a more complete structure,
-            % like the one in piMaterialRead.  This produces a broken
-            % structure that does not run for ZL.
-            %
-            % thisR.materials.list.(materialName).texturekd = checkerName;
-            % thisR.materials.list.(materialName).rgbkd = [];
+
+            thisR.materials.list.(materialName).texturekd = checkerName;
+            thisR.materials.list.(materialName).rgbkd = [];
         else
             index = randi(100,1);
             checkerName = sprintf('checker_%d',index);
             thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [%f %f %f] "rgb tex2" [%f %f %f] "float uscale" [%d] "float vscale" [%d]',...
                 checkerName,color1,color2,uscale,vscale);
             thisR.materials.txtLines{length(thisR.materials.txtLines)+1} = thisTexLine;
-            % The list here has to have a more complete structure,
-            % like the one in piMaterialRead.  This produces a broken
-            % structure that does not run for ZL.
-            %
-            % thisR.materials.list.(materialName).texturekd = checkerName;
-            % thisR.materials.list.(materialName).rgbkd = [];
+
+            thisR.materials.list.(materialName).texturekd = checkerName;
+            thisR.materials.list.(materialName).rgbkd = [];
         end
     case 'dots'
         disp('Not Implemented yet.');
