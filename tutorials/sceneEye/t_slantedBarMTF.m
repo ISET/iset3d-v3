@@ -97,18 +97,17 @@ oiWindow;
 
 % If you have isetlens-eye ( https://github.com/ISET/isetlens-eye) on your
 % path, you can run the following:
-[freq,mtf] = calculateMTFfromSlantedBar(oi);
-figure();
-plot(freq,mtf);
-xlabel('Spatial Frequency (cycles/deg)');
-ylabel('Contrast Reduction (SFR)');
-grid on;
-axis([0 60 0 1])
+% [freq,mtf] = calculateMTFfromSlantedBar(oi);
+% figure();
+% plot(freq,mtf);
+% xlabel('Spatial Frequency (cycles/deg)');
+% ylabel('Contrast Reduction (SFR)');
+% grid on;
+% axis([0 60 0 1])
 
 % Otherwise, you can run this, which is essentially what
 % calculateMTFfromSlantedBar does.
 
-%{
 % Crop the image so we only have the slanted line visible. The ISO12233
 % routine will be confused by the edges of the retinal image if we don't
 % first crop it.
@@ -133,4 +132,3 @@ xlabel('Spatial Frequency (cycles/deg)');
 ylabel('Contrast Reduction (SFR)');
 grid on;
 axis([0 60 0 1])
-%}
