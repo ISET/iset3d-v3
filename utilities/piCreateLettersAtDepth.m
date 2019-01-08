@@ -35,7 +35,7 @@ nchecks = parser.Results.nchecks;
 illumination = parser.Results.illumination;
 
 %% Read in base scene
-scenePath = fullfile(piRootPath,'local','V3','lettersAtDepth');
+scenePath = fullfile(piRootPath,'local','scenes','lettersAtDepth');
 sceneName = 'lettersAtDepth.pbrt';
 
 recipe = piRead(fullfile(scenePath,sceneName),'version',3);
