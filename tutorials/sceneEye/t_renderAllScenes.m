@@ -19,8 +19,9 @@
 
 %% Initialize
 
-if ~strcmp(piCamBio,'isetbio')
-    error('ISETBio required.  You have %s\n',iset); 
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    return;
 end
 
 ieInit;

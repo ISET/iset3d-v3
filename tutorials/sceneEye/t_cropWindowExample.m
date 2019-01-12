@@ -9,6 +9,11 @@
 % TL ISETBIO Team, 2017  
 
 %% Initialize
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBIO, not ISETCam\n',mfilename); 
+    return;
+end
+    
 ieInit;
 
 %% Load a scene
@@ -108,3 +113,5 @@ size(scene3d.angularSupport)
 
 % Therefore you will have to calculate the the correct "cropped" angular
 % support if you want to plot using units of visual angle.
+
+%% END

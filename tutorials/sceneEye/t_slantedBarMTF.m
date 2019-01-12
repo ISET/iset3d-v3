@@ -19,6 +19,10 @@
 % TL ISETBIO Team, 2017
 
 %% Initialize ISETBIO
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    return;
+end
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
