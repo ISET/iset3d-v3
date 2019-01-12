@@ -5,7 +5,11 @@ objects = ieObject.metadata.objects;
 % check isetObj size, resize depthmap and meshImage accordingly
 
 %%
+if strcmp(ieObject.type,'opticalimage')
 depthmap = ieObject.depthMap;
+else
+    depthmap = ieObject.metadata.depthMap;
+end
 meshImage = ieObject.metadata.meshImage;
 label = ieObject.metadata.meshtxt;
 [scenelabel,objectList]=instanceSeg(meshImage,label,objects,depthmap);
