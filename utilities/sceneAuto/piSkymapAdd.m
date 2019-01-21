@@ -23,13 +23,8 @@ st = scitran('stanfordlabs');
 if ~piContains(skyName,':')
     skyName = lower(skyName);
     if isequal(skyName,'random')
-<<<<<<< HEAD
         index = randi(4,1);
         skynamelist = {'morning','noon','sunset','cloudy'};
-=======
-        index = randi(3,1);
-        skynamelist = {'morning','noon','sunset'};
->>>>>>> Add daytime for piskymapAdd; Change small bugs comes from scale slot of thisR.assets; Change Colorpick to pick color less saturated.
         skyName = skynamelist{index};
     end
     thisR.metadata.daytime = skyName;
@@ -38,27 +33,16 @@ if ~piContains(skyName,':')
             skyname = sprintf('morning_%03d.exr',randi(4,1));
         case 'noon'
             skyname = sprintf('noon_%03d.exr',randi(10,1));
-<<<<<<< HEAD
 %                     skyname = sprintf('noon_%03d.exr',9);
-=======
-            %         skyname = sprintf('noon_%03d.exr',1);
->>>>>>> Add daytime for piskymapAdd; Change small bugs comes from scale slot of thisR.assets; Change Colorpick to pick color less saturated.
         case 'sunset'
             skyname = sprintf('sunset_%03d.exr',randi(4,1));
         case 'cloudy'
             skyname = sprintf('cloudy_%03d.exr',randi(2,1));
     end
-<<<<<<< HEAD
 
     % Get the information about the skymap so we can download from
     % Flywheel
 
-=======
-    
-    % Get the information about the skymap so we can download from
-    % Flywheel
-    
->>>>>>> Add daytime for piskymapAdd; Change small bugs comes from scale slot of thisR.assets; Change Colorpick to pick color less saturated.
     try
         acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
         dataId      = acquisition.id;
@@ -75,30 +59,18 @@ if ~piContains(skyName,':')
 else
     % Fix this with Flywheel and Justin E
     time = strsplit(skyName,':');
-<<<<<<< HEAD
     acqName = sprintf('wandell/Graphics assets/skymap_daytime/%02d00',str2double(time{1}));
     thisAcq = st.fw.lookup(acqName);
     dataId = thisAcq.id;
     skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));
-=======
-    acqName = sprintf('wandell/Graphics assets/skymap_daytime/%s00',time{1});
-    thisAcq = st.fw.lookup(acqName);
-    dataId = thisAcq.id;
-    skyname= sprintf('probe_%s-%s_latlongmap.exr',time{1},time{2});
->>>>>>> Add daytime for piskymapAdd; Change small bugs comes from scale slot of thisR.assets; Change Colorpick to pick color less saturated.
 end
 
 skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 
 index_m = find(piContains(thisR.world,'_materials.pbrt'));
 
-<<<<<<< HEAD
 skyview = randi(360,1);
 skyview = randi(45,1)+45;
-=======
-% skyview = randi(360,1);
-skyview = randi(45,1)+45;% tmp
->>>>>>> Add daytime for piskymapAdd; Change small bugs comes from scale slot of thisR.assets; Change Colorpick to pick color less saturated.
 % skyview = 45;% tmp
 
 world(1,:) = thisR.world(1);
