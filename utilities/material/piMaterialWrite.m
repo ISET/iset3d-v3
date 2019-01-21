@@ -135,7 +135,7 @@ for jj = 1: length(textureLines)
     end
     textureLines{jj} = textureLines_tmp{1};
 end
-textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy"';
+textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy" "float uscale" [512] "float vscale" [512] ';
 %% Create txtLines for the material struct array
 field =fieldnames(thisR.materials.list);
 materialTxt = cell(1,length(field));
