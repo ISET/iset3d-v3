@@ -7,12 +7,14 @@ p.addParameter('thistrafficflow',[]);
 p.addParameter('nexttrafficflow',[]);
 p.addParameter('CamPosition',[]);
 p.addParameter('CamOrientation','');
+p.addParameter('oriOffset',0);
 p.parse(varargin{:});
 
 thisTrafficflow = p.Results.thistrafficflow;
 CamPos = p.Results.CamPosition;
 CamOri = p.Results.CamOrientation;
 carlist = thisTrafficflow.objects.car;
+oriOffset = p.Results.oriOffset;
 %%
 idx = [];
 if isempty(CamPos)
@@ -66,9 +68,10 @@ if ~isempty(idx)
     if ~isempty(CamOri)
         
     end
+    orientation = orientation+oriOffset;
     % the pivot point is at the the front of the car
     from(1) = from(1);
-    from(2) = rand*0.5 + 1.5; % random height from 1.5m to 2m;
+    from(2) = rand*0.5 + 1.3; % random height from 1.5m to 2m;
     from(3) = from(3);
     to(1)   = from(1)+30*cosd(orientation);
     to(2)   = from(2);

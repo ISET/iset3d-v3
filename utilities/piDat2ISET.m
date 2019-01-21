@@ -125,8 +125,8 @@ switch opticsType
         
         % We always set meanIlluminance per square millimeter of the
         % lens aperture
-        lensArea = pi*(aperture/2)^2;
-        meanIlluminance = meanIlluminance/lensArea;
+        lensArea = pi*(aperture*1e3/2)^2;
+        meanIlluminance = meanIlluminance*lensArea;
         
         ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
         ieObject.data.illuminance = oiCalculateIlluminance(ieObject);     

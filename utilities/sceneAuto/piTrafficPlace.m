@@ -125,13 +125,17 @@ if nScene == 1
         % transformation of both.
         for jj = 1:length(assets_shuffled.(assetClass))
              assets_shuffled.(assetClass)(jj).motion=[];
-            for ii = 1:numel(trafficflow(timestamp+1).objects.(assetClass))
-                if strcmp(assets_shuffled.(assetClass)(jj).name,trafficflow(timestamp+1).objects.(assetClass)(ii).name)
-                    assets_shuffled.(assetClass)(jj).motion.pos = trafficflow(timestamp+1).objects.(assetClass)(ii).pos;
-                    assets_shuffled.(assetClass)(jj).motion.orientation = trafficflow(timestamp+1).objects.(assetClass)(ii).orientation;
-                    assets_shuffled.(assetClass)(jj).motion.slope = trafficflow(timestamp+1).objects.(assetClass)(ii).slope;
-                end
-            end
+             try
+                 for ii = 1:numel(trafficflow(timestamp+1).objects.(assetClass))
+                     if strcmp(assets_shuffled.(assetClass)(jj).name,trafficflow(timestamp+1).objects.(assetClass)(ii).name)
+                         assets_shuffled.(assetClass)(jj).motion.pos = trafficflow(timestamp+1).objects.(assetClass)(ii).pos;
+                         assets_shuffled.(assetClass)(jj).motion.orientation = trafficflow(timestamp+1).objects.(assetClass)(ii).orientation;
+                         assets_shuffled.(assetClass)(jj).motion.slope = trafficflow(timestamp+1).objects.(assetClass)(ii).slope;
+                     end
+                 end
+             catch
+                 fprintf('% not found in next timestamp \n',assetClass);
+             end
             if isempty(assets_shuffled.(assetClass)(jj).motion)
                 % there are cases when a car is going out of boundary or
                 % some else reason, sumo decides to kill this car, so in
