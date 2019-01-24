@@ -18,6 +18,8 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               have depth, mesh, and material. For pbrt-v3 we have depth
 %               and coordinates at the moment.
 %  version    - PBRT version, 2 or 3
+%  scaleIlluminance -  if true, we scale the mean illuminance by the pupil
+%                       diameter in piDat2ISET 
 %
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
@@ -60,6 +62,7 @@ p.addParameter('rendertype','both',@(x)(ismember(x,rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('meanluminance',100,@inumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
+p.addParameter('scaleIlluminance',true,@islogical);
 
 % If you are insisting on using V2, then set dockerImageName to
 % 'vistalab/pbrt-v2-spectral';
@@ -71,6 +74,7 @@ p.parse(thisR,varargin{:});
 renderType      = p.Results.rendertype;
 version         = p.Results.version;
 dockerImageName = p.Results.dockerimagename;
+scaleIlluminance = p.Results.scaleIlluminance;
 
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build
@@ -205,7 +209,9 @@ for ii = 1:length(filesToRender)
     switch label{ii}
         case 'radiance'
             ieObject = piDat2ISET(outFile,...
-                'label','radiance','recipe',thisR);
+                'label','radiance',...
+                'recipe',thisR,...
+                'scaleIlluminance',scaleIlluminance);
         case {'metadata'}
             metadata = piDat2ISET(outFile,'label','mesh');
             ieObject   = metadata;
