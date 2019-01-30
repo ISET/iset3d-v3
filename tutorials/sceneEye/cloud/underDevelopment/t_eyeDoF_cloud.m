@@ -27,8 +27,8 @@ tic
 dockerAccount= 'tlian';
 dockerImage = 'gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud';
 cloudBucket = 'gs://primal-surfer-140120.appspot.com';
-clusterName = 'trisha-dof';
-zone         = 'us-central1-a'; %'us-west1-a';    
+clusterName = 'tl-dof';
+zone         = 'us-central1-b'; %'us-west1-a';    
 instanceType = 'n1-highcpu-32';
 gcp = gCloud('dockerAccount',dockerAccount,...
     'dockerImage',dockerImage,...
@@ -57,23 +57,35 @@ myScene.numCABands = 6;
 myScene.diffractionEnabled = false;
 myScene.numBounces = 3;
 
+lqFlag = false;
+
 %% Loop and upload to cloud
 
 pupilDiameters = [2 2.5 3 3.5 4 4.5 5 5.5 6];
+% pupilDiameters = [2 4 6];
+
 for ii = 1:length(pupilDiameters)
     
     myScene.pupilDiameter = pupilDiameters(ii);
     
     % Change number of rays depending on pupil size
-    if(pupilDiameters(ii) < 3)
-        myScene.numRays = 8192;
-    elseif(pupilDiameters(ii) >= 4)
-        myScene.numRays = 2048;
+    if(~lqFlag)
+        if(pupilDiameters(ii) < 3)
+            myScene.numRays = 8192;
+        elseif(pupilDiameters(ii) >= 4)
+            myScene.numRays = 2048;
+        else
+            myScene.numRays = 4096;
+        end
     else
-        myScene.numRays = 4096;
+        myScene.numRays = 256;
     end
     
-    myScene.resolution = 512;
+    if(lqFlag)
+        myScene.resolution = 256;
+    else
+        myScene.resolution = 512;
+    end
     
     myScene.name = sprintf('DoF%0.2fmm',pupilDiameters(ii));
 
