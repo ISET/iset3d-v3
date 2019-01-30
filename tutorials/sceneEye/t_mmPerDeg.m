@@ -1,21 +1,27 @@
 % Use rendering through model eye to obtain mm on retina per degree
 %
+% *****Warning*****
+% This tutorial may be outdated. I would suggest using it only as reference
+% at the moment.
+%
 % Description:
 %    Render two spots, one red and one green, of known spatial
 %    separation in terms of visual angle.  Compute separation
 %    in terms of mm on the retina.
-
+%
 % History:
 %   TL ISETBIO Team, 2017
 %
 %   06/08/18 dhb Process outcome, loop over separation.
 
-%% Warning
-% This tutorial may be outdated. I would suggest using it only as reference
-% at the moment.
-
 %% Initialize ISETBIO
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBIO, not ISETCam\n',mfilename); 
+    return;
+end
+
 ieInit;
+
 clear; close all;
 showOi = true;
 showFigs = true;
@@ -200,3 +206,5 @@ for ss = 1:length(sphereSeparationsDegrees)
         renderingFovDegrees(ss),renderingFovMm(ss),1e3*renderingMmPerPixel(ss));
     fprintf('\n');
 end
+
+%% END

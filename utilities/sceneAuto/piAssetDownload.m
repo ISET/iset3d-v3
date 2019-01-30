@@ -12,6 +12,7 @@ function assetRecipe = piAssetDownload(session,nassets,varargin)
 
 % Examples:
 %{
+% ETTBSkip
 fname = piAssetDownload(session,sessionname,ncars);
 %}
 

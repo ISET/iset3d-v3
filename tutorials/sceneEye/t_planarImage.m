@@ -22,6 +22,10 @@
 % TL ISETBIO Team, 2017
 
 %% Initialize ISETBIO
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBIO, not ISETCam\n',mfilename); 
+    return;
+end
 ieInit;
 
 %% Load up the textured plane scene
