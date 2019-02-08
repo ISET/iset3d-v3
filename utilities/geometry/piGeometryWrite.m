@@ -60,9 +60,9 @@ for ii = 1: length(obj)
                         if ~isempty(obj(ii).rotate)
                             obj_rotate = obj(ii).rotate;
                             % Write out rotation
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Z
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % Y
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % X 
                         end
                         % Write out scaling
                         if isfield(obj(ii),'scale')
@@ -100,9 +100,9 @@ for ii = 1: length(obj)
                         if ~isempty(obj(ii).rotate)
                             obj_rotate = obj(ii).rotate;
                             % Write out rotation
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Z
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % Y
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % X 
                         end
                         % Write out scaling
                         if isfield(obj(ii),'scale')
@@ -124,9 +124,9 @@ for ii = 1: length(obj)
                         if ~isempty(obj(ii).motion.rotate)
                             obj_rotate = obj(ii).motion.rotate;
                             % Write out rotation
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Y
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % Z
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % X
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Z
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % Y
+                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % X 
                         end
                         fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
                         fprintf(fid_obj,'AttributeEnd \n \n');
