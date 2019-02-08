@@ -109,10 +109,6 @@ scene3d.numRays = 128;
 scene3d.numCABands = 0;
 scene3d.accommodation = 1/10;
 
-%
-% BW asks:  But these do not show up.  What is going on here?  Please
-% explain the intention.
-%
 % Add red and green sphere in the scene. They will have a radius of 0.3
 % meter and a distance of 10 meters,and be separated by a meter.
 scene3d.recipe = piAddSphere(scene3d.recipe,...
@@ -124,8 +120,8 @@ scene3d.recipe = piAddSphere(scene3d.recipe,...
     'radius',0.3,...
     'location',[1 0 10]);
 
-oi = scene3d.render();
-oi = oiSet(oi,'name','Black OI');
+[oi, results] = scene3d.render();
+oi = oiSet(oi,'name','blankScene_with_spheres');
 ieAddObject(oi); oiWindow;
 
 %% Numbers at depth
