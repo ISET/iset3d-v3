@@ -170,20 +170,39 @@ for ii = 1:length(filesToRender)
     if(~exist(fullfile(outputFolder,'renderings'),'dir'))
         mkdir(fullfile(outputFolder,'renderings'));
     end
-    
+
     outFile = fullfile(outputFolder,'renderings',[currName,'.dat']);
-    renderCommand = sprintf('pbrt --outfile %s %s', ...
-        outFile, currFile);
-    
-    if ~isempty(outputFolder)
-        if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
-        dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
+
+    if ispc  % Windows
+        outF = strcat('renderings/',currName,'.dat');
+        renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, ".pbrt"));
+
+        folderBreak = split(outputFolder, '\');
+        shortOut = strcat('/', char(folderBreak(end)));
+
+        if ~isempty(outputFolder)
+            if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
+            dockerCommand = sprintf('%s -w %s', dockerCommand, shortOut);
+        end
+
+        linuxOut = strcat('/c', strrep(erase(outputFolder, "C:"), '\', '/'));
+
+        dockerCommand = sprintf('%s -v %s:%s', dockerCommand, linuxOut, shortOut);
+
+        cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
+    else  % Linux & Mac
+        renderCommand = sprintf('pbrt --outfile %s %s', outFile, currFile);
+
+        if ~isempty(outputFolder)
+            if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
+            dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
+        end
+
+        dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
+
+        cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
     end
-    
-    dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
-    
-    cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
-    
+
     %% Invoke the Docker command
     tic
     [status, result] = piRunCommand(cmd);

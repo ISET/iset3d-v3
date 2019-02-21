@@ -10,7 +10,17 @@ function  piGeometryWrite(thisR,varargin)
 % Zhenyi, 2018
 %%
 p = inputParser;
-varargin =ieParamFormat(varargin);
+
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
+
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 % default is flase, will turn on for night scene
 p.addParameter('lightsFlag',false,@islogical);

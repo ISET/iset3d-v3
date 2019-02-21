@@ -34,7 +34,16 @@ function ieObject = piDat2ISET(inputFile,varargin)
 %%
 p = inputParser;
 
-varargin =ieParamFormat(varargin);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
+                | isobject(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
 
 p.addRequired('inputFile',@(x)(exist(x,'file')));
 p.addParameter('label','radiance',@(x)ischar(x));

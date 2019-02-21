@@ -28,7 +28,17 @@ p.KeepUnmatched = true;
 p.addRequired('photons',@isnumeric);
 p.addParameter('fov',40,@isscalar)               % Horizontal fov, degrees
 p.addParameter('meanluminance',100,@isscalar);
-if ~isempty(varargin), varargin = ieParamFormat(varargin); end
+
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
+                | isobject(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
 
 p.parse(photons,varargin{:});
 
