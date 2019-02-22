@@ -2,7 +2,15 @@ function [thisCar, from,to,orientation]= piCamPlace(varargin)
 %% Find a position for camera by checking the position of cars, place the camera in front of the car.
 %%
 p = inputParser;
-varargin =ieParamFormat(varargin);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
 p.addParameter('thistrafficflow',[]);
 p.addParameter('nexttrafficflow',[]);
 p.addParameter('CamPosition',[]);
