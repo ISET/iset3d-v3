@@ -219,13 +219,15 @@ switch param
         thisR.film.cropwindow.type = 'float';
     case{'maxdepth','bounces'}
         % Eliminated warning Nov. 11, 2018.
-        if(~strcmp(thisR.integrator.subtype,'path'))
-            % warning('Changing integrator sub type to "path"');
+        if(~strcmp(thisR.integrator.subtype,'path')) &&...
+                (~strcmp(thisR.integrator.subtype,'bdpt'))
+        disp('Changing integrator sub type to "bdpt"');
+        
+        % When there are multiple bounces, apply this integrator
+        thisR.integrator.subtype = 'bdpt';
         end
         thisR.integrator.maxdepth.value = val(1);
         thisR.integrator.maxdepth.type = 'integer';
-        % When there are multiple bounces, apply this integrator
-        thisR.integrator.subtype = 'path';
     otherwise
         error('Unknown parameter %s\n',param);
 end
