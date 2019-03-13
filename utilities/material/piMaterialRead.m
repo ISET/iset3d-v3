@@ -166,6 +166,11 @@ for ii=1:nLines
                     materials(cnt).spectrumks = thisLine{ss+1};
                 case 'spectrum k'
                     materials(cnt).spectrumk = thisLine{ss+1};
+                case 'spectrum Kr'
+                    % How do we check if it's going to be a string or numeric values?  
+                    materials(cnt).spectrumkr = piParseNumericSpectrum(thisLine,ss); 
+                case 'spectrum Kt'
+                    materials(cnt).spectrumkt = piParseNumericSpectrum(thisLine,ss); 
                 case 'spectrum eta'
                     materials(cnt).spectrumeta = thisLine{ss+1};
                 case 'string namedmaterial1'
@@ -174,7 +179,10 @@ for ii=1:nLines
                     materials(cnt).stringnamedmaterial2 = thisLine{ss+1};
                 case 'texture bumpmap'
                     materials(cnt).texturebumpmap = thisLine{ss+1};
-                    
+                case 'bool remaproughness'
+                    materials(cnt).boolremaproughness = thisLine{ss+1};
+                case 'string bsdffile'   
+                    materials(cnt).bsdffile = thisLine{ss+1};
                 otherwise
                     % fprintf('Unknown case %s\n',thisLine{ss});
             end
@@ -201,5 +209,14 @@ r = piParseNumericString(thisLine{ss+1});
 g = piParseNumericString(thisLine{ss+2});
 b = piParseNumericString(thisLine{ss+3});
 rgb = [r,g,b];
+end
+
+function output = piParseNumericSpectrum(thisLine,ss)
+% A hack for now, since it's possible for there to be more than 4 values...
+output = zeros(1,4);
+output(1) = piParseNumericString(thisLine{ss+1});
+output(2) = piParseNumericString(thisLine{ss+2});
+output(3) = piParseNumericString(thisLine{ss+3});
+output(4) = piParseNumericString(thisLine{ss+4});
 end
 
