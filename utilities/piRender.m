@@ -188,7 +188,7 @@ for ii = 1:length(filesToRender)
 
     if ispc  % Windows
         outF = strcat('renderings/',currName,'.dat');
-        renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, ".pbrt"));
+        renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, '.pbrt'));
 
         folderBreak = split(outputFolder, '\');
         shortOut = strcat('/', char(folderBreak(end)));
@@ -198,7 +198,7 @@ for ii = 1:length(filesToRender)
             dockerCommand = sprintf('%s -w %s', dockerCommand, shortOut);
         end
 
-        linuxOut = strcat('/c', strrep(erase(outputFolder, "C:"), '\', '/'));
+        linuxOut = strcat('/c', strrep(erase(outputFolder, 'C:'), '\', '/'));
 
         dockerCommand = sprintf('%s -v %s:%s', dockerCommand, linuxOut, shortOut);
 
@@ -220,7 +220,7 @@ for ii = 1:length(filesToRender)
     if p.Results.reuse
         [fid, message] = fopen(outFile, 'r');
         if fid < 0
-            warning(strcat(message, ": ", currName));
+            warning(strcat(message, ': ', currName));
         else
             sizeLine = fgetl(fid);
             [imageSize, count, err] = sscanf(sizeLine, '%f', inf);
