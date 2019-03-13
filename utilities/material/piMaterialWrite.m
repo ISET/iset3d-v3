@@ -103,17 +103,25 @@ for jj = 1: length(textureLines)
     for ii = 1:length(thisLine_tmp)
         if piContains(thisLine_tmp{ii},'.png') 
             if piContains(thisLine_tmp{ii-1},'filename')
-            filename = thisLine_tmp{ii};
-            if ~piContains(filename,'"textures/')
-            thisLine_tmp{ii} = fullfile('"textures',filename(2:length(filename)));
-            end
+                filename = thisLine_tmp{ii};
+                if ~piContains(filename,'"textures/')
+                    if ispc
+                        thisLine_tmp{ii} = strrep(fullfile('"textures',filename(2:length(filename))),'\','/');
+                    else
+                        thisLine_tmp{ii} = fullfile('"textures',filename(2:length(filename)));
+                    end
+                end
             else
                 thisLine_tmp{index+1} = thisLine_tmp{ii};
                 thisLine_tmp(index+2:ii)   = '';
                 filename = thisLine_tmp{index+1};
-            if ~piContains(filename,'"textures/')
-            thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
-            end                
+                if ~piContains(filename,'"textures/')
+                    if ispc
+                        thisLine_tmp{index+1} = strrep(fullfile('"textures',filename(2:length(filename))),'\','/');
+                    else
+                        thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
+                    end
+                end                
             end
         end
     end

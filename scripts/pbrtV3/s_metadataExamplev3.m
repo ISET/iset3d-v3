@@ -18,7 +18,7 @@ thisR = piRead(fname,'version',3); % We must specify version 3 here!
 thisR.set('film resolution',[400 300]);
 
 [p,n,e] = fileparts(fname); 
-thisR.set('outputFile',fullfile(piRootPath,'local',[n,e]));
+thisR.set('outputFile',fullfile(piRootPath,'local','SimpleScene',[n,e]));
 piWrite(thisR);
 
 %% Render a radiance file and a depth map.
@@ -34,7 +34,7 @@ figure(2)
 imagesc(matImage); title('Material');
 % You can find a txt file with the material names corresponding to each index
 % in the 'renderings' folder of the output. In this case...
-fprintf('For material indices labels, see %s \n',fullfile(piRootPath,'local','renderings'));
+fprintf('For material indices labels, see %s \n',fullfile(piRootPath,'local','SimpleScene','renderings'));
 
 %% Render an image segmented by mesh type.
 
@@ -43,7 +43,7 @@ figure(4)
 imagesc(meshImage); title('Mesh');
 % You can find a txt file with the mesh names corresponding to each index
 % in the 'renderings' folder of the output. In this case...
-fprintf('For mesh indices labels, see %s \n',fullfile(piRootPath,'local','renderings'));
+fprintf('For mesh indices labels, see %s \n',fullfile(piRootPath,'local','SimpleScene','renderings'));
 
 % Let's remap the values so it's easier to see 
 % (the 100 has a similar index as the background, which is why it seems to

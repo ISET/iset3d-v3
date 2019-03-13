@@ -65,7 +65,16 @@ function thisR = piRead(fname,varargin)
 %%
 p = inputParser;
 
-varargin =ieParamFormat(varargin);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
+                | isobject(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
 
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('version',3,@(x)isnumeric(x));
