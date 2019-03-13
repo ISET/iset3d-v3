@@ -175,11 +175,6 @@ end
 renderingDir = fullfile(workingDir,'renderings');
 if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
 
-%% Make sure there is a renderings sub-directory of the working directory
-
-renderingDir = fullfile(workingDir,'renderings');
-if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
-
 
 %% OK, we are good to go. Open up the file.
 
