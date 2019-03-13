@@ -47,7 +47,7 @@ recipe.integrator.maxdepth.value = 1;
 %% Write out a new pbrt file
 
 % Docker will mount the volume specified by the working directory
-workingDirectory = fullfile(piRootPath,'local');
+workingDirectory = fullfile(piRootPath,'local','whiteScene');
 
 % We copy the pbrt scene directory to the working directory
 [p,n,e] = fileparts(fname); 

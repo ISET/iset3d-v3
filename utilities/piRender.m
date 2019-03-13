@@ -18,8 +18,11 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               have depth, mesh, and material. For pbrt-v3 we have depth
 %               and coordinates at the moment.
 %  version    - PBRT version, 2 or 3
-%  scaleIlluminance -  if true, we scale the mean illuminance by the pupil
-%                       diameter in piDat2ISET 
+%  scaleIlluminance
+%             - if true, we scale the mean illuminance by the pupil
+%               diameter in piDat2ISET 
+%  reuse      - Boolean. Indicate whether to use an existing file if one of
+%               the correct size exists.
 %
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
@@ -28,6 +31,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 % See also s_piReadRender*.m
 %
 % TL SCIEN Stanford, 2017
+% JNM 03/19 Add reuse feature for renderings
 
 % Examples
 %{
@@ -71,6 +75,7 @@ p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('meanluminance',100,@inumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
+p.addParameter('reuse',false,@islogical);
 
 % If you are insisting on using V2, then set dockerImageName to
 % 'vistalab/pbrt-v2-spectral';
@@ -166,14 +171,14 @@ end
 
 %% Call the Docker contains for rendering
 for ii = 1:length(filesToRender)
-    
+    skipDocker = false;
     currFile = filesToRender{ii};
-    
+
     %% Build the docker command
     dockerCommand   = 'docker run -ti --rm';
-    
+
     [~,currName,~] = fileparts(currFile);
-    
+
     % Make sure renderings folder exists
     if(~exist(fullfile(outputFolder,'renderings'),'dir'))
         mkdir(fullfile(outputFolder,'renderings'));
@@ -211,26 +216,51 @@ for ii = 1:length(filesToRender)
         cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
     end
 
-    %% Invoke the Docker command
-    tic
-    [status, result] = piRunCommand(cmd);
-    elapsedTime = toc;
-    
-    %% Check the return
-    
-    if status
-        warning('Docker did not run correctly');
-        % The status may contain a useful error message that we should
-        % look up.  The ones we understand should offer help here.
-        fprintf('Status:\n'); disp(status)
-        fprintf('Result:\n'); disp(result)
-        pause;
+    %% Determine if prefer to use existing files, and if they exist.
+    if p.Results.reuse
+        [fid, message] = fopen(outFile, 'r');
+        if fid < 0
+            warning(strcat(message, ": ", currName));
+        else
+            sizeLine = fgetl(fid);
+            [imageSize, count, err] = sscanf(sizeLine, '%f', inf);
+            if count ~=3
+                fclose(fid);
+                warning('Could not read image size: %s', err);
+            end
+            serializedImage = fread(fid, inf, 'double');
+            fclose(fid);
+            if numel(serializedImage) == prod(imageSize)
+                fprintf('\nThe file "%s" already exists in the correct size.\n\n', currName);
+                skipDocker = true;
+            end
+        end
     end
-    
-    fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
-    
+
+    if skipDocker
+        result = '';
+    else
+        %% Invoke the Docker command
+        tic
+        [status, result] = piRunCommand(cmd);
+        elapsedTime = toc;
+
+        %% Check the return
+
+        if status
+            warning('Docker did not run correctly');
+            % The status may contain a useful error message that we should
+            % look up.  The ones we understand should offer help here.
+            fprintf('Status:\n'); disp(status)
+            fprintf('Result:\n'); disp(result)
+            pause;
+        end
+
+        fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
+    end
+
     %% Convert the returned data to an ieObject
-    
+
     % We should add in the mean luminance and mean illuminance here
     % when we are ready.  piDat2ISET already handles those inputs.
     switch label{ii}
@@ -251,11 +281,10 @@ for ii = 1:length(filesToRender)
             coordMap = piDat2ISET(outFile,'label','coordinates');
             ieObject = coordMap;
     end
-    
-end
 
 end
 
+end
 
 
 

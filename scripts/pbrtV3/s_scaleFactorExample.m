@@ -28,16 +28,17 @@ cameraShift = [-1 0 0;
                 0 0 0;
                 1 0 0]; % in meters
 
-scaleFactor = [];
+scaleFactor = 1;
 for ii = 1:size(cameraShift,1)
     
     oiName = sprintf('teapot%i',ii);
-    recipe.set('outputFile',fullfile(piRootPath,'local',strcat(oiName,'.pbrt')));
+    recipe.set('outputFile',fullfile(piRootPath,'local','scaleFactorEx',strcat(oiName,'.pbrt')));
     
     recipeSet(recipe,'from',originalFrom + cameraShift(ii,:));
     
     piWrite(recipe);
-    [oi, result,scaleFactor] = piRender(recipe,'scaleFactor',scaleFactor);
+    % [oi, result,scaleFactor] = piRender(recipe,'scaleFactor',scaleFactor);
+    [oi, result] = piRender(recipe,'scaleFactor',scaleFactor);
     
     ieAddObject(oi);
     oiWindow;

@@ -37,7 +37,12 @@ fprintf('Docker command\n\t%s\n', command);
 
 % Capture the status and results
 try
-    [status, result] = system(command);
+    if ispc
+        [status, result] = system(strcat(command,' &'));
+        pause(20);
+    else
+        [status, result] = system(command);
+    end
 catch exception
 end
 

@@ -21,6 +21,8 @@ parser = inputParser();
 parser.addParameter('planeDepth',1, @isnumeric);
 parser.addParameter('eccentricity',0, @isnumeric);
 parser.addParameter('illumination', 'EqualEnergy.spd', @ischar);
+parser.addParameter('whiteDepth',0, @isnumeric);
+parser.addParameter('blackDepth',0, @isnumeric);
 
 parser.parse(varargin{:});
 planeDepth = parser.Results.planeDepth;
