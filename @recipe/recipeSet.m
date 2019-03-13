@@ -55,7 +55,9 @@ switch param
                 % Sometimes the output directory has not been created yet.
                 mkdir(dirdest);
             end
-            if(~strcmp(dirsource,dirdest))
+            if(~exist(dirsource,'dir'))
+                warning('Source directory does not exist anymore.')
+            elseif(~strcmp(dirsource,dirdest))
                 copyfile(dirsource,dirdest);
                 rmdir(dirsource,'s');
             end
