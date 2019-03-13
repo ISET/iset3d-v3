@@ -27,6 +27,26 @@ end
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
+%% Colorful scene
+% A complex, colorful scene with lots of different material types and
+% edges. 
+
+scene3d = sceneEye('colorfulScene');
+               
+scene3d.fov = 30; 
+scene3d.resolution = 128;
+scene3d.numRays = 128;
+scene3d.numCABands = 0;
+scene3d.accommodation = 1/1.3; 
+
+% For this scene, bounces must be >6 because of glass materials
+scene3d.numBounces = 6;
+
+oi = scene3d.render();
+oi = oiSet(oi,'name','Colorful scene');
+ieAddObject(oi);
+oiWindow;
+
 %% Chess set
 % A chess set "to scale" (e.g. the pieces match real word sizes). A ruler
 % is placed in the middle of the chess set.
