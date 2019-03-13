@@ -22,7 +22,6 @@ thistrafficflow = p.Results.thistrafficflow;
 %%
 [Filepath,scene_fname] = fileparts(thisR.outputFile);
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));[~,n,e]=fileparts(fname);
-thisR.world{length(thisR.world)-1} = sprintf('Include "%s_geometry.pbrt" ',scene_fname);
 obj = thisR.assets;
 %% Make parent obj files which includes all the children obj files
 

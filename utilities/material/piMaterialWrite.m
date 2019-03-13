@@ -65,7 +65,6 @@ end
 
 output = thisR.materials.outputFile_materials;
 [~,materials_fname,~]=fileparts(output);
-thisR.world{length(thisR.world)-2} = sprintf('Include "%s.pbrt" ',materials_fname);
 txtLines = thisR.materials.txtLines;
 for ii = 1:size(txtLines)
     if ~isempty(txtLines(ii))
