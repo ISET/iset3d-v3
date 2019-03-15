@@ -89,7 +89,7 @@ thistrafficflow         = p.Results.thistrafficflow;
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
-inputDir   = fileparts(renderRecipe.inputFile);
+inputDir = fileparts(renderRecipe.inputFile);
 if ~exist(inputDir,'dir'), error('Could not find %s\n',inputDir); end
 
 % Make working dir if it does not already exist

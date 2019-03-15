@@ -1,5 +1,13 @@
 %% t_schematicEyeModels
 % Render the same scene using a couple of different eye models.
+%
+% Description:
+%   Model the same scene with multiple eye models, including the following:
+%   Navarro, Gullstrand, and Arizona.
+%
+% History:
+%    XX/XX/XX  ???  Created
+%    03/15/19  JNM  Documentation pass
 
 %% Initialize
 if isequal(piCamBio,'isetcam')
@@ -20,7 +28,6 @@ thisScene.numRays = 256;
 thisScene.numCABands = 0;
 
 %% Try the Navarro eye model
-
 % This tell isetbio which model to use.
 thisScene.modelName = 'Navarro';
 
@@ -30,7 +37,9 @@ thisScene.accommodation = 0;
 
 % Render!
 thisScene.name = 'navarro'; % The name of the optical image
-oiNavarro = thisScene.render();
+% to reuse an existing rendered file of the correct size, uncomment the
+% parameter provided below.
+oiNavarro = thisScene.render(); %'reuse');
 
 % Show the retinal image
 % Everything is very out of focus since the accommodation is set to
@@ -44,25 +53,27 @@ oiWindow;
 % thisScene.workingDir
 
 %% Try the Gullstrand-LeGrand Model
-
 % The gullstrand has no accommodation modeling. 
 thisScene.modelName = 'Gullstrand';
 
 % Render!
 thisScene.name = 'gullstrand'; % The name of the optical image
-oiGullstrand = thisScene.render();
+% to reuse an existing rendered file of the correct size, uncomment the
+% parameter provided below.
+oiGullstrand = thisScene.render(); %'reuse');
 
 ieAddObject(oiGullstrand);
 oiWindow;
 
 %% Try Arizona eye model
-
 thisScene.modelName = 'Arizona';
 thisScene.accommodation = 0;
 
 % Render!
 thisScene.name = 'arizona'; % The name of the optical image
-oiArizona = thisScene.render();
+% to reuse an existing rendered file of the correct size, uncomment the
+% parameter provided below.
+oiArizona = thisScene.render(); %'reuse');
 
 ieAddObject(oiArizona);
 oiWindow;

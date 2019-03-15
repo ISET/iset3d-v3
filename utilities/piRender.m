@@ -246,7 +246,6 @@ for ii = 1:length(filesToRender)
         elapsedTime = toc;
 
         %% Check the return
-
         if status
             warning('Docker did not run correctly');
             % The status may contain a useful error message that we should
@@ -260,7 +259,6 @@ for ii = 1:length(filesToRender)
     end
 
     %% Convert the returned data to an ieObject
-
     % We should add in the mean luminance and mean illuminance here
     % when we are ready.  piDat2ISET already handles those inputs.
     switch label{ii}
@@ -285,8 +283,3 @@ for ii = 1:length(filesToRender)
 end
 
 end
-
-
-
-
-
