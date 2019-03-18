@@ -14,7 +14,7 @@
 
 %% Initialize ISETBIO
 if isequal(piCamBio, 'isetcam')
-    fprintf('%s: requires ISETBio, not ISETCam\n', mfilename); 
+    fprintf('%s: requires ISETBio, not ISETCam\n', mfilename);
     return;
 end
 ieInit;
@@ -23,19 +23,19 @@ ieInit;
 myScene = sceneEye('chessSet');
 
 %% Set parameters
-myScene.resolution = 128; 
+myScene.resolution = 128;
 myScene.numRays = 128;
 
 ipd = 64e-3; % Average interpupillary distance
 
 % We save the original parameters so we have them around even after moving
-% and rotating the eye. 
+% and rotating the eye.
 originalPos = myScene.eyePos;
 startingPos = originalPos + [0 0 0.1]; % This looks a little better.
 
 % Needed because we will objects to the 3d world. This text block contains
 % the "original" scene.
-originalWorld = myScene.recipe.world; 
+originalWorld = myScene.recipe.world;
 
 %% Create binocular retinal images
 % Move the red sphere to these distances along the z-axis (optical axis).

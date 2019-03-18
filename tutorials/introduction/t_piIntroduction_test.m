@@ -15,7 +15,7 @@
 %
 % Dependencies:
 %    ISET3d, ISETCam or ISETBio, JSONio, SCITRAN, Flywheel Add-On (at
-%    least version 4.3.2) 
+%    least version 4.3.2)
 %
 % Notes:
 %    Check that you have the updated docker image by running
@@ -34,7 +34,7 @@ if ~piDockerExists, piDockerConfig; end
 % if ~piScitranExists, error('scitran installation required'); end
 
 % Determine whether you are working in ISETBio or ISETCam
-fprintf('Attempting to execute using %s.\n', piCamBio); 
+fprintf('Attempting to execute using %s.\n', piCamBio);
 
 %% Read pbrt files
 FilePath = fullfile(piRootPath, 'data', 'V3', 'SimpleScene');
@@ -55,24 +55,24 @@ if piScitranExists
     % Use a small skymap. We should make all the skymaps small, but
     % 'noon' is not small!
     [~, skymapInfo] = piSkymapAdd(thisR, 'cloudy');
-    
+
     % The skymapInfo is structured according to python rules. We convert
     % to Matlab format here.
     s = split(skymapInfo, ' ');
-    
+
     % If the skymap is there already, move on.
     skyMapFile = fullfile(fileparts(thisR.outputFile), s{2});
-    
+
     % Otherwise open up Flywheel and download it.
     if ~exist(skyMapFile, 'file')
         fprintf('Downloading Skymap from Flywheel ... ');
         st = scitran('stanfordlabs');
-        
+
         fName = st.fileDownload(s{2}, ...
             'containerType', 'acquisition', ...
             'containerID', s{1}, ...
             'destination', skyMapFile);
-        
+
         assert(isequal(fName, skyMapFile));
         fprintf('complete\n');
     end
@@ -98,7 +98,7 @@ thisR.set('outputFile', outFile);
 
 piWrite(thisR, 'creatematerials', true);
 
-%% Render. 
+%% Render.
 % Maybe we should speed this up by only returning radiance.
 %
 % to reuse an existing rendered file of the correct size, uncomment the
@@ -131,7 +131,7 @@ sceneWindow;
 
 %% move a obj
 fprintf('****move %s to the right side****\n', thisR.assets(3).name);
-% horizontally 
+% horizontally
 % position is saved as x, y, z; z represents depth. x represents
 % horizontal position.
 thisR.assets(3).position(1) = 2;

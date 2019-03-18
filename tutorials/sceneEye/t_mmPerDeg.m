@@ -7,7 +7,7 @@
 %        reference at the moment.
 %
 %    Render two spots, one red and one green, of known spatial separation
-%    in terms of visual angle.  Compute separation in terms of mm on the
+%    in terms of visual angle. Compute separation in terms of mm on the
 %    retina.
 %
 % History:
@@ -17,7 +17,7 @@
 
 %% Initialize ISETBIO
 if isequal(piCamBio, 'isetcam')
-    error('%s: requires ISETBIO, not ISETCam\n', mfilename); 
+    error('%s: requires ISETBIO, not ISETCam\n', mfilename);
 end
 
 ieInit;
@@ -69,15 +69,16 @@ for ss = 1:length(sphereSeparationsDegrees)
     theScene.accommodation = 1/sphereDistanceMeters;
 
     %% Model eye radius
-    %
-    % This is for the Navarro model
-    % eye.  Might someday figure out
-    % how to get it out of the lens structure.
+    % This is for the Navarro model eye. Might someday figure out how to
+    % get it out of the lens structure.
     modelEyeRadiusMm = 12;
 
     %% Render
     theScene.name = 'degToMm';
-    [oi, result] = theScene.render;
+    % to reuse an existing rendered file of the correct size, uncomment the
+    % parameter provided below. We recommend against doing this here as new
+    % calculations result in differing images.
+    [oi, result] = theScene.render; %('reuse');
     if (showOi)
         vcAddAndSelectObject(oi);
         oiWindow;
@@ -86,7 +87,7 @@ for ss = 1:length(sphereSeparationsDegrees)
     %% Convert oi pixel units to mm
     % The rendering works in mm on the retina. But the oi works in degrees.
     % So we need to know how the rendering converted converts the fov in
-    % degrees to mm.  This is done using simple trig and the focal length
+    % degrees to mm. This is done using simple trig and the focal length
     % in the oi.
     focalLengthMm(ss) = 1e3*oiGet(oi, 'focal length');
     renderingFovMm(ss) = 2*focalLengthMm(ss)*tand(oiGet(oi, 'fov')/2);
@@ -139,20 +140,26 @@ for ss = 1:length(sphereSeparationsDegrees)
     % [~, indexGreen] = min(smoothRG(:));
     % [iGreen, jGreen] = ind2sub(size(smoothRG), indexGreen);
 
-    % Figure to diagnose whether we found the right place in 
-    % the image.
+    % Figure to diagnose whether we found the right place in the image.
     if (showFigs)
-        figure; clf; hold on
+        figure;
+        clf;
+        hold on
         plot(photonsRG(iGreen, :), 'y', 'LineWidth', 2);
         plot(smoothRG(iGreen, :), 'k:', 'LineWidth', 2);
-        plot([jGreen jGreen], [min(smoothRG(iGreen, :)) max(smoothRG(iGreen, :))], 'g', 'LineWidth', 2);
-        plot([jRed jRed], [min(smoothRG(iGreen, :)) max(smoothRG(iGreen, :))], 'r', 'LineWidth', 2);
+        plot([jGreen jGreen], ...
+            [min(smoothRG(iGreen, :)) max(smoothRG(iGreen, :))], 'g', ...
+            'LineWidth', 2);
+        plot([jRed jRed], ...
+            [min(smoothRG(iGreen, :)) max(smoothRG(iGreen, :))], 'r', ...
+            'LineWidth', 2);
         xlabel('Position (pixels)')
         ylabel('Intensity');
         title({sprintf('Separation %0.1f deg, fov %0.1f (deg)', ...
             sphereSeparationDegrees, renderingFovDegrees(ss)) ; ...
-            sprintf('Red ctr %d pixels, green ctr %d pixels, image %d pixels, actual ctr %d', ...
-            jRed, jGreen, nValid, centerValid) });
+            sprintf(strcat('Red ctr %d pixels, green ctr %d pixels, ', ...
+            'image %d pixels, actual ctr %d'), ...
+            jRed, jGreen, nValid, centerValid)});
     end
 
     % Offset in pixels and then mm
@@ -165,9 +172,8 @@ for ss = 1:length(sphereSeparationsDegrees)
     offsetOnChordMmDown(ss) = renderingMmPerPixel(ss)*offsetPixelsDown(ss);
     offsetPixelsUp(ss) = offsetPixels(ss)+pixelErrorGuess;
     offsetOnChordMmUp(ss) = renderingMmPerPixel(ss)*offsetPixelsUp(ss);
-        
+ 
     %% Correct for the chord
-    %
     % The image is on a chord drawn of the specified width
     % across the back of the spherical model eye. Correct for
     % this.
@@ -178,10 +184,13 @@ for ss = 1:length(sphereSeparationsDegrees)
     offsetOnRetinaMm(ss) = offsetInSphereDeg*modelEyeRadiusMm*(pi/180);
 
     % Propagate error estimate
-    offsetInSphereDegDown = atand(offsetOnChordMmDown(ss)/distanceToChordMm);
-    offsetOnRetinaMmDown(ss) = offsetInSphereDegDown*modelEyeRadiusMm*(pi/180);
-    offsetInSphereDegUp = atand(offsetOnChordMmUp(ss)/distanceToChordMm);
-    offsetOnRetinaMmUp(ss) = offsetInSphereDegUp*modelEyeRadiusMm*(pi/180);
+    offsetInSphereDegDown = atand(offsetOnChordMmDown(ss) / ...
+        distanceToChordMm);
+    offsetOnRetinaMmDown(ss) = offsetInSphereDegDown * ...
+        modelEyeRadiusMm * (pi / 180);
+    offsetInSphereDegUp = atand(offsetOnChordMmUp(ss) / distanceToChordMm);
+    offsetOnRetinaMmUp(ss) = offsetInSphereDegUp * ...
+        modelEyeRadiusMm * (pi / 180);
 
     %% Convert to mm per degree
     mmPerDegreeOnChord(ss) = offsetOnChordMm(ss)/sphereSeparationDegrees;
@@ -189,26 +198,34 @@ for ss = 1:length(sphereSeparationsDegrees)
 end
 
 %% Use Drasdo formula
-offsetOnRetinaDrasdoMm = DegreesToRetinalEccentricityMM(sphereSeparationsDegrees, 'Human', 'DaceyPeterson');
+offsetOnRetinaDrasdoMm = DegreesToRetinalEccentricityMM(...
+    sphereSeparationsDegrees, 'Human', 'DaceyPeterson');
 
 %% Plot mm on retina versus degrees
-figure; clf; hold on
-plot(sphereSeparationsDegrees, offsetOnRetinaMm, 'ro', 'MarkerFaceColor', 'r', 'MarkerSize', 8);
-errorbar(sphereSeparationsDegrees, offsetOnRetinaMm, offsetOnRetinaMm-offsetOnRetinaMmDown, offsetOnRetinaMmUp-offsetOnRetinaMm, 'ro');
+figure;
+clf;
+hold on
+plot(sphereSeparationsDegrees, offsetOnRetinaMm, 'ro', ...
+    'MarkerFaceColor', 'r', 'MarkerSize', 8);
+errorbar(sphereSeparationsDegrees, offsetOnRetinaMm, offsetOnRetinaMm - ...
+    offsetOnRetinaMmDown, offsetOnRetinaMmUp-offsetOnRetinaMm, 'ro');
 plot(sphereSeparationsDegrees, offsetOnRetinaDrasdoMm, 'r');
 xlabel('Position (degrees)');
 ylabel('Position (mm on retina)');
 
-%% Print out some useful information 
+%% Print out some useful information
 for ss = 1:length(sphereSeparationsDegrees)
-    fprintf('Model eye focal length %0.2f, mm per deg from trig = %0.3f\n', ...
-        focalLengthMm(ss), renderingMmPerDegree(ss));
-    fprintf('For %0.1f deg separation, %0.3f mm on rendering chord, %0.3f mm/deg on chord\n', ...
-        sphereSeparationsDegrees(ss), offsetOnChordMm(ss), mmPerDegreeOnChord(ss));
-    fprintf('For %0.1f deg separation, %0.3f mm on retina, %0.3f mm/deg on retina\n', ...
-        sphereSeparationsDegrees(ss), offsetOnRetinaMm(ss), mmPerDegreeOnRetina(ss));
-    fprintf('Rendering fov: %0.1f deg, %0.1f mm, um per pixel in the rendering plane: %0.2f\n', ...
-        renderingFovDegrees(ss), renderingFovMm(ss), 1e3*renderingMmPerPixel(ss));
+    fprintf(strcat('Model eye focal length %0.2f, mm per deg from ', ...
+        'trig = %0.3f\n'), focalLengthMm(ss), renderingMmPerDegree(ss));
+    fprintf(strcat('For %0.1f deg separation, %0.3f mm on rendering ', ...
+        'chord, %0.3f mm/deg on chord\n'), sphereSeparationsDegrees(...
+        ss), offsetOnChordMm(ss), mmPerDegreeOnChord(ss));
+    fprintf(strcat('For %0.1f deg separation, %0.3f mm on retina, ', ...
+        '%0.3f mm/deg on retina\n'), sphereSeparationsDegrees(ss), ...
+        offsetOnRetinaMm(ss), mmPerDegreeOnRetina(ss));
+    fprintf(strcat('Rendering fov: %0.1f deg, %0.1f mm, um per pixel ', ...
+        'in the rendering plane: %0.2f\n'), renderingFovDegrees(ss), ...
+        renderingFovMm(ss), 1e3 * renderingMmPerPixel(ss));
     fprintf('\n');
 end
 

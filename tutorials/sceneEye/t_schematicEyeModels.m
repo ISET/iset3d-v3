@@ -11,7 +11,7 @@
 
 %% Initialize
 if isequal(piCamBio,'isetcam')
-    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename);
     return;
 end
 ieInit;
@@ -43,7 +43,7 @@ oiNavarro = thisScene.render(); %'reuse');
 
 % Show the retinal image
 % Everything is very out of focus since the accommodation is set to
-% infinity. 
+% infinity.
 ieAddObject(oiNavarro);
 oiWindow;
 
@@ -53,7 +53,7 @@ oiWindow;
 % thisScene.workingDir
 
 %% Try the Gullstrand-LeGrand Model
-% The gullstrand has no accommodation modeling. 
+% The gullstrand has no accommodation modeling.
 thisScene.modelName = 'Gullstrand';
 
 % Render!

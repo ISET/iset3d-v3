@@ -6,7 +6,7 @@
 %    This introduction renders a local file in the data directory of the
 %    ISET3d repository. The introduction sets up a very simple recipe, runs
 %    the docker command, and loads the result into an ISET scene structure.
-% 
+%
 % Dependencies:
 %   ISET3d, ISETCam or ISETBio, JSONio
 %
@@ -27,7 +27,7 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 % Determine whether you are working in ISETBio or ISETCam
-fprintf('Attempting to execute using %s.\n', piCamBio); 
+fprintf('Attempting to execute using %s.\n', piCamBio);
 
 %% Read the file
 % The teapot is our test file

@@ -24,7 +24,7 @@
 
 %% Initialize
 if isequal(piCamBio, 'isetcam')
-    error('%s: requires ISETBio, not ISETCam\n', mfilename); 
+    error('%s: requires ISETBio, not ISETCam\n', mfilename);
 end
 
 ieInit;
@@ -34,11 +34,11 @@ if ~piDockerExists, piDockerConfig; end
 % A chess set "to scale" (e.g. the pieces match real word sizes). A ruler
 % is placed in the middle of the chess set.
 scene3d = sceneEye('chessSet');
-scene3d.fov = 30; 
+scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1; 
+scene3d.accommodation = 1;
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
@@ -51,11 +51,11 @@ oiWindow;
 % The same chess set, but it's been distorted in order to emphasize depth
 % of field effects.
 scene3d = sceneEye('chessSetScaled');
-scene3d.fov = 30; 
+scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/0.3; % Accommodate to the white pawn 
+scene3d.accommodation = 1/0.3; % Accommodate to the white pawn
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
@@ -195,11 +195,11 @@ textureFile = fullfile(piRootPath, ...
     'data', 'imageTextures', 'squareResolutionChart.png');
 scene3d = sceneEye('texturedPlane', 'planeTexture', textureFile, ...
                    'planeSize', [1 1], 'planeDistance', 2);
-scene3d.fov = 30; 
+scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1; % Accommodate to the plane 
+scene3d.accommodation = 1; % Accommodate to the plane
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
@@ -222,18 +222,18 @@ oiWindow;
 % rays.
 scene3d = sceneEye('pointSource', 'pointDiameter', 0.01, ...
                    'pointDistance', 1);
-scene3d.fov = 30; 
+scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1; % Accommodate to the point 
+scene3d.accommodation = 1; % Accommodate to the point
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Point');
 ieAddObject(oi);
-oiWindow;                
+oiWindow;
 
 %% Letters at depth
 % Similar to the "numbers at depth" and "snellen at depth" scenes. Three
@@ -244,24 +244,24 @@ oiWindow;
 % Let's put A at 1.8 dpt, B at 1.4 dpt, and C at 1.0 dpt (~0.5, 0.7 & 1 m)
 scene3d = sceneEye('lettersAtDepth', 'Adist', 1/1.8, ...
                     'Bdist', 1/1.4, 'Cdist', 1);
-scene3d.fov = 30; 
+scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1; % Accommodate to the point 
+scene3d.accommodation = 1; % Accommodate to the point
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Letters at depth');
 ieAddObject(oi);
-oiWindow;   
+oiWindow;
 
 %% Colored Cube
 % A cube with different colored sides. Another mdoel used primarily to test
 % rotations. You can see how ISET3d handles rotations in
 % "t_piSimpleTransforms.m." To do something like this with sceneEye, you
-% could replace the "recipe" variable with "scene3d.recipe." 
+% could replace the "recipe" variable with "scene3d.recipe."
 scene3d = sceneEye('coloredCube');
 scene3d.fov = 30;
 scene3d.resolution = 128;
@@ -282,7 +282,7 @@ oiWindow;
 % Loop through all assets and rotate the one called "Cube"
 for ii = 1:length(scene3d.recipe.assets)
     if strcmp(scene3d.recipe.assets(ii).name, 'Cube')
-        % The rotation is stored in angle-axis format, along the columns.  
+        % The rotation is stored in angle-axis format, along the columns.
         scene3d.recipe.assets(ii).rotate(1, 2) = ...
             scene3d.recipe.assets(ii).rotate(1, 2) + 20;
     end
@@ -294,5 +294,5 @@ oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Colored cube 2');
 ieAddObject(oi);
 oiWindow;
-                  
+
 %% END

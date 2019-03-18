@@ -15,7 +15,7 @@
 
 %% Initialize ISETBIO
 if isequal(piCamBio, 'isetcam')
-    error('%s: requires ISETBIO, not ISETCam\n', mfilename); 
+    error('%s: requires ISETBIO, not ISETCam\n', mfilename);
 end
 ieInit;
 if ~piDockerExists, piDockerConfig; end
@@ -29,7 +29,7 @@ if ~exist(saveDir, 'dir'), mkdir(saveDir); end
 
 %% Load scene
 planeDistance = 5; % 5 meters away
-myScene = sceneEye('slantedBar', 'planeDistance', planeDistance); 
+myScene = sceneEye('slantedBar', 'planeDistance', planeDistance);
 
 %% Set fixed parameters
 myScene.accommodation = 1 / planeDistance; % Accomodate to plane
@@ -42,7 +42,7 @@ pupilDiameters = [6 4 2];
 
 % Fast test version
 numRays = [128 128 128];
-myScene.resolution = 128; 
+myScene.resolution = 128;
 
 if length(numRays) ~= length(pupilDiameters)
     error('numRays and pupilDiameters length need to match!')

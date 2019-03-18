@@ -14,8 +14,7 @@
 
 %% Initialize ISETBIO
 if isequal(piCamBio, 'isetcam')
-    fprintf('%s: requires ISETBIO, not ISETCam\n', mfilename); 
-    return;
+    error('%s: requires ISETBIO, not ISETCam\n', mfilename);
 end
 ieInit;
 

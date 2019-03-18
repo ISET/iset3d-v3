@@ -22,7 +22,7 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 % Determine whether you are working in ISETBio or ISETCam
-fprintf('Attempting to execute using %s.\n', piCamBio); 
+fprintf('Attempting to execute using %s.\n', piCamBio);
 
 %% Read pbrt_material files
 FilePath = fullfile(piRootPath, 'data', 'V3', 'SimpleScene');
@@ -85,7 +85,7 @@ thisR.integrator.maxdepth.value = 4;
 %% Write out the pbrt scene file, based on thisR.
 piWrite(thisR);
 
-%% Render. 
+%% Render.
 % Maybe we should speed this up by only returning radiance.
 %
 % to reuse an existing rendered file of the correct size, uncomment the
@@ -108,7 +108,7 @@ piMaterialAssign(thisR, 'GLASS', target, 'rgbkd', rgbkd, 'rgbkr', rgbkr);
 
 % Write out the modified scene in the same folder but put a '1' into
 % the output name.
-[~, sceneName, e] = fileparts(fname); 
+[~, sceneName, e] = fileparts(fname);
 thisR.set('outputFile', ...
     fullfile(piRootPath, 'local', sceneName, [sceneName, '1', e]));
 piWrite(thisR, 'creatematerials', true);

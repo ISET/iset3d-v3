@@ -10,7 +10,7 @@
 %
 %    We also set up a few more variables than we used in the first
 %    introduction, t_Introduction01.
-% 
+%
 % Dependencies:
 %   ISET3d, ISETCam or ISETBio, JSONio, RemoteDataToolbox
 %
@@ -30,11 +30,11 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
-    error('You must have the remote data toolbox on your path'); 
+    error('You must have the remote data toolbox on your path');
 end
 
 % Determine whether you are working in ISETBio or ISETCam
-fprintf('Attempting to execute using %s.\n', piCamBio); 
+fprintf('Attempting to execute using %s.\n', piCamBio);
 
 %% Read the white-room file for the Remote Data site
 % sceneName = 'white-room'; sceneFileName = 'scene.pbrt';
@@ -76,7 +76,7 @@ scenePlot(scene, 'depth map');
 recipe.set('camera', 'realistic');
 recipe.set('lensfile', fullfile(piRootPath, 'data', 'lens', ...
     'dgauss.22deg.50.0mm.dat'));
-recipe.set('filmdiagonal', 35); 
+recipe.set('filmdiagonal', 35);
 %}
 
 %% End

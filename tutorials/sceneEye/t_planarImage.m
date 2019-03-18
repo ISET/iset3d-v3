@@ -6,7 +6,7 @@
 %    this scene, we can load up an image texture, place it on a scaled, 2D
 %    plane at a certain distance away from the eye. We can then render the
 %    image through the eye to obtain the retinal image.
-% 
+%
 %    This can be used as an approximation of the eye viewing a flat
 %    "display." It's not quite the same as using a simulated display in
 %    ISETBIO with real primaries, but it does allow us to use the 3D eye
@@ -14,7 +14,7 @@
 %
 %    For example, you can use this textured plane to approximate the
 %    following steps:
-%       1. Render a retinal image from a 3D scene, 
+%       1. Render a retinal image from a 3D scene,
 %       2. Apply some processing on the resulting retinal image
 %       3. Place it on a flat display of size xxx at yyy distance away from
 %          the viewer.
@@ -58,7 +58,7 @@ myScene.numCABands = 0;
 
 %% Accommodate to the plane
 % We can have the display image approximately cover the entire retinal
-% image by matching the FOV. 
+% image by matching the FOV.
 myScene.fov = planeFOV;
 
 % Accommodate to the plane

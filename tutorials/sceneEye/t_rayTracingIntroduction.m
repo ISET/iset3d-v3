@@ -4,11 +4,11 @@
 % Description:
 %    This tutorial is an introduction to modeling the optics of the eye
 %    using ray-tracing in ISETBIO.
-% 
+%
 %    To begin, you must have the Github repo iset3d on your MATLAB path:
 %    https://github.com/ISET/iset3d as well as the Github repo isetbio on
 %    your path: https://github.com/isetbio/isetbio
-% 
+%
 %    You must also have docker installed and running on your machine. You
 %    can find general instructions on docker here: https://www.docker.com/
 %
@@ -19,10 +19,10 @@
 %    PBRT, which we call pbrt-v3-spectral, has the ability to render
 %    through the optics of the human eye and to trace rays spectrally.
 %    Pbrt-v3-spectral has also been dockerized so you do not need to
-%    compile or install the source code in order to render images. Instead, 
+%    compile or install the source code in order to render images. Instead,
 %    you must have docker installed and running on your computer and the
 %    scenes should automatically render through the docker container.
-% 
+%
 %    You can find the source code for pbrt-v3-spectral here:
 %    https://github.com/scienstanford/pbrt-v3-spectral
 %
@@ -32,7 +32,7 @@
 % History:
 %    XX/XX/17  TL   ISETBIO Team, 2017
 %    03/16/19  JNM  Documentation pass
-    
+
 
 %% Initialize ISETBIO
 if isequal(piCamBio, 'isetcam')
@@ -55,7 +55,7 @@ myScene = sceneEye('numbersAtDepth');
 % upon creation of the scene. All new data generated within ISETBIO will
 % also be placed in the working directory. This folder will eventually be
 % mounted onto the docker container to be rendered. You can specify a
-% specific working folder as follows: 
+% specific working folder as follows:
 % myScene = sceneEye('scene', 'numbersAtDepth', 'workingDirectory', [path to
 % desired directory]);
 
@@ -68,7 +68,7 @@ myScene
 % render fastExample.
 myScene.name = 'fastExample';
 
-% Let's change the number of rays to render with. 
+% Let's change the number of rays to render with.
 myScene.numRays = 128;
 
 % And the FOV of the retinal image
@@ -79,7 +79,7 @@ myScene.fov = 30;
 myScene.resolution = 128;
 
 % Now let's render. This may take a few seconds, depending on the number of
-% cores on your machine. On a machine with 2 cores it takes ~15 seconds. 
+% cores on your machine. On a machine with 2 cores it takes ~15 seconds.
 %
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
@@ -97,7 +97,7 @@ oiWindow;
 % to render on a local machine with 8 cores. If you'd like to bump up the
 % image quality slightly, you can turn the resolution up to 256 and numRays
 % to 256, which will bring rendering time to around 2 min per image.
-% myScene.resoltuion = 256; 
+% myScene.resoltuion = 256;
 % myScene.numRays = 256;
 
 accomm = [3 5 10]; % in diopters
@@ -109,7 +109,7 @@ for ii = 1:length(accomm)
     % This produces the characteristic LCA of the eye. The higher the
     % number, the longer the rendering time but the finer the sampling
     % across the visible spectrum.
-    myScene.numCABands = 6; 
+    myScene.numCABands = 6;
 
     % When we change accommodation the lens geometry and dispersion curves
     % of the eye will change. ISETBIO automatically generates these new

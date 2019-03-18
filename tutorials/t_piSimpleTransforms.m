@@ -12,7 +12,7 @@
 %    XX/XX/17  TL   ISETBIO Team, 2017
 %	 03/14/19  JNM  Documentation pass
 
-%% Initialize 
+%% Initialize
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
@@ -47,7 +47,7 @@ for rot = 1:numRotations
     % Loop through all assets and rotate the one called "Cube"
     for ii = 1:length(recipe.assets)
         if strcmp(recipe.assets(ii).name, 'Cube')
-            % Rotation is stored in angle-axis format, along the columns.  
+            % Rotation is stored in angle-axis format, along the columns.
             recipe.assets(ii).rotate(1, 2) = ...
                 recipe.assets(ii).rotate(1, 2) + 10;
         end
@@ -67,7 +67,7 @@ end
 %
 % Loop through all assets and rotate the one called "Cube"
 for ii = 1:length(recipe.assets)
-    if strcmp(recipe.assets(ii).name, 'Cube')  
+    if strcmp(recipe.assets(ii).name, 'Cube')
         recipe.assets(ii).position(1) = ...
             recipe.assets(ii).position(1) + 0.15;
     end

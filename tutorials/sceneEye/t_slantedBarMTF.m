@@ -24,7 +24,7 @@
 
 %% Initialize ISETBIO
 if isequal(piCamBio, 'isetcam')
-    fprintf('%s: requires ISETBio, not ISETCam\n', mfilename); 
+    fprintf('%s: requires ISETBio, not ISETCam\n', mfilename);
     return;
 end
 ieInit;
@@ -40,7 +40,7 @@ if ~piDockerExists, piDockerConfig; end
 myScene = sceneEye('slantedBar', 'planeDistance', 0.5);
 myScene.name = 'slantedBarFast';
 myScene.numRays = 64;
-myScene.resolution = 128; 
+myScene.resolution = 128;
 
 myScene.accommodation = 2;
 myScene.pupilDiameter = 4;
@@ -60,7 +60,7 @@ sceneWindow;
 %   band of wavelength. The parameter, numCABands determines the number of
 %   band we will sample. We will trace a total of numRay x numCABands rays,
 %   meaning that the rendering will be ~(numCABands) times slower.
-% 
+%
 % As we move the plane in and out of focus we can see the color fringes
 % change due to longitudinal chromatic aberration.
 planeDistance = [0.3 0.5 0.8]; % meters
@@ -73,7 +73,7 @@ for ii = 1:length(planeDistance)
     myScene.resolution = 128;
     myScene.numCABands = 8;
 
-    myScene.accommodation = 1/0.5; 
+    myScene.accommodation = 1/0.5;
     myScene.pupilDiameter = 4;
     myScene.fov = 3;
 
@@ -85,7 +85,7 @@ for ii = 1:length(planeDistance)
     oiWindow;
 end
 
-%% Calculate the MTF 
+%% Calculate the MTF
 % We can use the ISO12233 standard to calculate the MTF from a slanted bar.
 %
 % First render the slanted bar. You might want to increase the numRays and
