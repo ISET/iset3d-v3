@@ -134,6 +134,7 @@ switch opticsType
         
         % We always set meanIlluminance per square millimeter of the
         % lens aperture
+<<<<<<< HEAD
         if(scaleIlluminance)
             lensArea = pi*(aperture*1e3/2)^2;
             meanIlluminance = meanIlluminance*lensArea;
@@ -141,6 +142,13 @@ switch opticsType
             ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
             ieObject.data.illuminance = oiCalculateIlluminance(ieObject);
         end
+=======
+        lensArea = pi*(aperture*1e3/2)^2;
+        meanIlluminance = meanIlluminance*lensArea;
+        
+        ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
+        ieObject.data.illuminance = oiCalculateIlluminance(ieObject);     
+>>>>>>> Add daytime for piskymapAdd; Change small bugs comes from scale slot of thisR.assets; Change Colorpick to pick color less saturated.
         
     case {'pinhole','environment'}
         % A scene radiance, not an oi

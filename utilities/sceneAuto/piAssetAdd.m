@@ -93,12 +93,18 @@ for ii = 1:length(assets.(assetname))
     end
     %% add objects.geometry to scene(geometry struct)
     scene = thisR.assets;
+    
+    if isfield(scene,'scale'),scene=rmfield(scene,'scale');end
     % add motion slot
     if geometry
         numScene = length(scene);
         numObj   = length(assets.(assetname)(ii).geometry);
         for hh = 1:numObj
+            %% 
+            if isfield(assets.(assetname)(ii).geometry,'scale')
+                assets.(assetname)(ii).geometry=rmfield(assets.(assetname)(ii).geometry,'scale');end
             scene(numScene+hh) = assets.(assetname)(ii).geometry(hh);
+            %% 
         end
     end
     thisR.assets = scene;
