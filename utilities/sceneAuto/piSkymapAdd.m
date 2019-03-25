@@ -20,7 +20,9 @@ function [thisR,skymapInfo] = piSkymapAdd(thisR,skyName)
 %%
 st = scitran('stanfordlabs');
 % sunlights = sprintf('# LightSource "distant" "point from" [ -30 100  100 ] "blackbody L" [6500 1.5]');
+
 if ~piContains(skyName,':')
+
     skyName = lower(skyName);
     if isequal(skyName,'random')
         index = randi(4,1);
@@ -42,6 +44,8 @@ if ~piContains(skyName,':')
 
     % Get the information about the skymap so we can download from
     % Flywheel
+
+    
 
     try
         acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');

@@ -153,6 +153,7 @@ roadName   = roadFolder{length(roadFolder)};
 trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadName,trafficflowDensity));
 trafficflowFolder = fileparts(trafficflowPath);
 
+
 if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
 
 % This is where SUMO is called.  Or maybe the file already exists.

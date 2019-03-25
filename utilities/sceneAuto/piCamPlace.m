@@ -11,6 +11,7 @@ if length(varargin) > 1
 else
     varargin =ieParamFormat(varargin);
 end
+p.addParameter('thisR',[]);
 p.addParameter('thistrafficflow',[]);
 p.addParameter('nexttrafficflow',[]);
 % p.addParameter('CamPosition',[]);
@@ -137,6 +138,8 @@ else
     to(1)=0;
     to(2)=2;
     to(3)=30;
+
 end
 
 end
+
