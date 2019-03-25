@@ -69,9 +69,10 @@ skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 
 index_m = find(piContains(thisR.world,'_materials.pbrt'));
 
-skyview = randi(360,1);
-skyview = randi(45,1)+45;
-% skyview = 45;% tmp
+
+% skyview = randi(360,1);
+% skyview = randi(45,1)+45;% tmp
+skyview = 45;% tmp
 
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));
