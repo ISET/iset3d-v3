@@ -10,7 +10,15 @@ function thisR = piMaterialTextureAdd(renderRecipe,material, texture,varargin)
 
 %%
 p = inputParser;
-varargin = ieParamFormat(varargin);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 p.addRequired('material',@ischar);
 p.addRequired('texture',@ischar);
@@ -39,25 +47,18 @@ switch texture
             thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [%f %f %f] "rgb tex2" [%f %f %f] "float uscale" [%d] "float vscale" [%d]',...
                 checkerName,color1,color2,uscale,vscale);
             thisR.materials.txtLines{length(thisR.materials.txtLines)+1} = thisTexLine;
-            
-            % The list here has to have a more complete structure,
-            % like the one in piMaterialRead.  This produces a broken
-            % structure that does not run for ZL.
-            %
-            % thisR.materials.list.(materialName).texturekd = checkerName;
-            % thisR.materials.list.(materialName).rgbkd = [];
+
+            thisR.materials.list.(materialName).texturekd = checkerName;
+            thisR.materials.list.(materialName).rgbkd = [];
         else
             index = randi(100,1);
             checkerName = sprintf('checker_%d',index);
             thisTexLine = sprintf('Texture "%s" "spectrum" "checkerboard" "rgb tex1" [%f %f %f] "rgb tex2" [%f %f %f] "float uscale" [%d] "float vscale" [%d]',...
                 checkerName,color1,color2,uscale,vscale);
             thisR.materials.txtLines{length(thisR.materials.txtLines)+1} = thisTexLine;
-            % The list here has to have a more complete structure,
-            % like the one in piMaterialRead.  This produces a broken
-            % structure that does not run for ZL.
-            %
-            % thisR.materials.list.(materialName).texturekd = checkerName;
-            % thisR.materials.list.(materialName).rgbkd = [];
+
+            thisR.materials.list.(materialName).texturekd = checkerName;
+            thisR.materials.list.(materialName).rgbkd = [];
         end
     case 'dots'
         disp('Not Implemented yet.');

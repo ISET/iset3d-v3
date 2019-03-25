@@ -2,6 +2,10 @@
 % Render the same scene using a couple of different eye models.
 
 %% Initialize
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    return;
+end
 ieInit;
 clear; close all;
 

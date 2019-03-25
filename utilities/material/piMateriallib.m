@@ -107,6 +107,10 @@ materiallib.translucent.colortransmit = [0.5 0.5 0.5];
 % Human skin is assigned with this material.
 materiallib.substrate.string = 'substrate';
 
+%% fourier
+materiallib.fourier.string = 'fourier';
+materiallib.fourier.bsdffile = 'bsdfs/roughglass_alpha_0.2.bsdf';
+
 end
 
 

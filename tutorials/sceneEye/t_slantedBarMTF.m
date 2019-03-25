@@ -10,11 +10,19 @@
 % We recommend you go through t_rayTracingIntroduction.m before running
 % this tutorial.
 %
+% 01/05/19 dhb  This broken because it calls a function
+%               calculateMTFFromSlantedBar that does not
+%               exist in iset3d or isetbio.
+%
 % Depends on: pbrt2ISET, ISETBIO, Docker, ISET
 %
 % TL ISETBIO Team, 2017
 
 %% Initialize ISETBIO
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    return;
+end
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
@@ -93,18 +101,17 @@ oiWindow;
 
 % If you have isetlens-eye ( https://github.com/ISET/isetlens-eye) on your
 % path, you can run the following:
-[freq,mtf] = calculateMTFfromSlantedBar(oi);
-figure();
-plot(freq,mtf);
-xlabel('Spatial Frequency (cycles/deg)');
-ylabel('Contrast Reduction (SFR)');
-grid on;
-axis([0 60 0 1])
+% [freq,mtf] = calculateMTFfromSlantedBar(oi);
+% figure();
+% plot(freq,mtf);
+% xlabel('Spatial Frequency (cycles/deg)');
+% ylabel('Contrast Reduction (SFR)');
+% grid on;
+% axis([0 60 0 1])
 
 % Otherwise, you can run this, which is essentially what
 % calculateMTFfromSlantedBar does.
 
-%{
 % Crop the image so we only have the slanted line visible. The ISO12233
 % routine will be confused by the edges of the retinal image if we don't
 % first crop it.
@@ -129,4 +136,3 @@ xlabel('Spatial Frequency (cycles/deg)');
 ylabel('Contrast Reduction (SFR)');
 grid on;
 axis([0 60 0 1])
-%}

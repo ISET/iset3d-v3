@@ -152,6 +152,15 @@ elseif isunix
         if (args.debug); fprintf('Docker status: %d\n',status); end
         error('Docker not configured: %s', result);
     end
+elseif ispc
+    % Check for docker
+    [status, result] = system('docker ps -a');
+    if status == 0
+        if args.debug; disp('Docker configured successfully!'); end
+    else
+        if (args.debug); fprintf('Docker status: %d\n',status); end
+        error('Docker not configured: %s', result);
+    end
 else
     % Not MAC or LINUX
     % We need a Windows implementation.

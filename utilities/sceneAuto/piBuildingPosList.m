@@ -61,13 +61,13 @@ for kk = 1:length(objects.assets)
         switch type
             case 'front'
                 if coordination(1)<0
-                    ankor = coordination + [lenx_tmp, 0];
+                    ankor = coordination + [lenx_tmp, 1];
                 else
                     ankor = coordination;
                 end
             case 'back'
                 if coordination(1)>0
-                    ankor = coordination - [lenx_tmp, 0];
+                    ankor = coordination - [lenx_tmp, 1];
                 else
                     ankor = coordination;
                 end
@@ -101,7 +101,7 @@ for kk = 1:length(objects.assets)
         
         
         %% test algotithm. Comment this part when using.
-        %{
+        
         figure(1);hold on;xlim([-130, 130]);ylim([-30, 280]);hold on;
         switch type
             case 'front'
@@ -166,7 +166,7 @@ end
 
 function [settle_list, count] = buildingPlan(building_list, lenx_tmp, ...
     leny_tmp, coordination, settle_list, count, type, ankor, aveW)
-offset = 2; % adjust the interval berween the buildings. Don't too big! Or might cause problem!
+offset = 0.2; % adjust the interval berween the buildings. Don't too big! Or might cause problem!
 
 %% calculate the parameter in spare region.
 switch type

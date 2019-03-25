@@ -4,7 +4,15 @@ function asset = piAssetAssign(assetRecipe,varargin)
 %
 %%
 p = inputParser;
-varargin = ieParamFormat(varargin);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
 p.addParameter('label','');
 p.parse(varargin{:});
 label = p.Results.label;
@@ -66,6 +74,7 @@ for ii = 1: length(assetRecipe)
     asset(ii).name = name;
     asset(ii).index = n;
     asset(ii).geometry = geometry;
+    
     if ~isequal(assetRecipe{ii}.count,1)
         for hh = 1: length(asset(ii).geometry)
             pos = asset(ii).geometry(hh).position;

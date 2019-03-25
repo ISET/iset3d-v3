@@ -26,6 +26,7 @@ function workingDir = piWrite(renderRecipe,varargin)
 %    workingDir - path to the output directory mounted by the Docker containe
 %
 % TL Scien Stanford 2017
+% JNM -- Add Windows support 01/25/2019
 
 %{
 piWrite(thisR,'overwrite resources',false,'overwrite pbrt file',true);
@@ -34,11 +35,22 @@ piWrite(thisR);
 %%
 p = inputParser;
 
-varargin =ieParamFormat(varargin);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
+        | isobject(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
+
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
-% Format the parameters by removing spaces and forcing lower case.
-if ~isempty(varargin), varargin = ieParamFormat(varargin); end
+% % JNM -- Why format variables twice?
+% % Format the parameters by removing spaces and forcing lower case.
+% if ~isempty(varargin), varargin = ieParamFormat(varargin); end
 
 % Copy over the whole directory
 p.addParameter('overwriteresources', true,@islogical);
@@ -135,7 +147,11 @@ if isequal(renderRecipe.get('optics type'),'lens')
     end
     
     % Verify that the input lens is a full path
-    if ~strcmp(inputLensFile(1),'/')
+    if ispc()
+        if ~strcmp(inputLensFile(1),'C')
+            error('You must specify an absolute path for the lens file.');
+        end
+    elseif ~strcmp(inputLensFile(1),'/')
         error('You must specify an absolute path for the lens file.');
     end
     
@@ -169,11 +185,6 @@ if isequal(renderRecipe.get('optics type'),'lens')
         copyfile(inputLensFile,workingLensFile);
     end
 end
-
-%% Make sure there is a renderings sub-directory of the working directory
-
-renderingDir = fullfile(workingDir,'renderings');
-if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
 
 %% Make sure there is a renderings sub-directory of the working directory
 
@@ -321,7 +332,11 @@ for ofns = outerFields'
                     else
                         % It is a lens, so just update the name.  It
                         % was already copied
-                        currValue = fullfile('lens',strcat(name,ext));
+                        if ispc()
+                            currValue = strcat('lens/',strcat(name,ext));
+                        else
+                            currValue = fullfile('lens',strcat(name,ext));
+                        end
                     end
                 end
                                 

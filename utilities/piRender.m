@@ -1,4 +1,4 @@
-function [ieObject, result, scaleFactor] = piRender(thisR,varargin)
+function [ieObject, result] = piRender(thisR,varargin)
 % Read a PBRT scene file, run the docker cmd locally, return the ieObject.
 %
 % Syntax:
@@ -18,20 +18,20 @@ function [ieObject, result, scaleFactor] = piRender(thisR,varargin)
 %               have depth, mesh, and material. For pbrt-v3 we have depth
 %               and coordinates at the moment.
 %  version    - PBRT version, 2 or 3
-%  scaleFactor - photons are scaled by a value in order to produce
-%               reasonable illuminance. Here, you can manually input a
-%               scale factor to apply to this particular render. If empty,
-%               a default value is used
+%  scaleIlluminance
+%             - if true, we scale the mean illuminance by the pupil
+%               diameter in piDat2ISET 
+%  reuse      - Boolean. Indicate whether to use an existing file if one of
+%               the correct size exists.
 %
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
 %   result   - PBRT output from the terminal, vital for debugging!
-%   scaleFactor - the scaling factor for the photons (see scaleFactor in
-%                 OPTIONAL inputs)
 %
 % See also s_piReadRender*.m
 %
 % TL SCIEN Stanford, 2017
+% JNM 03/19 Add reuse feature for renderings
 
 % Examples
 %{
@@ -59,13 +59,23 @@ p.KeepUnmatched = true;
 p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
 
 % Squeeze out spaces and force lower case
-varargin = ieParamFormat(varargin);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin =ieParamFormat(varargin);
+end
 
 rTypes = {'radiance','depth','both','coordinates','material','mesh'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('meanluminance',100,@inumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
+p.addParameter('scaleIlluminance',true,@islogical);
+p.addParameter('reuse',false,@islogical);
 
 % If you are insisting on using V2, then set dockerImageName to
 % 'vistalab/pbrt-v2-spectral';
@@ -77,6 +87,7 @@ p.parse(thisR,varargin{:});
 renderType      = p.Results.rendertype;
 version         = p.Results.version;
 dockerImageName = p.Results.dockerimagename;
+scaleIlluminance = p.Results.scaleIlluminance;
 
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build
@@ -160,58 +171,104 @@ end
 
 %% Call the Docker contains for rendering
 for ii = 1:length(filesToRender)
-    
+    skipDocker = false;
     currFile = filesToRender{ii};
-    
+
     %% Build the docker command
     dockerCommand   = 'docker run -ti --rm';
-    
+
     [~,currName,~] = fileparts(currFile);
-    
+
     % Make sure renderings folder exists
     if(~exist(fullfile(outputFolder,'renderings'),'dir'))
         mkdir(fullfile(outputFolder,'renderings'));
     end
-    
+
     outFile = fullfile(outputFolder,'renderings',[currName,'.dat']);
-    renderCommand = sprintf('pbrt --outfile %s %s', ...
-        outFile, currFile);
-    
-    if ~isempty(outputFolder)
-        if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
-        dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
+
+    if ispc  % Windows
+        outF = strcat('renderings/',currName,'.dat');
+        renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, '.pbrt'));
+
+        folderBreak = split(outputFolder, '\');
+        shortOut = strcat('/', char(folderBreak(end)));
+
+        if ~isempty(outputFolder)
+            if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
+            dockerCommand = sprintf('%s -w %s', dockerCommand, shortOut);
+        end
+
+        linuxOut = strcat('/c', strrep(erase(outputFolder, 'C:'), '\', '/'));
+
+        dockerCommand = sprintf('%s -v %s:%s', dockerCommand, linuxOut, shortOut);
+
+        cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
+    else  % Linux & Mac
+        renderCommand = sprintf('pbrt --outfile %s %s', outFile, currFile);
+
+        if ~isempty(outputFolder)
+            if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
+            dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
+        end
+
+        dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
+
+        cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
     end
-    
-    dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
-    
-    cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
-    
-    %% Invoke the Docker command
-    tic
-    [status, result] = piRunCommand(cmd);
-    elapsedTime = toc;
-    
-    %% Check the return
-    
-    if status
-        warning('Docker did not run correctly');
-        % The status may contain a useful error message that we should
-        % look up.  The ones we understand should offer help here.
-        fprintf('Status:\n'); disp(status)
-        fprintf('Result:\n'); disp(result)
-        pause;
+
+    %% Determine if prefer to use existing files, and if they exist.
+    if p.Results.reuse
+        [fid, message] = fopen(outFile, 'r');
+        if fid < 0
+            warning(strcat(message, ': ', currName));
+        else
+            sizeLine = fgetl(fid);
+            [imageSize, count, err] = sscanf(sizeLine, '%f', inf);
+            if count ~=3
+                fclose(fid);
+                warning('Could not read image size: %s', err);
+            end
+            serializedImage = fread(fid, inf, 'double');
+            fclose(fid);
+            if numel(serializedImage) == prod(imageSize)
+                fprintf('\nThe file "%s" already exists in the correct size.\n\n', currName);
+                skipDocker = true;
+            end
+        end
     end
-    
-    fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
-    
+
+    if skipDocker
+        result = '';
+    else
+        %% Invoke the Docker command
+        tic
+        [status, result] = piRunCommand(cmd);
+        elapsedTime = toc;
+
+        %% Check the return
+
+        if status
+            warning('Docker did not run correctly');
+            % The status may contain a useful error message that we should
+            % look up.  The ones we understand should offer help here.
+            fprintf('Status:\n'); disp(status)
+            fprintf('Result:\n'); disp(result)
+            pause;
+        end
+
+        fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
+    end
+
     %% Convert the returned data to an ieObject
-    
+
     % We should add in the mean luminance and mean illuminance here
     % when we are ready.  piDat2ISET already handles those inputs.
     switch label{ii}
         case 'radiance'
             ieObject = piDat2ISET(outFile,...
-                'label','radiance','recipe',thisR);
+                'label','radiance',...
+                'recipe',thisR,...
+                'scaleIlluminance',scaleIlluminance);
         case {'metadata'}
             metadata = piDat2ISET(outFile,'label','mesh');
             ieObject   = metadata;
@@ -224,11 +281,10 @@ for ii = 1:length(filesToRender)
             coordMap = piDat2ISET(outFile,'label','coordinates');
             ieObject = coordMap;
     end
-    
-end
 
 end
 
+end
 
 
 

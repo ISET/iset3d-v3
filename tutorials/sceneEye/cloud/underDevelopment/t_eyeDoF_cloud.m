@@ -1,14 +1,17 @@
-%% t_LCA_cloud.m
+%% t_eyeDoF.m
 %
-% Render a slanted bar while moving the retina along the optical axis. We
-% can use the images generated here to calculate the amount of LCA present
-% in the eye
-%
+% This tutorial shows the effect of pupil diameter on the depth of field in
+% the scene.
+% 
 % Depends on: iset3d, isetbio, Docker, isetcloud
 %
-% TL ISETBIO Team, 2017
+% TL ISETBIO Team, 2017 
 
 %% Initialize ISETBIO
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    return;
+end
 ieInit;
 if ~mcDockerExists, mcDockerConfig; end % check whether we can use docker
 if ~mcGcloudExists, mcGcloudConfig; end % check whether we can use google cloud sdk;
@@ -17,7 +20,7 @@ if ~mcGcloudExists, mcGcloudConfig; end % check whether we can use google cloud 
 % Since rendering these images often takes a while, we will save out the
 % optical images into a folder for later processing.
 currDate = datestr(now,'mm-dd-yy_HH_MM');
-saveDirName = sprintf('LCA_%s',currDate);
+saveDirName = sprintf('dof_%s',currDate);
 saveDir = fullfile(isetbioRootPath,'local',saveDirName);
 if(~exist(saveDir,'dir'))
     mkdir(saveDir);
@@ -25,23 +28,16 @@ end
 
 %% Initialize your cluster
 tic
-
 dockerAccount= 'tlian';
-projectid = 'renderingfrl';
-dockerImage = 'gcr.io/renderingfrl/pbrt-v3-spectral-gcloud';
-cloudBucket = 'gs://renderingfrl';
-
-clusterName = 'lca';
-zone         = 'us-central1-a';    
+dockerImage = 'gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud';
+cloudBucket = 'gs://primal-surfer-140120.appspot.com';
+clusterName = 'tl-dof';
+zone         = 'us-central1-b'; %'us-west1-a';    
 instanceType = 'n1-highcpu-32';
-
 gcp = gCloud('dockerAccount',dockerAccount,...
     'dockerImage',dockerImage,...
     'clusterName',clusterName,...
-    'cloudBucket',cloudBucket,...
-    'zone',zone,...
-    'instanceType',instanceType,...
-    'projectid',projectid);
+    'cloudBucket',cloudBucket,'zone',zone,'instanceType',instanceType);
 toc
 
 % Render depth
@@ -50,49 +46,62 @@ gcp.renderDepth = true;
 % Clear the target operations
 gcp.targets = [];
 
-%% Turn on chromatic aberration to show color fringing.
+%% Load scene
 
-distToPlane = 0.2;
+% The "chessSetScaled" is the chessSet scene but scaled and shifted in a
+% way that emphasizes the depth of field of the eye. The size of the chess
+% pieces and the board may no longer match the real world.
+myScene = sceneEye('chessSetScaled');
 
-% Move the retina plane 
-retinaDistance = 16.00:0.05:16.60;
-% retinaDistance = [16.3 16.2];
-retinaRadius = 10000; % Make it flat
-retinaSemiDiam = 0.15;
+%% Set fixed parameters
+myScene.accommodation = 1/0.28; 
+myScene.fov = 30;
 
-for ii = 1:length(retinaDistance)
-    
-    % Load scene with plane at a specific distance
-    myScene = sceneEye('slantedBar','planeDistance',distToPlane);
-    
-    myScene.name = sprintf('slantedBar_LCA_%0.3fmm',retinaDistance(ii));
-    
-    % Calculate FOV needed to get the same image size
-    myScene.fov = 2*atand(retinaSemiDiam/retinaDistance(ii));
-    
-    myScene.retinaDistance = retinaDistance(ii);
-    myScene.accommodation = 1/distToPlane;
-    myScene.pupilDiameter = 4;
+myScene.numCABands = 6;
+myScene.diffractionEnabled = false;
+myScene.numBounces = 3;
 
-    myScene.numCABands = 16;
-    myScene.numRays = 1024;
-    myScene.resolution = 512;
-%    myScene.numRays = 128;
-%    myScene.resolution = 128;
+lqFlag = false;
+
+%% Loop and upload to cloud
+
+pupilDiameters = [2 2.5 3 3.5 4 4.5 5 5.5 6];
+% pupilDiameters = [2 4 6];
+
+for ii = 1:length(pupilDiameters)
     
-    if(ii == length(retinaDistance))
+    myScene.pupilDiameter = pupilDiameters(ii);
+    
+    % Change number of rays depending on pupil size
+    if(~lqFlag)
+        if(pupilDiameters(ii) < 3)
+            myScene.numRays = 8192;
+        elseif(pupilDiameters(ii) >= 4)
+            myScene.numRays = 2048;
+        else
+            myScene.numRays = 4096;
+        end
+    else
+        myScene.numRays = 256;
+    end
+    
+    if(lqFlag)
+        myScene.resolution = 256;
+    else
+        myScene.resolution = 512;
+    end
+    
+    myScene.name = sprintf('DoF%0.2fmm',pupilDiameters(ii));
+
+    if(ii == length(pupilDiameters))
         fprintf('Uploading zip... \n');
         uploadFlag = true;
     else
         uploadFlag = false;
     end
+    
     [cloudFolder,zipFileName] =  ...
         sendToCloud(gcp,myScene,'uploadZip',uploadFlag);
-
-    % Normal render
-%     [oi, results] = myScene.render();
-%     ieAddObject(oi);
-%     oiWindow;
     
 end
 
@@ -127,5 +136,9 @@ for ii=1:length(oiAll)
     save(saveFilename,'oi','myScene');
     
 end
+
+
+
+
 
 

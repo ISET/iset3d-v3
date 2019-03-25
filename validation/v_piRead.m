@@ -10,7 +10,7 @@ disp('Validating pi_read');
 %% Read the first test file
 
 % This is a big file and tests the HB form
-thisR = piRead(fullfile(piRootPath,'validation','data','piExample.pbrt'));
+thisR = piRead(fullfile(piRootPath,'data','piExample.pbrt'));
 assert(max(abs(thisR.lookAt.up - [0.1293 -0.0688 -0.9892])) < 1e-3);
 
 %% Check a small teapot file

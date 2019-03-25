@@ -68,8 +68,8 @@ end
 
 
 texturePath = 'textures';
-textureFiles=dir('*.png');
-if ~exist('textures','dir')
+textureFiles=dir('*.png'); 
+if ~exist([currentfolder,'/textures'],'dir')
     mkdir('textures');
 end
 for i=1:length(textureFiles)

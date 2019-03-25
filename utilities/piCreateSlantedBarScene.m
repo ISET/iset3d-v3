@@ -18,15 +18,15 @@ function recipe = piCreateSlantedBarScene(varargin)
 
 %% Parse inputs
 parser = inputParser();
-parser.addParameter('blackDepth',1, @isnumeric);
-parser.addParameter('whiteDepth',1, @isnumeric);
-parser.addParameter('planeDepth',[], @isnumeric);
+parser.addParameter('planeDepth',1, @isnumeric);
+parser.addParameter('eccentricity',0, @isnumeric);
 parser.addParameter('illumination', 'EqualEnergy.spd', @ischar);
+parser.addParameter('whiteDepth',0, @isnumeric);
+parser.addParameter('blackDepth',0, @isnumeric);
 
 parser.parse(varargin{:});
-blackDepth = parser.Results.blackDepth;
-whiteDepth = parser.Results.whiteDepth;
 planeDepth = parser.Results.planeDepth;
+eccentricity = parser.Results.eccentricity;
 illumination = parser.Results.illumination;
 
 %% Read in base scene
@@ -36,19 +36,22 @@ recipe = piRead(fullfile(scenePath,sceneName),'version',3);
 
 %% Make adjustments to the plane
 
-if(~isempty(planeDepth))
-    % If the user provides an overall plane depth, override the black and
-    % white depths.
-    whiteDepth = planeDepth;
-    blackDepth = planeDepth;
-end
+% Calculate x position given eccentricity
+% Note: Where should this position be calculated from?
+x = tand(eccentricity)*planeDepth;
 
 for ii = 1:length(recipe.assets)
     if strcmp(recipe.assets(ii).name,'BlackPlane')
-        recipe.assets(ii).position = [recipe.assets(ii).position(1);recipe.assets(ii).position(2); blackDepth];
+        recipe.assets(ii).position = ...
+            [recipe.assets(ii).position(1)+x;...
+            recipe.assets(ii).position(2);...
+            planeDepth];
     end
     if strcmp(recipe.assets(ii).name,'WhitePlane')
-        recipe.assets(ii).position = [recipe.assets(ii).position(1);recipe.assets(ii).position(2); whiteDepth];
+        recipe.assets(ii).position = ...
+            [recipe.assets(ii).position(1)+x;...
+            recipe.assets(ii).position(2);...
+            planeDepth];
     end
 end
 

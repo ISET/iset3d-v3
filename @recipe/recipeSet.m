@@ -55,7 +55,9 @@ switch param
                 % Sometimes the output directory has not been created yet.
                 mkdir(dirdest);
             end
-            if(~strcmp(dirsource,dirdest))
+            if(~exist(dirsource,'dir'))
+                warning('Source directory does not exist anymore.')
+            elseif(~strcmp(dirsource,dirdest))
                 copyfile(dirsource,dirdest);
                 rmdir(dirsource,'s');
             end
@@ -219,13 +221,15 @@ switch param
         thisR.film.cropwindow.type = 'float';
     case{'maxdepth','bounces'}
         % Eliminated warning Nov. 11, 2018.
-        if(~strcmp(thisR.integrator.subtype,'path'))
-            % warning('Changing integrator sub type to "path"');
+        if(~strcmp(thisR.integrator.subtype,'path')) &&...
+                (~strcmp(thisR.integrator.subtype,'bdpt'))
+        disp('Changing integrator sub type to "bdpt"');
+        
+        % When there are multiple bounces, apply this integrator
+        thisR.integrator.subtype = 'bdpt';
         end
         thisR.integrator.maxdepth.value = val(1);
         thisR.integrator.maxdepth.type = 'integer';
-        % When there are multiple bounces, apply this integrator
-        thisR.integrator.subtype = 'path';
     otherwise
         error('Unknown parameter %s\n',param);
 end

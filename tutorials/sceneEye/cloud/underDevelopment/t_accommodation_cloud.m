@@ -1,12 +1,18 @@
-%% t_chessSet_cloud.m
+%% t_accommodation_cloud.m
 %
-% Render a very nice view of the chess set using the cloud. 
-% 
-% Depends on: iset3d, isetbio, Docker, isetcloud
+% Demonstrate sceneEye accommodation using the numbersAtDepth scene and
+% rendering using the cloud.
+
+% Depends on: iset3d, isetbio, Docker, isetcloud.
 %
 % TL ISETBIO Team, 2017
 
+
 %% Initialize ISETBIO
+if isequal(piCamBio,'isetcam')
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    return;
+end
 ieInit;
 if ~mcDockerExists, mcDockerConfig; end % check whether we can use docker
 if ~mcGcloudExists, mcGcloudConfig; end % check whether we can use google cloud sdk;
@@ -15,7 +21,7 @@ if ~mcGcloudExists, mcGcloudConfig; end % check whether we can use google cloud 
 % Since rendering these images often takes a while, we will save out the
 % optical images into a folder for later processing.
 currDate = datestr(now,'mm-dd-yy_HH_MM');
-saveDirName = sprintf('ChessSet_%s',currDate);
+saveDirName = sprintf('accom_%s',currDate);
 saveDir = fullfile(isetbioRootPath,'local',saveDirName);
 if(~exist(saveDir,'dir'))
     mkdir(saveDir);
@@ -26,7 +32,7 @@ tic
 dockerAccount= 'tlian';
 dockerImage = 'gcr.io/primal-surfer-140120/pbrt-v3-spectral-gcloud';
 cloudBucket = 'gs://primal-surfer-140120.appspot.com';
-clusterName = 'trisha-chess';
+clusterName = 'trisha-accom';
 zone         = 'us-central1-a'; %'us-west1-a';    
 instanceType = 'n1-highcpu-32';
 gcp = gCloud('dockerAccount',dockerAccount,...
@@ -34,49 +40,52 @@ gcp = gCloud('dockerAccount',dockerAccount,...
     'clusterName',clusterName,...
     'cloudBucket',cloudBucket,'zone',zone,'instanceType',instanceType);
 toc
-% gcp.Configlist; Doesn't seem to work
 
-% Render depth?
+% Render depth
 gcp.renderDepth = true;
 
 % Clear the target operations
 gcp.targets = [];
 
-%% Load the scene
-myScene = sceneEye('chessSet');
+%% Select scene
 
-%% Set parameters
+myScene = sceneEye('numbersAtDepth');
 
-myScene.accommodation = 1.43; 
+myScene.eyePos = myScene.eyePos + [0 0.005 0];
+myScene.fov = 35;
+
+%% Set fixed parameters
+
+myScene.numRays = 256;
+myScene.resolution = 256;
+
 myScene.pupilDiameter = 4;
-myScene.fov = 30;
+myScene.numCABands = 6;
 
-myScene.numCABands = 8;
-myScene.diffractionEnabled = false;
-myScene.numBounces = 4;
+%% Step through accommodation
 
-myScene.numRays = 1024;
-myScene.resolution = 512;
+accomm = [3:10]; % in diopters
 
-myScene.eyePos = myScene.eyePos + [0.1 0.4 -0.3];
-myScene.eyeTo = myScene.eyeTo + [0 0 -0.6];
-
-% Zoom in 
-forward = myScene.eyeTo - myScene.eyePos;
-myScene.eyePos = myScene.eyePos + forward*0.2;
-
-myScene.name = 'ChessSet';
+for ii = 1:length(accomm)
     
-% Normal render
-% [oi, results] = myScene.render;
-% ieAddObject(oi);
-% oiWindow;
-
-%% Render on cloud
-
-uploadFlag = true;
-[cloudFolder,zipFileName] =  ...
-    sendToCloud(gcp,myScene,'uploadZip',uploadFlag);
+    myScene.accommodation = accomm(ii);
+    myScene.name = sprintf('accom_%0.2fdpt',myScene.accommodation);
+    
+    % Instead of rendering, we add it to the list of gcloud targets
+    % Note: since sceneEye is a a special object (different from the usual
+    % recipe we use in iset3d) we use a helper function that will
+    % facilitate the adding of each sceneEye into the gCloud class
+    if(ii == length(accomm))
+        % Upload the zip file during the final loop.  
+        fprintf('Uploading zip... \n');
+        uploadFlag = true;
+    else
+        uploadFlag = false;
+    end
+    [cloudFolder,zipFileName] =  ...
+        sendToCloud(gcp,myScene,'uploadZip',uploadFlag);
+    
+end
 
 %% Render
 gcp.render();
@@ -109,5 +118,7 @@ for ii=1:length(oiAll)
     save(saveFilename,'oi','myScene');
     
 end
+
+
 
 
