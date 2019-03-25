@@ -1,12 +1,19 @@
 %% s_oi2rgbExample.m
-% Load an OI and process it through a sensor and IP pipeline all the way to
-% an RGB image.
+% Load & process an OI through a sensor & IP pipeline through to RGB image.
+%
+% Description:
+%    Load an OI and process it through a sensor and IP pipeline all the way
+%    to an RGB image.
 
-% Tlian 1/2018
+% History:
+%    01/XX/18  TL   Tlian 1/2018
+%    03/25/19  JNM  Documentation pass
 
 %% Initialize
-
 ieInit;
+
+% Determine whether you are working in ISETBio or ISETCam
+fprintf('Attempting to execute using %s.\n', piCamBio);
 
 % Load the OI here
 oiFilename = '';
@@ -17,7 +24,7 @@ load(oiFilename);
 % For a single image, we can just adjust illuminance directly. (For
 % multiple captures in the same scene, we have to be careful about how we
 % scale these photons.)
-oi = oiSet(oi,'mean illuminance',10); % in lux
+oi = oiSet(oi, 'mean illuminance', 10); % in lux
 
 % Check the oi
 vcAddAndSelectObject(oi);
@@ -28,49 +35,46 @@ oiWindow;
 % aperture diameter, and FOV were not set correctly when saving the OI.
 
 %% Sensor
-
 sensor = sensorCreate();
 
 % Set the pixel size
 % Sensor size will be the same as the size of the optical image.
-sensorPixelSize = oiGet(oi,'sample spacing','m');
-oiHeight = oiGet(oi,'height');
-oiWidth = oiGet(oi,'width');
+sensorPixelSize = oiGet(oi, 'sample spacing', 'm');
+oiHeight = oiGet(oi, 'height');
+oiWidth = oiGet(oi, 'width');
 sensorSize = round([oiWidth oiHeight]./sensorPixelSize);
-sensor = sensorSet(sensor,'size',sensorSize);
-sensor = sensorSet(sensor,'pixel size same fill factor',sensorPixelSize);
+sensor = sensorSet(sensor, 'size', sensorSize);
+sensor = sensorSet(sensor, 'pixel size same fill factor', sensorPixelSize);
 
 % Set exposure time
-sensor = sensorSet(sensor,'auto Exposure',true); % Use auto exposure. 
+sensor = sensorSet(sensor, 'auto Exposure', true); % Use auto exposure.
 
 % Compute!
-sensor = sensorCompute(sensor,oi);
+sensor = sensorCompute(sensor, oi);
 
 % Check exposure
-exposureTime = sensorGet(sensor,'exp time');
-fprintf('Exposure Time is 1/%0.2f s \n',1/exposureTime);
+exposureTime = sensorGet(sensor, 'exp time');
+fprintf('Exposure Time is 1/%0.2f s \n', 1/exposureTime);
 
 % Check the sensor window
 ieAddObject(sensor);
 sensorWindow;
 
 %% Image Processing
-
 ip = ipCreate;
-ip = ipSet(ip,'demosaic method','bilinear');
-ip = ipSet(ip,'correction method illuminant','gray world');
+ip = ipSet(ip, 'demosaic method', 'bilinear');
+ip = ipSet(ip, 'correction method illuminant', 'gray world');
 
 % Compute!
-ip = ipCompute(ip,sensor);
+ip = ipCompute(ip, sensor);
 
 ieAddObject(ip);
 ipWindow;
 
 %% Get RGB image
-srgb = ipGet(ip,'data srgb');
+srgb = ipGet(ip, 'data srgb');
 imshow(srgb);
 
 %% Save RGB image
-% [p,n,e] = fileparts(oiFilename);
-% imwrite(srgb,fullfile(p,strcat(n,'.png')));
-
+% [p, n, e] = fileparts(oiFilename);
+% imwrite(srgb, fullfile(p, strcat(n, '.png')));
