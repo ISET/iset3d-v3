@@ -66,6 +66,7 @@ for ii = 1: length(assetRecipe)
     asset(ii).name = name;
     asset(ii).index = n;
     asset(ii).geometry = geometry;
+    
     if ~isequal(assetRecipe{ii}.count,1)
         for hh = 1: length(asset(ii).geometry)
             pos = asset(ii).geometry(hh).position;

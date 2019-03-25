@@ -45,6 +45,8 @@ p.addParameter('timestamp',50,@isnumeric);
 p.addParameter('nScene',1,@isnumeric);
 p.addParameter('cloudRender',1);
 p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
+p.addParameter('thisR',[]);
+p.addParameter('road',[]);
 p.parse(varargin{:});
 
 sceneType      = p.Results.sceneType;
@@ -52,19 +54,20 @@ treeDensity    = p.Results.treeDensity;
 roadType       = p.Results.roadType;
 trafficflowDensity = p.Results.trafficflowDensity;
 weatherType    = p.Results.weatherType;
-dayTime        = p.Results.dayTime;
 timestamp      = p.Results.timestamp;
 st             = p.Results.scitran;
 cloudRenderFlag= p.Results.cloudRender;
-
+thisR_road     = p.Results.thisR;
+road           = p.Results.road;
 %% Flywheel init
 
 if isempty(st), st = scitran('stanfordlabs'); end
+
+
 hierarchy  = st.projectHierarchy('Graphics assets');
 sessions   = hierarchy.sessions;
-
 %% Create a road using SUMO
-
+%
 % return a road contains road information and Flyweel asset list: road.fwList;
 [road,thisR_road] = piRoadCreate('type',roadType,...
     'trafficflowDensity',trafficflowDensity,...
@@ -73,8 +76,6 @@ sessions   = hierarchy.sessions;
     'cloudRender',cloudRenderFlag,...
     'scitran',st);
 
-% It takes about 6 mins to generate a trafficflow, so for each scene, we'd
-% like generate the trafficflow only once.
 roadFolder = fileparts(thisR_road.inputFile);
 roadFolder = strsplit(roadFolder,'/');
 roadName   = roadFolder{length(roadFolder)};
@@ -96,15 +97,17 @@ end
 % Uncomment when SUSO runs
 %
 tic
-tree_interval = rand(1)*20+5;
+% tree_interval = rand(1)*20+5;
+tree_interval = 10;
 if piContains(sceneType,'city')||piContains(sceneType,'suburb')
-    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+    
+     susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
     % place parked cars
     if piContains(roadType,'parking')
         trafficflow = piParkingPlace(road, trafficflow);
     end
     building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));
-
+    
     if ~exist(building_listPath,'file')
         building_list = piAssetListCreate('class',sceneType,...
             'scitran',st);
@@ -115,6 +118,14 @@ if piContains(sceneType,'city')||piContains(sceneType,'suburb')
     buildingPosList = piBuildingPosList(building_list,thisR_road);
     susoPlaced.building = piBuildingPlace(building_list,buildingPosList);
 
+    
+    %     save(savedSusoPlaced,'susoPlaced');
+    
+    %% tmp disable suso randomization
+%     savedSusoPlaced = fullfile(piRootPath,'local','Assets_tmp','susoPlaced');
+%     susoPlaced = load(savedSusoPlaced,'susoPlaced'); 
+%     susoPlaced = susoPlaced.susoPlaced;
+    %%
     % Add All placed assets
     thisR_road = piAssetAdd(thisR_road, susoPlaced);
     % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
@@ -125,8 +136,24 @@ if piContains(sceneType,'city')||piContains(sceneType,'suburb')
     road = fwInfoCat(road,susoPlaced);
 end
 
-%}
+%%
+% It takes about 6 mins to generate a trafficflow, so for each scene, we'd
+% like generate the trafficflow only once.
+roadFolder = fileparts(thisR_road.inputFile);
+roadFolder = strsplit(roadFolder,'/');
+roadName   = roadFolder{length(roadFolder)};
+trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadName,trafficflowDensity));
+trafficflowFolder = fileparts(trafficflowPath);
 
+if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
+
+% This is where SUMO is called.  Or maybe the file already exists.
+if ~exist(trafficflowPath,'file')
+    trafficflow = piTrafficflowGeneration(road);
+    save(trafficflowPath,'trafficflow');
+else
+    load(trafficflowPath,'trafficflow');
+end
 %% Place vehicles/pedestrians using the SUMO data
 
 [sumoPlaced, ~] = piTrafficPlace(trafficflow,...

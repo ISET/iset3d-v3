@@ -20,11 +20,11 @@ function [thisR,skymapInfo] = piSkymapAdd(thisR,skyName)
 %%
 st = scitran('stanfordlabs');
 % sunlights = sprintf('# LightSource "distant" "point from" [ -30 100  100 ] "blackbody L" [6500 1.5]');
-if ~piContains(skyName,':')
+if ~piContains(skyName,':') 
     skyName = lower(skyName);
     if isequal(skyName,'random')
-        index = randi(3,1);
-        skynamelist = {'morning','noon','sunset'};
+        index = randi(4,1);
+        skynamelist = {'morning','noon','sunset','cloudy'};
         skyName = skynamelist{index};
     end
     thisR.metadata.daytime = skyName;
@@ -33,7 +33,7 @@ if ~piContains(skyName,':')
             skyname = sprintf('morning_%03d.exr',randi(4,1));
         case 'noon'
             skyname = sprintf('noon_%03d.exr',randi(10,1));
-            %         skyname = sprintf('noon_%03d.exr',1);
+%                     skyname = sprintf('noon_%03d.exr',9);
         case 'sunset'
             skyname = sprintf('sunset_%03d.exr',randi(4,1));
         case 'cloudy'
@@ -59,10 +59,10 @@ if ~piContains(skyName,':')
 else
     % Fix this with Flywheel and Justin E
     time = strsplit(skyName,':');
-    acqName = sprintf('wandell/Graphics assets/skymap_daytime/%s00',time{1});
+    acqName = sprintf('wandell/Graphics assets/skymap_daytime/%02d00',str2double(time{1}));
     thisAcq = st.fw.lookup(acqName);
     dataId = thisAcq.id;
-    skyname= sprintf('probe_%s-%s_latlongmap.exr',time{1},time{2});
+    skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));
 end
 
 skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
@@ -70,8 +70,8 @@ skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
 index_m = find(piContains(thisR.world,'_materials.pbrt'));
 
 % skyview = randi(360,1);
-skyview = randi(45,1)+45;% tmp
-% skyview = 45;% tmp
+% skyview = randi(45,1)+45;% tmp
+skyview = 45;% tmp
 
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));

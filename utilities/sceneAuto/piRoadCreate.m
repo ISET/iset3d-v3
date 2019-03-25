@@ -43,34 +43,34 @@ load(fullfile(piRootPath,'local','configuration','roadInfo.mat'),'roadinfo');
 vTypes={'pedestrian','passenger','bus','truck','bicycle'};
 
 % randm = randi(2,1);
-randm = 1;% tmp 0915 zhenyi
+% randm = 1;% tmp 0915 zhenyi
 switch sceneType
-    case {'city','city2','city1','city3','city4'}
+    case {'city','city2','city1','city3','city4','citymix'}
         sceneType_tmp = 'city';
-        if randm ==1,road.nlanes = 4;else, road.nlanes = 6;end
+%         if randm ==1,road.nlanes = 4;else, road.nlanes = 6;end
         interval=[0.1,0.5,0.05,0.05,0.05];
-        if piContains(roadtype,'cross')
-            roadname = sprintf('%s_%s_%dlanes',sceneType_tmp,roadtype,road.nlanes);
-        else
-            roadname = roadtype;
-        end
+%         if piContains(roadtype,'cross')
+%             roadname = sprintf('%s_%s_%dlanes',sceneType_tmp,roadtype,road.nlanes);
+%         else
+         roadname = roadtype;
+%         end
     case {'suburb'}
         sceneType_tmp = sceneType;
         interval=[0.05,0.1,0.01,0.01,0.03];
         roadname = roadtype;
-    case'residential'
-        road.nlanes = 2;
-        interval=[0.6,0.4,0.02,0.01,0.05];
-    case 'highway'
-        sceneType_tmp = sceneType;
-        if randm ==1,road.nlanes = 6;else, road.nlanes = 8;end
-        interval=[0,0.9,0.1,0.5,0];
-        roadname = roadtype;
-    case 'bridge'
-        sceneType_tmp = sceneType;
-        if randm ==1,road.nlanes = 6;else, road.nlanes = 8;end
-        interval=[0,0.9,0.1,0.5,0];
-        roadname = sceneType;
+%     case'residential'
+%         road.nlanes = 2;
+%         interval=[0.6,0.4,0.02,0.01,0.05];
+%     case 'highway'
+%         sceneType_tmp = sceneType;
+%         if randm ==1,road.nlanes = 6;else, road.nlanes = 8;end
+%         interval=[0,0.9,0.1,0.5,0];
+%         roadname = roadtype;
+%     case 'bridge'
+%         sceneType_tmp = sceneType;
+%         if randm ==1,road.nlanes = 6;else, road.nlanes = 8;end
+%         interval=[0,0.9,0.1,0.5,0];
+%         roadname = sceneType;
 end
 % check the road type and get road assets from flywheel
 containerID = idGet(roadSession,'data type','session');
@@ -80,7 +80,8 @@ fileType = 'CG Resource';
 [resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
 kk =1;
 for dd = 1:length(recipeFiles)
-   if contains (recipeFiles{dd}{1}.name,roadname)
+    fwRoadName = strsplit(recipeFiles{dd}{1}.name,'.');
+   if strcmp(fwRoadName{1},roadname)
        thisRoad{kk} = recipeFiles{dd}{1}.name;
        index{kk} = dd;
        kk=kk+1;
