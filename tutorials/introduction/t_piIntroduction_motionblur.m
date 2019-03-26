@@ -43,7 +43,8 @@ thisR.set('pixel samples',64);
 % bounce, so it will not appear like glass or mirror.
 thisR.integrator.maxdepth.value = 5;
 
-% This adds a mirror and other materials that are used in driving.s
+% This adds a mirror and other materials that are used in driving
+% simulation.
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.

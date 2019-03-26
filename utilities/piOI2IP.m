@@ -27,7 +27,7 @@ if ~isempty(pixelSize)
 end
 
 % [~,rect] = ieROISelect(oi);
-rect = [718   698   200   198];
+rect = [718   698   200   198];% 
 sensor = sensorSet(sensor, 'size',[800,1920]);
 sensor   = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
 eTime  = autoExposure(oi,sensor,0.90,'video','center rect',rect,'videomax',1/60);
