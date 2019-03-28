@@ -50,8 +50,8 @@ outFile = fullfile(outFolder,[sceneName,'.pbrt']);
 recipe.set('outputFile',outFile);
 
 %% Change render quality
-recipe.set('film resolution',[128 128]);
-recipe.set('pixel samples',128);
+recipe.set('film resolution',[192 192]);
+recipe.set('pixel samples',96);
 recipe.set('max depth',1); % Number of bounces
 
 %% Render

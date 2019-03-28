@@ -44,26 +44,35 @@ switch param
     
     % Rendering and Docker related
     case {'outputfile'}
-        % Is there already an output file set? If so, copy all directories
-        % over to the new directory.
-        if(~strcmp(thisR.outputFile,val) && strcmp(thisR.exporter,'C4D'))
-            [dirsource,~,~] = fileparts(thisR.outputFile);
-            [dirdest,~,~] = fileparts(val);
-            fprintf('Output directory changed! Copying files from %s to %s \n',...
-                dirsource,dirdest);
-            if(~exist(dirdest,'dir'))
-                % Sometimes the output directory has not been created yet.
-                mkdir(dirdest);
-            end
-            if(~exist(dirsource,'dir'))
-                warning('Source directory does not exist anymore.')
-            elseif(~strcmp(dirsource,dirdest))
-                copyfile(dirsource,dirdest);
-                rmdir(dirsource,'s');
+        % thisR.set('outputfile',fullfilepath);
+        %
+        % The outputfile has a default initial string.  When we set,
+        % we check that the new directory exists. If not, we make it.
+        % If there were files in the previous directory we copy them
+        % to the new directory.  Maybe there should be an option to
+        % stop the copy.
+        
+        currentDir = fileparts(thisR.outputFile);
+        newDir     = fileparts(val);
+        if ~exist(newDir,'dir'), mkdir(newDir); end
+        
+        % Are we changing the output directory?
+        if isequal(currentDir,newDir)
+            % Nothing needs to be done
+        else
+            % We start copying from the current to the new
+            if ~exist(currentDir,'dir')
+                % No files to be copied
+            else
+                fprintf('Output directory changed. Copying files from %s to %s \n',... 
+                currentDir,newDir);
+                copyfile(currentDir,newDir);
+                rmdir(currentDir,'s');
             end
         end
+
         thisR.outputFile = val;
-        
+
     case {'inputfile'}
         thisR.inputFile = val;   
         % Scene

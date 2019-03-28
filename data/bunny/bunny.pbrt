@@ -10,7 +10,7 @@ Camera "perspective"
     "float fov" [60]
 
 # Added these
-SurfaceIntegrator "path" 
+Integrator "path" 
 
 PixelFilter "gaussian" 
    "float xwidth" [2.000000 ] 

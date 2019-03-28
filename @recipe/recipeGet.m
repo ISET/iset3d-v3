@@ -154,10 +154,17 @@ switch ieParamFormat(param)
                 val = NaN;
             case 'lens'
                 % Focal distance given the object distance and the lens file
-                [p,flname,~] = fileparts(thisR.camera.specfile.value);
-                focalLength = load(fullfile(p,[flname,'.FL.mat']));
-                objDist = thisR.get('object distance');
-                val = interp1(focalLength.dist,focalLength.focalDistance,objDist);
+                [p,flname,~] = fileparts(thisR.camera.lensfile.value);
+                focalLength = load(fullfile(p,[flname,'.FL.mat']));  % Millimeters
+                objDist = thisR.get('object distance');   % Units?  Where does this come from?
+                % objDist = objDist*1e3;
+                if objDist < min(focalLength.dist(:))
+                    fprintf('Object too close to focus\n');
+                elseif objDist > max(focalLength.dist(:))
+                    fprintf('Object too far to focus\n');
+                else
+                    val = interp1(focalLength.dist,focalLength.focalDistance,objDist);
+                end
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end

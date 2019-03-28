@@ -34,10 +34,13 @@ function ieObject = piDat2ISET(inputFile,varargin)
 %%
 p = inputParser;
 
+
+% Why is this here?
 if length(varargin) > 1
     for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
-                | isobject(varargin{i}))
+        if ~(isnumeric(varargin{i})    || ...
+                islogical(varargin{i}) || ...
+                isobject(varargin{i}))
             varargin{i} = ieParamFormat(varargin{i});
         end
     end

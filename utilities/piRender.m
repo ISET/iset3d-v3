@@ -61,7 +61,7 @@ p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
 % Squeeze out spaces and force lower case
 if length(varargin) > 1
     for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+        if ~(isnumeric(varargin{i}) || islogical(varargin{i}))
             varargin{i} = ieParamFormat(varargin{i});
         end
     end
@@ -77,11 +77,11 @@ p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);
 
-% If you are insisting on using V2, then set dockerImageName to
-% 'vistalab/pbrt-v2-spectral';
-% We were testing this one.
-% 'vistalab/pbrt-v3-spectral:test';
-p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral',@ischar);
+% If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
+
+% We were testing this one      'vistalab/pbrt-v3-spectral:test';
+% The one we have run a lot is  'vistalab/pbrt-v3-spectral:latest';
+p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:test',@ischar);
 
 p.parse(thisR,varargin{:});
 renderType      = p.Results.rendertype;

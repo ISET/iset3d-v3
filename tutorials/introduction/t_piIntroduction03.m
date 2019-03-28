@@ -1,4 +1,4 @@
-%% Uses Flywheel to get a skymap; also uses special scene materials
+%% Gets a skymap from Flywheel; also uses special scene materials
 %
 % We store many graphics assets in the Flywheel database.  This script
 % shows how to download a file from Flywheel.  This technique is used
@@ -43,7 +43,7 @@ thisR = piRead(fname);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[400 300]);
+thisR.set('film resolution',[267 200]);
 thisR.set('pixel samples',32);
 
 %% Get a sky map from Flywheel, and use it in the scene
@@ -58,23 +58,21 @@ for ii  = 1: length(timeofDay)
         [~, skymapInfo] = piSkymapAdd(thisR,thisTime);
         
         % The skymapInfo is structured according to python rules.  We convert
-        % to Matlab format here.
+        % to Matlab format here. The first cell is the acquisition ID
+        % and the second cell is the file name of the skymap
         s = split(skymapInfo,' ');
         
-        % If the skymap is there already, move on.
+        % The destination of the skymap file
         skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
         
-        % Otherwise open up Flywheel and download it.
+        % If it exists, move on. Otherwise open up Flywheel and
+        % download the skypmap file.
         if ~exist(skyMapFile,'file')
             fprintf('Downloading Skymap from Flywheel ... ');
-            st = scitran('stanfordlabs');
-            
-            fName = st.fileDownload(s{2},...
-                'containerType','acquisition',...
-                'containerID',s{1}, ...
-                'destination',skyMapFile);
-            
-            assert(isequal(fName,skyMapFile));
+            st        = scitran('stanfordlabs');
+            acq       = st.fw.get(s{1});    % Get the acquisition using the ID
+            thisFile  = acq.getFile(s{2});  % Get the FileEntry for this skymap
+            thisFile.download(skyMapFile);  % Download the file
             fprintf('complete\n');
         end
     end

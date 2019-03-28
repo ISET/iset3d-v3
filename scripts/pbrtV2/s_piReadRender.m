@@ -1,5 +1,7 @@
 %% s_piReadRender
 %
+% DEPRECATED
+%
 % Read a PBRT scene file, interpret it, render it (with depth map).
 % On a reasonable machine, this takes about 10 sec.
 %
@@ -12,6 +14,9 @@
 %
 % See also
 %   piRead, piWrite, piRender
+
+%
+error('DEPRECATED')
 
 %% Set up ISET and Docker
 ieInit;

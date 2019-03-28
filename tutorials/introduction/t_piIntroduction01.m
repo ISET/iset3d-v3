@@ -39,7 +39,7 @@ recipe.set('outputFile',outFile);
 %% Set up the render quality
 
 % There are many different parameters that can be set.
-recipe.set('film resolution',[128 128]);
+recipe.set('film resolution',[192 192]);
 recipe.set('pixel samples',128);
 recipe.set('max depth',1); % Number of bounces
 
