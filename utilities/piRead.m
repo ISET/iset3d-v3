@@ -90,11 +90,10 @@ thisR.inputFile = fname;
 readmaterials   = p.Results.readmaterials;
 
 % Set the output directory default
-% fprintf('Setting output path\n');
-[~,scene_fname] = fileparts(fname);
-outFilepath = fullfile(piRootPath,'local',scene_fname);
-outputFile  = fullfile(outFilepath,[scene_fname,'.pbrt']);
-thisR.outputFile = outputFile;
+[~,scene_fname]  = fileparts(fname);
+outFilepath      = fullfile(piRootPath,'local',scene_fname);
+outputFile       = fullfile(outFilepath,[scene_fname,'.pbrt']);
+thisR.set('outputFile',outputFile);
 
 %% Check version number
 if(ver ~= 2 && ver ~=3)

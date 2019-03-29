@@ -14,7 +14,7 @@ Film "image"
   "integer yresolution" [256 ]
   "string filename" "teapot-area-light.exr"
 
-SurfaceIntegrator "directlighting" 
+Integrator "directlighting" 
 
 Sampler "lowdiscrepancy" 
   "integer pixelsamples" [8]

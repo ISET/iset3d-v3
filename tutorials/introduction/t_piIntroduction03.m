@@ -1,4 +1,4 @@
-%% Uses Flywheel to get a skymap; also uses special scene materials
+%% Gets a skymap from Flywheel; also uses special scene materials
 %
 % We store many graphics assets in the Flywheel database.  This script
 % shows how to download a file from Flywheel.  This technique is used
@@ -43,39 +43,40 @@ thisR = piRead(fname);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',64);
+thisR.set('film resolution',[267 200]);
+thisR.set('pixel samples',32);
 
 %% Get a sky map from Flywheel, and use it in the scene
-
-% We will put a skymap in the local directory so people without
-% Flywheel can see the output
-if piScitranExists
-    % Use a small skymap.  We should make all the skymaps small, but
-    % 'noon' is not small!
-    [~, skymapInfo] = piSkymapAdd(thisR,'cloudy');
-    
-    % The skymapInfo is structured according to python rules.  We convert
-    % to Matlab format here.
-    s = split(skymapInfo,' ');
-    
-    % If the skymap is there already, move on.
-    skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
-    
-    % Otherwise open up Flywheel and download it.
-    if ~exist(skyMapFile,'file')
-        fprintf('Downloading Skymap from Flywheel ... ');
-        st = scitran('stanfordlabs');
+timeofDay = {'7:30', '12:30', '16:30'};
+for ii  = 1: length(timeofDay)
+    thisTime = timeofDay{ii};
+    % We will put a skymap in the local directory so people without
+    % Flywheel can see the output
+    if piScitranExists
+        % Use a small skymap.  We should make all the skymaps small, but
+        % 'noon' is not small!
+        [~, skymapInfo] = piSkymapAdd(thisR,thisTime);
         
-        fName = st.fileDownload(s{2},...
-            'containerType','acquisition',...
-            'containerID',s{1}, ...
-            'destination',skyMapFile);
+        % The skymapInfo is structured according to python rules.  We convert
+        % to Matlab format here. The first cell is the acquisition ID
+        % and the second cell is the file name of the skymap
+        s = split(skymapInfo,' ');
         
-        assert(isequal(fName,skyMapFile));
-        fprintf('complete\n');
+        % The destination of the skymap file
+        skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
+        
+        % If it exists, move on. Otherwise open up Flywheel and
+        % download the skypmap file.
+        if ~exist(skyMapFile,'file')
+            fprintf('Downloading Skymap from Flywheel ... ');
+            st        = scitran('stanfordlabs');
+            acq       = st.fw.get(s{1});    % Get the acquisition using the ID
+            thisFile  = acq.getFile(s{2});  % Get the FileEntry for this skymap
+            thisFile.download(skyMapFile);  % Download the file
+            fprintf('complete\n');
+        end
     end
-end
+
 %% List material library
 
 % This value determines the number of ray bounces.  The scene has
@@ -103,7 +104,7 @@ piWrite(thisR,'creatematerials',true);
 % Maybe we should speed this up by only returning radiance.
 [scene, result] = piRender(thisR,'render type','radiance');
 
-scene = sceneSet(scene,'name',sprintf('%s',thisR.integrator.subtype));
+scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
 ieAddObject(scene); sceneWindow;
-
+end
 %% END

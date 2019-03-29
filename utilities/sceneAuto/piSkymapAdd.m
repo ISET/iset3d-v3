@@ -63,7 +63,7 @@ if ~piContains(skyName,':')
 else
     % Fix this with Flywheel and Justin E
     time = strsplit(skyName,':');
-    acqName = sprintf('wandell/Graphics assets/skymap_daytime/%02d00',str2double(time{1}));
+    acqName = sprintf('wandell/Graphics assets/skymap/skymap_daytime/%02d00',str2double(time{1}));
     thisAcq = st.fw.lookup(acqName);
     dataId = thisAcq.id;
     skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));
