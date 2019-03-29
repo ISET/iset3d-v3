@@ -35,7 +35,7 @@ function [thisR_scene,road] = piSceneAuto(varargin)
 p = inputParser;
 if length(varargin) > 1
     for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+        if ~(isnumeric(varargin{i}) || islogical(varargin{i}))
             varargin{i} = ieParamFormat(varargin{i});
         end
     end

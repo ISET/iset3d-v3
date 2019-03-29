@@ -17,13 +17,11 @@ if ~exist(sceneFolder,'dir'),mkdir(sceneFolder);end
 %    'session label exact','scenes_pbrt',...
 %    'acquisition label exact',sceneName);
 %     dataId = files{1}.parent.id;
-acquisition = st.fw.lookup(sprintf('wandell/Graphics assets/scenes_pbrt/%s',sceneName));
+acquisition = st.fw.lookup(sprintf('wandell/Graphics assets/scenes_pbrt/scenes_pbrt/%s',sceneName));
 dataId = acquisition.id;
 % download the file
-st.fileDownload([sceneName,'.json'],...
-    'container type', 'acquisition' , ...
-    'container id',  dataId ,...
-    'destination',destName_recipe);
+piFwFileDownload(destName_recipe, [sceneName,'.json'], dataId);
+
 fprintf('%s downloaded \n',[sceneName,'.json']);
 thisR_tmp = jsonread(destName_recipe);
 scene_label.daytime = thisR_tmp.metadata.daytime;

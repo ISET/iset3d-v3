@@ -1,9 +1,9 @@
 function assetlist = piAssetListCreate(varargin)
-%% Create an assetList for street elements on flywheel 
-% Input: 
+%% Create an assetList for street elements on flywheel
+% Input:
 %        class: session name on flywheel;
 %        subclass: acquisition names on flywheel;
-% Output: 
+% Output:
 %       assetList: Assigned assets libList used for street elements;
 %
 %
@@ -55,19 +55,16 @@ if isempty(acquisitionname)
         [~,n,~] = fileparts(n); % extract file name
         % Download the scene to a destination zip file
         localFolder = fullfile(piRootPath,'local','AssetLists',n);
-
+        
         destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
         if ~exist(localFolder,'dir')
             mkdir(localFolder)
         end
-        st.fileDownload(recipeFiles{ii}{1}.name,...
-            'container type', 'acquisition' , ...
-            'container id',  recipe_acqID{ii} ,...
-            'destination',destName_recipe);
+        piFwFileDownload(destName_recipe, recipeFiles{ii}{1}.name, recipe_acqID{ii});
         %%
         thisR = jsonread(destName_recipe);
-%         assetRecipe{ii}.name   = destName_recipe;
-%         assetRecipe{ii}.count  = downloadList(ii).count;
+        %         assetRecipe{ii}.name   = destName_recipe;
+        %         assetRecipe{ii}.count  = downloadList(ii).count;
         assetlist(ii).name = n;
         assetlist(ii).material.list = thisR.materials.list;
         assetlist(ii).material.txtLines = thisR.materials.txtLines;
@@ -89,22 +86,17 @@ else
         end
     end
     for dd = 1:length(thisAcq)
-    [~,n,~] = fileparts(thisAcq{dd}.name);
-    [~,n,~] = fileparts(n); % extract file name
-    % Download the scene to a destination zip file
-    localFolder = fullfile(piRootPath,'local','AssetLists',n);
-
-    destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
-    if ~exist(localFolder,'dir')
-        mkdir(localFolder)
-    end
-    st.fileDownload(thisAcq{dd}.name,...
-        'container type', 'acquisition' , ...
-        'container id',  thisID{dd} ,...
-        'destination',destName_recipe);
-        thisR = jsonread(destName_recipe);
-%         assetRecipe{dd}.name   = destName_recipe;
-%         assetRecipe{dd}.count  = downloadList(dd).count;
+        [~,n,~] = fileparts(thisAcq{dd}.name);
+        [~,n,~] = fileparts(n); % extract file name
+        % Download the scene to a destination zip file
+        localFolder = fullfile(piRootPath,'local','AssetLists',n);
+        
+        destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
+        if ~exist(localFolder,'dir')
+            mkdir(localFolder)
+        end
+        
+        piFwFileDownload(destName_recipe, thisAcq{dd}.name, thisID{dd});
         assetlist(dd).name = n;
         assetlist(dd).material.list     = thisR.materials.list;
         assetlist(dd).material.txtLines = thisR.materials.txtLines;
