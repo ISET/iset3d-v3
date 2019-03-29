@@ -141,7 +141,7 @@ if piContains(sceneType,'city')||piContains(sceneType,'suburb')
     % create a file ID & name strings for Flywheel to copy selected assets
     % over to VMs.
     % static objects
-    road = fwInfoCat(road,susoPlaced);
+    road = fwInfoAppend(road,susoPlaced);
 end
 
 %%
@@ -174,15 +174,12 @@ for ii = 1: length(sumoPlaced)
     thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
 end
 
-road = fwInfoCat(road,sumoPlaced{1}); % mobile objects
-
-
-
+road = fwInfoAppend(road,sumoPlaced{1}); % mobile objects
 
 end
 
 % Maybe a better name and maybe attached to the relevant object.
-function road = fwInfoCat(road,assets)
+function road = fwInfoAppend(road,assets)
 %% List the selected fwInfo str with road.fwList
 
 assetFields = fieldnames(assets);
