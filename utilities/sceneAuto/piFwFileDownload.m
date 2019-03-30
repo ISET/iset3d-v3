@@ -1,6 +1,5 @@
 function piFwFileDownload(destination, fileName, AcqID)
     p = inputParser;
-    p.addParameter('unzip',ture)
     st = scitran('stanfordlabs');    
     acq       = st.fw.get(AcqID); % Get the acquisition using the ID
     thisFile  = acq.getFile(fileName); % Get the FileEntry for this skymap

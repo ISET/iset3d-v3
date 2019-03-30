@@ -33,16 +33,16 @@ function [thisR_scene,road] = piSceneAuto(varargin)
 
 %% Read input parameters
 p = inputParser;
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) || islogical(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
-
+% if length(varargin) > 1
+%     for i = 1:length(varargin)
+%         if ~(isnumeric(varargin{i}) || islogical(varargin{i}))
+%             varargin(i) = ieParamFormat(varargin(i));
+%         end
+%     end
+% else
+%     
+% end
+varargin =ieParamFormat(varargin);
 p.addParameter('sceneType','city',@ischar);
 p.addParameter('treeDensity','random',@ischar);
 p.addParameter('roadType','crossroad',@ischar);
