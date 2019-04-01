@@ -22,11 +22,17 @@ if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
 
-FilePath = fullfile(piRootPath,'data','V3','ChessSet');
-fname = fullfile(FilePath,'ChessSet.pbrt');
-if ~exist(fname,'file'), error('File not found'); end
+% This is the INPUT file name
+sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
-thisR = piRead(fname);
+% The output will be written here
+inFolder = fullfile(piRootPath,'local','scenes');
+piPBRTFetch(sceneName,'pbrtversion',3,'destinationFolder',inFolder);
+
+%%
+
+inFile = fullfile(inFolder,sceneName,sceneFileName);
+thisR = piRead(inFile);
 
 %% Set render quality
 
@@ -73,35 +79,35 @@ thisR.integrator.maxdepth.value = 4;
 % This adds a mirror and other materials that are used in driving.s
 % piMaterialGroupAssign(thisR);
 
-%% Write out the pbrt scene file, based on thisR.
-%
-
 %%
-lensfile = '';
 %{
+lensfile = '';
+%}
+
+%
 % This runs but includes the 'sun', so we need HDR rendering to see it
 % We are not in good shape with lenses and lens distances.
 % More editing and checking of units are needed.
 
-lensfile = 'fisheye.87deg.6.0mm.dat';
-% lensfile = 'dgauss.22deg.50.0mm.dat';
+% lensfile = 'fisheye.87deg.6.0mm.dat';
+lensfile = 'dgauss.22deg.50.0mm.dat';
 fprintf('Using this lens %s\n',lensfile);
 thisR.camera = piCameraCreate('realistic','lensFile',lensfile,'pbrtVersion',3);
-thisR.set('autofocus',true);
-% thisR.camera.focusdistance.value = 50;
+% thisR.set('autofocus',true);
+thisR.camera.focusdistance.value = 0.5;
 % thisR.camera.aperturediameter.value = 5.5;
 %}
 
 thisR.set('fov',45);
-thisR.film.diagonal.value=10;
+thisR.film.diagonal.value=  30;
 thisR.film.diagonal.type = 'float';
 
-thisR.integrator.subtype = 'bdpt';
+thisR.integrator.subtype = 'path';  % bdpt
 thisR.sampler.subtype = 'sobol';
 
 % thisR.integrator.lightsamplestrategy.type = 'string';
 % thisR.integrator.lightsamplestrategy.value = 'spatial';
-thisR.lookAt.to(3) = 0;
+% thisR.lookAt.to(3) = 0;
 
 % thisR.lookAt.from(1) = 3;
 piWrite(thisR,'creatematerials',true);
@@ -121,7 +127,10 @@ if isempty(lensfile)
 else
     
     % Maybe we should speed this up by only returning radiance.
-    [oi, result] = piRender(thisR,'render type','radiance');
+    [oi, result] = piRender(thisR);
+    dmap = oiGet(oi,'depth map');
+    ieNewGraphWin; histogram(dmap(:),100);
+    xlabel('Meters');
     
     oi = oiSet(oi,'name',sprintf('%s',oiName));
     oiWindow(oi);
