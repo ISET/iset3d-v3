@@ -34,16 +34,16 @@ function [assetsPosList,assets] = piTrafficPlace(trafficflow,varargin)
 
 %% Parse parameterss
 p = inputParser;
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
-
+% if length(varargin) > 1
+%     for i = 1:length(varargin)
+%         if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+%             varargin{i} = ieParamFormat(varargin{i});
+%         end
+%     end
+% else
+%     
+% end
+varargin =ieParamFormat(varargin);
 p.addParameter('nScene',1);
 p.addParameter('timestamp',[]);
 p.addParameter('scitran',[]);

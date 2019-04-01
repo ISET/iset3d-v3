@@ -149,7 +149,7 @@ dataId = files{1}.parent.id;
 %}
 % Add rendering resources
 st          = scitran('stanfordlabs');
-acquisition = st.fw.lookup('wandell/Graphics assets/data/others');
+acquisition = st.fw.lookup('wandell/Graphics assets/data/data/others');
 dataId      = acquisition.id;
 dataName = 'data.zip';
 

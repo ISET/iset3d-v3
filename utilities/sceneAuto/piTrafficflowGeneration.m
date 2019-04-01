@@ -51,16 +51,16 @@ end
 
 %% Parameter Definition
 p=inputParser;
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
-
+% if length(varargin) > 1
+%     for i = 1:length(varargin)
+%         if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+%             varargin{i} = ieParamFormat(varargin{i});
+%         end
+%     end
+% else
+%     
+% end
+varargin =ieParamFormat(varargin);
 p.addParameter('generationTime',180);
 p.addParameter('iterMax',1);
 p.addParameter('pedestrian',true);
