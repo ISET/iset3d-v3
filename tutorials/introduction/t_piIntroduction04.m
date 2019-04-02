@@ -1,11 +1,11 @@
 %% Render using a lens
 %
-% Takes about 140 seconds to render
+% Takes about 90 seconds to render
 %
 % Dependencies:
-%    ISET3d, ISETCam or ISETBio, JSONio, SCITRAN
+%    ISET3d, ISETCam, JSONio
 %
-%  Check that you have the updated docker image by running
+% Check that you have the updated docker image by running
 %
 %    docker pull vistalab/pbrt-v3-spectral:test
 %
@@ -25,6 +25,7 @@ if ~piDockerExists, piDockerConfig; end
 % This is the INPUT file name
 % sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
+% sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
 
 % The output will be written here
 inFolder = fullfile(piRootPath,'local','scenes');
@@ -41,7 +42,7 @@ thisR.set('pixel samples',32);
 
 %% Set output file
 
-oiName = 'living-room';
+oiName = sceneName;
 outFile = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
 thisR.set('outputFile',outFile);
 outputDir = fileparts(outFile);
@@ -60,17 +61,19 @@ thisR.integrator.maxdepth.value = 4;
 %% To learn about the range of distances, you can use
 %
 %   dMap = piRender(thisR,'render type','depth');
-%   ieNewGraphWin; histogram(dMap(:),100);
-%   median(dMap(:))
+%   ieNewGraphWin; histogram(dMap(:),100);  median(dMap(:))
 
-%%
+%% Add camera with lens
 
 % lensfile = 'fisheye.87deg.6.0mm.dat';
 lensfile = 'dgauss.22deg.50.0mm.dat';
-fprintf('Using this lens %s\n',lensfile);
-thisR.camera = piCameraCreate('realistic','lensFile',lensfile,'pbrtVersion',3);
+fprintf('Using lens: %s\n',lensfile);
+thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 
-thisR.camera.focusdistance.value = 2.5;
+thisR.camera.focusdistance.value = 5;
+
+% Default aperture diameter is 5
+% thisR.camera.aperturediameter.value = 10;   
 
 thisR.set('fov',45);
 thisR.film.diagonal.value=  30;
@@ -79,28 +82,13 @@ thisR.film.diagonal.type = 'float';
 thisR.integrator.subtype = 'path';  % bdpt
 thisR.sampler.subtype = 'sobol';
 
-% thisR.integrator.lightsamplestrategy.type = 'string';
-% thisR.integrator.lightsamplestrategy.value = 'spatial';
-% thisR.lookAt.to(3) = 0;
-
-% thisR.lookAt.from(1) = 3;
 piWrite(thisR,'creatematerials',true);
 
-%% Render.  
-
-oi = piRender(thisR);
-oi = oiSet(isetObject,'name',sprintf('%s',oiName));
-oiWindow(oi);
-oi = oiSet(oi,'gamma',0.7);
-
-%% Set the focus to a more distant plane
-
-thisR.camera.focusdistance.value = 10;
-piWrite(thisR);
+%% Render and display
 
 oi = piRender(thisR);
 oi = oiSet(oi,'name',sprintf('%s',oiName));
 oiWindow(oi);
-oi = oiSet(oi,'gamma',0.7);
+oi = oiSet(oi,'gamma',0.8);
 
 %% END
