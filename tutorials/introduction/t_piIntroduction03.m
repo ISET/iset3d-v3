@@ -91,6 +91,7 @@ thisR.set('fov',45);
 thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type  = 'float';
 
+% Changing the name!!!!  Important to comment and explain!!! ZL, BW
 sceneName = 'simpleTest';
 outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_scene.pbrt',thisR.integrator.subtype));
 thisR.set('outputFile',outFile);
