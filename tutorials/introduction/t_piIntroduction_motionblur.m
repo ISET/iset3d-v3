@@ -32,7 +32,7 @@ thisR = piRead(fname);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[300 225]);
+thisR.set('film resolution',[400 300]);
 thisR.set('pixel samples',32);
 
 %% List material library
@@ -62,9 +62,20 @@ piWrite(thisR,'creatematerials',true);
 %% Render.  
 
 % Maybe we should speed this up by only returning radiance.
-scene = piRender(thisR);
+scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 
+%% Motion blur from camera
+thisR.camera.motion.activeTransformStart.pos   = thisR.assets(2).position;
+thisR.camera.motion.activeTransformStart.rotate = thisR.assets(2).rotate;
+thisR.camera.motion.activeTransformEnd.pos     = thisR.assets(2).position;
+thisR.camera.motion.activeTransformEnd.rotate = thisR.assets(2).rotate;
+
+thisR.camera.motion.activeTransformEnd.pos(3) = thisR.assets(2).position(3)+0.7;
+piWrite(thisR,'creatematerials',true);
+scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene,'name','Camera Motionblur: Translation');
+sceneWindow(scene);
 %% Introduce motion blur
 
 % The motion blur is assigned to a particular asset.  In this example,
@@ -107,8 +118,8 @@ thisR.assets(3).motion.position(1) = thisR.assets(3).position(1) + 0.1;
 %% Render the motion blur
 
 piWrite(thisR,'creatematerials',true);
-scene = piRender(thisR);
-scene = sceneSet(scene,'name','motionblur: Position');
+scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene,'name','motionblur: Translation');
 sceneWindow(scene);
 
 %% Add some rotation to the motion
@@ -137,7 +148,7 @@ thisR.assets(3).motion.rotate(1,1) = 30;
 
 % Render the motion blur
 piWrite(thisR,'creatematerials',true);
-[scene, result] = piRender(thisR);
+scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Rotation');
 sceneWindow(scene);
 
