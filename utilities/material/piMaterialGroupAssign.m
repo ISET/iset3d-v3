@@ -53,8 +53,8 @@ for ii = 1:length(mlist)
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
-        rgbkr = [0.5 0.5 0.5];
-        piMaterialAssign(thisR,material.name,target,'rgbkr',rgbkr);
+%         spectrumkr = [0.5 0.5 0.5];
+        piMaterialAssign(thisR,material.name,target,'spectrumkr',[400 0.5 800 0.5]);
     elseif piContains(lower(mlist(ii)),'mirror')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);

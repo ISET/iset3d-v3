@@ -40,7 +40,7 @@ thisR = piRead(fname);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[267 200]);
+thisR.set('film resolution',[600 400]);
 thisR.set('pixel samples',32);
 
 %% List material library
@@ -90,7 +90,7 @@ piMaterialAssign(thisR, partName, target);
 % This value determines the number of ray bounces.  If a scene has
 % glass we need to have at least 2 bounces. Unfortunately, bounces is
 % stored in a variable called maxdepth
-thisR.integrator.maxdepth.value = 4;
+thisR.integrator.maxdepth.value = 5;
 
 % Because we changed the material assignment, we need to set the
 % 'creatematerials' argument to true.
@@ -107,7 +107,7 @@ sceneWindow(scene);
 % Now change the partName 'mirror' to glass material. 
 target = thisR.materials.lib.glass; 
 piMaterialAssign(thisR, partName, target);
-
+piMaterialAssign(thisR, 'GLASS', target);
 personName = 'uber_blue';
 piMaterialAssign(thisR, personName, target);
 
