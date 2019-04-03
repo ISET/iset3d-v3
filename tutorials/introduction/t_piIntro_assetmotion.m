@@ -38,12 +38,10 @@ thisR.set('pixel samples',32);
 %% List material library
 
 % This value determines the number of ray bounces.  The scene has
-% glass we need to have at least 2 or more.  We start with only 1
-% bounce, so it will not appear like glass or mirror.
+% glass we need to have at least 2 or more.
 thisR.integrator.maxdepth.value = 5;
 
-% This adds a mirror and other materials that are used in driving
-% simulation.
+% This adds a mirror and other materials.
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
@@ -66,16 +64,21 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 
 %% Motion blur from camera
-thisR.camera.motion.activeTransformStart.pos   = thisR.assets(2).position;
+thisR.camera.motion.activeTransformStart.pos    = thisR.assets(2).position;
 thisR.camera.motion.activeTransformStart.rotate = thisR.assets(2).rotate;
 thisR.camera.motion.activeTransformEnd.pos     = thisR.assets(2).position;
-thisR.camera.motion.activeTransformEnd.rotate = thisR.assets(2).rotate;
+thisR.camera.motion.activeTransformEnd.rotate  = thisR.assets(2).rotate;
 
 thisR.camera.motion.activeTransformEnd.pos(3) = thisR.assets(2).position(3)+0.7;
+
+%% Write the scene file and render.
+
 piWrite(thisR,'creatematerials',true);
+
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: Translation');
 sceneWindow(scene);
+
 %% Introduce motion blur
 
 % The motion blur is assigned to a particular asset.  In this example,
@@ -146,7 +149,7 @@ thisR.assets(3).motion.position = thisR.assets(3).position;
 % Rotate 30 deg around the z-axis (depth direction)
 thisR.assets(3).motion.rotate(1,1) = 30;
 
-% Render the motion blur
+%% Write and render the motion blur
 piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Rotation');
