@@ -2,13 +2,13 @@
 %
 % Brief description:
 %
-%  This introduction renders a local file in the data directory of the
+%  This introduction renders the teapot scene in the data directory of the
 %  ISET3d repository. This introduction sets up a very simple recipe, runs
 %  the docker command, and loads the result into an ISET scene structure.
 % 
 % Dependencies:
 %
-%    ISET3d, ISETCam or ISETBio, JSONio
+%    ISET3d, (ISETCam or ISETBio), JSONio
 %
 %  Check that you have the updated docker image by running
 %
@@ -50,10 +50,10 @@ piWrite(recipe);
 
 [scene, result] = piRender(recipe);
 
-ieAddObject(scene); sceneWindow;
-scene = sceneSet(scene,'gamma',0.5);
+sceneWindow(scene);
+scene = sceneSet(scene,'gamma',0.7);
 
-% Notice that we also computed the depth map
+%% Notice that we also computed the depth map
 scenePlot(scene,'depth map');
 
 %% END

@@ -1,5 +1,7 @@
 %% Change the material properties in a V3 PBRT scene
 %
+% Deprecated for t_piIntro_material.m
+%
 % We create two scenes.  In one the material of certain objects is
 % plastic, and in the other the objects are turned to glass.
 %

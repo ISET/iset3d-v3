@@ -12,7 +12,8 @@
 % ZL, BW SCIEN 2018
 %
 % See also
-%   t_piIntroduction*
+%   t_piIntro_*
+%   isetLens repository
 
 
 %% Initialize ISET and Docker
@@ -24,8 +25,8 @@ if ~piDockerExists, piDockerConfig; end
 
 % This is the INPUT file name
 % sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
-sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
+sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
 
 % The output will be written here
 inFolder = fullfile(piRootPath,'local','scenes');
@@ -36,7 +37,7 @@ thisR = piRead(inFile);
 
 %% Set render quality
 
-% This is a relatively low resolution for speed.
+% Relatively low resolution for speed.
 thisR.set('film resolution',[300 225]);
 thisR.set('pixel samples',32);
 
@@ -54,15 +55,6 @@ outputDir = fileparts(outFile);
 % bounce, so it will not appear like glass or mirror.
 thisR.integrator.maxdepth.value = 4;
 
-% This adds a mirror and other materials that are used in driving.s
-% piMaterialGroupAssign(thisR);
-
-
-%% To learn about the range of distances, you can use
-%
-%   dMap = piRender(thisR,'render type','depth');
-%   ieNewGraphWin; histogram(dMap(:),100);  median(dMap(:))
-
 %% Add camera with lens
 
 % lensfile = 'fisheye.87deg.6.0mm.dat';
@@ -70,16 +62,22 @@ lensfile = 'dgauss.22deg.50.0mm.dat';
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 
+% You might adjust the focus for different scenes.  Use piRender with
+% the 'depth map' option to see how far away the scene objects are.
 thisR.camera.focusdistance.value = 5;
 
-% Default aperture diameter is 5
+% Default aperture diameter is 5.  You can change this for depth of
+% field effects.
+%
 % thisR.camera.aperturediameter.value = 10;   
 
 thisR.set('fov',45);
 thisR.film.diagonal.value=  30;
 thisR.film.diagonal.type = 'float';
 
-thisR.integrator.subtype = 'path';  % bdpt
+% We can use bdpt if you are using the docker with the "test" tag (see
+% header). Otherwise you must use 'path'
+thisR.integrator.subtype = 'path';  
 thisR.sampler.subtype = 'sobol';
 
 piWrite(thisR,'creatematerials',true);

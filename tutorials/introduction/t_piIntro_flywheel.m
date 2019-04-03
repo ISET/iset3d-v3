@@ -1,8 +1,9 @@
 %% Gets a skymap from Flywheel; also uses special scene materials
 %
-% We store many graphics assets in the Flywheel database.  This script
-% shows how to download a file from Flywheel.  This technique is used
-% much more extensively in creating complex driving scenes.
+% We store the automotive graphics assets in the Flywheel database.
+% This script shows how to download a file from Flywheel.  This
+% technique is used much more extensively in creating complex driving
+% scenes.
 %
 % This example scene also includes glass and other materials that
 % were created for driving scenes.  The script sets up the glass
@@ -13,8 +14,7 @@
 %
 % Dependencies:
 %
-%    ISET3d, ISETCam or ISETBio, JSONio, SCITRAN, Flywheel Add-On (at
-%    least version 4.3.2) 
+%    ISET3d, (ISETCam or ISETBio), JSONio, SCITRAN
 %
 %  Check that you have the updated docker image by running
 %
@@ -104,6 +104,8 @@ piWrite(thisR,'creatematerials',true);
 [scene, result] = piRender(thisR,'render type','radiance');
 
 scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
-ieAddObject(scene); sceneWindow;
+sceneWindow(scene);
+
 end
+
 %% END

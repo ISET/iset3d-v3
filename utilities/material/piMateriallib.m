@@ -1,18 +1,48 @@
 function [materiallib] = piMateriallib
-% A library of materials stored in the materials struct fields
+% A library of material properties
 %
-%  The material properties included here are designed to be assigned
-%  to an existing material, not replace the entire material.
-%  Typically, we read a material and if we want it to look like, say
-%  carpaint, we assign the materiallib.carpaint properties to the
-%  material.
+% Syntax:
+%  materiallib = piMaterialib;
+%
+% Brief description:
+%  All of the material definitions that we use in ISET3d are
+%  represented in the materiallib.  This function creates the material
+%  lib with the specific parameters for each type of material.
+%
+% Inputs:
+%  N/A
+%
+% Outputs:
+%  materiallib:  A structure with the different material definitions
+%
+% Description:
+%
+%  The PBRT material properties include the specular and diffuse and
+%  transparency material properties.  The parameters to achieve these
+%  effects are stored in this library for about a dozen different
+%  material types.  The definitions of the slots are defined on the
+%  PBRT web-site (https://www.pbrt.org/fileformat-v3.html#materials)
+% 
+%  For the imported Cinema 4D scenes we know the material types of
+%  each part, and ISET3d specifies in the recipe for each object an
+%  object-specific name and a material type.  The reflectance and
+%  other material properties are stored in this material library.
+%
+%  For example, if we want a particular part to look like, say
+%  carpaint, we assign the materiallib.carpaint properties to that
+%  object.
 %
 % ZL Scien Stanford, 2018
+% 
+% See also
+%   piMaterial*
+
 
 % Examples:
 %{
   
 %}
+
 %% carpaintmix
 %
 % A mixture of a specular (mirror like) material and a substrate
@@ -49,21 +79,21 @@ materiallib.chrome_spd.spectrumk='spds/metals/Ag.k.spd';
 materiallib.chrome_spd.spectrumeta='spds/metals/Ag.eta.spd';
 
 %% blackrubber
-%
+
 % Good for tires
-%
 materiallib.blackrubber.floatroughness = 0.5;
 materiallib.blackrubber.string = 'uber';
 materiallib.blackrubber.rgbkd = [ .01 .01 .01 ];
 materiallib.blackrubber.rgbks = [ 0.2 .2 .2 ];
 
 %% mirror
+
 materiallib.mirror.string='mirror';
 materiallib.mirror.rgbkr = [0.9 0.9 0.9];
 
 %% matte
-% Standard matte surface
 
+% Standard matte surface.  Only diffuse.
 materiallib.matte.string = 'matte';
 materiallib.matte.rgbkd = [0.7 0.7 0.7];
 
@@ -76,38 +106,37 @@ materiallib.plastic.rgbkd = [0.25 0.25 0.25];
 materiallib.plastic.rgbks = [0.25 0.25 0.25];
 
 %% glass
-%
-% Standard glass appearance
 
+% Standard glass appearance
 materiallib.glass.string = 'glass';
+% materiallib.glass.rgbkr = [0.00415 0.00415 0.00415];
 materiallib.glass.rgbkr = [0.9 0.9 0.9];
 materiallib.glass.rgbkt = [0.9 0.9 0.9];
+materiallib.glass.floatroughness = [];
+materiallib.glass.rgbkd = [];
+materiallib.glass.rgbks = [];
 
 %% Retroreflective
-%
-% Standard glass appearance
 
 materiallib.retroreflective.string = 'retroreflective';
 
 %% Uber
-%
-% Standard glass appearance
 
 materiallib.uber.string = 'uber';
 
 %% translucent
-%
-% Standard glass appearance
 
 materiallib.translucent.string = 'translucent';
 materiallib.translucent.colorreflect = [0.5 0.5 0.5];
 materiallib.translucent.colortransmit = [0.5 0.5 0.5];
 
 %% substrate
-% Human skin is assigned with this material.
+
+% Human skin is assigned this material.
 materiallib.substrate.string = 'substrate';
 
 %% fourier
+
 materiallib.fourier.string = 'fourier';
 materiallib.fourier.bsdffile = 'bsdfs/roughglass_alpha_0.2.bsdf';
 

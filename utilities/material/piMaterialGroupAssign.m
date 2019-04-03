@@ -12,7 +12,8 @@ function piMaterialGroupAssign(thisR)
 % ZL, Vistasoft Team, 2018
 %
 % See also
-%
+%  piMaterial*
+
 
 % A scene has a set of materials represented in its recipe
 mlist = fieldnames(thisR.materials.list);
@@ -106,11 +107,6 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         piMaterialAssign(thisR,material.name,target);
-%     elseif piContains(mlist(ii),'retro')
-%         name = cell2mat(mlist(ii));
-%         material = thisR.materials.list.(name);
-%         target = thisR.materials.lib.retroreflective;
-%         piMaterialAssign(thisR,material.name,target);
     elseif piContains(lower(mlist(ii)),'bodymat')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
