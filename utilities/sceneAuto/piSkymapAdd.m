@@ -48,7 +48,7 @@ if ~piContains(skyName,':')
     
 
     try
-        acquisition = st.fw.lookup('wandell/Graphics assets/data/skymaps');
+        acquisition = st.fw.lookup('wandell/Graphics assets/data/data/skymaps');
         dataId      = acquisition.id;
     catch
         % We have had trouble making lookup work across Add-On toolbox

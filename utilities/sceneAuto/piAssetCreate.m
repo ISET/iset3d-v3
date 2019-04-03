@@ -25,16 +25,16 @@ function asset = piAssetCreate(varargin)
 
 %% Parse input parameters
 p = inputParser;
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
-
+% if length(varargin) > 1
+%     for i = 1:length(varargin)
+%         if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
+%             varargin{i} = ieParamFormat(varargin{i});
+%         end
+%     end
+% else
+%     
+% end
+varargin =ieParamFormat(varargin);
 p.addParameter('ncars',0);
 p.addParameter('ntrucks',0);
 p.addParameter('nped',0);

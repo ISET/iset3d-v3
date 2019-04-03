@@ -35,15 +35,19 @@ piWrite(thisR);
 %%
 p = inputParser;
 
+% When varargin contains a number, the ieParamFormat() method fails.
+% It takes only a string or cell.  We should look into that.
 if length(varargin) > 1
     for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
-        | isobject(varargin{i}))
+        if ~(isnumeric(varargin{i}) || ...
+                islogical(varargin{i}) || ...
+                isobject(varargin{i}))
             varargin{i} = ieParamFormat(varargin{i});
         end
     end
 else
-    varargin =ieParamFormat(varargin);
+    %
+    varargin = ieParamFormat(varargin);
 end
 
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
@@ -371,6 +375,9 @@ end
 %% Write out WorldBegin/WorldEnd
 
 if creatematerials
+    % We may have created new materials.
+    % We write the material and geometry files based on the recipe,
+    % which defines these new materials.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
         if piContains(currLine, 'materials.pbrt')
@@ -386,6 +393,8 @@ if creatematerials
         fprintf(fileID,'%s \n',currLine);
     end
 else
+    % No materials were created, so we just write out the world data
+    % without any changes.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
         fprintf(fileID,'%s \n',currLine);
@@ -397,7 +406,10 @@ fclose(fileID);
 
 %% Overwrite Materials.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
+    % If the scene is from Cinema 4D, 
     if ~creatematerials
+        % We overwrite from the input directory, but we do not create
+        % any new material files beyond what is already in the input
         if overwritematerials
             [~,n] = fileparts(renderRecipe.inputFile);
             fname_materials = sprintf('%s_materials.pbrt',n);
@@ -405,16 +417,20 @@ if piContains(renderRecipe.exporter, 'C4D')
             piMaterialWrite(renderRecipe);
         end
     else
+        % Create new material files that could come from somewhere
+        % other than the input directory.
         [~,n] = fileparts(renderRecipe.outputFile);
         fname_materials = sprintf('%s_materials.pbrt',n);
         renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
         piMaterialWrite(renderRecipe);
     end
 end
-%% Overwirte geometry.pbrt
+
+%% Overwrite geometry.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
-    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'thistrafficflow',thistrafficflow); 
+        piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag, ...
+            'thistrafficflow',thistrafficflow);
     end
 end
 

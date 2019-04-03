@@ -48,13 +48,11 @@ thisR.set('pixel samples',32);
 
 %% Get a sky map from Flywheel, and use it in the scene
 timeofDay = {'7:30', '12:30', '16:30'};
-for ii  = 1: length(timeofDay)
+for ii  = 1 %: length(timeofDay)
     thisTime = timeofDay{ii};
     % We will put a skymap in the local directory so people without
     % Flywheel can see the output
     if piScitranExists
-        % Use a small skymap.  We should make all the skymaps small, but
-        % 'noon' is not small!
         [~, skymapInfo] = piSkymapAdd(thisR,thisTime);
         
         % The skymapInfo is structured according to python rules.  We convert
@@ -70,9 +68,8 @@ for ii  = 1: length(timeofDay)
         if ~exist(skyMapFile,'file')
             fprintf('Downloading Skymap from Flywheel ... ');
             st        = scitran('stanfordlabs');
-            acq       = st.fw.get(s{1});    % Get the acquisition using the ID
-            thisFile  = acq.getFile(s{2});  % Get the FileEntry for this skymap
-            thisFile.download(skyMapFile);  % Download the file
+            % Download the file from acq using fileName
+            piFwFileDownload(skyMapFile, s{2}, s{1})% (dest, FileName, AcqID)
             fprintf('complete\n');
         end
     end
@@ -84,7 +81,8 @@ for ii  = 1: length(timeofDay)
 % bounce, so it will not appear like glass or mirror.
 thisR.integrator.maxdepth.value = 4;
 
-% This adds a mirror and other materials that are used in driving.s
+% This adds a mirror and other materials that are used in driving
+% simulation
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
@@ -93,6 +91,7 @@ thisR.set('fov',45);
 thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type  = 'float';
 
+% Changing the name!!!!  Important to comment and explain!!! ZL, BW
 sceneName = 'simpleTest';
 outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_scene.pbrt',thisR.integrator.subtype));
 thisR.set('outputFile',outFile);
