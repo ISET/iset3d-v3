@@ -23,8 +23,10 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt files
 
-FilePath = fullfile(piRootPath,'data','V3','SimpleScene');
-fname = fullfile(FilePath,'SimpleScene.pbrt');
+sceneName = 'simpleScene';
+
+FilePath = fullfile(piRootPath,'data','V3',sceneName);
+fname = fullfile(FilePath,[sceneName,'.pbrt']);
 if ~exist(fname,'file'), error('File not found'); end
 
 thisR = piRead(fname);
@@ -50,8 +52,7 @@ thisR.set('fov',45);
 % We have to check what happens when the sceneName is the same as the
 % original, but we have added materials.  This section here is
 % important to clarify for us.
-sceneName = 'simpleTest';
-outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_scene.pbrt',sceneName));
+outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
 thisR.set('outputFile',outFile);
 
 % The first time, we create the materials folder.
