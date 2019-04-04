@@ -32,6 +32,7 @@ for ii = 1: length(assetRecipe)
     for ll = 1:length(thisR.assets)
         thisR.assets(ll).position = [0;0;0];
     end
+    thisR.assets(ll).motion = [];
     %% assign random color for carpaint
     mlist = fieldnames(thisR.materials.list);
     for kk = 1:length(mlist)

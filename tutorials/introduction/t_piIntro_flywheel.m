@@ -30,59 +30,62 @@
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-% if ~piScitranExists, error('scitran installation required'); end
+if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
-
-FilePath = fullfile(piRootPath,'data','V3','SimpleScene');
-fname = fullfile(FilePath,'SimpleScene.pbrt');
+sceneName = 'checkerboard_new';
+FilePath = fullfile(piRootPath,'data','V3',sceneName);
+fname = fullfile(FilePath,[sceneName,'.pbrt']);
 if ~exist(fname,'file'), error('File not found'); end
 
 thisR = piRead(fname);
 
+%% get a random car and a random person from flywheel
+% take some time, maybe you dont want to run this everytime when you debug
+assets = piAssetCreate('ncars',1, 'nped',1);
+
+%% add downloaded asset information to Render recipe.
+thisR = piAssetAdd(thisR, assets);
+% change position of person
+thisR.assets(end).position = [3; 0; 0];
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[267 200]);
-thisR.set('pixel samples',32);
+thisR.set('film resolution',[400 300]);
+thisR.set('pixel samples',64);
 
 %% Get a sky map from Flywheel, and use it in the scene
-timeofDay = {'7:30', '12:30', '16:30'};
-for ii  = 1 %: length(timeofDay)
-    thisTime = timeofDay{ii};
-    % We will put a skymap in the local directory so people without
-    % Flywheel can see the output
-    if piScitranExists
-        [~, skymapInfo] = piSkymapAdd(thisR,thisTime);
-        
-        % The skymapInfo is structured according to python rules.  We convert
-        % to Matlab format here. The first cell is the acquisition ID
-        % and the second cell is the file name of the skymap
-        s = split(skymapInfo,' ');
-        
-        % The destination of the skymap file
-        skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
-        
-        % If it exists, move on. Otherwise open up Flywheel and
-        % download the skypmap file.
-        if ~exist(skyMapFile,'file')
-            fprintf('Downloading Skymap from Flywheel ... ');
-            st        = scitran('stanfordlabs');
-            % Download the file from acq using fileName
-            piFwFileDownload(skyMapFile, s{2}, s{1})% (dest, FileName, AcqID)
-            fprintf('complete\n');
-        end
+thisTime = '16:30';
+% We will put a skymap in the local directory so people without
+% Flywheel can see the output
+if piScitranExists
+    [~, skymapInfo] = piSkymapAdd(thisR,thisTime);
+    
+    % The skymapInfo is structured according to python rules.  We convert
+    % to Matlab format here. The first cell is the acquisition ID
+    % and the second cell is the file name of the skymap
+    s = split(skymapInfo,' ');
+    
+    % The destination of the skymap file
+    skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
+    
+    % If it exists, move on. Otherwise open up Flywheel and
+    % download the skypmap file.
+    if ~exist(skyMapFile,'file')
+        fprintf('Downloading Skymap from Flywheel ... ');
+        st        = scitran('stanfordlabs');
+        % Download the file from acq using fileName
+        piFwFileDownload(skyMapFile, s{2}, s{1})% (dest, FileName, AcqID)
+        fprintf('complete\n');
     end
-
-%% List material library
+end
 
 % This value determines the number of ray bounces.  The scene has
 % glass we need to have at least 2 or more.  We start with only 1
 % bounce, so it will not appear like glass or mirror.
-thisR.integrator.maxdepth.value = 4;
+thisR.integrator.maxdepth.value = 10;
 
-% This adds a mirror and other materials that are used in driving
-% simulation
+%% This adds materials to all assets in this scene
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
@@ -90,22 +93,20 @@ piMaterialGroupAssign(thisR);
 thisR.set('fov',45);
 thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type  = 'float';
-
+thisR.integrator.subtype = 'bdpt';  
+thisR.sampler.subtype = 'sobol';
 % Changing the name!!!!  Important to comment and explain!!! ZL, BW
-sceneName = 'simpleTest';
-outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_scene.pbrt',thisR.integrator.subtype));
+outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
 thisR.set('outputFile',outFile);
 
 piWrite(thisR,'creatematerials',true);
 
-%% Render.  
+%% Render.
 
 % Maybe we should speed this up by only returning radiance.
-[scene, result] = piRender(thisR,'render type','radiance');
+[scene, result] = piRender(thisR);
 
 scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
 sceneWindow(scene);
-
-end
 
 %% END

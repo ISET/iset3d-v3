@@ -55,7 +55,7 @@ for ii = 1:length(mlist)
         target = thisR.materials.lib.glass;
 %         spectrumkr = [0.5 0.5 0.5];
         piMaterialAssign(thisR,material.name,target,'spectrumkr',[400 0.5 800 0.5]);
-    elseif piContains(lower(mlist(ii)),'mirror')
+    elseif piContains(lower(mlist(ii)),'mirror') && ~strcmpi(mlist(ii),'paint_mirror')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.mirror;
@@ -77,6 +77,7 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.chrome_spd;
         piMaterialAssign(thisR,material.name,target);
+        copyfile(fullfile(piRootPath,'data','spds'), [fileparts(thisR.outputFile),'/spds']);
     elseif piContains(lower(mlist(ii)),'wheel')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);

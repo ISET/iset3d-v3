@@ -49,7 +49,7 @@ function [materiallib_updated] = piMateriallib
 % material that looks like a car.
 
 materiallib.carpaintmix.paint_mirror.string = 'mirror';
-materiallib.carpaintmix.paint_mirror.spectrumkr = [400 0.1 800 0.1];
+materiallib.carpaintmix.paint_mirror.rgbkr = [.1 .1 .1];
 materiallib.carpaintmix.paint_base.string='substrate';
 materiallib.carpaintmix.paint_base.colorkd = piColorPick('random');
 materiallib.carpaintmix.paint_base.colorks =[.1 .1 .1];
@@ -58,7 +58,6 @@ materiallib.carpaintmix.paint_base.floatvroughness=0.01;
 materiallib.carpaintmix.carpaint.string = 'mix';
 materiallib.carpaintmix.carpaint.stringnamedmaterial1 = 'paint_mirror';
 materiallib.carpaintmix.carpaint.stringnamedmaterial2='paint_base';
-piMaterialEmptySlot(materiallib.carpaintmix);
 %% carpaint
 %
 % Typical car paint without much specularity.  Some people define it
@@ -146,8 +145,6 @@ thisMaterial = fieldnames(materiallib);
 for ii = 1: length(thisMaterial)
     if isfield(materiallib.(thisMaterial{ii}), 'string')
     switch materiallib.(thisMaterial{ii}).string
-        case 'uber'
-            % do no
         case 'glass'
             materiallib.(thisMaterial{ii}).floatroughness = [];
             materiallib.(thisMaterial{ii}).rgbkr = [];
@@ -160,14 +157,12 @@ for ii = 1: length(thisMaterial)
             materiallib.(thisMaterial{ii}).rgbks = [];
             materiallib.(thisMaterial{ii}).rgbkd = [];
             materiallib.(thisMaterial{ii}).rgbkt = [];
-        case 'retroreflective'
         case 'mirror'
             materiallib.(thisMaterial{ii}).floatroughness = [];
             materiallib.(thisMaterial{ii}).rgbkr = [];
             materiallib.(thisMaterial{ii}).rgbks = [];
             materiallib.(thisMaterial{ii}).rgbkd = [];
             materiallib.(thisMaterial{ii}).rgbkt = [];
-        case 'carpaint'
         case 'substrate'
             materiallib.(thisMaterial{ii}).floatroughness = [];
             materiallib.(thisMaterial{ii}).rgbkr = [];

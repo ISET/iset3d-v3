@@ -40,7 +40,7 @@ thisR = piRead(fname);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[600 400]);
+thisR.set('film resolution',[400 300]);
 thisR.set('pixel samples',32);
 
 %% List material library

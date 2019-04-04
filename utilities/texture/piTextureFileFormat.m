@@ -75,7 +75,7 @@ end
 for i=1:length(textureFiles)
     textureFileName=textureFiles(i).name;
     textureFilePath=textureFileName;
-    movefile(textureFilePath,fullfile(textureDir,textureFileName));
+    copyfile(textureFilePath,fullfile(textureDir,textureFileName));
 end
 %%
 cd(currentfolder)

@@ -64,14 +64,6 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 
-%% Motion blur from camera
-thisR.camera.motion.activeTransformStart.pos    = thisR.assets(2).position;
-thisR.camera.motion.activeTransformStart.rotate = thisR.assets(2).rotate;
-thisR.camera.motion.activeTransformEnd.pos     = thisR.assets(2).position;
-thisR.camera.motion.activeTransformEnd.rotate  = thisR.assets(2).rotate;
-
-thisR.camera.motion.activeTransformEnd.pos(3) = thisR.assets(2).position(3)+0.7;
-
 %% Write the scene file and render.
 
 piWrite(thisR,'creatematerials',true);
