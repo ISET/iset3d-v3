@@ -41,7 +41,7 @@ thisR = piRead(fname);
 
 % This is a low resolution for speed.
 thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',32);
+thisR.set('pixel samples',64);
 
 %% List material library
 
@@ -61,6 +61,8 @@ piMaterialList(thisR);
 thisR.set('fov',45);
 thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type  = 'float';
+thisR.integrator.subtype = 'bdpt';  
+thisR.sampler.subtype = 'sobol';
 
 %% Changing the name!!!!  Important to comment and explain!!! ZL, BW
 outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
@@ -90,7 +92,7 @@ piMaterialAssign(thisR, partName, target);
 % This value determines the number of ray bounces.  If a scene has
 % glass we need to have at least 2 bounces. Unfortunately, bounces is
 % stored in a variable called maxdepth
-thisR.integrator.maxdepth.value = 5;
+thisR.integrator.maxdepth.value = 10;
 
 % Because we changed the material assignment, we need to set the
 % 'creatematerials' argument to true.
