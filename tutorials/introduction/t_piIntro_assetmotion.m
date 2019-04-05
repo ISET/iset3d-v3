@@ -1,20 +1,21 @@
-%% Add motion blur to the scene
+%% Add motion blur of an asset to the scene
 %
 % This script shows how to add motion blur to individual objects in
-% the scene.
+% a scene.
 %
 % Dependencies:
 %
 %    ISET3d, ISETCam 
 %
-%  Check that you have the updated docker image by running
+% Check that you have the updated docker image by running
 %
 %    docker pull vistalab/pbrt-v3-spectral
+%    docker pull vistalab/pbrt-v3-spectral:test
 %
 % Zhenyi SCIEN 2019
 %
 % See also
-%   t_piIntroduction*
+%   t_piIntro_*
 
 %% Initialize ISET and Docker
 
@@ -43,7 +44,9 @@ thisR.set('pixel samples',32);
 % glass we need to have at least 2 or more.
 thisR.integrator.maxdepth.value = 5;
 
-% This adds a mirror and other materials.
+% This is a convenient routine we use when there are many parts and
+% you are willing to accept ZL's mapping into materials based on
+% automobile parts.  
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
@@ -63,14 +66,7 @@ piWrite(thisR,'creatematerials',true);
 % Maybe we should speed this up by only returning radiance.
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
-
-%% Write the scene file and render.
-
-piWrite(thisR,'creatematerials',true);
-
-scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene,'name','Camera Motionblur: Translation');
-sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
 
 %% Introduce motion blur
 
@@ -117,6 +113,7 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Translation');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
 
 %% Add some rotation to the motion
 
@@ -147,6 +144,7 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Rotation');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
 
 %% END
 

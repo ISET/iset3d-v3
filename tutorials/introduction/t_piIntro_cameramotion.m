@@ -1,6 +1,6 @@
 %% Add camera motion blur
 %
-% This script shows how to add motion blur to camera while keeping the
+% This script shows how to add camera motion blur while keeping the
 % whole scene still.
 %
 % Dependencies:
@@ -10,6 +10,7 @@
 %  Check that you have the updated docker image by running
 %
 %    docker pull vistalab/pbrt-v3-spectral
+%    docker pull vistalab/pbrt-v3-spectral:test
 %
 % Zhenyi SCIEN 2019
 %
@@ -42,8 +43,9 @@ thisR.set('pixel samples',32);
 % bounce, so it will not appear like glass or mirror.
 thisR.integrator.maxdepth.value = 5;
 
-% This adds a mirror and other materials that are used in driving
-% simulation.
+% This is a convenient routine we use when there are many parts and
+% you are willing to accept ZL's mapping into materials based on
+% automobile parts. 
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
@@ -52,38 +54,58 @@ thisR.set('fov',45);
 % We have to check what happens when the sceneName is the same as the
 % original, but we have added materials.  This section here is
 % important to clarify for us.
-sceneName = 'simpleTest';
-outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_scene.pbrt',sceneName));
+sceneName = 'SimpleScene';
+outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
 thisR.set('outputFile',outFile);
 
 % The first time, we create the materials folder.
 piWrite(thisR,'creatematerials',true);
 
-%% Render.  
+%% Render the original scene with no camera motion
 
-% Maybe we should speed this up by only returning radiance.
+% We speed this up by only returning radiance.
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
 
 %% Motion blur from camera
-thisR.camera.motion.activeTransformStart.pos   = thisR.assets(2).position;
-thisR.camera.motion.activeTransformStart.rotate = thisR.assets(2).rotate;
-thisR.camera.motion.activeTransformEnd.pos     = thisR.assets(2).position;
-thisR.camera.motion.activeTransformEnd.rotate = thisR.assets(2).rotate;
 
-thisR.camera.motion.activeTransformEnd.pos(3) = thisR.assets(2).position(3)+0.7;
+% Specify the initial position and rotation of the camera.  We find
+% the current camera position 
+thisR.camera.motion.activeTransformStart.pos    = thisR.lookAt.from(:);
+thisR.camera.motion.activeTransformStart.rotate = piRotationMatrix;
+
+% Move in the direction you are looking, but just a small amount.
+fromto = thisR.get('from to');
+endPos = -0.5*fromto(:) + thisR.lookAt.from(:);
+thisR.camera.motion.activeTransformEnd.pos      = endPos;
+
+% No rotation
+thisR.camera.motion.activeTransformEnd.rotate   = piRotationMatrix;
+
 piWrite(thisR,'creatematerials',true);
+
+%%
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: Translation');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
+
+%%  Now, rotate the camera as well
+
+% No translation
+thisR.camera.motion.activeTransformEnd.pos = thisR.lookAt.from(:);
+
+% The angle specification is piRotationMatrix.  To change the angle,
+% say by rotation around the z-axis by 5 deg we set
+thisR.camera.motion.activeTransformEnd.rotate = piRotationDefault('zrot',1);
+piWrite(thisR,'creatematerials',true);
 
 %%
-thisR.camera.motion.activeTransformEnd.pos(3) = thisR.assets(2).position(3);
-thisR.camera.motion.activeTransformEnd.rotate(1,1) = 5;
-piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: rotation');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
 
 %% END
 
