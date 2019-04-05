@@ -201,6 +201,8 @@ if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
 % fprintf('Opening %s for output\n',outFile);
 fileID = fopen(outFile,'w');
 
+
+
 %% Write header
 fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
@@ -222,29 +224,24 @@ end
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
 if isfield(renderRecipe.camera,'motion') 
+    
     motionTranslate =renderRecipe.camera.motion.activeTransformStart.pos-renderRecipe.camera.motion.activeTransformEnd.pos;
-    motionRotate    =renderRecipe.camera.motion.activeTransformStart.rotate-renderRecipe.camera.motion.activeTransformEnd.rotate;
+    motionStart     =renderRecipe.camera.motion.activeTransformStart.rotate;
+    motionEnd      =  renderRecipe.camera.motion.activeTransformEnd.rotate;
     fprintf(fileID,'ActiveTransform StartTime \n');
     fprintf(fileID,'Translate 0 0 0 \n');
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionStart(:,1)); % Z
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionStart(:,2)); % Y
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionStart(:,3));  % X
     fprintf(fileID,'ActiveTransform EndTime \n');
     fprintf(fileID,'Translate %0.2f %0.2f %0.2f \n',...
         [motionTranslate(1),...
         motionTranslate(2),...
         motionTranslate(3)]);
-    fprintf(fileID,'Rotate %0.2f 0 1 0 \n',motionRotate);
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionEnd(:,1)); % Z
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionEnd(:,2)); % Y
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionEnd(:,3));  % X
     fprintf(fileID,'ActiveTransform All \n');
-%     fprintf(fileID,'ActiveTransform StartTime \n');
-%     fprintf(fileID,'Translate %0.2f %0.2f %0.2f\n',...
-%         [renderRecipe.camera.motion.activeTransformStart.pos(1),...
-%         renderRecipe.camera.motion.activeTransformStart.pos(2),...
-%         renderRecipe.camera.motion.activeTransformStart.pos(3)]);
-% %     fprintf(fileID,'Rotate \n'); % add rotate aroung x, y, z
-%     fprintf(fileID,'ActiveTransform EndTime \n');
-%     fprintf(fileID,'Translate %0.2f %0.2f %0.2f\n',...
-%         [renderRecipe.camera.motion.activeTransformEnd.pos(1),...
-%         renderRecipe.camera.motion.activeTransformEnd.pos(2),...
-%         renderRecipe.camera.motion.activeTransformEnd.pos(3)]);
-%     fprintf(fileID,'ActiveTransform All \n');
 end
 % Required LookAt 
 fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...

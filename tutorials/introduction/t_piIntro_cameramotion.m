@@ -98,7 +98,7 @@ thisR.camera.motion.activeTransformEnd.pos = thisR.lookAt.from(:);
 
 % The angle specification is piRotationMatrix.  To change the angle,
 % say by rotation around the z-axis by 5 deg we set
-thisR.camera.motion.activeTransformEnd.rotate = piRotationDefault('zrot',1);
+thisR.camera.motion.activeTransformEnd.rotate = piRotationMatrix('zrot',5);
 piWrite(thisR,'creatematerials',true);
 
 %%
