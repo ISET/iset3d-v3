@@ -91,8 +91,8 @@ end
 % bounce, so it will not appear like glass or mirror.
 thisR.integrator.maxdepth.value = 10;
 
-%% This adds materials to all assets in this scene
-piMaterialGroupAssign(thisR);
+% %% This adds materials to all assets in this scene
+% piMaterialGroupAssign(thisR);
 
 % Assign a nice position.
 thisR.assets(end).position = [2 0 -2]';

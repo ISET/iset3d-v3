@@ -25,85 +25,59 @@ sessionname = p.Results.class;
 acquisitionname  = p.Results.subclass;
 
 %%
-hierarchy = st.projectHierarchy('Graphics assets');
-sessions     = hierarchy.sessions;
-
+project = st.lookup('wandell/Graphics assets');
+session     = project.sessions.findOne(sprintf('label=%s',sessionname));
+acqs = session.acquisitions();
 %%
-for ii=1:length(sessions)
-    if isequal(lower(sessions{ii}.label),sessionname)
-        thisSession = sessions{ii};
-        break;
-    end
-end
-containerID = idGet(thisSession,'data type','session');
-fileType_json ='source code'; % json
-[recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
-fileType = 'CG Resource';
-[resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
+% fileType_json ='source code'; % json
+% [recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
+% fileType = 'CG Resource';
+% [resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
 %%
-nDatabaseAssets = length(recipeFiles);
-% assetList = randi(nDatabaseAssets,nassets,1);
-% % count objectInstance
-% downloadList = piObjectInstanceCount(assetList);
-% assetRecipe = cell(nDownloads,1);
-
-%%
-
+nDatabaseAssets = length(acqs);
 if isempty(acquisitionname)
     for ii = 1:nDatabaseAssets
-        [~,n,~] = fileparts(recipeFiles{ii}{1}.name);
-        [~,n,~] = fileparts(n); % extract file name
-        % Download the scene to a destination zip file
-        localFolder = fullfile(piRootPath,'local','AssetLists',n);
-        
-        destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
+        acqLabel = acqs{thisIdx}.label;
+        localFolder = fullfile(piRootPath,'local','AssetLists',acqLabel);
+        destName_recipe = fullfile(localFolder,sprintf('%s.json',acqLabel));
         if ~exist(localFolder,'dir')
             mkdir(localFolder)
         end
-        piFwFileDownload(destName_recipe, recipeFiles{ii}{1}.name, recipe_acqID{ii});
+        thisRecipe = stFileSelect(acqs{thisIdx}.files,'type','source code');
+        thisResource = stFileSelect(acqs{thisIdx}.files,'type','CG Resource');
+        thisRecipe{1}.download(destName_recipe);
         %%
         thisR = jsonread(destName_recipe);
-        %         assetRecipe{ii}.name   = destName_recipe;
-        %         assetRecipe{ii}.count  = downloadList(ii).count;
-        assetlist(ii).name = n;
+        assetlist(ii).name = acqLabel;
         assetlist(ii).material.list = thisR.materials.list;
         assetlist(ii).material.txtLines = thisR.materials.txtLines;
         assetlist(ii).geometry = thisR.assets;
         assetlist(ii).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
-        assetlist(ii).fwInfo       = [resource_acqID{ii},' ',resourceFiles{ii}{1}.name];
+        assetlist(ii).fwInfo       = [acqs{thisIdx}.id,' ',thisResource{1}.name];
     end
     
     fprintf('%d files added to the list.\n',nDatabaseAssets);
 else
-    kk=1;
-    for ii=1:length(recipeFiles)
-        if piContains(lower(recipeFiles{ii}{1}.name),acquisitionname)
-            thisAcq{kk} = recipeFiles{ii}{1};
-            thisID{kk} =  recipe_acqID{ii};
-            resFile{kk} = resourceFiles{ii}{1};
-            resID{kk} = resource_acqID{ii};
-            kk = kk+1;
-        end
-    end
+    thisAcq = stSelect(acqs,'label',acquisitionname);
     for dd = 1:length(thisAcq)
-        [~,n,~] = fileparts(thisAcq{dd}.name);
-        [~,n,~] = fileparts(n); % extract file name
-        % Download the scene to a destination zip file
-        localFolder = fullfile(piRootPath,'local','AssetLists',n);
+        acqLabel = thisAcq{dd}.label;
+        localFolder = fullfile(piRootPath,'local','AssetLists',acqLabel);
         
-        destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
+        destName_recipe = fullfile(localFolder,sprintf('%s.json',acqLabel));
         if ~exist(localFolder,'dir')
             mkdir(localFolder)
         end
-        
-        piFwFileDownload(destName_recipe, thisAcq{dd}.name, thisID{dd});
-        assetlist(dd).name = n;
+        thisRecipe = stFileSelect(thisAcq{dd}.files,'type','source code');
+        thisResource = stFileSelect(thisAcq{dd}.files,'type','CG Resource');
+        thisRecipe{1}.download(destName_recipe);
+        thisR = jsonread(destName_recipe);
+        assetlist(dd).name = acqLabel;
         assetlist(dd).material.list     = thisR.materials.list;
         assetlist(dd).material.txtLines = thisR.materials.txtLines;
         assetlist(dd).geometry          = thisR.assets;
         assetlist(dd).geometryPath      = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
-        assetlist(dd).fwInfo            = [resID{dd},' ',resFile{dd}.name];
+        assetlist(dd).fwInfo            = [thisAcq{dd}.id,' ',thisResource{1}.name];
     end
-    fprintf('%s added to the list.\n',n);
+    fprintf('%s added to the list.\n',acqLabel);
 end
 end
