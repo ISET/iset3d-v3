@@ -42,12 +42,18 @@ thisR = piRead(fname);
 
 %% get a random car and a random person from flywheel
 % take some time, maybe you dont want to run this everytime when you debug
-assets = piAssetCreate('ncars',1, 'nped',1);
+% assets = piAssetCreate('ncars',1, 'nped',1);
+st = scitran('stanfordlabs');
+project = st.lookup('wandell/Graphics assets');
+session = project.sessions.findOne('label=car');
+
+inputs.ncars = 1;
+assetRecipe = piAssetDownload(session,inputs.ncars,'acquisition label','Car_085');
+asset.car   = piAssetAssign(assetRecipe,'label','car');
 
 %% add downloaded asset information to Render recipe.
-thisR = piAssetAdd(thisR, assets);
-% change position of person
-thisR.assets(end).position = [3; 0; 0];
+thisR = piAssetAdd(thisR, asset);
+
 %% Set render quality
 
 % This is a low resolution for speed.
@@ -88,6 +94,9 @@ thisR.integrator.maxdepth.value = 10;
 %% This adds materials to all assets in this scene
 piMaterialGroupAssign(thisR);
 
+% Assign a nice position.
+thisR.assets(end).position = [2 0 -2]';
+
 %% Write out the pbrt scene file, based on thisR.
 
 thisR.set('fov',45);
@@ -104,9 +113,10 @@ piWrite(thisR,'creatematerials',true);
 %% Render.
 
 % Maybe we should speed this up by only returning radiance.
-[scene, result] = piRender(thisR);
+[scene, result] = piRender(thisR,'render type','radiance');
 
 scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
 sceneWindow(scene);
+sceneSet(scene,'display mode','hdr');
 
 %% END

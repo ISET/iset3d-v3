@@ -24,17 +24,10 @@ function asset = piAssetCreate(varargin)
 % Zhenyi, Vistasoft Team, 2018
 
 %% Parse input parameters
-p = inputParser;
-% if length(varargin) > 1
-%     for i = 1:length(varargin)
-%         if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
-%             varargin{i} = ieParamFormat(varargin{i});
-%         end
-%     end
-% else
-%     
-% end
 varargin =ieParamFormat(varargin);
+
+p = inputParser;
+
 p.addParameter('ncars',0);
 p.addParameter('ntrucks',0);
 p.addParameter('nped',0);
@@ -47,6 +40,7 @@ p.parse(varargin{:});
 
 inputs = p.Results;
 st     = p.Results.scitran;
+
 resources = p.Results.resources;
 if resources== 0
     resources = false;

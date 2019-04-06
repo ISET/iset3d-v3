@@ -76,6 +76,7 @@ for ll = 1: length(assetsnameList)
     end
 end
 end
+
 function thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR)
 for ii = 1:length(assets.(assetname))
     if material
