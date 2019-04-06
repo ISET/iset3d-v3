@@ -45,14 +45,14 @@ mlist = fieldnames(thisR.materials.list);
 % with the colorkd to the recipe.
 for ii = 1:length(mlist)
     if  piContains(lower(mlist(ii)),'carbody') && ~piContains(lower(mlist(ii)),'paint_base')
-        if piContains(mlist(ii),'black')
-            colorkd = piColorPick('black');
-        elseif piContains(mlist(ii),'white')
-            colorkd = piColorPick('white');
-        else
+%         if piContains(mlist(ii),'black')
+%             colorkd = piColorPick('black');
+%         elseif piContains(mlist(ii),'white')
+%             colorkd = piColorPick('white');
+%         else
             % Default
             colorkd = piColorPick('random');
-        end
+%         end
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % This is the assignment
