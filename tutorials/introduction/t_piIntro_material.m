@@ -14,13 +14,12 @@
 %  Check that you have the updated docker image by running
 %
 %    docker pull vistalab/pbrt-v3-spectral
-% Or
 %    docker pull vistalab/pbrt-v3-spectral:test
 %
 % ZL, BW SCIEN 2018
 %
 % See also
-%   t_piIntroduction01, t_piIntroduction02
+%   t_piIntro_*
 
 
 %% Initialize ISET and Docker
@@ -50,8 +49,7 @@ mType = piMateriallib;
 disp(mType);
 
 % In fact, this whole library is always stored as part of any recipe
-%
-% thisR.materials.lib
+%    thisR.materials.lib
 
 % These are the materials in this particular scene.
 piMaterialList(thisR);
@@ -75,6 +73,7 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
+sceneSet(scene,'display mode','hdr');
 
 %% Adjust the scene material from uber to mirror
 
@@ -90,9 +89,8 @@ piMaterialAssign(thisR, partName, target);
 %% Set the render to account for glass and mirror requiring multiple bounces
 
 % This value determines the number of ray bounces.  If a scene has
-% glass we need to have at least 2 bounces. Unfortunately, bounces is
-% stored in a variable called maxdepth
-thisR.integrator.maxdepth.value = 10;
+% glass we need to have at least 2 bounces.
+thisR.set('nbounces',10);
 
 % Because we changed the material assignment, we need to set the
 % 'creatematerials' argument to true.
@@ -103,13 +101,16 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Mirror %s',sceneName));
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.8);
 
-%% Adjust the scene material from mirror to glass
+%% Adjust the scene material from mirror to glass (the person, too)
 
 % Now change the partName 'mirror' to glass material. 
 target = thisR.materials.lib.glass; 
 piMaterialAssign(thisR, partName, target);
 piMaterialAssign(thisR, 'GLASS', target);
+
+% Set the person to glass, too
 personName = 'uber_blue';
 piMaterialAssign(thisR, personName, target);
 

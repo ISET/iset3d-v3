@@ -34,11 +34,15 @@ function val = recipeGet(thisR, param, varargin)
 %     'focal distance' - See autofocus calculation (mm)
 %     'pupil diameter' - In millimeters
 %     'fov'  (Field of view) present if 'optics type' is 'pinhole'
-%     
+%
 %    % Light field camera
 %     'n microlens' (alias 'n pinholes') - 2-vector, row,col
 %     'n subpixels' - 2 vector, row,col
-%      
+%
+%    % Rendering
+%      'integrator'
+%      'n bounces'
+%
 % BW, ISETBIO Team, 2017
 
 % Examples
@@ -63,13 +67,13 @@ end
 p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
-p.addRequired('param',@ischar); 
+p.addRequired('param',@ischar);
 
 p.parse(thisR,param,varargin{:});
 
 switch ieParamFormat(param)
     
-        % Data management
+    % Data management
     case 'inputfile'
         val = thisR.inputFile;
     case 'outputfile'
@@ -88,7 +92,7 @@ switch ieParamFormat(param)
         name = thisR.outputFile;
         [~,val] = fileparts(name);
         
-        % Scene and camera relationship
+        % Scene and camera direction
     case 'objectdistance'
         diff = thisR.lookAt.from - thisR.lookAt.to;
         val = sqrt(sum(diff.^2));
@@ -108,7 +112,7 @@ switch ieParamFormat(param)
         % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
         
-        % Camera
+        % Lens and optics
     case 'opticstype'
         % perspective means pinhole.  Maybe we should rename.
         % realisticDiffraction means lens.  Not sure of all the possibilities
@@ -142,7 +146,6 @@ switch ieParamFormat(param)
                     end
                 end
         end
-        
     case 'focaldistance'
         opticsType = thisR.get('optics type');
         switch opticsType
@@ -196,7 +199,6 @@ switch ieParamFormat(param)
         % How many microlens (pinholes)
         val(2) = thisR.camera.num_pinholes_w.value;
         val(1) = thisR.camera.num_pinholes_h.value;
-        
     case 'nsubpixels'
         % How many film pixels behind each microlens/pinhole
         val(2) = thisR.camera.subpixels_w;
@@ -232,13 +234,21 @@ switch ieParamFormat(param)
         
     case {'raysperpixel'}
         val = thisR.sampler.pixelsamples.value;
-    
+        
     case {'cropwindow','crop window'}
         if(isfield(thisR.film,'cropwindow'))
             val = thisR.film.cropwindow.value;
         else
             val = [0 1 0 1];
         end
+        
+        % Rendering related
+    case{'maxdepth','bounces','nbounces'}
+        val = thisR.integrator.maxdepth.value;
+        
+    case{'integrator'}
+        val = thisR.integrator.subtype;
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end

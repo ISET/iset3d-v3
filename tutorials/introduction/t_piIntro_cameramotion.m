@@ -34,14 +34,14 @@ thisR = piRead(fname);
 
 % This is a low resolution for speed.
 thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',32);
+thisR.set('pixel samples',64);
 
 %% List material library
 
 % This value determines the number of ray bounces.  The scene has
 % glass we need to have at least 2 or more.  We start with only 1
 % bounce, so it will not appear like glass or mirror.
-thisR.integrator.maxdepth.value = 5;
+thisR.set('bounces',5);
 
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on
@@ -66,7 +66,7 @@ piWrite(thisR,'creatematerials',true);
 % We speed this up by only returning radiance.
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.7);
+sceneSet(scene,'display mode','hdr');
 
 %% Motion blur from camera
 
@@ -89,9 +89,8 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: Translation');
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.7);
 
-%%  Now, rotate the camera as well
+%%  Now, rotate the camera
 
 % No translation
 thisR.camera.motion.activeTransformEnd.pos = thisR.lookAt.from(:);
@@ -105,7 +104,6 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: rotation');
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.7);
 
 %% END
 

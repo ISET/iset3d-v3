@@ -9,6 +9,23 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %   has many fields specifying camera and rendering parameters. This
 %   method is only capable of setting one parameter at a time.
 %
+% Parameter list (in progress)
+%   Data management
+%     outputfile
+%     inputfile
+%
+%   Scene and camera
+%     object distance
+%     camera
+%
+%   Lens
+%     lensfile
+%
+%   Film/sensor 
+%
+%   Rendering
+%     nbounces
+%
 % BW ISETBIO Team, 2017
 %
 % See also
@@ -75,7 +92,9 @@ switch param
 
     case {'inputfile'}
         thisR.inputFile = val;   
-        % Scene
+        
+        
+        % Scene and camera
     case 'objectdistance'
         % Adjust the lookat 'from' field to match the distance in val
         objDirection = thisR.get('object direction');
@@ -96,9 +115,10 @@ switch param
             thisR.film.diagonal.value = 35;
             thisR.film.diagonal.type = 'float';
         end
-        
     case 'cameratype'
         thisR.camera.subtype = val;
+        
+        % Lens related
     case 'lensfile'
         if(thisR.version == 3)
             thisR.camera.lensfile.value = val;
@@ -124,12 +144,7 @@ switch param
             thisR.camera.focusdistance.type = 'float';
         else
             warning('focus distance parameter not applicable for version 2');
-        end
-    case 'lookat'
-        % Includes the from, to and up in a struct
-        if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
-            thisR.lookAt = val; 
-        end
+        end        
     case 'fov'
         % We should check that this is a pinhole, I think
         thisR.camera.fov.value = val;
@@ -142,7 +157,6 @@ switch param
         elseif(thisR.version == 3)
             warning('diffraction parameter not applicable for version 3')
         end
-        
     case 'chromaticaberration'
         if(thisR.version == 2)
             thisR.camera.chromaticAberrationEnabled.value = val;
@@ -168,14 +182,7 @@ switch param
             end
             
         end
-    case 'from'
-        thisR.lookAt.from = val;
-    case 'to'
-        thisR.lookAt.to = val;
-    case 'up'
-        thisR.lookAt.up = val;
-        
-    case 'autofocus'
+        case 'autofocus'
         % thisR.set('autofocus',true);
         % Sets the film distance so the lookAt to point is in good focus
         if val
@@ -185,6 +192,35 @@ switch param
             end
             thisR.set('film distance',fdist);
         end
+        
+       % Camera position related
+    case 'lookat'
+        % Includes the from, to and up in a struct
+        if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
+            thisR.lookAt = val;
+        end
+    case 'from'
+        thisR.lookAt.from = val;
+    case 'to'
+        thisR.lookAt.to = val;
+    case 'up'
+        thisR.lookAt.up = val;
+ 
+    
+        % Rendering related
+    case{'maxdepth','bounces','nbounces'}
+        % Eliminated warning Nov. 11, 2018.
+        if(~strcmp(thisR.integrator.subtype,'path')) &&...
+                (~strcmp(thisR.integrator.subtype,'bdpt'))
+            disp('Changing integrator sub type to "bdpt"');
+            
+            % When multiple bounces are needed, use this integrator
+            thisR.integrator.subtype = 'bdpt';
+        end
+        thisR.integrator.maxdepth.value = val;
+        thisR.integrator.maxdepth.type = 'integer';
+    
+        % Microlens
     case 'microlens'
         % Not sure about what this means.  It is on or off
         thisR.camera.microlens_enabled.value = val;
@@ -228,17 +264,7 @@ switch param
     case{'cropwindow','crop window'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
-    case{'maxdepth','bounces'}
-        % Eliminated warning Nov. 11, 2018.
-        if(~strcmp(thisR.integrator.subtype,'path')) &&...
-                (~strcmp(thisR.integrator.subtype,'bdpt'))
-        disp('Changing integrator sub type to "bdpt"');
-        
-        % When there are multiple bounces, apply this integrator
-        thisR.integrator.subtype = 'bdpt';
-        end
-        thisR.integrator.maxdepth.value = val(1);
-        thisR.integrator.maxdepth.type = 'integer';
+   
     otherwise
         error('Unknown parameter %s\n',param);
 end
