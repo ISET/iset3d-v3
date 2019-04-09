@@ -28,6 +28,14 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %
 % BW ISETBIO Team, 2017
 %
+% PBRT information that explains man
+% Generally
+% https://www.pbrt.org/fileformat-v3.html#overview
+% 
+% And specifically
+% https://www.pbrt.org/fileformat-v3.html#cameras
+%
+%
 % See also
 %    recipeGet
 
@@ -147,6 +155,7 @@ switch param
         end        
     case 'fov'
         % We should check that this is a pinhole, I think
+        % This is only used for scenes????
         thisR.camera.fov.value = val;
         thisR.camera.fov.type = 'float';
         

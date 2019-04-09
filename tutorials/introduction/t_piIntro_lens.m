@@ -1,7 +1,5 @@
 %% Render using a lens
 %
-% Takes about 90 seconds to render
-%
 % Dependencies:
 %    ISET3d, ISETCam, JSONio
 %
@@ -15,6 +13,12 @@
 %   t_piIntro_*
 %   isetLens repository
 
+% Generally
+% https://www.pbrt.org/fileformat-v3.html#overview
+% 
+% And specifically
+% https://www.pbrt.org/fileformat-v3.html#cameras
+%
 
 %% Initialize ISET and Docker
 
@@ -44,7 +48,7 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Relatively low resolution for speed.
-thisR.set('film resolution',[400 300]);
+thisR.set('film resolution',round([600 400]*1.5));
 thisR.set('pixel samples',64);
 
 %% Set output file
@@ -57,6 +61,7 @@ outputDir = fileparts(outFile);
 %% Add camera with lens
 
 % lensfile = 'fisheye.87deg.6.0mm.dat';
+% 22deg is the half width of the field of view
 lensfile = 'dgauss.22deg.50.0mm.dat';
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
@@ -64,46 +69,50 @@ thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 %{
 % You might adjust the focus for different scenes.  Use piRender with
 % the 'depth map' option to see how far away the scene objects are.
+% There appears to be some difference between the depth map and the
+% true focus.
 dMap = piRender(thisR,'render type','depth');
-ieNewGraphWin; imagesc(dMap); colormap(flipud(gray));
-colorbar;
+ieNewGraphWin; imagesc(dMap); colormap(flipud(gray)); colorbar;
 %}
-thisR.camera.focusdistance.value = 0.375;
 
-% Default aperture diameter is 5.  You can change this for depth of
-% field effects.
-thisR.camera.aperturediameter.value = 2;   
+thisR.set('focus distance',0.45);
+% thisR.camera.focusdistance.value = 0.45;   % The king is 0.33
 
-thisR.set('fov',45);
-thisR.film.diagonal.value=  30;
-thisR.film.diagonal.type = 'float';
+% The FOV is not used for the 'realistic' camera.
+% The FOV is determined by the lens. 
+
+% This is the size of the film/sensor in millimeters
+thisR.set('film diagonal',40);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
 thisR.integrator.subtype = 'path';  
 thisR.sampler.subtype = 'sobol';
 
-% This value determines the number of ray bounces.  The scene has
-% glass we need to have at least 2 or more.  We start with only 1
-% bounce, so it will not appear like glass or mirror.
-thisR.set('nbounces',4); 
-
-piWrite(thisR,'creatematerials',true);
+% This value determines the number of ray bounces.  If the scene has
+% glass or mirrors, we need to have at least 2 or more.
+% thisR.set('nbounces',4); 
 
 %% Render and display
 
+% Default aperture diameter is 5.  You can change this for depth of
+% field effects.
+thisR.camera.aperturediameter.value = 6;   
+
+piWrite(thisR,'creatematerials',true);
+
 oi = piRender(thisR,'render type','radiance');
-oi = oiSet(oi,'name',sprintf('%s',oiName));
+oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 oi = oiSet(oi,'gamma',0.8);
 
 %% Change this for depth of field effects.
-thisR.camera.aperturediameter.value = 10; 
+thisR.camera.aperturediameter.value = 3; 
 
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
-oi = oiSet(oi,'name',sprintf('%s',oiName));
+oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 oi = oiSet(oi,'gamma',0.8);
 
@@ -113,7 +122,7 @@ thisR.camera.aperturediameter.value = 1;
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
-oi = oiSet(oi,'name',sprintf('%s',oiName));
+oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 oi = oiSet(oi,'gamma',0.8);
 
