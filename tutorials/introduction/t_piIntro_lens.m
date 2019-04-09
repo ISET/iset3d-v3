@@ -35,7 +35,9 @@ sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
 % The output directory will be written here to inFolder/sceneName
 inFolder = fullfile(piRootPath,'local','scenes');
-piPBRTFetch(sceneName,'pbrtversion',3,'destinationFolder',inFolder);
+dest = piPBRTFetch(sceneName,'pbrtversion',3,...
+    'destinationFolder',inFolder,...
+    'delete zip',true);
 
 % This is the PBRT scene file inside the output directory
 inFile = fullfile(inFolder,sceneName,sceneFileName);
@@ -49,7 +51,7 @@ thisR.set('outputFile',outFile);
 
 % Relatively low resolution for speed.
 thisR.set('film resolution',round([600 400]*1.5));
-thisR.set('pixel samples',64);
+thisR.set('pixel samples',512);
 
 %% Set output file
 
@@ -71,12 +73,13 @@ thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 % the 'depth map' option to see how far away the scene objects are.
 % There appears to be some difference between the depth map and the
 % true focus.
-dMap = piRender(thisR,'render type','depth');
-ieNewGraphWin; imagesc(dMap); colormap(flipud(gray)); colorbar;
+  dMap = piRender(thisR,'render type','depth');
+  ieNewGraphWin; imagesc(dMap); colormap(flipud(gray)); colorbar;
 %}
 
+% PBRT estimates the distance.  It is not perfectly aligned to the depth
+% map, but it is close.
 thisR.set('focus distance',0.45);
-% thisR.camera.focusdistance.value = 0.45;   % The king is 0.33
 
 % The FOV is not used for the 'realistic' camera.
 % The FOV is determined by the lens. 
@@ -95,9 +98,8 @@ thisR.sampler.subtype = 'sobol';
 
 %% Render and display
 
-% Default aperture diameter is 5.  You can change this for depth of
-% field effects.
-thisR.camera.aperturediameter.value = 6;   
+% Change this for depth of field effects.
+thisR.set('aperture diameter',6);
 
 piWrite(thisR,'creatematerials',true);
 
@@ -107,7 +109,7 @@ oiWindow(oi);
 oi = oiSet(oi,'gamma',0.8);
 
 %% Change this for depth of field effects.
-thisR.camera.aperturediameter.value = 3; 
+thisR.set('aperture diameter',3);
 
 piWrite(thisR,'creatematerials',true);
 
@@ -117,7 +119,7 @@ oiWindow(oi);
 oi = oiSet(oi,'gamma',0.8);
 
 %% Change again for depth of field effects.
-thisR.camera.aperturediameter.value = 1; 
+thisR.set('aperture diameter',1);
 
 piWrite(thisR,'creatematerials',true);
 
