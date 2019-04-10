@@ -51,8 +51,8 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*0.5));
-thisR.set('pixel samples',64*1);   % Lots of rays for quality.
+thisR.set('film resolution',round([600 400]*1.5));
+thisR.set('pixel samples',64*6);   % Lots of rays for quality.
 
 %% Set output file
 
@@ -63,9 +63,7 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-% lensfile = 'fisheye.87deg.6.0mm.dat';
-% 22deg is the half width of the field of view
-lensfile = 'dgauss.22deg.50.0mm.dat';
+lensfile = 'fisheye.87deg.6.0mm.dat';
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 
@@ -86,7 +84,7 @@ thisR.set('focus distance',0.45);
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters
-thisR.set('film diagonal',40);
+thisR.set('film diagonal',15);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
@@ -97,33 +95,13 @@ thisR.sampler.subtype = 'sobol';
 % glass or mirrors, we need to have at least 2 or more.
 % thisR.set('nbounces',4); 
 
-%% Render and display
-
-% Change this for depth of field effects.
-thisR.set('aperture diameter',6);
-
-piWrite(thisR,'creatematerials',true);
-
-oi = piRender(thisR,'render type','radiance');
-oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
-oiWindow(oi);
-
 %% Change this for depth of field effects.
 thisR.set('aperture diameter',3);
 
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
-oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
-oiWindow(oi);
-
-%% Change again for depth of field effects.
-thisR.set('aperture diameter',1);
-
-piWrite(thisR,'creatematerials',true);
-
-oi = piRender(thisR,'render type','radiance');
-oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
+oi = oiSet(oi,'name',sprintf('%s',oiName));
 oiWindow(oi);
 
 %% END
