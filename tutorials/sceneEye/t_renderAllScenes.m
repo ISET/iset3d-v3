@@ -44,8 +44,7 @@ scene3d.numBounces = 6;
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Colorful scene');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Chess set
 % A chess set "to scale" (e.g. the pieces match real word sizes). A ruler
@@ -61,8 +60,7 @@ scene3d.accommodation = 1;
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Chess Set');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Chess set scaled
 % The same chess set, but it's been distorted in order to emphasize depth
@@ -79,7 +77,7 @@ scene3d.accommodation = 1/0.3; % Accommodate to the white pawn
 oi = scene3d.render();
 oi = oiSet(oi,'name','Chess Set scaled');
 
-ieAddObject(oi); oiWindow;
+oiWindow(oi);
 
 %% Snellen Single
 % A single letter E placed at a certain depth. The background is a black
@@ -113,7 +111,7 @@ scene3d.accommodation = 1/0.8;
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Snellen at depth');
-ieAddObject(oi); oiWindow;
+oiWindow(oi);
 
 %% Black backdrop and blank scene
 
@@ -121,7 +119,7 @@ ieAddObject(oi); oiWindow;
 % objects in (see below).
 
 % Load scene
-scene3d = sceneEye('blankScene');
+scene3d = sceneEye('blackBackdrop');
 
 scene3d.fov = 30;
 scene3d.resolution = 128;
@@ -142,7 +140,7 @@ scene3d.recipe = piAddSphere(scene3d.recipe,...
 
 [oi, results] = scene3d.render();
 oi = oiSet(oi,'name','blankScene_with_spheres');
-ieAddObject(oi); oiWindow;
+oiWindow(oi);
 
 %% Numbers at depth
 
@@ -158,7 +156,7 @@ scene3d.accommodation = 1/(200e-3); % Accommodate to "200"
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Numbers at depth');
-ieAddObject(oi); oiWindow;
+oiWindow(oi);
 
 %% Slanted bar
 
@@ -177,7 +175,7 @@ scene3d.accommodation = 1/3; % Accommodate to the plane
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Slanted edge');
-ieAddObject(oi); oiWindow;
+oiWindow(oi);
 
 %% Slanted bar (texture ver.)
 % Similar the previous scene, except the two planes now have checkerboard
@@ -196,8 +194,7 @@ scene3d.accommodation = 1/2; % Accommodate to the bottom plane
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Slanted edge texture');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Textured plane
 % A blank plane that is placed perpendicular to the optical axis so that it
@@ -221,10 +218,10 @@ scene3d.accommodation = 1; % Accommodate to the plane
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Textured plane');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Point source
+
 % The "point source" is actually just a sphere placed at a certain
 % distance. To make it a point source, we would make it very small and
 % place it very far away. Because of the way ray-tracing works, we need
@@ -236,6 +233,8 @@ oiWindow;
 % roughly half a degree. This is no where close to a point source, but
 % makes it easier to test this scene without having to render with lots of
 % rays.
+
+%{   - Cannot find this.  Ask TL
 scene3d = sceneEye('pointSource',...
                     'pointDiameter',0.01,...
                     'pointDistance',1);
@@ -248,8 +247,8 @@ scene3d.accommodation = 1; % Accommodate to the point
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Point');
-ieAddObject(oi);
-oiWindow;                
+oiWindow(oi);            
+%}
 
 %% Letters at depth
 % Similar to the "numbers at depth" and "snellen at depth" scenes. Three
@@ -272,8 +271,7 @@ scene3d.accommodation = 1; % Accommodate to the point
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Letters at depth');
-ieAddObject(oi);
-oiWindow;   
+oiWindow(oi);
 
 %% Colored Cube
 % A cube with different colored sides. Another mdoel used primarily to test
@@ -292,8 +290,7 @@ scene3d.accommodation = 1/2.78;
 oi = scene3d.render();
 oi = oiSet(oi,'name','Colored cube 1');
 
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% You can rotate the cube like this:
 
@@ -309,7 +306,7 @@ end
 
 oi = scene3d.render();
 oi = oiSet(oi,'name','Colored cube 2');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
+
                   
 %% END
