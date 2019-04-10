@@ -21,7 +21,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %   Lens
 %     lensfile
 %
-%   Film/sensor 
+%   Film/sensor
 %
 %   Rendering
 %     nbounces
@@ -31,7 +31,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % PBRT information that explains man
 % Generally
 % https://www.pbrt.org/fileformat-v3.html#overview
-% 
+%
 % And specifically
 % https://www.pbrt.org/fileformat-v3.html#cameras
 %
@@ -64,7 +64,7 @@ p.parse(thisR, param, val, varargin{:});
 
 param = ieParamFormat(p.Results.param);
 
-%% Act 
+%% Act
 switch param
     
     % Rendering and Docker related
@@ -89,17 +89,17 @@ switch param
             if ~exist(currentDir,'dir')
                 % No files to be copied
             else
-                fprintf('Output directory changed. Copying files from %s to %s \n',... 
-                currentDir,newDir);
+                fprintf('Output directory changed. Copying files from %s to %s \n',...
+                    currentDir,newDir);
                 copyfile(currentDir,newDir);
                 rmdir(currentDir,'s');
             end
         end
-
+        
         thisR.outputFile = val;
-
+        
     case {'inputfile'}
-        thisR.inputFile = val;   
+        thisR.inputFile = val;
         
         
         % Scene and camera
@@ -144,20 +144,24 @@ switch param
             thisR.camera.aperture_diameter.type = 'float';
         end
     case {'filmdistance'}
-            thisR.camera.filmdistance.value = val;
-            thisR.camera.filmdistance.type = 'float';
+        thisR.camera.filmdistance.value = val;
+        thisR.camera.filmdistance.type = 'float';
     case {'focusdistance'}
         if(thisR.version == 3)
             thisR.camera.focusdistance.value = val;
             thisR.camera.focusdistance.type = 'float';
         else
             warning('focus distance parameter not applicable for version 2');
-        end        
+        end
     case 'fov'
         % We should check that this is a pinhole, I think
-        % This is only used for scenes????
-        thisR.camera.fov.value = val;
-        thisR.camera.fov.type = 'float';
+        % This is only used for pinholes, not realistic camera case. 
+        if isequal(thisR.camera.subtype,'pinhole')
+            thisR.camera.fov.value = val;
+            thisR.camera.fov.type = 'float';
+        else
+            warning('fov not set for camera models');
+        end
         
     case 'diffraction'
         if(thisR.version == 2)
@@ -167,31 +171,28 @@ switch param
             warning('diffraction parameter not applicable for version 3')
         end
     case 'chromaticaberration'
-        if(thisR.version == 2)
-            thisR.camera.chromaticAberrationEnabled.value = val;
-            thisR.camera.chromaticAberrationEnabled.type = 'bool';
-            
-            % Set chromatic aberration correctly
-            thisR.renderer.subtype = 'spectralrenderer';
-
-        elseif(thisR.version == 3)
-            thisR.camera.chromaticAberrationEnabled.value = val;
-            thisR.camera.chromaticAberrationEnabled.type = 'bool';
-            
-            thisR.integrator.subtype = 'spectralpath';
-            if(ischar(val))
-                % User probably put in true or false, so let's just use a
-                % default of 8 bands.
-                warning('Using a default of 8 sampled bands for the chromatic aberration.');
-                thisR.integrator.numCABands.value = 8;
-                thisR.integrator.numCABands.type = 'integer';
-            else
-                thisR.integrator.numCABands.value = val;
-                thisR.integrator.numCABands.type = 'integer';
-            end
-            
-        end
-        case 'autofocus'
+        % Enable chrommatic aberration, and potentially set the number
+        % of wavelength bands.  (Default is 8).
+        %   thisR.set('chromatic aberration',true);
+        %   thisR.set('chromatic aberration',false);
+        %   thisR.set('chromatic aberration',16);
+        
+        % Enable or disable
+        thisR.camera.chromaticAberrationEnabled.value = val;
+        thisR.camera.chromaticAberrationEnabled.type = 'bool';
+        
+        if isequal(val,false), return; end
+        
+        if islogical(val), val = 8; end
+        % Enabled, so set proper integrator
+        thisR.integrator.subtype = 'spectralpath';
+        
+        % Set the bands.  These are divided evenly into bands between
+        % 400 and 700 nm.  If a number, then
+        thisR.integrator.numCABands.value = val;
+        thisR.integrator.numCABands.type = 'integer';
+        
+    case 'autofocus'
         % thisR.set('autofocus',true);
         % Sets the film distance so the lookAt to point is in good focus
         if val
@@ -202,7 +203,7 @@ switch param
             thisR.set('film distance',fdist);
         end
         
-       % Camera position related
+        % Camera position related
     case 'lookat'
         % Includes the from, to and up in a struct
         if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
@@ -214,8 +215,8 @@ switch param
         thisR.lookAt.to = val;
     case 'up'
         thisR.lookAt.up = val;
- 
-    
+        
+        
         % Rendering related
     case{'maxdepth','bounces','nbounces'}
         % Eliminated warning Nov. 11, 2018.
@@ -228,7 +229,7 @@ switch param
         end
         thisR.integrator.maxdepth.value = val;
         thisR.integrator.maxdepth.type = 'integer';
-    
+        
         % Microlens
     case 'microlens'
         % Not sure about what this means.  It is on or off
@@ -273,8 +274,8 @@ switch param
     case{'cropwindow','crop window'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
-   
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end
- 
+

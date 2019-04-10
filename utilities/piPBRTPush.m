@@ -29,6 +29,10 @@ function rd = piPBRTPush(fnameZIP,varargin)
 %
 % See also:  piPBRTFetch, piPBRTList
 
+% Examples:
+%{
+  piPBRTPush('ChessSet.zip');
+%}
 %% Parse inputs
 p = inputParser;
 for ii=1:2:length(varargin)
@@ -38,7 +42,7 @@ end
 % varargin = ieParamFormat(varargin);
 p.addRequired('fnameZIP',@ischar);
 p.addParameter('artifactname','',@ischar);
-p.addParameter('pbrtversion','v2',@ischar);
+p.addParameter('pbrtversion','v3',@ischar);
 p.addParameter('rd',[],@(x)(isa(x,'RdtClient')));
 
 p.parse(fnameZIP,varargin{:});
