@@ -178,18 +178,27 @@ switch param
         %   thisR.set('chromatic aberration',16);
         
         % Enable or disable
-        thisR.camera.chromaticAberrationEnabled.value = val;
         thisR.camera.chromaticAberrationEnabled.type = 'bool';
         
-        if isequal(val,false), return; end
+        if isequal(val,false)
+            thisR.camera.chromaticAberrationEnabled.value = 'false';
+            return;
+        elseif isequal(val,true)
+            thisR.camera.chromaticAberrationEnabled.value = 'true';
+            val = 8; 
+        elseif isnumeric(val)
+            thisR.camera.chromaticAberrationEnabled.value = 'true';
+        else
+            error('Unexpected type for val.  %s\n',class(val));
+        end
         
-        if islogical(val), val = 8; end
         % Enabled, so set proper integrator
         thisR.integrator.subtype = 'spectralpath';
         
         % Set the bands.  These are divided evenly into bands between
-        % 400 and 700 nm.  If a number, then
-        thisR.integrator.numCABands.value = val;
+        % 400 and 700 nm. There are  31 wavelength samples, so we
+        % should not have more than 30 wavelength bands
+        thisR.integrator.numCABands.value = min(30,val);
         thisR.integrator.numCABands.type = 'integer';
         
     case 'autofocus'

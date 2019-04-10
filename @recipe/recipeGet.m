@@ -195,7 +195,19 @@ switch ieParamFormat(param)
         if strcmp(thisR.camera.subtype,'realisticEye')
             val = thisR.camera.pupilDiameter.value;
         end
-        
+    case 'chromaticaberration'
+        % thisR.get('chromatic aberration')
+        % True or false (on or off)
+        val = thisR.camera.chromaticAberrationEnabled.value;
+        if isequal(val,'true'), val = true; else, val = false; end
+    case 'numcabands'
+        % thisR.get('num ca bands')
+        try
+            val = thisR.integrator.numCABands.value;
+        catch
+            val = 0;
+        end
+
         % Light field camera parameters
     case {'nmicrolens','npinholes'}
         % How many microlens (pinholes)
