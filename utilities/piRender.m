@@ -81,7 +81,9 @@ p.addParameter('reuse',false,@islogical);
 
 % We were testing this one      'vistalab/pbrt-v3-spectral:test';
 % The one we have run a lot is  'vistalab/pbrt-v3-spectral:latest';
-p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:test',@ischar);
+thisDocker = 'vistalab/pbrt-v3-spectral:test';
+fprintf('Docker container %s\n',thisDocker);
+p.addParameter('dockerimagename',thisDocker,@ischar);
 
 p.parse(thisR,varargin{:});
 renderType      = p.Results.rendertype;

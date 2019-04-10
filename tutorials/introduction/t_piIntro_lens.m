@@ -5,6 +5,7 @@
 %
 % Check that you have the updated docker image by running
 %
+%    docker pull vistalab/pbrt-v3-spectral
 %    docker pull vistalab/pbrt-v3-spectral:test
 %
 % ZL, BW SCIEN 2018
@@ -49,9 +50,9 @@ outFile = fullfile(outFolder,[sceneName,'.pbrt']);
 thisR.set('outputFile',outFile);
 %% Set render quality
 
-% Relatively low resolution for speed.
-thisR.set('film resolution',round([600 400]*1.5));
-thisR.set('pixel samples',512);
+% Set resolution for speed or quality.
+thisR.set('film resolution',round([600 400]*0.5));
+thisR.set('pixel samples',64*1);   % Lots of rays for quality.
 
 %% Set output file
 
@@ -106,7 +107,6 @@ piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
-oi = oiSet(oi,'gamma',0.8);
 
 %% Change this for depth of field effects.
 thisR.set('aperture diameter',3);
@@ -116,7 +116,6 @@ piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
-oi = oiSet(oi,'gamma',0.8);
 
 %% Change again for depth of field effects.
 thisR.set('aperture diameter',1);
@@ -126,6 +125,5 @@ piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
-oi = oiSet(oi,'gamma',0.8);
 
 %% END

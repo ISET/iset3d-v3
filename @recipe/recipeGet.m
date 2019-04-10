@@ -21,23 +21,25 @@ function val = recipeGet(thisR, param, varargin)
 %     'working directory' - directory mounted by docker image
 %
 %   % Camera and scene
-%     'object distance'  - The units are from the scene, not real.
-%                          We are hoping to get everything in mm
-%     'object direction' - An angle, I guess ...
-%     'look at'          - Three components
-%       'from'
-%       'to'
-%       'up'
-%       'from to' - vector difference (from - to)
-%     'optics type'
-%     'lens file'
-%     'focal distance' - See autofocus calculation (mm)
-%     'pupil diameter' - In millimeters
-%     'fov'  (Field of view) present if 'optics type' is 'pinhole'
+%     'object distance'  - The magnitude ||(from - to)|| of the difference
+%                          between from and to.  Units are from the scene,
+%                          typically in meters. 
+%     'object direction' - Unit length vector of from and to
+%     'look at'          - Struct with four components
+%        'from'           - Camera location
+%        'to'             - Camera points at
+%        'up'             - Direction that is 'up'
+%        'from to'        - vector difference (from - to)
+%     'optics type'      -
+%     'lens file'        - Name of lens file in data/lens
+%     'focal distance'   - See autofocus calculation (mm)
+%     'pupil diameter'   - In millimeters
+%     'fov'              - (Field of view) only used if 'optics type' is
+%                          'pinhole' 
 %
 %    % Light field camera
-%     'n microlens' (alias 'n pinholes') - 2-vector, row,col
-%     'n subpixels' - 2 vector, row,col
+%     'n microlens'      - 2-vector, row,col (alias 'n pinholes')
+%     'n subpixels'      - 2 vector, row,col
 %
 %    % Rendering
 %      'integrator'
@@ -52,13 +54,13 @@ function val = recipeGet(thisR, param, varargin)
   val = thisR.get('focal distance');
   val = thisR.get('camera type');
   val = thisR.get('lens file');
-
 %}
 
 % Programming todo
 %
 
-%%
+%% Parameters
+
 if isequal(param,'help')
     doc('recipe.recipeGet');
     return;
