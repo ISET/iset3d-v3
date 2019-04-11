@@ -84,10 +84,11 @@ sessions   = hierarchy.sessions;
     'cloudRender',cloudRenderFlag,...
     'scitran',st);
 
-roadFolder = fileparts(thisR_road.inputFile);
-roadFolder = strsplit(roadFolder,'/');
-roadName   = roadFolder{length(roadFolder)};
-trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadName,trafficflowDensity));
+% roadFolder = fileparts(thisR_road.inputFile);
+% roadFolder = strsplit(roadFolder,'/');
+% roadName   = roadFolder{length(roadFolder)};
+
+trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity));
 trafficflowFolder = fileparts(trafficflowPath);
 
 if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end

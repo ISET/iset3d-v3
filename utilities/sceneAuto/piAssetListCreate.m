@@ -29,11 +29,6 @@ project = st.lookup('wandell/Graphics assets');
 session     = project.sessions.findOne(sprintf('label=%s',sessionname));
 acqs = session.acquisitions();
 %%
-% fileType_json ='source code'; % json
-% [recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
-% fileType = 'CG Resource';
-% [resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
-%%
 nDatabaseAssets = length(acqs);
 if isempty(acquisitionname)
     for ii = 1:nDatabaseAssets

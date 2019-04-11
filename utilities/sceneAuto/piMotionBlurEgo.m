@@ -22,7 +22,7 @@ fps   = p.Results.fps;
 nextTrafficflow = p.Results.nextTrafficflow;
 thisCar = p.Results.thisCar;
 %% Add shutter open time
-shutterclosed = 1/fps/2;
+shutterclosed = 1/fps;
 thisR.camera.shutteropen.type = 'float';
 thisR.camera.shutteropen.value = 0;
 thisR.camera.shutterclose.type = 'float';
