@@ -1,0 +1,66 @@
+# PBRT version = 3 
+# This scene consists of a camera looking at a disk. 
+# The disk serves as a simple "point." 
+# There is a black plane behind the point that reflects no light. 
+# By default the camera is facing down the positive z-axis. 
+
+# camera default orientation
+LookAt 0 0 0 0 0 1 0 1 0
+
+# 1_Camera
+Camera "perspective"
+  "float fov" [30]
+
+# integrator 
+Integrator "path" 
+  "integer maxdepth" [1] 
+
+# sampler
+Sampler "lowdiscrepancy" 
+  "integer pixelsamples" [128] 
+
+# filter
+PixelFilter "gaussian" 
+  "float alpha" [2] 
+  "float xwidth" [2] 
+  "float ywidth" [2] 
+
+# film
+Film "image" 
+  "integer xresolution" [128] 
+  "integer yresolution" [128] 
+
+WorldBegin
+
+# PointMaterial
+MakeNamedMaterial "PointMaterial" "string type" "uber" 
+  "rgb Kd" [1 0 0] 
+  "rgb Ks" [0 0 0] 
+  "spectrum Kr" [300 0 800 0] 
+  "float roughness" [0] 
+  "float index" [1] 
+  "rgb opacity" [1 1 1] 
+
+# Point
+ObjectBegin "Point"
+  Material "matte" "color Kd" [1 1 1]
+  Shape "disk" "float radius" [1]
+ObjectEnd
+
+# Background plane
+ObjectBegin "Plane"
+  Material "matte" "color Kd" [0 0 0]
+  Shape "disk" "float radius" [1]
+ObjectEnd
+
+AttributeBegin  
+  ObjectInstance "Plane"
+  ObjectInstance "Point"      
+AttributeEnd
+
+LightSource "infinite" 
+  "integer nsamples" [8] 
+  "spectrum L" "EqualEnergy.spd" 
+
+WorldEnd
+
