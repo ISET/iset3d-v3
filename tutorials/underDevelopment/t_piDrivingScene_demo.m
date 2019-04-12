@@ -2,15 +2,16 @@
 %
 %    t_piDrivingScene_demo
 %
+% Dependencies
+%    ISETCloud, ISET3d, ISETCam and scitran
+%
 % Description:
-%   Illustrates the use of ISETCloud, ISET3d, ISETCam and Flywheel to
-%   generate driving scenes.  This example works with the PBRT-V3
-%   docker container (not V2).
+%   Generate driving scenes.
 %
 % Author: ZL
 %
 % See also
-%   piSceneAuto, piSkymapAdd, gCloud, SUMO
+%   piSceneAuto, piSkymapAdd, gCloud
 
 %% Initialize ISET and Docker
 ieInit;
@@ -22,6 +23,7 @@ st = scitran('stanfordlabs');
 
 %% Initialize your GCP cluster
 
+% Initializing takes a few minutes
 tic
 gcp = gCloud('configuration','cloudRendering-pbrtv3-central-standard-32cpu-120m-flywheel');
 
@@ -35,17 +37,18 @@ str = gcp.configList;
 
 %%  Example scene creation
 
-% Avaliable sceneType: city1, city2, city3, city4, citymix, suburb
+% This can take 20-30 minutes
+
+% Available sceneTypes: city1, city2, city3, city4, citymix, suburb
 sceneType = 'city3';
 
-% Avaliable roadType: 
-%                   curve_6lanes_001
-%                   straight_2lanes_parking
-%                   city_cross_6lanes_001
-%                   city_cross_6lanes_001_construct
-%                   city_cross_4lanes_002
+% Available roadType: 
+%      curve_6lanes_001
+%      straight_2lanes_parking
+%      city_cross_6lanes_001
+%      city_cross_6lanes_001_construct
+%      city_cross_4lanes_002
 roadType = 'city_cross_4lanes_002';
-
 
 % Avaliable trafficflowDensity: low, medium, high
 trafficflowDensity = 'medium';
@@ -57,12 +60,15 @@ timestamp = 122;
 cloudRender = 1;
 %
 % Only for this Demo: Copy trafficflow from data folder to local folder
-trafficflowPath   = fullfile(piRootPath,'data','demo',...
+trafficflowPath   = fullfile(piRootPath,'data','sumo_input','demo',...
     'trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity));
 localTF = fullfile(piRootPath,'local','trafficflow');
+
 if ~exist(localTF,'dir'), mkdir(localTF);end
 copyfile(trafficflowPath,localTF);
 %% Scene Generation
+
+% A couple of minutes
 tic
 [thisR_scene,road] = piSceneAuto('sceneType',sceneType,...
     'roadType',roadType,...
@@ -74,14 +80,19 @@ toc
 
 thisR_scene.metadata.sumo.trafficflowdensity = trafficflowDensity;
 thisR_scene.metadata.sumo.timestamp          = timestamp;
+
 %% Add a skymap and add SkymapFwInfor to fwList
+
 dayTime = '14:30';
 [thisR_scene,skymapfwInfo] = piSkymapAdd(thisR_scene,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
+
 %% Render parameters
+
 xRes = 1280;
 yRes = 720;
 pSamples = 32;
+
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
 thisR_scene.set('film diagonal',10);
@@ -95,12 +106,12 @@ thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion
 % To place the camera, we find a car and place a camera at the front
 % of the car.  We find the car using the trafficflow information.
 
-load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity)),'trafficflow');
+load(fullfile(piRootPath,'local',...
+    'trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity)),'trafficflow');
 thisTrafficflow = trafficflow(timestamp);
 nextTrafficflow = trafficflow(timestamp+1);
-%
 
-CamOrientation =270;
+CamOrientation = 270;
 camPos = {'left','right','front','rear'};
 % camPos = camPos{randi(4,1)};
 camPos = camPos{3};
@@ -149,8 +160,10 @@ fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 % Describe the target to the user
 
 gcp.targetsList;
+
 %% This invokes the PBRT-V3 docker image
 gcp.render(); 
+
 %% Monitor the processes on GCP
 
 [podnames,result] = gcp.Podslist('print',false);

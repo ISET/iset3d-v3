@@ -1,4 +1,11 @@
-%% cross: 5 types
+%% Information about the roads is written into
+%  iset3d/local/configuration
+%
+% Could be updated in many ways.
+%
+% ZL
+
+%% First road crossing
 roadinfo(1).name='city_cross_4lanes_001';
 roadinfo(1).roadtype='cross';
 roadinfo(1).scenetype='city';
@@ -52,6 +59,7 @@ roadinfo(1).sidewalk_list(8).coordinate = [123.352/2, 129.991/2];
 roadinfo(1).sidewalk_list(8).height = 0.452/2;
 roadinfo(1).sidewalk_list(8).width = 5;
 
+%% Second road
 
 roadinfo(2).name='city_cross_6lanes_001';
 roadinfo(2).roadtype='cross';
@@ -106,6 +114,7 @@ roadinfo(2).sidewalk_list(8).coordinate = [66.76, 60.733];
 roadinfo(2).sidewalk_list(8).height = 0;
 roadinfo(2).sidewalk_list(8).width = 6.6;
 
+%% Third road
 
 roadinfo(3).roadtype='cross';
 roadinfo(3).name='city_cross_4lanes_002';
@@ -160,6 +169,7 @@ roadinfo(3).sidewalk_list(8).coordinate = [-15.182, 107.986+6.6];
 roadinfo(3).sidewalk_list(8).height = 0;
 roadinfo(3).sidewalk_list(8).width = 6.6;
 
+%% Fourth road
 
 roadinfo(4).roadtype='straight';
 roadinfo(4).name='straight_2lanes_parking';
@@ -189,6 +199,7 @@ roadinfo(4).parking_list(2).coordinate = [6, 233];
 roadinfo(4).parking_list(2).height = 0;
 roadinfo(4).parking_list(2).width = 2.58;
 
+%% Fifth road
 
 roadinfo(5).roadtype='curve';
 roadinfo(5).name='curve_6lanes_001';
@@ -243,9 +254,16 @@ roadinfo(5).sidewalk_list(8).height = 0.15;
 roadinfo(5).sidewalk_list(8).width = 5;
 
 
-%% 
+%%  Always write the road information to the same place
+
 currdir = pwd;
+
 filepath = fullfile(piRootPath,'local','configuration');
+if ~exist(filepath,'dir'), mkdir(filepath); end
+
 cd(filepath);
-save('roadInfo.mat','roadinfo');cd(currdir)
+save('roadInfo.mat','roadinfo');
+cd(currdir)
 filefullpath = fullfile(filepath, 'roadInfo.mat');
+
+
