@@ -1,21 +1,27 @@
 %% t_renderAllScenes.m
 %
-% Works with ISETBio (not ISETCam)
+% Requires ISETBio (not ISETCam)
 %
-% This tutorial will run quick renders of all available scenes. It will
-% also give examples on how to set certain parameters for certain scenes
-% (e.g. the distance to a textured plane.)
+% This tutorial quickly renders many test scenes. It is quick because
+% they are very low resolution. It will also give examples on how to
+% set certain parameters for certain scenes (e.g. the distance to a
+% textured plane.)
 %
-% In order to save on computation time, we do not render any chromatic
-% aberration in the lens.
+% To computation time, we do not render any chromatic aberration in
+% the lens.
 %
 % On an 8-core machine, this script takes around 2-3 minutes to run.
 % (Excluding the time it takes to download new scenes from the remote data
 % toolbox).
 %
-% Depends on: iset3d, isetbio, Docker, RemoteDataToolbox
+% Dependencies:
+%  iset3d, isetbio, Docker, RemoteDataToolbox
 %
 % TL ISETBIO Team, 2017
+%
+% See also:
+%  t_piIntro_*
+%
 
 %% Initialize
 
