@@ -1,11 +1,32 @@
 function m = piMaterialCreate
-% Template for the material structure.
-% We have noticed these as possible additions
-%    spectrum Kd
-%    xyz Kd
+% Create a template for the material structure.
 %
-% V2 had a specifier 'texture bumpmap' that we don't think is V3.
+% Syntax:
+%   m = piMaterialCreate
 %
+% Description:
+%    This function creates a template for a material structure.
+%    (Initializes all of the required values for a material structure.)
+%
+%    We have noticed these as possible additions
+%        spectrum Kd
+%        xyz Kd
+%
+%    V2 had a specifier 'texture bumpmap' that we don't think is V3.
+%
+% Inputs:
+%    None.
+%
+% Outputs:
+%    m - Struct. A material structure.
+%
+% Optional key/value pairs:
+%    None.
+%
+
+% History:
+%    XX/XX/XX  XXX  Created
+%    04/03/19  JNM  Documentation pass
 
 m.name = '';
 m.linenumber = [];

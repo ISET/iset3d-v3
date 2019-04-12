@@ -1,30 +1,40 @@
 function iset = piCamBio()
 % Returns a string that indicates ISETCam or ISETBio on the path
 %
-% Synopsis
-%    str= piCamBio;
+% Syntax:
+%    iset = piCamBio;
 %
-% Inputs
-%   N/A
+% Description:
+%    Returns a string indicating whether ISETBio or ISETCam is installed.
 %
-% Optional Key/value pairs
-%   N/A
+% Inputs:
+%    None.
 %
-% Returns
-%   String - isetcam, isetbio, or an empty string if neither
+% Outputs:
+%    iset - String. One of the following strings will be returned:
+%       'isetbio': ISETBio is installed.
+%       'isetcam': ISETCam is installed.
+%       '':        Neither ISETBio or ISETCam is installed.
 %
+% Optional key/value pairs:
+%   None.
 %
-% BW ISET Team, 2018
 
+% History:
+%    XX/XX/18  BW   ISET Team, 2018
+%    04/01/19  JNM  Documentation pass
+
+% Examples:
 %{
-   piCamBio
+    piCamBio
 %}
+
 rPath = which('isetRootPath');
 
 % Figure it out
-if piContains(rPath,'isetbio'),     iset = 'isetbio';
+if piContains(rPath,'isetbio'), iset = 'isetbio';
 elseif piContains(rPath,'isetcam'), iset = 'isetcam';
-else,                               iset = '';
+else, iset = '';
 end
 
 end
