@@ -85,7 +85,7 @@ thisR.set('focus distance',0.6);
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters
-thisR.set('film diagonal',20);
+thisR.set('film diagonal',22);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z
