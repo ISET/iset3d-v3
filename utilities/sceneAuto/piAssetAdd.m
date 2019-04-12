@@ -78,6 +78,7 @@ end
 end
 
 function thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR)
+
 for ii = 1:length(assets.(assetname))
     if material
         nObj  = fieldnames(assets.(assetname)(ii).material.list);
@@ -94,7 +95,6 @@ for ii = 1:length(assets.(assetname))
     end
     %% add objects.geometry to scene(geometry struct)
     scene = thisR.assets;
-    
     if isfield(scene,'scale'),scene=rmfield(scene,'scale');end
     % add motion slot
     if geometry
@@ -109,13 +109,13 @@ for ii = 1:length(assets.(assetname))
             %% 
         end
     end
-    if exist(assets.(assetname).geometryPath,'dir')
+    if exist(assets.(assetname)(1).geometryPath,'dir')
         assetPath = fullfile(piRootPath,'local',assets.(assetname).index);
         scenePath = fileparts(thisR.outputFile);
         copyfile(assetPath, scenePath);
     end
-
+    thisR.assets = scene;
 end
-thisR.assets = scene;
+
 end
 

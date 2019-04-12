@@ -94,12 +94,7 @@ callbox_number = inputs.callbox_number;
 callbox_offset = inputs.callbox_offset;
 
 %% Flywheel init
-if isempty(st)
-    st = scitran('stanfordlabs');
-end
-hierarchy = st.projectHierarchy('Graphics assets');
-sessions = hierarchy.sessions;
-
+if isempty(st), st = scitran('stanfordlabs');end
 
 %% generate list of assets(not finished) from flywheel, unfinished
 if (addStreetlight ==true)

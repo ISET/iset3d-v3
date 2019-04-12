@@ -92,7 +92,7 @@ end
 %% Get the people from the database
 if p.Results.nped > 0
     % Find the session with the label car
-    session = project.sessions.findOne('label=pedestrain');
+    session = project.sessions.findOne('label=pedestrian');
     
     % Create Assets obj struct
     % Download random assets from flywheel

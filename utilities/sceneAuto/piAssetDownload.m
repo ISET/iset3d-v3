@@ -1,3 +1,4 @@
+
 function assetRecipe = piAssetDownload(session,nassets,varargin)
 % Download assets from a flywheel database
 %
@@ -64,7 +65,7 @@ if isempty(acquisitionlabel)
     for ii = 1:nDownloads
         thisIdx = downloadList(ii).index;
         acqLabel = acqs{thisIdx}.label;
-        localFolder = fullfile(piRootPath,'local',acqLabel);
+        localFolder = fullfile(piRootPath,'local','AssetLists', acqLabel);
         destName_recipe = fullfile(localFolder,sprintf('%s.json',acqLabel));
         thisRecipe = stFileSelect(acqs{thisIdx}.files,'type','source code');
         destName_resource = fullfile(localFolder,sprintf('%s.zip',acqLabel));

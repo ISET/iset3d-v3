@@ -97,7 +97,7 @@ thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
 thisR_scene.set('film diagonal',10);
 thisR_scene.set('nbounces',10);
-thisR_scene.set('aperture size',1);
+thisR_scene.set('aperture',1);
 lensname = 'wide.56deg.6.0mm.dat';
 thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
 
@@ -121,7 +121,7 @@ camPos = camPos{3};
 thisR_scene.lookAt.from = from;
 thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
-fprintf('Velocity of Ego Vehicle: %.2f m/s', thisCar.speed);
+fprintf('Velocity of Ego Vehicle: %.2f m/s \n', thisCar.speed);
 
 %% Assign motion blur to camera
 
@@ -150,10 +150,10 @@ piWrite(thisR_scene,'creatematerials',true,...
     'overwriteresources',false,'lightsFlag',false,...
     'thistrafficflow',thisTrafficflow);
 
-% Upload the information to Flywheel.
+%% Upload the information to Flywheel.
 gcp.fwUploadPBRT(thisR_scene,'scitran',st,'road',road);
 
-% Tell the gcp object about this target scene
+%% Tell the gcp object about this target scene
 addPBRTTarget(gcp,thisR_scene);
 fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
@@ -184,14 +184,9 @@ gcp.PodDescribe(podname{1})
  gcp.Podlog(podname{1});
 %}
 %% Download files from Flywheel
-disp('*** Data downloading...');
-[oi]   = gcp.fwDownloadPBRT('scitran',st);
-disp('*** Data downloaded');
-
-%% Show the rendered image using ISETCam
 destDir = fullfile(outputDir,'renderings');
 disp('*** Data processing...');
-gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
+ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
 disp('*** Processing finished ***');
 
 

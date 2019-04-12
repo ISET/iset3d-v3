@@ -59,10 +59,10 @@ thisCar.pos(2) = thisR.lookAt.from(2);
 % default start time is 0, end time is 1; It means that the motion duration
 % is 1 second by default.
 thisR.camera.motion.activeTransformStart.pos   = thisCar.pos;
-thisR.camera.motion.activeTransformStart.rotate= thisCar.orientation-90;
+thisR.camera.motion.activeTransformStart.rotate=piRotationMatrix('yrot',thisCar.orientation-90);
 % translation and rotation will be written out.
 thisR.camera.motion.activeTransformEnd.pos     = motion.pos;
-thisR.camera.motion.activeTransformEnd.rotate  = motion.rotate;
+thisR.camera.motion.activeTransformEnd.rotate  = piRotationMatrix('yrot', motion.rotate);
 end
 
 

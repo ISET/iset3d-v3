@@ -37,18 +37,8 @@ p = inputParser;
 
 % When varargin contains a number, the ieParamFormat() method fails.
 % It takes only a string or cell.  We should look into that.
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) || ...
-                islogical(varargin{i}) || ...
-                isobject(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    %
-    varargin = ieParamFormat(varargin);
-end
+varargin = ieParamFormat(varargin);
+
 
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
@@ -394,6 +384,12 @@ else
     % without any changes.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
+        if overwritegeometry
+            if piContains(currLine, 'geometry.pbrt')
+                [~,n] = fileparts(renderRecipe.outputFile);
+                currLine = sprintf('Include "%s_geometry.pbrt"',n);
+            end
+        end
         fprintf(fileID,'%s \n',currLine);
     end
 end
