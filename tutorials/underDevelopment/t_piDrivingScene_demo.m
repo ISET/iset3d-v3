@@ -69,7 +69,7 @@ if ~exist(localTF,'dir'), mkdir(localTF);end
 copyfile(trafficflowPath,localTF);
 %% Scene Generation
 
-% A couple of minutes
+% 1~2 minutes
 tic
 disp('*** Scene Generating.....')
 [thisR_scene,road] = piSceneAuto('sceneType',sceneType,...
@@ -131,6 +131,13 @@ CamOrientation = 270;
 thisR_scene.lookAt.from = [0;3;40];
 thisR_scene.lookAt.to   = [0;1.9;150];
 thisR_scene.lookAt.up = [0;1;0];
+% Open at time zero
+thisR.camera.shutteropen.type = 'float';
+thisR.camera.shutteropen.value = 0;  
+
+% Close in half a second
+thisR.camera.shutterclose.type = 'float';
+thisR.camera.shutterclose.value = 1/60;
 %% Write out the scene into a PBRT file
 
 if contains(sceneType,'city')
@@ -172,7 +179,7 @@ gcp.targetsList;
 
 %% This sends the rendering job on google cloud, 
 % It takes about 30 mins depends on the complexity of the scene. 
-% (80 percent of the time is used to load data(texture and geometry), 
+% (Majority of the time is used to load data(texture and geometry), 
 % Render a slightly better quality image would be a good choice.
 gcp.render(); 
 
@@ -189,8 +196,8 @@ destDir = fullfile(outputDir,'renderings');
 disp('*** Data processing...');
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
 disp('*** Processing finished ***');
-
-
+oiWindow(ieObject);
+ieNewGraphWin;imagesc(ieObject.metadata.meshImage)
 %% Remove all jobs.
 % Anything still running is a stray that never completed.  We should
 % say more.
