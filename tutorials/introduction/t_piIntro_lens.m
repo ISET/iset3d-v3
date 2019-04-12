@@ -51,8 +51,8 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*1.5));
-thisR.set('pixel samples',64*4);   % Lots of rays for quality.
+thisR.set('film resolution',round([600 400]*0.5));  % 1.5 is pretty high res
+thisR.set('pixel samples',64*1);                    % 4 is Lots of rays .
 
 %% Set output file
 
