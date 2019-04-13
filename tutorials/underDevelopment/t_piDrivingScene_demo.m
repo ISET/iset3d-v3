@@ -54,22 +54,15 @@ roadType = 'city_cross_4lanes_002';
 trafficflowDensity = 'medium';
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
-<<<<<<< HEAD
-% simulation that we recorded the data. 
-timestamp = 122;
 
-% Choose whether we want to enable cloudrender
-cloudRender = 1;
-
-% Only for this Demo: 
-=======
 % simulation that we record the data. 
 timestamp = 30;
+
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
-%
+
 %% Only for Demo
->>>>>>> 9bbd8c808fd6105b3cbcbd513599e91a7eb8d200
+
 % Copy trafficflow from data folder to local folder
 trafficflowPath   = fullfile(piRootPath,'data','sumo_input','demo',...
     'trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity));
@@ -117,6 +110,7 @@ thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion
 load(fullfile(piRootPath,'local',...
     'trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity)),'trafficflow');
 thisTrafficflow = trafficflow(timestamp);
+
 %{
 % Assign the camera to a random car
 nextTrafficflow = trafficflow(timestamp+1);
@@ -130,17 +124,18 @@ camPos = camPos{3};
 fprintf('Velocity of Ego Vehicle: %.2f m/s \n', thisCar.speed);
 
 %% Assign motion blur to camera
-
 thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
                                'thisCar',thisCar,...
                                'fps',60);
 %}
+
 camPos = 'front';
 thisVelocity = 0 ;
 CamOrientation = 270;
 thisR_scene.lookAt.from = [0;3;40];
 thisR_scene.lookAt.to   = [0;1.9;150];
 thisR_scene.lookAt.up = [0;1;0];
+
 % Open at time zero
 thisR.camera.shutteropen.type = 'float';
 thisR.camera.shutteropen.value = 0;  
@@ -148,6 +143,7 @@ thisR.camera.shutteropen.value = 0;
 % Close in half a second
 thisR.camera.shutterclose.type = 'float';
 thisR.camera.shutterclose.value = 1/60;
+
 %% Write out the scene into a PBRT file
 
 if contains(sceneType,'city')
