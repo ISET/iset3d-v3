@@ -94,12 +94,7 @@ callbox_number = inputs.callbox_number;
 callbox_offset = inputs.callbox_offset;
 
 %% Flywheel init
-if isempty(st)
-    st = scitran('stanfordlabs');
-end
-hierarchy = st.projectHierarchy('Graphics assets');
-sessions = hierarchy.sessions;
-
+if isempty(st), st = scitran('stanfordlabs');end
 
 %% generate list of assets(not finished) from flywheel, unfinished
 if (addStreetlight ==true)
@@ -286,7 +281,7 @@ if billboard_number ~= 0 && ~isempty(billboardPosition_list)
     assetsplaced.billboard = piSidewalkPlace(billboard_list,billboardPosition_list);end
 if callbox_number ~= 0 && ~isempty(callboxPosition_list)
     assetsplaced.callbox = piSidewalkPlace(callbox_list,callboxPosition_list);end
-if bench_number ~=0 && ~isempty(callboxPosition_list)
+if bench_number ~=0 && ~isempty(benchPosition_list)
     assetsplaced.bench = piSidewalkPlace(bench_list,benchPosition_list);end
 if trashcan_number ~=0 && ~isempty(trashcanPosition_list)
     assetsplaced.trashcan = piSidewalkPlace(trashcan_list,trashcanPosition_list);end

@@ -21,24 +21,30 @@ function val = recipeGet(thisR, param, varargin)
 %     'working directory' - directory mounted by docker image
 %
 %   % Camera and scene
-%     'object distance'  - The units are from the scene, not real.
-%                          We are hoping to get everything in mm
-%     'object direction' - An angle, I guess ...
-%     'look at'          - Three components
-%       'from'
-%       'to'
-%       'up'
-%       'from to' - vector difference (from - to)
-%     'optics type'
-%     'lens file'
-%     'focal distance' - See autofocus calculation (mm)
-%     'pupil diameter' - In millimeters
-%     'fov'  (Field of view) present if 'optics type' is 'pinhole'
-%     
+%     'object distance'  - The magnitude ||(from - to)|| of the difference
+%                          between from and to.  Units are from the scene,
+%                          typically in meters. 
+%     'object direction' - Unit length vector of from and to
+%     'look at'          - Struct with four components
+%        'from'           - Camera location
+%        'to'             - Camera points at
+%        'up'             - Direction that is 'up'
+%        'from to'        - vector difference (from - to)
+%     'optics type'      -
+%     'lens file'        - Name of lens file in data/lens
+%     'focal distance'   - See autofocus calculation (mm)
+%     'pupil diameter'   - In millimeters
+%     'fov'              - (Field of view) only used if 'optics type' is
+%                          'pinhole' 
+%
 %    % Light field camera
-%     'n microlens' (alias 'n pinholes') - 2-vector, row,col
-%     'n subpixels' - 2 vector, row,col
-%      
+%     'n microlens'      - 2-vector, row,col (alias 'n pinholes')
+%     'n subpixels'      - 2 vector, row,col
+%
+%    % Rendering
+%      'integrator'
+%      'n bounces'
+%
 % BW, ISETBIO Team, 2017
 
 % Examples
@@ -48,13 +54,13 @@ function val = recipeGet(thisR, param, varargin)
   val = thisR.get('focal distance');
   val = thisR.get('camera type');
   val = thisR.get('lens file');
-
 %}
 
 % Programming todo
 %
 
-%%
+%% Parameters
+
 if isequal(param,'help')
     doc('recipe.recipeGet');
     return;
@@ -63,13 +69,13 @@ end
 p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
-p.addRequired('param',@ischar); 
+p.addRequired('param',@ischar);
 
 p.parse(thisR,param,varargin{:});
 
 switch ieParamFormat(param)
     
-        % Data management
+    % Data management
     case 'inputfile'
         val = thisR.inputFile;
     case 'outputfile'
@@ -88,7 +94,7 @@ switch ieParamFormat(param)
         name = thisR.outputFile;
         [~,val] = fileparts(name);
         
-        % Scene and camera relationship
+        % Scene and camera direction
     case 'objectdistance'
         diff = thisR.lookAt.from - thisR.lookAt.to;
         val = sqrt(sum(diff.^2));
@@ -108,7 +114,7 @@ switch ieParamFormat(param)
         % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
         
-        % Camera
+        % Lens and optics
     case 'opticstype'
         % perspective means pinhole.  Maybe we should rename.
         % realisticDiffraction means lens.  Not sure of all the possibilities
@@ -142,7 +148,6 @@ switch ieParamFormat(param)
                     end
                 end
         end
-        
     case 'focaldistance'
         opticsType = thisR.get('optics type');
         switch opticsType
@@ -154,10 +159,17 @@ switch ieParamFormat(param)
                 val = NaN;
             case 'lens'
                 % Focal distance given the object distance and the lens file
-                [p,flname,~] = fileparts(thisR.camera.specfile.value);
-                focalLength = load(fullfile(p,[flname,'.FL.mat']));
-                objDist = thisR.get('object distance');
-                val = interp1(focalLength.dist,focalLength.focalDistance,objDist);
+                [p,flname,~] = fileparts(thisR.camera.lensfile.value);
+                focalLength = load(fullfile(p,[flname,'.FL.mat']));  % Millimeters
+                objDist = thisR.get('object distance');   % Units?  Where does this come from?
+                % objDist = objDist*1e3;
+                if objDist < min(focalLength.dist(:))
+                    fprintf('Object too close to focus\n');
+                elseif objDist > max(focalLength.dist(:))
+                    fprintf('Object too far to focus\n');
+                else
+                    val = interp1(focalLength.dist,focalLength.focalDistance,objDist);
+                end
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
@@ -183,13 +195,24 @@ switch ieParamFormat(param)
         if strcmp(thisR.camera.subtype,'realisticEye')
             val = thisR.camera.pupilDiameter.value;
         end
-        
+    case 'chromaticaberration'
+        % thisR.get('chromatic aberration')
+        % True or false (on or off)
+        val = thisR.camera.chromaticAberrationEnabled.value;
+        if isequal(val,'true'), val = true; else, val = false; end
+    case 'numcabands'
+        % thisR.get('num ca bands')
+        try
+            val = thisR.integrator.numCABands.value;
+        catch
+            val = 0;
+        end
+
         % Light field camera parameters
     case {'nmicrolens','npinholes'}
         % How many microlens (pinholes)
         val(2) = thisR.camera.num_pinholes_w.value;
         val(1) = thisR.camera.num_pinholes_h.value;
-        
     case 'nsubpixels'
         % How many film pixels behind each microlens/pinhole
         val(2) = thisR.camera.subpixels_w;
@@ -225,13 +248,21 @@ switch ieParamFormat(param)
         
     case {'raysperpixel'}
         val = thisR.sampler.pixelsamples.value;
-    
+        
     case {'cropwindow','crop window'}
         if(isfield(thisR.film,'cropwindow'))
             val = thisR.film.cropwindow.value;
         else
             val = [0 1 0 1];
         end
+        
+        % Rendering related
+    case{'maxdepth','bounces','nbounces'}
+        val = thisR.integrator.maxdepth.value;
+        
+    case{'integrator'}
+        val = thisR.integrator.subtype;
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end

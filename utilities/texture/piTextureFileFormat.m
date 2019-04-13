@@ -66,16 +66,16 @@ if ~isempty(bmpFiles)
 end
 %% Put all texture files in a seperate folder.
 
-
-texturePath = 'textures';
-textureFiles=dir('*.png');
-if ~exist('textures','dir')
-    mkdir('textures');
+outputDir  = fileparts(thisR.outputFile);
+textureDir = fullfile(outputDir,'textures');
+textureFiles = dir('*.png'); 
+if ~exist(textureDir,'dir')
+    mkdir(textureDir);
 end
 for i=1:length(textureFiles)
     textureFileName=textureFiles(i).name;
     textureFilePath=textureFileName;
-    movefile(textureFilePath,fullfile(texturePath,textureFileName));
+    copyfile(textureFilePath,fullfile(textureDir,textureFileName));
 end
 %%
 cd(currentfolder)

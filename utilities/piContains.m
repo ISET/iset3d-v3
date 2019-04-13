@@ -5,8 +5,8 @@ function tf = piContains(str,pattern)
 %    tf = piContains(str,pattern)
 %
 % Description:
-%    Work around for the contains function. Written so that it will
-%    work with Matlab versions prior to those with contains().
+%    Work around for the Matlab contains function. Written so that it
+%    will work with Matlab versions prior to those with contains().
 %
 % Inputs
 %   str -  A cell array of strings (or a string)

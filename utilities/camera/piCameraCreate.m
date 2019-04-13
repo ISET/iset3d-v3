@@ -31,7 +31,7 @@ function camera = piCameraCreate(cameraType,varargin)
 p = inputParser;
 p.addRequired('cameraType',@ischar);
 p.addParameter('lensFile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
-p.addParameter('pbrtVersion',2,@isscalar);
+p.addParameter('pbrtVersion',3,@isscalar);
 
 p.parse(cameraType,varargin{:});
 

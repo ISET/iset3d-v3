@@ -35,16 +35,10 @@ piWrite(thisR);
 %%
 p = inputParser;
 
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
-        | isobject(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
+% When varargin contains a number, the ieParamFormat() method fails.
+% It takes only a string or cell.  We should look into that.
+varargin = ieParamFormat(varargin);
+
 
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
 
@@ -197,6 +191,8 @@ if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
 % fprintf('Opening %s for output\n',outFile);
 fileID = fopen(outFile,'w');
 
+
+
 %% Write header
 fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
@@ -218,29 +214,24 @@ end
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
 if isfield(renderRecipe.camera,'motion') 
+    
     motionTranslate =renderRecipe.camera.motion.activeTransformStart.pos-renderRecipe.camera.motion.activeTransformEnd.pos;
-    motionRotate    =renderRecipe.camera.motion.activeTransformStart.rotate-renderRecipe.camera.motion.activeTransformEnd.rotate;
+    motionStart     =renderRecipe.camera.motion.activeTransformStart.rotate;
+    motionEnd      =  renderRecipe.camera.motion.activeTransformEnd.rotate;
     fprintf(fileID,'ActiveTransform StartTime \n');
     fprintf(fileID,'Translate 0 0 0 \n');
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionStart(:,1)); % Z
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionStart(:,2)); % Y
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionStart(:,3));  % X
     fprintf(fileID,'ActiveTransform EndTime \n');
     fprintf(fileID,'Translate %0.2f %0.2f %0.2f \n',...
         [motionTranslate(1),...
         motionTranslate(2),...
         motionTranslate(3)]);
-    fprintf(fileID,'Rotate %0.2f 0 1 0 \n',motionRotate);
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionEnd(:,1)); % Z
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionEnd(:,2)); % Y
+    fprintf(fileID,'Rotate %f %f %f %f \n',motionEnd(:,3));  % X
     fprintf(fileID,'ActiveTransform All \n');
-%     fprintf(fileID,'ActiveTransform StartTime \n');
-%     fprintf(fileID,'Translate %0.2f %0.2f %0.2f\n',...
-%         [renderRecipe.camera.motion.activeTransformStart.pos(1),...
-%         renderRecipe.camera.motion.activeTransformStart.pos(2),...
-%         renderRecipe.camera.motion.activeTransformStart.pos(3)]);
-% %     fprintf(fileID,'Rotate \n'); % add rotate aroung x, y, z
-%     fprintf(fileID,'ActiveTransform EndTime \n');
-%     fprintf(fileID,'Translate %0.2f %0.2f %0.2f\n',...
-%         [renderRecipe.camera.motion.activeTransformEnd.pos(1),...
-%         renderRecipe.camera.motion.activeTransformEnd.pos(2),...
-%         renderRecipe.camera.motion.activeTransformEnd.pos(3)]);
-%     fprintf(fileID,'ActiveTransform All \n');
 end
 % Required LookAt 
 fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
@@ -371,6 +362,9 @@ end
 %% Write out WorldBegin/WorldEnd
 
 if creatematerials
+    % We may have created new materials.
+    % We write the material and geometry files based on the recipe,
+    % which defines these new materials.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
         if piContains(currLine, 'materials.pbrt')
@@ -386,8 +380,16 @@ if creatematerials
         fprintf(fileID,'%s \n',currLine);
     end
 else
+    % No materials were created, so we just write out the world data
+    % without any changes.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
+        if overwritegeometry
+            if piContains(currLine, 'geometry.pbrt')
+                [~,n] = fileparts(renderRecipe.outputFile);
+                currLine = sprintf('Include "%s_geometry.pbrt"',n);
+            end
+        end
         fprintf(fileID,'%s \n',currLine);
     end
 end
@@ -397,7 +399,10 @@ fclose(fileID);
 
 %% Overwrite Materials.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
+    % If the scene is from Cinema 4D, 
     if ~creatematerials
+        % We overwrite from the input directory, but we do not create
+        % any new material files beyond what is already in the input
         if overwritematerials
             [~,n] = fileparts(renderRecipe.inputFile);
             fname_materials = sprintf('%s_materials.pbrt',n);
@@ -405,16 +410,20 @@ if piContains(renderRecipe.exporter, 'C4D')
             piMaterialWrite(renderRecipe);
         end
     else
+        % Create new material files that could come from somewhere
+        % other than the input directory.
         [~,n] = fileparts(renderRecipe.outputFile);
         fname_materials = sprintf('%s_materials.pbrt',n);
         renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
         piMaterialWrite(renderRecipe);
     end
 end
-%% Overwirte geometry.pbrt
+
+%% Overwrite geometry.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
-    piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag,'thistrafficflow',thistrafficflow); 
+        piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag, ...
+            'thistrafficflow',thistrafficflow);
     end
 end
 

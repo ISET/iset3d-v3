@@ -11,7 +11,7 @@ function thisR = piMotionBlurEgo(thisR,varargin)
 %%
 p = inputParser;
 p.addRequired('thisR',@(x)(isequal(class(x),'recipe')));
-p.addParameter('fps',30,@isnumeric);
+p.addParameter('fps',60,@isnumeric);
 % pass in trafficflow with given timestamp
 p.addParameter('nextTrafficflow',[]);
 p.addParameter('thisCar',@isstruct);
@@ -33,6 +33,7 @@ motion = [];
 for ii = 1:numel(nextTrafficflow.objects.car)
     if strcmp(thisCar.name,nextTrafficflow.objects.car(ii).name)
         motion.pos = nextTrafficflow.objects.car(ii).pos;
+        motion.pos(2) = thisR.lookAt.from(2);
         motion.rotate = nextTrafficflow.objects.car(ii).orientation-90;
         motion.slope = nextTrafficflow.objects.car(ii).slope;
     end
@@ -45,23 +46,23 @@ if isempty(motion)
     distance = thisCar.speed;
     orientation = thisCar.orientation;
     to(1)   = from(1)+distance*cosd(orientation);
-    to(2)   = from(2);
+    to(2)   = thisR.lookAt.from(2);
     to(3)   = from(3)-distance*sind(orientation);
     motion.pos = to;
     motion.rotate = thisCar.orientation-90;
     motion.slope = thisCar.slope;
 end
 
-
+thisCar.pos(2) = thisR.lookAt.from(2);
 
 %%
 % default start time is 0, end time is 1; It means that the motion duration
 % is 1 second by default.
 thisR.camera.motion.activeTransformStart.pos   = thisCar.pos;
-thisR.camera.motion.activeTransformStart.rotate= thisCar.orientation-90;
+thisR.camera.motion.activeTransformStart.rotate=piRotationMatrix('yrot',thisCar.orientation-90);
 % translation and rotation will be written out.
 thisR.camera.motion.activeTransformEnd.pos     = motion.pos;
-thisR.camera.motion.activeTransformEnd.rotate  = motion.rotate;
+thisR.camera.motion.activeTransformEnd.rotate  = piRotationMatrix('yrot', motion.rotate);
 end
 
 

@@ -37,14 +37,16 @@ for jj = 1 : x
     coordinate_rand(1,:) = (rand_length .* sin(parking_list(jj).direction * pi/180));
     coordinate_rand(2,:) = (cos(parking_list(jj).direction * pi/180) .* rand_length);
     for ii = 1 : length(trafficflow)
-        car_num= length(trafficflow(ii).objects.car);
-        for kk =1:object_number
-            trafficflow(ii).objects.car(car_num+kk).class='car';
-            trafficflow(ii).objects.car(car_num+kk).type='passenger';
-            trafficflow(ii).objects.car(car_num+kk).name=sprintf('car_%d_%d',jj,kk);
-            trafficflow(ii).objects.car(car_num+kk).pos=[start_point(1) + coordinate_rand(1,kk), -0.15, start_point(2) + coordinate_rand(2,kk)];
-            trafficflow(ii).objects.car(car_num+kk).speed=0;
-            trafficflow(ii).objects.car(car_num+kk).orientation= parking_list(jj).direction+180;
+        if isfield(trafficflow(ii).objects,'car')
+            car_num= length(trafficflow(ii).objects.car);
+            for kk =1:object_number
+                trafficflow(ii).objects.car(car_num+kk).class='car';
+                trafficflow(ii).objects.car(car_num+kk).type='passenger';
+                trafficflow(ii).objects.car(car_num+kk).name=sprintf('car_%d_%d',jj,kk);
+                trafficflow(ii).objects.car(car_num+kk).pos=[start_point(1) + coordinate_rand(1,kk), -0.15, start_point(2) + coordinate_rand(2,kk)];
+                trafficflow(ii).objects.car(car_num+kk).speed=0;
+                trafficflow(ii).objects.car(car_num+kk).orientation= parking_list(jj).direction+180;
+            end
         end
     end
 end

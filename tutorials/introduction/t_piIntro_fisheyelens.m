@@ -84,7 +84,7 @@ thisR.set('focus distance',0.45);
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters
-thisR.set('film diagonal',20);
+thisR.set('film diagonal',15);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'

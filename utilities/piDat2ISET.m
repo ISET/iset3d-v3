@@ -33,18 +33,7 @@ function ieObject = piDat2ISET(inputFile,varargin)
 
 %%
 p = inputParser;
-
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
-                | isobject(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
-
+varargin =ieParamFormat(varargin);
 p.addRequired('inputFile',@(x)(exist(x,'file')));
 p.addParameter('label','radiance',@(x)ischar(x));
 
@@ -70,7 +59,7 @@ if(strcmp(label,'radiance'))
     % represented in photons
     energy = piReadDAT(inputFile, 'maxPlanes', nWave);
     photons = Energy2Quanta(wave,energy);
-
+    
     % The scaling factor comes from the display primary units. In
     % PBRT the display primaries are normalized to 1, the scaling
     % factor to convert back to real units is then reapplied here.
@@ -152,11 +141,8 @@ switch opticsType
         end
         
     otherwise
-        errror('Unknown optics type %s\n',opticsType);
-            
+        errror('Unknown optics type %s\n',opticsType);       
 end
-
-
 end
 
 
