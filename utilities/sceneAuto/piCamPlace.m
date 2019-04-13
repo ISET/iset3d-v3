@@ -1,4 +1,4 @@
-function [thisCar, from,to,orientation]= piCamPlace(varargin)
+function [thisCar, thisR]= piCamPlace(varargin)
 %% Find a position for camera by checking the position of cars, place the camera in front of the car.
 %%
 p = inputParser;
@@ -142,6 +142,8 @@ else
     to(3)=30;
 
 end
-
+thisR.lookAt.from = from;
+thisR.lookAt.to   = to;
+thisR.lookAt.up = [0;1;0];
 end
 

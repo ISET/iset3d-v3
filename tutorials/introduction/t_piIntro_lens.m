@@ -114,6 +114,7 @@ oiWindow(oi);
 
 %% Change this for depth of field effects.
 
+
 thisR.set('aperture diameter',3);
 piWrite(thisR,'creatematerials',true);
 
