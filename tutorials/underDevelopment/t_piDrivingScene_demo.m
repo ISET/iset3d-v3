@@ -7,9 +7,13 @@
 %
 % Description:
 %   Generate driving scenes using the gcloud (kubernetes) methods.  The
-%   scenes are built by sampling roads from the Flywheel database
+%   scenes are built by sampling roads from the Flywheel database.
 %
-% Author: Zhenyi Liu
+%   To delete the cluster when you are done execute the command
+%
+%       gcloud container clusters delete cloudrendering
+%
+% Author: Zhenyi Liu;m
 %
 % See also
 %   piSceneAuto, piSkymapAdd, gCloud
@@ -165,6 +169,7 @@ gcp.render();
 
 [podnames,result] = gcp.podsList('print',false);
 nPODS = length(result.items);
+fprintf('Found %d pods\n',nPODS);
 cnt  = 0;
 time = 0;
 while cnt < length(nPODS)
@@ -175,14 +180,15 @@ while cnt < length(nPODS)
 end
 
 %{
-%  You can get a lot of information about the job this way
-podname = gcp.Podslist
-gcp.PodDescribe(podname{1})
- gcp.Podlog(podname{1});
+% You can get a lot of information about the job this way
+   podname = gcp.Podslist
+   gcp.PodDescribe(podname{1})
+   gcp.Podlog(podname{1});
 %}
 %% Download files from Flywheel
 
 destDir = fullfile(outputDir,'renderings');
+
 disp('*** Data processing...');
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
 disp('*** Processing finished ***');
