@@ -6,9 +6,10 @@
 %    ISETCloud, ISET3d, ISETCam and scitran
 %
 % Description:
-%   Generate driving scenes.
+%   Generate driving scenes using the gcloud (kubernetes) methods.  The
+%   scenes are built by sampling roads from the Flywheel database
 %
-% Author: ZL
+% Author: Zhenyi Liu
 %
 % See also
 %   piSceneAuto, piSkymapAdd, gCloud
@@ -42,24 +43,21 @@ str = gcp.configList;
 % Available sceneTypes: city1, city2, city3, city4, citymix, suburb
 sceneType = 'city3';
 
-% Available roadType: 
-%      curve_6lanes_001
-%      straight_2lanes_parking
-%      city_cross_6lanes_001
-%      city_cross_6lanes_001_construct
-%      city_cross_4lanes_002
+% To see the available roadTypes use piRoadTypes
 roadType = 'city_cross_4lanes_002';
 
 % Avaliable trafficflowDensity: low, medium, high
 trafficflowDensity = 'medium';
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
-% simulation that we record the data. 
+% simulation that we recorded the data. 
 timestamp = 122;
+
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
-%
-% Only for this Demo: Copy trafficflow from data folder to local folder
+
+% Only for this Demo: 
+% Copy trafficflow from data folder to local folder
 trafficflowPath   = fullfile(piRootPath,'data','sumo_input','demo',...
     'trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity));
 localTF = fullfile(piRootPath,'local','trafficflow');
@@ -138,14 +136,14 @@ else
     thisR_scene.inputFile = fullfile(outputDir,[strcat(sceneType,'_',road.name),'.pbrt']);
 end
 
-% We might use md5 to has the parameters and put them in the file
+% We might use md5 to hash the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
 filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
                             sceneType,dayTime,thisCar.speed,thisR_scene.lookAt.from(3),camPos,ori,clock);
 thisR_scene.outputFile = fullfile(outputDir,filename);
 
-% Do the writing
+% Write the recipe for the scene we generated
 piWrite(thisR_scene,'creatematerials',true,...
     'overwriteresources',false,'lightsFlag',false,...
     'thistrafficflow',thisTrafficflow);
@@ -158,7 +156,6 @@ addPBRTTarget(gcp,thisR_scene);
 fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
 % Describe the target to the user
-
 gcp.targetsList;
 
 %% This invokes the PBRT-V3 docker image
@@ -166,12 +163,12 @@ gcp.render();
 
 %% Monitor the processes on GCP
 
-[podnames,result] = gcp.Podslist('print',false);
+[podnames,result] = gcp.podsList('print',false);
 nPODS = length(result.items);
 cnt  = 0;
 time = 0;
 while cnt < length(nPODS)
-    cnt = podSucceeded(gcp);
+    cnt = gcp.jobsList('namespace','all');
     pause(60);
     time = time+1;
     fprintf('******Elapsed Time: %d mins****** \n',time);
@@ -184,15 +181,17 @@ gcp.PodDescribe(podname{1})
  gcp.Podlog(podname{1});
 %}
 %% Download files from Flywheel
+
 destDir = fullfile(outputDir,'renderings');
 disp('*** Data processing...');
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
 disp('*** Processing finished ***');
 
-
 %% Remove all jobs.
-% Anything still running is a stray that never completed.  We should
-% say more.
+
+% Anything that i still running is a stray that never completed.  
+% We should say more about this. Also, do we need to kill the kubernetes
+% cluster?
 
 % gcp.JobsRmAll();
 

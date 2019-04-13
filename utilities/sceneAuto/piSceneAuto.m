@@ -40,7 +40,7 @@ p = inputParser;
 %         end
 %     end
 % else
-%     
+%
 % end
 varargin =ieParamFormat(varargin);
 p.addParameter('sceneType','city',@ischar);
@@ -84,10 +84,13 @@ roadSession = project.sessions.findOne('label=road');
     'cloudRender',cloudRenderFlag,...
     'scitran',st);
 
+disp('Road')
+
 % roadFolder = fileparts(thisR_road.inputFile);
 % roadFolder = strsplit(roadFolder,'/');
 % roadName   = roadFolder{length(roadFolder)};
 
+%% Read a local traffic flow if available
 trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity));
 trafficflowFolder = fileparts(trafficflowPath);
 
@@ -101,6 +104,8 @@ else
     load(trafficflowPath,'trafficflow');
 end
 
+disp('Traffic flow')
+
 %% SUSO setting
 
 % Uncomment when SUSO runs
@@ -110,7 +115,7 @@ tic
 tree_interval = 10;
 if piContains(sceneType,'city')||piContains(sceneType,'suburb')
     
-     susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
     % place parked cars
     if piContains(roadType,'parking')
         trafficflow = piParkingPlace(road, trafficflow);
@@ -126,14 +131,14 @@ if piContains(sceneType,'city')||piContains(sceneType,'suburb')
     end
     buildingPosList = piBuildingPosList(building_list,thisR_road);
     susoPlaced.building = piBuildingPlace(building_list,buildingPosList);
-
+    
     
     %     save(savedSusoPlaced,'susoPlaced');
     
     %% tmp disable suso randomization
-%     savedSusoPlaced = fullfile(piRootPath,'local','Assets_tmp','susoPlaced');
-%     susoPlaced = load(savedSusoPlaced,'susoPlaced'); 
-%     susoPlaced = susoPlaced.susoPlaced;
+    %     savedSusoPlaced = fullfile(piRootPath,'local','Assets_tmp','susoPlaced');
+    %     susoPlaced = load(savedSusoPlaced,'susoPlaced');
+    %     susoPlaced = susoPlaced.susoPlaced;
     %%
     % Add All placed assets
     thisR_road = piAssetAdd(thisR_road, susoPlaced);

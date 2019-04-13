@@ -1,7 +1,10 @@
 function roadTypes = piRoadTypes
 % Return a list of known road types
 %
-% These are the road types stored on Flywheel.
+% Syntax:
+%   piRoadTypes
+%
+% List the available road types stored on Flywheel.
 %
 % ZL/BW 
 
@@ -17,10 +20,10 @@ stPrint(acq,'label')
 % We are not using the bridge or the highway, yet.
 
 %}
- roadTypes = {'curve_6lanes_001',...
-     'straight_2lanes_parking',...
-     'city_cross_6lanes_001',...
-     'city_cross_6lanes_001_construct'
-     'city_cross_4lanes_002'};
+
+roadTypes = {'curve_6lanes_001','straight_2lanes_parking',...
+    'city_cross_6lanes_001','city_cross_6lanes_001_construct',...
+    'city_cross_4lanes_002'};
+
  
 end

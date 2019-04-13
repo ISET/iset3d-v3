@@ -51,8 +51,8 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*0.5));  % 1.5 is pretty high res
-thisR.set('pixel samples',64*1);                    % 4 is Lots of rays .
+thisR.set('film resolution',round([600 400]*2.0));  % 1.5 is pretty high res
+thisR.set('pixel samples',64*8);                    % 4 is Lots of rays .
 
 %% Set output file
 
@@ -84,13 +84,14 @@ thisR.set('focus distance',0.6);
 % The FOV is not used for the 'realistic' camera.
 % The FOV is determined by the lens. 
 
-% This is the size of the film/sensor in millimeters
+% This is the size of the film/sensor in millimeters (default 22)
 thisR.set('film diagonal',22);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
-% Third dimension is z
-thisR.set('from',[0 0.14 -0.7]);  % Get higher and back away
-thisR.set('to',  [0 -0.07 0.5]);  % Look down
+% Third dimension is z.  I picked a from/to that put the ruler in the
+% middle.  The in focus is about the pawn or rook.
+thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
+thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
@@ -107,7 +108,7 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',6);
 piWrite(thisR,'creatematerials',true);
 
-oi = piRender(thisR,'render type','both');
+oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 

@@ -1,28 +1,39 @@
 function assetsplaced = piSidewalkPlan(road,st,trafficflow,varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Function: Place objects at equal intervals on sidewalks.
-% use ABCD to represent a sidewalk
+% Place objects at equal intervals on sidewalks.
+%
+% Syntax
+%
+% Description:
+%
+% Use ABCD to represent a sidewalk
 %       D---A
 %       |   |
 %       |   | face
 %       |   |
 %       |   |
 %       C---B
-
+%
+% Inputs
+%  road
+%  st
+%  trafficflow
+%
 % Optional key/value parameters?
-%       road_type: 'cross'/
-%       tree_interval: the interval distance of each tree
-%       tree_offset: the distance from object to edge AB
-%       tree_type: 'T' or 'S'(represents tall or short)
-%       streetlight_interval: the interval distance of each streetlight
-%       streetlight_offset: the distance from object to edge AB
-%       streetlight_type: 'T' or 'S'(represents tall or short)
-%       trashcan_number: the number of trash cans on each sidewalk
-%       trashcan_offset: the distance from object to edge AB
-%       station_number: the number of stations on each sidewalk
-%       station_offset: the distance from object to edge AB
+%    road_type: 'cross'/
+%    tree_interval:  interval distance of each tree
+%    tree_offset:    distance from object to edge AB
+%    tree_type:      'T' or 'S'(represents tall or short)
+%    streetlight_interval: interval distance of each streetlight
+%    streetlight_offset:   distance from object to edge AB
+%    streetlight_type:     'T' or 'S'(represents tall or short)
+%    trashcan_number: number of trash cans on each sidewalk
+%    trashcan_offset: distance from object to edge AB
+%    station_number:  number of stations on each sidewalk
+%    station_offset:  distance from object to edge AB
 % 
 % Output structure: 
+%    assetsplaced
 %       asset----streetlightPosition_list----name
 %            |                            |--position
 %            |                            |--rotate
@@ -38,6 +49,7 @@ function assetsplaced = piSidewalkPlan(road,st,trafficflow,varargin)
 %
 % by SL, 2018.8
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %% load sidewalk information according to the type of road
 
 sidewalk_list = road.roadinfo.sidewalk_list;
@@ -267,13 +279,14 @@ else
 end
 %% consider overlap and obtain the position list of each object
 [streetlightPosition_list, total_list] = piCalOverlap(streetlightPosition, total_list);
-[treePosition_list, total_list] = piCalOverlap(treePosition, total_list);
-[callboxPosition_list, total_list] = piCalOverlap(callboxPosition, total_list);
-[billboardPosition_list, total_list] = piCalOverlap(billboardPosition, total_list);
+[treePosition_list, total_list]        = piCalOverlap(treePosition, total_list);
+[callboxPosition_list, total_list]     = piCalOverlap(callboxPosition, total_list);
+[billboardPosition_list, total_list]   = piCalOverlap(billboardPosition, total_list);
 
-[benchPosition_list, total_list] = piCalOverlap(benchPosition, total_list);
+[benchPosition_list, total_list]    = piCalOverlap(benchPosition, total_list);
 [trashcanPosition_list, total_list] = piCalOverlap(trashcanPosition, total_list);
-[stationPosition_list, total_list] = piCalOverlap(stationPosition, total_list);
+[stationPosition_list, total_list]  = piCalOverlap(stationPosition, total_list);
+
 %% Place them
 if addTree ==true && ~isempty(treePosition_list)
     assetsplaced.tree = piSidewalkPlace(tree_list,treePosition_list);end
