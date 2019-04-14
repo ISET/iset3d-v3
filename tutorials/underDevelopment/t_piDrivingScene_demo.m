@@ -178,11 +178,12 @@ piWrite(thisR_scene,'creatematerials',true,...
 % Each acquisition is a particular scene, like this one.
 gcp.fwUploadPBRT(thisR_scene,'scitran',st,'road',road);
 
-%% Tell the gcp object about this target scene
+%% Add this target scene to the target list
+
 addPBRTTarget(gcp,thisR_scene);
 fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
-% Describe the target to the user
+% Show the target list to the user
 gcp.targetsList;
 
 %% This sends the rendering job on google cloud
@@ -190,33 +191,24 @@ gcp.targetsList;
 % It takes about 30 mins depends on the complexity of the scene. 
 % (Majority of the time is used to load data(texture and geometry), 
 % Render a slightly better quality image would be a good choice.
+
+% Calling this starts the job and lets you know about it.
 gcp.render(); 
 
 %% Monitor the processes on GCP
 %
-% The best way to monitor is to go to the https://console.cloud.google.com
-
-%{
-% We do not use this because it takes too long.
-% We use the next bit, by hand.
-[podnames,result] = gcp.podsList('print',false);
-nPODS = length(result.items);
-fprintf('Found %d pods\n',nPODS);
-cnt  = 0;
-time = 0;
-while cnt < length(nPODS)
-    cnt = gcp.jobsList('namespace','all');
-    pause(60);
-    time = time + 1;
-    fprintf('******Elapsed Time: %d mins****** \n',time);
-end
-%}
+% The best way to monitor jobs progress is to go to the web page
+%
+%   https://console.cloud.google.com 
+%
+% And then go to the Kubernetes part
+%
 
 % You can get a lot of information about the job this way
 %{   
    podname = gcp.podsList
-   gcp.PodDescribe(podname{1})
-   cmd = gcp.Podlog(podname{1});
+   gcp.PodDescribe(podname{1})    % Prints out what has happened
+   cmd = gcp.Podlog(podname{1});  % Creates a command to show the running log
 %}
 
 %% Download files from Flywheel
@@ -234,15 +226,15 @@ imagesc(ieObject.metadata.meshImage)
 
 %% Remove all jobs.
 
-% Anything that i still running is a stray that never completed.  
-% We should say more about this. Also, do we need to kill the kubernetes
-% cluster?
+% Anything that i still running is a stray that never completed. We should
+% say more about this. Also, we need to kill the kubernetes cluster
 
 % gcp.jobsDelete();
 
 %% Close the cluster
 
 % In the terminal
+
 % gcloud container clusters delete cloudrendering
 
 %% END
