@@ -209,9 +209,6 @@ end
    gcp.Podlog(podname{1});
 %}
 
-%% Check the status of job on GCP
-cnt = podSucceeded(gcp);
-
 %% Download files from Flywheel
 
 destDir = fullfile(outputDir,'renderings');
