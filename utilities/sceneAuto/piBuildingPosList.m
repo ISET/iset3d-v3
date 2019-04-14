@@ -1,5 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Function: Random put buildings in one given region.
+function [buildingPosList] = piBuildingPosList(buildingList, objects)
+% Randomly place buildings in one given region.
 %
 % Given the info of spare region(lenth in x axis, lenth in y axis and
 % coordinate origin) and a building list including the
@@ -30,23 +30,27 @@
 %
 % Jiaqi Zhang
 % 09.21.2018
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [buildingPosList] = piBuildingPosList(buildingList, objects)
+%
+% See also
+%  piBuildingPlace
+
+%%
 buildingPosList = struct;
 for ii = 1:length(buildingList)
     building_list.size(ii, 1) = buildingList(ii).geometry.size.l;
     building_list.size(ii, 2) = buildingList(ii).geometry.size.w;
     building_list.name{ii} = buildingList(ii).geometry.name;
 end
+
+% tmp = 0;
 count = 1;  % initial parameters
-tmp = 0;
 buildingPosList_tmp = struct;
 sum = 0;
 for mm = 1:length(buildingList)
     sum = buildingList(mm).geometry.size.w + sum;
 end
-aveW = sum/length(buildingList)+10;    % calculate the average width of all the buildings
-                                    % viarable aveW can be used to delete
+aveW = sum/length(buildingList)+10; % calculate the average width of all the buildings
+                                    % variable aveW can be used to delete
                                     % unnecessary buildings in the scene
 for kk = 1:length(objects.assets)
     name = strsplit(objects.assets(kk).name, '_');
@@ -76,6 +80,7 @@ for kk = 1:length(objects.assets)
         end
         [buildingPosList_tmp, count] = buildingPlan(building_list, ...
             lenx_tmp, leny_tmp, coordination, buildingPosList_tmp, count, type, ankor, aveW);
+        
         % %% Delete unnecessary buildings from building list
         % if initialStruct == 1   % if it's first time use struct, initial it
         %     FieldName = fieldnames(buildingPosList_tmp)';
@@ -91,6 +96,7 @@ for kk = 1:length(objects.assets)
         %             finalCount = finalCount + 1;
         %         end
         %     end
+        
         %% change the structure of the output data
         for jj = count_before:length(buildingPosList_tmp)
             buildingPosList(jj).name = buildingPosList_tmp(jj).name;
@@ -99,10 +105,10 @@ for kk = 1:length(objects.assets)
             buildingPosList(jj).rotate = buildingPosList_tmp(jj).rotate;
         end
         
-        
         %% test algotithm. Comment this part when using.
         
-        figure(1);hold on;xlim([-130, 130]);ylim([-30, 280]);hold on;
+        ieNewGraphWin;
+        hold on;xlim([-130, 130]);ylim([-30, 280]);hold on;
         switch type
             case 'front'
                 % test algorithm for 'front' situation
@@ -152,18 +158,18 @@ for kk = 1:length(objects.assets)
                     rectangle('Position',[buildingPosList(jj).position(1)-xx,buildingPosList(jj).position(3)-yy,xx,yy]);title('back');
                 end
         end
-        tmp = tmp + 1;
-        disp(tmp);
-        %close(figure(1))
-        %}
+        
+        % tmp = tmp + 1; 
+        % disp(tmp);
+
     end
     
 end
-%%
 
 end
 
-
+%%
+% ----------------------------
 function [settle_list, count] = buildingPlan(building_list, lenx_tmp, ...
     leny_tmp, coordination, settle_list, count, type, ankor, aveW)
 offset = 0.2; % adjust the interval berween the buildings. Don't too big! Or might cause problem!
@@ -356,7 +362,5 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
 else
     % it is not possible to put a new building on spare region, sign out the recursion
 end
-
-
 
 end

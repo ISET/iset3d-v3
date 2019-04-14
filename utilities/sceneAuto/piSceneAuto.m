@@ -4,21 +4,20 @@ function [thisR_scene,road] = piSceneAuto(varargin)
 % Syntax
 %
 % Description
+%  Assembles assets from Flywheel and SUMO into a city or suburban street
+%  scene.
 %
 % Inputs
 %  N/A
 %
 % Optional key/value pairs
-%   scene type
-%   tree density
-%   road type
-%   traffice flow density (Default 'medium')
-%   weather type
-%   day time
-%   time stamp (Default: 50)
-%   nScene
-%   cloud render
-%   scitran   (Default is 'stanfordlabs')
+%   scene type     - 'city' or 'suburban'
+%   road type      - See piRoadTypes
+%   traffice flow density -  Traffic density (Default 'medium')
+%   time stamp (Default: 50) - Ticks in the SUMO simulation.  Integer
+%   cloud render   - Render on GCP (default, 1)
+%   scitran        - Flywheel interface object (Default is 'stanfordlabs')
+%   tree density   - Not currently used
 %
 % Returns:
 %  thisR_scene - Scene recipe
@@ -26,57 +25,48 @@ function [thisR_scene,road] = piSceneAuto(varargin)
 %          information. To list this out use road.fwList;
 %
 % Author:
-%   ZL
+%   Zhenyi Liu
 %
 % See also
+%   piRoadTypes, t_piDrivingScene_demo
 %
 
 %% Read input parameters
-p = inputParser;
-% if length(varargin) > 1
-%     for i = 1:length(varargin)
-%         if ~(isnumeric(varargin{i}) || islogical(varargin{i}))
-%             varargin(i) = ieParamFormat(varargin(i));
-%         end
-%     end
-% else
-%
-% end
+
 varargin =ieParamFormat(varargin);
+
+p = inputParser;
 p.addParameter('sceneType','city',@ischar);
 p.addParameter('treeDensity','random',@ischar);
 p.addParameter('roadType','crossroad',@ischar);
 p.addParameter('trafficflowDensity','medium',@ischar);
-p.addParameter('weatherType','clear',@ischar);
-p.addParameter('dayTime','day',@ischar);
 p.addParameter('timestamp',50,@isnumeric);
-p.addParameter('nScene',1,@isnumeric);
-p.addParameter('cloudRender',1);
 p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
-p.addParameter('thisR',[]);
-p.addParameter('road',[]);
+p.addParameter('cloudRender',1);   % Default is on the cloud
+
 p.parse(varargin{:});
 
 sceneType      = p.Results.sceneType;
-treeDensity    = p.Results.treeDensity;
+treeDensity    = p.Results.treeDensity;  % Not yet used
 roadType       = p.Results.roadType;
 trafficflowDensity = p.Results.trafficflowDensity;
-weatherType    = p.Results.weatherType;
 timestamp      = p.Results.timestamp;
 st             = p.Results.scitran;
 cloudRenderFlag= p.Results.cloudRender;
-thisR_road     = p.Results.thisR;
-road           = p.Results.road;
+
 %% Flywheel init
 
 if isempty(st), st = scitran('stanfordlabs'); end
 
-
 %% Read a road from Flywheel that we will use with SUMO
-%
 
+% Lookup the flywheel project with all the Graphics assets
 project = st.lookup('wandell/Graphics assets');
+
+% Find the session with the road information
 roadSession = project.sessions.findOne('label=road');
+
+% Assemble the road
 [road,thisR_road] = piRoadCreate('roadtype',roadType,...
     'trafficflowDensity',trafficflowDensity,...
     'session',roadSession,...
@@ -84,92 +74,69 @@ roadSession = project.sessions.findOne('label=road');
     'cloudRender',cloudRenderFlag,...
     'scitran',st);
 
-disp('Road')
-
-% roadFolder = fileparts(thisR_road.inputFile);
-% roadFolder = strsplit(roadFolder,'/');
-% roadName   = roadFolder{length(roadFolder)};
+disp('Created road')
 
 %% Read a local traffic flow if available
-trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity));
+% This is where SUMO is called, or the local file is read
+
+trafficflowPath   = fullfile(piRootPath,'local',...
+    'trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity));
 trafficflowFolder = fileparts(trafficflowPath);
 
 if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
 
-% This is where SUMO is called.  Or maybe the file already exists.
 if ~exist(trafficflowPath,'file')
     trafficflow = piTrafficflowGeneration(road);
     save(trafficflowPath,'trafficflow');
+    disp('Generated traffic flow using SUMO')
 else
     load(trafficflowPath,'trafficflow');
+    disp('Loaded local file of traffic flow')
 end
 
-disp('Traffic flow')
+%% SUSO Simulation of urban static objects
+% Put the trees and other assets into the city or suburban street
 
-%% SUSO setting
-
-% Uncomment when SUSO runs
-%
 tic
-% tree_interval = rand(1)*20+5;
 tree_interval = 10;
-if piContains(sceneType,'city')||piContains(sceneType,'suburb')
+if piContains(sceneType,'city')|| piContains(sceneType,'suburb')
     
     susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+    disp('Sidewalk generated');
+    
     % place parked cars
     if piContains(roadType,'parking')
         trafficflow = piParkingPlace(road, trafficflow);
+        disp('Parked cars placed')
     end
     building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));
     
     if ~exist(building_listPath,'file')
         building_list = piAssetListCreate('class',sceneType,...
             'scitran',st);
+        disp('Created building list and saved')
         save(building_listPath,'building_list')
     else
         load(building_listPath,'building_list');
+        disp('Loaded local file of buildings')
     end
-    buildingPosList = piBuildingPosList(building_list,thisR_road);
+    buildingPosList     = piBuildingPosList(building_list,thisR_road);
     susoPlaced.building = piBuildingPlace(building_list,buildingPosList);
-    
-    
-    %     save(savedSusoPlaced,'susoPlaced');
-    
-    %% tmp disable suso randomization
-    %     savedSusoPlaced = fullfile(piRootPath,'local','Assets_tmp','susoPlaced');
-    %     susoPlaced = load(savedSusoPlaced,'susoPlaced');
-    %     susoPlaced = susoPlaced.susoPlaced;
-    %%
-    % Add All placed assets
+  
+    % Put the suso placed assets on the road
     thisR_road = piAssetAdd(thisR_road, susoPlaced);
-    % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
     toc
-    % create a file ID & name strings for Flywheel to copy selected assets
-    % over to VMs.
-    % static objects
+        
+    % Create a file ID & name strings for Flywheel to copy selected assets
+    % over to VMs. 
     road = fwInfoAppend(road,susoPlaced);
-end
 
-%%
-% It takes about 6 mins to generate a trafficflow, so for each scene, we'd
-% like generate the trafficflow only once.
-roadFolder = fileparts(thisR_road.inputFile);
-roadFolder = strsplit(roadFolder,'/');
-roadName   = roadFolder{length(roadFolder)};
-trafficflowPath   = fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',roadName,trafficflowDensity));
-trafficflowFolder = fileparts(trafficflowPath);
-
-
-if ~exist(trafficflowFolder,'dir'),mkdir(trafficflowFolder);end
-
-% This is where SUMO is called.  Or maybe the file already exists.
-if ~exist(trafficflowPath,'file')
-    trafficflow = piTrafficflowGeneration(road);
-    save(trafficflowPath,'trafficflow');
+    disp('Assets placed on the road');
 else
-    load(trafficflowPath,'trafficflow');
+    disp('No SUSO assets placed.  Not city or suburban');
 end
-%% Place vehicles/pedestrians using the SUMO data
+
+%% Place vehicles/pedestrians from  SUMO traffic flow data on the road
 
 [sumoPlaced, ~] = piTrafficPlace(trafficflow,...
     'timestamp',timestamp,...
@@ -182,11 +149,13 @@ end
 
 road = fwInfoAppend(road,sumoPlaced{1}); % mobile objects
 
+disp('Completed SUMO combined with SUSO');
+
 end
 
-% Maybe a better name and maybe attached to the relevant object.
-function road = fwInfoAppend(road,assets)
+%-------------------------------
 %% List the selected fwInfo str with road.fwList
+function road = fwInfoAppend(road,assets)
 
 assetFields = fieldnames(assets);
 for jj = 1:length(assetFields)

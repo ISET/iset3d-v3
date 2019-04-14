@@ -13,7 +13,7 @@
 %
 %       gcloud container clusters delete cloudrendering
 %
-% Author: Zhenyi Liu;m
+% Author: Zhenyi Liu;
 %
 % See also
 %   piSceneAuto, piSkymapAdd, gCloud
@@ -102,7 +102,7 @@ thisR_scene.set('aperture',1);
 lensname = 'wide.56deg.6.0mm.dat';
 thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
 
-%% place the camera
+%% Place the camera
 
 % To place the camera, we find a car and place a camera at the front
 % of the car.  We find the car using the trafficflow information.
@@ -112,7 +112,7 @@ load(fullfile(piRootPath,'local',...
 thisTrafficflow = trafficflow(timestamp);
 
 %{
-% Assign the camera to a random car
+% We can assign the camera to a random car in the scene this way
 nextTrafficflow = trafficflow(timestamp+1);
 CamOrientation = 270;
 camPos = {'left','right','front','rear'};
@@ -123,30 +123,30 @@ camPos = camPos{3};
 
 fprintf('Velocity of Ego Vehicle: %.2f m/s \n', thisCar.speed);
 
-%% Assign motion blur to camera
+% Assign motion blur to the camera based on its motion
 thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
                                'thisCar',thisCar,...
                                'fps',60);
 %}
 
 camPos = 'front';
-thisVelocity = 0 ;
+thisVelocity   = 0 ;
 CamOrientation = 270;
 thisR_scene.lookAt.from = [0;3;40];
 thisR_scene.lookAt.to   = [0;1.9;150];
-thisR_scene.lookAt.up = [0;1;0];
+thisR_scene.lookAt.up   = [0;1;0];
 
 % Open at time zero
 thisR.camera.shutteropen.type = 'float';
 thisR.camera.shutteropen.value = 0;  
 
-% Close in half a second
+% Shutter duration
 thisR.camera.shutterclose.type = 'float';
-thisR.camera.shutterclose.value = 1/60;
+thisR.camera.shutterclose.value = 1/200;   % 5 ms exposure
 
 %% Write out the scene into a PBRT file
 
-if contains(sceneType,'city')
+if piContains(sceneType,'city')
     outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
     thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
 else
@@ -173,6 +173,9 @@ piWrite(thisR_scene,'creatematerials',true,...
     'thistrafficflow',thisTrafficflow);
 
 %% Upload the information to Flywheel.
+
+% This creates a new acquisition in the scenes_pbrt session.
+% Each acquisition is a particular scene, like this one.
 gcp.fwUploadPBRT(thisR_scene,'scitran',st,'road',road);
 
 %% Tell the gcp object about this target scene
@@ -182,14 +185,20 @@ fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 % Describe the target to the user
 gcp.targetsList;
 
-%% This sends the rendering job on google cloud, 
+%% This sends the rendering job on google cloud
+
 % It takes about 30 mins depends on the complexity of the scene. 
 % (Majority of the time is used to load data(texture and geometry), 
 % Render a slightly better quality image would be a good choice.
 gcp.render(); 
 
 %% Monitor the processes on GCP
+%
+% The best way to monitor is to go to the https://console.cloud.google.com
 
+%{
+% We do not use this because it takes too long.
+% We use the next bit, by hand.
 [podnames,result] = gcp.podsList('print',false);
 nPODS = length(result.items);
 fprintf('Found %d pods\n',nPODS);
@@ -198,26 +207,27 @@ time = 0;
 while cnt < length(nPODS)
     cnt = gcp.jobsList('namespace','all');
     pause(60);
-    time = time+1;
+    time = time + 1;
     fprintf('******Elapsed Time: %d mins****** \n',time);
 end
+%}
 
 % You can get a lot of information about the job this way
 %{   
-   podname = gcp.Podslist
+   podname = gcp.podsList
    gcp.PodDescribe(podname{1})
-   gcp.Podlog(podname{1});
+   cmd = gcp.Podlog(podname{1});
 %}
 
 %% Download files from Flywheel
 
 destDir = fullfile(outputDir,'renderings');
 
-disp('*** Data processing...');
+disp('Downloading PBRT dat and converting to ISET...');
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
-disp('*** Processing finished ***');
 
-% Show the OI and some metadata
+%% Show the OI and some metadata
+
 oiWindow(ieObject);
 ieNewGraphWin;
 imagesc(ieObject.metadata.meshImage)
@@ -228,7 +238,12 @@ imagesc(ieObject.metadata.meshImage)
 % We should say more about this. Also, do we need to kill the kubernetes
 % cluster?
 
-% gcp.JobsRmAll();
+% gcp.jobsDelete();
+
+%% Close the cluster
+
+% In the terminal
+% gcloud container clusters delete cloudrendering
 
 %% END
 

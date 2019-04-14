@@ -1,13 +1,32 @@
 function assetsPlaced = piBuildingPlace(assetsList,buildingPosList)
-%% For building assets, place the assets exactly by names
+% For building assets, place the assets exactly by names
 %
+% Syntax
+%   piBuildingPlace(assetsList,buildingPosList)
 %
+% Description
+%  Part of the SUSO code that positions the buildings onto the road.  
 %
+% Inputs
+%  assetList       - The building assets
+%  buildingPosList - Building positions
+% Key/val
+%  N/A
 %
-%%
+% Return
+%  assetsPlaced
+%
+% Zhenyi Liu
+%
+% See also
+%
+
+%% Make a cell array of the names associated with each position
 for ii = 1: length(buildingPosList)
     PosList{ii} = buildingPosList(ii).name;
 end
+
+% Check that are unique
 PosListCheck = unique(PosList);
 for kk = 1:length(PosListCheck)
     count = 1;
@@ -19,7 +38,8 @@ for kk = 1:length(PosListCheck)
         end
     end
 end
-%asset = buildingList.building;
+
+%% 
 asset = assetsList;
 for ii = 1: length(buildingPosList_tmp)
 %     gg=1;
@@ -51,6 +71,7 @@ for ii = 1: length(buildingPosList_tmp)
     end
     % end
 end
+
 assetsPlaced = assets_updated;
 % the reason why we keep this part seperate is that when we need to check which
 % buidling does not look correct in rendered image, we want to know the
@@ -63,4 +84,5 @@ for jj = 1:length(assetsPlaced)
         assetsPlaced(jj).geometry.name = sprintf('building_%s',name);
     end
 end
+
 end
