@@ -137,12 +137,12 @@ thisR_scene.lookAt.to   = [0;1.9;150];
 thisR_scene.lookAt.up   = [0;1;0];
 
 % Open at time zero
-thisR.camera.shutteropen.type = 'float';
-thisR.camera.shutteropen.value = 0;  
+thisR_scene.camera.shutteropen.type = 'float';
+thisR_scene.camera.shutteropen.value = 0;  
 
 % Shutter duration
-thisR.camera.shutterclose.type = 'float';
-thisR.camera.shutterclose.value = 1/200;   % 5 ms exposure
+thisR_scene.camera.shutterclose.type = 'float';
+thisR_scene.camera.shutterclose.value = 1/200;   % 5 ms exposure
 
 %% Write out the scene into a PBRT file
 
