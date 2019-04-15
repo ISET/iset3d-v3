@@ -1,0 +1,54 @@
+{
+    "description": " Description: multi element lens Focal length (mm) ",
+    "name": " Name: tessar.22deg.3.0mm",
+    "surfaces": [
+        {
+            "ior": 1.6200000047683716,
+            "radius": 0.972000002861023,
+            "semi_aperture": 0.44999998807907104,
+            "thickness": 0.18000000715255737
+        },
+        {
+            "ior": 1.0,
+            "radius": -17.393999099731445,
+            "semi_aperture": 0.44999998807907104,
+            "thickness": 0.1979999989271164
+        },
+        {
+            "ior": 1.5779999494552612,
+            "radius": -1.7549999952316284,
+            "semi_aperture": 0.375,
+            "thickness": 0.08699999749660492
+        },
+        {
+            "ior": 1.0,
+            "radius": 0.828000009059906,
+            "semi_aperture": 0.375,
+            "thickness": 0.11999999731779099
+        },
+        {
+            "ior": 0.0,
+            "radius": 0.0,
+            "semi_aperture": 0.34200000762939453,
+            "thickness": 0.07800000160932541
+        },
+        {
+            "ior": 1.531999945640564,
+            "radius": -17.393999099731445,
+            "semi_aperture": 0.3840000033378601,
+            "thickness": 0.06599999964237213
+        },
+        {
+            "ior": 1.6200000047683716,
+            "radius": 0.7860000133514404,
+            "semi_aperture": 0.3840000033378601,
+            "thickness": 0.2639999985694885
+        },
+        {
+            "ior": 1.0,
+            "radius": -1.2719999551773071,
+            "semi_aperture": 0.3840000033378601,
+            "thickness": 0.0
+        }
+    ]
+}

@@ -1,0 +1,72 @@
+{
+    "description": " Description: multi element lens Each row is a surface. The order of surfaces starts from the image and heads to the sensor.  Zero is the position of the first lens surface. Positive numbers are towards the lens, and negative numbers are towards the image    radius\t axpos\tN\taperture",
+    "name": " Name: wide.56deg.6.0mm",
+    "surfaces": [
+        {
+            "ior": 1.6390000581741333,
+            "radius": 3.036600112915039,
+            "semi_aperture": 2.628000020980835,
+            "thickness": 0.18479999899864197
+        },
+        {
+            "ior": 1.0,
+            "radius": 1.948199987411499,
+            "semi_aperture": 1.9320000410079956,
+            "thickness": 3.0552000999450684
+        },
+        {
+            "ior": 1.6130000352859497,
+            "radius": 4.083600044250488,
+            "semi_aperture": 1.0800000429153442,
+            "thickness": 0.7896000146865845
+        },
+        {
+            "ior": 1.5479999780654907,
+            "radius": -2.1071999073028564,
+            "semi_aperture": 1.0800000429153442,
+            "thickness": 0.26339998841285706
+        },
+        {
+            "ior": 1.0,
+            "radius": 11.327400207519531,
+            "semi_aperture": 0.5400000214576721,
+            "thickness": 0.020999999716877937
+        },
+        {
+            "ior": 0.0,
+            "radius": 0.0,
+            "semi_aperture": 0.4350000023841858,
+            "thickness": 0.020999999716877937
+        },
+        {
+            "ior": 1.5479999780654907,
+            "radius": -11.12339973449707,
+            "semi_aperture": 0.5400000214576721,
+            "thickness": 0.25920000672340393
+        },
+        {
+            "ior": 1.6130000352859497,
+            "radius": 2.0694000720977783,
+            "semi_aperture": 1.0800000429153442,
+            "thickness": 0.7764000296592712
+        },
+        {
+            "ior": 1.0,
+            "radius": -4.009799957275391,
+            "semi_aperture": 1.0800000429153442,
+            "thickness": 3.0
+        },
+        {
+            "ior": 1.6260000467300415,
+            "radius": -1.9121999740600586,
+            "semi_aperture": 1.878000020980835,
+            "thickness": 0.18119999766349792
+        },
+        {
+            "ior": 1.0,
+            "radius": -2.966399908065796,
+            "semi_aperture": 2.5199999809265137,
+            "thickness": 0.0
+        }
+    ]
+}

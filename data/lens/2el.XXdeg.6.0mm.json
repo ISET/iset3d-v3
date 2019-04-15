@@ -1,0 +1,24 @@
+{
+    "description": " Description: multi element lens Focal length (mm) ",
+    "name": " Name: 2el.XXdeg.6.0mm",
+    "surfaces": [
+        {
+            "ior": 1.649999976158142,
+            "radius": 8.039999961853027,
+            "semi_aperture": 1.5,
+            "thickness": 0.18000000715255737
+        },
+        {
+            "ior": 1.649999976158142,
+            "radius": 0.0,
+            "semi_aperture": 1.5,
+            "thickness": 0.18000000715255737
+        },
+        {
+            "ior": 1.0,
+            "radius": -8.039999961853027,
+            "semi_aperture": 1.5,
+            "thickness": 0.0
+        }
+    ]
+}

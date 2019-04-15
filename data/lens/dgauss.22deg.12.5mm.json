@@ -1,0 +1,72 @@
+{
+    "description": " Description: multi element lens Focal length (mm) ",
+    "name": " Name: dgauss.22deg.12.5mm",
+    "surfaces": [
+        {
+            "ior": 1.6699999570846558,
+            "radius": 7.368750095367432,
+            "semi_aperture": 3.1500000953674316,
+            "thickness": 0.9399999976158142
+        },
+        {
+            "ior": 1.0,
+            "radius": 21.207500457763672,
+            "semi_aperture": 3.1500000953674316,
+            "thickness": 0.029999999329447746
+        },
+        {
+            "ior": 1.6699999570846558,
+            "radius": 4.818749904632568,
+            "semi_aperture": 2.875,
+            "thickness": 1.006250023841858
+        },
+        {
+            "ior": 1.6990000009536743,
+            "radius": 10.192500114440918,
+            "semi_aperture": 2.875,
+            "thickness": 0.8187500238418579
+        },
+        {
+            "ior": 1.0,
+            "radius": 3.1875,
+            "semi_aperture": 2.375,
+            "thickness": 1.4262499809265137
+        },
+        {
+            "ior": 0.0,
+            "radius": 0.0,
+            "semi_aperture": 2.1312499046325684,
+            "thickness": 1.125
+        },
+        {
+            "ior": 1.6030000448226929,
+            "radius": -3.6237499713897705,
+            "semi_aperture": 2.125,
+            "thickness": 0.29499998688697815
+        },
+        {
+            "ior": 1.6579999923706055,
+            "radius": 10.192500114440918,
+            "semi_aperture": 2.5,
+            "thickness": 1.5162500143051147
+        },
+        {
+            "ior": 1.0,
+            "radius": -5.096250057220459,
+            "semi_aperture": 2.5,
+            "thickness": 0.04749999940395355
+        },
+        {
+            "ior": 1.7170000076293945,
+            "radius": 109.26625061035156,
+            "semi_aperture": 2.5,
+            "thickness": 0.8050000071525574
+        },
+        {
+            "ior": 1.0,
+            "radius": -9.932499885559082,
+            "semi_aperture": 2.5,
+            "thickness": 0.0
+        }
+    ]
+}
