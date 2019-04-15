@@ -75,7 +75,7 @@ copyfile(trafficflowPath,localTF);
 % 1~2 minutes
 tic
 disp('*** Scene Generating.....')
-[thisR_scene,road] = piSceneAuto('sceneType',sceneType,...
+[thisR,road] = piSceneAuto('sceneType',sceneType,...
     'roadType',roadType,...
     'trafficflowDensity',trafficflowDensity,...
     'timeStamp',timestamp,...
@@ -84,31 +84,37 @@ disp('*** Scene Generating.....')
 disp('*** Scene Generation completed.')
 toc
 
-thisR_scene.metadata.sumo.trafficflowdensity = trafficflowDensity;
-thisR_scene.metadata.sumo.timestamp          = timestamp;
+thisR.metadata.sumo.trafficflowdensity = trafficflowDensity;
+thisR.metadata.sumo.timestamp          = timestamp;
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
 dayTime = '14:30';
-[thisR_scene,skymapfwInfo] = piSkymapAdd(thisR_scene,dayTime);
+[thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 
 %% Render parameters
-thisR_scene.set('film resolution',[1280 720]);
-thisR_scene.set('pixel samples',128);
-thisR_scene.set('film diagonal',10);
-thisR_scene.set('nbounces',10);
-thisR_scene.set('aperture',1);
+thisR.set('film resolution',[1280 720]);
+thisR.set('pixel samples',128);
+thisR.set('film diagonal',10);
+thisR.set('nbounces',10);
+thisR.set('aperture',1);
 lensname = 'wide.56deg.6.0mm.dat';
-thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
+thisR.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
 
 %% Place the camera
 
 % To place the camera, we find a car and place a camera at the front
 % of the car.  We find the car using the trafficflow information.
+tfFileName = sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity);
 
-load(fullfile(piRootPath,'local',...
-    'trafficflow',sprintf('%s_%s_trafficflow.mat',roadType,trafficflowDensity)),'trafficflow');
+% Full path to file
+tfFileName = fullfile(piRootPath,'local','trafficflow',tfFileName);
+
+% Load the trafficflow variable, which contains the whole time series
+load(tfFileName,'trafficflow');
+
+% Choose the time stamp
 thisTrafficflow = trafficflow(timestamp);
 
 %{
@@ -117,14 +123,14 @@ nextTrafficflow = trafficflow(timestamp+1);
 CamOrientation = 270;
 camPos = {'left','right','front','rear'};
 camPos = camPos{3};
-[thisCar,thisR_scene] = piCamPlace('thistrafficflow',thisTrafficflow,...
+[thisCar,thisR] = piCamPlace('thistrafficflow',thisTrafficflow,...
     'CamOrientation',CamOrientation,...
-    'thisR',thisR_scene,'camPos',camPos,'oriOffset',0);
+    'thisR',thisR,'camPos',camPos,'oriOffset',0);
 
 fprintf('Velocity of Ego Vehicle: %.2f m/s \n', thisCar.speed);
 
 % Assign motion blur to the camera based on its motion
-thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
+thisR = piMotionBlurEgo(thisR,'nextTrafficflow',nextTrafficflow,...
                                'thisCar',thisCar,...
                                'fps',60);
 %}
@@ -132,26 +138,26 @@ thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
 camPos = 'front';
 thisVelocity   = 0 ;
 CamOrientation = 270;
-thisR_scene.lookAt.from = [0;3;40];
-thisR_scene.lookAt.to   = [0;1.9;150];
-thisR_scene.lookAt.up   = [0;1;0];
+thisR.lookAt.from = [0;3;40];
+thisR.lookAt.to   = [0;1.9;150];
+thisR.lookAt.up   = [0;1;0];
 
 % Open at time zero
-thisR_scene.camera.shutteropen.type = 'float';
-thisR_scene.camera.shutteropen.value = 0;  
+thisR.camera.shutteropen.type = 'float';
+thisR.camera.shutteropen.value = 0;  
 
 % Shutter duration
-thisR_scene.camera.shutterclose.type = 'float';
-thisR_scene.camera.shutterclose.value = 1/200;   % 5 ms exposure
+thisR.camera.shutterclose.type = 'float';
+thisR.camera.shutterclose.value = 1/200;   % 5 ms exposure
 
 %% Write out the scene into a PBRT file
 
 if piContains(sceneType,'city')
     outputDir = fullfile(piRootPath,'local',strrep(road.roadinfo.name,'city',sceneType));
-    thisR_scene.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
+    thisR.inputFile = fullfile(outputDir,[strrep(road.roadinfo.name,'city',sceneType),'.pbrt']);
 else
     outputDir = fullfile(piRootPath,'local',strcat(sceneType,'_',road.name));
-    thisR_scene.inputFile = fullfile(outputDir,[strcat(sceneType,'_',road.name),'.pbrt']);
+    thisR.inputFile = fullfile(outputDir,[strcat(sceneType,'_',road.name),'.pbrt']);
 end
 
 % We might use md5 to hash the parameters and put them in the file
@@ -161,14 +167,14 @@ filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
                             sceneType,...
                             dayTime,...
                             thisVelocity,...
-                            thisR_scene.lookAt.from(3),...
+                            thisR.lookAt.from(3),...
                             camPos,...
                             CamOrientation,...
                             clock);
-thisR_scene.outputFile = fullfile(outputDir,filename);
+thisR.outputFile = fullfile(outputDir,filename);
 
 % Write the recipe for the scene we generated
-piWrite(thisR_scene,'creatematerials',true,...
+piWrite(thisR,'creatematerials',true,...
     'overwriteresources',false,'lightsFlag',false,...
     'thistrafficflow',thisTrafficflow);
 
@@ -176,17 +182,21 @@ piWrite(thisR_scene,'creatematerials',true,...
 
 % This creates a new acquisition in the scenes_pbrt session.
 % Each acquisition is a particular scene, like this one.
-gcp.fwUploadPBRT(thisR_scene,'scitran',st,'road',road);
+gcp.fwUploadPBRT(thisR,'scitran',st,'road',road);
 
 %% Add this target scene to the target list
 
-addPBRTTarget(gcp,thisR_scene);
-fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
+% Add a target to the list
+gcp.addPBRTTarget(thisR);
 
 % Show the target list to the user
 gcp.targetsList;
 
-%% This sends the rendering job on google cloud
+% You can delete a single target from the list this way
+% val = 2;
+% gcp.targetDelete(val)
+
+%% Send the rendering job to the google cloud
 
 % It takes about 30 mins depends on the complexity of the scene. 
 % (Majority of the time is used to load data(texture and geometry), 

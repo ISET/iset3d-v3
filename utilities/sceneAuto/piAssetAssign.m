@@ -1,9 +1,18 @@
 function asset = piAssetAssign(assetRecipe,varargin)
 %% Assign properties from an assetRecipe on Flywheel to an asset struct
-% 
+%
 % Syntax:
+%  asset = piAssetAssign(assetRecipe,varargin)
 %
+% Inputs
+%  assetRecipe
 %
+% Key/val pairs
+%
+% Outputs
+%   asset
+%
+% Zhenyi Liu
 %
 % See also
 %
@@ -30,12 +39,12 @@ for ii = 1: length(assetRecipe)
         thisR.(fds{dd})= thisR_tmp.(fds{dd});
     end
     thisR.materials.lib = piMateriallib;
-    %% force y=0 
+    %% force y=0
     for ll = 1:length(thisR.assets)
         thisR.assets(ll).position = [0;0;0];
     end
     thisR.assets(ll).motion = [];
-   
+    
     %% Assign random color for carpaint
     mlist = fieldnames(thisR.materials.list);
     for kk = 1:length(mlist)
@@ -97,6 +106,6 @@ for ii = 1: length(assetRecipe)
     localFolder = fileparts(assetRecipe{ii}.name);
     asset(ii).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
     asset(ii).fwInfo       = assetRecipe{ii}.fwInfo;
-    fprintf('%d %s created \n',ii,label);
+    % fprintf('%d %s created \n',ii,label);
 end
 end

@@ -1,4 +1,3 @@
-
 function assetRecipe = piAssetDownload(session,nassets,varargin)
 % Download assets from a flywheel database
 %
@@ -70,11 +69,12 @@ if isempty(acquisitionlabel)
         thisRecipe = stFileSelect(acqs{thisIdx}.files,'type','source code');
         destName_resource = fullfile(localFolder,sprintf('%s.zip',acqLabel));
         thisResource = stFileSelect(acqs{thisIdx}.files,'type','CG Resource');
+        
         % if file exists, skip
         if ~exist(localFolder,'dir') && ~exist(destName_recipe,'file')
             mkdir(localFolder)
             thisRecipe{1}.download(destName_recipe);
-            fprintf('%s is downloaded \n',thisRecipe{1}.name);
+            % fprintf('%s is downloaded \n',thisRecipe{1}.name);
             if resourcesFlag
                 thisResource{1}.download(destName_resource);
                 fprintf('%s is downloaded \n',thisResource{1}.name);
@@ -82,7 +82,7 @@ if isempty(acquisitionlabel)
                 delete([destName_resource,'.zip']);
             end
         else
-            fprintf('%s found \n',acqLabel);
+            % fprintf('%s found \n',acqLabel);
         end
         assetRecipe{ii}.name   = destName_recipe;
         assetRecipe{ii}.count  = downloadList(ii).count;
@@ -102,16 +102,16 @@ else
     if ~exist(localFolder,'dir') && ~exist(destName_recipe,'file')
         mkdir(localFolder)
         thisRecipe{1}.download(destName_recipe);
-        fprintf('%s is downloaded \n',thisRecipe{1}.name);
+        % fprintf('%s is downloaded \n',thisRecipe{1}.name);
         if resourcesFlag
             % We always unzip the resource and remove the zip file
             thisResource{1}.download(destName_resource);
-            fprintf('%s is downloaded \n',thisResource{1}.name);
+            % fprintf('%s is downloaded \n',thisResource{1}.name);
             unzip(destName_resource,localFolder);
             delete(destName_resource);
         end
     else
-        fprintf('%s found \n',acquisitionlabel);
+        % fprintf('%s found \n',acquisitionlabel);
     end
     
     assetRecipe{1}.name  = destName_recipe;
