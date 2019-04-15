@@ -79,9 +79,7 @@ p.addParameter('reuse',false,@islogical);
 
 % If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
 
-% We were testing this one      'vistalab/pbrt-v3-spectral:test';
-% The one we have run a lot is  'vistalab/pbrt-v3-spectral:latest';
-thisDocker = 'vistalab/pbrt-v3-spectral:test';
+thisDocker = 'vistalab/pbrt-v3-spectral';
 fprintf('Docker container %s\n',thisDocker);
 p.addParameter('dockerimagename',thisDocker,@ischar);
 
