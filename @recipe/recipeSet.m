@@ -17,9 +17,10 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %   Scene and camera
 %     object distance
 %     camera
+%     exposure time
 %
 %   Lens
-%     lensfile
+%     lensfile - json format for omni case.  dat format for realistic.
 %
 %   Film/sensor
 %
@@ -115,16 +116,26 @@ switch param
     case 'camera'
         % Initialize a camera type with default parameters
         % To adjust the parameters use recipe.set() calls
-        thisR.camera = piCameraCreate(val,'lensFile',p.Results.lensfile, ...
-            'pbrtVersion',thisR.version);
+        thisR.camera = piCameraCreate(val,'lensFile',p.Results.lensfile);
         
-        % If version number is 3, add the film diagonal into the Film
-        if(thisR.version == 3)
-            thisR.film.diagonal.value = 35;
-            thisR.film.diagonal.type = 'float';
-        end
+        % For this camera, the film size should be
+        thisR.set('film diagonal',35);
+        
     case 'cameratype'
         thisR.camera.subtype = val;
+    case {'cameraexposure','exposuretime'}
+        % Normally, openShutter is at time zero
+        thisR.camera.shutteropen.type  = 'float';
+        thisR.camera.shutterclose.type = 'float';
+        try
+            openShutter = thisR.camera.shutteropen.value;
+        catch
+            openShutter = 0;
+            thisR.camera.shutteropen.value = 0;
+        end
+        
+        % Shutter duration in sec
+        thisR.camera.shutterclose.value = val + openShutter;   
         
         % Lens related
     case 'lensfile'
@@ -143,9 +154,6 @@ switch param
             thisR.camera.aperture_diameter.value = val;
             thisR.camera.aperture_diameter.type = 'float';
         end
-    case {'filmdistance'}
-        thisR.camera.filmdistance.value = val;
-        thisR.camera.filmdistance.type = 'float';
     case {'focusdistance'}
         if(thisR.version == 3)
             thisR.camera.focusdistance.value = val;
@@ -225,6 +233,13 @@ switch param
     case 'up'
         thisR.lookAt.up = val;
         
+        % Film parameters
+    case 'filmdiagonal'
+        thisR.film.diagonal.type = 'float';
+        thisR.film.diagonal.value = 35;
+    case {'filmdistance'}
+        thisR.camera.filmdistance.type = 'float';
+        thisR.camera.filmdistance.value = val;
         
         % Rendering related
     case{'maxdepth','bounces','nbounces'}

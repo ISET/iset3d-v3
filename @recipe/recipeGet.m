@@ -114,6 +114,14 @@ switch ieParamFormat(param)
         % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
         
+    case {'cameratype'}
+    case {'exposuretime','cameraexposure'}
+        try
+            val = thisR.camera.shutterclose.value - thisR.camera.shutteropen.value;
+        catch
+            val = 1;  % 1 sec is the default.  Too long.
+        end
+        
         % Lens and optics
     case 'opticstype'
         % perspective means pinhole.  Maybe we should rename.
