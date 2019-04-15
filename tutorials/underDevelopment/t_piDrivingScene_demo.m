@@ -45,7 +45,7 @@ str = gcp.configList;
 % This can take 20-30 minutes
 
 % Available sceneTypes: city1, city2, city3, city4, citymix, suburb
-sceneType = 'city3';
+sceneType = 'city1';
 
 % To see the available roadTypes use piRoadTypes
 roadType = 'city_cross_4lanes_002';
@@ -56,7 +56,7 @@ trafficflowDensity = 'medium';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 
 % simulation that we record the data. 
-timestamp = 30;
+timestamp = 45;
 
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
@@ -72,7 +72,7 @@ if ~exist(localTF,'dir'), mkdir(localTF);end
 copyfile(trafficflowPath,localTF);
 %% Scene Generation
 
-% 1~2 minutes
+% 20 seconds
 tic
 disp('*** Scene Generating.....')
 [thisR,road] = piSceneAuto('sceneType',sceneType,...
@@ -89,7 +89,7 @@ thisR.metadata.sumo.timestamp          = timestamp;
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
-dayTime = '14:30';
+dayTime = '13:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 
@@ -138,8 +138,8 @@ thisR = piMotionBlurEgo(thisR,'nextTrafficflow',nextTrafficflow,...
 camPos = 'front';
 thisVelocity   = 0 ;
 CamOrientation = 270;
-thisR.lookAt.from = [0;3;40];
-thisR.lookAt.to   = [0;1.9;150];
+thisR.lookAt.from = [1.5;2.7;20];
+thisR.lookAt.to   = [1.5;1.9;150];
 thisR.lookAt.up   = [0;1;0];
 
 % Open at time zero
