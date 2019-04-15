@@ -18,7 +18,7 @@ thisR = piRead(fname,'version',3);
 
 % Setup working folder
 workingDir = fullfile(piRootPath,'local','texturedPlane');
-if(~isdir(workingDir))
+if(~isfolder(workingDir))
     mkdir(workingDir);
 end
 
@@ -43,34 +43,47 @@ thisR = piWorldFindAndReplace(thisR,'dummyTexture.exr',imageName);
 
 %% Attach a lens
 
-thisR.set('camera','realistic');
-thisR.set('aperture',2);  % The number of rays should go up with the aperture 
-thisR.set('film resolution',128);
-thisR.set('rays per pixel',128);
-thisR.set('diagonal', 5);
+thisR.set('camera','realistic');     % Has a lens
+thisR.set('aperture',2);             % mm
+thisR.set('film resolution',128);    % Spatial samples
+thisR.set('rays per pixel',128);     % Rendering samples
+thisR.set('diagonal', 1);            % Size of film in mm
 thisR.set('focusdistance',1)
 
-%% Render once without chromatic aberration
+fprintf('Rendering with lens:   %s\n',thisR.get('lens file'));
 
-[p,n,e] = fileparts(fname); 
-thisR.outputFile = fullfile(workingDir,[n,e]);
-
-piWrite(thisR);
-
-[oi, results] = piRender(thisR);
-oi = oiSet(oi,'name','noCA');
-
-% Show it in ISET
-ieAddObject(oi); oiWindow;  
 
 %% Turn on chromatic aberration and render
 
-thisR.set('chromaticaberration','true');
-
+% This takes longer because we are using more wavelength samples to
+% trace through the lens (8 bands).
+thisR.set('chromatic aberration',true);
 piWrite(thisR);
 
-[oiCA, results] = piRender(thisR);
+[oiCA, results] = piRender(thisR,'render type','radiance');
 oiCA = oiSet(oiCA,'name','CA');
+oiWindow(oiCA);
+
+%% Render without chromatic aberration
+
+thisR.set('chromatic aberration',false);
+
+[p,n,e] = fileparts(fname); 
+thisR.outputFile = fullfile(workingDir,[n,e]);
+piWrite(thisR);
+
+[oi, results] = piRender(thisR,'render type','radiance');
+oi = oiSet(oi,'name','noCA');
 
 % Show it in ISET
-ieAddObject(oiCA); oiWindow;   
+oiWindow(oi);  
+
+%% Now with only 4 bands
+thisR.set('chromatic aberration',15);
+piWrite(thisR);
+
+[oiCA, results] = piRender(thisR,'render type','radiance');
+oiCA = oiSet(oiCA,'name','CA');
+oiWindow(oiCA);
+
+%% End

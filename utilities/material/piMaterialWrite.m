@@ -7,12 +7,12 @@ function piMaterialWrite(thisR)
 %
 % ZL, SCIEN STANFORD, 2018
 
-%% 
+%%
 p = inputParser;
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 p.parse(thisR);
 
-%% 
+%%
 % workingDir = fileparts(thisR.outputFile);
 % % copy spds to working directroy
 % spds_path = fullfile(piRootPath,'data','spds');
@@ -44,14 +44,14 @@ for jj = 1:ntxtLines
     end
     if piContains(str,'.jpg "')
         thisR.materials.txtLines(jj) = strrep(str,'jpg ','png');
-    end    
+    end
     % photoshop exports texture format with ".JPG "(with extra space) ext.
     if piContains(str,'.JPG "')
         thisR.materials.txtLines(jj) = strrep(str,'JPG ','png');
     end
     if piContains(str,'.JPG"')
         thisR.materials.txtLines(jj) = strrep(str,'JPG','png');
-    end    
+    end
     if piContains(str,'bmp')
         thisR.materials.txtLines(jj) = strrep(str,'bmp','png');
     end
@@ -75,33 +75,33 @@ for ii = 1:size(txtLines)
 end
 
 % Squeeze out the empty lines. Some day we might get the parsed
-% textures here. 
+% textures here.
 textureLines = txtLines(~cellfun('isempty',txtLines));
 
 for jj = 1: length(textureLines)
     textureLines_tmp = [];
-%     thisLine_tmp = textscan(textureLines{jj},'%q');
+    %     thisLine_tmp = textscan(textureLines{jj},'%q');
     thisLine_tmp= strsplit(textureLines{jj},' ');
     if ~strcmp(thisLine_tmp{length(thisLine_tmp)}(1),'"')
         for nn= length(thisLine_tmp):-1:1
-        if strcmp(thisLine_tmp{nn}(1),'"')
-            for kk = nn:length(thisLine_tmp)-1
-                % combine all the string from nn to end;
-                thisLine_tmp{nn} = [thisLine_tmp{nn},' ',thisLine_tmp{kk+1}];  
+            if strcmp(thisLine_tmp{nn}(1),'"')
+                for kk = nn:length(thisLine_tmp)-1
+                    % combine all the string from nn to end;
+                    thisLine_tmp{nn} = [thisLine_tmp{nn},' ',thisLine_tmp{kk+1}];
+                end
+                thisLine_tmp((nn+1):length(thisLine_tmp))=[];
+                break;
             end
-            thisLine_tmp((nn+1):length(thisLine_tmp))=[];
-            break;
-        end
         end
     end
-%     thisLine_tmp = thisLine_tmp{1};
+    %     thisLine_tmp = thisLine_tmp{1};
     for ii = 1:length(thisLine_tmp)
         if piContains(thisLine_tmp{ii},'filename')
             index = ii;
         end
     end
     for ii = 1:length(thisLine_tmp)
-        if piContains(thisLine_tmp{ii},'.png') 
+        if piContains(thisLine_tmp{ii},'.png')
             if piContains(thisLine_tmp{ii-1},'filename')
                 filename = thisLine_tmp{ii};
                 if ~piContains(filename,'"textures/')
@@ -121,7 +121,7 @@ for jj = 1: length(textureLines)
                     else
                         thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
                     end
-                end                
+                end
             end
         end
     end
@@ -129,20 +129,20 @@ for jj = 1: length(textureLines)
         if ii == 1
             textureLines_tmp = strcat(textureLines_tmp,thisLine_tmp{ii});
         else
-%             string = sprintf('%s"',thisLine_tmp{ii});
+            %             string = sprintf('%s"',thisLine_tmp{ii});
             textureLines_tmp = strcat(textureLines_tmp,{' '},thisLine_tmp{ii});
-        end 
+        end
     end
     textureLines{jj} = textureLines_tmp{1};
 end
-textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy"';
+textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy" "float uscale" [512] "float vscale" [512] ';
 %% Create txtLines for the material struct array
 field =fieldnames(thisR.materials.list);
 materialTxt = cell(1,length(field));
- 
+
 for ii=1:length(materialTxt)
     % Converts the material struct to text
-    materialTxt{ii} = piMaterialText(thisR.materials.list.(cell2mat(field(ii)))); 
+    materialTxt{ii} = piMaterialText(thisR.materials.list.(cell2mat(field(ii))));
 end
 
 %% Write to scene_material.pbrt texture-material file
@@ -159,8 +159,8 @@ gg = 1;
 for dd = 1:length(materialTxt)
     if piContains(materialTxt{dd},'paint_base') &&...
             ~piContains(materialTxt{dd},'mix')||...
-        piContains(materialTxt{dd},'paint_mirror') &&...
-            ~piContains(materialTxt{dd},'mix')   
+            piContains(materialTxt{dd},'paint_mirror') &&...
+            ~piContains(materialTxt{dd},'mix')
         nPaintLines{gg} = dd;
         gg = gg+1;
     end
@@ -169,11 +169,11 @@ end
 % Find material names contains 'paint_base' or 'paint_mirror'
 if ~isempty(nPaintLines)
     for hh = 1:length(nPaintLines)
-    fprintf(fileID,'%s\n',materialTxt{nPaintLines{hh}});
-    materialTxt{nPaintLines{hh}} = [];
+        fprintf(fileID,'%s\n',materialTxt{nPaintLines{hh}});
+        materialTxt{nPaintLines{hh}} = [];
     end
     materialTxt = materialTxt(~cellfun('isempty',materialTxt));
-%     nmaterialTxt = length(materialTxt)-length(nPaintLines);
+    %     nmaterialTxt = length(materialTxt)-length(nPaintLines);
     for row=1:length(materialTxt)
         fprintf(fileID,'%s\n',materialTxt{row});
         
@@ -286,24 +286,26 @@ if ~isempty(materials.spectrumks)
     val = strcat(val, val_spectrumks);
 end
 
-if ~isempty(materials.spectrumkr)
-    if(isstring(materials.spectrumkr))
-        val_spectrumkr = sprintf(' "spectrum Kr" "%s" ',materials.spectrumkr);
-    else
-        val_spectrumkr = sprintf(' "spectrum Kr" [%0.5f %0.5f %0.5f %0.5f] ',materials.spectrumkr);
+if isfield(materials, 'spectrumkr')
+    if ~isempty(materials.spectrumkr)
+        if(isstring(materials.spectrumkr))
+            val_spectrumkr = sprintf(' "spectrum Kr" "%s" ',materials.spectrumkr);
+        else
+            val_spectrumkr = sprintf(' "spectrum Kr" [%0.5f %0.5f %0.5f %0.5f] ',materials.spectrumkr);
+        end
+        val = strcat(val, val_spectrumkr);
     end
-    val = strcat(val, val_spectrumkr);
 end
-
-if ~isempty(materials.spectrumkt)
-    if(isstring(materials.spectrumkt))
-        val_spectrumkt = sprintf(' "spectrum Kt" "%s" ',materials.spectrumkt);
-    else
-        val_spectrumkt = sprintf(' "spectrum Kt" [%0.5f %0.5f %0.5f %0.5f] ',materials.spectrumkt);
+if isfield(materials, 'spectrumkt')
+    if ~isempty(materials.spectrumkt)
+        if(isstring(materials.spectrumkt))
+            val_spectrumkt = sprintf(' "spectrum Kt" "%s" ',materials.spectrumkt);
+        else
+            val_spectrumkt = sprintf(' "spectrum Kt" [%0.5f %0.5f %0.5f %0.5f] ',materials.spectrumkt);
+        end
+        val = strcat(val, val_spectrumkt);
     end
-    val = strcat(val, val_spectrumkt);
 end
-
 % if ~isempty(materials.spectrumk)
 %     val_spectrumks = sprintf(' "spectrum k" "%s" ',materials.spectrumk);
 %     val = strcat(val, val_spectrumks);
@@ -319,25 +321,26 @@ if ~isempty(materials.stringnamedmaterial1)
     val = strcat(val, val_stringnamedmaterial1);
 end
 
-if ~isempty(materials.bsdffile)
-    val_bsdfile = sprintf(' "string bsdffile" "%s" ',materials.bsdffile);
-    val = strcat(val, val_bsdfile);
+if isfield(materials, 'bsdffile')
+    if ~isempty(materials.bsdffile)
+        val_bsdfile = sprintf(' "string bsdffile" "%s" ',materials.bsdffile);
+        val = strcat(val, val_bsdfile);
+    end
 end
-
 if ~isempty(materials.stringnamedmaterial2)
     val_stringnamedmaterial2 = sprintf(' "string namedmaterial2" "%s" ',materials.stringnamedmaterial2);
     val = strcat(val, val_stringnamedmaterial2);
 end
 if isfield(materials,'texturebumpmap')
-if ~isempty(materials.texturebumpmap)
-    val_texturekr = sprintf(' "texture bumpmap" "%s" ',materials.texturebumpmap);
-    val = strcat(val, val_texturekr);
+    if ~isempty(materials.texturebumpmap)
+        val_texturekr = sprintf(' "texture bumpmap" "%s" ',materials.texturebumpmap);
+        val = strcat(val, val_texturekr);
+    end
 end
+if isfield(materials, 'boolremaproughness')
+    if ~isempty(materials.boolremaproughness)
+        val_boolremaproughness = sprintf(' "bool remaproughness" "%s" ',materials.boolremaproughness);
+        val = strcat(val, val_boolremaproughness);
+    end
 end
-
-if ~isempty(materials.boolremaproughness)
-    val_boolremaproughness = sprintf(' "bool remaproughness" "%s" ',materials.boolremaproughness);
-    val = strcat(val, val_boolremaproughness);
-end
-
 end

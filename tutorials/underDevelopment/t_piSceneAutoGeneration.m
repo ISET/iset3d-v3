@@ -48,21 +48,26 @@ str = gcp.configList;
 % This is where we pull down the assets from Flywheel and assemble
 % them into an asset list.  That is managed in piSceneAuto
 tic
-sceneType = 'city1';
+sceneType = 'city3';
 % roadType = 'cross';
 % sceneType = 'highway';
 % roadType = 'cross';
-% roadType = 'highway_straight_4lanes_001';
-roadType = 'cross';
+roadType = 'city_cross_4lanes_002';
+% roadType = 'city_cross_6lanes_001';
+% roadType = {'curve_6lanes_001',...
+%     'straight_2lanes_parking',...
+%     'city_cross_6lanes_001',...
+%     'city_cross_6lanes_001_construct',...
+%     'city_cross_4lanes_002'};
 
-trafficflowDensity = 'high';
+trafficflowDensity = 'medium';
 
-dayTime = 'noon';
+% dayTime = 'cloudy';
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
 % simulation that we record the data.  This could be fixed or random,
 % and since SUMO runs
-timestamp = 30;
+timestamp = 122;%,20,60,90;
 
 % Normally we want only one scene per generation.
 nScene = 1;
@@ -70,20 +75,22 @@ nScene = 1;
 cloudRender = 1;
 % Return an array of render recipe according to given number of scenes.
 % takes about 100 seconds
+%
 [thisR_scene,road] = piSceneAuto('sceneType',sceneType,...
     'roadType',roadType,...
     'trafficflowDensity',trafficflowDensity,...
-    'dayTime',dayTime,...
     'timeStamp',timestamp,...
     'nScene',nScene,...
     'cloudRender',cloudRender,...
     'scitran',st);
 toc
+
+
 thisR_scene.metadata.sumo.trafficflowdensity = trafficflowDensity;
 thisR_scene.metadata.sumo.timestamp          = timestamp;
 %% Add a skymap and add SkymapFwInfor to fwList
-
-dayTime = 'noon';
+% 11:30/14:30/16:30
+dayTime = '16:30';
 [thisR_scene,skymapfwInfo] = piSkymapAdd(thisR_scene,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 %% Render parameters
@@ -96,12 +103,12 @@ road.fwList = [road.fwList,' ',skymapfwInfo];
 % Default is a relatively low samples/pixel (256).
 
 xRes = 1920;
-yRes =  800;
+yRes = 1080;
 pSamples = 1024;
 thisR_scene.set('film resolution',[xRes yRes]);
 thisR_scene.set('pixel samples',pSamples);
 % thisR_scene.set('fov',45);
-thisR_scene.film.diagonal.value=10;
+thisR_scene.film.diagonal.value=15;
 thisR_scene.film.diagonal.type = 'float';
 thisR_scene.integrator.maxdepth.value = 5;
 thisR_scene.integrator.subtype = 'bdpt';
@@ -109,12 +116,12 @@ thisR_scene.sampler.subtype = 'sobol';
 thisR_scene.integrator.lightsamplestrategy.type = 'string';
 thisR_scene.integrator.lightsamplestrategy.value = 'spatial';
 
-
-%% create a realistic camera
-% lensfiles = dir('*.dat');
 %%
 % for ii = 1:35
+% lensname = 'dgauss.22deg.6.0mm.dat';
 lensname = 'wide.56deg.6.0mm.dat';
+% lensname = 'fisheye.87deg.12.5mm.dat';
+% thisR_scene.film.diagonal.value=15; % for fisheye
 thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
 % thisR_scene.camera = piCameraCreate('perspective','pbrtVersion',3);
 
@@ -122,26 +129,39 @@ thisR_scene.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion
 
 % To place the camera, we find a car and place a camera at the front
 % of the car.  We find the car using the trafficflow information.
-%
+
 load(fullfile(piRootPath,'local','trafficflow',sprintf('%s_%s_trafficflow.mat',road.name,trafficflowDensity)),'trafficflow');
 thisTrafficflow = trafficflow(timestamp);
 nextTrafficflow = trafficflow(timestamp+1);
 %
-CamOrientation =270;
-[thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
-    'CamOrientation',CamOrientation);
 
+CamOrientation =270;
+camPos = {'left','right','front','rear'};
+% camPos = camPos{randi(4,1)};
+camPos = camPos{3};
+[thisCar,from,to,ori] = piCamPlace('thistrafficflow',thisTrafficflow,...
+    'CamOrientation',CamOrientation,...
+    'thisR',thisR_scene,'camPos',camPos,'oriOffset',0);
+
+from = [0;3;40];
+to   = [0;1.9;150];
+thisVelocity = 0 ;
+ori = 270;
 thisR_scene.lookAt.from = from;
 thisR_scene.lookAt.to   = to;
 thisR_scene.lookAt.up = [0;1;0];
 % Will write a function to select a certain speed, now just manually check
-thisVelocity = thisCar.speed
-% give me z axis smaller than 110;
-%%
-thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
-                               'thisCar',thisCar,...
-                               'fps',60);
-                          
+% thisVelocity = thisCar.speed
+
+%% give me z axis smaller than 110;
+
+% thisR_scene = piMotionBlurEgo(thisR_scene,'nextTrafficflow',nextTrafficflow,...
+%                                'thisCar',thisCar,...
+%                                'fps',60);
+thisR_scene.camera.shutteropen.type = 'float';
+thisR_scene.camera.shutteropen.value = 0;
+thisR_scene.camera.shutterclose.type = 'float';
+thisR_scene.camera.shutterclose.value = 1/150;
 
 %% Write out the scene into a PBRT file
 
@@ -156,8 +176,10 @@ end
 % We might use md5 to has the parameters and put them in the file
 % name.
 if ~exist(outputDir,'dir'), mkdir(outputDir); end
-filename = sprintf('%s_v%0.1f_f%0.2fo%0.2f_%i%i%i%i%i%0.0f.pbrt',...
-     sceneType,thisVelocity,thisR_scene.lookAt.from(3),ori,clock);
+% filename = sprintf('%s_v%0.1f_f%0.2fo%0.2f_%i%i%i%i%i%0.0f.pbrt',...
+%      sceneType,thisVelocity,thisR_scene.lookAt.from(3),ori,clock);
+filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
+                            sceneType,dayTime,thisCar.speed,thisR_scene.lookAt.from(3),camPos,ori,clock);
 thisR_scene.outputFile = fullfile(outputDir,filename);
 
 % Do the writing
@@ -172,7 +194,7 @@ gcp.fwUploadPBRT(thisR_scene,'scitran',st,'road',road);
 addPBRTTarget(gcp,thisR_scene);
 fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
-%% Describe the target to the user
+% Describe the target to the user
 
 gcp.targetsList;
 %% save gcp.targets as a txt file so that I can read from gcp
@@ -180,7 +202,7 @@ filePath_record = '/Users/zhenyiliu/Google Drive (zhenyi27@stanford.edu)/renderi
 DateString=strrep(strrep(strrep(datestr(datetime('now')),' ','_'),':','_'),'-','_');
 save([filePath_record,'gcp',DateString,'.mat'],'gcp');
 %% This invokes the PBRT-V3 docker image
-gcp.render();
+gcp.render(); 
 %% Monitor the processes on GCP
 
 [podnames,result] = gcp.Podslist('print',false);
@@ -205,7 +227,7 @@ gcp.PodDescribe(podname{1})
 
 %% Download files from Flywheel
 disp('*** Data downloading...');
-[oi,scene_mesh,label]   = gcp.fwDownloadPBRT('scitran',st);
+[oi]   = gcp.fwDownloadPBRT('scitran',st);
 disp('*** Data downloaded');
 
 %% Show the rendered image using ISETCam

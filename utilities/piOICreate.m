@@ -73,8 +73,8 @@ if isempty(p.Results.fov) && isempty(p.Results.filmDiag)
 elseif isempty(p.Results.fov)
     % We must the filmdiag
     photons = oiGet(oi, 'photons');
-    x = size(photons, 1);
-    y = size(photons, 2);
+    x = size(photons, 2);
+    y = size(photons, 1);
     d = sqrt(x^2 + y^2);  % Number of samples along the diagonal
     fwidth= (p.Results.filmDiag / d) * x;    % Diagonal size by d gives us mm per step
     

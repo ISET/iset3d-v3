@@ -1,13 +1,32 @@
-function assetsPlaced = piSidewalkPlace(assetsList,AssetsPosList)
-%% For sidewalk assets, place the assets exactly by names
+function assetsPlaced = piSidewalkPlace(assetsList,assetsPosList)
+% Place sidewalk assets exactly by names
+%
+% Syntax
+%
+% Description
+%
+% Inputs
+%   assetList
+%   AssetsPosList
+%
+% Key/val pairs
+%
+% Outputs
+%   assetsPlaced
 %
 %
 %
+% Zhenyi
 %
+% See also
+%
+
 %%
-for ii = 1: length(AssetsPosList)
-    PosList{ii} = AssetsPosList(ii).name;
+
+for ii = 1: length(assetsPosList)
+    PosList{ii} = assetsPosList(ii).name;
 end
+
 PosListCheck = unique(PosList);
 for kk = 1:length(PosListCheck)
     count = 1;
@@ -19,11 +38,11 @@ for kk = 1:length(PosListCheck)
         end
     end
 end
-%asset = buildingList.building;
+
+%%
 asset = assetsList;
+
 for ii = 1: length(assetPosList_tmp)
-%     gg=1;
-    % if ~isequal(buildingPosList_tmp(ii).count,1)
     n = assetPosList_tmp(ii).count;
     for hh = 1: length(asset(ii).geometry)
         
@@ -37,10 +56,10 @@ for ii = 1: length(assetPosList_tmp)
                 position=cell(n,1);
                 rotationY=cell(n,1);
                 gg=1;
-                for jj = 1:length(AssetsPosList)
-                    if isequal(assetPosList_tmp(ii).name{1},AssetsPosList(jj).name)
-                        position{gg} = AssetsPosList(jj).position;
-                        rotationY{gg} = AssetsPosList(jj).rotate;
+                for jj = 1:length(assetsPosList)
+                    if isequal(assetPosList_tmp(ii).name{1},assetsPosList(jj).name)
+                        position{gg} = assetsPosList(jj).position;
+                        rotationY{gg} = assetsPosList(jj).rotate;
                         gg = gg+1;
                     end
                 end
@@ -50,7 +69,8 @@ for ii = 1: length(assetPosList_tmp)
             end
         end
     end
-    % end
 end
+
 assetsPlaced = assets_updated;
+
 end

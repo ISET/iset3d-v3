@@ -32,7 +32,7 @@ end
 inputFile = fullfile(inFilepath,sprintf('%s_geometry.pbrt',scene_fname));
 
 % Save the JSON file at AssetInfo
-outputFile  = renderRecipe.outputFile;
+% outputFile  = renderRecipe.outputFile;
 outFilepath = fileparts(renderRecipe.outputFile);
 AssetInfo   = fullfile(outFilepath,sprintf('%s.json',scene_fname));
 
@@ -109,11 +109,12 @@ if ~convertedflag
                     values = cell2mat(tmp(2:end));
                     transform = reshape(values,[4,4]);
                     dcm = [transform(1:3);transform(5:7);transform(9:11)];
-                    % [rotz,roty,rotx]= dcm2angle(dcm);
+                    
                     [rotz,roty,rotx]= piDCM2angle(dcm);
                     rotx = rotx*180/pi;
                     roty = roty*180/pi;
                     rotz = rotz*180/pi;
+                    
                     groupobj(hh).rotate(:,3)   = [rotx;1;0;0];
                     groupobj(hh).rotate(:,2)   = [roty;0;1;0];
                     groupobj(hh).rotate(:,1)   = [rotz;0;0;1];

@@ -50,13 +50,13 @@ imagesc(brightSpots);
 
 g = ones(3,3)/9;
 isolatedBrightSpots = conv2(brightSpots,g);
-sum(isolatedBrightSpots(:))
+sum(isolatedBrightSpots(:));
 
 % Sometimes we have white points within the local neighborhood, which
 % limits the effectiveness
 multipleSpots = (isolatedBrightSpots > 1);
 % Good when this is zero
-sum(multipleSpots(:))
+sum(multipleSpots(:));
 %% Calculate the illuminance around the bright spots
 
 % g = ones(3,3)/8;

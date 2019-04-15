@@ -1,14 +1,31 @@
 function assetRecipe = piAssetDownload(session,nassets,varargin)
-% Download assets from a flywheel session
+% Download assets from a flywheel database
 %
-%  fname = piAssetDownload(session,nassets,varargin)
+% Syntax
+%   assetRecipe = piAssetDownload(session,nassets,varargin)
 %
-% Description
+% Brief description
+%   Given a session download recipes for some number of assets.  The
+%   session might be, say, 'cars', and the recipes for each asset are
+%   stored in the acquisitions of the 'cars' session.
 %
 % Inputs
-% Optional key/value parameters
-% Outputs
+%   session:  A flywheel.model.Session
+%   nassets:  An integer of how many assets from the session.
 %
+% Optional key/value parameters
+%    resources:    Logical, download the resource file, too.
+%    acquisitionlabel:   The label of a specific acquisition you want
+%
+% Outputs
+%   assetRecipe:  Cell array of describing the assets
+%
+% Description
+%   When an acquisitionlabel is given, the nassets describes how many
+%   times that asset is used in the scene.
+%
+% See also
+%  
 
 % Examples:
 %{
@@ -17,115 +34,93 @@ fname = piAssetDownload(session,sessionname,ncars);
 %}
 
 %% Parse the inputs
-
+varargin = ieParamFormat(varargin);
 p = inputParser;
-% varargin = ieParamFormat(varargin);
+
 p.addRequired('session',@(x)(isa(x,'flywheel.model.Session')));
 p.addRequired('nassets',@isnumeric);
-p.addParameter('acquisition','',@ischar);
+p.addParameter('acquisitionlabel','',@ischar);
 p.addParameter('resources',true);
-p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
 
 p.parse(session, nassets, varargin{:});
-acquisitionname = p.Results.acquisition;
-resourcesFlag = p.Results.resources;
-st = p.Results.scitran;
+acquisitionlabel = p.Results.acquisitionlabel;
+resourcesFlag   = p.Results.resources;
 
-if isempty(st)
-    st = scitran('stanfordlabs');
-end
-%%
-containerID = idGet(session,'data type','session');
-fileType = 'CG Resource';
-[resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
-fileType_json ='source code'; % json
-[recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
-%%
-if isempty(acquisitionname)
-    %%
-    nDatabaseAssets = length(resourceFiles);
+%%  Download the recipes
+
+if isempty(acquisitionlabel)
+    acqs = session.acquisitions();
+
+    % No specific recipe, randomly choose them
+    nDatabaseAssets = length(acqs);
     assetList = randi(nDatabaseAssets,nassets,1);
-    % count objectInstance
+    
+    % Assets we want to download
     downloadList = piObjectInstanceCount(assetList);
     
     nDownloads = length(downloadList);
     assetRecipe = cell(nDownloads,1);
     
-    
     for ii = 1:nDownloads
-        [~,n,~] = fileparts(resourceFiles{downloadList(ii).index}{1}.name);
-        [~,n,~] = fileparts(n); % extract file name
-        % Download the scene to a destination zip file
+        thisIdx = downloadList(ii).index;
+        acqLabel = acqs{thisIdx}.label;
+        localFolder = fullfile(piRootPath,'local','AssetLists', acqLabel);
+        destName_recipe = fullfile(localFolder,sprintf('%s.json',acqLabel));
+        thisRecipe = stFileSelect(acqs{thisIdx}.files,'type','source code');
+        destName_resource = fullfile(localFolder,sprintf('%s.zip',acqLabel));
+        thisResource = stFileSelect(acqs{thisIdx}.files,'type','CG Resource');
         
-        localFolder = fullfile(piRootPath,'local',n);
-        destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
-        % we might not need to download zip files every time, use
-        % resourceCombine.m 08/14 --zhenyi
-        destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
         % if file exists, skip
         if ~exist(localFolder,'dir') && ~exist(destName_recipe,'file')
             mkdir(localFolder)
-            
-            st.fileDownload(recipeFiles{downloadList(ii).index}{1}.name,...
-                'container type', 'acquisition' , ...
-                'container id',  recipe_acqID{downloadList(ii).index} ,...
-                'destination',destName_recipe);
+            thisRecipe{1}.download(destName_recipe);
+            % fprintf('%s is downloaded \n',thisRecipe{1}.name);
             if resourcesFlag
-                st.fileDownload(resourceFiles{downloadList(ii).index}{1}.name,...
-                    'container type', 'acquisition' , ...
-                    'container id',  resource_acqID{downloadList(ii).index} ,...
-                    'unzip', true, ...
-                    'destination',destName_resource);
+                thisResource{1}.download(destName_resource);
+                fprintf('%s is downloaded \n',thisResource{1}.name);
+                unzip(destName_resource);
+                delete([destName_resource,'.zip']);
             end
-            
         else
-            fprintf('%s found \n',n);
+            % fprintf('%s found \n',acqLabel);
         end
         assetRecipe{ii}.name   = destName_recipe;
         assetRecipe{ii}.count  = downloadList(ii).count;
-        assetRecipe{ii}.fwInfo = [resource_acqID{downloadList(ii).index},' ',resourceFiles{downloadList(ii).index}{1}.name];
-        %     if ~exist(assetRecipe{ii}.name,'file'), error('File not found');end
-        
+        assetRecipe{ii}.fwInfo = [acqs{thisIdx}.id,' ',thisResource{1}.name];
     end
     
     fprintf('%d Files downloaded.\n',nDownloads);
 else
+    % Download recipe from an acq with a specific label
+    thisAcq = session.acquisitions.findOne(sprintf('label=%s',acquisitionlabel));
+    localFolder = fullfile(piRootPath,'local',acquisitionlabel);
     
-    % download acquisition by given name;
-    for ii=1:length(recipeFiles)
-        if piContains(lower(recipeFiles{ii}{1}.name),acquisitionname)
-            thisRecipe = recipeFiles{ii}{1};
-            thisResource = resourceFiles{ii}{1};
-            thisRecipeID =  recipe_acqID{ii};
-            thisResourceID = resource_acqID{ii};
-            break;
-        end
-    end
-    [~,n,~] = fileparts(thisRecipe.name);
-    [~,n,~] = fileparts(n); % extract file name
-    % Download the scene to a destination zip file
-    localFolder = fullfile(piRootPath,'local',n);
-    
-    destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
-    destName_resource = fullfile(localFolder,sprintf('%s.zip',n));
-    if ~exist(localFolder,'dir')
+    destName_recipe = fullfile(localFolder,sprintf('%s.json',acquisitionlabel));
+    thisRecipe = stFileSelect(thisAcq.files,'type','source code');
+    destName_resource = fullfile(localFolder,sprintf('%s.zip',acquisitionlabel));
+    thisResource = stFileSelect(thisAcq.files,'type','CG Resource');
+    if ~exist(localFolder,'dir') && ~exist(destName_recipe,'file')
         mkdir(localFolder)
+        thisRecipe{1}.download(destName_recipe);
+        % fprintf('%s is downloaded \n',thisRecipe{1}.name);
+        if resourcesFlag
+            % We always unzip the resource and remove the zip file
+            thisResource{1}.download(destName_resource);
+            % fprintf('%s is downloaded \n',thisResource{1}.name);
+            unzip(destName_resource,localFolder);
+            delete(destName_resource);
+        end
+    else
+        % fprintf('%s found \n',acquisitionlabel);
     end
-    st.fileDownload(thisRecipe.name,...
-        'container type', 'acquisition' , ...
-        'container id',  thisRecipeID ,...
-        'destination',destName_recipe);
-    if resourcesFlag
-        st.fileDownload(thisResource.name,...
-            'container type', 'acquisition' , ...
-            'container id',  thisResourceID,...
-            'unzip', true, ...
-            'destination',destName_resource);
-    end
-    assetRecipe.name = destName_recipe;
-    assetRecipe.fwInfo = [thisResourceID,' ',thisResource.name];
-    fprintf('%s downloaded.\n',n);
+    
+    assetRecipe{1}.name  = destName_recipe;
+    assetRecipe{1}.fwInfo = [thisAcq.id,' ',thisResource{1}.name];
+    assetRecipe{1}.count  = nassets;
+
+    fprintf('%s downloaded.\n',acquisitionlabel);
 end
+
 end
 
 

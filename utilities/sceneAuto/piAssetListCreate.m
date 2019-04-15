@@ -1,14 +1,25 @@
 function assetlist = piAssetListCreate(varargin)
-%% Create an assetList for street elements on flywheel 
-% Input: 
-%        class: session name on flywheel;
-%        subclass: acquisition names on flywheel;
-% Output: 
-%       assetList: Assigned assets libList used for street elements;
+% Create an assetList for street elements on flywheel
+%
+% Syntax:
+%
+% 
+% Input:
+%  N/A
+% Key/val variables
+%   class:    session name on flywheel;
+%   subclass: acquisition names on flywheel
+%   scitran:  
+%
+% Output:
+%   assetList: Assigned assets libList used for street elements;
 %
 %
-%%
+% Zhenyi
+%
+% See also
 
+%%
 p = inputParser;
 p.addParameter('class','');
 p.addParameter('subclass','');
@@ -21,97 +32,68 @@ if isempty(st)
     st = scitran('stanfordlabs');
 end
 
-sessionname = p.Results.class;
+sessionname      = p.Results.class;
 acquisitionname  = p.Results.subclass;
 
-%%
-hierarchy = st.projectHierarchy('Graphics assets');
-sessions     = hierarchy.sessions;
+%% Find all the acuisitions
+project = st.lookup('wandell/Graphics assets');
+session = project.sessions.findOne(sprintf('label=%s',sessionname));
+acqs    = session.acquisitions();
 
 %%
-for ii=1:length(sessions)
-    if isequal(lower(sessions{ii}.label),sessionname)
-        thisSession = sessions{ii};
-        break;
-    end
-end
-containerID = idGet(thisSession,'data type','session');
-fileType_json ='source code'; % json
-[recipeFiles, recipe_acqID] = st.dataFileList('session', containerID, fileType_json);
-fileType = 'CG Resource';
-[resourceFiles, resource_acqID] = st.dataFileList('session', containerID, fileType);
-%%
-nDatabaseAssets = length(recipeFiles);
-% assetList = randi(nDatabaseAssets,nassets,1);
-% % count objectInstance
-% downloadList = piObjectInstanceCount(assetList);
-% assetRecipe = cell(nDownloads,1);
-
-%%
-
+nDatabaseAssets = length(acqs);
 if isempty(acquisitionname)
+    %% No acquisition name. Loop across all of them.
+    %
+    % We had a variable called thisIdx, but it was undefined.
+    % So I replaced it with the loop variable, ii.
+    % Causing problems, I fear (BW).
     for ii = 1:nDatabaseAssets
-        [~,n,~] = fileparts(recipeFiles{ii}{1}.name);
-        [~,n,~] = fileparts(n); % extract file name
-        % Download the scene to a destination zip file
-        localFolder = fullfile(piRootPath,'local','AssetLists',n);
-
-        destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
+        acqLabel = acqs{ii}.label;
+        localFolder = fullfile(piRootPath,'local','AssetLists',acqLabel);
+        destName_recipe = fullfile(localFolder,sprintf('%s.json',acqLabel));
         if ~exist(localFolder,'dir')
             mkdir(localFolder)
         end
-        st.fileDownload(recipeFiles{ii}{1}.name,...
-            'container type', 'acquisition' , ...
-            'container id',  recipe_acqID{ii} ,...
-            'destination',destName_recipe);
-        %%
+        
+        % Download the recipe and the resources
+        thisRecipe   = stFileSelect(acqs{ii}.files,'type','source code');
+        thisResource = stFileSelect(acqs{ii}.files,'type','CG Resource');
+        thisRecipe{1}.download(destName_recipe);
+        
+        % Read the recipe and create an entry in the assetlist
         thisR = jsonread(destName_recipe);
-%         assetRecipe{ii}.name   = destName_recipe;
-%         assetRecipe{ii}.count  = downloadList(ii).count;
-        assetlist(ii).name = n;
+        assetlist(ii).name = acqLabel;
         assetlist(ii).material.list = thisR.materials.list;
         assetlist(ii).material.txtLines = thisR.materials.txtLines;
         assetlist(ii).geometry = thisR.assets;
         assetlist(ii).geometryPath = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
-        assetlist(ii).fwInfo       = [resource_acqID{ii},' ',resourceFiles{ii}{1}.name];
+        assetlist(ii).fwInfo       = [acqs{ii}.id,' ',thisResource{1}.name];
     end
     
-    fprintf('%d files added to the list.\n',nDatabaseAssets);
+    fprintf('%d files added to the asset list.\n',nDatabaseAssets);
 else
-    kk=1;
-    for ii=1:length(recipeFiles)
-        if piContains(lower(recipeFiles{ii}{1}.name),acquisitionname)
-            thisAcq{kk} = recipeFiles{ii}{1};
-            thisID{kk} =  recipe_acqID{ii};
-            resFile{kk} = resourceFiles{ii}{1};
-            resID{kk} = resource_acqID{ii};
-            kk = kk+1;
-        end
-    end
+    %% We have the name, so just one.  Not sure why we have a loop on dd (BW)
+    thisAcq = stSelect(acqs,'label',acquisitionname);
     for dd = 1:length(thisAcq)
-    [~,n,~] = fileparts(thisAcq{dd}.name);
-    [~,n,~] = fileparts(n); % extract file name
-    % Download the scene to a destination zip file
-    localFolder = fullfile(piRootPath,'local','AssetLists',n);
-
-    destName_recipe = fullfile(localFolder,sprintf('%s.json',n));
-    if ~exist(localFolder,'dir')
-        mkdir(localFolder)
-    end
-    st.fileDownload(thisAcq{dd}.name,...
-        'container type', 'acquisition' , ...
-        'container id',  thisID{dd} ,...
-        'destination',destName_recipe);
+        acqLabel = thisAcq{dd}.label;
+        localFolder = fullfile(piRootPath,'local','AssetLists',acqLabel);
+        
+        destName_recipe = fullfile(localFolder,sprintf('%s.json',acqLabel));
+        if ~exist(localFolder,'dir')
+            mkdir(localFolder)
+        end
+        thisRecipe = stFileSelect(thisAcq{dd}.files,'type','source code');
+        thisResource = stFileSelect(thisAcq{dd}.files,'type','CG Resource');
+        thisRecipe{1}.download(destName_recipe);
         thisR = jsonread(destName_recipe);
-%         assetRecipe{dd}.name   = destName_recipe;
-%         assetRecipe{dd}.count  = downloadList(dd).count;
-        assetlist(dd).name = n;
+        assetlist(dd).name = acqLabel;
         assetlist(dd).material.list     = thisR.materials.list;
         assetlist(dd).material.txtLines = thisR.materials.txtLines;
         assetlist(dd).geometry          = thisR.assets;
         assetlist(dd).geometryPath      = fullfile(localFolder,'scene','PBRT','pbrt-geometry');
-        assetlist(dd).fwInfo            = [resID{dd},' ',resFile{dd}.name];
+        assetlist(dd).fwInfo            = [thisAcq{dd}.id,' ',thisResource{1}.name];
     end
-    fprintf('%s added to the list.\n',n);
+    fprintf('%s added to the list.\n',acqLabel);
 end
 end

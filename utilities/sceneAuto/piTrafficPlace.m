@@ -34,16 +34,8 @@ function [assetsPosList,assets] = piTrafficPlace(trafficflow,varargin)
 
 %% Parse parameterss
 p = inputParser;
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
 
+varargin =ieParamFormat(varargin);
 p.addParameter('nScene',1);
 p.addParameter('timestamp',[]);
 p.addParameter('scitran',[]);
@@ -52,17 +44,17 @@ p.addParameter('resources',true);
 
 p.parse(varargin{:});
 
-nScene =p.Results.nScene;
-timestamp = p.Results.timestamp;
+nScene       = p.Results.nScene;
+timestamp    = p.Results.timestamp;
 trafficlight = p.Results.trafficlight;
-resources = p.Results.resources;
+resources    = p.Results.resources;
 st = p.Results.scitran;
 
-if isempty(st)
-    st = scitran('stanfordlabs');
-end
+if isempty(st), st = scitran('stanfordlabs'); end
+
 %% Download asssets with respect to the number and class of Sumo output.
-if isfield(trafficflow(timestamp).objects,'car') || isfield(trafficflow(timestamp).objects,'passenger')
+if isfield(trafficflow(timestamp).objects,'car') || ...
+        isfield(trafficflow(timestamp).objects,'passenger')
     ncars = length(trafficflow(timestamp).objects.car);
     %     [~,carList] = piAssetListCreate('class','car',...
     %                                       'scitran',st);
@@ -112,8 +104,8 @@ assets = piAssetCreate('ncars',ncars,...
     'scitran',st);
 
 %% Classified mobile object positions.
-% Buildings and trees are static objects, placed separately
 
+% Buildings and trees are static objects, placed separately
 assets_updated = assets;
 
 if nScene == 1
@@ -133,13 +125,17 @@ if nScene == 1
         % transformation of both.
         for jj = 1:length(assets_shuffled.(assetClass))
              assets_shuffled.(assetClass)(jj).motion=[];
-            for ii = 1:numel(trafficflow(timestamp+1).objects.(assetClass))
-                if strcmp(assets_shuffled.(assetClass)(jj).name,trafficflow(timestamp+1).objects.(assetClass)(ii).name)
-                    assets_shuffled.(assetClass)(jj).motion.pos = trafficflow(timestamp+1).objects.(assetClass)(ii).pos;
-                    assets_shuffled.(assetClass)(jj).motion.orientation = trafficflow(timestamp+1).objects.(assetClass)(ii).orientation;
-                    assets_shuffled.(assetClass)(jj).motion.slope = trafficflow(timestamp+1).objects.(assetClass)(ii).slope;
-                end
-            end
+             try
+                 for ii = 1:numel(trafficflow(timestamp+1).objects.(assetClass))
+                     if strcmp(assets_shuffled.(assetClass)(jj).name,trafficflow(timestamp+1).objects.(assetClass)(ii).name)
+                         assets_shuffled.(assetClass)(jj).motion.pos = trafficflow(timestamp+1).objects.(assetClass)(ii).pos;
+                         assets_shuffled.(assetClass)(jj).motion.orientation = trafficflow(timestamp+1).objects.(assetClass)(ii).orientation;
+                         assets_shuffled.(assetClass)(jj).motion.slope = trafficflow(timestamp+1).objects.(assetClass)(ii).slope;
+                     end
+                 end
+             catch
+                 fprintf('% not found in next timestamp \n',assetClass);
+             end
             if isempty(assets_shuffled.(assetClass)(jj).motion)
                 % there are cases when a car is going out of boundary or
                 % some else reason, sumo decides to kill this car, so in
@@ -154,7 +150,6 @@ if nScene == 1
                 assets_shuffled.(assetClass)(jj).motion.pos = to;
                 assets_shuffled.(assetClass)(jj).motion.orientation = assets_shuffled.(assetClass)(jj).orientation;
                 assets_shuffled.(assetClass)(jj).motion.slope = assets_shuffled.(assetClass)(jj).slope;
-
             end
         end
         for ii = 1: length(assets.(assetClass))

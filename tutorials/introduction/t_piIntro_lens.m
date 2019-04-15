@@ -42,17 +42,17 @@ dest = piPBRTFetch(sceneName,'pbrtversion',3,...
 
 % This is the PBRT scene file inside the output directory
 inFile = fullfile(inFolder,sceneName,sceneFileName);
-thisR = piRead(inFile);
+thisR  = piRead(inFile);
 
 % We will output the calculations to a temp directory.  
 outFolder = fullfile(tempdir,sceneName);
-outFile = fullfile(outFolder,[sceneName,'.pbrt']);
+outFile   = fullfile(outFolder,[sceneName,'.pbrt']);
 thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*0.5));
-thisR.set('pixel samples',64*1);   % Lots of rays for quality.
+thisR.set('film resolution',round([600 400]*2.0));  % 1.5 is pretty high res
+thisR.set('pixel samples',64*8);                    % 4 is Lots of rays .
 
 %% Set output file
 
@@ -63,7 +63,6 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-% lensfile = 'fisheye.87deg.6.0mm.dat';
 % 22deg is the half width of the field of view
 lensfile = 'dgauss.22deg.50.0mm.dat';
 fprintf('Using lens: %s\n',lensfile);
@@ -80,18 +79,24 @@ thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 
 % PBRT estimates the distance.  It is not perfectly aligned to the depth
 % map, but it is close.
-thisR.set('focus distance',0.45);
+thisR.set('focus distance',0.6);
 
 % The FOV is not used for the 'realistic' camera.
 % The FOV is determined by the lens. 
 
-% This is the size of the film/sensor in millimeters
-thisR.set('film diagonal',40);
+% This is the size of the film/sensor in millimeters (default 22)
+thisR.set('film diagonal',22);
+
+% Pick out a bit of the image to look at.  Middle dimension is up.
+% Third dimension is z.  I picked a from/to that put the ruler in the
+% middle.  The in focus is about the pawn or rook.
+thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
+thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
 thisR.integrator.subtype = 'path';  
-thisR.sampler.subtype = 'sobol';
+thisR.sampler.subtype    = 'sobol';
 
 % This value determines the number of ray bounces.  If the scene has
 % glass or mirrors, we need to have at least 2 or more.
@@ -101,7 +106,6 @@ thisR.sampler.subtype = 'sobol';
 
 % Change this for depth of field effects.
 thisR.set('aperture diameter',6);
-
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
@@ -109,8 +113,9 @@ oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value)
 oiWindow(oi);
 
 %% Change this for depth of field effects.
-thisR.set('aperture diameter',3);
 
+
+thisR.set('aperture diameter',3);
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
@@ -118,8 +123,8 @@ oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value)
 oiWindow(oi);
 
 %% Change again for depth of field effects.
-thisR.set('aperture diameter',1);
 
+thisR.set('aperture diameter',1);
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');

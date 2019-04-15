@@ -76,19 +76,17 @@ if piContains(object_list(1).name,'tree')
             objectPosition_list(count).size.w = edgeSize;
             objectPosition_list(count).size.l = edgeSize;
             objectPosition_list(count).rotate = sidewalk_list(jj).direction;
+            
             % generate random number for tree_list
-            if (num1==1)
-                randnum1=1;
-            else if (num1>1)
-                    randnum1=randi(num1);
-                end
+            randnum1 = 0; randnum2 = 0;
+            if (num1==1),    randnum1=1;
+            elseif (num1>1), randnum1=randi(num1);
             end
-            if (num2==1)
-                randnum2=1;
-            else if (num2>1)
-                    randnum2=randi(num2);
-                end
+            
+            if (num2==1),     randnum2=1;
+            elseif (num2>1),  randnum2=randi(num2);
             end
+            
             switch(type)
                 case 'T'
                     objectPosition_list(count).name = sprintf('%s_tall_%03d',objname, randnum1);
@@ -130,16 +128,6 @@ if piContains(object_list(1).name,'streetlight')
                     objectPosition_list(count).rotate = sidewalk_list(jj).direction;
                     objectPosition_list(count).size.w = edgeSize;
                     objectPosition_list(count).size.l = edgeSize;
-%                 else
-%                     center = start_point;
-%                     point = start_point+[object_list(mm).geometry(kk).position(1),object_list(mm).geometry(kk).position(3)];
-%                     theta = sidewalk_list(jj).direction;
-%                     tmp = piPointRotate(point, center, theta);
-%                     objectPosition_list(count).position = [tmp(1), sidewalk_list(jj).height+object_list(mm).geometry(kk).position(2), tmp(2)];
-%                     objectPosition_list(count).rotate = sidewalk_list(jj).direction;
-%                     objectPosition_list(count).size.w = 0;
-%                     objectPosition_list(count).size.l = 0;
-                    
                 end
                 
                 

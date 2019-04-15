@@ -2,11 +2,11 @@ function [r1,r2,r3] = piDCM2angle( dcm )
 % Simplified version of the Aerospace toolbox angle conversion utility
 %
 % Syntax:
+%  [r1,r2,r3] = piDCM2angle( dcm )
 %
 % Brief description:
-%   
-% The case that we compute is this one.  There are many others and
-% various options in the Mathworks dcm2angle.m code
+%  The case that we compute is this one.  There are many others and
+%  various options in the Mathworks dcm2angle.m code
 %
 %     [          cy*cz,          cy*sz,            -sy]
 %     [ sy*sx*cz-sz*cx, sy*sx*sz+cz*cx,          cy*sx]
@@ -19,33 +19,32 @@ function [r1,r2,r3] = piDCM2angle( dcm )
 %   N/A
 %
 % Outputs:
-%  zAngle, yAngle, xAngle:  vectors of rotation angles for the matrices
+%  zAngle, yAngle, xAngle:  Vectors of rotation angles for the matrices
 %
 % See also:
-%
-
-% TODO
-%   Zhenyi to make sure that this function returns the same as dcm2angle
-%   in the Aerospace toolbox for this case.
+%    piRotationDefault, piGeometryRead
 
 % Examples:
 %{
-dcm(:,:,1) = eye(3);
-dcm(:,:,2) = eye(3);
-[z,y,x] = piDCM2angle(dcm)
+ % Should be all zeros
+ dcm(:,:,1) = eye(3);
+ dcm(:,:,2) = eye(3);
+ [z,y,x] = piDCM2angle(dcm)
+%}
+%{
+
 %}
 
-% Should validate here
-
-%% This is the transform
+%% Should validate here
 
 % TL: Validate seems to fail for certain scenes. Commenting out for now
 % until we figure out what's going on.
 % validatedcm(dcm);
 
+%% This is the transform
+
 [r1,r2,r3] = threeaxisrot( dcm(1,2,:), dcm(1,1,:), -dcm(1,3,:), ...
-    dcm(2,3,:), dcm(3,3,:), ...
-    -dcm(2,1,:), dcm(2,2,:));
+    dcm(2,3,:), dcm(3,3,:));
 
 r1 = r1(:);
 r2 = r2(:);
@@ -53,8 +52,9 @@ r3 = r3(:);
 
 end
 
-function [r1,r2,r3] = threeaxisrot(r11, r12, r21, r31, r32, r11a, r12a)
+function [r1,r2,r3] = threeaxisrot(r11, r12, r21, r31, r32)
 % find angles for rotations about X, Y, and Z axes
+
 r1 = atan2( r11, r12 );
 r2 = asin( r21 );
 r3 = atan2( r31, r32 );
