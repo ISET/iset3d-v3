@@ -51,8 +51,8 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*1.5));
-thisR.set('pixel samples',64*6);   % Lots of rays for quality.
+thisR.set('film resolution',round([600 400]*0.5));
+thisR.set('pixel samples',64*1);   % Lots of rays for quality.
 
 %% Set output file
 
@@ -63,9 +63,9 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-lensfile = 'fisheye.87deg.6.0mm.dat';
+lensfile = 'fisheye.87deg.6.0mm.json';
 fprintf('Using lens: %s\n',lensfile);
-thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
+thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
 %{
 % You might adjust the focus for different scenes.  Use piRender with
