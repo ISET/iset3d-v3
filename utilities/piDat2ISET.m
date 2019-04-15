@@ -141,7 +141,7 @@ switch opticsType
         end
         
     otherwise
-        errror('Unknown optics type %s\n',opticsType);       
+        error('Unknown optics type %s\n',opticsType);       
 end
 end
 

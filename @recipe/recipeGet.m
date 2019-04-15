@@ -122,7 +122,7 @@ switch ieParamFormat(param)
         val = thisR.camera.subtype;
         if isequal(val,'perspective'), val = 'pinhole';
         elseif isequal(val,'environment'), val = 'environment';
-        elseif ismember(val,{'realisticDiffraction','realisticEye','realistic'})
+        elseif ismember(val,{'realisticDiffraction','realisticEye','realistic','omni'})
             val = 'lens';
         end
     case 'lensfile'

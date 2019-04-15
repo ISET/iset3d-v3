@@ -64,6 +64,11 @@ switch cameraType
             camera.chromaticAberrationEnabled.type = 'bool';
             camera.chromaticAberrationEnabled.value = 'false';
         elseif(pbrtVersion == 3)
+            [~,~,e] = fileparts(lensFile);
+            if(~strcmp(e,'.dat'))
+                error('Realistic camera needs .dat lens file.');
+            end
+            
             camera.type = 'Camera';
             camera.subtype = 'realistic';
             camera.lensfile.type = 'string';
@@ -73,7 +78,20 @@ switch cameraType
             camera.focusdistance.type = 'float';
             camera.focusdistance.value = 10; % mm
         end
+    case {'omni'}
+        [~,~,e] = fileparts(lensFile);
+        if(~strcmp(e,'.json'))
+            error('Omni camera needs .json lens file.');
+        end
         
+        camera.type = 'Camera';
+        camera.subtype = 'omni';
+        camera.lensfile.type = 'string';
+        camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
+        camera.aperturediameter.type = 'float';
+        camera.aperturediameter.value = 5;    % mm
+        camera.focusdistance.type = 'float';
+        camera.focusdistance.value = 10; % mm
     case {'microlens','lightfield','plenoptic'}
         
         % General parameters
