@@ -70,6 +70,8 @@ localTF = fullfile(piRootPath,'local','trafficflow');
 
 if ~exist(localTF,'dir'), mkdir(localTF);end
 copyfile(trafficflowPath,localTF);
+disp('*** Copied traffic flow')
+
 %% Scene Generation
 
 % 20 seconds
@@ -81,26 +83,29 @@ disp('*** Scene Generating.....')
     'timeStamp',timestamp,...
     'cloudRender',cloudRender,...
     'scitran',st);
-disp('*** Scene Generation completed.')
-toc
-
 thisR.metadata.sumo.trafficflowdensity = trafficflowDensity;
 thisR.metadata.sumo.timestamp          = timestamp;
+toc
+
+disp('*** Scene Generation completed.')
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
 dayTime = '13:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
+disp('Skymap added')
 
 %% Render parameters
+lensname = 'wide.56deg.6.0mm.dat';
+thisR.camera = piCameraCreate('realistic','lens file',lensname);
+
 thisR.set('film resolution',[1280 720]);
-thisR.set('pixel samples',128);
+thisR.set('pixel samples',64);   % 1024 for high resolution
 thisR.set('film diagonal',10);
 thisR.set('nbounces',10);
 thisR.set('aperture',1);
-lensname = 'wide.56deg.6.0mm.dat';
-thisR.camera = piCameraCreate('realistic','lens file',lensname);
+disp('Camera created')
 
 %% Place the camera
 
@@ -136,13 +141,14 @@ thisR = piMotionBlurEgo(thisR,'nextTrafficflow',nextTrafficflow,...
 %}
 
 camPos = 'front';
-thisVelocity   = 0 ;
-CamOrientation = 270;
-thisR.lookAt.from = [1.5;2.7;20];
-thisR.lookAt.to   = [1.5;1.9;150];
+cameraVelocity = 0 ;            % Camera velocity
+CamOrientation = 270;           % Not sure
+thisR.lookAt.from = [0;3;40];   % X,Y,Z
+thisR.lookAt.to   = [0;1.9;150];
 thisR.lookAt.up   = [0;1;0];
 
 thisR.set('exposure time',1/200);
+disp('Camera positioned')
 
 %% Write out the scene into a PBRT file
 
@@ -160,7 +166,7 @@ if ~exist(outputDir,'dir'), mkdir(outputDir); end
 filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
                             sceneType,...
                             dayTime,...
-                            thisVelocity,...
+                            cameraVelocity,...
                             thisR.lookAt.from(3),...
                             camPos,...
                             CamOrientation,...
@@ -173,19 +179,22 @@ piWrite(thisR,'creatematerials',true,...
     'thistrafficflow',thisTrafficflow);
 
 % edit(thisR.outputFile)
-
+disp('Scene written');
 %% Upload the information to Flywheel.
 
 % This creates a new acquisition in the scenes_pbrt session.
 % Each acquisition is a particular scene, like this one.
 gcp.fwUploadPBRT(thisR,'scitran',st,'road',road);
-
+disp('Scene uploaded')
 %% Add this target scene to the target list
+
+% Current targets
+gcp.targetsList;
 
 % Add a target to the list
 gcp.addPBRTTarget(thisR);
 
-% Show the target list to the user
+% Show the updated target list to the user
 gcp.targetsList;
 
 % You can delete a single target from the list this way
@@ -203,10 +212,10 @@ gcp.targetsList;
 
 % Calling this starts the job and lets you know about it.
 gcp.render(); 
-
+disp('Initiated rendering');
 %% Monitor the processes on GCP
 %
-% The best way to monitor jobs progress is to go to the web page
+% One way to monitor jobs progress is to go to the web page
 %
 %   https://console.cloud.google.com 
 %
@@ -216,12 +225,18 @@ gcp.render();
 % You can get a lot of information about the job this way
 %{   
    podname = gcp.podsList
-   gcp.PodDescribe(podname{end})    % Prints out what has happened
-   cmd = gcp.Podlog(podname{end});  % Creates a command to show the running log
+   gcp.PodDescribe(podname{1})    % Prints out what has happened
+   cmd = gcp.Podlog(podname{1});  % Creates a command to show the running log
 %}
 
 %% Download files from Flywheel
 
+% Run this after the render command is complete.  We put the pause here so
+% that running the whole script will not execute until you are ready.
+disp('Pausing for rendering to complete')
+pause;
+
+%%
 destDir = fullfile(outputDir,'renderings');
 
 disp('Downloading PBRT dat and converting to ISET...');
