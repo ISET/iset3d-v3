@@ -45,7 +45,7 @@ str = gcp.configList;
 % This can take 20-30 minutes
 
 % Available sceneTypes: city1, city2, city3, city4, citymix, suburb
-sceneType = 'city1';
+sceneType = 'city2';
 
 % To see the available roadTypes use piRoadTypes
 roadType = 'city_cross_4lanes_002';
@@ -61,6 +61,8 @@ timestamp = 15;
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
 
+disp('*** Setup parameters')
+
 %% Only for Demo
 
 % Copy trafficflow from data folder to local folder
@@ -70,6 +72,8 @@ localTF = fullfile(piRootPath,'local','trafficflow');
 
 if ~exist(localTF,'dir'), mkdir(localTF);end
 copyfile(trafficflowPath,localTF);
+disp('*** Copied traffic flow')
+
 %% Scene Generation
 
 % 20 seconds
@@ -81,26 +85,29 @@ disp('*** Scene Generating.....')
     'timeStamp',timestamp,...
     'cloudRender',cloudRender,...
     'scitran',st);
-disp('*** Scene Generation completed.')
-toc
-
 thisR.metadata.sumo.trafficflowdensity = trafficflowDensity;
 thisR.metadata.sumo.timestamp          = timestamp;
+toc
+
+disp('*** Scene Generation completed.')
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
 dayTime = '13:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
+disp('*** Skymap added')
 
 %% Render parameters
-thisR.set('film resolution',[1280 720]);
-thisR.set('pixel samples',128);
+lensname = 'wide.56deg.6.0mm.dat';
+thisR.camera = piCameraCreate('realistic','lens file',lensname);
+
+thisR.set('film resolution',[1280 720]*1.5);
+thisR.set('pixel samples',1024);   % 1024 for high resolution
 thisR.set('film diagonal',10);
 thisR.set('nbounces',10);
 thisR.set('aperture',1);
-lensname = 'wide.56deg.6.0mm.dat';
-thisR.camera = piCameraCreate('realistic','lensFile',lensname);
+disp('*** Camera created')
 
 %% Place the camera
 
@@ -135,23 +142,15 @@ thisR = piMotionBlurEgo(thisR,'nextTrafficflow',nextTrafficflow,...
                                'fps',60);
 %}
 
-camPos = 'front';
-thisVelocity   = 0 ;
-CamOrientation = 270;
-thisR.lookAt.from = [1.5;2.7;20];
-thisR.lookAt.to   = [1.5;1.9;150];
+camPos = 'front';               % Position of the camera on the car
+cameraVelocity = 0 ;            % Camera velocity
+CamOrientation = 270;           % Starts at x-axis.  -90 (or 270) to the z axis.
+thisR.lookAt.from = [0;3;40];   % X,Y,Z
+thisR.lookAt.to   = [0;1.9;150];
 thisR.lookAt.up   = [0;1;0];
 
 thisR.set('exposure time',1/200);
-
-% 
-% % Open at time zero
-% thisR.camera.shutteropen.type = 'float';
-% thisR.camera.shutteropen.value = 0;  
-% 
-% % Shutter duration
-% thisR.camera.shutterclose.type = 'float';
-% thisR.camera.shutterclose.value = 1/200;   % 5 ms exposure
+disp('*** Camera positioned')
 
 %% Write out the scene into a PBRT file
 
@@ -169,7 +168,7 @@ if ~exist(outputDir,'dir'), mkdir(outputDir); end
 filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
                             sceneType,...
                             dayTime,...
-                            thisVelocity,...
+                            cameraVelocity,...
                             thisR.lookAt.from(3),...
                             camPos,...
                             CamOrientation,...
@@ -182,19 +181,22 @@ piWrite(thisR,'creatematerials',true,...
     'thistrafficflow',thisTrafficflow);
 
 % edit(thisR.outputFile)
-
+disp('*** Scene written');
 %% Upload the information to Flywheel.
 
 % This creates a new acquisition in the scenes_pbrt session.
 % Each acquisition is a particular scene, like this one.
 gcp.fwUploadPBRT(thisR,'scitran',st,'road',road);
-
+disp('*** Scene uploaded')
 %% Add this target scene to the target list
+
+% Current targets
+gcp.targetsList;
 
 % Add a target to the list
 gcp.addPBRTTarget(thisR);
 
-% Show the target list to the user
+% Show the updated target list to the user
 gcp.targetsList;
 
 % You can delete a single target from the list this way
@@ -212,29 +214,41 @@ gcp.targetsList;
 
 % Calling this starts the job and lets you know about it.
 gcp.render(); 
-
+disp('*** Initiated rendering');
 %% Monitor the processes on GCP
 %
-% The best way to monitor jobs progress is to go to the web page
+% One way to monitor jobs progress is to go to the web page
 %
-%   https://console.cloud.google.com 
+%   https://console.cloud.google.com
 %
-% And then go to the Kubernetes part
+% You can see the compute engine activity as it rises and falls.
 %
+% You can go to the Kubernetes part to see which clusters are present.
+%
+nActive = gcp.jobsList;
 
-% You can get a lot of information about the job this way
+% You can get a lot of information about the job this way.  Examining this
+% is useful when there is an error.  It is not needed, but watching it
+% scroll lets you see what is happening moment to moment.
 %{   
    podname = gcp.podsList
-   gcp.PodDescribe(podname{1})    % Prints out what has happened
-   cmd = gcp.Podlog(podname{1});  % Creates a command to show the running log
+   gcp.PodDescribe(podname{end})    % Prints out what has happened
+   cmd = gcp.Podlog(podname{end});  % Creates a command to show the running log
 %}
 
 %% Download files from Flywheel
 
+% Run this after the render command is complete.  We put the pause here so
+% that running the whole script will not execute until you are ready.
+disp('Pausing for rendering to complete')
+pause;
+
+%%
 destDir = fullfile(outputDir,'renderings');
 
 disp('Downloading PBRT dat and converting to ISET...');
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
+disp('*** Downloaded ieObject')
 
 %% Show the OI and some metadata
 

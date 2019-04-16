@@ -236,7 +236,8 @@ switch param
         % Film parameters
     case 'filmdiagonal'
         thisR.film.diagonal.type = 'float';
-        thisR.film.diagonal.value = 35;
+        thisR.film.diagonal.value = val;
+        
     case {'filmdistance'}
         thisR.camera.filmdistance.type = 'float';
         thisR.camera.filmdistance.value = val;

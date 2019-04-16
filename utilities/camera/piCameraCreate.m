@@ -16,15 +16,32 @@ function camera = piCameraCreate(cameraType,varargin)
 %
 % TL, SCIEN STANFORD 2017 
 
+% Examples:
+%{
+c = piCameraCreate('pinhole');
+%}
+%{
+lensname = 'dgauss.22deg.12.5mm.dat';
+c = piCameraCreate('realistic');
+%}
+%{
+c = piCameraCreate('lightfield');
+%}
+%{
+lensname = 'dgauss.22deg.12.5mm.json';
+c = piCameraCreate('omni','lens file',lensname);
+%}
+
 % PROGRAMMING
 %   TODO: Perhaps this should be a function of the recipe class?
 %
-%   TODO:   implement things like this for the camera type values
+%   TODO: Implement things like this for the camera type values
 %
 %           piCameraCreate('pinhole','fov',val);
 %
 
 %% Check input
+varargin = ieParamFormat(varargin);
 
 p = inputParser;
 validCameraTypes = {'pinhole','realistic','omni', 'humaneye','lightfield'};
@@ -40,11 +57,11 @@ switch cameraType
     otherwise
         lensDefault = '';
 end
-p.addParameter('lensFile',lensDefault,@(x)(exist(x,'file')));
+p.addParameter('lensfile',lensDefault,@(x)(exist(x,'file')));
 
 p.parse(cameraType,varargin{:});
 
-lensFile      = p.Results.lensFile;
+lensFile      = p.Results.lensfile;
 
 %% Initialize the default camera type
 switch cameraType
@@ -57,7 +74,7 @@ switch cameraType
     case {'realistic'}
         [~,~,e] = fileparts(lensFile);
         if(~strcmp(e,'.dat'))
-            error('Realistic camera needs .dat lens file.');
+            error('Realistic camera needs *.dat lens file.');
         end
         
         camera.type = 'Camera';
@@ -72,7 +89,7 @@ switch cameraType
     case {'omni'}
         [~,~,e] = fileparts(lensFile);
         if(~strcmp(e,'.json'))
-            error('Omni camera needs .json lens file.');
+            error('Omni camera needs *.json lens file.');
         end
         
         camera.type = 'Camera';
@@ -84,9 +101,8 @@ switch cameraType
         camera.focusdistance.type = 'float';
         camera.focusdistance.value = 10; % mm
         
-    case {'microlens'}
-        % Use to allow'lightfield','plenoptic'
-        % General parameters
+    case {'lightfield'}
+        % Use to allow 'microlens' and'plenoptic'
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
@@ -142,7 +158,7 @@ switch cameraType
         camera.ior4.value = ''; % FILL IN
 
     otherwise
-        error('Cannot recognize camera type.');
+        error('Cannot recognize camera type, %s\n.', cameraType);
 end
 
 end
