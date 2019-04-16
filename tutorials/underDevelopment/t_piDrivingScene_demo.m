@@ -56,7 +56,7 @@ trafficflowDensity = 'medium';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 
 % simulation that we record the data. 
-timestamp = 45;
+timestamp = 15;
 
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
@@ -100,7 +100,7 @@ thisR.set('film diagonal',10);
 thisR.set('nbounces',10);
 thisR.set('aperture',1);
 lensname = 'wide.56deg.6.0mm.dat';
-thisR.camera = piCameraCreate('realistic','lensFile',lensname,'pbrtVersion',3);
+thisR.camera = piCameraCreate('realistic','lensFile',lensname);
 
 %% Place the camera
 
@@ -181,6 +181,8 @@ piWrite(thisR,'creatematerials',true,...
     'overwriteresources',false,'lightsFlag',false,...
     'thistrafficflow',thisTrafficflow);
 
+% edit(thisR.outputFile)
+
 %% Upload the information to Flywheel.
 
 % This creates a new acquisition in the scenes_pbrt session.
@@ -196,8 +198,11 @@ gcp.addPBRTTarget(thisR);
 gcp.targetsList;
 
 % You can delete a single target from the list this way
-% val = 2;
-% gcp.targetDelete(val)
+%{
+ val = 1;
+ gcp.targetDelete(val);
+ gcp.targetsList;
+%}
 
 %% Send the rendering job to the google cloud
 
