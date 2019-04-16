@@ -45,7 +45,7 @@ str = gcp.configList;
 % This can take 20-30 minutes
 
 % Available sceneTypes: city1, city2, city3, city4, citymix, suburb
-sceneType = 'city1';
+sceneType = 'city2';
 
 % To see the available roadTypes use piRoadTypes
 roadType = 'city_cross_4lanes_002';
@@ -60,6 +60,8 @@ timestamp = 15;
 
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
+
+disp('*** Setup parameters')
 
 %% Only for Demo
 
@@ -94,18 +96,18 @@ disp('*** Scene Generation completed.')
 dayTime = '13:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
-disp('Skymap added')
+disp('*** Skymap added')
 
 %% Render parameters
 lensname = 'wide.56deg.6.0mm.dat';
 thisR.camera = piCameraCreate('realistic','lens file',lensname);
 
-thisR.set('film resolution',[1280 720]);
-thisR.set('pixel samples',64);   % 1024 for high resolution
+thisR.set('film resolution',[1280 720]*1.5);
+thisR.set('pixel samples',1024);   % 1024 for high resolution
 thisR.set('film diagonal',10);
 thisR.set('nbounces',10);
 thisR.set('aperture',1);
-disp('Camera created')
+disp('*** Camera created')
 
 %% Place the camera
 
@@ -140,15 +142,15 @@ thisR = piMotionBlurEgo(thisR,'nextTrafficflow',nextTrafficflow,...
                                'fps',60);
 %}
 
-camPos = 'front';
+camPos = 'front';               % Position of the camera on the car
 cameraVelocity = 0 ;            % Camera velocity
-CamOrientation = 270;           % Not sure
+CamOrientation = 270;           % Starts at x-axis.  -90 (or 270) to the z axis.
 thisR.lookAt.from = [0;3;40];   % X,Y,Z
 thisR.lookAt.to   = [0;1.9;150];
 thisR.lookAt.up   = [0;1;0];
 
 thisR.set('exposure time',1/200);
-disp('Camera positioned')
+disp('*** Camera positioned')
 
 %% Write out the scene into a PBRT file
 
@@ -179,13 +181,13 @@ piWrite(thisR,'creatematerials',true,...
     'thistrafficflow',thisTrafficflow);
 
 % edit(thisR.outputFile)
-disp('Scene written');
+disp('*** Scene written');
 %% Upload the information to Flywheel.
 
 % This creates a new acquisition in the scenes_pbrt session.
 % Each acquisition is a particular scene, like this one.
 gcp.fwUploadPBRT(thisR,'scitran',st,'road',road);
-disp('Scene uploaded')
+disp('*** Scene uploaded')
 %% Add this target scene to the target list
 
 % Current targets
@@ -212,18 +214,22 @@ gcp.targetsList;
 
 % Calling this starts the job and lets you know about it.
 gcp.render(); 
-disp('Initiated rendering');
+disp('*** Initiated rendering');
 %% Monitor the processes on GCP
 %
 % One way to monitor jobs progress is to go to the web page
 %
-%   https://console.cloud.google.com 
+%   https://console.cloud.google.com
 %
-% And then go to the Kubernetes part
+% You can see the compute engine activity as it rises and falls.
+%
+% You can go to the Kubernetes part to see which clusters are present.
 %
 nActive = gcp.jobsList;
 
-% You can get a lot of information about the job this way
+% You can get a lot of information about the job this way.  Examining this
+% is useful when there is an error.  It is not needed, but watching it
+% scroll lets you see what is happening moment to moment.
 %{   
    podname = gcp.podsList
    gcp.PodDescribe(podname{end})    % Prints out what has happened
@@ -242,6 +248,7 @@ destDir = fullfile(outputDir,'renderings');
 
 disp('Downloading PBRT dat and converting to ISET...');
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
+disp('*** Downloaded ieObject')
 
 %% Show the OI and some metadata
 
