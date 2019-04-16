@@ -16,6 +16,11 @@ function camera = piCameraCreate(cameraType,varargin)
 %
 % TL, SCIEN STANFORD 2017 
 
+% Examples:
+%{
+c = piCameraCreate('omni');
+%}
+
 % PROGRAMMING
 %   TODO: Perhaps this should be a function of the recipe class?
 %

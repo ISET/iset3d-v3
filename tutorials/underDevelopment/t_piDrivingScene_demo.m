@@ -225,8 +225,8 @@ gcp.render();
 % You can get a lot of information about the job this way
 %{   
    podname = gcp.podsList
-   gcp.PodDescribe(podname{1})    % Prints out what has happened
-   cmd = gcp.Podlog(podname{1});  % Creates a command to show the running log
+   gcp.PodDescribe(podname{end})    % Prints out what has happened
+   cmd = gcp.Podlog(podname{end});  % Creates a command to show the running log
 %}
 
 %% Download files from Flywheel
