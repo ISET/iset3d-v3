@@ -144,15 +144,6 @@ thisR.lookAt.up   = [0;1;0];
 
 thisR.set('exposure time',1/200);
 
-% 
-% % Open at time zero
-% thisR.camera.shutteropen.type = 'float';
-% thisR.camera.shutteropen.value = 0;  
-% 
-% % Shutter duration
-% thisR.camera.shutterclose.type = 'float';
-% thisR.camera.shutterclose.value = 1/200;   % 5 ms exposure
-
 %% Write out the scene into a PBRT file
 
 if piContains(sceneType,'city')
