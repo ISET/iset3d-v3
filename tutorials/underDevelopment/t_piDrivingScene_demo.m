@@ -100,7 +100,7 @@ thisR.set('film diagonal',10);
 thisR.set('nbounces',10);
 thisR.set('aperture',1);
 lensname = 'wide.56deg.6.0mm.dat';
-thisR.camera = piCameraCreate('realistic','lensFile',lensname);
+thisR.camera = piCameraCreate('realistic','lens file',lensname);
 
 %% Place the camera
 

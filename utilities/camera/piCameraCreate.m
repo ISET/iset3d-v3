@@ -18,13 +18,22 @@ function camera = piCameraCreate(cameraType,varargin)
 
 % Examples:
 %{
+c = piCameraCreate('pinhole');
+%}
+%{
+c = piCameraCreate('realistic');
+%}
+%{
+c = piCameraCreate('lightfield');
+%}
+%{
 c = piCameraCreate('omni');
 %}
 
 % PROGRAMMING
 %   TODO: Perhaps this should be a function of the recipe class?
 %
-%   TODO:   implement things like this for the camera type values
+%   TODO: Implement things like this for the camera type values
 %
 %           piCameraCreate('pinhole','fov',val);
 %
@@ -62,7 +71,7 @@ switch cameraType
     case {'realistic'}
         [~,~,e] = fileparts(lensFile);
         if(~strcmp(e,'.dat'))
-            error('Realistic camera needs .dat lens file.');
+            error('Realistic camera needs *.dat lens file.');
         end
         
         camera.type = 'Camera';
@@ -77,7 +86,7 @@ switch cameraType
     case {'omni'}
         [~,~,e] = fileparts(lensFile);
         if(~strcmp(e,'.json'))
-            error('Omni camera needs .json lens file.');
+            error('Omni camera needs *.json lens file.');
         end
         
         camera.type = 'Camera';
@@ -89,9 +98,8 @@ switch cameraType
         camera.focusdistance.type = 'float';
         camera.focusdistance.value = 10; % mm
         
-    case {'microlens'}
-        % Use to allow'lightfield','plenoptic'
-        % General parameters
+    case {'lightfield'}
+        % Use to allow 'microlens' and'plenoptic'
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
@@ -147,7 +155,7 @@ switch cameraType
         camera.ior4.value = ''; % FILL IN
 
     otherwise
-        error('Cannot recognize camera type.');
+        error('Cannot recognize camera type, %s\n.', cameraType);
 end
 
 end
