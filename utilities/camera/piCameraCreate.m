@@ -21,13 +21,15 @@ function camera = piCameraCreate(cameraType,varargin)
 c = piCameraCreate('pinhole');
 %}
 %{
+lensname = 'dgauss.22deg.12.5mm.dat';
 c = piCameraCreate('realistic');
 %}
 %{
 c = piCameraCreate('lightfield');
 %}
 %{
-c = piCameraCreate('omni');
+lensname = 'dgauss.22deg.12.5mm.json';
+c = piCameraCreate('omni','lens file',lensname);
 %}
 
 % PROGRAMMING
@@ -39,6 +41,7 @@ c = piCameraCreate('omni');
 %
 
 %% Check input
+varargin = ieParamFormat(varargin);
 
 p = inputParser;
 validCameraTypes = {'pinhole','realistic','omni', 'humaneye','lightfield'};
@@ -54,11 +57,11 @@ switch cameraType
     otherwise
         lensDefault = '';
 end
-p.addParameter('lensFile',lensDefault,@(x)(exist(x,'file')));
+p.addParameter('lensfile',lensDefault,@(x)(exist(x,'file')));
 
 p.parse(cameraType,varargin{:});
 
-lensFile      = p.Results.lensFile;
+lensFile      = p.Results.lensfile;
 
 %% Initialize the default camera type
 switch cameraType
