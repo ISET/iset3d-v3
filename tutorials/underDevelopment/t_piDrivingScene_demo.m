@@ -45,7 +45,7 @@ str = gcp.configList;
 % This can take 20-30 minutes
 
 % Available sceneTypes: city1, city2, city3, city4, citymix, suburb
-sceneType = 'city2';
+sceneType = 'citymix';
 
 % To see the available roadTypes use piRoadTypes
 roadType = 'city_cross_4lanes_002';
@@ -56,7 +56,7 @@ trafficflowDensity = 'medium';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 
 % simulation that we record the data. 
-timestamp = 15;
+timestamp = 100;
 
 % Choose whether we want to enable cloudrender
 cloudRender = 1;
@@ -93,7 +93,7 @@ disp('*** Scene Generation completed.')
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
-dayTime = '13:30';
+dayTime = '9:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 disp('*** Skymap added')
@@ -174,6 +174,9 @@ filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
                             CamOrientation,...
                             clock);
 thisR.outputFile = fullfile(outputDir,filename);
+
+% Makes the materials, particularly glass, look right.
+piMaterialGroupAssign(thisR);
 
 % Write the recipe for the scene we generated
 piWrite(thisR,'creatematerials',true,...

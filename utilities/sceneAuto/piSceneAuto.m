@@ -147,6 +147,9 @@ for ii = 1: length(sumoPlaced)
     thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
 end
 
+% Update the material lib to the recipe.
+thisR_scene.materials.lib = piMateriallib;
+
 road = fwInfoAppend(road,sumoPlaced{1}); % mobile objects
 
 disp('Completed SUMO combined with SUSO');
