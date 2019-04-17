@@ -256,8 +256,12 @@ disp('*** Downloaded ieObject')
 %% Show the OI and some metadata
 
 oiWindow(ieObject);
+
+%{
+% Shows the object.
 ieNewGraphWin;
 imagesc(ieObject.metadata.meshImage)
+%}
 
 %% Remove all jobs.
 

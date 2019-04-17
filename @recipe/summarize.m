@@ -27,7 +27,10 @@ function summarize(thisR,str)
 %  recipe
 %
 
-%%
+%% Parse
+
+warning('Not much implemented yet');
+
 str = ieParamFormat(str);
 
 validStr = {'all','camera','film','lookat','assets','metadata'};
