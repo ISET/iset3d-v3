@@ -92,7 +92,14 @@ end
 thisR.integrator.maxdepth.value = 10;
 
 %% This adds materials to all assets in this scene
-piMaterialGroupAssign(thisR);
+piMaterialGroupAssign(thisR);   % We like the glass better this way.
+
+%
+colorkd = piColorPick('red');
+name = 'HDM_06_002_carbody_black';
+material = thisR.materials.list.(name);    % A string labeling the material
+target = thisR.materials.lib.carpaintmix;  % This is the assignment
+piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
 
 % Assign a nice position.
 thisR.assets(end).position = [2 0 -2]';

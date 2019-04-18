@@ -37,15 +37,13 @@ gcp.renderDepth = 1;  % Create the depth map
 gcp.renderMesh  = 1;  % Create the object mesh for subsequent use
 gcp.targets     =[];  % clear job list
 
+% Choose whether we want to enable cloudrender
+cloudRender = 1;
+
 % Print out the gcp parameters for the user
 str = gcp.configList;
 
 %%  Example scene creation
-
-% This can take 20-30 minutes
-
-% Available sceneTypes: city1, city2, city3, city4, citymix, suburb
-sceneType = 'city2';
 
 % To see the available roadTypes use piRoadTypes
 roadType = 'city_cross_4lanes_002';
@@ -56,14 +54,7 @@ trafficflowDensity = 'medium';
 % Choose a timestamp(1~360), which is the moment in the SUMO
 
 % simulation that we record the data. 
-timestamp = 15;
-
-% Choose whether we want to enable cloudrender
-cloudRender = 1;
-
-disp('*** Setup parameters')
-
-%% Only for Demo
+timestamp = 100;
 
 % Copy trafficflow from data folder to local folder
 trafficflowPath   = fullfile(piRootPath,'data','sumo_input','demo',...
@@ -72,28 +63,34 @@ localTF = fullfile(piRootPath,'local','trafficflow');
 
 if ~exist(localTF,'dir'), mkdir(localTF);end
 copyfile(trafficflowPath,localTF);
-disp('*** Copied traffic flow')
+disp('*** Road traffic flow')
 
 %% Scene Generation
 
+% Available sceneTypes: city1, city2, city3, city4, citymix, suburb
+sceneType = 'city4';
+
 % 20 seconds
 tic
-disp('*** Scene Generating.....')
+disp('*** Scene Generation.....')
 [thisR,road] = piSceneAuto('sceneType',sceneType,...
     'roadType',roadType,...
     'trafficflowDensity',trafficflowDensity,...
     'timeStamp',timestamp,...
     'cloudRender',cloudRender,...
     'scitran',st);
-thisR.metadata.sumo.trafficflowdensity = trafficflowDensity;
-thisR.metadata.sumo.timestamp          = timestamp;
+
+% SUMO parameters.  Let's move this into piSceneAuto.
+thisR.set('traffic flow density',trafficflowDensity);
+thisR.set('traffic timestamp',timestamp);
 toc
 
 disp('*** Scene Generation completed.')
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
-dayTime = '16:30';
+
+dayTime = '9:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 disp('*** Skymap added')
@@ -102,8 +99,8 @@ disp('*** Skymap added')
 lensname = 'wide.56deg.6.0mm.dat';
 thisR.camera = piCameraCreate('realistic','lens file',lensname);
 
-thisR.set('film resolution',[1280 720]*1.5);
-thisR.set('pixel samples',1024);   % 1024 for high resolution
+thisR.set('film resolution',[1280 720]);
+thisR.set('pixel samples',2048);   % 1024 or higher to reduce graphics noise
 thisR.set('film diagonal',10);
 thisR.set('nbounces',10);
 thisR.set('aperture',1);
@@ -124,24 +121,7 @@ load(tfFileName,'trafficflow');
 % Choose the time stamp
 thisTrafficflow = trafficflow(timestamp);
 
-%{
-% We can assign the camera to a random car in the scene this way
-nextTrafficflow = trafficflow(timestamp+1);
-CamOrientation = 270;
-camPos = {'left','right','front','rear'};
-camPos = camPos{3};
-[thisCar,thisR] = piCamPlace('thistrafficflow',thisTrafficflow,...
-    'CamOrientation',CamOrientation,...
-    'thisR',thisR,'camPos',camPos,'oriOffset',0);
-
-fprintf('Velocity of Ego Vehicle: %.2f m/s \n', thisCar.speed);
-
-% Assign motion blur to the camera based on its motion
-thisR = piMotionBlurEgo(thisR,'nextTrafficflow',nextTrafficflow,...
-                               'thisCar',thisCar,...
-                               'fps',60);
-%}
-
+% See end of script for how to assign the camera to a random car.
 camPos = 'front';               % Position of the camera on the car
 cameraVelocity = 0 ;            % Camera velocity
 CamOrientation = 270;           % Starts at x-axis.  -90 (or 270) to the z axis.
@@ -174,7 +154,11 @@ filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
                             CamOrientation,...
                             clock);
 thisR.outputFile = fullfile(outputDir,filename);
+
+
+% Makes the materials, particularly glass, look right.
 piMaterialGroupAssign(thisR);
+
 % Write the recipe for the scene we generated
 piWrite(thisR,'creatematerials',true,...
     'overwriteresources',false,'lightsFlag',false,...
@@ -182,12 +166,14 @@ piWrite(thisR,'creatematerials',true,...
 
 % edit(thisR.outputFile)
 disp('*** Scene written');
+
 %% Upload the information to Flywheel.
 
 % This creates a new acquisition in the scenes_pbrt session.
 % Each acquisition is a particular scene, like this one.
 gcp.fwUploadPBRT(thisR,'scitran',st,'road',road);
 disp('*** Scene uploaded')
+
 %% Add this target scene to the target list
 
 % Current targets
@@ -215,6 +201,7 @@ gcp.targetsList;
 % Calling this starts the job and lets you know about it.
 gcp.render(); 
 disp('*** Initiated rendering');
+
 %% Monitor the processes on GCP
 %
 % One way to monitor jobs progress is to go to the web page
@@ -253,8 +240,15 @@ disp('*** Downloaded ieObject')
 %% Show the OI and some metadata
 
 oiWindow(ieObject);
+
+img = piSensorImage(ieObject);
+fname = fullfile(piRootPath,'local',[ieObject.name,'.png']);
+imwrite(img,fname);
+%{
+% Shows the object.
 ieNewGraphWin;
 imagesc(ieObject.metadata.meshImage)
+%}
 
 %% Remove all jobs.
 
@@ -270,4 +264,22 @@ imagesc(ieObject.metadata.meshImage)
 % gcloud container clusters delete cloudrendering
 
 %% END
+
+%{
+% We can assign the camera to a random car in the scene this way
+nextTrafficflow = trafficflow(timestamp+1);
+CamOrientation = 270;
+camPos = {'left','right','front','rear'};
+camPos = camPos{3};
+[thisCar,thisR] = piCamPlace('thistrafficflow',thisTrafficflow,...
+    'CamOrientation',CamOrientation,...
+    'thisR',thisR,'camPos',camPos,'oriOffset',0);
+
+fprintf('Velocity of Ego Vehicle: %.2f m/s \n', thisCar.speed);
+
+% Assign motion blur to the camera based on its motion
+thisR = piMotionBlurEgo(thisR,'nextTrafficflow',nextTrafficflow,...
+                               'thisCar',thisCar,...
+                               'fps',60);
+%}
 

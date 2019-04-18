@@ -285,14 +285,6 @@ switch param
         if length(val) == 1, val(2) = val(1); end
         thisR.film.xresolution.value = val(1);
         thisR.film.yresolution.value = val(2);
-    case {'filmdiagonal','diagonal'}
-        if(thisR.version == 2)
-            thisR.camera.filmdiag.value = val(1);
-            thisR.camera.filmdiag.type = 'float';
-        elseif(thisR.version == 3)
-            thisR.film.diagonal.value = val(1);
-            thisR.film.diagonal.type = 'float';
-        end
     case {'pixelsamples','raysperpixel'}
         % Sampler
         thisR.sampler.pixelsamples.value = val;
@@ -300,6 +292,12 @@ switch param
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
         
+        % SUMO parameters stored in recipe metadata
+    case {'trafficflowdensity'}
+        thisR.metadata.sumo.trafficflowdensity = val;
+    case {'traffictimestamp'}
+        thisR.metadata.sumo.timestamp = val;
+
     otherwise
         error('Unknown parameter %s\n',param);
 end

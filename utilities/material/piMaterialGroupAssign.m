@@ -6,9 +6,9 @@ function piMaterialGroupAssign(thisR)
 %
 % Describe:
 %  This function was built by ZL to manage the material assignments
-%  when there are many asset parts in the isetauto driving scenes.
-%  The part names that are known here are from cars or pedestrian
-%  (bodymat). 
+%  when there are many asset parts. This is frequently the case in the
+%  isetauto driving scenes. The known part names are from cars or
+%  pedestrian (bodymat).  This list is
 %
 %  This function processes all the entries in the materials.list in
 %  the recipe and invokes the piMaterialAssign for the cars in the
@@ -16,18 +16,17 @@ function piMaterialGroupAssign(thisR)
 %  recipe.  This information is used by PBRT to render the object
 %  materials.
 %
+% Materials recognized in this function
+%   (carbody ~paint_base), carpaint , window, mirror, lightsfront, lightsback
+%   chrome, wheel, rim, tire, plastic, metal, glass, bodymat, translucent,
+%   wall, paint_base
+%
 % ZL, Vistasoft Team, 2018
 %
 % See also
 %  piMaterial*
 
-%% Various materials that we recognize
-%{
-% This is the list we currently handle
-(carbody ~paint_base), carpaint , window, mirror, lightsfront, lightsback
-chrome, wheel, rim, tire, plastic, metal, glass, bodymat, translucent,
-wall, paint_base
-%}
+
 
 %% A scene has a set of materials represented in its recipe
 mlist = fieldnames(thisR.materials.list);
@@ -43,16 +42,20 @@ mlist = fieldnames(thisR.materials.list);
 % The mlist entry might be, say, 'carbody black'.  Then we would
 % assign the colorkd to the materal, and we would assign the material
 % with the colorkd to the recipe.
+
 for ii = 1:length(mlist)
     if  piContains(lower(mlist(ii)),'carbody') && ~piContains(lower(mlist(ii)),'paint_base')
-%         if piContains(mlist(ii),'black')
-%             colorkd = piColorPick('black');
-%         elseif piContains(mlist(ii),'white')
-%             colorkd = piColorPick('white');
-%         else
-            % Default
-            colorkd = piColorPick('random');
-%         end
+        % We seem to always be picking a random color for the car body
+        % pain base.  This could get adjusted.
+        
+        %         if piContains(mlist(ii),'black')
+        %             colorkd = piColorPick('black');
+        %         elseif piContains(mlist(ii),'white')
+        %             colorkd = piColorPick('white');
+        %         else
+        % Default
+        colorkd = piColorPick('random');
+        %         end
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
         target = thisR.materials.lib.carpaintmix;  % This is the assignment
