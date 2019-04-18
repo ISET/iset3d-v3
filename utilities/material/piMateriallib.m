@@ -32,7 +32,7 @@ function [materiallib_updated] = piMateriallib
 %  carpaint, we assign the materiallib.carpaint properties to that
 %  object.
 %
-% ZL Scien Stanford, 2018
+% Zhenyi Liu Scien Stanford, 2018
 %
 % See also
 %   piMaterial*
@@ -56,8 +56,9 @@ materiallib.carpaintmix.paint_base.colorks =[.1 .1 .1];
 materiallib.carpaintmix.paint_base.floaturoughness=0.01;
 materiallib.carpaintmix.paint_base.floatvroughness=0.01;
 materiallib.carpaintmix.carpaint.string = 'mix';
+materiallib.carpaintmix.carpaint.amount = 0.5;
 materiallib.carpaintmix.carpaint.stringnamedmaterial1 = 'paint_mirror';
-materiallib.carpaintmix.carpaint.stringnamedmaterial2='paint_base';
+materiallib.carpaintmix.carpaint.stringnamedmaterial2 = 'paint_base';
 %% carpaint
 %
 % Typical car paint without much specularity.  Some people define it
@@ -73,8 +74,8 @@ materiallib.carpaint.string='substrate';
 %
 % This the chrome metal appearance.
 %
-materiallib.chrome_spd.floatroughness=0.01;
 materiallib.chrome_spd.string='metal';
+materiallib.chrome_spd.floatroughness=0.01;
 materiallib.chrome_spd.spectrumk='spds/metals/Ag.k.spd';
 materiallib.chrome_spd.spectrumeta='spds/metals/Ag.eta.spd';
 
@@ -95,7 +96,6 @@ materiallib.mirror.spectrumkr = [400 1 800 1];
 
 % Standard matte surface.  Only diffuse.
 materiallib.matte.string = 'matte';
-materiallib.matte.rgbkd = [0.7 0.7 0.7];
 
 %% plastic
 
@@ -104,6 +104,7 @@ materiallib.matte.rgbkd = [0.7 0.7 0.7];
 materiallib.plastic.string = 'plastic';
 materiallib.plastic.rgbkd = [0.25 0.25 0.25];
 materiallib.plastic.rgbks = [0.25 0.25 0.25];
+materiallib.plastic.floatroughness = 0.1;
 
 %% glass
 
@@ -112,6 +113,7 @@ materiallib.glass.string = 'glass';
 % materiallib.glass.rgbkr = [0.00415 0.00415 0.00415];
 materiallib.glass.spectrumkr = [400 1 800 1];
 materiallib.glass.spectrumkt = [400 1 800 1];
+materiallib.glass.eta = 1.5;
 
 %% Retroreflective
 
@@ -141,6 +143,10 @@ materiallib_updated = piMaterialEmptySlot(materiallib);
 end
 
 function materiallib = piMaterialEmptySlot(materiallib)
+% Empty the unused material slot for certain type of material, for example,
+% mirror is only defined by reflectivity, since the default material
+% includes values for unused parameters, in this case, we should empty the
+% slots except Kr(reflectivity) to avoid errors when rendering.
 thisMaterial = fieldnames(materiallib);
 for ii = 1: length(thisMaterial)
     if isfield(materiallib.(thisMaterial{ii}), 'string')

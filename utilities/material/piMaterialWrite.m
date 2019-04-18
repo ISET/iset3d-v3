@@ -12,27 +12,6 @@ p = inputParser;
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 p.parse(thisR);
 
-%%
-% workingDir = fileparts(thisR.outputFile);
-% % copy spds to working directroy
-% spds_path = fullfile(piRootPath,'data','spds');
-% desdir = fullfile(workingDir,'spds');
-% if ~exist(desdir,'dir'), mkdir(desdir);end
-% status = copyfile(spds_path,desdir);
-% if(~status), error('Failed to copy spds directory to docker working directory.');end
-% % copy skymaps to working directroy
-% skymaps_path = fullfile(piRootPath,'data','skymaps');
-% desdir=fullfile(workingDir,'skymaps');
-% if ~exist(desdir,'dir'), mkdir(desdir);end
-% status = copyfile(skymaps_path,desdir);
-% if(~status), error('Failed to copy skymaps directory to docker working directory.');end
-% % copy brdfs to working directroy
-% brdfs_path = fullfile(piRootPath,'data','bsdfs');
-% desdir = fullfile(workingDir,'bsdfs');
-% if ~exist(desdir,'dir'), mkdir(desdir);end
-% status = copyfile(brdfs_path,desdir);
-% if(~status), error('Failed to copy bsdfs directory to docker working directory.');end
-
 %% Parse the output file, working directory, stuff like that.
 
 % Converts any jpg file names in the PBRT files into png file names
@@ -340,6 +319,18 @@ end
 if isfield(materials, 'boolremaproughness')
     if ~isempty(materials.boolremaproughness)
         val_boolremaproughness = sprintf(' "bool remaproughness" "%s" ',materials.boolremaproughness);
+        val = strcat(val, val_boolremaproughness);
+    end
+end
+if isfield(materials, 'eta')
+    if ~isempty(materials.eta)
+        val_boolremaproughness = sprintf(' "float eta" "%0.5f" ',materials.eta);
+        val = strcat(val, val_boolremaproughness);
+    end
+end
+if isfield(materials, 'amount')
+    if ~isempty(materials.amount)
+        val_boolremaproughness = sprintf(' "spectrum amount" "%0.5f" ',materials.amount);
         val = strcat(val, val_boolremaproughness);
     end
 end
