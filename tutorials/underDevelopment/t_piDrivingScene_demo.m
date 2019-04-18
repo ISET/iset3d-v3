@@ -239,12 +239,11 @@ disp('*** Downloaded ieObject')
 
 oiWindow(ieObject);
 
-img = piSensorImage(ieObject);
+% Save a png of the OI, but after passing through a sensor
 fname = fullfile(piRootPath,'local',[ieObject.name,'.png']);
-imwrite(img,fname);
+img = piSensorImage(ieObject,'filename',fname);
 %{
-% Shows the object.
-ieNewGraphWin;
+ieNewGraphWin
 imagesc(ieObject.metadata.meshImage)
 %}
 
