@@ -31,6 +31,7 @@ function rgb = piColorPick(color,varargin)
 % colorlist = {'white','black','red','blue','silver','yellow'};
 
 %%
+
 if piContains(color,'random')
     % Choose a random color, I guess.
     index = rand;
