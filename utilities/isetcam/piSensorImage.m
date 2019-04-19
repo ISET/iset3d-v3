@@ -1,5 +1,5 @@
 function [img, filename] = piSensorImage(oi,varargin)
-% Make an image from the OI by passing through a sensor and IP
+% Make an image from the OI after passing through a sensor and ip pipeline
 %
 % Syntax
 %   [img,filename] = piSensorImage(oi, ...)
@@ -8,15 +8,18 @@ function [img, filename] = piSensorImage(oi,varargin)
 %  Convert the oi through a sensor and the ip into an RGB image. We do this
 %  because the OI itself can be very high dynamic range, and the
 %  oiGet(oi,'rgb') may not save well.  This method always produces some
-%  sort of a reasonable image.  The simulated sensor is 1.5 microns.
+%  sort of a reasonable image.  
 %
 % Input
-%   oi
+%   oi          - The optical image returned by the PBRT Docker container
+%
 % Key/value
-%   filename
+%   filename    - Output png file
+%   pixel size  - Default value is 2 (in microns)
+%
 % Outputs
-%   img
-%   fname
+%   img         - RGB image
+%   fname       - Output file name (full path)
 %
 % Wandell
 %
@@ -32,15 +35,20 @@ function [img, filename] = piSensorImage(oi,varargin)
 %}
 
 %%
+varargin = ieParamFormat(varargin);
+
 p = inputParser;
 p.addRequired('oi',@(x)(isequal(x.type,'opticalimage')));
 p.addParameter('filename','',@ischar);
+p.addParameter('pixelsize',2,@isscalar);
+
 p.parse(oi,varargin{:});
 filename = p.Results.filename;
+pSize    = p.Results.pixelsize;
 
 %% High resolution sensor
 sensor = sensorCreate;
-sensor = sensorSet(sensor,'pixel size constant fill factor',[1.5 1.5]*1e-6);
+sensor = sensorSet(sensor,'pixel size constant fill factor',[pSize pSize]*1e-6);
 sensor = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
 sensor = sensorCompute(sensor,oi);
 % sensorWindow(sensor);

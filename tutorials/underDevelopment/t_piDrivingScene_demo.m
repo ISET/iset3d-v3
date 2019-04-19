@@ -46,10 +46,10 @@ str = gcp.configList;
 %%  Example scene creation
 
 % To see the available roadTypes use piRoadTypes
-roadType = 'city_cross_4lanes_002';
+roadType = 'curve_6lanes_001';
 
 % Avaliable trafficflowDensity: low, medium, high
-trafficflowDensity = 'medium';
+trafficflowDensity = 'low';
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
 
@@ -68,7 +68,7 @@ disp('*** Road traffic flow')
 %% Scene Generation
 
 % Available sceneTypes: city1, city2, city3, city4, citymix, suburb
-sceneType = 'city4';
+sceneType = 'suburb';
 
 % 20 seconds
 tic
@@ -89,7 +89,7 @@ disp('*** Scene Generation completed.')
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
-dayTime = '9:30';
+dayTime = '16:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 disp('*** Skymap added')
@@ -241,7 +241,7 @@ oiWindow(ieObject);
 
 % Save a png of the OI, but after passing through a sensor
 fname = fullfile(piRootPath,'local',[ieObject.name,'.png']);
-img = piSensorImage(ieObject,'filename',fname);
+img = piSensorImage(ieObject,'filename',fname,'pixel size',2.5);
 %{
 ieNewGraphWin
 imagesc(ieObject.metadata.meshImage)
