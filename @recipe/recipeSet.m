@@ -9,7 +9,32 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %   has many fields specifying camera and rendering parameters. This
 %   method is only capable of setting one parameter at a time.
 %
+% Parameter list (in progress)
+%   Data management
+%     outputfile
+%     inputfile
+%
+%   Scene and camera
+%     object distance
+%     camera
+%
+%   Lens
+%     lensfile
+%
+%   Film/sensor
+%
+%   Rendering
+%     nbounces
+%
 % BW ISETBIO Team, 2017
+%
+% PBRT information that explains man
+% Generally
+% https://www.pbrt.org/fileformat-v3.html#overview
+%
+% And specifically
+% https://www.pbrt.org/fileformat-v3.html#cameras
+%
 %
 % See also
 %    recipeGet
@@ -39,32 +64,45 @@ p.parse(thisR, param, val, varargin{:});
 
 param = ieParamFormat(p.Results.param);
 
-%% Act 
+%% Act
 switch param
     
     % Rendering and Docker related
     case {'outputfile'}
-        % Is there already an output file set? If so, copy all directories
-        % over to the new directory.
-        if(~strcmp(thisR.outputFile,val) && strcmp(thisR.exporter,'C4D'))
-            [dirsource,~,~] = fileparts(thisR.outputFile);
-            [dirdest,~,~] = fileparts(val);
-            fprintf('Output directory changed! Copying files from %s to %s \n',...
-                dirsource,dirdest);
-            if(~exist(dirdest,'dir'))
-                % Sometimes the output directory has not been created yet.
-                mkdir(dirdest);
-            end
-            if(~strcmp(dirsource,dirdest))
-                copyfile(dirsource,dirdest);
-                rmdir(dirsource,'s');
+        % thisR.set('outputfile',fullfilepath);
+        %
+        % The outputfile has a default initial string.  When we set,
+        % we check that the new directory exists. If not, we make it.
+        % If there were files in the previous directory we copy them
+        % to the new directory.  Maybe there should be an option to
+        % stop the copy.
+        
+        currentDir = fileparts(thisR.outputFile);
+        newDir     = fileparts(val);
+        if ~exist(newDir,'dir'), mkdir(newDir); end
+        
+        % Are we changing the output directory?
+        if isequal(currentDir,newDir)
+            % Nothing needs to be done
+        else
+            % We start copying from the current to the new
+            if ~exist(currentDir,'dir')
+                % No files to be copied
+            else
+                fprintf('Output directory changed. Copying files from %s to %s \n',...
+                    currentDir,newDir);
+                copyfile(currentDir,newDir);
+                rmdir(currentDir,'s');
             end
         end
+        
         thisR.outputFile = val;
         
     case {'inputfile'}
-        thisR.inputFile = val;   
-        % Scene
+        thisR.inputFile = val;
+        
+        
+        % Scene and camera
     case 'objectdistance'
         % Adjust the lookat 'from' field to match the distance in val
         objDirection = thisR.get('object direction');
@@ -85,9 +123,10 @@ switch param
             thisR.film.diagonal.value = 35;
             thisR.film.diagonal.type = 'float';
         end
-        
     case 'cameratype'
         thisR.camera.subtype = val;
+        
+        % Lens related
     case 'lensfile'
         if(thisR.version == 3)
             thisR.camera.lensfile.value = val;
@@ -105,8 +144,8 @@ switch param
             thisR.camera.aperture_diameter.type = 'float';
         end
     case {'filmdistance'}
-            thisR.camera.filmdistance.value = val;
-            thisR.camera.filmdistance.type = 'float';
+        thisR.camera.filmdistance.value = val;
+        thisR.camera.filmdistance.type = 'float';
     case {'focusdistance'}
         if(thisR.version == 3)
             thisR.camera.focusdistance.value = val;
@@ -114,15 +153,15 @@ switch param
         else
             warning('focus distance parameter not applicable for version 2');
         end
-    case 'lookat'
-        % Includes the from, to and up in a struct
-        if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
-            thisR.lookAt = val; 
-        end
     case 'fov'
         % We should check that this is a pinhole, I think
-        thisR.camera.fov.value = val;
-        thisR.camera.fov.type = 'float';
+        % This is only used for pinholes, not realistic camera case. 
+        if isequal(thisR.camera.subtype,'pinhole')
+            thisR.camera.fov.value = val;
+            thisR.camera.fov.type = 'float';
+        else
+            warning('fov not set for camera models');
+        end
         
     case 'diffraction'
         if(thisR.version == 2)
@@ -131,38 +170,36 @@ switch param
         elseif(thisR.version == 3)
             warning('diffraction parameter not applicable for version 3')
         end
-        
     case 'chromaticaberration'
-        if(thisR.version == 2)
-            thisR.camera.chromaticAberrationEnabled.value = val;
-            thisR.camera.chromaticAberrationEnabled.type = 'bool';
-            
-            % Set chromatic aberration correctly
-            thisR.renderer.subtype = 'spectralrenderer';
-
-        elseif(thisR.version == 3)
-            thisR.camera.chromaticAberrationEnabled.value = val;
-            thisR.camera.chromaticAberrationEnabled.type = 'bool';
-            
-            thisR.integrator.subtype = 'spectralpath';
-            if(ischar(val))
-                % User probably put in true or false, so let's just use a
-                % default of 8 bands.
-                warning('Using a default of 8 sampled bands for the chromatic aberration.');
-                thisR.integrator.numCABands.value = 8;
-                thisR.integrator.numCABands.type = 'integer';
-            else
-                thisR.integrator.numCABands.value = val;
-                thisR.integrator.numCABands.type = 'integer';
-            end
-            
+        % Enable chrommatic aberration, and potentially set the number
+        % of wavelength bands.  (Default is 8).
+        %   thisR.set('chromatic aberration',true);
+        %   thisR.set('chromatic aberration',false);
+        %   thisR.set('chromatic aberration',16);
+        
+        % Enable or disable
+        thisR.camera.chromaticAberrationEnabled.type = 'bool';
+        
+        if isequal(val,false)
+            thisR.camera.chromaticAberrationEnabled.value = 'false';
+            return;
+        elseif isequal(val,true)
+            thisR.camera.chromaticAberrationEnabled.value = 'true';
+            val = 8; 
+        elseif isnumeric(val)
+            thisR.camera.chromaticAberrationEnabled.value = 'true';
+        else
+            error('Unexpected type for val.  %s\n',class(val));
         end
-    case 'from'
-        thisR.lookAt.from = val;
-    case 'to'
-        thisR.lookAt.to = val;
-    case 'up'
-        thisR.lookAt.up = val;
+        
+        % Enabled, so set proper integrator
+        thisR.integrator.subtype = 'spectralpath';
+        
+        % Set the bands.  These are divided evenly into bands between
+        % 400 and 700 nm. There are  31 wavelength samples, so we
+        % should not have more than 30 wavelength bands
+        thisR.integrator.numCABands.value = min(30,val);
+        thisR.integrator.numCABands.type = 'integer';
         
     case 'autofocus'
         % thisR.set('autofocus',true);
@@ -174,6 +211,35 @@ switch param
             end
             thisR.set('film distance',fdist);
         end
+        
+        % Camera position related
+    case 'lookat'
+        % Includes the from, to and up in a struct
+        if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
+            thisR.lookAt = val;
+        end
+    case 'from'
+        thisR.lookAt.from = val;
+    case 'to'
+        thisR.lookAt.to = val;
+    case 'up'
+        thisR.lookAt.up = val;
+        
+        
+        % Rendering related
+    case{'maxdepth','bounces','nbounces'}
+        % Eliminated warning Nov. 11, 2018.
+        if(~strcmp(thisR.integrator.subtype,'path')) &&...
+                (~strcmp(thisR.integrator.subtype,'bdpt'))
+            disp('Changing integrator sub type to "bdpt"');
+            
+            % When multiple bounces are needed, use this integrator
+            thisR.integrator.subtype = 'bdpt';
+        end
+        thisR.integrator.maxdepth.value = val;
+        thisR.integrator.maxdepth.type = 'integer';
+        
+        % Microlens
     case 'microlens'
         % Not sure about what this means.  It is on or off
         thisR.camera.microlens_enabled.value = val;
@@ -217,16 +283,8 @@ switch param
     case{'cropwindow','crop window'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
-    case{'maxdepth','bounces'}
-        % Eliminated warning Nov. 11, 2018.
-        if(~strcmp(thisR.integrator.subtype,'path'))
-            % warning('Changing integrator sub type to "path"');
-        end
-        thisR.integrator.maxdepth.value = val(1);
-        thisR.integrator.maxdepth.type = 'integer';
-        % When there are multiple bounces, apply this integrator
-        thisR.integrator.subtype = 'path';
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end
- 
+

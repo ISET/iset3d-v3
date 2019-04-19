@@ -1,0 +1,72 @@
+{
+    "description": " MLD, p. 420\"   EFL is 100 mm BFL is: 52.78 mm",
+    "name": " Wide-angle (56-degree) lens. Roossinov.\t\t\t",
+    "surfaces": [
+        {
+            "ior": 1.6390000581741333,
+            "radius": 50.61000061035156,
+            "semi_aperture": 43.79999923706055,
+            "thickness": 3.0799999237060547
+        },
+        {
+            "ior": 1.0,
+            "radius": 32.470001220703125,
+            "semi_aperture": 32.20000076293945,
+            "thickness": 50.91999816894531
+        },
+        {
+            "ior": 1.6130000352859497,
+            "radius": 68.05999755859375,
+            "semi_aperture": 18.0,
+            "thickness": 13.15999984741211
+        },
+        {
+            "ior": 1.5479999780654907,
+            "radius": -35.119998931884766,
+            "semi_aperture": 18.0,
+            "thickness": 4.389999866485596
+        },
+        {
+            "ior": 1.0,
+            "radius": 188.7899932861328,
+            "semi_aperture": 9.0,
+            "thickness": 0.3499999940395355
+        },
+        {
+            "ior": 0.0,
+            "radius": 0.0,
+            "semi_aperture": 7.25,
+            "thickness": 0.3499999940395355
+        },
+        {
+            "ior": 1.5479999780654907,
+            "radius": -185.38999938964844,
+            "semi_aperture": 9.0,
+            "thickness": 4.320000171661377
+        },
+        {
+            "ior": 1.6130000352859497,
+            "radius": 34.4900016784668,
+            "semi_aperture": 18.0,
+            "thickness": 12.9399995803833
+        },
+        {
+            "ior": 1.0,
+            "radius": -66.83000183105469,
+            "semi_aperture": 18.0,
+            "thickness": 50.0
+        },
+        {
+            "ior": 1.6260000467300415,
+            "radius": -31.8700008392334,
+            "semi_aperture": 31.299999237060547,
+            "thickness": 3.0199999809265137
+        },
+        {
+            "ior": 1.0,
+            "radius": -49.439998626708984,
+            "semi_aperture": 42.0,
+            "thickness": 0.0
+        }
+    ]
+}

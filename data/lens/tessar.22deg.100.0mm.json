@@ -1,0 +1,54 @@
+{
+    "description": " US patent 2084714/1937 Tronnier/Schneider Moden Lens Design, p.263 Focal length (mm)  ",
+    "name": " Tessar F/3.5 ",
+    "surfaces": [
+        {
+            "ior": 1.6200000047683716,
+            "radius": 32.400001525878906,
+            "semi_aperture": 15.0,
+            "thickness": 6.0
+        },
+        {
+            "ior": 1.0,
+            "radius": -579.7999877929688,
+            "semi_aperture": 15.0,
+            "thickness": 6.599999904632568
+        },
+        {
+            "ior": 1.5779999494552612,
+            "radius": -58.5,
+            "semi_aperture": 12.5,
+            "thickness": 2.9000000953674316
+        },
+        {
+            "ior": 1.0,
+            "radius": 27.600000381469727,
+            "semi_aperture": 12.5,
+            "thickness": 4.0
+        },
+        {
+            "ior": 0.0,
+            "radius": 0.0,
+            "semi_aperture": 11.399999618530273,
+            "thickness": 2.5999999046325684
+        },
+        {
+            "ior": 1.531999945640564,
+            "radius": -579.7999877929688,
+            "semi_aperture": 12.800000190734863,
+            "thickness": 2.200000047683716
+        },
+        {
+            "ior": 1.6200000047683716,
+            "radius": 26.200000762939453,
+            "semi_aperture": 12.800000190734863,
+            "thickness": 8.800000190734863
+        },
+        {
+            "ior": 1.0,
+            "radius": -42.400001525878906,
+            "semi_aperture": 12.800000190734863,
+            "thickness": 0.0
+        }
+    ]
+}

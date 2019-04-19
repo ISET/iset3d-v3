@@ -5,7 +5,8 @@
 %   roadinfo = piRoadInfo;
 %
 % Description:
-%    This script creates the road information structure.
+%    This script creates the road information structure. Information about
+%    the roads is written into: iset3d/local/configuration
 %
 % Inputs:
 %    None.
@@ -24,10 +25,11 @@
 %
 
 % History:
-%    XX/XX/XX  XXX  Created
+%    XX/XX/XX  ZL   Created
 %    04/09/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge with Master (Resolve conflicts)
 
-% cross: 5 types of crosses
+%% First road crossing
 roadinfo(1).name = 'city_cross_4lanes_001';
 roadinfo(1).roadtype = 'cross';
 roadinfo(1).scenetype = 'city';
@@ -56,7 +58,6 @@ roadinfo(1).sidewalk_list(4).coordinate = [14.503 / 2, 400.257 / 2];
 roadinfo(1).sidewalk_list(4).height = 0.452 / 2;
 roadinfo(1).sidewalk_list(4).width = 5;
 
-
 roadinfo(1).sidewalk_list(5).length = 97.669 / 2;
 roadinfo(1).sidewalk_list(5).direction = 90;
 roadinfo(1).sidewalk_list(5).coordinate = [-123.108 / 2, 159.61 / 2];
@@ -81,7 +82,7 @@ roadinfo(1).sidewalk_list(8).coordinate = [123.352 / 2, 129.991 / 2];
 roadinfo(1).sidewalk_list(8).height = 0.452 / 2;
 roadinfo(1).sidewalk_list(8).width = 5;
 
-
+%% Second road
 roadinfo(2).name = 'city_cross_6lanes_001';
 roadinfo(2).roadtype = 'cross';
 roadinfo(2).scenetype = 'city';
@@ -110,7 +111,6 @@ roadinfo(2).sidewalk_list(4).coordinate = [9.16, 234.2];
 roadinfo(2).sidewalk_list(4).height = 0;
 roadinfo(2).sidewalk_list(4).width = 6.6;
 
-
 roadinfo(2).sidewalk_list(5).length = 51;
 roadinfo(2).sidewalk_list(5).direction = 90;
 roadinfo(2).sidewalk_list(5).coordinate = [-65.675, 69.267];
@@ -135,7 +135,7 @@ roadinfo(2).sidewalk_list(8).coordinate = [66.76, 60.733];
 roadinfo(2).sidewalk_list(8).height = 0;
 roadinfo(2).sidewalk_list(8).width = 6.6;
 
-
+%% Third road
 roadinfo(3).roadtype = 'cross';
 roadinfo(3).name = 'city_cross_4lanes_002';
 roadinfo(3).scenetype = 'city';
@@ -164,7 +164,6 @@ roadinfo(3).sidewalk_list(4).coordinate = [8.5820, 233.251];
 roadinfo(3).sidewalk_list(4).height = 0;
 roadinfo(3).sidewalk_list(4).width = 6.6;
 
-
 roadinfo(3).sidewalk_list(5).length = 52.665;
 roadinfo(3).sidewalk_list(5).direction = 90;
 roadinfo(3).sidewalk_list(5).coordinate = [15.111, 131.7370];
@@ -189,7 +188,7 @@ roadinfo(3).sidewalk_list(8).coordinate = [-15.182, 107.986 + 6.6];
 roadinfo(3).sidewalk_list(8).height = 0;
 roadinfo(3).sidewalk_list(8).width = 6.6;
 
-
+%% Fourth road
 roadinfo(4).roadtype = 'straight';
 roadinfo(4).name = 'straight_2lanes_parking';
 roadinfo(4).scenetype = 'surburb';
@@ -218,7 +217,7 @@ roadinfo(4).parking_list(2).coordinate = [6, 233];
 roadinfo(4).parking_list(2).height = 0;
 roadinfo(4).parking_list(2).width = 2.58;
 
-
+%% Fifth road
 roadinfo(5).roadtype = 'curve';
 roadinfo(5).name = 'curve_6lanes_001';
 roadinfo(5).scenetype = 'surburb';
@@ -271,11 +270,13 @@ roadinfo(5).sidewalk_list(8).coordinate = [186.991, 177.976];
 roadinfo(5).sidewalk_list(8).height = 0.15;
 roadinfo(5).sidewalk_list(8).width = 5;
 
-
-%%
+%%  Always write the road information to the same place
 currdir = pwd;
-filepath = fullfile(piRootPath,'local','configuration');
+
+filepath = fullfile(piRootPath, 'local', 'configuration');
+if ~exist(filepath, 'dir'), mkdir(filepath); end
+
 cd(filepath);
-save('roadInfo.mat','roadinfo');
+save('roadInfo.mat', 'roadinfo');
 cd(currdir)
 filefullpath = fullfile(filepath, 'roadInfo.mat');

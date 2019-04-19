@@ -1,0 +1,90 @@
+{
+    "description": " MLD, p. 417   EFL is 100 mm BFL is: 23.09 mm",
+    "name": " Wide-angle (40-degree) lens. Angulon.\t\t\t",
+    "surfaces": [
+        {
+            "ior": 1.503999948501587,
+            "radius": 138.197998046875,
+            "semi_aperture": 71.5,
+            "thickness": 3.4000000953674316
+        },
+        {
+            "ior": 1.0,
+            "radius": 73.8010025024414,
+            "semi_aperture": 58.0,
+            "thickness": 17.799999237060547
+        },
+        {
+            "ior": 1.4869999885559082,
+            "radius": 162.28500366210938,
+            "semi_aperture": 58.0,
+            "thickness": 3.4000000953674316
+        },
+        {
+            "ior": 1.0,
+            "radius": 73.54000091552734,
+            "semi_aperture": 54.0,
+            "thickness": 56.20000076293945
+        },
+        {
+            "ior": 1.7200000286102295,
+            "radius": 76.58300018310547,
+            "semi_aperture": 39.0,
+            "thickness": 40.099998474121094
+        },
+        {
+            "ior": 1.6069999933242798,
+            "radius": 33.619998931884766,
+            "semi_aperture": 24.0,
+            "thickness": 18.200000762939453
+        },
+        {
+            "ior": 1.0,
+            "radius": -267.23699951171875,
+            "semi_aperture": 24.0,
+            "thickness": 3.200000047683716
+        },
+        {
+            "ior": 1.0,
+            "radius": 0.0,
+            "semi_aperture": 18.799999237060547,
+            "thickness": 3.200000047683716
+        },
+        {
+            "ior": 1.569000005722046,
+            "radius": -346.3800048828125,
+            "semi_aperture": 22.0,
+            "thickness": 3.9000000953674316
+        },
+        {
+            "ior": 1.6230000257492065,
+            "radius": 41.93000030517578,
+            "semi_aperture": 22.0,
+            "thickness": 34.29999923706055
+        },
+        {
+            "ior": 1.722000002861023,
+            "radius": -31.479999542236328,
+            "semi_aperture": 25.0,
+            "thickness": 19.600000381469727
+        },
+        {
+            "ior": 1.0,
+            "radius": -76.35900115966797,
+            "semi_aperture": 35.0,
+            "thickness": 69.5999984741211
+        },
+        {
+            "ior": 1.6419999599456787,
+            "radius": -55.27899932861328,
+            "semi_aperture": 50.0,
+            "thickness": 12.5
+        },
+        {
+            "ior": 1.0,
+            "radius": -93.6240005493164,
+            "semi_aperture": 61.0,
+            "thickness": 0.0
+        }
+    ]
+}

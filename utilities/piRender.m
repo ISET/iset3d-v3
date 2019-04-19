@@ -43,6 +43,7 @@ function [ieObject, result] = piRender(thisR, varargin)
 %    XX/XX/17  TL   SCIEN Stanford, 2017
 %    03/XX/19  JNM  03/19 Add reuse feature for renderings
 %    03/25/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % Examples:
 %{
@@ -96,11 +97,12 @@ p.addParameter('meanilluminancepermm2', 5, @isnumeric);
 p.addParameter('scaleIlluminance', true, @islogical);
 p.addParameter('reuse', false, @islogical);
 
-% If you are insisting on using V2, then set dockerImageName to
+% If you insist on using V2, then set dockerImageName to
 % 'vistalab/pbrt-v2-spectral';
-% We were testing this one.
-% 'vistalab/pbrt-v3-spectral:test';
-p.addParameter('dockerimagename', 'vistalab/pbrt-v3-spectral', @ischar);
+
+thisDocker = 'vistalab/pbrt-v3-spectral';
+fprintf('Docker container %s\n', thisDocker);
+p.addParameter('dockerimagename', thisDocker, @ischar);
 
 p.parse(thisR, varargin{:});
 renderType = p.Results.rendertype;
@@ -109,23 +111,19 @@ dockerImageName = p.Results.dockerimagename;
 scaleIlluminance = p.Results.scaleIlluminance;
 
 if ischar(thisR)
-    % In this case, we only have a string to the pbrt file.  We build
-    % the PBRT recipe and default the metadata type to a depth map.
+    % In this case, we only have a string to the pbrt file. We build the
+    % PBRT recipe and default the metadata type to a depth map.
 
-    % Read the pbrt file and produce the recipe.  A full path is
-    % required.
+    % Read the pbrt file and produce the recipe. A full path is required.
     pbrtFile = which(thisR);
     thisR = piRead(pbrtFile, 'version', version);
 
     % Stash the file in the local output
     piWrite(thisR);
-
 end
 
 %% We have a radiance recipe and we have written the pbrt radiance file
-
-% Set up the output folder.  This folder will be mounted by the Docker
-% image
+% Set up the output folder. It will be mounted by the Docker image.
 outputFolder = fileparts(thisR.outputFile);
 if(~exist(outputFolder, 'dir'))
     error('We need an absolute path for the working folder.');
@@ -147,17 +145,15 @@ if (~strcmp(renderType, 'radiance'))  % If radiance, no metadata
     metadataRecipe = piRecipeConvertToMetadata(thisR, ...
         'metadata', metadataType);
 
-    % Depending on whether we used C4D to export, we create a new
-    % material files that we link with the main pbrt file.
+    % Depending on whether we used C4D to export, we create a new material
+    % files that we link with the main pbrt file.
     if(strcmp(metadataRecipe.exporter, 'C4D'))
         creatematerials = true;
     else
         creatematerials = false;
     end
-    piWrite(metadataRecipe, ...
-        'overwritepbrtfile', true, ...
-        'overwritelensfile', false, ...
-        'overwriteresources', false, ...
+    piWrite(metadataRecipe, 'overwritepbrtfile', true, ...
+        'overwritelensfile', false, 'overwriteresources', false, ...
         'creatematerials', creatematerials);
     metadataFile = metadataRecipe.outputFile;
 end
@@ -203,7 +199,8 @@ for ii = 1:length(filesToRender)
 
     if ispc  % Windows
         outF = strcat('renderings/', currName, '.dat');
-        renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, ".pbrt"));
+        renderCommand = sprintf('pbrt --outfile %s %s', outF, ...
+            strcat(currName, ".pbrt"));
 
         folderBreak = split(outputFolder, '\');
         shortOut = strcat('/', char(folderBreak(end)));
@@ -245,7 +242,7 @@ for ii = 1:length(filesToRender)
     if p.Results.reuse
         [fid, message] = fopen(outFile, 'r');
         if fid < 0
-            warning(strcat(message, ": ", currName));
+            warning(strcat(message, ': ', currName));
         else
             sizeLine = fgetl(fid);
             [imageSize, count, err] = sscanf(sizeLine, '%f', inf);

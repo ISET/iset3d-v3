@@ -8,6 +8,7 @@
 % History:
 %    XX/XX/18  TL   SCIEN Team, 2018
 %    03/22/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %% Initialize ISET and Docker
 ieInit;
@@ -49,36 +50,44 @@ thisR = piWorldFindAndReplace(thisR, 'dummyTexture.exr', imageName);
 
 %% Attach a lens
 % The number of rays should go up with the aperture
-thisR.set('camera', 'realistic');
-thisR.set('aperture', 2);
-thisR.set('film resolution', 128);
-thisR.set('rays per pixel', 128);
-thisR.set('diagonal', 5);
+thisR.set('camera', 'realistic');   % Has a lens
+thisR.set('aperture', 2);           % mm
+thisR.set('film resolution', 128);  % Spatial Samples
+thisR.set('rays per pixel', 128);   % Rendering Samples
+thisR.set('diagonal', 1);           % Size of file in mm.
 thisR.set('focusdistance', 1)
 
-%% Render once without chromatic aberration
-[p, n, e] = fileparts(fname);
+fprintf('Rendering with lens:   %s\n', thisR.get('lens file'));
+
+%% Turn on chromatic aberration and render
+% This takes longer because we are using more wavelength samples to trace
+% through the lens (8 bands).
+thisR.set('chromatic aberration', true);
+piWrite(thisR);
+
+[oiCA, results] = piRender(thisR, 'render type', 'radiance');
+oiCA = oiSet(oiCA,'name', 'CA');
+oiWindow(oiCA);
+
+%% Render without chromatic aberration
+thisR.set('chromatic aberration', false);
+
+[p, n, e] = fileparts(fname); 
 thisR.outputFile = fullfile(workingDir, [n, e]);
 piWrite(thisR);
 
-% to reuse an existing rendered file of the correct size, uncomment the
-% parameter key/value pair provided below.
-[oi, results] = piRender(thisR); %, 'reuse', true);
+[oi, results] = piRender(thisR, 'render type', 'radiance');
 oi = oiSet(oi, 'name', 'noCA');
 
 % Show it in ISET
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);  
 
-%% Turn on chromatic aberration and render
-thisR.set('chromaticaberration', 'true');
+%% Now with only 4 bands
+thisR.set('chromatic aberration', 15);
 piWrite(thisR);
 
-% to reuse an existing rendered file of the correct size, uncomment the
-% parameter key/value pair provided below.
-[oiCA, results] = piRender(thisR); %, 'reuse', true);
+[oiCA, results] = piRender(thisR, 'render type', 'radiance');
 oiCA = oiSet(oiCA, 'name', 'CA');
+oiWindow(oiCA);
 
-% Show it in ISET
-ieAddObject(oiCA);
-oiWindow;
+%% End

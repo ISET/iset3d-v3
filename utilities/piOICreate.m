@@ -26,6 +26,7 @@ function oi = piOICreate(photons, varargin)
 % History:
 %    XX/XX/17  BW   SCIENTSTANFORD, 2017
 %    03/28/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % Examples:
 %{
@@ -76,8 +77,8 @@ if isempty(p.Results.fov) && isempty(p.Results.filmDiag)
 elseif isempty(p.Results.fov)
     % Use the filmdiag to calculate the field of view.
     photons = oiGet(oi, 'photons');
-    x = size(photons, 1);
-    y = size(photons, 2);
+    x = size(photons, 2);
+    y = size(photons, 1);
     d = sqrt(x ^ 2 + y ^ 2); % Number of samples along the diagonal
     % Diagonal size by d gives us mm per step
     fwidth = (p.Results.filmDiag / d) * x;

@@ -1,13 +1,18 @@
 function piMaterialGroupAssign(thisR)
-% Map names to material data
+% Map materials.list names into material data using piMaterialAssign
 %
 % Syntax:
 %   piMaterialGroupAssign(recipe)
 %
 % Description:
-%    From a material string (mList), assign two structs, the material and
-%    target, to the recipe.  These structs contain the information used by
-%    PBRT to render the object materials.
+%    This function was built by ZL to manage the material assignments when
+%    there are many asset parts in the isetauto driving scenes. The part
+%    names that are known here are from cars or pedestrian (bodymat). 
+%
+%    This function processes all the entries in the materials.list in the
+%    recipe and invokes the piMaterialAssign for the cars in the isetauto
+%    simulation. That function assigns the material to the recipe. This
+%    information is used by PBRT to render the object materials.
 %
 % Inputs:
 %    thisR - Object. A recipe object.
@@ -18,10 +23,14 @@ function piMaterialGroupAssign(thisR)
 % Optional key/value pairs:
 %    None.
 %
+% See Also:
+%   piMaterial*
+%
 
 % History:
 %    XX/XX/18  ZL   Vistasoft Team, 2018
 %    04/03/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % A scene has a set of materials represented in its recipe
 mlist = fieldnames(thisR.materials.list);
@@ -30,27 +39,42 @@ mlist = fieldnames(thisR.materials.list);
 % material list name to a particular material definition in PBRT. We should
 % be able to print out this assignment
 
-% When the material list CONTAINS one of these strings, we know what
-% to do.  It doesn't necessarily match exactly.
+%% Various materials that we recognize
 %{
-    % Suppose mList(ii) is 'car_body_subaru' we would like this to be
-    % 'carbodysubaru'.
-    case piContains(mList(ii), 'carbody')
+% This is the list we currently handle
+(carbody ~paint_base), carpaint , window, mirror, lightsfront, lightsback
+chrome, wheel, rim, tire, plastic, metal, glass, bodymat, translucent,
+wall, paint_base
 %}
 
+%% A scene has a set of materials represented in its recipe
+mlist = fieldnames(thisR.materials.list);
+
+% Check whether each entry in mlist contains a known string, such as
+% 'carbody'.  If it does contain that string, do a particular
+% assignment using (piMaterialAssign).
+%
+% For each string in the mlist, there is a rule that converts the
+% string to a particular material definition in PBRT. That conversion
+% is implemented in the if then/else statement below.
+%
+% The mlist entry might be, say, 'carbody black'.  Then we would
+% assign the colorkd to the materal, and we would assign the material
+% with the colorkd to the recipe.
 for ii = 1:length(mlist)
     if  piContains(lower(mlist(ii)), 'carbody') && ...
             ~piContains(lower(mlist(ii)), 'paint_base')
-        if piContains(mlist(ii), 'black')
-            colorkd = piColorPick('black');
-        elseif piContains(mlist(ii), 'white')
-            colorkd = piColorPick('white');
-        else
-            colorkd = piColorPick('random');
-        end
+%         if piContains(mlist(ii), 'black')
+%             colorkd = piColorPick('black');
+%         elseif piContains(mlist(ii), 'white')
+%             colorkd = piColorPick('white');
+%         else
+            % Default
+        colorkd = piColorPick('random');
+%         end
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);   % String material label.
-        target = thisR.materials.lib.carpaintmix;
+        target = thisR.materials.lib.carpaintmix; % This is the assignment.
         piMaterialAssign(thisR, material.name, target, 'colorkd', colorkd);
     elseif piContains(lower(mlist(ii)), 'carpaint') && ...
             ~piContains(mlist(ii), 'paint_base')
@@ -63,9 +87,10 @@ for ii = 1:length(mlist)
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
-        rgbkr = [0.5 0.5 0.5];
-        piMaterialAssign(thisR, material.name, target, 'rgbkr', rgbkr);
-    elseif piContains(lower(mlist(ii)), 'mirror')
+        spkr = [400 0.5 800 0.5];
+        piMaterialAssign(thisR, material.name, target, 'spectrumkr', spkr);
+    elseif piContains(lower(mlist(ii)),'mirror') && ...
+            ~strcmpi(mlist(ii),'paint_mirror')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.mirror;
@@ -89,6 +114,8 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.chrome_spd;
         piMaterialAssign(thisR, material.name, target);
+        copyfile(fullfile(piRootPath, 'data', 'spds'), ...
+            [fileparts(thisR.outputFile), '/spds']);
     elseif piContains(lower(mlist(ii)), 'wheel')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
@@ -119,11 +146,6 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         piMaterialAssign(thisR, material.name, target);
-%     elseif piContains(mlist(ii), 'retro')
-%         name = cell2mat(mlist(ii));
-%         material = thisR.materials.list.(name);
-%         target = thisR.materials.lib.retroreflective;
-%         piMaterialAssign(thisR, material.name, target);
     elseif piContains(lower(mlist(ii)), 'bodymat')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);

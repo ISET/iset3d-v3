@@ -1,28 +1,45 @@
-function [materiallib] = piMateriallib
-% A library of materials stored in the materials struct fields
+function [materiallib_updated] = piMateriallib
+% A library of material properties
 %
 % Syntax:
 %   materiallib = piMateriallib
 %
 % Description:
-%    The material properties included here are designed to be assigned to
-%    an existing material, not replace the entire material. Typically, we
-%    read a material and if we want it to look like, say carpaint, we
-%    assign the materiallib.carpaint properties to the material.
+%    All of the material definitions that we use in ISET3d are represented
+%    in the materiallib. This function creates the material lib with the
+%    specific parameters for each type of material.
+%
+%    The PBRT material properties include the specular and diffuse and
+%    transparency material properties. The parameters to achieve these
+%    effects are stored in this library for about a dozen different
+%    material types. The definitions of the slots are defined on the PBRT
+%    web-site (https://www.pbrt.org/fileformat-v3.html#materials)
+%
+%    For the imported Cinema 4D scenes we know the material types of each
+%    part, and ISET3d specifies in the recipe for each object an
+%    object-specific name and a material type. The reflectance and other
+%    material properties are stored in this material library.
+%
+%    For example, if we want a particular part to look like, say carpaint,
+%    we assign the materiallib.carpaint properties to that object.
 %
 % Inputs:
 %    None.
 %
 % Outputs:
-%    materiallib - Struct. A structure of materials.
+%    materiallib - Struct. A structure of material definitions.
 %
 % Optional key/value pairs:
 %    None.
+%
+% See Also:
+%   piMaterial*
 %
 
 % History:
 %    XX/XX/18  ZL   Scien Stanford, 2018
 %    04/01/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %% carpaintmix
 % A mixture of a specular (mirror like) material and a substrate material
@@ -39,7 +56,7 @@ materiallib.carpaintmix.carpaint.stringnamedmaterial1 = 'paint_mirror';
 materiallib.carpaintmix.carpaint.stringnamedmaterial2 = 'paint_base';
 
 %% carpaint
-% Typical car paint without much specularity.  Some people define it this
+% Typical car paint without much specularity. Some people define it this
 % way rather than as carpaintmix.
 materiallib.carpaint.floaturoughness = 0.0005;
 materiallib.carpaint.floatvroughness = 0.00051;
@@ -61,10 +78,11 @@ materiallib.blackrubber.rgbks = [ 0.2 .2 .2 ];
 
 %% mirror
 materiallib.mirror.string = 'mirror';
-materiallib.mirror.rgbkr = [0.9 0.9 0.9];
+% materiallib.mirror.rgbkr = [0.9 0.9 0.9];
+materiallib.mirror.spectrumkr = [400 1 800 1];
 
 %% matte
-% Standard matte surface
+% Standard matte surface. Only diffuse.
 materiallib.matte.string = 'matte';
 materiallib.matte.rgbkd = [0.7 0.7 0.7];
 
@@ -77,8 +95,9 @@ materiallib.plastic.rgbks = [0.25 0.25 0.25];
 %% glass
 % Standard glass appearance
 materiallib.glass.string = 'glass';
-materiallib.glass.rgbkr = [0.9 0.9 0.9];
-materiallib.glass.rgbkt = [0.9 0.9 0.9];
+% materiallib.glass.rgbkr = [0.00415 0.00415 0.00415];
+materiallib.glass.spectrumkr = [400 1 800 1];
+materiallib.glass.spectrumkt = [400 1 800 1];
 
 %% Retroreflective
 % Standard glass appearance
@@ -97,5 +116,81 @@ materiallib.translucent.colortransmit = [0.5 0.5 0.5];
 %% substrate
 % Human skin is assigned with this material.
 materiallib.substrate.string = 'substrate';
+
+%% fourier
+materiallib.fourier.string = 'fourier';
+materiallib.fourier.bsdffile = 'bsdfs/roughglass_alpha_0.2.bsdf';
+
+%% Update the materials library?
+materiallib_updated = piMaterialEmptySlot(materiallib);
+
+end
+
+function materiallib = piMaterialEmptySlot(materiallib)
+% Use an empty material slot to update the material library
+%
+% Syntax:
+%   materiallib = piMaterialEmptySlot(materiallib)
+%
+% Description:
+%    Update the material library. (Reset all values).
+%
+% Inputs:
+%    materiallib - Struct. The material library structure.
+%
+% Outputs:
+%    materiallib - Struct. The modified material library structure.
+%
+% Optional key/value pairs:
+%    None.
+%
+
+thisMaterial = fieldnames(materiallib);
+for ii = 1:length(thisMaterial)
+    if isfield(materiallib.(thisMaterial{ii}), 'string')
+        switch materiallib.(thisMaterial{ii}).string
+            case 'glass'
+                materiallib.(thisMaterial{ii}).floatroughness = [];
+                materiallib.(thisMaterial{ii}).rgbkr = [];
+                materiallib.(thisMaterial{ii}).rgbks = [];
+                materiallib.(thisMaterial{ii}).rgbkd = [];
+                materiallib.(thisMaterial{ii}).rgbkt = [];
+            case 'metal'
+                materiallib.(thisMaterial{ii}).floatroughness = [];
+                materiallib.(thisMaterial{ii}).rgbkr = [];
+                materiallib.(thisMaterial{ii}).rgbks = [];
+                materiallib.(thisMaterial{ii}).rgbkd = [];
+                materiallib.(thisMaterial{ii}).rgbkt = [];
+            case 'mirror'
+                materiallib.(thisMaterial{ii}).floatroughness = [];
+                materiallib.(thisMaterial{ii}).rgbkr = [];
+                materiallib.(thisMaterial{ii}).rgbks = [];
+                materiallib.(thisMaterial{ii}).rgbkd = [];
+                materiallib.(thisMaterial{ii}).rgbkt = [];
+            case 'substrate'
+                materiallib.(thisMaterial{ii}).floatroughness = [];
+                materiallib.(thisMaterial{ii}).rgbkr = [];
+                materiallib.(thisMaterial{ii}).rgbkt = [];
+            case 'fourier'
+                materiallib.(thisMaterial{ii}).floatroughness = [];
+                materiallib.(thisMaterial{ii}).rgbkr = [];
+                materiallib.(thisMaterial{ii}).rgbks = [];
+                materiallib.(thisMaterial{ii}).rgbkd = [];
+                materiallib.(thisMaterial{ii}).rgbkt = [];
+            case 'translucent'
+                materiallib.(thisMaterial{ii}).floatroughness = [];
+                materiallib.(thisMaterial{ii}).rgbkr = [];
+                materiallib.(thisMaterial{ii}).rgbkt = [];
+            case 'mix'
+                materiallib.(thisMaterial{ii}).floatroughness = [];
+                materiallib.(thisMaterial{ii}).rgbkr = [];
+                materiallib.(thisMaterial{ii}).rgbks = [];
+                materiallib.(thisMaterial{ii}).rgbkd = [];
+                materiallib.(thisMaterial{ii}).rgbkt = []; 
+        end
+    else
+        continue
+    end
+end
 
 end

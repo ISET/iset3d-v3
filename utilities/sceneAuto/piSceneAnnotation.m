@@ -26,6 +26,7 @@ function scene_label = piSceneAnnotation(meshImage, label, st)
 % History:
 %    XX/XX/18  ZL/ST  Vistasoft Team, 2018
 %    04/12/19  JNM    Documentation pass
+%    04/18/19  JNM    Merge with Master (resolve conflicts)
 
 %% Check if a scitran object has been supplied
 if isempty(st), st = scitran('stanfordlabs'); end
@@ -35,20 +36,16 @@ if isempty(st), st = scitran('stanfordlabs'); end
 [sceneFolder, sceneName] = fileparts(label);
 sceneName = strrep(sceneName, '_mesh', '');
 destName_recipe = fullfile(sceneFolder, [sceneName, '.json']);
+
 % find acquisition
 if ~exist(sceneFolder, 'dir'), mkdir(sceneFolder); end
-% files = st.search('file', ...
-%    'project label exact', 'Graphics assets', ...
-%    'session label exact', 'scenes_pbrt', ...
-%    'acquisition label exact', sceneName);
-%     dataId = files{1}.parent.id;
-acquisition = st.fw.lookup(...
-    sprintf('wandell/Graphics assets/scenes_pbrt/%s', sceneName));
+acquisition = st.lookup(sprintf(...
+    'wandell/Graphics assets/scenes_pbrt/scenes_pbrt/%s', sceneName));
 dataId = acquisition.id;
 % download the file
-st.fileDownload([sceneName, '.json'], 'container type', 'acquisition' , ...
-    'container id', dataId , 'destination', destName_recipe);
+piFwFileDownload(destName_recipe, [sceneName, '.json'], dataId);
 fprintf('%s downloaded \n', [sceneName, '.json']);
+
 thisR_tmp = jsonread(destName_recipe);
 scene_label.daytime = thisR_tmp.metadata.daytime;
 scene_label.camera = thisR_tmp.camera;
@@ -71,53 +68,13 @@ for hh = 1: length(fds)
             objectList.(fds{hh}){tmp_index(ll)}.position = ...
                 objectList.(fds{hh}){tmp_index(ll)}.position(:, ll);
             objectList.(fds{hh}){tmp_index(ll)}.rotate = ...
-                objectList.(fds{hh}){tmp_index(ll)}.rotate(...
-                :, (3 * ll - 2):(3 * ll));
+                objectList.(fds{hh}){tmp_index(ll)}.rotate(:, ...
+                (3 * ll - 2):(3 * ll));
         end
     end
 end
 scene_label.bbox2d = objectList;
 scene_label.seg = scenelabel;
-%{
-% instanceIDs = unique(meshImage);  % Find index of labeled object
-% instanceIDs = instanceIDs(instanceIDs  >= 0);
-%
-% instance = instanceIDSearch(label, instanceIDs);
-% % Search ID in scene_mesh.txt, assign bndbox to the object.
-% dd = 1;
-% for ii = 1:length(instance)
-%     indicator = (meshImage == instance{ii}.index);
-%     if sum(indicator(:)) == 0, continue; end
-%
-%     xSpread = sum(indicator);
-%     xIndices = find(xSpread  >= 0);
-%
-%     ySpread = sum(indicator, 2);
-%     yIndices = find(ySpread  >= 0);
-% %     for jj = 1:length(objects)
-% %         if isequal(objects(jj).name, instance{ii}.name)
-% %             %    [~, name] = fileparts(thisR.outputFile);
-% %             %    tmp = strfind(name, '_');label = name(1:tmp - 1);
-% %             %    detections(dd).label = label;
-% %             detections(dd).index = jj;
-% %         end
-% %     end
-%     detections(dd).bndbox.xmin = min(xIndices);
-%     detections(dd).bndbox.xmax = max(xIndices);
-%     detections(dd).bndbox.ymin = min(yIndices);
-%     detections(dd).bndbox.ymax = max(yIndices);
-%     objects(detections(dd).index).bndbox.xmin = ...
-%          detections(dd).bndbox.xmin;
-%     objects(detections(dd).index).bndbox.xmax = ...
-%          detections(dd).bndbox.xmax;
-%     objects(detections(dd).index).bndbox.ymin = ...
-%          detections(dd).bndbox.ymin;
-%     objects(detections(dd).index).bndbox.ymax = ...
-%          detections(dd).bndbox.ymax;
-%     %objects(detections(dd).index).label = detections(dd).label;
-%     dd = dd + 1;
-% end
-%}
 
 end
 
@@ -173,28 +130,6 @@ else
 end
 
 end
-%{
-% function instance = instanceIDSearch(label, instanceIDs)
-% fid_tmp = fopen(label);
-% instanceIDlist = textscan(fid_tmp, '%s', 'Delimiter', '\n');
-% instanceIDlist = instanceIDlist{1};
-% fclose(fid_tmp);dd = 1;
-% for ii = 1:length(instanceIDlist)
-%     tmp = strfind(instanceIDlist{ii}, ' ');
-%     id{ii}.index = str2double(instanceIDlist{ii}(1:tmp-1));
-%     id{ii}.name = instanceIDlist{ii}(tmp + 1:end);
-%     % Search the corresponding name with the id found in meshImage
-%
-%     for jj = 1:length(instanceIDs)
-%         if instanceIDs(jj) == id{ii}.index
-%             instance{dd} = id{ii};
-%             dd = dd + 1;
-%         end
-%     end
-%     fprintf('%d object instances found \n', dd-1);
-% end
-% end
-%}
 
 function [sceneLabel, objectList] = instanceSeg(scene_mesh, label, objects)
 % Create & colorize a class & instance label map for training.

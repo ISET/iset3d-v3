@@ -27,6 +27,7 @@ function renderRecipe = piGeometryRead(renderRecipe)
 % History:
 %    XX/XX/18   Z   Created Zhenyi, 2018
 %    04/01/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %%
 p = inputParser;
@@ -44,7 +45,7 @@ end
 inputFile = fullfile(inFilepath, sprintf('%s_geometry.pbrt', scene_fname));
 
 % Save the JSON file at AssetInfo
-outputFile = renderRecipe.outputFile;
+% outputFile  = renderRecipe.outputFile;
 outFilepath = fileparts(renderRecipe.outputFile);
 AssetInfo = fullfile(outFilepath, sprintf('%s.json', scene_fname));
 
@@ -122,7 +123,7 @@ if ~convertedflag
                     values = cell2mat(tmp(2:end));
                     transform = reshape(values, [4, 4]);
                     dcm = [transform(1:3);transform(5:7);transform(9:11)];
-                    % [rotz, roty, rotx]= dcm2angle(dcm);
+                    % [rotz, roty, rotx] = dcm2angle(dcm);
                     [rotz, roty, rotx] = piDCM2angle(dcm);
                     rotx = rotx * 180 / pi;
                     roty = roty * 180 / pi;
@@ -132,7 +133,7 @@ if ~convertedflag
                     groupobj(hh).rotate(:, 1) = [rotz;0;0;1];
                     groupobj(hh).position = ...
                         reshape(transform(13:15), [3, 1]);
-                    % Add type of the object, get it from the file name, 
+                    % Add type of the object, get it from the file name,
                     % could be wrong, but this is how we named the object
                 else
                     groupobj(hh).rotate(:, 3) = [0;1;0;0];
@@ -180,9 +181,7 @@ if ~convertedflag
                     outputGeometry);
                 obj(jj).output = outputGeometry;
 
-                if ~exist(output_folder, 'dir')
-                    mkdir(output_folder);
-                end
+                if ~exist(output_folder, 'dir'), mkdir(output_folder); end
 
                 outputFileGeometry = fullfile(output_folder, output_name);
                 fid = fopen(outputFileGeometry, 'w');

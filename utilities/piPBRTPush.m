@@ -35,6 +35,12 @@ function rd = piPBRTPush(fnameZIP, varargin)
 % History:
 %    XX/XX/17  TL   SCIEN Stanford, 2017
 %    03/27/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
+
+% Examples:
+%{
+    piPBRTPush('ChessSet.zip');
+%}
 
 %% Parse inputs
 p = inputParser;
@@ -45,9 +51,8 @@ end
 % varargin = ieParamFormat(varargin);
 p.addRequired('fnameZIP', @ischar);
 p.addParameter('artifactname', '', @ischar);
-p.addParameter('pbrtversion', 'v2', @ischar);
+p.addParameter('pbrtversion', 'v3', @ischar);
 p.addParameter('rd', [], @(x)(isa(x, 'RdtClient')));
-
 p.parse(fnameZIP, varargin{:});
 
 artifactName = p.Results.artifactname;

@@ -33,6 +33,7 @@ function ieObject = piDat2ISET(inputFile, varargin)
 % History:
 %    XX/XX/18  Zhenyi/BW  SCIEN Stanford, 2018
 %    04/01/19  JNM        Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % Examples:
 %{

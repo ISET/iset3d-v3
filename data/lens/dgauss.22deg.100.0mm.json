@@ -1,0 +1,72 @@
+{
+    "description": " US patent 2,673,491 Tronnier Moden Lens Design, p.325 Focal length (mm)  ",
+    "name": " D-GAUSS F/2 22deg HFOV",
+    "surfaces": [
+        {
+            "ior": 1.6699999570846558,
+            "radius": 58.95000076293945,
+            "semi_aperture": 25.200000762939453,
+            "thickness": 7.519999980926514
+        },
+        {
+            "ior": 1.0,
+            "radius": 169.66000366210938,
+            "semi_aperture": 25.200000762939453,
+            "thickness": 0.23999999463558197
+        },
+        {
+            "ior": 1.6699999570846558,
+            "radius": 38.54999923706055,
+            "semi_aperture": 23.0,
+            "thickness": 8.050000190734863
+        },
+        {
+            "ior": 1.6990000009536743,
+            "radius": 81.54000091552734,
+            "semi_aperture": 23.0,
+            "thickness": 6.550000190734863
+        },
+        {
+            "ior": 1.0,
+            "radius": 25.5,
+            "semi_aperture": 19.0,
+            "thickness": 11.40999984741211
+        },
+        {
+            "ior": 0.0,
+            "radius": 0.0,
+            "semi_aperture": 17.049999237060547,
+            "thickness": 9.0
+        },
+        {
+            "ior": 1.6030000448226929,
+            "radius": -28.989999771118164,
+            "semi_aperture": 17.0,
+            "thickness": 2.359999895095825
+        },
+        {
+            "ior": 1.6579999923706055,
+            "radius": 81.54000091552734,
+            "semi_aperture": 20.0,
+            "thickness": 12.130000114440918
+        },
+        {
+            "ior": 1.0,
+            "radius": -40.77000045776367,
+            "semi_aperture": 20.0,
+            "thickness": 0.3799999952316284
+        },
+        {
+            "ior": 1.7170000076293945,
+            "radius": 874.1300048828125,
+            "semi_aperture": 20.0,
+            "thickness": 6.440000057220459
+        },
+        {
+            "ior": 1.0,
+            "radius": -79.45999908447266,
+            "semi_aperture": 20.0,
+            "thickness": 0.0
+        }
+    ]
+}

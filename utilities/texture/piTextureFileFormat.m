@@ -24,6 +24,7 @@ function piTextureFileFormat(thisR)
 % History:
 %    XX/XX/18  ZL   ZL Scien Stanford, 2018
 %    04/02/19  JNM  Documentation pass
+%    04/19/19  JNM  Merge with master (resolve conflicts)
 
 %%
 directory = fileparts(thisR.inputFile);
@@ -84,14 +85,16 @@ if ~isempty(bmpFiles)
     end
     fprintf('Converted %d bmp files.\n', numel(bmpFiles));
 end
+
 %% Put all texture files in a seperate folder.
-texturePath = 'textures';
-textureFiles = dir('*.png');
-if ~exist('textures', 'dir'), mkdir('textures'); end
+outputDir = fileparts(thisR.outputFile);
+textureDir = fullfile(outputDir, 'textures');
+textureFiles = dir('*.png'); 
+if ~exist(textureDir, 'dir'), mkdir(textureDir); end
 for i = 1:length(textureFiles)
     textureFileName = textureFiles(i).name;
     textureFilePath = textureFileName;
-    movefile(textureFilePath, fullfile(texturePath, textureFileName));
+    copyfile(textureFilePath, fullfile(textureDir, textureFileName));
 end
 
 cd(currentfolder)

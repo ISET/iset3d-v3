@@ -27,10 +27,14 @@ function [r1, r2, r3] = piDCM2angle(dcm)
 %    * TODO: Zhenyi to make sure that this function returns the same as
 %      dcm2angle in the Aerospace toolbox for this case.
 %
+% See Also:
+%   piRotationDefault, piGeometryRead
+%
 
 % History:
 %    XX/XX/XX  XXX  Created
 %    04/02/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % Examples:
 %{
@@ -39,14 +43,16 @@ function [r1, r2, r3] = piDCM2angle(dcm)
     [z, y, x] = piDCM2angle(dcm)
 %}
 
-% Should validate here
-%% This is the transform
-% TL: Validate seems to fail for certain scenes. Commenting out for now
-% until we figure out what's going on.
+%% Should validate here
+
+% [Note: TL - Validate seems to fail for certain scenes. Commenting out for
+% now until we figure out what's going on.]
 % validatedcm(dcm);
 
-% [r1, r2, r3] = threeaxisrot(dcm(1, 2, :), dcm(1, 1, :), -dcm(1, 3, :), ...
-%     dcm(2, 3, :), dcm(3, 3, :), -dcm(2, 1, :), dcm(2, 2, :));
+% This is the transform
+% [r1, r2, r3] = threeaxisrot(dcm(1, 2, :), ...
+%     dcm(1, 1, :), -dcm(1, 3, :), dcm(2, 3, :), ...
+%     dcm(3, 3, :), -dcm(2, 1, :), dcm(2, 2, :));
 [r1, r2, r3] = threeaxisrot(dcm(1, 2, :), dcm(1, 1, :), -dcm(1, 3, :), ...
     dcm(2, 3, :), dcm(3, 3, :));
 

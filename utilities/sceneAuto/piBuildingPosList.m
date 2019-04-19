@@ -10,40 +10,47 @@ function [buildingPosList] = piBuildingPosList(buildingList, objects)
 %    size. Return a settle list, record the settle positions and building
 %    name.
 %
-% Inputs:
-%    buildingList    - including the building size and name
-%    objects         - recipe of assets. e.g. thisR
-%
-% input of subfunction:(generated according to Input)
+%    input of subfunction:(generated according to Input)
 %       lenx_tmp: lenth of spare region in x axis
 %       leny_tmp: lenth of spare region in y axis
 %       coordinate: origin coordinate(lower left point of building, when
 %       face to the building).
 %       type: define what kind of batch the region is.
-%               including:'front', 'left', 'right', 'back', means the building
-%               area in front/left/right/back of the road.
+%               including:'front', 'left', 'right', 'back', means the
+%               building area in front/left/right/back of the road.
+%
+% Inputs:
+%    buildingList    - including the building size and name
+%    objects         - recipe of assets. e.g. thisR
 %
 % Output:
 %    buildingPosList - record how to settle buildings on the given region,
-%       including building position and building name(position refer to the
-%       lower left point.
+%                      including building position and building
+%                      name(position refer to the lower left point.
 %
-% Parameter:
-%       offset: adjust the interval between the buildings. default is 2
+% Optional key/value pairs:
+%    offset          - Numeric. A numeric value used to adjust the interval
+%                      between the buildings. Default is 2.
 %
+% See Also:
+%   piBuildingPlace
 %
+
 % History:
 %    09/21/18  JZ   Jiaqi Zhang 09.21.2018
 %    04/09/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
+%%
 buildingPosList = struct;
 for ii = 1:length(buildingList)
     building_list.size(ii, 1) = buildingList(ii).geometry.size.l;
     building_list.size(ii, 2) = buildingList(ii).geometry.size.w;
     building_list.name{ii} = buildingList(ii).geometry.name;
 end
+
+% tmp = 0;
 count = 1;  % initial parameters
-tmp = 0;
 buildingPosList_tmp = struct;
 sum = 0;
 for mm = 1:length(buildingList)
@@ -65,13 +72,13 @@ for kk = 1:length(objects.assets)
         switch type
             case 'front'
                 if coordination(1) < 0
-                    ankor = coordination + [lenx_tmp, 0];
+                    ankor = coordination + [lenx_tmp, 1];
                 else
                     ankor = coordination;
                 end
             case 'back'
                 if coordination(1) > 0
-                    ankor = coordination - [lenx_tmp, 0];
+                    ankor = coordination - [lenx_tmp, 1];
                 else
                     ankor = coordination;
                 end
@@ -81,6 +88,7 @@ for kk = 1:length(objects.assets)
         [buildingPosList_tmp, count] = buildingPlan(building_list, ...
             lenx_tmp, leny_tmp, coordination, buildingPosList_tmp, ...
             count, type, ankor, aveW);
+
         % %% Delete unnecessary buildings from building list
         % if initialStruct == 1   % for struct's first use, initialize it
         %     FieldName = fieldnames(buildingPosList_tmp)';
@@ -102,6 +110,7 @@ for kk = 1:length(objects.assets)
         %             finalCount = finalCount + 1;
         %         end
         %     end
+        
         %% change the structure of the output data
         for jj = count_before:length(buildingPosList_tmp)
             buildingPosList(jj).name = buildingPosList_tmp(jj).name;
@@ -111,12 +120,13 @@ for kk = 1:length(objects.assets)
             buildingPosList(jj).rotate = buildingPosList_tmp(jj).rotate;
         end
 
-        %% test algotithm. Comment this part when using.
-        figure(1);
+        %% test algotithm. Comment this part when using.        
+        ieNewGraphWin;
         hold on;
         xlim([-130, 130]);
         ylim([-30, 280]);
         hold on;
+
         switch type
             case 'front'
                 % test algorithm for 'front' situation
@@ -181,13 +191,12 @@ for kk = 1:length(objects.assets)
                     title('back');
                 end
         end
-        tmp = tmp + 1;
-        disp(tmp);
-        %close(figure(1))
+
+        % tmp = tmp + 1; 
+        % disp(tmp);
     end
 
 end
-%%
 
 end
 
@@ -196,7 +205,7 @@ function [settle_list, count] = buildingPlan(building_list, lenx_tmp, ...
 
 % Adjust the interval between the buildings. If this is set too large it
 % will cause problems.
-offset = 2;
+offset = 0.2;
 
 %% calculate the parameter in spare region.
 switch type

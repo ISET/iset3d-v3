@@ -1,0 +1,90 @@
+{
+    "description": " Description: multi element lens Focal length (mm) ",
+    "name": " Name: wide.40deg.12.5mm",
+    "surfaces": [
+        {
+            "ior": 1.503999948501587,
+            "radius": 17.274749755859375,
+            "semi_aperture": 8.9375,
+            "thickness": 0.42500001192092896
+        },
+        {
+            "ior": 1.0,
+            "radius": 9.225125312805176,
+            "semi_aperture": 7.25,
+            "thickness": 2.2249999046325684
+        },
+        {
+            "ior": 1.4869999885559082,
+            "radius": 20.285625457763672,
+            "semi_aperture": 7.25,
+            "thickness": 0.42500001192092896
+        },
+        {
+            "ior": 1.0,
+            "radius": 9.192500114440918,
+            "semi_aperture": 6.75,
+            "thickness": 7.025000095367432
+        },
+        {
+            "ior": 1.7200000286102295,
+            "radius": 9.572875022888184,
+            "semi_aperture": 4.875,
+            "thickness": 5.012499809265137
+        },
+        {
+            "ior": 1.6069999933242798,
+            "radius": 4.202499866485596,
+            "semi_aperture": 3.0,
+            "thickness": 2.2750000953674316
+        },
+        {
+            "ior": 1.0,
+            "radius": -33.404624938964844,
+            "semi_aperture": 3.0,
+            "thickness": 0.4000000059604645
+        },
+        {
+            "ior": 1.0,
+            "radius": 0.0,
+            "semi_aperture": 2.3499999046325684,
+            "thickness": 0.4000000059604645
+        },
+        {
+            "ior": 1.569000005722046,
+            "radius": -43.29750061035156,
+            "semi_aperture": 2.75,
+            "thickness": 0.48750001192092896
+        },
+        {
+            "ior": 1.6230000257492065,
+            "radius": 5.241250038146973,
+            "semi_aperture": 2.75,
+            "thickness": 4.287499904632568
+        },
+        {
+            "ior": 1.722000002861023,
+            "radius": -3.934999942779541,
+            "semi_aperture": 3.125,
+            "thickness": 2.450000047683716
+        },
+        {
+            "ior": 1.0,
+            "radius": -9.544875144958496,
+            "semi_aperture": 4.375,
+            "thickness": 8.699999809265137
+        },
+        {
+            "ior": 1.6419999599456787,
+            "radius": -6.90987491607666,
+            "semi_aperture": 6.25,
+            "thickness": 1.5625
+        },
+        {
+            "ior": 1.0,
+            "radius": -11.70300006866455,
+            "semi_aperture": 7.625,
+            "thickness": 0.0
+        }
+    ]
+}

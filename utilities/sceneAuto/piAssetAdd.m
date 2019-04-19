@@ -25,6 +25,7 @@ function [thisR] = piAssetAdd(renderRecipe, assets, varargin)
 % History:
 %    XX/XX/XX  XXX  Created
 %    04/09/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %%
 % objects = assets;
@@ -165,16 +166,26 @@ for ii = 1:length(assets.(assetname))
 
     %% add objects.geometry to scene(geometry struct)
     scene = thisR.assets;
+    if isfield(scene,'scale'),scene=rmfield(scene,'scale');end
     % add motion slot
     if geometry
         numScene = length(scene);
         numObj = length(assets.(assetname)(ii).geometry);
         for hh = 1:numObj
+            if isfield(assets.(assetname)(ii).geometry, 'scale')
+                assets.(assetname)(ii).geometry = ...
+                    rmfield(assets.(assetname)(ii).geometry, 'scale');
+            end
             scene(numScene + hh) = assets.(assetname)(ii).geometry(hh);
+            %%
         end
     end
+    if exist(assets.(assetname)(1).geometryPath, 'dir')
+        assetPath = fullfile(piRootPath, 'local', assets.(assetname).index);
+        scenePath = fileparts(thisR.outputFile);
+        copyfile(assetPath, scenePath);
+    end
     thisR.assets = scene;
-
 end
 
 end

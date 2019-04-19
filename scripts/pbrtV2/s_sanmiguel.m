@@ -31,7 +31,7 @@ if ~piDockerExists, piDockerConfig; end
 
 % Check that you have the sanmiguel data in the data directory.
 if ~exist(fullfile(piRootPath,'data','sanmiguel'),'dir')
-    piPBRTFetch('sanmiguel','pbrt version','v2');
+    piPBRTFetch('sanmiguel','pbrt version',2);
 end
 
 %% Specify the pbrt scene file and its dependencies

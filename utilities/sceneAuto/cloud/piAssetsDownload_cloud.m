@@ -63,10 +63,8 @@ if isempty(acquisitionname)
         % resourceCombine.m 08/14 --zhenyi
         destName_resource = fullfile(localFolder, sprintf('%s.zip', n));
         if ~exist(localFolder, 'dir'), mkdir(localFolder); end
-        st.fileDownload(resourceFiles{ii}{1}.name, ...
-            'container type', 'acquisition' , ...
-            'container id', resource_acqID{ii} , ...
-            'unzip', true, 'destination', destName_resource);   
+        piFwFileDownload(destName_resource, resourceFiles{ii}{1}.name, ...
+            resource_acqID{ii});
     end
 
     fprintf('%d Files downloaded.\n', nDatabaseAssets);
@@ -86,9 +84,6 @@ else
     % resourceCombine.m 08/14 --zhenyi
     destName_resource = fullfile(localFolder, sprintf('%s.zip', n));
     if ~exist(localFolder, 'dir'), mkdir(localFolder); end
-    st.fileDownload(thisAcq, 'container type', 'acquisition', ...
-        'container id', thisID, ...
-        'unzip', true, 'destination', destName_resource);
-    fprintf('%s downloaded.\n', n);
-end
+    piFwFileDownload(destName_resource, thisAcq, thisID);
+    fprintf('%s downloaded.\n',n);
 end

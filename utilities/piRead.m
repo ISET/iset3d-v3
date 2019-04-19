@@ -53,6 +53,7 @@ function thisR = piRead(fname, varargin)
 % History:
 %    XX/XX/17  TL   Scienstanford 2017
 %    04/01/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % Examples:
 %{
@@ -72,7 +73,7 @@ if length(varargin) > 1
         end
     end
 else
-    varargin =ieParamFormat(varargin);
+    varargin = ieParamFormat(varargin);
 end
 
 p.addRequired('fname', @(x)(exist(fname, 'file')));
@@ -88,11 +89,11 @@ thisR.inputFile = fname;
 readmaterials = p.Results.readmaterials;
 
 % Set the output directory default
-% fprintf('Setting output path\n');
 [~, scene_fname] = fileparts(fname);
 outFilepath = fullfile(piRootPath, 'local', scene_fname);
 outputFile = fullfile(outFilepath, [scene_fname, '.pbrt']);
-thisR.outputFile = outputFile;
+% thisR.outputFile = outputFile;
+thisR.set('outputFile', outputFile);
 
 %% Check version number
 if ver ~= 2 && ver ~=3

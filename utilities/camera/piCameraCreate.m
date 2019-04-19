@@ -36,13 +36,14 @@ function camera = piCameraCreate(cameraType, varargin)
 % History:
 %    XX/XX/17  TL   SCIEN STANFORD 2017 
 %    04/02/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %% Check input
 p = inputParser;
 p.addRequired('cameraType', @ischar);
 p.addParameter('lensFile', 'dgauss.22deg.12.5mm.dat', ...
     @(x)(exist(x, 'file')));
-p.addParameter('pbrtVersion', 2, @isscalar);
+p.addParameter('pbrtVersion', 3, @isscalar);
 
 p.parse(cameraType, varargin{:});
 lensFile = p.Results.lensFile;

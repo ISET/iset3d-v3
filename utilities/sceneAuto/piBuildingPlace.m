@@ -5,11 +5,12 @@ function assetsPlaced = piBuildingPlace(assetsList, buildingPosList)
 %   assetsPlaced = piBuildingPlace(assetList, buildingPosList)
 %
 % Description:
-%    Place building assets exactly by names.
+%    Place building assets exactly by names. This is part of the SUSO code
+%    that positions the buildings onto the road.
 %
 % Inputs:
-%    assetsList      - Struct. A structure containing all of the assets and
-%                      their information.
+%    assetsList      - Struct. A structure containing all of the building
+%                      assets and their information.
 %    buildingPosList - Struct. A structure containing all of the
 %                      information on building positions & placement.
 %
@@ -22,14 +23,16 @@ function assetsPlaced = piBuildingPlace(assetsList, buildingPosList)
 %
 
 % History:
-%    XX/XX/XX  XXX  Created
+%    XX/XX/XX  ZL   Created
 %    04/11/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
-%%
+%% Make a cell array of the names associated with each position.
 for ii = 1:length(buildingPosList)
     PosList{ii} = buildingPosList(ii).name;
 end
 
+% Check that are unique
 PosListCheck = unique(PosList);
 for kk = 1:length(PosListCheck)
     count = 1;
@@ -41,7 +44,7 @@ for kk = 1:length(PosListCheck)
         end
     end
 end
-% asset = buildingList.building;
+
 asset = assetsList;
 for ii = 1:length(buildingPosList_tmp)
     % gg = 1;
@@ -79,6 +82,7 @@ for ii = 1:length(buildingPosList_tmp)
     end
     % end
 end
+
 assetsPlaced = assets_updated;
 % [Note: the reason why we keep this part seperate is that when we need to
 % check which buidling does not look correct in rendered image, we want to
@@ -91,4 +95,5 @@ for jj = 1:length(assetsPlaced)
         assetsPlaced(jj).geometry.name = sprintf('building_%s', name);
     end
 end
+
 end

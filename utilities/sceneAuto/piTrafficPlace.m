@@ -34,6 +34,7 @@ function [assetsPosList, assets] = piTrafficPlace(trafficflow, varargin)
 % History:
 %    XX/XX/XX  ZL   Author: Zhenyi Liu (ZL)
 %    04/05/19  JNM  Documentation pass
+%    04/19/19  JNM  Merge with master (resolve conflicts)
 
 %% Parse parameterss
 p = inputParser;
@@ -128,40 +129,45 @@ if nScene == 1
         % transformation of both.
         for jj = 1:length(assets_shuffled.(assetClass))
              assets_shuffled.(assetClass)(jj).motion = [];
-            for ii = 1:numel(...
-                    trafficflow(timestamp + 1).objects.(assetClass))
-                if strcmp(assets_shuffled.(assetClass)(jj).name, ...
-                        trafficflow(timestamp + 1).objects.(...
-                        assetClass)(ii).name)
-                    assets_shuffled.(assetClass)(jj).motion.pos = ...
-                        trafficflow(timestamp + 1).objects.(...
-                        assetClass)(ii).pos;
-                    assets_shuffled.(...
-                        assetClass)(jj).motion.orientation = ...
-                        trafficflow(timestamp + 1).objects.(...
-                    assetClass)(ii).orientation;
-                    assets_shuffled.(assetClass)(jj).motion.slope = ...
-                        trafficflow(timestamp + 1).objects.(...
-                        assetClass)(ii).slope;
-                end
-            end
-            if isempty(assets_shuffled.(assetClass)(jj).motion)
-                % there are cases when a car is going out of boundary or
-                % some else reason, sumo decides to kill this car, so in
-                % these cases, the motion info remains empty so we should
-                % estimate by speed information;
-                from = assets_shuffled.(assetClass)(jj).pos;
-                distance = assets_shuffled.(assetClass)(jj).speed;
-                orientation = assets_shuffled.(assetClass)(jj).orientation;
-                to(1) = from(1) + distance * cosd(orientation);
-                to(2) = from(2);
-                to(3) = from(3) - distance * sind(orientation);
-                assets_shuffled.(assetClass)(jj).motion.pos = to;
-                assets_shuffled.(assetClass)(jj).motion.orientation = ...
-                    assets_shuffled.(assetClass)(jj).orientation;
-                assets_shuffled.(assetClass)(jj).motion.slope = ...
-                    assets_shuffled.(assetClass)(jj).slope;
-            end
+             try
+                 for ii = 1:numel(...
+                         trafficflow(timestamp + 1).objects.(assetClass))
+                     if strcmp(assets_shuffled.(assetClass)(jj).name, ...
+                             trafficflow(timestamp + 1).objects.(...
+                             assetClass)(ii).name)
+                         assets_shuffled.(assetClass)(jj).motion.pos = ...
+                             trafficflow(timestamp+1).objects.(...
+                             assetClass)(ii).pos;
+                         assets_shuffled.(assetClass)(...
+                             jj).motion.orientation = trafficflow(...
+                             timestamp + 1).objects.(...
+                             assetClass)(ii).orientation;
+                         assets_shuffled.(assetClass)(...
+                             jj).motion.slope = trafficflow(...
+                             timestamp + 1).objects.(assetClass)(ii).slope;
+                     end
+                 end
+             catch
+                 fprintf('% not found in next timestamp \n', assetClass);
+             end
+             if isempty(assets_shuffled.(assetClass)(jj).motion)
+                 % there are cases when a car is going out of boundary or
+                 % some else reason, sumo decides to kill this car, so in
+                 % these cases, the motion info remains empty so we should
+                 % estimate by speed information;
+                 from = assets_shuffled.(assetClass)(jj).pos;
+                 distance = assets_shuffled.(assetClass)(jj).speed;
+                 orientation = assets_shuffled.(assetClass)(...
+                     jj).orientation;
+                 to(1) = from(1) + distance * cosd(orientation);
+                 to(2) = from(2);
+                 to(3) = from(3) - distance * sind(orientation);
+                 assets_shuffled.(assetClass)(jj).motion.pos = to;
+                 assets_shuffled.(assetClass)(jj).motion.orientation = ...
+                     assets_shuffled.(assetClass)(jj).orientation;
+                 assets_shuffled.(assetClass)(jj).motion.slope = ...
+                     assets_shuffled.(assetClass)(jj).slope;
+             end
         end
         for ii = 1: length(assets.(assetClass))
             [~, n] = size(assets.(assetClass)(ii).geometry(1).position);
@@ -199,9 +205,7 @@ if nScene == 1
                 piAssetMotionAdd(assets_updated.(...
                 assetClass)(ii).geometry, 'translation', motionPos, ...
                 'Y', motionRotY, 'Z', motioinSlope, 'Pos_demention', n);
-
         end
-
     end
     assetsPosList{1} = assets_updated;
 end

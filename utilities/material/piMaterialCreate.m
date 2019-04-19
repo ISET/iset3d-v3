@@ -53,10 +53,14 @@ m.floatvroughness = [];
 m.floatroughness =[];
 m.spectrumkd = '';
 m.spectrumks ='';
+m.spectrumkr = '';
+m.spectrumkt ='';
 m.spectrumk = '';
 m.spectrumeta ='';
 m.stringnamedmaterial1 = '';
 m.stringnamedmaterial2 = '';
 m.texturebumpmap = '';
+m.bsdffile = '';
+m.boolremaproughness = '';
 
 end

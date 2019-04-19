@@ -5,7 +5,8 @@ function [thisR_scene, road] = piSceneAuto(varargin)
 %   [thisR_scene, road] = piSceneAuto([varargin])
 %
 % Description:
-%    Generate scene(s) for Autonomous driving scenarios using SUMO/SUSO.
+%    Assembles assets from Flywheel and SUMO/SUSO into a city or suburban
+%    street scene.
 %
 % Inputs
 %  None.
@@ -18,31 +19,34 @@ function [thisR_scene, road] = piSceneAuto(varargin)
 %
 % Optional key/value pairs:
 %    sceneType           - String. A string indicating the city type.
-%                          Options are 'city', & 'suburb'. Default 'city'.
+%                          Options are 'city', & 'suburban'. Default city.
 %    treeDensity         - String. A string indicating the density of trees
-%                          within the scene. Default 'random'.
+%                          within the scene. Default 'random'. This
+%                          variable is currently unused.
 %    roadType            - String. A string indicating the type of road.
-%                          Options are: 'crossroad', 'straight', 'merge',
+%                          See piRoadTypes for more information. Options
+%                          are: 'crossroad', 'straight', 'merge',
 %                          'roundabout', 'right turn', and 'left turn'.
 %                          Default 'crossroad'.
 %    trafficeFlowDensity - String. A string indicating the traffic flow
-%                          density. Default 'medium'.
-%    weatherType         - String. A string indicating the weather
-%                          conditions. Default 'clear'.
-%    dayTime             - String. A string indicating the time of day.
-%                          Options include 'day' & 'night'. Default 'day'.
-%    timeStamp           - Numeric. The duration of time for the traffic
-%                          scene. Default 50.
-%    nScene              - Numeric. The scene number. Default 1.
+%                          density. Options include 'low', 'medium', and
+%                          'high'. Default 'medium'.
+%    timeStamp           - Numeric. The integer duration of time for the
+%                          scene. (Ticks in SUMO simulation). Default 50.
 %    cloudRender         - Boolean. A numeric boolean indicating whether or
-%                          not to render clouds. Default 1 (true).
-%    scitran             - Object. A scitran object. The default is [], and
-%                          then pulls an instance of 'stanfordlabs'.
+%                          not to render on GCP. Default 1 (true).
+%    scitran             - Object. A scitran object (Flywheel.io interface
+%                          object). The default is [], and then pulls an
+%                          instance of 'stanfordlabs'.
+%
+% See Also:
+%   piRoadTypes, t_piDrivingScene_demo
 %
 
 % History:
-%    XX/XX/XX  ZL   Created
+%    XX/XX/XX  ZL   Created by Zhenyi Liu
 %    04/05/19  JNM  Documentation pass, add Windows support.
+%    04/19/19  JNM  Merge with Master (resolve conflicts)
 
 %% Read input parameters
 p = inputParser;
@@ -62,110 +66,111 @@ p.addParameter('treeDensity', 'random', @ischar);
 p.addParameter('roadType', 'crossroad', @ischar);
 p.addParameter('trafficflowDensity', 'medium', @ischar);
 p.addParameter('weatherType', 'clear', @ischar);
-p.addParameter('dayTime', 'day', @ischar);
 p.addParameter('timestamp', 50, @isnumeric);
-p.addParameter('nScene', 1, @isnumeric);
 p.addParameter('cloudRender', 1);
 p.addParameter('scitran', [], @(x)(isa(x, 'scitran')));
 p.parse(varargin{:});
 
 sceneType = p.Results.sceneType;
-treeDensity = p.Results.treeDensity;
+treeDensity = p.Results.treeDensity;  % Not yet used.
 roadType = p.Results.roadType;
 trafficflowDensity = p.Results.trafficflowDensity;
-weatherType = p.Results.weatherType;
-dayTime = p.Results.dayTime;
 timestamp = p.Results.timestamp;
 st = p.Results.scitran;
 cloudRenderFlag = p.Results.cloudRender;
 
 %% Flywheel initialization
 if isempty(st), st = scitran('stanfordlabs'); end
-hierarchy = st.projectHierarchy('Graphics assets');
-sessions = hierarchy.sessions;
 
-%% Create a road using SUMO
-% This function call returns a road structure and a road recipe object. The
-% structure contains road information and Flyweel asset list: road.fwList;
-[road, thisR_road] = piRoadCreate('type', roadType, ...
-    'trafficflowDensity', trafficflowDensity, 'sessions', sessions, ...
+%% Read a road from Flywheel that we will use with SUMO
+% Lookup the flywheel project with all the Graphics assets
+project = st.lookup('wandell/Graphics assets');
+
+% Find the session with the road information
+roadSession = project.sessions.findOne('label=road');
+
+% Assemble the road
+[road,thisR_road] = piRoadCreate('roadtype', roadType, ...
+    'trafficflowDensity', trafficflowDensity, 'session', roadSession, ...
     'sceneType', sceneType, 'cloudRender', cloudRenderFlag, 'scitran', st);
+disp('Created road')
 
-% It takes about 6 mins to generate a trafficflow, so for each scene, we'd
-% like generate the trafficflow only once.
-roadFolder = fileparts(thisR_road.inputFile);
-if ispc
-    roadFolder = strsplit(roadFolder, '\');
-else
-    roadFolder = strsplit(roadFolder, '/');
-end
-roadName = roadFolder{length(roadFolder)};
+%% Read a local traffic flow if available
+% This is where SUMO is called, or the local file is read
 trafficflowPath = fullfile(piRootPath, 'local', 'trafficflow', ...
-    sprintf('%s_%s_trafficflow.mat', roadName, trafficflowDensity));
+    sprintf('%s_%s_trafficflow.mat', roadType, trafficflowDensity));
 trafficflowFolder = fileparts(trafficflowPath);
 
 if ~exist(trafficflowFolder, 'dir'), mkdir(trafficflowFolder); end
 
-% This is where SUMO is called.  Or maybe the file already exists.
-if ~exist(trafficflowPath, 'file')
+if ~exist(trafficflowPath,'file')
     trafficflow = piTrafficflowGeneration(road);
     save(trafficflowPath, 'trafficflow');
+    disp('Generated traffic flow using SUMO')
 else
     load(trafficflowPath, 'trafficflow');
+    disp('Loaded local file of traffic flow')
 end
 
-%% SUSO setting
-% %{
-% Uncomment when SUSO runs
+%% SUSO Simulation of urban static objects
+% Put the trees and other assets into the city or suburban street
 tic
-tree_interval = rand(1) * 20 + 5;
-if piContains(sceneType, 'city') || piContains(sceneType, 'suburb')
+tree_interval = 10;
+if piContains(sceneType,'city') || piContains(sceneType, 'suburb')
     susoPlaced = piSidewalkPlan(road, st, trafficflow(timestamp), ...
         'tree_interval', tree_interval);
+    disp('Sidewalk generated');
+
     % place parked cars
     if piContains(roadType, 'parking')
         trafficflow = piParkingPlace(road, trafficflow);
+        disp('Parked cars placed')
     end
+
     building_listPath = fullfile(piRootPath, 'local', 'AssetLists', ...
         sprintf('%s_building_list.mat', sceneType));
 
     if ~exist(building_listPath, 'file')
         building_list = piAssetListCreate('class', sceneType, ...
             'scitran', st);
+        disp('Created building list and saved')
         save(building_listPath, 'building_list')
     else
         load(building_listPath, 'building_list');
+        disp('Loaded local file of buildings')
     end
     buildingPosList = piBuildingPosList(building_list, thisR_road);
     susoPlaced.building = piBuildingPlace(building_list, buildingPosList);
 
-    % Add All placed assets
+    % Put the suso placed assets on the road
     thisR_road = piAssetAdd(thisR_road, susoPlaced);
-    % thisR_scene = piAssetAdd(thisR_road, assetsPlaced);
     toc
-    % create a file ID & name strings for Flywheel to copy selected assets
-    % over to VMs. The below is static objects.
-    road = fwInfoCat(road, susoPlaced);
-end
-%}
 
-%% Place vehicles/pedestrians using the SUMO data
+    % Create a file ID & name strings for Flywheel to copy selected assets
+    % over to VMs.
+    road = fwInfoAppend(road, susoPlaced);
+    disp('Assets placed on the road');
+else
+    disp('No SUSO assets placed.  Not city or suburban');
+end
+
+%% Place vehicles/pedestrians from  SUMO traffic flow data on the road
 [sumoPlaced, ~] = piTrafficPlace(trafficflow, 'timestamp', timestamp, ...
     'resources', ~cloudRenderFlag, 'scitran', st);
+
 for ii = 1: length(sumoPlaced)
     thisR_scene = piAssetAdd(thisR_road, sumoPlaced{ii});
 end
 
-road = fwInfoCat(road, sumoPlaced{1}); % mobile objects
+road = fwInfoAppend(road, sumoPlaced{1}); % mobile objects
 
 end
 
-% Maybe a better name and maybe attached to the relevant object.
-function road = fwInfoCat(road, assets)
+function road = fwInfoAppend(road, assets)
 % List the selected fwInfo str with road.fwList
 %
 % Syntax:
-%   road = fwInfoCat(roat, assets)
+%   road = fwInfoAppend(road, assets)
 %
 % Description:
 %   List the selected fwInfo string with road.fwList.

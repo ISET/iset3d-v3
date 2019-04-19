@@ -29,6 +29,7 @@ function tf = piContains(str, pattern, varargin)
 % History:
 %    XX/XX/XX  DHB/ZL  ISETBIO Team
 %    03/29/19  JNM     Documentation pass. Ingore case added.
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % Examples:
 %{

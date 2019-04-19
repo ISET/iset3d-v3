@@ -21,6 +21,7 @@ function rgb = piColorPick(color)
 % History:
 %    XX/XX/XX  XXX  Created
 %    04/01/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 if piContains(color, 'random')
     colorlist = {'white', 'black', 'red', 'blue', 'silver', ''};
@@ -62,37 +63,37 @@ function rgb = colorswitch(color)
 
 switch color
     case 'white'
-        r = randi(14, 1) + 240;
+        r = randi(14, 1) + 220;
         g = r;
         b = r;
         rgb = [r/255 g/255 b/255];
     case 'black'
-        r = randi(50, 1);
-        g = randi(20, 1);
-        b = randi(20, 1);
+        r = randi(50, 1) + 20;
+        g = randi(20, 1) + 20;
+        b = randi(20, 1) + 20;
         rgb = [r/255 g/255 b/255];
     case 'red'
         r = randi(50, 1) + 200;
-        g = randi(30, 1);
-        b = randi(30, 1);
+        g = randi(30, 1) + 30;
+        b = randi(30, 1) + 30;
         rgb = [r/255 g/255 b/255];
     case 'blue'
-        r = randi(50, 1);
+        r = randi(50, 1) + 15;
         g = 50 + randi(50, 1);
         b = 205 + randi(50, 1);
         rgb = [r/255 g/255 b/255];
     case 'green'
-        r = randi(80, 1);
+        r = randi(80, 1) + 10;
         g = 120 + randi(80, 1);
-        b = randi(80, 1);
+        b = randi(80, 1) + 10;
         rgb = [r/255 g/255 b/255];
     case 'yellow'
         r = 170 + randi(50, 1);
         g = r-10;
-        b = randi(50, 1);
+        b = randi(50, 1) + 15;
         rgb = [r/255 g/255 b/255];
     case 'silver'
-        r = 200;
+        r = randi(20,1)+150;
         g = r;
         b = g;
         rgb = [r/255 g/255 b/255];

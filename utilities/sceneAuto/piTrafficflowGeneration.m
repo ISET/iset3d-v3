@@ -35,6 +35,7 @@ function trafficflow = piTrafficflowGeneration(road, varargin)
 %    04/05/19  JNM  Documentation pass. Remove trafficFlowDensity optional
 %                   parameter(unused) and add in pedestrian. Add Windows
 %                   SUMO_HOME support.
+%    04/19/19  JNM  Merge with master (resolve conflicts)
 
 %% SUMO_HOME environment variable
 % This needs to be generalized!

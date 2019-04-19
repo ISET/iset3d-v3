@@ -37,6 +37,7 @@ function thisR = ...
 % History:
 %    XX/XX/XX  XXX  Created
 %    04/03/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %%
 p = inputParser;

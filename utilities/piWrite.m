@@ -45,6 +45,7 @@ function workingDir = piWrite(renderRecipe, varargin)
 %    XX/XX/17  TL   Scien Stanford 2017
 %    01/25/19  JNM  Add Windows support 01/25/2019
 %    03/25/19  JNM  Documentation pass.
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 % Examples:
 %{
@@ -74,16 +75,10 @@ if length(varargin) > 1
         end
     end
 else
-    varargin =ieParamFormat(varargin);
+    varargin = ieParamFormat(varargin);
 end
 
 p.addRequired('renderRecipe', @(x)isequal(class(x), 'recipe'));
-
-%{
-    % JNM -- Why format variables twice?
-    % Format the parameters by removing spaces and forcing lower case.
-    % if ~isempty(varargin), varargin = ieParamFormat(varargin); end
-%}
 
 % Copy over the whole directory
 p.addParameter('overwriteresources', true, @islogical);
@@ -119,8 +114,8 @@ overwritegeometry = p.Results.overwritegeometry;
 creatematerials = p.Results.creatematerials;
 lightsFlag = p.Results.lightsFlag;
 thistrafficflow = p.Results.thistrafficflow;
-%% Copy the input directory to the Docker working directory
 
+%% Copy the input directory to the Docker working directory
 % Input must exist
 inputDir = fileparts(renderRecipe.inputFile);
 if ~exist(inputDir, 'dir'), error('Could not find %s\n', inputDir); end
@@ -217,10 +212,6 @@ end
 renderingDir = fullfile(workingDir, 'renderings');
 if ~exist(renderingDir, 'dir'), mkdir(renderingDir); end
 
-%% Make sure there is a renderings sub-directory of the working directory
-renderingDir = fullfile(workingDir, 'renderings');
-if ~exist(renderingDir, 'dir'), mkdir(renderingDir); end
-
 %% OK, we are good to go. Open up the file.
 % fprintf('Opening %s for output\n', outFile);
 fileID = fopen(outFile, 'w');
@@ -237,7 +228,6 @@ if(isfield(renderRecipe.film, 'cropwindow'))
 end
 
 %% Write Scale and LookAt commands first
-
 % Optional Scale
 if(~isempty(renderRecipe.scale))
    fprintf(fileID, 'Scale %0.2f %0.2f %0.2f \n', ...
@@ -246,34 +236,25 @@ if(~isempty(renderRecipe.scale))
 end
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
-if isfield(renderRecipe.camera, 'motion')
+
+if isfield(renderRecipe.camera, 'motion') 
     motionTranslate = ...
         renderRecipe.camera.motion.activeTransformStart.pos - ...
         renderRecipe.camera.motion.activeTransformEnd.pos;
-    motionRotate = ...
-        renderRecipe.camera.motion.activeTransformStart.rotate - ...
-        renderRecipe.camera.motion.activeTransformEnd.rotate;
+    motionStart = renderRecipe.camera.motion.activeTransformStart.rotate;
+    motionEnd = renderRecipe.camera.motion.activeTransformEnd.rotate;
     fprintf(fileID, 'ActiveTransform StartTime \n');
     fprintf(fileID, 'Translate 0 0 0 \n');
+    fprintf(fileID, 'Rotate %f %f %f %f \n', motionStart(:, 1)); % Z
+    fprintf(fileID, 'Rotate %f %f %f %f \n', motionStart(:, 2)); % Y
+    fprintf(fileID, 'Rotate %f %f %f %f \n', motionStart(:, 3)); % X
     fprintf(fileID, 'ActiveTransform EndTime \n');
     fprintf(fileID, 'Translate %0.2f %0.2f %0.2f \n', ...
-        [motionTranslate(1), ...
-        motionTranslate(2), ...
-        motionTranslate(3)]);
-    fprintf(fileID, 'Rotate %0.2f 0 1 0 \n', motionRotate);
+        [motionTranslate(1), motionTranslate(2), motionTranslate(3)]);
+    fprintf(fileID, 'Rotate %f %f %f %f \n', motionEnd(:, 1)); % Z
+    fprintf(fileID, 'Rotate %f %f %f %f \n', motionEnd(:, 2)); % Y
+    fprintf(fileID, 'Rotate %f %f %f %f \n', motionEnd(:, 3)); % X
     fprintf(fileID, 'ActiveTransform All \n');
-%     fprintf(fileID, 'ActiveTransform StartTime \n');
-%     fprintf(fileID, 'Translate %0.2f %0.2f %0.2f\n', ...
-%         [renderRecipe.camera.motion.activeTransformStart.pos(1), ...
-%         renderRecipe.camera.motion.activeTransformStart.pos(2), ...
-%         renderRecipe.camera.motion.activeTransformStart.pos(3)]);
-% %     fprintf(fileID, 'Rotate \n'); % add rotate aroung x, y, z
-%     fprintf(fileID, 'ActiveTransform EndTime \n');
-%     fprintf(fileID, 'Translate %0.2f %0.2f %0.2f\n', ...
-%         [renderRecipe.camera.motion.activeTransformEnd.pos(1), ...
-%         renderRecipe.camera.motion.activeTransformEnd.pos(2), ...
-%         renderRecipe.camera.motion.activeTransformEnd.pos(3)]);
-%     fprintf(fileID, 'ActiveTransform All \n');
 end
 % Required LookAt
 fprintf(fileID, ...
@@ -399,6 +380,9 @@ end
 
 %% Write out WorldBegin/WorldEnd
 if creatematerials
+    % We may have created new materials.
+    % We write the material and geometry files based on the recipe,
+    % which defines these new materials.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
         if piContains(currLine, 'materials.pbrt')
@@ -414,8 +398,16 @@ if creatematerials
         fprintf(fileID, '%s \n', currLine);
     end
 else
+    % No materials were created, so we just write out the world data
+    % without any changes.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
+        if overwritegeometry
+            if piContains(currLine, 'geometry.pbrt')
+                [~, n] = fileparts(renderRecipe.outputFile);
+                currLine = sprintf('Include "%s_geometry.pbrt"', n);
+            end
+        end
         fprintf(fileID, '%s \n', currLine);
     end
 end
@@ -424,7 +416,10 @@ fclose(fileID);
 
 %% Overwrite Materials.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
+    % If the scene is from Cinema 4D, 
     if ~creatematerials
+        % We overwrite from the input directory, but we do not create
+        % any new material files beyond what is already in the input
         if overwritematerials
             [~, n] = fileparts(renderRecipe.inputFile);
             fname_materials = sprintf('%s_materials.pbrt', n);
@@ -433,18 +428,22 @@ if piContains(renderRecipe.exporter, 'C4D')
             piMaterialWrite(renderRecipe);
         end
     else
-        [~, n] = fileparts(renderRecipe.outputFile);
+
+        % Create new material files that could come from somewhere
+        % other than the input directory.
+        [~,n] = fileparts(renderRecipe.outputFile);
         fname_materials = sprintf('%s_materials.pbrt', n);
         renderRecipe.materials.outputFile_materials = ...
             fullfile(workingDir, fname_materials);
         piMaterialWrite(renderRecipe);
     end
 end
-%% Overwirte geometry.pbrt
+
+%% Overwrite geometry.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
-    piGeometryWrite(renderRecipe, 'lightsFlag', lightsFlag, ...
-        'thistrafficflow', thistrafficflow);
+        piGeometryWrite(renderRecipe, 'lightsFlag', lightsFlag, ...
+            'thistrafficflow', thistrafficflow);
     end
 end
 

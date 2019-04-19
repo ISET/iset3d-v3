@@ -4,8 +4,9 @@
 % Description:
 %    Works with ISETBio (not ISETCam)
 %
-%    This tutorial will run quick renders of all available scenes. It will
-%    also give examples on how to set certain parameters for certain scenes
+%    This tutorial will run quick renders of all available scenes. It is
+%    quick due to the renders being of very low resolution. It will also
+%    give examples on how to set certain parameters for certain scenes
 %    (e.g. the distance to a textured plane.)
 %
 %    In order to save on computation time, we do not render any chromatic
@@ -18,9 +19,14 @@
 % Dependencies:
 %   iset3d, isetbio, Docker, RemoteDataToolbox
 %
+% See Also:
+%   t_piIntro_*
+%
+
 % History:
 %    XX/XX/17  TL   ISETBIO Team, 2017
 %    03/15/19  JNM  Documentation pass
+%    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %% Initialize
 if isequal(piCamBio, 'isetcam')
@@ -29,6 +35,25 @@ end
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
+
+%% Colorful scene
+% A complex, colorful scene with lots of different material types and
+% edges. 
+
+scene3d = sceneEye('colorfulScene');
+               
+scene3d.fov = 30; 
+scene3d.resolution = 128;
+scene3d.numRays = 128;
+scene3d.numCABands = 0;
+scene3d.accommodation = 1/1.3; 
+
+% For this scene, bounces must be >6 because of glass materials
+scene3d.numBounces = 6;
+
+oi = scene3d.render();
+oi = oiSet(oi,'name','Colorful scene');
+oiWindow(oi);
 
 %% Chess set
 % A chess set "to scale" (e.g. the pieces match real word sizes). A ruler
@@ -44,8 +69,7 @@ scene3d.accommodation = 1;
 % parameter provided below.
 oi = scene3d.render(); %'reuse);
 oi = oiSet(oi, 'name', 'Chess Set');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Chess set scaled
 % The same chess set, but it's been distorted in order to emphasize depth
@@ -61,9 +85,7 @@ scene3d.accommodation = 1/0.3; % Accommodate to the white pawn
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Chess Set scaled');
-
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Snellen Single
 % A single letter E placed at a certain depth. The background is a black
@@ -93,26 +115,25 @@ scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/0.8;
+scene3d.accommodation = 1 / 0.8;
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Snellen at depth');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Black backdrop and blank scene
 % A black wall, or an empty scene with nothing in it. Used when adding
 % objects in (see below).
 
 % Load scene
-scene3d = sceneEye('blankScene');
+scene3d = sceneEye('blackBackdrop');
 scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/10;
+scene3d.accommodation = 1 / 10;
 
 % Add red and green sphere in the scene. They will have a radius of 0.3
 % meter and a distance of 10 meters, and be separated by a meter.
@@ -125,8 +146,7 @@ scene3d.recipe = piAddSphere(scene3d.recipe, 'rgb', [0.05 1 0], ...
 % parameter provided below.
 [oi, results] = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'blankScene_with_spheres');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Numbers at depth
 % Similar to Snellen at depth, but with colored numbers instead. The number
@@ -136,14 +156,13 @@ scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/(200e-3); % Accommodate to "200"
+scene3d.accommodation = 1 / (200e-3); % Accommodate to "200"
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Numbers at depth');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Slanted bar
 % A very large plane with a diagonal line through it. The bottom half of
@@ -156,13 +175,13 @@ scene3d.fov = 10;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/3; % Accommodate to the plane
+scene3d.accommodation = 1 / 3; % Accommodate to the plane
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Slanted edge');
-ieAddObject(oi); oiWindow;
+oiWindow(oi);
 
 %% Slanted bar (texture ver.)
 % Similar the previous scene, except the two planes now have checkerboard
@@ -170,19 +189,18 @@ ieAddObject(oi); oiWindow;
 % plane at different depths, creating an depth discontinuity.
 
 scene3d = sceneEye('slantedBarTexture', 'topDepth', 0.5, ...
-                   'bottomDepth', 2);
+    'bottomDepth', 2);
 scene3d.fov = 5; % Keep FOV small to see the checkerboard more clearly
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/2; % Accommodate to the bottom plane
+scene3d.accommodation = 1 / 2; % Accommodate to the bottom plane
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Slanted edge texture');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Textured plane
 % A blank plane that is placed perpendicular to the optical axis so that it
@@ -194,7 +212,7 @@ oiWindow;
 textureFile = fullfile(piRootPath, ...
     'data', 'imageTextures', 'squareResolutionChart.png');
 scene3d = sceneEye('texturedPlane', 'planeTexture', textureFile, ...
-                   'planeSize', [1 1], 'planeDistance', 2);
+    'planeSize', [1 1], 'planeDistance', 2);
 scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
@@ -205,8 +223,7 @@ scene3d.accommodation = 1; % Accommodate to the plane
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Textured plane');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Point source
 % The "point source" is actually just a sphere placed at a certain
@@ -220,8 +237,10 @@ oiWindow;
 % roughly half a degree. This is no where close to a point source, but
 % makes it easier to test this scene without having to render with lots of
 % rays.
+
+% [Note: XXX - Cannot find this. Ask TL]
 scene3d = sceneEye('pointSource', 'pointDiameter', 0.01, ...
-                   'pointDistance', 1);
+    'pointDistance', 1);
 scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
@@ -232,8 +251,7 @@ scene3d.accommodation = 1; % Accommodate to the point
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Point');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Letters at depth
 % Similar to the "numbers at depth" and "snellen at depth" scenes. Three
@@ -254,8 +272,7 @@ scene3d.accommodation = 1; % Accommodate to the point
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Letters at depth');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% Colored Cube
 % A cube with different colored sides. Another mdoel used primarily to test
@@ -267,15 +284,13 @@ scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/2.78;
+scene3d.accommodation = 1 / 2.78;
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Colored cube 1');
-
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% You can rotate the cube like this:
 % Rotate 10 degrees clockwise around cube's y-axis
@@ -292,7 +307,6 @@ end
 % parameter provided below.
 oi = scene3d.render(); %'reuse');
 oi = oiSet(oi, 'name', 'Colored cube 2');
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 %% END

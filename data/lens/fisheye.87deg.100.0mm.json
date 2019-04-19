@@ -1,0 +1,114 @@
+{
+    "description": " US patent 4256373 Horimoto Moden Lens Design, p.410 Focal length (mm)  ",
+    "name": " Fisheye F/2.8 87deg HFOV",
+    "surfaces": [
+        {
+            "ior": 1.7130000591278076,
+            "radius": 417.94000244140625,
+            "semi_aperture": 160.0,
+            "thickness": 13.079999923706055
+        },
+        {
+            "ior": 1.0,
+            "radius": 68.2300033569336,
+            "semi_aperture": 68.0,
+            "thickness": 57.529998779296875
+        },
+        {
+            "ior": 1.6200000047683716,
+            "radius": 342.79998779296875,
+            "semi_aperture": 75.0,
+            "thickness": 9.8100004196167
+        },
+        {
+            "ior": 1.0,
+            "radius": 78.4000015258789,
+            "semi_aperture": 66.0,
+            "thickness": 21.6200008392334
+        },
+        {
+            "ior": 1.6690000295639038,
+            "radius": 96.05000305175781,
+            "semi_aperture": 64.0,
+            "thickness": 34.599998474121094
+        },
+        {
+            "ior": 1.0,
+            "radius": -267.8599853515625,
+            "semi_aperture": 64.0,
+            "thickness": 4.320000171661377
+        },
+        {
+            "ior": 1.694000005722046,
+            "radius": -158.67999267578125,
+            "semi_aperture": 58.0,
+            "thickness": 6.179999828338623
+        },
+        {
+            "ior": 1.6679999828338623,
+            "radius": 78.2300033569336,
+            "semi_aperture": 54.0,
+            "thickness": 24.709999084472656
+        },
+        {
+            "ior": 1.0,
+            "radius": -346.8900146484375,
+            "semi_aperture": 54.0,
+            "thickness": 3.0899999141693115
+        },
+        {
+            "ior": 1.5180000066757202,
+            "radius": 100000.0,
+            "semi_aperture": 50.0,
+            "thickness": 9.270000457763672
+        },
+        {
+            "ior": 0.0,
+            "radius": 0.0,
+            "semi_aperture": 50.0,
+            "thickness": 8.529999732971191
+        },
+        {
+            "ior": 1.0,
+            "radius": 100000.0,
+            "semi_aperture": 50.0,
+            "thickness": 10.0
+        },
+        {
+            "ior": 1.0,
+            "radius": 100000.0,
+            "semi_aperture": 42.70000076293945,
+            "thickness": 9.270000457763672
+        },
+        {
+            "ior": 1.496999979019165,
+            "radius": -5285.7001953125,
+            "semi_aperture": 44.5,
+            "thickness": 21.010000228881836
+        },
+        {
+            "ior": 1.0,
+            "radius": -113.80000305175781,
+            "semi_aperture": 50.0,
+            "thickness": 0.6200000047683716
+        },
+        {
+            "ior": 1.4869999885559082,
+            "radius": 661.219970703125,
+            "semi_aperture": 52.0,
+            "thickness": 30.889999389648438
+        },
+        {
+            "ior": 1.8049999475479126,
+            "radius": -63.5,
+            "semi_aperture": 52.0,
+            "thickness": 6.179999828338623
+        },
+        {
+            "ior": 1.0,
+            "radius": -127.48999786376953,
+            "semi_aperture": 56.0,
+            "thickness": 0.0
+        }
+    ]
+}
