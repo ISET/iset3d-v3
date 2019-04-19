@@ -232,6 +232,9 @@ pause;
 destDir = fullfile(outputDir,'renderings');
 
 disp('Downloading PBRT dat and converting to ISET...');
+% This function creates two subfolder in the output folder renderings: 
+% OIpngPreviews contains a png file directly from Optical Image.
+% opticalImages contains Optical Image object in .mat format.
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
 disp('*** Downloaded ieObject')
 
@@ -241,6 +244,8 @@ oiWindow(ieObject);
 
 % Save a png of the OI, but after passing through a sensor
 fname = fullfile(piRootPath,'local',[ieObject.name,'.png']);
+% piOI2ISET is a similar function, but frequently changed by Zhenyi for different experiments, 
+% so this function is better for a tutorial.
 img = piSensorImage(ieObject,'filename',fname,'pixel size',2.5);
 %{
 ieNewGraphWin
