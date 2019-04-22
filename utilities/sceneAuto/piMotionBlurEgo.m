@@ -34,7 +34,7 @@ for ii = 1:numel(nextTrafficflow.objects.car)
     if strcmp(thisCar.name,nextTrafficflow.objects.car(ii).name)
         motion.pos = nextTrafficflow.objects.car(ii).pos;
         motion.pos(2) = thisR.lookAt.from(2);
-        motion.rotate = nextTrafficflow.objects.car(ii).orientation-90;
+        motion.rotate = nextTrafficflow.objects.car(ii).orientation;
         motion.slope = nextTrafficflow.objects.car(ii).slope;
     end
 end
@@ -49,7 +49,7 @@ if isempty(motion)
     to(2)   = thisR.lookAt.from(2);
     to(3)   = from(3)-distance*sind(orientation);
     motion.pos = to;
-    motion.rotate = thisCar.orientation-90;
+    motion.rotate = thisCar.orientation;
     motion.slope = thisCar.slope;
 end
 
@@ -59,7 +59,7 @@ thisCar.pos(2) = thisR.lookAt.from(2);
 % default start time is 0, end time is 1; It means that the motion duration
 % is 1 second by default.
 thisR.camera.motion.activeTransformStart.pos   = thisCar.pos;
-thisR.camera.motion.activeTransformStart.rotate=piRotationMatrix('yrot',thisCar.orientation-90);
+thisR.camera.motion.activeTransformStart.rotate=piRotationMatrix('yrot',thisCar.orientation);
 % translation and rotation will be written out.
 thisR.camera.motion.activeTransformEnd.pos     = motion.pos;
 thisR.camera.motion.activeTransformEnd.rotate  = piRotationMatrix('yrot', motion.rotate);
