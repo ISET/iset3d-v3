@@ -47,7 +47,6 @@ for ii = 1:length(mlist)
     if  piContains(lower(mlist(ii)),'carbody') && ~piContains(lower(mlist(ii)),'paint_base')
         % We seem to always be picking a random color for the car body
         % pain base.  This could get adjusted.
-        
         %         if piContains(mlist(ii),'black')
         %             colorkd = piColorPick('black');
         %         elseif piContains(mlist(ii),'white')
@@ -58,7 +57,7 @@ for ii = 1:length(mlist)
         %         end
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);    % A string labeling the material 
-        target = thisR.materials.lib.carpaintmix;  % This is the assignment
+        target = thisR.materials.lib.carpaint;  % This is the assignment
         piMaterialAssign(thisR, material.name,target,'colorkd',colorkd);
     elseif piContains(lower(mlist(ii)),'carpaint') && ~piContains(mlist(ii),'paint_base')
         name = cell2mat(mlist(ii));

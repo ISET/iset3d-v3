@@ -98,7 +98,7 @@ end
 % Put the trees and other assets into the city or suburban street
 
 tic
-tree_interval = 10;
+tree_interval = rand(1)*4+2;
 if piContains(sceneType,'city')|| piContains(sceneType,'suburb')
     
     susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
@@ -106,7 +106,7 @@ if piContains(sceneType,'city')|| piContains(sceneType,'suburb')
     
     % place parked cars
     if piContains(roadType,'parking')
-        trafficflow = piParkingPlace(road, trafficflow);
+        trafficflow = piParkingPlace(road, trafficflow, 'parallelParking',false);
         disp('Parked cars placed')
     end
     building_listPath = fullfile(piRootPath,'local','AssetLists',sprintf('%s_building_list.mat',sceneType));

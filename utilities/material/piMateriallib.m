@@ -65,10 +65,11 @@ materiallib.carpaintmix.carpaint.stringnamedmaterial2 = 'paint_base';
 % this way rather than as carpaintmix.
 %
 
+materiallib.carpaint.string='substrate';
+materiallib.carpaint.rgbkd = piColorPick('random');
+materiallib.carpaint.rgbks =[.15 .15 .15];
 materiallib.carpaint.floaturoughness =0.0005;
 materiallib.carpaint.floatvroughness=0.00051;
-materiallib.carpaint.string='substrate';
-
 
 %% chrome_spd
 %
@@ -173,6 +174,8 @@ for ii = 1: length(thisMaterial)
             materiallib.(thisMaterial{ii}).floatroughness = [];
             materiallib.(thisMaterial{ii}).rgbkr = [];
             materiallib.(thisMaterial{ii}).rgbkt = [];
+            materiallib.(thisMaterial{ii}).stringnamedmaterial1 = [];
+            materiallib.(thisMaterial{ii}).stringnamedmaterial2 = [];
         case 'fourier'
             materiallib.(thisMaterial{ii}).floatroughness = [];
             materiallib.(thisMaterial{ii}).rgbkr = [];

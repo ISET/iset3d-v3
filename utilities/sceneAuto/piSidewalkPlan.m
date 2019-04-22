@@ -59,7 +59,7 @@ p = inputParser;
 p.addParameter('addTree',true);
 p.addParameter('tree_interval',4);
 p.addParameter('tree_offset',1);
-p.addParameter('tree_type','T');
+p.addParameter('tree_type','T');% used to be T
 p.addParameter('streetlight_interval',12);
 p.addParameter('streetlight_offset',1);
 p.addParameter('streetlight_type','T');

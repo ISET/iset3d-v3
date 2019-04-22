@@ -81,7 +81,12 @@ function thisR = AddMaterialandGeometry(assets,assetname,material,geometry,thisR
 
 for ii = 1:length(assets.(assetname))
     if material
+        try
         nObj  = fieldnames(assets.(assetname)(ii).material.list);
+        catch
+            fprintf('No %s list if found', assetname);
+            continue;
+        end
         % add objects.material to thisR.materials.list
         for nn = 1:length(nObj)
             thisR.materials.list.(nObj{nn}) = assets.(assetname)(ii).material.list.(nObj{nn});

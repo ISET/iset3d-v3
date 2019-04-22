@@ -324,7 +324,7 @@ if isfield(materials, 'boolremaproughness')
 end
 if isfield(materials, 'eta')
     if ~isempty(materials.eta)
-        val_boolremaproughness = sprintf(' "float eta" "%0.5f" ',materials.eta);
+        val_boolremaproughness = sprintf(' "float eta" %0.5f ',materials.eta);
         val = strcat(val, val_boolremaproughness);
     end
 end
