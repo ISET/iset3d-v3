@@ -44,7 +44,7 @@ thisR = piRead(fname);
 % take some time, maybe you dont want to run this everytime when you debug
 % assets = piAssetCreate('ncars',1, 'nped',1);
 st = scitran('stanfordlabs');
-project = st.lookup('wandell/Graphics assets');
+project = st.lookup('wandell/Graphics auto assets');
 session = project.sessions.findOne('label=car');
 
 inputs.ncars = 1;

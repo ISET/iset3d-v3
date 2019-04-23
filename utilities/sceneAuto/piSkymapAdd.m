@@ -45,17 +45,16 @@ if ~piContains(skyName,':')
     % Get the information about the skymap so we can download from
     % Flywheel
 
-    
-
+    % Is this data/data bit right?
     try
-        acquisition = st.fw.lookup('wandell/Graphics assets/data/data/skymaps');
+        acquisition = st.fw.lookup('wandell/Graphics auto assets/data/data/skymaps');
         dataId      = acquisition.id;
     catch
         % We have had trouble making lookup work across Add-On toolbox
         % versions.  So we have this
         warning('Using piSkymapAdd search, not lookup')
         acquisition = st.search('acquisitions',...
-            'project label exact','Graphics assets',...
+            'project label exact','Graphics auto assets',...
             'session label exact','data',...
             'acquisition label exact','skymaps');
         dataId = st.objectParse(acquisition{1});
@@ -63,7 +62,7 @@ if ~piContains(skyName,':')
 else
     % Fix this with Flywheel and Justin E
     time = strsplit(skyName,':');
-    acqName = sprintf('wandell/Graphics assets/skymap/skymap_daytime/%02d00',str2double(time{1}));
+    acqName = sprintf('wandell/Graphics auto assets/skymap_daytime/skymap_daytime/%02d00',str2double(time{1}));
     thisAcq = st.fw.lookup(acqName);
     dataId = thisAcq.id;
     skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));

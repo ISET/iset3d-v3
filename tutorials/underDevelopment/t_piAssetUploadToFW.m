@@ -93,7 +93,7 @@ imwrite(pngFile,pngfile);
 
 % There could be an stScitranConfig
 st = scitran('stanfordlabs');
-project = st.lookup('wandell/Graphics assets');
+project = st.lookup('wandell/Graphics auto assets');
 thisSession = project.sessions.findOne(sprintf('label=%s',assetType));
 %%
 current_acquisitions = assetname;
@@ -115,7 +115,7 @@ for ii=1:length(acquisitions)
 end
 % create an acquisition
 if isempty(Acq_index)
-    current_id = st.containerCreate('Wandell Lab', 'Graphics assets',...
+    current_id = st.containerCreate('Wandell Lab', 'Graphics auto assets',...
         'session',assetType,'acquisition',current_acquisitions);
     if ~isempty(current_id.acquisition)
         fprintf('%s acquisition created \n',current_acquisitions);

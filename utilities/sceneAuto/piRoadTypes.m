@@ -12,7 +12,7 @@ function roadTypes = piRoadTypes
 % You can update the list this way
 
 st = scitran('stanfordlabs');
-project = st.lookup('wandell/Graphics assets');
+project = st.lookup('wandell/Graphics auto assets');
 session = project.sessions.find('label=road');
 acq = session{1}.acquisitions();
 stPrint(acq,'label')
