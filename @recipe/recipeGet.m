@@ -138,23 +138,18 @@ switch ieParamFormat(param)
         subType = thisR.camera.subtype;
         switch(lower(subType))
             case 'pinhole'
-                val = 'pinhole (no lens)';
+                val = 'pinhole';
+            case 'perspective'
+                val = 'pinhole (perspective)';
             otherwise
                 % realisticeye and realisticDiffraction both work here.
-                % Not sure what else is out there.
-                if thisR.version==2
-                    try
-                        [~,val,~] = fileparts(thisR.camera.specfile.value);
-                    catch
-                        error('Unknown lens file %s\n',subType);
-                    end
-                elseif thisR.version == 3
-                    try
-                        [~,val,~] = fileparts(thisR.camera.lensfile.value);
-                    catch
-                        error('Unknown lens file %s\n',subType);
-                    end
+                % Need to test 'omni'               
+                try
+                    [~,val,~] = fileparts(thisR.camera.lensfile.value);
+                catch
+                    error('Unknown lens file %s\n',subType);
                 end
+                
         end
     case 'focaldistance'
         opticsType = thisR.get('optics type');
@@ -172,9 +167,11 @@ switch ieParamFormat(param)
                 objDist = thisR.get('object distance');   % Units?  Where does this come from?
                 % objDist = objDist*1e3;
                 if objDist < min(focalLength.dist(:))
-                    fprintf('Object too close to focus\n');
+                    fprintf('** Object too close to focus\n');
+                    val = []; return;
                 elseif objDist > max(focalLength.dist(:))
-                    fprintf('Object too far to focus\n');
+                    fprintf('** Object too far to focus\n');
+                    val = []; return;
                 else
                     val = interp1(focalLength.dist,focalLength.focalDistance,objDist);
                 end

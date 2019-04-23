@@ -105,7 +105,7 @@ thisR.sampler.subtype    = 'sobol';
 %% Render and display
 
 % Change this for depth of field effects.
-thisR.set('aperture diameter',6);
+thisR.set('aperture diameter',6);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
