@@ -1,12 +1,11 @@
 function [out, namelist] = summarize(thisR,str)
-% Summarize the recipe entries
+% Summarize the recipe 
 %
 % Syntax
 %   [out, namelist] = recipe.summarize(str)
 %
 % Description
-%   Prints to the console a summary of the recipe parameters.  The string
-%   suggests which parameters to emphasize.
+%   Prints a summary of the recipe parameters to the console. 
 %
 % Inputs
 %   str:  'all','file','render','camera','film',lookat','assets',
@@ -16,16 +15,18 @@ function [out, namelist] = summarize(thisR,str)
 %   N/A
 %
 % Outputs:
-%   N/A
+%   out  - Either the object described our empty
+%   namelist - If str = 'assets', a sorted list of the names of the assets,
+%              or if str = 'materials' the names of the materials
 %
-% A utility to improve the quality of programming life by printing to the
-% console a quick and clear look at the critical rendering recipe
-% parameters.
+% Description
+%    A quick summary of the critical rendering recipe parameters. In
+%    several cases the object described is returned
 %
 % Wandell
 %
 % See also
-%  recipe
+%  recipe, recipeGet
 %
 
 % Examples:
@@ -33,10 +34,11 @@ function [out, namelist] = summarize(thisR,str)
  c = thisR.summarize('camera');
 %}
 %{
- [assets, names] = thisR.summarize('assets');
+ [assets, sortedNames] = thisR.summarize('assets');
+  sortedNames
 %}
 %{
- [~,names] = thisR.summarize('all');
+ [~,sortedNames] = thisR.summarize('all');
 %}
 %% Parse
 str = ieParamFormat(str);
@@ -48,6 +50,7 @@ p.addRequired('str',@(x)(ismember(x,validStr)));
 p.parse(thisR,str);
 
 namelist = [];
+out = [];
 %% Build descriptions
 
 switch str
@@ -60,9 +63,7 @@ switch str
         [~,namelist] = thisR.summarize('assets');
         thisR.summarize('materials');
         thisR.summarize('metadata');
-        out = [];
     case 'file'
-        out = [];
         fprintf('\nFile information\n-----------\n');
         fprintf('Input:  %s\n',thisR.get('input file'));
         fprintf('Output:  %s\n',thisR.get('output file'));
@@ -70,8 +71,9 @@ switch str
         fprintf('\n');
         
     case 'render'
-        out = thisR.renderer;
         fprintf('\nRenderer information\n-----------\n');
+        if isempty(thisR.renderer), return; end
+        out = thisR.renderer;
         fprintf('Sampler\n');
         fprintf('Integration\n');
         fprintf('renderer\n');
@@ -80,8 +82,10 @@ switch str
         fprintf('\n');
         
     case 'camera'
-        out = thisR.camera;
         fprintf('\nCamera parameters\n-----------\n');
+        if isempty(thisR.camera), return; end
+        out = thisR.camera;
+        
         fprintf('Sub type: %s\n',thisR.camera.subtype);
         fprintf('Lens file name:   %s\n',thisR.get('lens file'));
         fprintf('Aperture diameter (mm): %0.2f\n',thisR.get('aperture diameter'));
@@ -98,17 +102,19 @@ switch str
         fprintf('\n');
         
     case 'lookat'
-        out = thisR.lookAt;
         fprintf('\nLookat parameters\n-----------\n');
+        if isempty(thisR.lookAt), return; end
+        out = thisR.lookAt;
         fprintf('from:\t%.3f %.3f %.3f\n',thisR.get('from'));
         fprintf('to:\t%.3f %.3f %.3f\n',thisR.get('to'));
         fprintf('up:\t%.3f %.3f %.3f\n',thisR.get('up'));
         fprintf('\n');
         
     case 'assets'
+        fprintf('\nAssets\n-----------\n');
+        if isempty(thisR.assets), return; end
         out = thisR.assets;
         nAssets = numel(out);
-        fprintf('\nAssets\n-----------\n');
         fprintf('Number:  %d\n',nAssets);
         nMoving = 0;
         for ii=1:nAssets
@@ -126,8 +132,9 @@ switch str
         fprintf('\n');
         
     case 'materials'
-        out = thisR.materials;
         fprintf('\nMaterials\n-----------\n');
+        if isempty(thisR.materials), return; end
+        out = thisR.materials;
         namelist = sort(unique(fieldnames(thisR.materials.list)));
         fprintf('Number:\t%d\n',numel(namelist));
         [~,filename,ext] = fileparts(thisR.materials.inputFile_materials);
@@ -135,8 +142,16 @@ switch str
         fprintf('\n');
         
     case 'metadata'
-        out = thisR.metadata;
+
         fprintf('\nMetadata\n-----------\n');
+        if isempty(thisR.metadata), return; end
+        out = thisR.metadata;
+
+        namelist = fieldnames(thisR.metadata);
+        fprintf('Fields:\n');
+        for ii=1:numel(namelist)
+            fprintf('%d\t%s\n',ii,namelist{ii});
+        end
         fprintf('\n');
         
     otherwise
