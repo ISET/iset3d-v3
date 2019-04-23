@@ -41,12 +41,16 @@ function [out, namelist] = summarize(thisR,str)
  [~,sortedNames] = thisR.summarize('all');
 %}
 %% Parse
-str = ieParamFormat(str);
 
 validStr = {'all','file','render','camera','film','lookat','assets','materials','metadata'};
 p = inputParser;
 p.addRequired('thisR',@(x)(isequal(class(x),'recipe')));
 p.addRequired('str',@(x)(ismember(x,validStr)));
+
+% Default for str is 'all'.  Force to lower case.
+if ~exist('str','var'),str = 'all'; end
+str = ieParamFormat(str);
+
 p.parse(thisR,str);
 
 namelist = [];
