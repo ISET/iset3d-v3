@@ -9,7 +9,8 @@ function [out, namelist] = summarize(thisR,str)
 %   suggests which parameters to emphasize.
 %
 % Inputs
-%   str:  'all','camera','film',lookat','assets', or 'metadata'
+%   str:  'all','file','render','camera','film',lookat','assets',
+%         'materials',or 'metadata' 
 %
 % Key/value pairs
 %   N/A
@@ -40,7 +41,7 @@ function [out, namelist] = summarize(thisR,str)
 %% Parse
 str = ieParamFormat(str);
 
-validStr = {'all','camera','film','lookat','assets','metadata'};
+validStr = {'all','file','render','camera','film','lookat','assets','materials','metadata'};
 p = inputParser;
 p.addRequired('thisR',@(x)(isequal(class(x),'recipe')));
 p.addRequired('str',@(x)(ismember(x,validStr)));
@@ -51,12 +52,32 @@ namelist = [];
 
 switch str
     case 'all'
+        thisR.summarize('file');
+        thisR.summarize('render');
         thisR.summarize('camera');
         thisR.summarize('film');
         thisR.summarize('lookat');
         [~,namelist] = thisR.summarize('assets');
+        thisR.summarize('materials');
         thisR.summarize('metadata');
         out = [];
+    case 'file'
+        out = [];
+        fprintf('\nFile information\n-----------\n');
+        fprintf('Input:  %s\n',thisR.get('input file'));
+        fprintf('Output:  %s\n',thisR.get('output file'));
+        if isfield(thisR,'exporter'), fprintf('Exported by %s\n',thisR.exporter); end
+        fprintf('\n');
+        
+    case 'render'
+        out = thisR.renderer;
+        fprintf('\nRenderer information\n-----------\n');
+        fprintf('Sampler\n');
+        fprintf('Integration\n');
+        fprintf('renderer\n');
+        fprintf('filter\n');
+        namelist = thisR.world;  % Abusive.  Change variable name.
+        fprintf('\n');
         
     case 'camera'
         out = thisR.camera;
@@ -66,7 +87,7 @@ switch str
         fprintf('Aperture diameter (mm): %0.2f\n',thisR.get('aperture diameter'));
         fprintf('Focal distance (m):   %0.2f\n',thisR.get('focal distance'));
         fprintf('Exposure time (s): %f\n',thisR.get('exposure time'));
-        fprintf('\n\n');
+        fprintf('\n');
         
     case 'film'
         out = thisR.film;
@@ -74,7 +95,7 @@ switch str
         fprintf('subtype: %s\n',out.subtype);
         fprintf('x,y resolution: %d %d (samples)\n',thisR.get('film resolution'));
         fprintf('diagonal:   %d (mm)\n',thisR.get('film diagonal'));
-        fprintf('\n\n');
+        fprintf('\n');
         
     case 'lookat'
         out = thisR.lookAt;
@@ -82,7 +103,7 @@ switch str
         fprintf('from:\t%.3f %.3f %.3f\n',thisR.get('from'));
         fprintf('to:\t%.3f %.3f %.3f\n',thisR.get('to'));
         fprintf('up:\t%.3f %.3f %.3f\n',thisR.get('up'));
-        fprintf('\n\n');
+        fprintf('\n');
         
     case 'assets'
         out = thisR.assets;
@@ -94,7 +115,7 @@ switch str
             if ~isempty(out(ii).motion)
                 nMoving = nMoving + 1;
             end
-        end    
+        end
         fprintf('Moving  assets: %d\n',nMoving);
         fprintf('Static  assets: %d\n',nAssets - nMoving);
         namelist = cell(nAssets,1);
@@ -102,10 +123,21 @@ switch str
             namelist{ii} = thisR.assets(ii).name;
         end
         namelist = sort(unique(namelist));
+        fprintf('\n');
+        
+    case 'materials'
+        out = thisR.materials;
+        fprintf('\nMaterials\n-----------\n');
+        namelist = sort(unique(fieldnames(thisR.materials.list)));
+        fprintf('Number:\t%d\n',numel(namelist));
+        [~,filename,ext] = fileparts(thisR.materials.inputFile_materials);
+        fprintf('File:\t%s\n',[filename,ext])
+        fprintf('\n');
         
     case 'metadata'
         out = thisR.metadata;
         fprintf('\nMetadata\n-----------\n');
+        fprintf('\n');
         
     otherwise
         error('Unknown parameter %s\n',str);
