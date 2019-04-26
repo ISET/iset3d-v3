@@ -131,14 +131,17 @@ if (~strcmp(renderType,'radiance'))  % If radiance, no metadata
     % material files that we link with the main pbrt file.
     if(strcmp(metadataRecipe.exporter,'C4D'))
         creatematerials = true;
+        overwritegeometry = true;
     else
         creatematerials = false;
+        overwritegeometry = false;
     end
     piWrite(metadataRecipe,...
         'overwritepbrtfile', true,...
         'overwritelensfile', false, ...
         'overwriteresources', false,...
-        'creatematerials',creatematerials);
+        'creatematerials',creatematerials,...
+        'overwritegeometry',overwritegeometry);
     
     metadataFile = metadataRecipe.outputFile;
 
