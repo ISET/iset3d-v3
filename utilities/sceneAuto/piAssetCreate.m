@@ -51,7 +51,7 @@ if isempty(st), st = scitran('stanfordlabs'); end
 
 %%  Store up the asset information
 
-project = st.lookup('wandell/Graphics assets');
+project = st.lookup('wandell/Graphics auto');
 asset = [];
 
 %% Find the cars in the database

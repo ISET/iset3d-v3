@@ -37,16 +37,15 @@ if piContains(color,'random')
     index = rand;
     
     if index <= 0.3, color = 'white';end
-    if index > 0.3 && index <= 0.8, color = 'black';end
-    if index > 0.8  && index <= 0.825, color = 'red';end
-    if index > 0.825  && index <= 0.85, color = 'blue';end
+    if index > 0.3 && index <= 0.75, color = 'black';end
+    if index > 0.75  && index <= 0.8, color = 'red';end
+    if index > 0.8  && index <= 0.85, color = 'blue';end
     if index > 0.85 && index <= 0.875, color = 'green';end
     if index > 0.875 && index <= 0.90, color = 'yellow';end
     if index > 0.90 && index <= 1.00, color = 'silver';end
     rgb = colorswitch(color);
-    
 else
-    rgb = colorswitch(color);
+    rgb = colorswitch(color);    
 end
 
 end
@@ -59,9 +58,9 @@ switch color
         b = r-10;
         rgb = [r/255 g/255 b/255];
     case 'black'
-        r = randi(10,1);
-        g = randi(10,1);
-        b = randi(10,1);
+        r = randi(5,1);
+        g = randi(5,1);
+        b = randi(5,1);
         rgb = [r/255 g/255 b/255];
     case 'red'
         r = randi(50,1)+200;

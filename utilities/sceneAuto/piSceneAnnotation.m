@@ -12,7 +12,7 @@ sceneName = strrep(sceneName,'_mesh','');
 destName_recipe = fullfile(sceneFolder,[sceneName,'.json']);
 % find acquisition
 if ~exist(sceneFolder,'dir'),mkdir(sceneFolder);end
-acquisition = st.lookup(sprintf('wandell/Graphics assets/scenes_pbrt/scenes_pbrt/%s',sceneName));
+acquisition = st.lookup(sprintf('wandell/Graphics auto/scenes_pbrt/scenes_pbrt/%s',sceneName));
 dataId = acquisition.id;
 % download the file
 piFwFileDownload(destName_recipe, [sceneName,'.json'], dataId);
