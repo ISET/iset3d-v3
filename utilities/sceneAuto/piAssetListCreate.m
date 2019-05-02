@@ -36,8 +36,8 @@ sessionname      = p.Results.class;
 acquisitionname  = p.Results.subclass;
 
 %% Find all the acuisitions
-project = st.lookup('wandell/Graphics assets');
-session = project.sessions.findOne(sprintf('label=%s',sessionname));
+subject = st.lookup('wandell/Graphics auto/assets');
+session = subject.sessions.findOne(sprintf('label=%s',sessionname));
 acqs    = session.acquisitions();
 
 %%

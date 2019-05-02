@@ -60,11 +60,11 @@ if isempty(st), st = scitran('stanfordlabs'); end
 
 %% Read a road from Flywheel that we will use with SUMO
 
-% Lookup the flywheel project with all the Graphics assets
-project = st.lookup('wandell/Graphics assets');
+% Lookup the flywheel project with all the Graphics auto
+subject = st.lookup('wandell/Graphics auto/assets');
 
 % Find the session with the road information
-roadSession = project.sessions.findOne('label=road');
+roadSession = subject.sessions.findOne('label=road');
 
 % Assemble the road
 [road,thisR_road] = piRoadCreate('roadtype',roadType,...
