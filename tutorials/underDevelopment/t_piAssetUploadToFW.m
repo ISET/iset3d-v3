@@ -62,6 +62,7 @@ thisR.camera.fov.value = 43.5;
 piSkymapAdd(thisR,'noon'); 
 
 %% Assign Materials and Color
+thisR.materials.lib = piMateriallib;
 piMaterialGroupAssign(thisR);
 %% Write out the 
 % assetname = 'Road_cross';
@@ -78,7 +79,6 @@ zip(resourceFile,{'textures','scene'});
 oldRecipeFile = sprintf('%s.json',assetname);
 recipeFile = sprintf('%s.recipe.json',assetname);
 movefile(oldRecipeFile,recipeFile);
-objFile = sprintf('%s.obj',assetname);
 
 % Render a pngfile
 [scene,result] = piRender(thisR,'rendertype','radiance');
@@ -93,29 +93,23 @@ imwrite(pngFile,pngfile);
 
 % There could be an stScitranConfig
 st = scitran('stanfordlabs');
-project = st.lookup('wandell/Graphics assets');
-thisSession = project.sessions.findOne(sprintf('label=%s',assetType));
+subject = st.lookup('wandell/Graphics auto/assets');
+thisSession = subject.sessions.findOne(sprintf('label=%s',assetType));
 %%
 current_acquisitions = assetname;
-acquisitions = st.list('acquisition',thisSession.id);
-Acq_index = [];
-for ii=1:length(acquisitions)
-    if isequal(lower(acquisitions{ii}.label),lower(current_acquisitions))
-        Acq_index = ii;
-        % Upload the two files and set their modality.
-        st.fileUpload(recipeFile,acquisitions{ii}.id,'acquisition');
-        fprintf('%s uploaded \n',recipeFile);
-        st.fileUpload(resourceFile,acquisitions{ii}.id,'acquisition');
-        fprintf('%s uploaded \n',resourceFile);
-        st.fileUpload(pngfile,acquisitions{ii}.id,'acquisition');
-        fprintf('%s uploaded \n',pngfile);toc
+acquisition = thisSession.acquisitions.findOne(sprintf('label=%s',assetname));
 
-    break;   
-    end
-end
-% create an acquisition
-if isempty(Acq_index)
-    current_id = st.containerCreate('Wandell Lab', 'Graphics assets',...
+if ~isempty(acquisition)
+
+        % Upload the two files and set their modality.
+        st.fileUpload(recipeFile,acquisition.id,'acquisition');
+        fprintf('%s uploaded \n',recipeFile);
+        st.fileUpload(resourceFile,acquisition.id,'acquisition');
+        fprintf('%s uploaded \n',resourceFile);
+%         st.fileUpload(pngfile,acquisition.id,'acquisition');
+%         fprintf('%s uploaded \n',pngfile);toc
+else
+    current_id = st.containerCreate('Wandell Lab', 'Graphics auto',...
         'session',assetType,'acquisition',current_acquisitions);
     if ~isempty(current_id.acquisition)
         fprintf('%s acquisition created \n',current_acquisitions);
