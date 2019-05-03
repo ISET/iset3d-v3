@@ -108,17 +108,17 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',6);
 piWrite(thisR,'creatematerials',true);
 
-oi = piRender(thisR,'render type','radiance');
+oi = piRender(thisR,'render type','both');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
-
+depth = piRender(thisR,'render type','depth');imagesc(depth);
 %% Change this for depth of field effects.
 
 
 thisR.set('aperture diameter',3);
 piWrite(thisR,'creatematerials',true);
 
-oi = piRender(thisR,'render type','radiance');
+[oi,result] = piRender(thisR,'render type','both');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 
@@ -127,7 +127,7 @@ oiWindow(oi);
 thisR.set('aperture diameter',1);
 piWrite(thisR,'creatematerials',true);
 
-oi = piRender(thisR,'render type','radiance');
+oi = piRender(thisR,'render type','both');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 

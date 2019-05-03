@@ -124,7 +124,7 @@ if piContains(sceneType,'city')|| piContains(sceneType,'suburb')
     susoPlaced.building = piBuildingPlace(building_list,buildingPosList);
   
     % Put the suso placed assets on the road
-    thisR_road = piAssetAdd(thisR_road, susoPlaced);
+    thisR_road = piAssetAddBatch(thisR_road, susoPlaced);
     toc
         
     % Create a file ID & name strings for Flywheel to copy selected assets
@@ -144,7 +144,7 @@ end
     'scitran',st);
 
 for ii = 1: length(sumoPlaced)
-    thisR_scene = piAssetAdd(thisR_road,sumoPlaced{ii});
+    thisR_scene = piAssetAddBatch(thisR_road,sumoPlaced{ii});
 end
 % Update recipe material library.
 thisR_scene.materials.lib = piMateriallib;

@@ -1,6 +1,6 @@
 %% Gets a skymap from Flywheel; also uses special scene materials
 %
-% We store the automotive graphics assets in the Flywheel database.
+% We store the automotive Graphics auto in the Flywheel database.
 % This script shows how to download a file from Flywheel.  This
 % technique is used much more extensively in creating complex driving
 % scenes.
@@ -44,15 +44,15 @@ thisR = piRead(fname);
 % take some time, maybe you dont want to run this everytime when you debug
 % assets = piAssetCreate('ncars',1, 'nped',1);
 st = scitran('stanfordlabs');
-project = st.lookup('wandell/Graphics assets');
-session = project.sessions.findOne('label=car');
+subject = st.lookup('wandell/Graphics auto/assets');
+session = subject.sessions.findOne('label=car');
 
 inputs.ncars = 1;
 assetRecipe = piAssetDownload(session,inputs.ncars,'acquisition label','Car_085');
 asset.car   = piAssetAssign(assetRecipe,'label','car');
 
 %% add downloaded asset information to Render recipe.
-thisR = piAssetAdd(thisR, asset);
+thisR = piAssetAddBatch(thisR, asset);
 
 %% Set render quality
 
@@ -99,7 +99,7 @@ piMaterialGroupAssign(thisR);   % We like the glass better this way.
 colorkd = piColorPick('red');
 name = 'HDM_06_002_carbody_black';
 material = thisR.materials.list.(name);    % A string labeling the material
-target = thisR.materials.lib.carpaintmix;  % This is the assignment
+target = thisR.materials.lib.carpaint;  % This is the assignment
 piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
 
 % Assign a nice position.
@@ -126,5 +126,11 @@ piWrite(thisR,'creatematerials',true);
 scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
 sceneWindow(scene);
 sceneSet(scene,'display mode','hdr');
-
+coordMap = piRender(thisR,'renderType','coordinates');
+x  = coordMap(:,:,1) - thisR.lookAt.from(1);
+y  = coordMap(:,:,2)- thisR.lookAt.from(2);
+z  = coordMap(:,:,3)- thisR.lookAt.from(3); 
+player = pcplayer([-20 0],[0 10],[-1 1]);
+ptCloud = pointCloud([x(:),z(:),y(:)]);
+view(player,ptCloud);           
 %% END
