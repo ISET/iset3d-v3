@@ -92,6 +92,7 @@ end
 thisR.integrator.maxdepth.value = 10;
 
 %% This adds materials to all assets in this scene
+thisR.materials.lib=piMateriallib;
 piMaterialGroupAssign(thisR);   % We like the glass better this way.
 
 %
@@ -102,7 +103,7 @@ target = thisR.materials.lib.carpaintmix;  % This is the assignment
 piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
 
 % Assign a nice position.
-thisR.assets(end).position = [2 0 -2]';
+thisR.assets(end).position = [3.5 0 -2]';
 
 %% Write out the pbrt scene file, based on thisR.
 

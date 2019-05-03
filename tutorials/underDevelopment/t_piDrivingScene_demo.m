@@ -89,7 +89,8 @@ disp('*** Scene Generation completed.')
 
 %% Add a skymap and add SkymapFwInfo to fwList
 
-dayTime = '16:30';
+
+dayTime = '9:30';
 [thisR,skymapfwInfo] = piSkymapAdd(thisR,dayTime);
 road.fwList = [road.fwList,' ',skymapfwInfo];
 disp('*** Skymap added')
@@ -153,6 +154,7 @@ filename = sprintf('%s_%s_v%0.1f_f%0.2f%s_o%0.2f_%i%i%i%i%i%0.0f.pbrt',...
                             CamOrientation,...
                             clock);
 thisR.outputFile = fullfile(outputDir,filename);
+
 
 % Makes the materials, particularly glass, look right.
 piMaterialGroupAssign(thisR);
