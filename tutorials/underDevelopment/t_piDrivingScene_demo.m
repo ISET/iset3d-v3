@@ -46,10 +46,10 @@ str = gcp.configList;
 %%  Example scene creation
 
 % To see the available roadTypes use piRoadTypes
-roadType = 'city_cross_4lanes_002';
+roadType = 'curve_6lanes_001';
 
 % Avaliable trafficflowDensity: low, medium, high
-trafficflowDensity = 'medium';
+trafficflowDensity = 'low';
 
 % Choose a timestamp(1~360), which is the moment in the SUMO
 
@@ -68,7 +68,7 @@ disp('*** Road traffic flow')
 %% Scene Generation
 
 % Available sceneTypes: city1, city2, city3, city4, citymix, suburb
-sceneType = 'city4';
+sceneType = 'suburb';
 
 % 20 seconds
 tic
@@ -234,6 +234,9 @@ pause;
 destDir = fullfile(outputDir,'renderings');
 
 disp('Downloading PBRT dat and converting to ISET...');
+% This function creates two subfolder in the output folder renderings: 
+% OIpngPreviews contains a png file directly from Optical Image.
+% opticalImages contains Optical Image object in .mat format.
 ieObject = gcp.fwBatchProcessPBRT('scitran',st,'destination dir',destDir);
 disp('*** Downloaded ieObject')
 
@@ -241,12 +244,13 @@ disp('*** Downloaded ieObject')
 
 oiWindow(ieObject);
 
-img = piSensorImage(ieObject);
+% Save a png of the OI, but after passing through a sensor
 fname = fullfile(piRootPath,'local',[ieObject.name,'.png']);
-imwrite(img,fname);
+% piOI2ISET is a similar function, but frequently changed by Zhenyi for different experiments, 
+% so this function is better for a tutorial.
+img = piSensorImage(ieObject,'filename',fname,'pixel size',2.5);
 %{
-% Shows the object.
-ieNewGraphWin;
+ieNewGraphWin
 imagesc(ieObject.metadata.meshImage)
 %}
 

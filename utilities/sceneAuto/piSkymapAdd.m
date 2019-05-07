@@ -35,7 +35,7 @@ if ~piContains(skyName,':')
             skyname = sprintf('morning_%03d.exr',randi(4,1));
         case 'noon'
             skyname = sprintf('noon_%03d.exr',randi(10,1));
-%                     skyname = sprintf('noon_%03d.exr',9);
+            % skyname = sprintf('noon_%03d.exr',9);
         case 'sunset'
             skyname = sprintf('sunset_%03d.exr',randi(4,1));
         case 'cloudy'
@@ -45,8 +45,7 @@ if ~piContains(skyName,':')
     % Get the information about the skymap so we can download from
     % Flywheel
 
-    
-
+    % Is this data/data bit right?
     try
         acquisition = st.fw.lookup('wandell/Graphics auto/assets/data/skymaps');
         dataId      = acquisition.id;

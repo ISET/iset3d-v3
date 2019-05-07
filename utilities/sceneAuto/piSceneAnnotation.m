@@ -1,5 +1,8 @@
 function scene_label=piSceneAnnotation(meshImage, label,st)
 % Read primitive ID from _mesh.txt
+%
+%   NOT MUCH USED
+%
 % Add class information here: convert meshImage(instanceSeg) to A
 % classSeg.
 %

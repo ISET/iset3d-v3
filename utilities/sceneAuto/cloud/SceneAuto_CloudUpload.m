@@ -1,4 +1,7 @@
-%% Combine all render resources by scene type
+%% Combine all render resources by scene type%
+%
+% Deprecated, we think
+%
 % To Do: upload resouces to cloud bucket by pre defined scene types
 %       
 %%
@@ -52,7 +55,7 @@ roadnamelist{1} = 'highway_straight_4lanes_001';
 for jj = 1:length(roadnamelist)
     roadname = roadnamelist{jj};
 st = scitran('stanfordlabs');
-hierarchy = st.projectHierarchy('Graphics assets');
+hierarchy = st.projectHierarchy('Graphics auto assets');
 sessions     = hierarchy.sessions;
 for ii=1:length(sessions)
     if isequal(lower(sessions{ii}.label),'road')

@@ -46,7 +46,6 @@ thisR = piRead(fname);
 st = scitran('stanfordlabs');
 subject = st.lookup('wandell/Graphics auto/assets');
 session = subject.sessions.findOne('label=car');
-
 inputs.ncars = 1;
 assetRecipe = piAssetDownload(session,inputs.ncars,'acquisition label','Car_085');
 asset.car   = piAssetAssign(assetRecipe,'label','car');

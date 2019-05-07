@@ -1,5 +1,6 @@
 function piAssetsDownload_cloud(varargin)
 
+error('Deprecated')
 
 p = inputParser;
 p.addParameter('session','',@ischar);
@@ -12,7 +13,7 @@ acquisitionname  = p.Results.acquisition;
 
 %%
 st = scitran('stanfordlabs');
-hierarchy = st.projectHierarchy('Graphics assets');
+hierarchy = st.projectHierarchy('Graphics auto assets');
 
 % projects     = hierarchy.project;
 sessions     = hierarchy.sessions;
