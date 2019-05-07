@@ -9,7 +9,7 @@ function asset = piAssetTranslate(asset, translation,varargin)
 % ZL, Vistasoft Team, 2018
 %% 
 p = inputParser;
-p.addParameter('Pos_demention',1)
+p.addParameter('instancesNum',1)
 p.parse(varargin{:})
 pos_d = p.Results.Pos_demention;
 %%

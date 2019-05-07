@@ -4,7 +4,7 @@ p = inputParser;
 p.addParameter('translation',[],@iscell)
 p.addParameter('Y',[],@iscell);
 p.addParameter('Z',[],@iscell);
-p.addParameter('Pos_demention',1)
+p.addParameter('instancesNum',1)
 p.parse(varargin{:})
 translation = p.Results.translation;
 pos_d = p.Results.Pos_demention;

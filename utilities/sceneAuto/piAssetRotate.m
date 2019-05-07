@@ -2,7 +2,7 @@ function object=piAssetRotate(object,varargin)
 % only rotate around y axis is allowed
 %%
 p = inputParser;
-p.addParameter('Pos_demention',1);
+p.addParameter('instancesNum',1);
 p.addParameter('Y',[],@iscell);
 p.addParameter('Z',[],@iscell);
 p.parse(varargin{:})
