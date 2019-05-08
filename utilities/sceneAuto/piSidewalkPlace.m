@@ -63,8 +63,8 @@ for ii = 1: length(assetPosList_tmp)
                         gg = gg+1;
                     end
                 end
-                assets_updated(ii).geometry = piAssetTranslate(asset(dd).geometry,position,'Pos_demention',n);
-                assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,'Y',rotationY,'Pos_demention',n);
+                assets_updated(ii).geometry = piAssetTranslate(asset(dd).geometry,position,'instancesNum',n);
+                assets_updated(ii).geometry = piAssetRotate(assets_updated(ii).geometry,'Y',rotationY,'instancesNum',n);
                 assets_updated(ii).fwInfo   = asset(dd).fwInfo;
             end
         end

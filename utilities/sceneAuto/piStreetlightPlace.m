@@ -41,8 +41,8 @@ for ii = 1: length(assetPosList_tmp)
                 rotationY{gg} = streetlightPosList(jj).rotate;
                 gg = gg+1;
             end
-            assets_updated(ii).geometry(hh) = piAssetTranslate(asset(dd).geometry(hh),position,'Pos_demention',n);
-            assets_updated(ii).geometry(hh) = piAssetRotate(assets_updated(dd).geometry(hh),'Y',rotationY,'Pos_demention',n);
+            assets_updated(ii).geometry(hh) = piAssetTranslate(asset(dd).geometry(hh),position,'instancesNum',n);
+            assets_updated(ii).geometry(hh) = piAssetRotate(assets_updated(dd).geometry(hh),'Y',rotationY,'instancesNum',n);
             assets_updated(ii).fwInfo       = asset(dd).fwInfo;
         end
     end

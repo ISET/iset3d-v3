@@ -11,7 +11,7 @@ function asset = piAssetTranslate(asset, translation,varargin)
 p = inputParser;
 p.addParameter('instancesNum',1)
 p.parse(varargin{:})
-pos_d = p.Results.Pos_demention;
+pos_d = p.Results.instancesNum;
 %%
 for dd = 1:pos_d
     for ii=1:length(asset)
