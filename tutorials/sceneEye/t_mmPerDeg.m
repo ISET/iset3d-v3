@@ -1,5 +1,4 @@
-%% t_mmPerDeg
-% *WARNING* OUTDATED. Rendering model eye to obtain mm on retina per degree
+%% *WARNING* OUTDATED. Render model eye to obtain mm on retina per degree
 %
 % Description:
 %    *****Warning*****

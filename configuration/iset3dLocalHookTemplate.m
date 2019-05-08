@@ -48,7 +48,5 @@ end
 
 dataDirName = 'VirtualWorldColorConstancy';
 dataDir = fullfile(dataDirRoot,projectName,'');
-if (~exist(dataDir,'dir'))
-    mkdir(dataDir);
-end
+if ~exist(dataDir,'dir'), mkdir(dataDir); end
 setpref(projectName, 'baseFolder',dataDir);

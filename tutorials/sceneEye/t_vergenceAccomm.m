@@ -1,5 +1,4 @@
-%% t_vergenceAccomm.m
-% Simple simulation of vergence and accommodation via convergence.
+%% Simple simulation of vergence and accommodation via convergence.
 %
 % Description:
 %    We can do a simple simulation of vergence and accommodation by having
@@ -25,7 +24,6 @@ myScene = sceneEye('chessSet');
 %% Set parameters
 myScene.resolution = 128;
 myScene.numRays = 128;
-
 ipd = 64e-3; % Average interpupillary distance
 
 % We save the original parameters so we have them around even after moving

@@ -1,10 +1,10 @@
-%% t_schematicEyeModels
-% Render the same scene using a couple of different eye models.
+%% Render the same scene using a couple of different eye models.
 %
 % Description:
 %   Model the same scene with multiple eye models, including the following:
 %   Navarro, Gullstrand, and Arizona.
 %
+
 % History:
 %    XX/XX/XX  ???  Created
 %    03/15/19  JNM  Documentation pass
@@ -18,7 +18,6 @@ ieInit;
 clear; close all;
 
 %% Load up a scene
-
 thisScene = sceneEye('numbersAtDepth');
 
 % Set general parameters

@@ -63,7 +63,7 @@ for kk = 1:length(objects.assets)
     name = strsplit(objects.assets(kk).name, '_');
     if strcmp(name{1}, 'Plane') % if the object is a building region.
         count_before = count;
-        type = name{2};     % extract region information
+        type = name{2};  % extract region information
         lenx_tmp = objects.assets(kk).size.l;
         leny_tmp = objects.assets(kk).size.w;
         coordination = objects.assets(kk).position;
@@ -110,7 +110,7 @@ for kk = 1:length(objects.assets)
         %             finalCount = finalCount + 1;
         %         end
         %     end
-        
+
         %% change the structure of the output data
         for jj = count_before:length(buildingPosList_tmp)
             buildingPosList(jj).name = buildingPosList_tmp(jj).name;
@@ -145,7 +145,6 @@ for kk = 1:length(objects.assets)
                 end
             case 'right'
                 % test algorithm for 'right' situation
-
                 for jj = count_before:length(buildingPosList)
                     for ii = 1:size(building_list.name, 2)
                         if strcmpi(building_list.name(ii), ...
@@ -156,12 +155,11 @@ for kk = 1:length(objects.assets)
                     end
                     rectangle('Position', [...
                         buildingPosList(jj).position(1), ...
-                        buildingPosList(jj).position(3)-xx, yy, xx]);
+                        buildingPosList(jj).position(3) - xx, yy, xx]);
                     title('right');
                 end
             case 'left'
                 % test algorithm for 'left' situation
-
                 for jj = count_before:length(buildingPosList)
                     for ii = 1:size(building_list.name, 2)
                         if strcmpi(building_list.name(ii), ...
@@ -175,8 +173,8 @@ for kk = 1:length(objects.assets)
                         buildingPosList(jj).position(3), yy, xx]);
                     title('left');
                 end
-                % test algorithm for 'back' situation
             case 'back'
+                % test algorithm for 'back' situation
                 for jj = count_before:length(buildingPosList)
                     for ii = 1:size(building_list.name, 2)
                         if strcmpi(building_list.name(ii), ...
@@ -195,16 +193,44 @@ for kk = 1:length(objects.assets)
         % tmp = tmp + 1; 
         % disp(tmp);
     end
-
 end
 
 end
 
 function [settle_list, count] = buildingPlan(building_list, lenx_tmp, ...
     leny_tmp, coordination, settle_list, count, type, ankor, aveW)
+% Adjust the spacing interval between buildings.
+%
+% Syntax:
+%   [settle_list, count] = buildingPlan(building_list, lenx_tmp, ...
+%       leny_tmp, coordination, settle_list, count, type, ankor, aveW)
+%
+% Description:
+%    Adjust the interval between the buildings. If this is set too large it
+%    will cause problems.
+%
+% Inputs:
+%    building_list - Struct. A structure containing all of the information
+%                    about the buildings in the scene.
+%    lenx_tmp      - Numeric. The length of spare region in x direction.
+%    leny_tmp      - Numeric. The length of spare region in y direction.
+%    coordination  - Matrix. A 1x2 matrix of area coordinates.
+%    settle_list   - Struct. An array of structures containing position
+%                    information for the buildings, of length count.
+%    count         - Numeric. The number of buildings in the scene.
+%    type          - String. The direction of the region. Options are
+%                    'front', 'right', 'left', and 'back'.
+%    ankor         - Matrix. A 1x2 matrix of anchor coordinates.
+%    aveW          - Numeric. The average width for margins along x.
+%
+% Outputs:
+%    settle_list   - Struct. The modified structure array, of length count.
+%    count         - Numeric. The number of buildings in the scene.
+%
+% Optional key/value pairs:
+%    None.
+%
 
-% Adjust the interval between the buildings. If this is set too large it
-% will cause problems.
 offset = 0.2;
 
 %% calculate the parameter in spare region.
@@ -227,7 +253,7 @@ switch type
         lenx = leny_tmp;  % leny - lenth of spare region in y direction
     case 'left'
         % ABCD are 4 vertices of spare region
-        A = [coordination(1)-lenx_tmp, coordination(2)];
+        A = [coordination(1) - lenx_tmp, coordination(2)];
         B = coordination;
         C = [coordination(1), coordination(2) + leny_tmp];
         D = [coordination(1) - lenx_tmp, coordination(2) + leny_tmp];
@@ -280,9 +306,10 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
             next_x2 = C2(1) - B2(1);
             next_y2 = D2(2) - C2(2);
 
-            % record the info of new biulding, including id, x and y coordinates
-            % only record the building's info that confirm our requirments
-            if B(1)<0   % delete unnecessary buildings
+            % record the info of the new biulding, including id, x and y
+            % coordinates. Only record the building's information that
+            % confirms our requirments.
+            if B(1) < 0   % delete unnecessary buildings
                 marginX = aveW;
                 marginY = 2;
             else
@@ -320,7 +347,7 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
             next_x2 = C2(1) - B2(1);
             next_y2 = C2(2) - D2(2);
 
-            if abs(ankor(1)-B(1))<1%||(abs(ankor(2)-B(2))<11)
+            if abs(ankor(1)-B(1))<1  % ||(abs(ankor(2)-B(2))<11)
                 settle_list(count).name = id;
                 settle_list(count).position(1, 1) = B(1);
                 settle_list(count).position(1, 2) = B(2);
@@ -365,6 +392,7 @@ if ~isempty(sel)    % it is possible to put a new building on spare region
                 next_y1, B1, settle_list, count, type, ankor, aveW);
             [settle_list, count] = buildingPlan(building_list, next_x2, ...
                 next_y2, B2, settle_list, count, type, ankor, aveW);
+
         case 'back'
             % calculate info of spare region 1
             A1 = A;

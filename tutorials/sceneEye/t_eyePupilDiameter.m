@@ -1,5 +1,4 @@
-%% t_eyePupilDiameter.m
-% Render the slanted bar scene at differing pupil diameters.
+%% Render the slanted bar scene at differing pupil diameters.
 %
 % Description:
 %    Render the slanted bar scene at different pupil diameters. The

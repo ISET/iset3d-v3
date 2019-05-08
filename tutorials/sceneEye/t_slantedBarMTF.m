@@ -1,5 +1,4 @@
-%% t_slantedBarMTF.m
-% Estimate the MTF of the optical system using a slanted bar.
+%% Estimate the MTF of the optical system using a slanted bar.
 %
 % Description:
 %    This tutorial shows how you can render a retinal image of "slanted

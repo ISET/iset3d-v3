@@ -1,5 +1,4 @@
-%% t_planarImage.m
-% Demonstrate how to use the textured plane scene on a flat 'display'
+%% Demonstrate how to use the textured plane scene on a flat 'display'
 %
 % Description:
 %    This tutorial demonstrates how to use the textured plane scene. With
@@ -47,7 +46,7 @@ imageTexture = fullfile(piRootPath, 'data', ...
 
 % Load up the textured plane scene with the parameters calculated above:
 myScene = sceneEye('texturedPlane', 'planeDistance', distance, ...
-                   'planeSize', size, 'planeTexture', imageTexture);
+    'planeSize', size, 'planeTexture', imageTexture);
 
 %% Keep the quality low so we can render quickly!
 myScene.resolution = 128;
@@ -73,7 +72,7 @@ oiWindow
 
 %%  Accommodate away from the plane
 myScene.fov = planeFOV;
-myScene.accommodation = 1/0.1;
+myScene.accommodation = 1 / 0.1;
 myScene.name = sprintf('%0.2fdiopters', myScene.accommodation);
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.

@@ -67,6 +67,9 @@ fclose(fileID);
 if piContains(txtLines(1), ...
         '# PBRT geometry file converted from C4D exporter output')
     convertedflag = true;
+elseif piContains(txtLines(1), ...
+        '# PBRT geometry file converted from C4Dexporter output')
+    convertedflag = true;
 else
     convertedflag = false;
 end
@@ -79,10 +82,12 @@ if ~convertedflag
     kk = 1;
     gg = 1;
     for nn = 1: length(txtLines_indent)
-        if isequal(txtLines_indent{nn}, 'AttributeBegin')
+        if isequal(txtLines_indent{nn}, 'AttributeBegin') || ...
+                isequal(txtLines_indent{nn}, 'AttributeBegin ')
             nestbegin(kk) = nn;
             kk = kk + 1;
-        elseif isequal(txtLines_indent{nn}, 'AttributeEnd')
+        elseif isequal(txtLines_indent{nn}, 'AttributeEnd') || ...
+                isequal(txtLines_indent{nn}, 'AttributeEnd ')
             nestend(gg) = nn;
             gg = gg + 1;
         end

@@ -1,5 +1,4 @@
-%% t_renderAllScenes.m
-% Render all of the scenes. ISETBio specific.
+%% Render all of the scenes. ISETBio specific.
 %
 % Description:
 %    Works with ISETBio (not ISETCam)
@@ -41,6 +40,8 @@ if ~piDockerExists, piDockerConfig; end
 % edges. 
 
 scene3d = sceneEye('colorfulScene');
+% For those who don't have a populated option 'Colorful Scene', use cube.
+% scene3d = sceneEye('coloredCube');
                
 scene3d.fov = 30; 
 scene3d.resolution = 128;

@@ -149,7 +149,7 @@ elseif isunix
     if status == 0
         if args.debug; disp('Docker configured successfully!'); end
     else
-        if (args.debug); fprintf('Docker status: %d\n',status); end
+        if args.debug, fprintf('Docker status: %d\n',status); end
         error('Docker not configured: %s', result);
     end
 elseif ispc
@@ -158,7 +158,7 @@ elseif ispc
     if status == 0
         if args.debug; disp('Docker configured successfully!'); end
     else
-        if (args.debug); fprintf('Docker status: %d\n',status); end
+        if args.debug, fprintf('Docker status: %d\n',status); end
         error('Docker not configured: %s', result);
     end
 else

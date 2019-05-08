@@ -22,7 +22,6 @@ if ~piDockerExists, piDockerConfig; end
 
 % Determine whether you are working in ISETBio or ISETCam
 fprintf('Attempting to execute using %s.\n', piCamBio);
-
 workingFolder = fullfile(piRootPath, 'local', 'psfEstimate');
 
 %% Create a simple point scene

@@ -1,5 +1,4 @@
-%% t_eyeMovement3D.m
-% Demonstrate how to translate and rotate the eye using chess set scene.
+%% Demonstrate how to translate and rotate the eye using chess set scene.
 %
 % Description:
 %    This tutorial shows how to translate and rotate the eye throughout the

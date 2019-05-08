@@ -1,74 +1,85 @@
-function [fnameZIP, artifact] = piFetchPBRT(aName,varargin)
-% Deprecated.  Use piPBRTFetch
-% FETCH a PBRT file from the RDT archive to a local directory.
+function [fnameZIP, artifact] = piFetchPBRT(aName, varargin)
+% Deprecated. Use piPBRTFetch - FETCH a PBRT file from RDT to local dir.
 %
-% Syntax
-%  piFetchPBRT(artifactName,varargin)
-%
-% Required input
-%   artifactName - The base name of the artifact that can be found by a search
-%   
-% Optional inputs
-%   destinationFolder - default is piRootPath/data
-%   unzip     - perform the unzip operation (default true)
-%   deletezip - delete zip after unzipping (default false)
-%
-% Return
-%   fnameZIP - full path to the zip file
-%   artifact - artifact that was found on the remote site during the search
+% Syntax:
+%   [fnameZIP, artifact] = piFetchPBRT(artifactName, [varargin])
 %
 % Description
-%   The PBRT data are stored as zip files that include the pbrt scene file
-%   along with all of the necessary additional files.  These are typically
-%   stored inside of folders (geometry, brdfs, spds, textures).  This
-%   function pulls down the zip file containing everything and, by default,
-%   unzips the file so that the scene and auxiliary files are in a single
-%   directory.
+%    The PBRT data are stored as zip files that include the pbrt scene file
+%    along with all of the necessary additional files.  These are typically
+%    stored inside of folders (geometry, brdfs, spds, textures).  This
+%    function pulls down the zip file containing everything and, by
+%    default, unzips the file so that the scene and auxiliary files are in
+%    a single directory.
 % 
-% Wandell, SCIEN Stanford, 2017
+% Inputs:
+%    artifactName      - String. The artifact's base name that can be found
+%                        by a search.
+%   
+% Optional key/value pairs:
+%    destinationFolder - String. The destination folder path. Default is
+%                        piRootPath/data.
+%    unzip             - Boolean. Whether or not to perform the unzip
+%                        operation. Default true.
+%    deletezip         - Boolean. Whether or not to delete zip after
+%                        unzipping. Default false.
+%
+% Outputs:
+%    fnameZIP          - String. The full file path to the zip file.
+%    artifact          - Object. The artifact that was found on the remote
+%                        site during the search.
+%
+
+% History:
+%    XX/XX/17  BW   Wandell, SCIEN Stanford, 2017
+%    05/02/19  JNM  Documentation pass (comment out original function since
+%                   function set to call piPBRTFetch instead of using
+%                   function as written.)
 
 % Examples
 %{
- % Specify the scene name, download it, and render it
- % By default, the download is to piRootPath/data
- [fnameZIP, artifact] = piFetchPBRT('whiteScene');
- [p,n,e] = fileparts(fnameZIP);
- name = fullfile(p,n); fname = [n,'.pbrt'];
+    % Specify the scene name, download it, and render it
+    % By default, the download is to piRootPath/data
+    [fnameZIP, artifact] = piFetchPBRT('whiteScene');
+    [p, n, e] = fileparts(fnameZIP);
+    name = fullfile(p, n);
+    fname = [n, '.pbrt'];
 
- % Read the recipe from the pbrt scene file, 
- % which is contained inside a directory of the same name
- thisR = piRead(fullfile(dname,fname));
+    % Read the recipe from the pbrt scene file, 
+    % which is contained inside a directory of the same name
+    thisR = piRead(fullfile(dname, fname));
 
- % Render the output to the piRootPath/local output directory
- thisR.outputFile = fullfile(piRootPath,'local',fname); 
- scene = piRender(thisR);
+    % Render the output to the piRootPath/local output directory
+    thisR.outputFile = fullfile(piRootPath, 'local', fname); 
+    scene = piRender(thisR);
 
- % View it
- ieAddObject(scene); sceneWindow;
+    % View it
+    ieAddObject(scene);
+    sceneWindow;
 %}
 %{
- % By default, this places the data in piRootPath/data.  
- % You could set the 'deletezip', true parameter.
- [fnameZIP, artifact] = piFetchPBRT('sanmiguel');
+    % By default, this places the data in piRootPath/data.  
+    % You could set the 'deletezip', true parameter.
+    [fnameZIP, artifact] = piFetchPBRT('sanmiguel');
 
- % Assumes the scene pbrt file is in piRootPath/data
- % And places the output in piRootPath/local
- s_sanmiguel;
+    % Assumes the scene pbrt file is in piRootPath/data
+    % And places the output in piRootPath/local
+    s_sanmiguel;
 %}
 
-warning('Calling piPBRTFetch.  This routine is deprecated').
-piPBRTFetch(aName,varargin{:});
+warning('Calling piPBRTFetch.  This routine is deprecated');
+piPBRTFetch(aName, varargin{:});
 
 end
-
+%{
 %% Parse inputs
 p = inputParser;
-p.addRequired('aName',@ischar);
-p.addParameter('destinationFolder',fullfile(piRootPath,'data'),@ischar);
-p.addParameter('unzip',true,@islogical);
-p.addParameter('deletezip',false,@islogical);
+p.addRequired('aName', @ischar);
+p.addParameter('destinationFolder', fullfile(piRootPath, 'data'), @ischar);
+p.addParameter('unzip', true, @islogical);
+p.addParameter('deletezip', false, @islogical);
 
-p.parse(aName,varargin{:});
+p.parse(aName, varargin{:});
 destinationFolder = p.Results.destinationFolder;
 zipFlag = p.Results.unzip;
 deleteFlag = p.Results.deletezip;
@@ -78,18 +89,20 @@ deleteFlag = p.Results.deletezip;
 rdt = RdtClient('isetbio');
 rdt.crp('/resources/scenes/pbrt');
 a = rdt.searchArtifacts(aName);
-[fnameZIP, artifact] =rdt.readArtifact(a(1),'destinationFolder',destinationFolder);
+[fnameZIP, artifact] = rdt.readArtifact(a(1), ...
+    'destinationFolder', destinationFolder);
 
 %% If download succeeded, check if unzip and delete are requested
-if exist(fnameZIP,'file')
+if exist(fnameZIP, 'file')
     if zipFlag
         % unzip into the destionation directory.
-        unzip(fnameZIP,destinationFolder);
+        unzip(fnameZIP, destinationFolder);
     end
     
     % Only delete the zip file if the person has unzipped.  This prevents
     % boneheaded mistakes.
-    if deleteFlag && zipFlag,  delete(fnameZIP); end
+    if deleteFlag && zipFlag, delete(fnameZIP); end
 end
 
 end
+%}

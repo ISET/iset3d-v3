@@ -32,7 +32,7 @@ function asset = piAssetCreate(varargin)
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
 
 %% Parse input parameters
-varargin =ieParamFormat(varargin);
+varargin = ieParamFormat(varargin);
 
 p = inputParser;
 if length(varargin) > 1

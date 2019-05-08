@@ -44,6 +44,7 @@ for ii = 1: length(trafficflow)
         hold on
     end
 end
+
 xlabel('timestep')
 ylabel('number of objects')
 legend([Car, Ped, Bike, Bus, Truck], ...

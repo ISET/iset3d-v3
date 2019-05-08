@@ -166,7 +166,7 @@ for ii = 1:length(assets.(assetname))
 
     %% add objects.geometry to scene(geometry struct)
     scene = thisR.assets;
-    if isfield(scene,'scale'),scene=rmfield(scene,'scale');end
+    if isfield(scene, 'scale'), scene = rmfield(scene, 'scale'); end
     % add motion slot
     if geometry
         numScene = length(scene);
@@ -177,11 +177,11 @@ for ii = 1:length(assets.(assetname))
                     rmfield(assets.(assetname)(ii).geometry, 'scale');
             end
             scene(numScene + hh) = assets.(assetname)(ii).geometry(hh);
-            %%
         end
     end
     if exist(assets.(assetname)(1).geometryPath, 'dir')
-        assetPath = fullfile(piRootPath, 'local', assets.(assetname).index);
+        assetPath = fullfile(piRootPath, 'local', ...
+            assets.(assetname).index);
         scenePath = fileparts(thisR.outputFile);
         copyfile(assetPath, scenePath);
     end

@@ -30,7 +30,7 @@ if ~isfolder(workingDir), mkdir(workingDir); end
 % if ~(isdir(workingDir)), mkdir(workingDir); end
 
 %% Scale and translate the plane
-scale = 0.5; % 1*0.5 = 0.5 m
+scale = 0.5; % 1 * 0.5 = 0.5 m
 translate = 1; % m
 
 % The textured plane has specifically been named "Plane" in this scene. We
@@ -65,7 +65,9 @@ fprintf('Rendering with lens:   %s\n', thisR.get('lens file'));
 thisR.set('chromatic aberration', true);
 piWrite(thisR);
 
-[oiCA, results] = piRender(thisR, 'render type', 'radiance');
+% to reuse an existing render, simply uncomment the below key/value pair.
+[oiCA, results] = piRender(thisR, 'render type', 'radiance');  %, ...
+%    'reuse', true);
 oiCA = oiSet(oiCA,'name', 'CA');
 oiWindow(oiCA);
 
@@ -76,7 +78,9 @@ thisR.set('chromatic aberration', false);
 thisR.outputFile = fullfile(workingDir, [n, e]);
 piWrite(thisR);
 
-[oi, results] = piRender(thisR, 'render type', 'radiance');
+% to reuse an existing render, simply uncomment the below key/value pair.
+[oi, results] = piRender(thisR, 'render type', 'radiance');  %, ...
+%    'reuse', true);
 oi = oiSet(oi, 'name', 'noCA');
 
 % Show it in ISET
@@ -86,7 +90,9 @@ oiWindow(oi);
 thisR.set('chromatic aberration', 15);
 piWrite(thisR);
 
-[oiCA, results] = piRender(thisR, 'render type', 'radiance');
+% to reuse an existing render, simply uncomment the below key/value pair.
+[oiCA, results] = piRender(thisR, 'render type', 'radiance');  %, ...
+%    'reuse', true);
 oiCA = oiSet(oiCA, 'name', 'CA');
 oiWindow(oiCA);
 

@@ -1,5 +1,4 @@
-%% t_rayTracingIntroduction.m
-% An introduction to eye optics modeling using ray tracing and ISETBio
+%% An introduction to eye optics modeling using ray tracing and ISETBio
 %
 % Description:
 %    This tutorial is an introduction to modeling the optics of the eye

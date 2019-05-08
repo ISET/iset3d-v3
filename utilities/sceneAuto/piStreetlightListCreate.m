@@ -1,4 +1,23 @@
 function StreetlightList = piStreetlightListCreate()
+% Create a streetlight list from flywheel.io content previously downloaded
+%
+% Syntax:
+%   StreetlightList = piStreetlightListCreate()
+%
+% Description:
+%    Create a Streetlight List object from content previously downloaded
+%    from Flywheel.io, reading from the provided file.
+%
+% Inputs:
+%    None.
+%
+% Outputs:
+%    StreetlightList - Object. The object to store all the streetlights.
+%
+% Optional key/value pairs:
+%    None.
+%
+
 % Download from flywheel
 % Test now
 currentPath = pwd;
@@ -31,15 +50,17 @@ fname = fullfile(BuildingFolder, sprintf('streetlight_tall_%03d', 1), ...
     end
 
     StreetlightList(1).name = name;
-
     StreetlightList(1).geometry = geometry;
     StreetlightList(1).material.list = thisR.materials.list;
     StreetlightList(1).material.txtLines = thisR.materials.txtLines;
     localFolder = fileparts(fname);
-    StreetlightList(1).geometryPath = fullfile(localFolder, 'scene', 'PBRT', 'pbrt-geometry');
+    StreetlightList(1).geometryPath = fullfile(localFolder, 'scene', ...
+        'PBRT', 'pbrt-geometry');
 for ii = 1:2
-count = count+1;
-fname = fullfile(BuildingFolder, sprintf('streetlight_short_%03d', ii), sprintf('streetlight_short_%03d.pbrt', ii));
+    count = count + 1;
+    fname = fullfile(BuildingFolder, ...
+        sprintf('streetlight_short_%03d', ii), ...
+        sprintf('streetlight_short_%03d.pbrt', ii));
     thisR_tmp = piRead(fname, 'version', 3);
     fds = fieldnames(thisR_tmp);
     thisR = recipe;
@@ -47,28 +68,28 @@ fname = fullfile(BuildingFolder, sprintf('streetlight_short_%03d', ii), sprintf(
     for dd = 1:length(fds)
         thisR.(fds{dd}) = thisR_tmp.(fds{dd});
     end
-        geometry = thisR.assets;
+    geometry = thisR.assets;
     for jj = 1:length(geometry)
         if ~isequal(lower(geometry(jj).name), 'camera')
             index = strfind(geometry(jj).name, '_');
             if isempty(index)
                 name = geometry(jj).name;
             else
-            name = geometry(jj).name(1:index(1)-1);
+                name = geometry(jj).name(1:index(1) - 1);
             end
             break;
         end
     end
 
     StreetlightList(count).name = name;
-
     StreetlightList(count).geometry = geometry;
     StreetlightList(count).material.list = thisR.materials.list;
     StreetlightList(count).material.txtLines = thisR.materials.txtLines;
     localFolder = fileparts(fname);
-    StreetlightList(count).geometryPath = fullfile(localFolder, 'scene', 'PBRT', 'pbrt-geometry');
+    StreetlightList(count).geometryPath = ...
+        fullfile(localFolder, 'scene', 'PBRT', 'pbrt-geometry');
 end
 fprintf('%d streetlights created \n', count);
 cd(currentPath);
-end
 
+end

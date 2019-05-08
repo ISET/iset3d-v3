@@ -393,17 +393,21 @@ if isfield(materials, 'bsdffile')
         val = strcat(val, val_bsdfile);
     end
 end
+
 if ~isempty(materials.stringnamedmaterial2)
     val_stringnamedmaterial2 = sprintf(...
         ' "string namedmaterial2" "%s" ', materials.stringnamedmaterial2);
     val = strcat(val, val_stringnamedmaterial2);
 end
+
 if isfield(materials, 'texturebumpmap')
     if ~isempty(materials.texturebumpmap)
         val_texturekr = sprintf(' "texture bumpmap" "%s" ', ...
             materials.texturebumpmap);
         val = strcat(val, val_texturekr);
     end
+end
+
 if isfield(materials, 'boolremaproughness')
     if ~isempty(materials.boolremaproughness)
         val_boolremaproughness = sprintf(...

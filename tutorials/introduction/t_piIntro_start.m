@@ -1,5 +1,4 @@
-%% t_piIntroduction01
-% This is the first in a series of scripts introducing iset3d calulcations
+%% This is the first in a series of scripts introducing iset3d calulcations
 %
 % Description:
 %    This introduction renders the teapot scene in the ISET3d respository's
@@ -14,7 +13,8 @@
 %    docker pull vistalab/pbrt-v3-spectral
 %
 % See Also:
-%   t_piIntroduction02, t_piIntroduction03, and t_piIntroduction_test
+%   t_piIntro_rdt, t_piIntro_material, t_piIntro_flywheel, t_piIntro_lens,
+%   t_piIntro_fisheyelens, t_piIntro_assetmotion, & t_piIntro_cameramotion
 %
 % History:
 %    XX/XX/17  TL, BW, ZL  SCIEN 2017

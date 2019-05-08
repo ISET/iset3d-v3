@@ -11,7 +11,7 @@ function assetlist = piAssetListCreate(varargin)
 %    None.
 %
 % Outputs:
-%    assetList - Assigned assets libList used for street elements;
+%    assetList - Struct. Assigned assets libList used for street elements.
 %
 % Optional key/value pairs:
 %    class     - String. The session name on flywheel. Default ''.
