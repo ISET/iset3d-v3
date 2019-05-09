@@ -6,13 +6,19 @@ function piMaterialGroupAssign(thisR)
 %
 % Description:
 %    This function was built by ZL to manage the material assignments when
-%    there are many asset parts in the isetauto driving scenes. The part
-%    names that are known here are from cars or pedestrian (bodymat). 
+%    there are many asset parts. This is frequently the case in the
+%    isetauto driving scenes. The known part names are from cars or
+%    pedestrian (bodymat). This list is still a work in progress.
 %
 %    This function processes all the entries in the materials.list in the
 %    recipe and invokes the piMaterialAssign for the cars in the isetauto
 %    simulation. That function assigns the material to the recipe. This
 %    information is used by PBRT to render the object materials.
+%
+%    Materials recognized in this function
+%       (carbody ~paint_base), carpaint , window, mirror, lightsfront,
+%       lightsback chrome, wheel, rim, tire, plastic, metal, glass,
+%       bodymat, translucent, wall, and paint_base
 %
 % Inputs:
 %    thisR - Object. A recipe object.
@@ -31,47 +37,36 @@ function piMaterialGroupAssign(thisR)
 %    XX/XX/18  ZL   Vistasoft Team, 2018
 %    04/03/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
-
-% A scene has a set of materials represented in its recipe
-mlist = fieldnames(thisR.materials.list);
-
-% For each material in the list (mlist) we have a map that converts the
-% material list name to a particular material definition in PBRT. We should
-% be able to print out this assignment
-
-%% Various materials that we recognize
-%{
-% This is the list we currently handle
-(carbody ~paint_base), carpaint , window, mirror, lightsfront, lightsback
-chrome, wheel, rim, tire, plastic, metal, glass, bodymat, translucent,
-wall, paint_base
-%}
+%    05/09/19  JNM  Merge Master in again
 
 %% A scene has a set of materials represented in its recipe
+% Check whether each entry in mlist contains a known string, such as
+% 'carbody'. If it does contain that string, do a particular assignment
+% using (piMaterialAssign).
+%
+% For each string in the mlist, there is a rule that converts the string to
+% a particular material definition in PBRT. That conversion is implemented
+% in the if then/else statement below.
+%
+% The mlist entry might be, say, 'carbody black'. Then we would assign the
+% colorkd to the materal, and we would assign the material with the colorkd
+% to the recipe.
 mlist = fieldnames(thisR.materials.list);
 
-% Check whether each entry in mlist contains a known string, such as
-% 'carbody'.  If it does contain that string, do a particular
-% assignment using (piMaterialAssign).
-%
-% For each string in the mlist, there is a rule that converts the
-% string to a particular material definition in PBRT. That conversion
-% is implemented in the if then/else statement below.
-%
-% The mlist entry might be, say, 'carbody black'.  Then we would
-% assign the colorkd to the materal, and we would assign the material
-% with the colorkd to the recipe.
 for ii = 1:length(mlist)
     if  piContains(lower(mlist(ii)), 'carbody') && ...
             ~piContains(lower(mlist(ii)), 'paint_base')
-%         if piContains(mlist(ii), 'black')
-%             colorkd = piColorPick('black');
-%         elseif piContains(mlist(ii), 'white')
-%             colorkd = piColorPick('white');
-%         else
-            % Default
+        % We seem to always be picking a random color for the car body
+        % paint base. This could get adjusted.
+
+        % if piContains(mlist(ii), 'black')
+        %     colorkd = piColorPick('black');
+        % elseif piContains(mlist(ii), 'white')
+        %     colorkd = piColorPick('white');
+        % else
+        %     Default
         colorkd = piColorPick('random');
-%         end
+        % end
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);   % String material label.
         target = thisR.materials.lib.carpaintmix; % This is the assignment.

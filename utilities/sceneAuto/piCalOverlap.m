@@ -1,5 +1,5 @@
 function [remain_list, total_list] = piCalOverlap(delete_list, total_list)
-% Determine if there is object overlap
+% Determine if there is object overlap, and delete overlapping objects.
 %
 % Syntax:
 %   [remain_list, total_list] = piCalOverlap(delete_list, total_list)
@@ -14,14 +14,15 @@ function [remain_list, total_list] = piCalOverlap(delete_list, total_list)
 %    total_list  - Array. The list of all of the structures.
 %
 % Outputs:
-%    remain_list: consists objects in delete_list that don't overlap
-%         objects in total_list.
-%         total_list: objects in original total_list & objects in
-%         remain_list.
+%    remain_list - Array. Consists of objects in delete_list that don't
+%                  overlap objects in total_list.
+%    total_list  - Array. Objects in original total_list, as well as
+%                  objects in remain_list.
 
 % History:
-%    08/XX/18  SL   Created by SL 2018.8
+%    08/XX/18  SL   Created by Shuangting Liu 2018.8
 %    04/11/19  JNM  DOcumentation pass
+%    05/09/19  JNM  Merge with master
 
 if isfield(delete_list, 'name') && isfield(total_list, 'name')
     count_total = size(total_list, 2);
@@ -54,11 +55,11 @@ end
 
 end
 
-function TF = piCalOverlap1(delete_obj, total_list)
+function TF = piOverlapCheck(delete_obj, total_list)
 %  Calculate overlap from within the provided lists
 %
 % Syntax:
-%   TF = piCalOverlap1(delete_obj, total_list)
+%   TF = piOverlapCheck(delete_obj, total_list)
 %
 % Description:
 %    Using the provided information, calculate whether or not there is
@@ -108,41 +109,43 @@ Dy2 = delete_obj.position(3) + ...
     sind(-delete_obj.rotate) * (-width_delete) / 2;
 p2 = polyshape([Ax2 Bx2 Cx2 Dx2], [Ay2 By2 Cy2 Dy2]);
 
-% Calculate overlap between objects in delete_list and total_list.
 for ii = 1:size(total_list, 2)
-    Ax1 = total_list(ii).position(1) + ...
-        cosd(-total_list(ii).rotate) * total_list(ii).size.w / 2 + ...
-        sind(-total_list(ii).rotate) * total_list(ii).size.l / 2;
-    Bx1 = total_list(ii).position(1) + ...
-        cosd(-total_list(ii).rotate) * total_list(ii).size.w / 2 + ...
+    obj1 = delete_obj.position;
+    obj2 = total_list(ii).position;
+    dist = max(total_list(ii).size.w, total_list(ii).size.l) / 2 + ...
+        max(length_delete, width_delete) / 2;
+    if abs(obj1(1) - obj2(1)) < dist && abs(obj1(3) - obj2(3)) < dist
+        Ax1 = total_list(ii).position(1) + ...
+            cosd(-total_list(ii).rotate) * total_list(ii).size.w / 2 + ...
+            sind(-total_list(ii).rotate) * total_list(ii).size.l / 2;
+        Bx1 = total_list(ii).position(1) + ...
+            cosd(-total_list(ii).rotate) * total_list(ii).size.w / 2 + ...
+            sind(-total_list(ii).rotate) * (-total_list(ii).size.l / 2);
+        Cx1 = total_list(ii).position(1) + ...
+        cosd(-total_list(ii).rotate) * (-total_list(ii).size.w / 2) + ...
         sind(-total_list(ii).rotate) * (-total_list(ii).size.l / 2);
-    Cx1 = total_list(ii).position(1) + ...
-    cosd(-total_list(ii).rotate) * (-total_list(ii).size.w / 2) + ...
-    sind(-total_list(ii).rotate) * (-total_list(ii).size.l / 2);
-    Dx1 = total_list(ii).position(1) + ...
-    cosd(-total_list(ii).rotate) * (-total_list(ii).size.w / 2) + ...
-    sind(-total_list(ii).rotate) * total_list(ii).size.l / 2;
-
-    Ay1 = total_list(ii).position(3) + ...
-        cosd(-total_list(ii).rotate) * total_list(ii).size.l / 2 - ...
-        sind(-total_list(ii).rotate) * total_list(ii).size.w / 2;
-    By1 = total_list(ii).position(3) + ...
-        cosd(-total_list(ii).rotate) * (-total_list(ii).size.l) / 2 - ...
-        sind(-total_list(ii).rotate) * total_list(ii).size.w / 2;
-    Cy1 = total_list(ii).position(3) + ...
-        cosd(-total_list(ii).rotate) * (-total_list(ii).size.l) / 2 - ...
-        sind(-total_list(ii).rotate) * (-total_list(ii).size.w) / 2;
-    Dy1 = total_list(ii).position(3) + ...
-        cosd(-total_list(ii).rotate) * total_list(ii).size.l / 2 - ...
-        sind(-total_list(ii).rotate) * (-total_list(ii).size.w) / 2;
-    p1 = polyshape([Ax1 Bx1 Cx1 Dx1], [Ay1 By1 Cy1 Dy1]);
-    ployvec = [p1 p2];
-    % figure;
-    % patch([Ax1 Bx1 Cx1 Dx1], [Ay1 By1 Cy1 Dy1], 'blue');
-    % patch([Ax2 Bx2 Cx2 Dx2], [Ay2 By2 Cy2 Dy2], 'red');
-
-    TF_tmp = overlaps(ployvec);
-    TF = TF | TF_tmp;
-    if TF(1, 2), break; end
+        Dx1 = total_list(ii).position(1) + ...
+        cosd(-total_list(ii).rotate) * (-total_list(ii).size.w / 2) + ...
+        sind(-total_list(ii).rotate) * total_list(ii).size.l / 2;
+        
+        Ay1 = total_list(ii).position(3) + ...
+            cosd(-total_list(ii).rotate) * total_list(ii).size.l / 2 - ...
+            sind(-total_list(ii).rotate) * total_list(ii).size.w / 2;
+        By1 = total_list(ii).position(3) + ...
+            cosd(-total_list(ii).rotate) * (-total_list(ii).size.l) / 2 ...
+            - sind(-total_list(ii).rotate) * total_list(ii).size.w / 2;
+        Cy1 = total_list(ii).position(3) + ...
+            cosd(-total_list(ii).rotate) * (-total_list(ii).size.l) / 2 ...
+            - sind(-total_list(ii).rotate) * (-total_list(ii).size.w) / 2;
+        Dy1 = total_list(ii).position(3) + ...
+            cosd(-total_list(ii).rotate) * total_list(ii).size.l / 2 - ...
+            sind(-total_list(ii).rotate) * (-total_list(ii).size.w) / 2;
+        p1 = polyshape([Ax1 Bx1 Cx1 Dx1], [Ay1 By1 Cy1 Dy1]);
+        ployvec = [p1 p2];
+        TF_tmp = overlaps(ployvec);
+        TF = TF | TF_tmp;
+        if TF(1, 2) == 1, break; end
+    end
 end
+
 end

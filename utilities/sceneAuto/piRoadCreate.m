@@ -36,6 +36,7 @@ function [road, thisR] = piRoadCreate(varargin)
 %    XX/XX/18   Z   Created: Zhenyi, 2018
 %    04/12/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge with master (Resolve conflicts) update params.
+%    05/09/19  JNM  Merge with master again
 
 %% Initialization
 p = inputParser;
@@ -144,7 +145,7 @@ thisR = piJson2Recipe(assetRecipe{1}.name);
 % if exist(fileFolder, 'dir'), mkdir(fileFolder); end
 % thisR.outputFile = fullfile(fileFolder, [filename, '.pbrt']);
 
-data_acq = st.fw.lookup('wandell/Graphics assets/data/data/others');
+data_acq = st.fw.lookup('wandell/Graphics auto/assets/data/others');
 thisResource = stFileSelect(acqs.files, 'type', 'CG Resource');
 road.fwList = [data_acq.id, ' ', 'data.zip', ' ', acqs.id, ' ', ...
     thisResource{1}.name];

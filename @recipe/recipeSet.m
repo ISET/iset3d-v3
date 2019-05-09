@@ -18,68 +18,73 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %    thisR - Object. A recipe object.
 %    param - String. A string indicating which parameter's value to change.
 %            Some of the parameters available to set are as follows*:
-%         outputfile     - String. A data management pair type. The
-%                          full filepath to the output file.
-%         inputfile      - String. A data management pair type. The
-%                          full filepath to the input file.
-%         objectDistance - Numeric. A scene and camera pair type. The
-%                          distance to the object.
-%         camera         - Object. A scene and camera pair type. This
-%                          is a camera object.
-%         cameratype     - String. A scene and camera pair type. This
-%                          is the subtype of the camera.
-%         lensfile       - String. A lens pair type. The filename for
-%                          an applicable lens file.
-%         nbounces       - Numeric. A rendering pair type. The number
-%                          of bounces for the light source. Also known
-%                          as maxDepth, or bounces.
-%         aperture       - Numeric. Also known as apertureDiameter,
-%                          this is the diameter of the aperture.
-%         filmDistance   - Numeric. The film distance.
-%         focusDistance  - Numeric. The focus distance. Only in v3.
-%         fov            - Numeric. The field of view, in degrees. Only
+%         outputfile         - String. A data management pair type. The
+%                              full filepath to the output file.
+%         inputfile          - String. A data management pair type. The
+%                              full filepath to the input file.
+%         objectDistance     - Numeric. A scene and camera pair type. The
+%                              distance to the object.
+%         camera             - Object. A scene and camera pair type. This
+%                              is a camera object.
+%         cameratype         - String. A scene and camera pair type. This
+%                              is the subtype of the camera.
+%         lensfile           - String. A lens pair type. The filename for
+%                              an applicable lens file. This is a json file
+%                              for omni case, and a dat file for realistic.
+%         nbounces           - Numeric. A rendering pair type. The number
+%                              of bounces for the light source. Also known
+%                              as maxDepth, or bounces.
+%         aperture           - Numeric. Also known as apertureDiameter, 
+%                              this is the diameter of the aperture.
+%         filmDistance       - Numeric. The film distance.
+%         focusDistance      - Numeric. The focus distance. Only in v3.
+%         fov                - Numeric. The field of view, in degrees. Only
 %                          works for pinhole cameras.
-%         diffraction    - Numeric. The diffraction value. Only in v2.
-%         chroAbb        - Varies. Either boolean or numeric. Also known as
-%                          chromatic abberation. If numeric, assign value
-%                          and set chromaticAbberationEnabled to true.
-%                          Otherwise, set chromaticAbberation to the
-%                          provided boolean value (if true, default value
-%                          of chroAbb is 8).
-%         autoFocus      - Boolean. Whether or not to automatically set the
-%                          film distance so that the lookAt to point is in
-%                          good focus.
-%         lookat         - Struct. A camera position pair. A structure
-%                          defining the lookAt paridigam, including from,
-%                          to, & up coordinates.
-%         from           - Matrix. A camera position pair. A 1x3 Matrix
-%                          defining the from perspective in 3D space.
-%         to             - Matrix. A camera position pair. A 1x3 Matrix
-%                          defining the to perspective in 3D space.
-%         up             - Matrix. A camera position pair. A 1x3 Matrix
-%                          defining the up perspective in 3D space.
-%         microLens      - Numeric. A microlens pair. If the microlens is
-%                          enabled, a numeric value to represent the number
-%                          of microlens/pinhole samples for the specified
-%                          light field camera.
-%         nMicroLens     - Numeric. A microlens pair. The number of pinhole
-%                          /microlens samples for a light field camera.
-%         lfFilmRes      - Varies. The value provided is unused. Resolution
-%                          is calculated by dot multiplying the values of
-%                          nMicroLens and nSubPixels.
-%         nSubPixels     - Numeric. The numbr of pixels behind each
-%                          microlens/pinhole.
-%         filmResolution - Matrix. A film pair. Either a 1x2 or 1x1 numeric
-%                          matrix (which is converted to 1x2) showcasing
-%                          the film resolution for the scene.
-%         diagonal       - Numeric. Also known as filmDiagonal. The
-%                          measurement of the diagonal across the
-%                          resolution of the film.
-%         raysPerPixel   - Numeric. A sampler pair. Also known as
-%                          pixelSamples. The number of rays per pixel in
-%                          the scene.
-%         cropWindow     - Matrix. A 1x4 matrix representing the dimensions
-%                          /coordinates of the cropped window.
+%         diffraction        - Numeric. The diffraction value. Only in v2.
+%         chroAbb            - Varies. Either boolean or numeric. Also
+%                              known as chromatic abberation. If numeric,
+%                              assign value and set
+%                              chromaticAbberationEnabled to true.
+%                              Otherwise, set chromaticAbberation to the
+%                              provided boolean value (if true, default
+%                              value of chroAbb is 8).
+%         autoFocus          - Boolean. Whether or not to automatically set
+%                              the film distance so that the lookAt to
+%                              point is in good focus.
+%         lookat             - Struct. A camera position pair. A structure
+%                              defining the lookAt paridigam, including
+%                              from, to, & up coordinates.
+%         from               - Matrix. A camera position pair. A 1x3 Matrix
+%                              defining the from perspective in 3D space.
+%         to                 - Matrix. A camera position pair. A 1x3 Matrix
+%                              defining the to perspective in 3D space.
+%         up                 - Matrix. A camera position pair. A 1x3 Matrix
+%                              defining the up perspective in 3D space.
+%         microLens          - Numeric. A microlens pair. If the microlens
+%                              is enabled, a numeric value to represent the
+%                              number of microlens/pinhole samples for the
+%                              specified light field camera.
+%         nMicroLens         - Numeric. A microlens pair. The number of
+%                              pinhole samples for a light field camera.
+%         lfFilmRes          - Varies. The value provided is unused.
+%                              Resolution is calculated by dot multiplying
+%                              the values of nMicroLens and nSubPixels.
+%         nSubPixels         - Numeric. The numbr of pixels behind each
+%                              microlens/pinhole.
+%         filmResolution     - Matrix. A film pair. Either a 1x2 or 1x1
+%                              numeric matrix (which is converted to 1x2)
+%                              showcasing the film resolution for the scene
+%         diagonal           - Numeric. Also known as filmDiagonal. The
+%                              measurement of the diagonal across the
+%                              resolution of the film.
+%         raysPerPixel       - Numeric. A sampler pair. Also known as
+%                              pixelSamples. The number of rays per pixel
+%                              in the scene.
+%         cropWindow         - Matrix. A 1x4 matrix representing the
+%                              dimensions/coordinates of the cropped window
+%         trafficflowdensity - Numeric. A numerical value representing the
+%                              trafficflow's density.
+%         trafficTimeStamp   - Numeric. The timestamp for the trafficflow.
 %    val   - VARIES. The value type for the individual parameters above is
 %            listed with each of their descriptions.
 %
@@ -102,6 +107,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % History:
 %    XX/XX/17  BW   ISETBIO Team, 2017
 %    04/19/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge with master
 
 % Examples
 %{
@@ -171,16 +177,27 @@ switch param
     case 'camera'
         % Initialize a camera type with default parameters
         % To adjust the parameters use recipe.set() calls
-        thisR.camera = piCameraCreate(val, ...
-            'lensFile', p.Results.lensfile, 'pbrtVersion', thisR.version);
+        thisR.camera = piCameraCreate(val, 'lensFile', p.Results.lensfile);
 
-        % If version number is 3, add the film diagonal into the Film
-        if thisR.version == 3
-            thisR.film.diagonal.value = 35;
-            thisR.film.diagonal.type = 'float';
-        end
+        % For this camera, the film size should be
+        thisR.set('film diagonal', 35);
+
     case 'cameratype'
         thisR.camera.subtype = val;
+
+    case {'cameraexposure', 'exposuretime'}
+        % Normally, openShutter is at time zero
+        thisR.camera.shutteropen.type  = 'float';
+        thisR.camera.shutterclose.type = 'float';
+        try
+            openShutter = thisR.camera.shutteropen.value;
+        catch
+            openShutter = 0;
+            thisR.camera.shutteropen.value = 0;
+        end
+
+        % Shutter duration in sec
+        thisR.camera.shutterclose.value = val + openShutter;   
 
     % Lens related
     case 'lensfile'
@@ -200,10 +217,6 @@ switch param
             thisR.camera.aperture_diameter.value = val;
             thisR.camera.aperture_diameter.type = 'float';
         end
-
-    case {'filmdistance'}
-        thisR.camera.filmdistance.value = val;
-        thisR.camera.filmdistance.type = 'float';
 
     case {'focusdistance'}
         if thisR.version == 3
@@ -291,6 +304,15 @@ switch param
     case 'up'
         thisR.lookAt.up = val;
 
+    % Film parameters
+    case 'filmdiagonal'
+        thisR.film.diagonal.type = 'float';
+        thisR.film.diagonal.value = val;
+        
+    case {'filmdistance'}
+        thisR.camera.filmdistance.type = 'float';
+        thisR.camera.filmdistance.value = val;
+        
     % Rendering related
     case{'maxdepth', 'bounces', 'nbounces'}
         % Eliminated warning Nov. 11, 2018.
@@ -337,15 +359,6 @@ switch param
         thisR.film.xresolution.value = val(1);
         thisR.film.yresolution.value = val(2);
 
-    case {'filmdiagonal', 'diagonal'}
-        if thisR.version == 2
-            thisR.camera.filmdiag.value = val(1);
-            thisR.camera.filmdiag.type = 'float';
-        elseif thisR.version == 3
-            thisR.film.diagonal.value = val(1);
-            thisR.film.diagonal.type = 'float';
-        end
-
     case {'pixelsamples', 'raysperpixel'}
         % Sampler
         thisR.sampler.pixelsamples.value = val;
@@ -353,6 +366,13 @@ switch param
     case{'cropwindow', 'crop'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
+     
+    % SUMO parameters stored in recipe metadata
+    case {'trafficflowdensity'}
+        thisR.metadata.sumo.trafficflowdensity = val;
+
+    case {'traffictimestamp'}
+        thisR.metadata.sumo.timestamp = val;
 
     otherwise
         error('Unknown parameter %s\n', param);

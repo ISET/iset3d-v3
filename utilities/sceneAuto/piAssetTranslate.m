@@ -27,13 +27,15 @@ function asset = piAssetTranslate(asset, translation, varargin)
 % History:
 %    XX/XX/18  ZL   Vistasoft Team, 2018
 %    05/07/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge with master
 
 p = inputParser;
-p.addParameter('pos_dimension', 1)
+p.addParameter('instancesNum', 1)
 p.parse(varargin{:})
-pos_d = p.Results.pos_dimension;
+instN = p.Results.instancesNum;
 
-for dd = 1:pos_d
+%%
+for dd = 1:instN
     for ii = 1:length(asset)
         % Add the translation
         if ~isempty(translation{dd})

@@ -40,6 +40,7 @@ function [buildingPosList] = piBuildingPosList(buildingList, objects)
 %    09/21/18  JZ   Jiaqi Zhang 09.21.2018
 %    04/09/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/09/19  JNM  Merge Master in again
 
 %%
 buildingPosList = struct;
@@ -120,13 +121,12 @@ for kk = 1:length(objects.assets)
             buildingPosList(jj).rotate = buildingPosList_tmp(jj).rotate;
         end
 
-        %% test algotithm. Comment this part when using.        
-        ieNewGraphWin;
+        %% test algotithm. Comment this part when using.
+        figure(1);
         hold on;
         xlim([-130, 130]);
         ylim([-30, 280]);
         hold on;
-
         switch type
             case 'front'
                 % test algorithm for 'front' situation

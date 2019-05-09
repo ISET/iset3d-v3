@@ -9,31 +9,30 @@ function object = piAssetRotate(object, varargin)
 %    currently allowed.
 %
 % Inputs:
-%    object        - Object. The asset object to rotate.
+%    object       - Object. The asset object to rotate.
 %
 % Outputs:
-%    object        - Object. The modified asset object.
+%    object       - Object. The modified asset object.
 %
 % Optional key/value pairs:
-%    Pos_demention - Numeric. The number indicating which positional
-%                    dimension to rotate around. Default 1 (Y).
-%    Y             - Cell. Cell information relative to the Y dimension.
-%                    Default [].
-%    Z             - Cell. Cell information relative to the Z dimension.
-%                    Default [].
+%    instancesNum - Numeric. The number of instances. Default 1.
+%    Y            - Cell. Cell information relative to the Y dimension.
+%                   Default [].
+%    Z            - Cell. Cell information relative to the Z dimension.
+%                   Default [].
 %
 
 p = inputParser;
-p.addParameter('Pos_demention', 1);
+p.addParameter('instancesNum', 1);
 p.addParameter('Y', [], @iscell);
 p.addParameter('Z', [], @iscell);
 p.parse(varargin{:})
-pos_d = p.Results.Pos_demention;
+instN = p.Results.instancesNum;
 Y = p.Results.Y;
 Z = p.Results.Z;
 
 %%
-for dd = 1:pos_d
+for dd = 1:instN
     for ii = 1:length(object)
         % rotate car
         if isfield(object(ii), 'children')
@@ -81,4 +80,5 @@ for dd = 1:pos_d
     %       end
     %   end
 end
+
 end

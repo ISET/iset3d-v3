@@ -8,69 +8,128 @@ function trafficflow = piParkingPlace(road, trafficflow, varargin)
 %    Add parked cars to a trafficflow structure.
 %
 % Inputs:
-%    Road        - Struct. A structure that includes road information.
+%    Road           - Struct. A structure that includes road information.
+%    trafficflow    - Struct. The trafficflow structure that contains
+%                     information about the entirety of the scene for each
+%                     timestep, not just active cars on the road.
 %
 % Outputs:
-%    trafficflow - Struct. The trafficflow structure that contains
-%                  information about the entirety of the scene for each
-%                  timestep, not just active cars on the road.
+%    trafficflow    - Struct. The updated trafficflow structure that
+%                     contains information about the entirety of the scene
+%                     for each timestep, not just active cars on the road,
+%                     with the planned parked cars included.
 %
 % Optional key/value parameters:
-%   density      - Numeric. A control on how many parking cars, ranging
-%                  from 0~1. Default 0.5.
+%   density         - Numeric. A control on how many parking cars, ranging
+%                     from 0~1. Default 1.
+%   parallelParking - Boolean. Whether the parked cars are parked in this
+%                     manner or not.
 %
 
 % History:
 %    XX/XX/18  SL   Shuangting Liu, VISTALAB, 2018
 %    05/02/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge with master
 
 %% read the information of parking street
 parking_list = road.roadinfo.parking_list;
 %% parse the input
 p = inputParser;
-p.addParameter('density', 0.5);
+p.addParameter('density', 1);
+p.addParameter('parallelParking', true);
 p.parse(varargin{:});
 inputs = p.Results;
 density = inputs.density;
+parallelParking = inputs.parallelParking;
 
 %%
 x = size(parking_list, 2);
-remain_length = 2+randi(3);
-offset = parking_list(1).width/2;
-% interval distance between positions of cars
-interval = 12;
+remain_length = 2 + randi(3);
+offset = parking_list(1).width / 2;
 
-for jj = 1 : x
-    start_point = parking_list(jj).coordinate - ...
-        [cos(parking_list(jj).direction * pi / 180) * offset, ...
-        -sin(parking_list(jj).direction * pi / 180) * offset];
-    total_number = ...
-        floor((parking_list(jj).length - 2 * remain_length) / interval);
-    object_number = floor(density * ...
-        (parking_list(jj).length - 2 * remain_length) / interval);
-    
-    rand_list = randperm(total_number);
-    rand_length = rand_list(1:object_number) * 4 + ...
-        remain_length * ones(1, object_number);
-    coordinate_rand(1, :) = ...
-        (rand_length .* sin(parking_list(jj).direction * pi / 180));
-    coordinate_rand(2, :) = ...
-        (cos(parking_list(jj).direction * pi / 180) .* rand_length);
-    for ii = 1 : length(trafficflow)
-        if isfield(trafficflow(ii).objects, 'car')
-            car_num = length(trafficflow(ii).objects.car);
-            for kk = 1:object_number
-                trafficflow(ii).objects.car(car_num + kk).class = 'car';
-                trafficflow(ii).objects.car(car_num + kk).type = ...
-                    'passenger';
-                trafficflow(ii).objects.car(car_num + kk).name = ...
-                    sprintf('car_%d_%d', jj, kk);
-                trafficflow(ii).objects.car(car_num + kk).pos = ...
-                    [start_point(1) + coordinate_rand(1, kk), -0.15, ...
-                    start_point(2) + coordinate_rand(2, kk)];
-                trafficflow(ii).objects.car(car_num + kk).speed = 0;
-                trafficflow(ii).objects.car(car_num + kk).orientation = ...
-                    parking_list(jj).direction + 180;
+% interval distance between positions of cars
+interval = 5;
+% Parallel parking along the road, else vertical parking
+if parallelParking
+    for jj = 1 : x
+        start_point = parking_list(jj).coordinate - [...
+            cos(parking_list(jj).direction * pi / 180) * offset, ...
+            -sin(parking_list(jj).direction * pi / 180) * offset];
+        total_number = floor((parking_list(jj).length - ...
+            2 * remain_length) / interval);
+        object_number = floor(density * (parking_list(jj).length - ...
+            2 * remain_length) / interval);
+        
+        rand_list = randperm(total_number);
+        rand_length = rand_list(1:object_number) * 4 + ...
+            remain_length * ones(1, object_number);
+        coordinate_rand(1, :) = (rand_length .* ...
+            sin(parking_list(jj).direction * pi / 180));
+        coordinate_rand(2, :) = ...
+            (cos(parking_list(jj).direction * pi/180) .* rand_length);
+        for ii = 1 : length(trafficflow)
+            if isfield(trafficflow(ii).objects, 'car')
+                car_num = length(trafficflow(ii).objects.car);
+                for kk = 1:object_number
+                    trafficflow(ii).objects.car(car_num + kk).class = ...
+                        'car';
+                    trafficflow(ii).objects.car(car_num + kk).type = ...
+                        'passenger';
+                    trafficflow(ii).objects.car(car_num + kk).name = ...
+                        sprintf('car_%d_%d', jj, kk);
+                    trafficflow(ii).objects.car(car_num + kk).pos = [...
+                        start_point(1) + coordinate_rand(1, kk), -0.15, ...
+                        start_point(2) + coordinate_rand(2, kk)];
+                    trafficflow(ii).objects.car(car_num + kk).speed = 0;
+                    trafficflow(ii).objects.car(car_num + kk ...
+                        ).orientation = parking_list(jj).direction + 180;
+                end
+            end
+        end
+    end
+else
+    for jj = 1 : x
+        start_point = parking_list(jj).coordinate - ...
+            [cos(parking_list(jj).direction * pi / 90) * offset, ...
+            -sin(parking_list(jj).direction * pi / 90) * offset];
+        total_number = floor((parking_list(jj).length - ...
+            2 * remain_length) / interval);
+        object_number = floor(density * ...
+            (parking_list(jj).length - 2 * remain_length) / interval);
+        
+        rand_list = randperm(total_number);
+        rand_length = rand_list(1:object_number) * 4 + ...
+            remain_length * ones(1, object_number);
+        coordinate_rand(1, :) = (rand_length .* ...
+            sin(parking_list(jj).direction * pi / 90));
+        coordinate_rand(2, :) = ...
+            (cos(parking_list(jj).direction * pi/180) .* rand_length);
+        for ii = 1 : length(trafficflow)
+            if isfield(trafficflow(ii).objects, 'car')
+                car_num = length(trafficflow(ii).objects.car);
+                for kk = 1:object_number
+                    trafficflow(ii).objects.car(car_num + kk).class = ...
+                        'car';
+                    trafficflow(ii).objects.car(car_num + kk).type = ...
+                        'passenger';
+                    trafficflow(ii).objects.car(car_num + kk).name = ...
+                        sprintf('car_%d_%d', jj, kk);
+                    if trafficflow(ii).objects.car(...
+                            car_num + kk).orientation == 0
+                        Xoffset = 1.5;
+                        Rot_park = 90;
+                    else
+                        Xoffset = -1.5;
+                        Rot_park = -90;
+                    end
+                    trafficflow(ii).objects.car(car_num + kk).pos = [...
+                        start_point(1) + coordinate_rand(1, kk) + ...
+                        Xoffset, -0.15, ...
+                        start_point(2) + coordinate_rand(2, kk)];
+                    trafficflow(ii).objects.car(car_num + kk).speed = 0;
+                    trafficflow(ii).objects.car(...
+                        car_num + kk).orientation = Rot_park;
+                end
             end
         end
     end

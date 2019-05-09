@@ -47,6 +47,7 @@ function [thisR_scene, road] = piSceneAuto(varargin)
 %    XX/XX/XX  ZL   Created by Zhenyi Liu
 %    04/05/19  JNM  Documentation pass, add Windows support.
 %    04/19/19  JNM  Merge with Master (resolve conflicts)
+%    05/09/19  JNM  Merge with Master again
 
 %% Read input parameters
 p = inputParser;
@@ -83,14 +84,14 @@ cloudRenderFlag = p.Results.cloudRender;
 if isempty(st), st = scitran('stanfordlabs'); end
 
 %% Read a road from Flywheel that we will use with SUMO
-% Lookup the flywheel project with all the Graphics assets
-project = st.lookup('wandell/Graphics assets');
+% Lookup the flywheel project with all the Graphics auto
+subject = st.lookup('wandell/Graphics auto/assets');
 
 % Find the session with the road information
-roadSession = project.sessions.findOne('label=road');
+roadSession = subject.sessions.findOne('label=road');
 
 % Assemble the road
-[road,thisR_road] = piRoadCreate('roadtype', roadType, ...
+[road, thisR_road] = piRoadCreate('roadtype', roadType, ...
     'trafficflowDensity', trafficflowDensity, 'session', roadSession, ...
     'sceneType', sceneType, 'cloudRender', cloudRenderFlag, 'scitran', st);
 disp('Created road')
@@ -103,7 +104,7 @@ trafficflowFolder = fileparts(trafficflowPath);
 
 if ~exist(trafficflowFolder, 'dir'), mkdir(trafficflowFolder); end
 
-if ~exist(trafficflowPath,'file')
+if ~exist(trafficflowPath, 'file')
     trafficflow = piTrafficflowGeneration(road);
     save(trafficflowPath, 'trafficflow');
     disp('Generated traffic flow using SUMO')
@@ -115,15 +116,17 @@ end
 %% SUSO Simulation of urban static objects
 % Put the trees and other assets into the city or suburban street
 tic
-tree_interval = 10;
-if piContains(sceneType,'city') || piContains(sceneType, 'suburb')
+tree_interval = rand(1) * 4 + 2;
+if piContains(sceneType, 'city') || piContains(sceneType, 'suburb')
+    
     susoPlaced = piSidewalkPlan(road, st, trafficflow(timestamp), ...
         'tree_interval', tree_interval);
     disp('Sidewalk generated');
 
     % place parked cars
     if piContains(roadType, 'parking')
-        trafficflow = piParkingPlace(road, trafficflow);
+        trafficflow = piParkingPlace(road, trafficflow, ...
+            'parallelParking', false);
         disp('Parked cars placed')
     end
 
@@ -143,7 +146,7 @@ if piContains(sceneType,'city') || piContains(sceneType, 'suburb')
     susoPlaced.building = piBuildingPlace(building_list, buildingPosList);
 
     % Put the suso placed assets on the road
-    thisR_road = piAssetAdd(thisR_road, susoPlaced);
+    thisR_road = piAssetAddBatch(thisR_road, susoPlaced);
     toc
 
     % Create a file ID & name strings for Flywheel to copy selected assets
@@ -159,8 +162,13 @@ end
     'resources', ~cloudRenderFlag, 'scitran', st);
 
 for ii = 1: length(sumoPlaced)
-    thisR_scene = piAssetAdd(thisR_road, sumoPlaced{ii});
+    thisR_scene = piAssetAddBatch(thisR_road, sumoPlaced{ii});
 end
+% Update recipe material library.
+thisR_scene.materials.lib = piMateriallib;
+
+% Update the material lib to the recipe.
+thisR_scene.materials.lib = piMateriallib;
 
 road = fwInfoAppend(road, sumoPlaced{1}); % mobile objects
 

@@ -18,6 +18,7 @@
 % History:
 %    XX/XX/19   Z   Zhenyi SCIEN 2019
 %    04/22/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge with master
 
 
 %% Initialize ISET and Docker
@@ -36,7 +37,7 @@ thisR = piRead(fname);
 %% Set render quality
 % This is a low resolution for speed.
 thisR.set('film resolution', [400 300]);
-thisR.set('pixel samples', 32);
+thisR.set('pixel samples', 128);
 
 %% List material library
 % This value determines the number of ray bounces. The scene has glass we
@@ -61,9 +62,22 @@ thisR.set('outputFile', outFile);
 % The first time, we create the materials folder.
 piWrite(thisR, 'creatematerials', true);
 
+%{
+coordMap = piRender(thisR, 'renderType', 'coordinates'); %, 'reuse', true);
+coordMap((coordMap(:, :, 1)== 0) & (coordMap(:, :, 2) == 0) & ...
+    (coordMap(:, :, 3) == 0)) = NaN;
+x  = coordMap(:, :, 1) - thisR.lookAt.from(1);
+y  = coordMap(:, :, 2) - thisR.lookAt.from(2);
+z  = coordMap(:, :, 3) - thisR.lookAt.from(3);
+player = pcplayer([min(x(:)), nanmax(x(:))], ...
+    [min(z(:)), nanmax(z(:))], [min(y(:)), nanmax(y(:))]);
+ptCloud = pointCloud([x(:), z(:), y(:)]);
+view(player, ptCloud);
+%}
+
 %% Render.
 % Maybe we should speed this up by only returning radiance.
-scene = piRender(thisR, 'render type', 'radiance', 'reuse', true);
+scene = piRender(thisR, 'render type', 'radiance'); %, 'reuse', true);
 sceneWindow(scene);
 sceneSet(scene, 'gamma', 0.7);
 
@@ -80,8 +94,7 @@ fprintf('Moving asset named: %s\n', thisR.assets(3).name);
 %  y represents vertical position
 
 fprintf('Object position: \n    x: %.1f, depth: %.1f \n', ...
-    thisR.assets(3).position(1), ...
-    thisR.assets(3).position(3));
+    thisR.assets(3).position(1), thisR.assets(3).position(3));
 
 % To add a motion blur you need to define the shutter speed of the camera.
 % This is supposed in the shutter open time and close time. These are
@@ -107,7 +120,7 @@ thisR.assets(3).motion.position(1) = thisR.assets(3).position(1) + 0.1;
 
 %% Render the motion blur
 piWrite(thisR, 'creatematerials', true);
-scene = piRender(thisR, 'render type', 'radiance', 'reuse', true);
+scene = piRender(thisR, 'render type', 'radiance'); %, 'reuse', true);
 scene = sceneSet(scene, 'name', 'motionblur: Translation');
 sceneWindow(scene);
 sceneSet(scene, 'gamma', 0.7);
@@ -137,7 +150,7 @@ thisR.assets(3).motion.rotate(1, 1) = 30;
 
 %% Write and render the motion blur
 piWrite(thisR, 'creatematerials', true);
-scene = piRender(thisR, 'render type', 'radiance', 'reuse', true);
+scene = piRender(thisR, 'render type', 'radiance'); %, 'reuse', true);
 scene = sceneSet(scene, 'name', 'motionblur: Rotation');
 sceneWindow(scene);
 sceneSet(scene, 'gamma', 0.7);

@@ -24,6 +24,7 @@ function StreetPlaced = ...
 % History:
 %    XX/XX/XX  XXX  Created
 %    04/08/19  JNM  Documentation pass
+%    05/09/19  JNM  merge with master (resolve conflicts)
 
 for ii = 1: length(streetlightPosList)
     PosList{ii} = streetlightPosList(ii).name;
@@ -69,10 +70,10 @@ for ii = 1: length(assetPosList_tmp)
                 gg = gg + 1;
             end
             assets_updated(ii).geometry(hh) = piAssetTranslate(...
-                asset(dd).geometry(hh), position, 'Pos_demention', n);
+                asset(dd).geometry(hh), position, 'instancesNum', n);
             assets_updated(ii).geometry(hh) = piAssetRotate(...
                 assets_updated(dd).geometry(hh), 'Y', rotationY, ...
-                'Pos_demention', n);
+                'instancesNum', n);
             assets_updated(ii).fwInfo = asset(dd).fwInfo;
         end
     end

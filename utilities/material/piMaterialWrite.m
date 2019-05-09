@@ -25,41 +25,12 @@ function piMaterialWrite(thisR)
 %    XX/XX/18  ZL   SCIEN STANFORD, 2018
 %    03/29/19  JNM  Documentation pass. Ignore case added to piContains.
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/09/19  JNM  Merge Master in again
 
 %%
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
 p.parse(thisR);
-
-%{
-%%
-% workingDir = fileparts(thisR.outputFile);
-% % copy spds to working directroy
-% spds_path = fullfile(piRootPath, 'data', 'spds');
-% desdir = fullfile(workingDir, 'spds');
-% if ~exist(desdir, 'dir'), mkdir(desdir);end
-% status = copyfile(spds_path, desdir);
-% if(~status)
-%     error('Failed to copy spds directory to docker working directory.');
-% end
-% % copy skymaps to working directroy
-% skymaps_path = fullfile(piRootPath, 'data', 'skymaps');
-% desdir = fullfile(workingDir, 'skymaps');
-% if ~exist(desdir, 'dir'), mkdir(desdir);end
-% status = copyfile(skymaps_path, desdir);
-% if(~status)
-%     error(strcat('Failed to copy skymaps directory to docker ', ...
-%         'working directory.'));
-% end
-% % copy brdfs to working directroy
-% brdfs_path = fullfile(piRootPath, 'data', 'bsdfs');
-% desdir = fullfile(workingDir, 'bsdfs');
-% if ~exist(desdir, 'dir'), mkdir(desdir);end
-% status = copyfile(brdfs_path, desdir);
-% if(~status)
-%     error('Failed to copy bsdfs directory to docker working directory.');
-% end
-%}
 
 %% Parse the output file, working directory, stuff like that.
 % Converts any jpg file names in the PBRT files into png file names
@@ -89,7 +60,6 @@ end
 %% Empty any line that contains MakeNamedMaterial
 % The remaining lines have a texture definition.
 output = thisR.materials.outputFile_materials;
-[~,materials_fname,~] = fileparts(output);
 txtLines = thisR.materials.txtLines;
 for ii = 1:size(txtLines)
     if ~isempty(txtLines(ii))
@@ -208,7 +178,7 @@ if ~isempty(nPaintLines)
         materialTxt{nPaintLines{hh}} = [];
     end
     materialTxt = materialTxt(~cellfun('isempty', materialTxt));
-%     nmaterialTxt = length(materialTxt)-length(nPaintLines);
+%     nmaterialTxt = length(materialTxt) - length(nPaintLines);
     for row = 1:length(materialTxt)
         fprintf(fileID, '%s\n', materialTxt{row});
     end
@@ -370,7 +340,7 @@ if isfield(materials, 'spectrumkt')
     end
 end
 % if ~isempty(materials.spectrumk)
-%     val_spectrumks = sprintf(' "spectrum k" "%s" ',materials.spectrumk);
+%     val_spectrumks = sprintf(' "spectrum k" "%s" ', materials.spectrumk);
 %     val = strcat(val, val_spectrumks);
 % end
 
@@ -412,6 +382,22 @@ if isfield(materials, 'boolremaproughness')
     if ~isempty(materials.boolremaproughness)
         val_boolremaproughness = sprintf(...
             ' "bool remaproughness" "%s" ', materials.boolremaproughness);
+        val = strcat(val, val_boolremaproughness);
+    end
+end
+
+if isfield(materials, 'eta')
+    if ~isempty(materials.eta)
+        val_boolremaproughness = ...
+            sprintf(' "float eta" %0.5f ', materials.eta);
+        val = strcat(val, val_boolremaproughness);
+    end
+end
+
+if isfield(materials, 'amount')
+    if ~isempty(materials.amount)
+        val_boolremaproughness = ...
+            sprintf(' "spectrum amount" "%0.5f" ', materials.amount);
         val = strcat(val, val_boolremaproughness);
     end
 end

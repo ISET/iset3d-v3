@@ -1,11 +1,11 @@
 function piAssetsDownload_cloud(varargin)
-% Function to download assets from the cloud
+% (DEPRECATED) Function to download assets from the cloud
 %
 % Syntax:
 %   piAssetsDownload_cloud([varargin])
 %
 % Description:
-%    Download assets from the cloud.
+%    (DEPRECATED) Download assets from the cloud.
 %
 % Inputs:
 %    None.
@@ -21,6 +21,9 @@ function piAssetsDownload_cloud(varargin)
 % History:
 %    XX/XX/XX  XXX  Created
 %    04/04/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge Master in again
+
+error('Deprecated')
 
 p = inputParser;
 p.addParameter('session', '', @ischar);
@@ -32,7 +35,7 @@ acquisitionname = p.Results.acquisition;
 
 %%
 st = scitran('stanfordlabs');
-hierarchy = st.projectHierarchy('Graphics assets');
+hierarchy = st.projectHierarchy('Graphics auto assets');
 
 % projects = hierarchy.project;
 sessions = hierarchy.sessions;

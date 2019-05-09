@@ -13,16 +13,14 @@ function camera = piCameraCreate(cameraType, varargin)
 %       'pinhole'     - Default. A pinhole camera.
 %       'realistic'   - Realistic allows for chromatic aberration and
 %                       diffraction and a lens file.
-%       'light field' - A microlens array in front of the sensor .
+%       'light field' - A microlens array in front of the sensor.
 %       'human eye'   - T. Lian human eye model parameters
+%       'omni'        - M. Mara implementation
 %
 % Outputs:
 %    camera     - Struct. The structure representing the camera.
 %
 % Optional key/value pairs:
-%    version    - Numeric. The pbrt version number for the recipe.
-%                 Depending on the version, we will use different values
-%                 for the realistic camera. Default is 2.
 %    lensFile   - String. The filename for the lens file. Default is
 %                 'dgauss.22deg.12.5mm.dat'
 %
@@ -30,24 +28,60 @@ function camera = piCameraCreate(cameraType, varargin)
 %    * PROGRAMMING TODOS:
 %       + Perhaps this should be a function of the recipe class?
 %       + Implement things like this for the camera type values
-%           piCameraCreate('pinhole', 'fov', val);
 %
+
+% Examples:
+%{
+    c = piCameraCreate('pinhole');
+%}
+%{
+    lensname = 'dgauss.22deg.12.5mm.dat';
+    c = piCameraCreate('realistic');
+%}
+%{
+    c = piCameraCreate('lightfield');
+%}
+%{
+    lensname = 'dgauss.22deg.12.5mm.json';
+    c = piCameraCreate('omni', 'lens file', lensname);
+%}
 
 % History:
 %    XX/XX/17  TL   SCIEN STANFORD 2017 
 %    04/02/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/09/19  JNM  Merge Master in again
 
 %% Check input
 p = inputParser;
-p.addRequired('cameraType', @ischar);
-p.addParameter('lensFile', 'dgauss.22deg.12.5mm.dat', ...
-    @(x)(exist(x, 'file')));
-p.addParameter('pbrtVersion', 3, @isscalar);
+if length(varargin) > 1
+    for i = 1:length(varargin)
+        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
+                | isobject(varargin{i}))
+            varargin{i} = ieParamFormat(varargin{i});
+        end
+    end
+else
+    varargin = ieParamFormat(varargin);
+end
 
+validCameraTypes = ...
+    {'pinhole', 'realistic', 'omni', 'humaneye', 'lightfield'};
+p.addRequired('cameraType', @(x)(ismember(x, validCameraTypes)));
+
+% This will work for realistic, but not omni.  Perhaps we should make the
+% default depend on the camera type.
+switch cameraType
+    case 'omni'
+        lensDefault = 'dgauss.22deg.12.5mm.json';
+    case 'realistic'
+        lensDefault = 'dgauss.22deg.12.5mm.dat';
+    otherwise
+        lensDefault = '';
+end
+p.addParameter('lensfile', lensDefault, @(x)(exist(x, 'file')));
 p.parse(cameraType, varargin{:});
 lensFile = p.Results.lensFile;
-pbrtVersion = p.Results.pbrtVersion;
 
 %% Initialize the default camera type
 switch cameraType
@@ -56,38 +90,37 @@ switch cameraType
         camera.subtype = 'perspective';
         camera.fov.type = 'float';
         camera.fov.value = 45;  % deg of angle
-    case {'realistic', 'realisticdiffraction', 'lens'}
-        if pbrtVersion == 2
-            camera.type = 'Camera';
-            camera.subtype = 'realisticDiffraction';
-            camera.specfile.type = 'string';
-            camera.specfile.value = ...
-                fullfile(piRootPath, 'data', 'lens', lensFile);
-            camera.filmdistance.type = 'float';
-            camera.filmdistance.value = 50;    % mm
-            camera.aperture_diameter.type = 'float';
-            camera.aperture_diameter.value = 2; % mm
-            camera.filmdiag.type = 'float';
-            camera.filmdiag.value = 7;
-            camera.diffractionEnabled.type = 'bool';
-            camera.diffractionEnabled.value = 'false';
-            camera.chromaticAberrationEnabled.type = 'bool';
-            camera.chromaticAberrationEnabled.value = 'false';
-        elseif pbrtVersion == 3
-            camera.type = 'Camera';
-            camera.subtype = 'realistic';
-            camera.lensfile.type = 'string';
-            camera.lensfile.value = ...
-                fullfile(piRootPath, 'data', 'lens', lensFile);
-            camera.aperturediameter.type = 'float';
-            camera.aperturediameter.value = 5;    % mm
-            camera.focusdistance.type = 'float';
-            camera.focusdistance.value = 10; % mm
-        else
-            error('Unrecognized pbrt version %d', pbrtVersion);
+    case {'realistic'}
+        % We used to allow 'realisticdiffraction', and 'lens'
+        [~, ~, e] = fileparts(lensFile);
+        if ~strcmp(e, '.dat')
+            error('Realistic camera needs *.dat lens file.');
         end
-    case {'microlens', 'lightfield', 'plenoptic'}
-        % General parameters
+        camera.type = 'Camera';
+        camera.subtype = 'realistic';
+        camera.lensfile.type = 'string';
+        camera.lensfile.value = fullfile(piRootPath, 'data', ...
+            'lens', lensFile);
+        camera.aperturediameter.type = 'float';
+        camera.aperturediameter.value = 5;  % mm
+        camera.focusdistance.type = 'float';
+        camera.focusdistance.value = 10;    % mm
+    case {'omni'}
+        [~, ~, e] = fileparts(lensFile);
+        if(~strcmp(e, '.json'))
+            error('Omni camera needs *.json lens file.');
+        end
+        camera.type = 'Camera';
+        camera.subtype = 'omni';
+        camera.lensfile.type = 'string';
+        camera.lensfile.value = fullfile(piRootPath, 'data', ...
+            'lens', lensFile);
+        camera.aperturediameter.type = 'float';
+        camera.aperturediameter.value = 5;  % mm
+        camera.focusdistance.type = 'float';
+        camera.focusdistance.value = 10;    % mm
+    case {'lightfield'}
+        % We used to allow 'microlens' and 'plenoptic'
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
@@ -111,7 +144,9 @@ switch cameraType
         camera.num_pinholes_w.value = 8;
         camera.num_pinholes_h.type = 'float';
         camera.num_pinholes_h.value = 8;
-    case {'eye', 'realisticeye', 'humaneye', 'human', 'realisticEye'}
+    case {'humaneye'}
+        % We used to allow 'eye', 'realisticeye', 'humaneye', and 'human'
+        %
         % TODO: When we render, we need to make sure pbrt2ISET
         % automatically copies over all the correct files into a the
         % working folder. This is taken care of in ISETBIO, but not here.
@@ -122,7 +157,7 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'realisticEye';
         camera.specfile.type = 'string';
-        camera.specfile.value = ''; % FILL IN
+        camera.specfile.value = '';  % FILL IN
         camera.retinaDistance.type = 'float';
         camera.retinaDistance.value = 16.32;
         camera.retinaRadius.type = 'float';
@@ -132,15 +167,15 @@ switch cameraType
         camera.retinaSemiDiam.type = 'float';
         camera.retinaSemiDiam.value = 6;
         camera.ior1.type = 'spectrum';
-        camera.ior1.value = ''; % FILL IN
+        camera.ior1.value = '';      % FILL IN
         camera.ior2.type = 'spectrum';
-        camera.ior2.value = ''; % FILL IN
+        camera.ior2.value = '';      % FILL IN
         camera.ior3.type = 'spectrum';
-        camera.ior3.value = ''; % FILL IN
+        camera.ior3.value = '';      % FILL IN
         camera.ior4.type = 'spectrum';
-        camera.ior4.value = ''; % FILL IN
+        camera.ior4.value = '';      % FILL IN
     otherwise
-        error('Cannot recognize camera type.');
+        error('Cannot recognize camera type, %s\n.', cameraType);
 end
 
 end

@@ -107,7 +107,7 @@ assets(2).geometry = piAssetRotate(assets(2).geometry,rotation);
 
 %% Assemble the objects with the scene here
 
-[thisR_scene,scene_2] = piAssetAdd(thisR,scene_1,assets);
+[thisR_scene,scene_2] = piAssetAddBatch(thisR,scene_1,assets);
 
 %% Write out scene and materials
 

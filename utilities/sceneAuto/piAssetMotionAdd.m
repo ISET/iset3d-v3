@@ -25,20 +25,21 @@ function asset = piAssetMotionAdd(asset, varargin)
 % History:
 %    XX/XX/XX  XXX  Created
 %    04/12/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge Master in again
 
 p = inputParser;
 p.addParameter('translation', [], @iscell)
 p.addParameter('Y', [], @iscell);
 p.addParameter('Z', [], @iscell);
-p.addParameter('Pos_demention', 1)
+p.addParameter('instancesNum', 1)
 p.parse(varargin{:})
 translation = p.Results.translation;
-pos_d = p.Results.Pos_demention;
+instN = p.Results.instancesNum;
 Y = p.Results.Y;
 Z = p.Results.Z;
 
 %%
-for dd = 1:pos_d
+for dd = 1:instN
     for ii = 1:length(asset)
         % Add the translation
         if ~isempty(translation{dd})

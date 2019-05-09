@@ -30,6 +30,7 @@ function asset = piAssetCreate(varargin)
 %    XX/XX/XX   Z   Zhenyi, Vistasoft Team, 2018
 %    04/11/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/09/19  JNM  Merge Master in again
 
 %% Parse input parameters
 varargin = ieParamFormat(varargin);
@@ -64,7 +65,7 @@ if ~resources, resources = false; else, resources = true; end
 if isempty(st), st = scitran('stanfordlabs'); end
 
 %%  Store up the asset information
-project = st.lookup('wandell/Graphics assets');
+project = st.lookup('wandell/Graphics auto');
 asset = [];
 
 %% Find the cars in the database

@@ -40,6 +40,7 @@ function [materiallib_updated] = piMateriallib
 %    XX/XX/18  ZL   Scien Stanford, 2018
 %    04/01/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/08/19  JNM  Merge Master in again
 
 %% carpaintmix
 % A mixture of a specular (mirror like) material and a substrate material
@@ -52,6 +53,7 @@ materiallib.carpaintmix.paint_base.colorks = [.1 .1 .1];
 materiallib.carpaintmix.paint_base.floaturoughness = 0.01;
 materiallib.carpaintmix.paint_base.floatvroughness = 0.01;
 materiallib.carpaintmix.carpaint.string = 'mix';
+materiallib.carpaintmix.carpaint.amount = 0.5;
 materiallib.carpaintmix.carpaint.stringnamedmaterial1 = 'paint_mirror';
 materiallib.carpaintmix.carpaint.stringnamedmaterial2 = 'paint_base';
 
@@ -61,6 +63,8 @@ materiallib.carpaintmix.carpaint.stringnamedmaterial2 = 'paint_base';
 materiallib.carpaint.floaturoughness = 0.0005;
 materiallib.carpaint.floatvroughness = 0.00051;
 materiallib.carpaint.string = 'substrate';
+materiallib.carpaint.rgbkd = piColorPick('random');
+materiallib.carpaint.rgbks =[.15 .15 .15];
 
 %% chrome_spd
 % This the chrome metal appearance.
@@ -84,13 +88,13 @@ materiallib.mirror.spectrumkr = [400 1 800 1];
 %% matte
 % Standard matte surface. Only diffuse.
 materiallib.matte.string = 'matte';
-materiallib.matte.rgbkd = [0.7 0.7 0.7];
 
 %% plastic
 % Standard plastic appearance
 materiallib.plastic.string = 'plastic';
 materiallib.plastic.rgbkd = [0.25 0.25 0.25];
 materiallib.plastic.rgbks = [0.25 0.25 0.25];
+materiallib.plastic.floatroughness = 0.1;
 
 %% glass
 % Standard glass appearance
@@ -98,6 +102,7 @@ materiallib.glass.string = 'glass';
 % materiallib.glass.rgbkr = [0.00415 0.00415 0.00415];
 materiallib.glass.spectrumkr = [400 1 800 1];
 materiallib.glass.spectrumkt = [400 1 800 1];
+materiallib.glass.eta = 1.5;
 
 %% Retroreflective
 % Standard glass appearance
@@ -135,6 +140,12 @@ function materiallib = piMaterialEmptySlot(materiallib)
 % Description:
 %    Update the material library. (Reset all values).
 %
+%    Empty the unused material slot for certain type of material, for
+%    example, mirror is only defined by reflectivity, since the default
+%    material includes values for unused parameters, in this case, we
+%    should empty the slots except Kr(reflectivity) to avoid any errors
+%    when rendering.
+%
 % Inputs:
 %    materiallib - Struct. The material library structure.
 %
@@ -171,6 +182,8 @@ for ii = 1:length(thisMaterial)
                 materiallib.(thisMaterial{ii}).floatroughness = [];
                 materiallib.(thisMaterial{ii}).rgbkr = [];
                 materiallib.(thisMaterial{ii}).rgbkt = [];
+                materiallib.(thisMaterial{ii}).stringnamedmaterial1 = [];
+                materiallib.(thisMaterial{ii}).stringnamedmaterial2 = [];
             case 'fourier'
                 materiallib.(thisMaterial{ii}).floatroughness = [];
                 materiallib.(thisMaterial{ii}).rgbkr = [];
@@ -189,7 +202,7 @@ for ii = 1:length(thisMaterial)
                 materiallib.(thisMaterial{ii}).rgbkt = []; 
         end
     else
-        continue
+        continue;
     end
 end
 

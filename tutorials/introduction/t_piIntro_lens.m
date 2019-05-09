@@ -18,6 +18,7 @@
 % History:
 %    XX/XX/18  ZL, BW  SCIEN 2018
 %    04/23/19  JNM     Documentation pass
+%    05/09/19  JNM     Merge with master
 
 %% Initialize ISET and Docker
 ieInit;
@@ -25,6 +26,7 @@ if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
     error('You must have the remote data toolbox on your path'); 
 end
+
 %% Read the pbrt files
 % sceneName = 'kitchen';
 % sceneFileName = 'scene.pbrt';
@@ -35,8 +37,6 @@ sceneFileName = 'ChessSet.pbrt';
 
 % The output directory will be written here to inFolder/sceneName
 inFolder = fullfile(piRootPath, 'local', 'scenes');
-dest = piPBRTFetch(sceneName, 'pbrtversion', 3, ...
-    'destinationFolder', inFolder, 'delete zip', true);
 
 % This is the PBRT scene file inside the output directory
 inFile = fullfile(inFolder, sceneName, sceneFileName);
@@ -46,11 +46,12 @@ thisR = piRead(inFile);
 outFolder = fullfile(tempdir, sceneName);
 outFile = fullfile(outFolder, [sceneName, '.pbrt']);
 thisR.set('outputFile', outFile);
+
 %% Set render quality
 % Set resolution for speed or quality.
 % 1.5 is pretty high res
 thisR.set('film resolution', round([600 400] * 2.0));
-thisR.set('pixel samples', 64 * 8);  % 4 is Lots of rays.
+thisR.set('pixel samples', 64);  % 4 is Lots of rays.
 
 %% Set output file
 oiName = sceneName;
@@ -61,9 +62,10 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 % 22deg is the half width of the field of view
-lensfile = 'dgauss.22deg.50.0mm.dat';
+lensfile = 'dgauss.22deg.50.0mm.json';
 fprintf('Using lens: %s\n', lensfile);
-thisR.camera = piCameraCreate('realistic', 'lensFile', lensfile);
+% thisR.camera = piCameraCreate('realistic', 'lensFile', lensfile);
+thisR.camera = piCameraCreate('omni', 'lensFile', lensfile);
 
 %{
 % You might adjust the focus for different scenes. Use piRender with the
@@ -100,19 +102,22 @@ thisR.sampler.subtype = 'sobol';
 
 %% Render and display
 % Change this for depth of field effects.
-thisR.set('aperture diameter', 6);
+thisR.set('aperture diameter', 6);  % thisR.summarize('all');
 piWrite(thisR, 'creatematerials', true);
 
-oi = piRender(thisR, 'render type', 'radiance');  %, 'reuse', true);
+oi = piRender(thisR, 'render type', 'both');  %, 'reuse', true);
 oi = oiSet(oi, 'name', ...
     sprintf('%s-%d', oiName, thisR.camera.aperturediameter.value));
 oiWindow(oi);
+
+depth = piRender(thisR, 'render type', 'depth');  %, 'reuse', true);
+imagesc(depth);
 
 %% Change this for depth of field effects.
 thisR.set('aperture diameter', 3);
 piWrite(thisR, 'creatematerials', true);
 
-oi = piRender(thisR, 'render type', 'radiance');  %, 'reuse', true);
+[oi, result] = piRender(thisR, 'render type', 'both');  %, 'reuse', true);
 oi = oiSet(oi, 'name', ...
     sprintf('%s-%d', oiName, thisR.camera.aperturediameter.value));
 oiWindow(oi);
@@ -121,7 +126,7 @@ oiWindow(oi);
 thisR.set('aperture diameter', 1);
 piWrite(thisR, 'creatematerials', true);
 
-oi = piRender(thisR, 'render type', 'radiance');  %, 'reuse', true);
+oi = piRender(thisR, 'render type', 'both');  %, 'reuse', true);
 oi = oiSet(oi, 'name', ...
     sprintf('%s-%d', oiName, thisR.camera.aperturediameter.value));
 oiWindow(oi);

@@ -44,6 +44,7 @@ function [ieObject, result] = piRender(thisR, varargin)
 %    03/XX/19  JNM  03/19 Add reuse feature for renderings
 %    03/25/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/09/19  JNM  Merge Master in again
 
 % Examples:
 %{
@@ -149,12 +150,16 @@ if (~strcmp(renderType, 'radiance'))  % If radiance, no metadata
     % files that we link with the main pbrt file.
     if(strcmp(metadataRecipe.exporter, 'C4D'))
         creatematerials = true;
+        overwritegeometry = true;
     else
         creatematerials = false;
+        overwritegeometry = false;
     end
+
     piWrite(metadataRecipe, 'overwritepbrtfile', true, ...
         'overwritelensfile', false, 'overwriteresources', false, ...
-        'creatematerials', creatematerials);
+        'creatematerials', creatematerials, ...
+        'overwritegeometry', overwritegeometry);
     metadataFile = metadataRecipe.outputFile;
 end
 

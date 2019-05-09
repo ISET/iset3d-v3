@@ -4,6 +4,9 @@ function val = recipeGet(thisR, param, varargin)
 % Syntax:
 %   val = recipeGet(thisR, param, [varargin])
 %
+% Description:
+%    Derive parameters from the recipe class.
+%
 % Inputs:
 %    thisR - Object. A recipe object
 %    param - String. A parameter name. Some of the possible options and
@@ -75,6 +78,7 @@ function val = recipeGet(thisR, param, varargin)
 % History:
 %    XX/XX/17  BW   ISETBIO Team, 2017
 %    05/08/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge with master
 
 % Examples
 %{
@@ -120,11 +124,11 @@ switch ieParamFormat(param)
     % Scene and camera direction
     case 'objectdistance'
         diff = thisR.lookAt.from - thisR.lookAt.to;
-        val = sqrt(sum(diff.^2));
+        val = sqrt(sum(diff .^ 2));
     case 'objectdirection'
         % A unit vector in the lookAt direction
         val = thisR.lookAt.from - thisR.lookAt.to;
-        val = val/norm(val);
+        val = val / norm(val);
     case 'lookat'
         val = thisR.lookAt;
     case 'from'
@@ -136,6 +140,14 @@ switch ieParamFormat(param)
     case 'fromto'
         % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
+    case {'cameratype'}
+    case {'exposuretime', 'cameraexposure'}
+        try
+            val = thisR.camera.shutterclose.value - ...
+                thisR.camera.shutteropen.value;
+        catch
+            val = 1;  % 1 sec is the default.  Too long.
+        end
     % Lens and optics
     case 'opticstype'
         % perspective means pinhole. Maybe we should rename.
@@ -146,8 +158,8 @@ switch ieParamFormat(param)
             val = 'pinhole';
         elseif isequal(val, 'environment')
             val = 'environment';
-        elseif ismember(val, ...
-                {'realisticDiffraction', 'realisticEye', 'realistic'})
+        elseif ismember(val, {'realisticDiffraction', 'realisticEye', ...
+                'realistic', 'omni'})
             val = 'lens';
         end
     case 'lensfile'
@@ -155,25 +167,18 @@ switch ieParamFormat(param)
         subType = thisR.camera.subtype;
         switch(lower(subType))
             case 'pinhole'
-                val = 'pinhole (no lens)';
+                val = 'pinhole';
+            case 'perspective'
+                val = 'pinhole (perspective)';
             otherwise
                 % realisticeye and realisticDiffraction both work here.
-                % Not sure what else is out there.
-                if thisR.version == 2
-                    try
-                        [~, val, ~] = ...
-                            fileparts(thisR.camera.specfile.value);
-                    catch
-                        error('Unknown lens file %s\n', subType);
-                    end
-                elseif thisR.version == 3
-                    try
-                        [~, val, ~] = ...
-                            fileparts(thisR.camera.lensfile.value);
-                    catch
-                        error('Unknown lens file %s\n', subType);
-                    end
+                % Need to test 'omni'               
+                try
+                    [~, val, ~] = fileparts(thisR.camera.lensfile.value);
+                catch
+                    error('Unknown lens file %s\n', subType);
                 end
+                
         end
     case 'focaldistance'
         opticsType = thisR.get('optics type');
@@ -192,9 +197,11 @@ switch ieParamFormat(param)
                 objDist = thisR.get('object distance');
                 % objDist = objDist * 1e3;
                 if objDist < min(focalLength.dist(:))
-                    fprintf('Object too close to focus\n');
+                    fprintf('** Object too close to focus\n');
+                    val = []; return;
                 elseif objDist > max(focalLength.dist(:))
-                    fprintf('Object too far to focus\n');
+                    fprintf('** Object too far to focus\n');
+                    val = []; return;
                 else
                     val = interp1(focalLength.dist, ...
                         focalLength.focalDistance, objDist);

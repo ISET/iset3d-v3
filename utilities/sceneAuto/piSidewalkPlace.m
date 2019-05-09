@@ -25,6 +25,7 @@ function assetsPlaced = piSidewalkPlace(assetsList, assetsPosList)
 % History:
 %    XX/XX/XX  ZL   Author: Zhenyi
 %    05/06/19  JNM  Documentation pass
+%    05/08/19  JNM  Merge with Master
 
 %%
 
@@ -71,10 +72,10 @@ for ii = 1: length(assetPosList_tmp)
                     end
                 end
                 assets_updated(ii).geometry = piAssetTranslate(...
-                    asset(dd).geometry, position, 'Pos_demention', n);
-                assets_updated(ii).geometry = ...
-                    piAssetRotate(assets_updated(ii).geometry, ...
-                    'Y', rotationY, 'Pos_demention', n);
+                    asset(dd).geometry, position, 'instancesNum', n);
+                assets_updated(ii).geometry = piAssetRotate(...
+                    assets_updated(ii).geometry, 'Y', rotationY, ...
+                    'instancesNum', n);
                 assets_updated(ii).fwInfo = asset(dd).fwInfo;
             end
         end

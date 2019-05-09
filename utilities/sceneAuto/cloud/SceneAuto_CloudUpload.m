@@ -1,14 +1,14 @@
-%% SceneAuto_CloudUpload
-% Combine all render resources by scene type
+%% (DEPRECATED) Combine all render resources by scene type
 %
 % Description:
-%    Combine all render resources by scene type.
+%    (DEPRECATED). Combine all render resources by scene type.
 %
 % Notes:
 %    * TODO: upload resouces to cloud bucket by pre defined scene types
 %
 
 %% Initialize
+
 % ieInit;
 % if ~mcGcloudExists, mcGcloudConfig; end
 
@@ -44,8 +44,8 @@ sessionname = [];
 % piAssetsDownload_cloud('session', 'others', ...
 %     'acquisition', 'streetlight_tall_001');
 
-%% Download building
-piAssetsDownload_cloud('session', sessionname);
+% %% Download building
+% piAssetsDownload_cloud('session', sessionname);
 
 %%
 % roadnamelist{1} = 'city_cross_4lanes_001';
@@ -60,16 +60,13 @@ roadnamelist{1} = 'bridge';
 roadnamelist{1} = 'highway_straight_4lanes_001';
 
 %% Download Road
-for jj = 1:length(roadnamelist)
-    roadname = roadnamelist{jj};
-    st = scitran('stanfordlabs');
-    hierarchy = st.projectHierarchy('Graphics assets');
-    sessions = hierarchy.sessions;
-    for ii = 1:length(sessions)
-        if isequal(lower(sessions{ii}.label), 'road')
-            roadSession = sessions{ii};
-            break;
-        end
+st = scitran('stanfordlabs');
+hierarchy = st.projectHierarchy('Graphics auto assets');
+sessions = hierarchy.sessions;
+for ii = 1:length(sessions)
+    if isequal(lower(sessions{ii}.label), 'road')
+        roadSession = sessions{ii};
+        break;
     end
     assetRecipe = piAssetDownload(roadSession, 1, ...
         'acquisition', roadname, 'resources', 1, 'scitran', st);

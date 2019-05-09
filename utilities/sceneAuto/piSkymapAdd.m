@@ -27,6 +27,7 @@ function [thisR, skymapInfo] = piSkymapAdd(thisR, skyName)
 %    XX/XX/18  Z    Zhenyi, 2018
 %    04/08/19  JNM  Documentation pass. Expanded/fixed example.
 %    04/19/19  JNM  Merge with Master (resolve conflicts).
+%    05/09/19  JNM  Merge with Master again
 
 % Examples:
 %{
@@ -62,26 +63,25 @@ if ~piContains(skyName, ':')
             skyname = sprintf('morning_%03d.exr', randi(4, 1));
         case 'noon'
             skyname = sprintf('noon_%03d.exr', randi(10, 1));
-%                     skyname = sprintf('noon_%03d.exr', 9);
+            % skyname = sprintf('noon_%03d.exr', 9);
         case 'sunset'
             skyname = sprintf('sunset_%03d.exr', randi(4, 1));
         case 'cloudy'
             skyname = sprintf('cloudy_%03d.exr', randi(2, 1));
     end
 
-    % Get the information about the skymap so we can download from
-    % Flywheel
-
+    % Get the information about the skymap so we can download from Flywheel
+    % [Note: XXX - Is this data/data bit right?]
     try
         acquisition = st.fw.lookup(...
-            'wandell/Graphics assets/data/data/skymaps');
+            'wandell/Graphics auto/assets/data/skymaps');
         dataId = acquisition.id;
     catch
         % We have had trouble making lookup work across Add-On toolbox
         % versions. So we have this...
         warning('Using piSkymapAdd search, not lookup')
         acquisition = st.search('acquisitions', ...
-            'project label exact', 'Graphics assets', ...
+            'project label exact', 'Graphics auto', ...
             'session label exact', 'data', ...
             'acquisition label exact', 'skymaps');
         dataId = st.objectParse(acquisition{1});
@@ -90,7 +90,7 @@ else
     % Fix this with Flywheel and Justin E
     time = strsplit(skyName, ':');
     acqName = sprintf(...
-        'wandell/Graphics assets/skymap/skymap_daytime/%02d00', ...
+        'wandell/Graphics auto/skymap/skymap_daytime/%02d00', ...
         str2double(time{1}));
     thisAcq = st.fw.lookup(acqName);
     dataId = thisAcq.id;
@@ -100,7 +100,6 @@ end
 
 skylights = sprintf(...
     'LightSource "infinite" "string mapname" "%s"', skyname);
-
 index_m = find(piContains(thisR.world, '_materials.pbrt'));
 
 % skyview = randi(360, 1);
@@ -114,7 +113,7 @@ world(4, :) = cellstr(sprintf('Rotate -90 1 0 0'));
 world(5, :) = cellstr(sprintf('Scale 1 1 1'));
 world(6, :) = cellstr(skylights);
 world(7, :) = cellstr(sprintf('AttributeEnd'));
-jj = 1;% skip materials and lightsource which are exported from C4D.
+jj = 1;  % skip materials and lightsource which are exported from C4D.
 for ii = index_m:length(thisR.world)
     world(jj + 7, :) = thisR.world(ii);
     jj = jj + 1;

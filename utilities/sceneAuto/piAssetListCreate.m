@@ -24,6 +24,7 @@ function assetlist = piAssetListCreate(varargin)
 %    XX/XX/XX   Z   Created by Zhenyi
 %    04/10/19  JNM  Documentation pass, add example.
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/09/19  JNM  Merge Master in again
 
 % Examples:
 %{
@@ -43,7 +44,7 @@ sessionname = p.Results.class;
 acquisitionname = p.Results.subclass;
 
 %% Find all the acuisitions
-project = st.lookup('wandell/Graphics assets');
+project = st.lookup('wandell/Graphics auto/assets');
 session = project.sessions.findOne(sprintf('label=%s', sessionname));
 acqs = session.acquisitions();
 nDatabaseAssets = length(acqs);
@@ -66,7 +67,7 @@ if isempty(acquisitionname)
         thisRecipe = stFileSelect(acqs{ii}.files, 'type', 'source code');
         thisResource = stFileSelect(acqs{ii}.files, 'type', 'CG Resource');
         thisRecipe{1}.download(destName_recipe);
-        
+
         % Read the recipe and create an entry in the assetlist
         thisR = jsonread(destName_recipe);
         assetlist(ii).name = acqLabel;

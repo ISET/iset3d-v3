@@ -70,6 +70,7 @@ function [assetsPosList, assets] = piAssetPlace(trafficflow, varargin)
 % History:
 %    XX/XX/XX   Z   Zhenyi, Created
 %    04/10/19  JNM  Documentation pass
+%    05/09/19  JNM  Merge Master in again
 
 %% Initialize & check parameters
 p = inputParser;
@@ -118,7 +119,6 @@ assets = piAssetCreate('ncars', ncars);
 %% objects' positions are classified by class
 % Note: building/trees might be different.
 assets_updated = assets;
-
 if nScene == 1
     assetClassList = fieldnames(assets);
     for hh = 1: length(assetClassList)
@@ -146,10 +146,10 @@ if nScene == 1
             end
             assets_updated.(assetClass)(ii).geometry = ...
                 piAssetTranslate(assets.(assetClass)(ii).geometry, ...
-                position, 'Pos_demention', n);
+                position, 'instancesNum', n);
             assets_updated.(assetClass)(ii).geometry = ...
                 piAssetRotate(assets_updated.(assetClass)(ii).geometry, ...
-                'Y', rotationY, 'Z', slope, 'Pos_demention', n);
+                'Y', rotationY, 'Z', slope, 'instancesNum', n);
         end
     end
     assetsPosList{1} = assets_updated;

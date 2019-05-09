@@ -26,6 +26,7 @@ function assetsPlaced = piBuildingPlace(assetsList, buildingPosList)
 %    XX/XX/XX  ZL   Created
 %    04/11/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    05/09/19  JNM  Merge Master in again
 
 %% Make a cell array of the names associated with each position.
 for ii = 1:length(buildingPosList)
@@ -73,10 +74,10 @@ for ii = 1:length(buildingPosList_tmp)
                     end
                 end
                 assets_updated(ii).geometry = piAssetTranslate(...
-                    asset(dd).geometry, position, 'Pos_demention', n);
+                    asset(dd).geometry, position, 'instancesNum', n);
                 assets_updated(ii).geometry = piAssetRotate(...
                     assets_updated(ii).geometry, 'Y', rotationY, ...
-                    'Pos_demention', n);
+                    'instancesNum', n);
             end
         end
     end

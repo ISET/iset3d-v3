@@ -91,6 +91,7 @@ function assetsplaced = piSidewalkPlan(road, st, trafficflow, varargin)
 % History:
 %    08/XX/18  SL   by SL, 2018.8
 %    05/02/19  JNM  Documentation pass
+%    05/08/19  JNM  Merge with master
 
 %% load sidewalk information according to the type of road
 

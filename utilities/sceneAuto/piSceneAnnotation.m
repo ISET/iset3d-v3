@@ -1,5 +1,5 @@
 function scene_label = piSceneAnnotation(meshImage, label, st)
-% Read primitive ID from the mesh file and add class information
+% Read primitive ID from the *mesh.txt file (infrequently used)
 %
 % Syntax:
 %   scene_label = piSceneAnnotation(meshImage, label, st)
@@ -27,6 +27,7 @@ function scene_label = piSceneAnnotation(meshImage, label, st)
 %    XX/XX/18  ZL/ST  Vistasoft Team, 2018
 %    04/12/19  JNM    Documentation pass
 %    04/18/19  JNM    Merge with Master (resolve conflicts)
+%    05/09/19  JNM    Merge with Master again
 
 %% Check if a scitran object has been supplied
 if isempty(st), st = scitran('stanfordlabs'); end
@@ -40,7 +41,7 @@ destName_recipe = fullfile(sceneFolder, [sceneName, '.json']);
 % find acquisition
 if ~exist(sceneFolder, 'dir'), mkdir(sceneFolder); end
 acquisition = st.lookup(sprintf(...
-    'wandell/Graphics assets/scenes_pbrt/scenes_pbrt/%s', sceneName));
+    'wandell/Graphics auto/scenes_pbrt/scenes_pbrt/%s', sceneName));
 dataId = acquisition.id;
 % download the file
 piFwFileDownload(destName_recipe, [sceneName, '.json'], dataId);
