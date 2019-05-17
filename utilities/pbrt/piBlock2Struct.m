@@ -1,13 +1,13 @@
 % DEPRECATED
 function s = piBlock2Struct(blockLines,varargin)
 % Parse a block of scene file text (e.g. from piExtractBlock) and
-% return it as a structure 
+% return it as a structure
 %
 %  s = piBlock2Struct(blockLines,varargin)
 %
 % Required input
 %   blockLines - a block of text from the top of a scene.pbrt file
-% 
+%
 % Return
 %   s -  a struct containing the critical information from the block
 %   of text.
@@ -53,25 +53,25 @@ blockSubtype = C{1};
 s = struct('type',blockType,'subtype',blockSubtype);
 
 % Get all other parameters within the block
-% Generally they are in the form: 
+% Generally they are in the form:
 % "type name" [value] or "type name" "value"
 for ii = 2:nLines
-    
+
     currLine = blockLines{ii};
-    
+
     % Find everything between quotation marks ("type name")
     C = regexp(currLine, '(?<=")[^"]+(?=")', 'match');
     C = strsplit(C{1});
     valueType = C{1};
     valueName = C{2};
-    
+
     % Get the value corresponding to this type and name
     if(strcmp(valueType,'string') || strcmp(valueType,'bool'))
         % Find everything between quotation marks
         C = regexp(currLine, '(?<=")[^"]+(?=")', 'match');
         value = C{3};
     elseif(strcmp(valueType,'spectrum'))
-       %{ 
+       %{
          TODO:
          Spectrum can either be a spectrum file "xxx.spd" or it can be a
          series of four numbers [wave1 wave2 value1 value2]. There might
@@ -88,7 +88,7 @@ for ii = 2:nLines
     elseif(strcmp(valueType,'rgb'))
         % TODO: Find three values between the brackets, e.g. [r g b]
     end
-    
+
     if(isempty(value))
         % Some types can potentially be
         % defined as a vector, string, or float. We have to be able to
@@ -100,10 +100,10 @@ for ii = 2:nLines
         fprintf('Line to parse: %s \n',currLine)
         error('Parser cannot find the value associated with this type. The parser is still incomplete, so we cannot yet recognize all type cases.');
     end
-    
+
     % Set this value and type as a field in the structure
     [s.(valueName)] = struct('value',value,'type',valueType);
-    
+
 end
 
 

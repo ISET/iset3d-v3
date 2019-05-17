@@ -1,8 +1,8 @@
 %% Download from the archiva server and create some images
 %
-%  
 %
-% 
+%
+%
 
 %% San miguel scene
 

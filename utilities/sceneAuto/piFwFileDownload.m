@@ -63,7 +63,7 @@ function piFwFileDownload(destination, fileName, AcqID)
     end
 %}
 
-st = scitran('stanfordlabs');    
+st = scitran('stanfordlabs');
 acq = st.fw.get(AcqID); % Get the acquisition using the ID
 thisFile = acq.getFile(fileName); % Get the FileEntry for this skymap
 thisFile.download(destination); % Download the file

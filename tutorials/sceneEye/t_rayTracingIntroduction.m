@@ -82,7 +82,7 @@ myScene.resolution = 128;
 %
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = myScene.render; %('reuse');
+oi = myScene.render; %('reuse', true);
 
 % Now we have an optical image that we can use with the rest of ISETBIO. We
 % can take a look at what it looks like right now:
@@ -118,7 +118,7 @@ for ii = 1:length(accomm)
     %
     % to reuse an existing rendered file of the correct size, uncomment the
     % parameter provided below.
-    [oi, results] = myScene.render; %('reuse');
+    [oi, results] = myScene.render; %('reuse', true);
     ieAddObject(oi);
     opticalImages{ii} = oi;
 end

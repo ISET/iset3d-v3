@@ -1,12 +1,12 @@
 function recipe = piObjectTransform(recipe,objectName,transformType,transform,varargin)
-% Move an object inside of a scene. 
+% Move an object inside of a scene.
 %
 % Syntax
 %   recipe = piObjectTransform(recipe,objectName,transformType,transform,varargin)
 %
 % We look for an object within the WorldBegin/WorldEnd block with
 % objectName. We then insert the given transform, so the object can be
-% translated, rotated, scaled, or transformed within the scene. 
+% translated, rotated, scaled, or transformed within the scene.
 %
 % Input
 %   recipe:         a recipe object that includes a WorldBegin/WorldEnd block.
@@ -15,7 +15,7 @@ function recipe = piObjectTransform(recipe,objectName,transformType,transform,va
 %   transformType:  translate, rotate, scale, or transform
 %   transform:      Depends on the transform type. For translate it's [x y z],
 %                   for rotate its a 4x1 vector of the rotation degree and the axis. For a
-%                   transform it's a 4x4 transformation matrix. 
+%                   transform it's a 4x4 transformation matrix.
 %
 % Optional parameter/values
 %
@@ -61,7 +61,7 @@ end
 if(isempty(transformLine))
     warning('Transform did not match the transform type.');
 end
-        
+
 %% Look for the object within the world block
 
 world = recipe.world;
@@ -73,17 +73,17 @@ foundFlag = 0;
 for ii = 1:length(world)
     currLine = world{ii};
     if(strcmp(currLine,targetLine))
-        
+
         foundFlag = 1;
-        
+
         % Add line
         worldTop = {world{1:ii}};
         worldBottom = {world{ii+1:end}};
         newLine = {transformLine};
         recipe.world = [worldTop newLine worldBottom];
-        
+
         break;
-        
+
     end
 end
 

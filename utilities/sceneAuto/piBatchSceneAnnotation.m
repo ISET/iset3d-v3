@@ -99,7 +99,7 @@ bbox2d.ymax = max(yIndices);
 w = size(scene_mesh, 2);
 h = size(scene_mesh, 1);
 objDepth = zeros(size(indicator));
-for irows = 1:size(indicator, 1) 
+for irows = 1:size(indicator, 1)
     for icols = 1:size(indicator, 2)
         if indicator(irows, icols) == 1
             objDepth(irows, icols) = depthmap(irows, icols);
@@ -122,7 +122,7 @@ objDist = min(objDepth(objDepth > 0));
 % ignore target if objDist larger than 150m
 % Occlusions
 ccomp = bwconncomp(indicator);
-if ccomp.NumObjects > 1 
+if ccomp.NumObjects > 1
    occluded = 1;
    % approximate percentage of occluded pixels
    occludedRate = 1 - sum(indicator(:)) / length(depthCrop(:));
@@ -380,7 +380,7 @@ for ii = 1:size(s, 1)
             objectList.motor{count_motor}.size = objects(jj).size;
             objectList.motor{count_motor}.position = objects(jj).position;
             objectList.motor{count_motor}.rotate = objects(jj).rotate;
-        end        
+        end
         InstanceMap(scene_mesh == a) = 7000 + count_motor;
 
         I_1(scene_mesh == a) = randi(255);
@@ -412,7 +412,7 @@ for ii = 1:size(s, 1)
                 objects(jj).position;
             objectList.pedestrian{count_pedestrian}.rotate = ...
                 objects(jj).rotate;
-        end        
+        end
         InstanceMap(scene_mesh == a) = 8000 + count_pedestrian;
 
         I_1(scene_mesh == a) = randi(255);

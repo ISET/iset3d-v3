@@ -33,7 +33,7 @@ scene3d.name = 'chessSet_full';
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 ieAddObject(oi);
 oiWindow;
 
@@ -79,7 +79,7 @@ scene3d.name = 'chessSet_cropped_lowRes';
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 ieAddObject(oi);
 oiWindow;
 
@@ -105,7 +105,7 @@ scene3d.name = 'chessSet_cropped_highRes';
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 ieAddObject(oi);
 oiWindow;
 

@@ -4,19 +4,23 @@ function thisR = piJson2Recipe(JsonFile)
 % Syntax
 %   thisR = piJson2Recipe(JsonFile)
 %
-% Description
-%    
+% Description:
+%    Convert a JSON formatted recipe file to a recipe class object.
 %
-% Input
-%   JsonFile:  File name of the json file containing the scene recipe
-% 
-% Output
-%   thisR:     Scene recipe object
+% Inputs:
+%    JsonFile - String. The file name of the json file containing the
+%               recipe for the scene.
 %
-% ZL, maybe
+% Outputs:
+%   thisR     - Object. The scene recipe object.
 %
-% See also
+% Optional key/value pairs:
+%    None.
 %
+
+% History:
+%    XX/XX/XX  ZL   maybe?
+%    05/17/19  JNM  Documentation pass
 
 %% Read the file
 thisR_tmp = jsonread(JsonFile);

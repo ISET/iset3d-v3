@@ -84,7 +84,7 @@ if isempty(acquisitionlabel)
     % No specific recipe, randomly choose them
     nDatabaseAssets = length(acqs);
     assetList = randi(nDatabaseAssets, nassets, 1);
-    
+
     % Assets we want to download
     downloadList = piObjectInstanceCount(assetList);
     nDownloads = length(downloadList);
@@ -130,7 +130,7 @@ else
     thisAcq = session.acquisitions.findOne(...
         sprintf('label=%s', acquisitionlabel));
     localFolder = fullfile(piRootPath, 'local', acquisitionlabel);
-    
+
     destName_recipe = fullfile(localFolder, ...
         sprintf('%s.json', acquisitionlabel));
     thisRecipe = stFileSelect(thisAcq.files, 'type', 'source code');

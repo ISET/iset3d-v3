@@ -72,7 +72,7 @@ for ii = 1:length(sphereZ)
     [oi, result] = myScene.render;
     % [Note: JNM - reusing is inadvisable here as the parameters being
     % rendered change between instances.]
-    % [oi, result] = myScene.render('reuse');
+    % [oi, result] = myScene.render('reuse', true);
     vcAddAndSelectObject(oi);
     oiWindow;
 
@@ -82,7 +82,7 @@ for ii = 1:length(sphereZ)
     oi = myScene.render;
     % [Note: JNM - reusing is inadvisable here as the parameters being
     % rendered change between instances.]
-    % oi = myScene.render('reuse');
+    % oi = myScene.render('reuse', true);
     vcAddAndSelectObject(oi);
     oiWindow;
 

@@ -74,7 +74,7 @@ oiWindow(oiCA);
 %% Render without chromatic aberration
 thisR.set('chromatic aberration', false);
 
-[p, n, e] = fileparts(fname); 
+[p, n, e] = fileparts(fname);
 thisR.outputFile = fullfile(workingDir, [n, e]);
 piWrite(thisR);
 
@@ -84,7 +84,7 @@ piWrite(thisR);
 oi = oiSet(oi, 'name', 'noCA');
 
 % Show it in ISET
-oiWindow(oi);  
+oiWindow(oi);
 
 %% Now with only 4 bands
 thisR.set('chromatic aberration', 15);

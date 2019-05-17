@@ -38,7 +38,7 @@ function assetsplaced = piSidewalkPlan(road, st, trafficflow, varargin)
 %                           stamp. The state is represented by the position
 %                           and orientation.
 %
-% Outputs: 
+% Outputs:
 %    assetsplaced         - Struct. A structure containing the position
 %                           information for all of the assets along the
 %                           sidewalk. The structure takes the form
@@ -243,7 +243,7 @@ if ~(bikerack_number == 0)
         save(bikerack_listPath, 'bikerack_list');
     else
         load(bikerack_listPath, 'bikerack_list');
-    end                                     
+    end
 end
 
 %% get position lists of objects

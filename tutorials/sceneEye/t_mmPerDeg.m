@@ -77,7 +77,7 @@ for ss = 1:length(sphereSeparationsDegrees)
     % to reuse an existing rendered file of the correct size, uncomment the
     % parameter provided below. We recommend against doing this here as new
     % calculations result in differing images.
-    [oi, result] = theScene.render; %('reuse');
+    [oi, result] = theScene.render; %('reuse', true);
     if (showOi)
         vcAddAndSelectObject(oi);
         oiWindow;
@@ -171,7 +171,7 @@ for ss = 1:length(sphereSeparationsDegrees)
     offsetOnChordMmDown(ss) = renderingMmPerPixel(ss)*offsetPixelsDown(ss);
     offsetPixelsUp(ss) = offsetPixels(ss)+pixelErrorGuess;
     offsetOnChordMmUp(ss) = renderingMmPerPixel(ss)*offsetPixelsUp(ss);
- 
+
     %% Correct for the chord
     % The image is on a chord drawn of the specified width
     % across the back of the spherical model eye. Correct for

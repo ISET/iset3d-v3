@@ -12,10 +12,10 @@ refBox = refObj.bndbox + repmat(refObj.position(:),[1, 2])*1000;
 
 intersect = false;
 for i=1:length(objs)
-    
+
     targetBox = objs(i).bndbox + repmat(objs(i).position(:), [1, 2])*1000;
     int = bboxIntersect(refBox, targetBox);
-    
+
     if int,
         intersect = true;
         break;

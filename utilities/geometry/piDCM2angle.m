@@ -131,7 +131,7 @@ function validatedcm(dcm)
 
 tolerance = 1e-6;
 for ii = 1:size(dcm, 3)
-    x = dcm(:, :, ii) * dcm(:, :, ii)'; 
+    x = dcm(:, :, ii) * dcm(:, :, ii)';
     d = (x - eye(3));
     assert(max(d(:)) < tolerance);
     assert(det(x) - 1 < tolerance);

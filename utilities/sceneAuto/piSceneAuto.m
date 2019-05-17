@@ -118,7 +118,7 @@ end
 tic
 tree_interval = rand(1) * 4 + 2;
 if piContains(sceneType, 'city') || piContains(sceneType, 'suburb')
-    
+
     susoPlaced = piSidewalkPlan(road, st, trafficflow(timestamp), ...
         'tree_interval', tree_interval);
     disp('Sidewalk generated');

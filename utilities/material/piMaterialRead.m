@@ -21,7 +21,7 @@ function [materiallist, txtLines] = piMaterialRead(fname, varargin)
 % See Also:
 %   piBlockExtract, piWriteMaterial
 %
- 
+
 % History:
 %    XX/XX/18  ZL   SCIEN Stanford, 2018
 %    04/03/19  JNM  Documentation pass, changed default version 2 -> 3.
@@ -76,7 +76,7 @@ function materiallist = piBlockExtractMaterial(txtLines)
 %    None.
 %
 % Notes:
-%    * The format for PBRT V2 differs noticeably from V3. In particular, 
+%    * The format for PBRT V2 differs noticeably from V3. In particular,
 %      MakeNamedMaterial is just Material.
 %    * Cinema 4D exporter always puts the materials on a single line, but
 %      V2 scenes can be formatted much more loosely across lines.
@@ -86,10 +86,10 @@ function materiallist = piBlockExtractMaterial(txtLines)
 %             "rgb Kr" [.1 .1 .1]
 %         MakeNamedMaterial "paint_base" "string type" "substrate", ...
 %             "color Kd" [.7 .125 .125] "color Ks" [.1 .1 .1], ...
-%             "float uroughness" .01 "float vroughness" .01 
+%             "float uroughness" .01 "float vroughness" .01
 %         MakeNamedMaterial "BODY"  "string type" "mix", ...
 %         "string namedmaterial1" [ "paint-mirror" ], ...
-%         "string namedmaterial2" [ "paint-base" ] 
+%         "string namedmaterial2" [ "paint-base" ]
 %    * We aren't sure about the whole set of possibilities. We have
 %      covered the ones in our current Cinema 4D export. But ...
 %
@@ -136,7 +136,7 @@ for ii = 1:nLines
                 case 'rgb Kr'
                     materials(cnt).rgbkr = piParseRGB(thisLine, ss);
                 case 'rgb Ks'
-                    materials(cnt).rgbks = piParseRGB(thisLine, ss); 
+                    materials(cnt).rgbks = piParseRGB(thisLine, ss);
                 case 'rgb Kd'
                     materials(cnt).rgbkd = piParseRGB(thisLine, ss);
                 case 'rgb Kt'
@@ -163,10 +163,10 @@ for ii = 1:nLines
                 case 'spectrum Kr'
                     % How do we check value type? (string/numeric)?
                     materials(cnt).spectrumkr = ...
-                        piParseNumericSpectrum(thisLine, ss); 
+                        piParseNumericSpectrum(thisLine, ss);
                 case 'spectrum Kt'
                     materials(cnt).spectrumkt = ...
-                        piParseNumericSpectrum(thisLine, ss); 
+                        piParseNumericSpectrum(thisLine, ss);
                 case 'spectrum eta'
                     materials(cnt).spectrumeta = thisLine{ss + 1};
                 case 'string namedmaterial1'
@@ -177,7 +177,7 @@ for ii = 1:nLines
                     materials(cnt).texturebumpmap = thisLine{ss+1};
                 case 'bool remaproughness'
                     materials(cnt).boolremaproughness = thisLine{ss+1};
-                case 'string bsdffile'   
+                case 'string bsdffile'
                     materials(cnt).bsdffile = thisLine{ss+1};
                 otherwise
                     % fprintf('Unknown case %s\n', thisLine{ss});

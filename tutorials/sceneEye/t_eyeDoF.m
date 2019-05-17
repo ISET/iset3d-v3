@@ -39,7 +39,7 @@ myScene.name = 'chessSetTest';
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-[oi, results] = myScene.render(); %'reuse');
+[oi, results] = myScene.render(); %'reuse', true);
 
 ieAddObject(oi);
 oiWindow;
@@ -61,7 +61,7 @@ for pd = pupilDiameter
     [oi, results] = myScene.render;
     % [Note: JNM - reusing is inadvisable here as the parameters being
     % rendered change between instances.]
-    % [oi, results] = myScene.render('reuse');
+    % [oi, results] = myScene.render('reuse', true);
 
     vcAddAndSelectObject(oi);
     oiWindow;

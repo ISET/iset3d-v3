@@ -58,7 +58,7 @@ for ii = 1:length(pupilDiameters)
 
     % to reuse an existing rendered file of the correct size, uncomment the
     % parameter provided below.
-    oi = myScene.render; %('reuse');
+    oi = myScene.render; %('reuse', true);
 
     % Save the oi and the corresponding myScene object into the save
     % directory.

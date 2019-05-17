@@ -98,7 +98,7 @@ acqs = roadSession.acquisitions.findOne(sprintf('label=%s', roadtype));
 % This is the rendering recipe for the road session
 % fileType_json = 'source code'; % json
 % recipeFiles = st.dataFileList(roadSession, fileType_json);
-% 
+%
 % fileType = 'CG Resource';
 % [resourceFiles, resource_acqID] = st.dataFileList(roadSession, fileType);
 

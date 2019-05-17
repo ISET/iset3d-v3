@@ -20,7 +20,7 @@ function downloadList = piObjectInstanceCount(assetList)
 %   assetList - Struct. A structure containing all of the assets.
 %
 % Outputs:
-%  downloadList - Struct. A struct with index and count. 
+%  downloadList - Struct. A struct with index and count.
 %       index: Numeric. The index into the list of acquisitions
 %       count: Numeric. The number of times this particular acquisition is
 %              in the assetList.

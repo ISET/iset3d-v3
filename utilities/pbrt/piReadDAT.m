@@ -34,7 +34,7 @@ function [imageData, imageSize, lens] = piReadDAT(filename, varargin)
 %                the fields focalLength, fStop, and fieldOfView.
 %
 % Optional key/value pairs:
-%   maxPlanes - Numeric. The maximum number of planes
+%    maxPlanes - Numeric. The maximum number of planes
 %
 % Notes:
 %    * RenderToolbox4 Copyright (c) 2012-2016 The RenderToolbox Team.
@@ -115,9 +115,9 @@ end
 % inherent difference in how v2 and v3 store the final image data. It is
 % much easier to do the reshape here than to change v3 to write out in the
 % same way v2 writes out.
-if(pbrtVer == 2)
+if pbrtVer == 2
     imageData = reshape(serializedImage, hSize, wSize, nPlanes);
-elseif(pbrtVer == 3)
+elseif pbrtVer == 3
     imageData = reshape(serializedImage, wSize, hSize, nPlanes);
     imageData = permute(imageData, [2 1 3]);
 end

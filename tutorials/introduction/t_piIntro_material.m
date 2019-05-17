@@ -42,7 +42,7 @@ thisR.set('film resolution', [400 300]);
 thisR.set('pixel samples', 64);
 
 %% List material library
-% These all the possible materials. 
+% These all the possible materials.
 mType = piMateriallib;
 disp(mType);
 
@@ -56,7 +56,7 @@ piMaterialList(thisR);
 thisR.set('fov', 45);
 thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type  = 'float';
-thisR.integrator.subtype = 'bdpt';  
+thisR.integrator.subtype = 'bdpt';
 thisR.sampler.subtype = 'sobol';
 
 %% Changing the name!!!! Important to comment and explain!!! ZL, BW
@@ -79,7 +79,7 @@ partName = 'mirror';
 
 % Get the mirror material from the library.  The library is always
 % part of any recipe.
-target = thisR.materials.lib.mirror; 
+target = thisR.materials.lib.mirror;
 piMaterialAssign(thisR, partName, target);
 
 %% Set render to account for glass and mirror requiring multiple bounces
@@ -98,8 +98,8 @@ sceneWindow(scene);
 sceneSet(scene, 'gamma', 0.8);
 
 %% Adjust the scene material from mirror to glass (the person, too)
-% Now change the partName 'mirror' to glass material. 
-target = thisR.materials.lib.glass; 
+% Now change the partName 'mirror' to glass material.
+target = thisR.materials.lib.glass;
 piMaterialAssign(thisR, partName, target);
 piMaterialAssign(thisR, 'GLASS', target);
 

@@ -199,7 +199,7 @@ for ii = 1:length(thisMaterial)
                 materiallib.(thisMaterial{ii}).rgbkr = [];
                 materiallib.(thisMaterial{ii}).rgbks = [];
                 materiallib.(thisMaterial{ii}).rgbkd = [];
-                materiallib.(thisMaterial{ii}).rgbkt = []; 
+                materiallib.(thisMaterial{ii}).rgbkt = [];
         end
     else
         continue;

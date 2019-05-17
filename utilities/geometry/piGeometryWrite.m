@@ -97,7 +97,7 @@ for ii = 1: length(obj)
                             fprintf(fid_obj, 'Rotate %f %f %f %f \n', ...
                                 obj_rotate(:, gg * 3 - 1)); % Y
                             fprintf(fid_obj, 'Rotate %f %f %f %f \n', ...
-                                obj_rotate(:, gg * 3));   % X 
+                                obj_rotate(:, gg * 3));   % X
                         end
                         % Write out scaling
                         if isfield(obj(ii), 'scale')
@@ -143,7 +143,7 @@ for ii = 1: length(obj)
                             fprintf(fid_obj, 'Rotate %f %f %f %f \n', ...
                                 obj_rotate(:, gg * 3 - 1)); % Y
                             fprintf(fid_obj, 'Rotate %f %f %f %f \n', ...
-                                obj_rotate(:, gg * 3));   % X 
+                                obj_rotate(:, gg * 3));   % X
                         end
                         % Write out scaling
                         if isfield(obj(ii), 'scale')
@@ -172,7 +172,7 @@ for ii = 1: length(obj)
                             fprintf(fid_obj, 'Rotate %f %f %f %f \n', ...
                                 obj_rotate(:, gg * 3 - 1)); % Y
                             fprintf(fid_obj, 'Rotate %f %f %f %f \n', ...
-                                obj_rotate(:, gg * 3));   % X 
+                                obj_rotate(:, gg * 3));   % X
                         end
                         fprintf(fid_obj, ...
                             'ObjectInstance "%s"\n', obj(ii).name);

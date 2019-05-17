@@ -1,6 +1,6 @@
 function camera = piCameraSet(camera,param,val)
 % Deprecated - using recipeSet() instead.
-% 
+%
 % I left this here because we might call this from recipeSet() for the camera
 % types.  We will see.
 %
@@ -32,4 +32,4 @@ end
 
 end
 
-      
+

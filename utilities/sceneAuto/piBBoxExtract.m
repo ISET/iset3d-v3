@@ -1,4 +1,5 @@
-function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
+function objects = ...
+    piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
 % Convert a mesh image instance to a class (both segment maps)
 %
 % Syntax:
@@ -13,7 +14,8 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
 %    objects   - Struct. A structure containing all of the scene objects.
 %    scene     - Struct. An optical image structure representing a scene.
 %    meshImage - Matrix. A matrix representing the mesh image.
-%    labelMap  - 
+%    labelMap  - Struct. A label map structure, with fields for name and id
+%                for each of the objects being described within.
 %
 % Outputs:
 %    objects   - Struct. The modified objects structure.
@@ -21,6 +23,9 @@ function objects = piBBoxExtract(thisR, objects, scene, meshImage, labelMap)
 % Optional key/value pairs:
 %    None.
 %
+% Notes:
+%    * JNM 05/17/19: This function appears to be unfinished, not even
+%      counting the embedded functions within this file.
 
 % History:
 %    XX/XX/18  ZL   Vistasoft Team, 2018

@@ -5,7 +5,7 @@
 %    a scene.
 %
 % Dependencies:
-%    ISET3d, ISETCam 
+%    ISET3d, ISETCam
 %
 % Notes:
 %    * Check that you have the updated docker image by running
@@ -46,7 +46,7 @@ thisR.integrator.maxdepth.value = 5;
 
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on
-% automobile parts.  
+% automobile parts.
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
@@ -82,14 +82,14 @@ sceneWindow(scene);
 sceneSet(scene, 'gamma', 0.7);
 
 %% Introduce motion blur
-% The motion blur is assigned to a particular asset.  In this example, 
+% The motion blur is assigned to a particular asset.  In this example,
 % we are moving the third asset, assets(3)
 fprintf('Moving asset named: %s\n', thisR.assets(3).name);
 
 % Check current object position
 %
-% Position is saved as x, y, z; 
-%  z represents depth. 
+% Position is saved as x, y, z;
+%  z represents depth.
 %  x represents horizontal position
 %  y represents vertical position
 
@@ -102,7 +102,7 @@ fprintf('Object position: \n    x: %.1f, depth: %.1f \n', ...
 
 % Open at time zero
 thisR.camera.shutteropen.type = 'float';
-thisR.camera.shutteropen.value = 0;  
+thisR.camera.shutteropen.value = 0;
 
 % Close in half a second
 thisR.camera.shutterclose.type = 'float';
@@ -126,18 +126,18 @@ sceneWindow(scene);
 sceneSet(scene, 'gamma', 0.7);
 
 %% Add some rotation to the motion
-% The rotation matrix is defined as: 
+% The rotation matrix is defined as:
 %
 %    (z    y    x in deg)
 %     0    0    0
 %     0    0    1
 %     0    1    0
-%     1    0    0 
+%     1    0    0
 %
 % To rotate around the z-axis, we change (1, 1)
 % To rotate around the y-axis, we change (1, 2)
 % To rotate around the y-axis, we change (1, 3)
-% 
+%
 % A plus value for rotation is CCW
 %
 % The rotation is around the center of the asset

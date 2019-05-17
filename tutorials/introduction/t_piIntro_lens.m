@@ -24,7 +24,7 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
-    error('You must have the remote data toolbox on your path'); 
+    error('You must have the remote data toolbox on your path');
 end
 
 %% Read the pbrt files
@@ -42,7 +42,7 @@ inFolder = fullfile(piRootPath, 'local', 'scenes');
 inFile = fullfile(inFolder, sceneName, sceneFileName);
 thisR = piRead(inFile);
 
-% We will output the calculations to a temp directory.  
+% We will output the calculations to a temp directory.
 outFolder = fullfile(tempdir, sceneName);
 outFile = fullfile(outFolder, [sceneName, '.pbrt']);
 thisR.set('outputFile', outFile);
@@ -62,10 +62,11 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 % 22deg is the half width of the field of view
-lensfile = 'dgauss.22deg.50.0mm.json';
+% lensfile = 'dgauss.22deg.50.0mm.json';
+lensfile = 'dgauss.22deg.50.0mm.dat';
 fprintf('Using lens: %s\n', lensfile);
-% thisR.camera = piCameraCreate('realistic', 'lensFile', lensfile);
-thisR.camera = piCameraCreate('omni', 'lensFile', lensfile);
+thisR.camera = piCameraCreate('realistic', 'lensFile', lensfile);
+% thisR.camera = piCameraCreate('omni', 'lensFile', lensfile);
 
 %{
 % You might adjust the focus for different scenes. Use piRender with the
@@ -80,7 +81,7 @@ thisR.camera = piCameraCreate('omni', 'lensFile', lensfile);
 thisR.set('focus distance', 0.6);
 
 % The FOV is not used for the 'realistic' camera.
-% The FOV is determined by the lens. 
+% The FOV is determined by the lens.
 
 % This is the size of the film/sensor in millimeters (default 22)
 thisR.set('film diagonal', 22);
@@ -93,12 +94,12 @@ thisR.set('to', [0.05 -0.07 0.5]);  % Look down default compared to default
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
-thisR.integrator.subtype = 'path';  
+thisR.integrator.subtype = 'path';
 thisR.sampler.subtype = 'sobol';
 
 % This value determines the number of ray bounces.  If the scene has
 % glass or mirrors, we need to have at least 2 or more.
-% thisR.set('nbounces', 4); 
+% thisR.set('nbounces', 4);
 
 %% Render and display
 % Change this for depth of field effects.

@@ -57,7 +57,7 @@ for ii = 1:numel(nextTrafficflow.objects.car)
 end
 if isempty(motion)
     % there are cases when a car is going out of boundary or just disappear
-    % for some other reason, so in these cases, the motion info remains 
+    % for some other reason, so in these cases, the motion info remains
     % empty or we should estimate motion End position by speed information;
     from = thisCar.pos;
     distance = thisCar.speed;

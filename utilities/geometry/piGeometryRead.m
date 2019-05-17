@@ -220,7 +220,7 @@ if ~convertedflag
     jsonwrite(AssetInfo, renderRecipe);
     fprintf(strcat('piGeometryRead done.\nSaving render recipe as a', ...
         ' JSON file %s.\n'), AssetInfo);
-    
+
 else
     % The converted flag is true, so AssetInfo is already stored in a JSON
     % file with the recipe information. We just copy it isnto the recipe.

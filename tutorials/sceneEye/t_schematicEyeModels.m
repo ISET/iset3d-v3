@@ -38,7 +38,7 @@ thisScene.accommodation = 0;
 thisScene.name = 'navarro'; % The name of the optical image
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oiNavarro = thisScene.render(); %'reuse');
+oiNavarro = thisScene.render(); %'reuse', true);
 
 % Show the retinal image
 % Everything is very out of focus since the accommodation is set to
@@ -59,7 +59,7 @@ thisScene.modelName = 'Gullstrand';
 thisScene.name = 'gullstrand'; % The name of the optical image
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oiGullstrand = thisScene.render(); %'reuse');
+oiGullstrand = thisScene.render(); %'reuse', true);
 
 ieAddObject(oiGullstrand);
 oiWindow;
@@ -72,7 +72,7 @@ thisScene.accommodation = 0;
 thisScene.name = 'arizona'; % The name of the optical image
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oiArizona = thisScene.render(); %'reuse');
+oiArizona = thisScene.render(); %'reuse', true);
 
 ieAddObject(oiArizona);
 oiWindow;

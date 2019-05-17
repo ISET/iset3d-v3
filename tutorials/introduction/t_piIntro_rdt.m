@@ -6,7 +6,7 @@
 %    then renders it.
 %
 %    You must have the Remote Data Toolbox on your path to run this.
-% 
+%
 % Dependencies:
 %    ISET3d, (ISETCam or ISETBio), JSONio, RemoteDataToolbox
 %
@@ -27,7 +27,7 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
-    error('You must have the remote data toolbox on your path'); 
+    error('You must have the remote data toolbox on your path');
 end
 
 %% Read the scene file for the Remote Data site

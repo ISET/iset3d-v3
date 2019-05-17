@@ -29,7 +29,7 @@ assert(isequal(thisR.get('film xresolution'), 256));
 
 %% Read a file without comments
 
-%% Read files with and without blank lines 
+%% Read files with and without blank lines
 
 %% Other test files needed
 

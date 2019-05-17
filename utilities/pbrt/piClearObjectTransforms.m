@@ -1,11 +1,11 @@
 function recipe = piClearObjectTransforms(recipe,objectName,varargin)
-% Clear all existing transforms on an object 
+% Clear all existing transforms on an object
 %
 % Syntax
 %   recipe = piClearObjectTransforms(recipe,objectName,varargin)
 %
 % We look for an object within the WorldBegin/WorldEnd block with
-% objectName. We then remove all transforms below it. 
+% objectName. We then remove all transforms below it.
 %
 % Input
 %   recipe:         a recipe object that includes a WorldBegin/WorldEnd block.
@@ -25,7 +25,7 @@ function recipe = piClearObjectTransforms(recipe,objectName,varargin)
 p = inputParser;
 p.addRequired('recipe',@(x)isequal(class(x),'recipe'));
 p.addRequired('objectName',@(x)ischar(x));
-   
+
 %% Look for the object within the world block
 
 world = recipe.world;
@@ -38,9 +38,9 @@ foundFlag = 0;
 for ii = 1:length(world)
     currLine = world{ii};
     if(strcmp(currLine,targetLine))
-        
+
         foundFlag = 1;
-        
+
         % Look for lines that have a transform
         noTransforms = 0;
         jj = ii;
@@ -50,7 +50,7 @@ for ii = 1:length(world)
             if(~isempty(strfind(currLine,'Translate')) || ...
                ~isempty(strfind(currLine,'Scale')) || ...
                ~isempty(strfind(currLine,'Transform')) || ...
-               ~isempty(strfind(currLine,'Rotate')))          
+               ~isempty(strfind(currLine,'Rotate')))
                 % Save line indices
                 transformLines = [transformLines jj];
             else
@@ -58,7 +58,7 @@ for ii = 1:length(world)
             end
         end
         break;
-        
+
     end
 end
 

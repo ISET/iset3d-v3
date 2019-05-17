@@ -6,7 +6,7 @@
 %
 %  You must have the Remote Data Toolbox on your path to run this.
 %
-% 
+%
 % Dependencies
 %
 %    ISET3d, ISETCam or ISETBio, JSONio, RemoteDataToolbox
@@ -78,7 +78,7 @@ scenePlot(scene,'depth map');
 %{
 recipe.set('camera','realistic');
 recipe.set('lensfile',fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat'));
-recipe.set('filmdiagonal',35); 
+recipe.set('filmdiagonal',35);
 %}
 
 %%

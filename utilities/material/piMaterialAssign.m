@@ -11,7 +11,7 @@ function piMaterialAssign(thisR, material, target, varargin)
 %    We get a target material from the materiallib. We add the properties
 %    of that target material onto the material (idx) in the recipe
 %    Adding functions for changing color appearance.
-%    Supported color parameters shown below, 
+%    Supported color parameters shown below,
 %       rgbkr:   [0 0 1]
 %       rgbks:   [0 0 1]
 %       rgbkd:   [0 0 1]
@@ -99,7 +99,7 @@ if isfield(target, 'paint_base') && isfield(target, 'paint_mirror')
         thisR.materials.list.(materialNames{idx}), target.carpaint);
     % change paint_base to carname_paint_base
     thisR.materials.list.(materialNames{idx}).stringnamedmaterial2 = ...
-        sprintf('%s_paint_base', material);    
+        sprintf('%s_paint_base', material);
     %% Assign color
     thisR.materials.list.(slotname1) = ...
         piCopyColor(thisR.materials.list.(slotname1), p);
@@ -110,7 +110,7 @@ if isfield(target, 'paint_base') && isfield(target, 'paint_mirror')
                 paint = jj;
             else
                 paint = 0;
-            end    
+            end
         end
         if paint
         thisR.materials.list.(materialNames{paint}) = ...

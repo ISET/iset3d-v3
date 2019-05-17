@@ -108,7 +108,7 @@ thisR.assets(end).position = [3.5 0 -2]';
 thisR.set('fov', 45);
 thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type = 'float';
-thisR.integrator.subtype = 'bdpt';  
+thisR.integrator.subtype = 'bdpt';
 thisR.sampler.subtype = 'sobol';
 % Changing the name!!!!  Important to comment and explain!!! ZL, BW
 outFile = fullfile(piRootPath, 'local', sceneName, ...
@@ -128,7 +128,7 @@ sceneSet(scene, 'display mode', 'hdr');
 coordMap = piRender(thisR, 'renderType', 'coordinates');
 x = coordMap(:, :, 1) - thisR.lookAt.from(1);
 y = coordMap(:, :, 2) - thisR.lookAt.from(2);
-z = coordMap(:, :, 3) - thisR.lookAt.from(3); 
+z = coordMap(:, :, 3) - thisR.lookAt.from(3);
 player = pcplayer([-20 0], [0 10], [-1 1]);
 ptCloud = pointCloud([x(:), z(:), y(:)]);
 view(player, ptCloud);

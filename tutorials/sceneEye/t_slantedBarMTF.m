@@ -48,7 +48,7 @@ myScene.fov = 4;
 myScene.debugMode = true;
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-scene = myScene.render; %('reuse');
+scene = myScene.render; %('reuse', true);
 
 vcAddObject(scene);
 sceneWindow;
@@ -78,7 +78,7 @@ for ii = 1:length(planeDistance)
 
     % to reuse an existing rendered file of the correct size, uncomment the
     % parameter provided below.
-    oi = myScene.render; %('reuse');
+    oi = myScene.render; %('reuse', true);
 
     ieAddObject(oi);
     oiWindow;
@@ -100,7 +100,7 @@ myScene.numRays = 256;
 myScene.resolution = 256;
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = myScene.render; %('reuse');
+oi = myScene.render; %('reuse', true);
 
 ieAddObject(oi);
 oiWindow;

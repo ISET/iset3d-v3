@@ -47,7 +47,7 @@ if ~isempty(pixelSize)
 end
 
 % [~, rect] = ieROISelect(oi);
-rect = [718   698   200   198];% 
+rect = [718   698   200   198];%
 sensor = sensorSet(sensor, 'size', [800, 1920]);
 sensor = sensorSetSizeToFOV(sensor, oiGet(oi, 'fov'));
 eTime = autoExposure(oi, sensor, 0.90, 'video', 'center rect', rect, ...
@@ -71,7 +71,7 @@ ip = ipCreate;
 ip = ipSet(ip, 'conversion method sensor', 'MCC Optimized');
 ip = ipSet(ip, 'illuminant correction method', 'gray world');
 % demosaics = [{'Adaptive Laplacian'}, {'Bilinear'}];
-ip = ipSet(ip, 'demosaic method', 'Adaptive Laplacian'); 
+ip = ipSet(ip, 'demosaic method', 'Adaptive Laplacian');
 ip = ipCompute(ip, sensor);
 % ipWindow(ip);
 if isfield(sensor, 'metadata')

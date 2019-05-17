@@ -4,7 +4,7 @@ function oi = piFireFliesRemove(ieObject)
 % Syntax:
 %   oi = piFireFliesRemove(ieObject)
 %
-% Description: 
+% Description:
 %    The rendering algorithm sometimes produces these unwanted white spots
 %    just, well, because of ray tracing.
 %
@@ -63,7 +63,7 @@ dLogIlluminance = conv2(logIlluminance, g, 'same');
 % hist(dLogIlluminance(:), 100);
 
 
-%% Find points  more than XX larger than the average of their neighbors 
+%% Find points  more than XX larger than the average of their neighbors
 brightSpots = (dLogIlluminance > log10(3.5));
 [r, c] = find(brightSpots);
 

@@ -64,7 +64,6 @@ function thisR = piRead(fname, varargin)
 
 %%
 p = inputParser;
-
 if length(varargin) > 1
     for i = 1:length(varargin)
         if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
@@ -332,8 +331,8 @@ end
 if flip, thisR.scale = [-1 1 1]; end
 
 %% Read Material.pbrt file if pbrt file is exported by C4D.
-% Is the read materials flag necessary?  Can't we just check if this
-% is an exporterFlag case and see if there is a file?
+% Is the read materials flag necessary? Can't we just check if this is an
+% exporterFlag case and see if there is a file?
 if exporterFlag
     if readmaterials
         % Check if a materials.pbrt exist

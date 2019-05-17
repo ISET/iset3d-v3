@@ -34,7 +34,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %         nbounces           - Numeric. A rendering pair type. The number
 %                              of bounces for the light source. Also known
 %                              as maxDepth, or bounces.
-%         aperture           - Numeric. Also known as apertureDiameter, 
+%         aperture           - Numeric. Also known as apertureDiameter,
 %                              this is the diameter of the aperture.
 %         filmDistance       - Numeric. The film distance.
 %         focusDistance      - Numeric. The focus distance. Only in v3.
@@ -197,7 +197,7 @@ switch param
         end
 
         % Shutter duration in sec
-        thisR.camera.shutterclose.value = val + openShutter;   
+        thisR.camera.shutterclose.value = val + openShutter;
 
     % Lens related
     case 'lensfile'
@@ -229,7 +229,7 @@ switch param
 
     case 'fov'
         % We should check that this is a pinhole, I think
-        % This is only used for pinholes, not realistic camera case. 
+        % This is only used for pinholes, not realistic camera case.
         if isequal(thisR.camera.subtype, 'pinhole')
             thisR.camera.fov.value = val;
             thisR.camera.fov.type = 'float';
@@ -260,7 +260,7 @@ switch param
             return;
         elseif isequal(val, true)
             thisR.camera.chromaticAberrationEnabled.value = 'true';
-            val = 8; 
+            val = 8;
         elseif isnumeric(val)
             thisR.camera.chromaticAberrationEnabled.value = 'true';
         else
@@ -308,11 +308,11 @@ switch param
     case 'filmdiagonal'
         thisR.film.diagonal.type = 'float';
         thisR.film.diagonal.value = val;
-        
+
     case {'filmdistance'}
         thisR.camera.filmdistance.type = 'float';
         thisR.camera.filmdistance.value = val;
-        
+
     % Rendering related
     case{'maxdepth', 'bounces', 'nbounces'}
         % Eliminated warning Nov. 11, 2018.
@@ -366,7 +366,7 @@ switch param
     case{'cropwindow', 'crop'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
-     
+
     % SUMO parameters stored in recipe metadata
     case {'trafficflowdensity'}
         thisR.metadata.sumo.trafficflowdensity = val;

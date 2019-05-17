@@ -26,14 +26,15 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
-    error('You must have the remote data toolbox on your path'); 
+    error('You must have the remote data toolbox on your path');
 end
 %% Read the pbrt files
 % sceneName = 'kitchen';
 % sceneFileName = 'scene.pbrt';
 % sceneName = 'living-room';
 % sceneFileName = 'scene.pbrt';
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+sceneName = 'ChessSet';
+sceneFileName = 'ChessSet.pbrt';
 
 % The output directory will be written here to inFolder/sceneName
 inFolder = fullfile(piRootPath, 'local', 'scenes');
@@ -44,7 +45,7 @@ dest = piPBRTFetch(sceneName, 'destinationFolder', inFolder, ...
 inFile = fullfile(inFolder, sceneName, sceneFileName);
 thisR = piRead(inFile);
 
-% We will output the calculations to a temp directory. 
+% We will output the calculations to a temp directory.
 outFolder = fullfile(tempdir, sceneName);
 outFile = fullfile(outFolder, [sceneName, '.pbrt']);
 thisR.set('outputFile', outFile);
@@ -83,19 +84,19 @@ colorbar;
 thisR.set('focus distance', 0.45);
 
 % The FOV is not used for the 'realistic' camera.
-% The FOV is determined by the lens. 
+% The FOV is determined by the lens.
 
 % This is the size of the film/sensor in millimeters
 thisR.set('film diagonal', 15);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
-thisR.integrator.subtype = 'path';  
+thisR.integrator.subtype = 'path';
 thisR.sampler.subtype = 'sobol';
 
 % This value determines the number of ray bounces. If the scene has
 % glass or mirrors, we need to have at least 2 or more.
-% thisR.set('nbounces', 4); 
+% thisR.set('nbounces', 4);
 
 %% Change this for depth of field effects.
 thisR.set('aperture diameter', 3);

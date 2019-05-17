@@ -6,7 +6,7 @@
 %
 % Dependencies:
 %
-%    ISET3d, ISETCam 
+%    ISET3d, ISETCam
 %
 % Notes:
 %    * Check that you have the updated docker image by running
@@ -44,7 +44,7 @@ thisR.set('bounces', 5);
 
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on
-% automobile parts. 
+% automobile parts.
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
@@ -70,7 +70,7 @@ sceneSet(scene, 'display mode', 'hdr');
 
 %% Motion blur from camera
 % Specify the initial position and rotation of the camera.  We find
-% the current camera position 
+% the current camera position
 thisR.camera.motion.activeTransformStart.pos = thisR.lookAt.from(:);
 thisR.camera.motion.activeTransformStart.rotate = piRotationMatrix;
 
@@ -92,7 +92,7 @@ sceneWindow(scene);
 % No translation
 thisR.camera.motion.activeTransformEnd.pos = thisR.lookAt.from(:);
 
-% The angle specification is piRotationMatrix.  To change the angle, 
+% The angle specification is piRotationMatrix.  To change the angle,
 % say by rotation around the z-axis by 5 deg we set
 thisR.camera.motion.activeTransformEnd.rotate = ...
     piRotationMatrix('zrot', 5);

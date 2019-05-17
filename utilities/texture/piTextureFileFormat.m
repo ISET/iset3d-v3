@@ -39,7 +39,7 @@ bmpFiles = dir('*.bmp');
 if ~isempty(jpgFiles)
     nfiles = length(jpgFiles);
     for ii = 1:nfiles
-        % some hidden files might appear in dir as '._xxxxx.jpg', which we 
+        % some hidden files might appear in dir as '._xxxxx.jpg', which we
         % will delete.
         if isequal(jpgFiles(ii).name(1), '.')
             delete(jpgFiles(ii).name);
@@ -66,7 +66,7 @@ end
 if ~isempty(bmpFiles)
     nfiles = length(bmpFiles);
     for ii = 1:nfiles
-        % some hidden files might appear in dir as '._xxxxx.jpg', which we 
+        % some hidden files might appear in dir as '._xxxxx.jpg', which we
         % will delete.
         if isequal(bmpFiles(ii).name(1), '.')
             delete(bmpFiles(ii).name);
@@ -89,7 +89,7 @@ end
 %% Put all texture files in a seperate folder.
 outputDir = fileparts(thisR.outputFile);
 textureDir = fullfile(outputDir, 'textures');
-textureFiles = dir('*.png'); 
+textureFiles = dir('*.png');
 if ~exist(textureDir, 'dir'), mkdir(textureDir); end
 for i = 1:length(textureFiles)
     textureFileName = textureFiles(i).name;

@@ -20,7 +20,7 @@ for ll = 1: length(assetsnameList)
     if find(piContains(trafficAssets,assetsnameList{ll}))
         if ~isfield(thisR.assets,'motion')
             [thisR.assets(:).motion] = deal([]);
-        end        
+        end
         thisR = AddMaterialandGeometry(assets,assetsnameList{ll},material,geometry,thisR);
     else
         thisR = AddMaterialandGeometry(assets,assetsnameList{ll},material,geometry,thisR);
@@ -57,12 +57,12 @@ for ii = 1:length(assets.(assetname))
         numScene = length(scene);
         numObj   = length(assets.(assetname)(ii).geometry);
         for hh = 1:numObj
-            %% 
+            %%
             if isfield(assets.(assetname)(ii).geometry,'scale')
                 assets.(assetname)(ii).geometry=rmfield(assets.(assetname)(ii).geometry,'scale');
             end
             scene(numScene+hh) = assets.(assetname)(ii).geometry(hh);
-            %% 
+            %%
         end
     end
     if exist(assets.(assetname)(1).geometryPath,'dir')

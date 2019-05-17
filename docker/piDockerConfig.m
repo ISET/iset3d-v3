@@ -1,22 +1,34 @@
 function status = piDockerConfig(varargin)
 % Configure the Matlab environment and initiate the docker-machine
 %
-%   status = piDockerConfig(varargin)
+% Syntax:
+%   status = piDockerConfig([varargin])
 %
-% INPUTS:
-%    'machine' - [Optional, type=char, default='default']
-%                Name of the docker-machine on OSX. Should exist.
-%    'debug'   - [Optional, type=logical, default=false]
-%                If true then messages are displayed throughout the
-%                process, otherwise we're quiet save for an error.
+% Description:
+%    Configure the MATLAB environment
 %
-% OUTPUTS:
-%    status    - boolean where 0=success and >0 denotes failure.
+% Inputs:
+%    None.
 %
-% EXAMPLE:
-%    [status] = piDockerConfig('machine', 'default', 'debug', true);
+% Outputs:
+%    status  - Boolean. A numeric boolean where 0 = success and > 0 denotes
+%              initialization failure.
 %
-% (C) Stanford VISTA Lab, 2016
+% Optional key/value pairs:
+%    machine - Char. The focker-machine name on OSX, which should exist.
+%              Default 'default'.
+%    debug   - Boolean. Whether or not to display messages throughout the
+%              process. If false, only display error(s). Default false.
+%
+
+% History:
+%    XX/XX/16  XXX  (C) Stanford VISTA Lab, 2016
+%    05/10/19  JNM  Documentation pass
+
+% Examples:
+%{
+    [status] = piDockerConfig('machine', 'default', 'debug', true);
+%}
 
 %% Parse input arguments
 
@@ -24,24 +36,19 @@ p = inputParser;
 p.addParameter('machine', 'default', @ischar);
 p.addOptional('debug', false, @islogical);
 p.parse(varargin{:})
-
 args = p.Results;
 
 %% Configure Matlab ENV for the machine
-
 % MAC OSX
 if ismac
-    
     % By default, docker-machine and docker for mac are installed in
     % /usr/local/bin:
     initPath = getenv('PATH');
     if ~piContains(initPath, '/usr/local/bin')
-        if args.debug
-            disp('Adding ''/usr/local/bin'' to PATH.');
-        end
+        if args.debug, disp('Adding ''/usr/local/bin'' to PATH.'); end
         setenv('PATH', ['/usr/local/bin:', initPath]);
     end
-    
+
     % Check for "docker for mac"
     [status, ~] = system('docker ps -a');
     if status == 0
@@ -51,51 +58,52 @@ if ismac
         end
         return
     elseif exist('/Applications/Docker.app/Contents/MacOS/Docker', 'file')
-        if args.debug
-            disp('Starting Docker for Mac...')
-        end
+        if args.debug, disp('Starting Docker for Mac...'); end
         [s, ~] = system('open /Applications/Docker.app');
         [status, ~] = system('which docker', '-echo');
-        if s==0 && status==0
+        if s == 0 && status == 0
             if args.debug
                 disp('Docker configured successfully!');
                 system('docker -v', '-echo');
             end
         end
-        return
+        return;
     end
-    
+
     % Check that docker machine is installed
     [status, version] = system('docker-machine -v');
     if status == 0
-        if args.debug
-            fprintf('Found %s\n', version);
-        end
+        if args.debug, fprintf('Found %s\n', version); end
     else
         error('%s \nIs docker-machine installed?', version);
     end
-    
+
     % Check that the machine is running
-    [~, result] = system(sprintf('docker-machine status %s', args.machine));
-    if strcmp(strtrim(result),'Running')
+    [~, result] = system(sprintf('docker-machine status %s', ...
+        args.machine));
+    if strcmp(strtrim(result), 'Running')
         if args.debug
             fprintf('docker-machine ''%s'' is running.\n', args.machine);
         end
-        
-        % Start the machine
+
+    % Start the machine
     else
         fprintf('Starting docker-machine ''%s'' ... \n', args.machine);
-        [status, result] = system(sprintf('docker-machine start %s', args.machine), '-echo');
+        [status, result] = system(...
+            sprintf('docker-machine start %s', args.machine), '-echo');
         if status && piContains(strtrim(result), 'not exist')
-            
             % Prompt to create the machine
-            resp = input('Would you like to create the machine now? (y/n): ', 's');
+            resp = input(strcat('Would you like to create the ', ...
+                'machine now? (y/n): '), 's');
             if lower(resp) == 'y'
-                [status, result] = system(sprintf('docker-machine create -d virtualbox %s', args.machine), '-echo');
+                [status, result] = system(sprintf(...
+                    'docker-machine create -d virtualbox %s', ...
+                    args.machine), '-echo');
                 if status
                     error(result);
                 else
-                    fprintf('The machine ''%s'' is up and running!\n', args.machine);
+                    fprintf('The machine ''%s'' is up and running!\n', ...
+                        args.machine);
                 end
             else
                 warning(result);
@@ -104,11 +112,12 @@ if ismac
             end
         end
     end
-    
+
     % Get the docker env variables for the machine
-    [status, docker_env] = system(sprintf('docker-machine env %s', args.machine));
+    [status, docker_env] = system(sprintf('docker-machine env %s', ...
+        args.machine));
     if status ~= 0; error(docker_env); end
-    
+
     % Configure the Matlab ENV based on the machine ENV
     docker_env = strsplit(docker_env);
     docker_env_vars = {};
@@ -118,51 +127,51 @@ if ismac
         end
     end
     if args.debug
-        fprintf('Configuring docker-machine env for machine: [%s] ...\n', args.machine);
+        fprintf(strcat('Configuring docker-machine env for machine: ', ...
+            '[%s] ...\n'), args.machine);
     end
     for jj = 1:numel(docker_env_vars)
-        env_var = strsplit(docker_env_vars{jj},'"');
-        setenv(strrep(env_var{1},'=',''), env_var{2});
+        env_var = strsplit(docker_env_vars{jj}, '"');
+        setenv(strrep(env_var{1}, '=', ''), env_var{2});
         if args.debug
-            fprintf('%s=%s\n', strrep(env_var{1},'=',''), getenv(strrep(env_var{1},'=','')));
+            fprintf('%s=%s\n', strrep(env_var{1}, '=', ''), ...
+                getenv(strrep(env_var{1}, '=', '')));
         end
     end
-    
+
     % Check that the configuration worked
     [status, result] = system('docker ps -a');
     if status == 0
-        if args.debug
-            disp('Docker configured successfully!');
-        end
+        if args.debug, disp('Docker configured successfully!'); end
     else
         error('Docker could not be configured: %s', result);
     end
-    
-    % LINUX
+
+% LINUX
 elseif isunix
-    
     % This is needed for assimp library issues.  See the mexximp Readme.
     % system('export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6');
-    
+
     % Check for docker
     [status, result] = system('docker ps -a');
     if status == 0
         if args.debug; disp('Docker configured successfully!'); end
     else
-        if args.debug, fprintf('Docker status: %d\n',status); end
+        if args.debug, fprintf('Docker status: %d\n', status); end
         error('Docker not configured: %s', result);
     end
 elseif ispc
     % Check for docker
     [status, result] = system('docker ps -a');
     if status == 0
-        if args.debug; disp('Docker configured successfully!'); end
+        if args.debug, disp('Docker configured successfully!'); end
     else
-        if args.debug, fprintf('Docker status: %d\n',status); end
+        if args.debug, fprintf('Docker status: %d\n', status); end
         error('Docker not configured: %s', result);
     end
 else
     % Not MAC or LINUX
     % We need a Windows implementation.
-    warning('Platform [%s] not supported.  No configuration attempted.', computer);
+    warning(strcat('Platform [%s] not supported.  ', ...
+        'No configuration attempted.'), computer);
 end

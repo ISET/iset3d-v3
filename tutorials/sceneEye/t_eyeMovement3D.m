@@ -45,7 +45,7 @@ for ii = 1:length(xShift)
 
     % to reuse an existing rendered file of the correct size, uncomment the
     % parameter provided below.
-    oi = myScene.render; %('reuse');
+    oi = myScene.render; %('reuse', true);
     imageFrames{ii} = oiGet(oi,'rgb');
 
     vcAddAndSelectObject(oi);
@@ -73,7 +73,7 @@ for ii = 1:length(xShift)
 
     % to reuse an existing rendered file of the correct size, uncomment the
     % parameter provided below.
-    oi = myScene.render; %('reuse');
+    oi = myScene.render; %('reuse', true);
     imageFrames{ii} = oiGet(oi,'rgb');
 
     vcAddAndSelectObject(oi);

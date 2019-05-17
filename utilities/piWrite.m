@@ -237,7 +237,7 @@ end
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
 
-if isfield(renderRecipe.camera, 'motion') 
+if isfield(renderRecipe.camera, 'motion')
     motionTranslate = ...
         renderRecipe.camera.motion.activeTransformStart.pos - ...
         renderRecipe.camera.motion.activeTransformEnd.pos;
@@ -416,7 +416,7 @@ fclose(fileID);
 
 %% Overwrite Materials.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
-    % If the scene is from Cinema 4D, 
+    % If the scene is from Cinema 4D,
     if ~creatematerials
         % We overwrite from the input directory, but we do not create
         % any new material files beyond what is already in the input

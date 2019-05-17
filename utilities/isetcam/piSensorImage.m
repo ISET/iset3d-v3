@@ -8,7 +8,7 @@ function [img, filename] = piSensorImage(oi,varargin)
 %  Convert the oi through a sensor and the ip into an RGB image. We do this
 %  because the OI itself can be very high dynamic range, and the
 %  oiGet(oi,'rgb') may not save well.  This method always produces some
-%  sort of a reasonable image.  
+%  sort of a reasonable image.
 %
 % Input
 %   oi          - The optical image returned by the PBRT Docker container

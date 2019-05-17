@@ -1,5 +1,5 @@
 function camera = piCameraCreate(cameraType, varargin)
-% Return a camera structure to be placed in a recipe. 
+% Return a camera structure to be placed in a recipe.
 %
 % Syntax:
 %   camera = piCameraCreate(cameraType, lensFile, [varargin])
@@ -47,7 +47,7 @@ function camera = piCameraCreate(cameraType, varargin)
 %}
 
 % History:
-%    XX/XX/17  TL   SCIEN STANFORD 2017 
+%    XX/XX/17  TL   SCIEN STANFORD 2017
 %    04/02/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
 %    05/09/19  JNM  Merge Master in again
@@ -81,7 +81,7 @@ switch cameraType
 end
 p.addParameter('lensfile', lensDefault, @(x)(exist(x, 'file')));
 p.parse(cameraType, varargin{:});
-lensFile = p.Results.lensFile;
+lensFile = p.Results.lensfile;
 
 %% Initialize the default camera type
 switch cameraType

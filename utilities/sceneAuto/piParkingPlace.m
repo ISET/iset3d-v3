@@ -59,7 +59,7 @@ if parallelParking
             2 * remain_length) / interval);
         object_number = floor(density * (parking_list(jj).length - ...
             2 * remain_length) / interval);
-        
+
         rand_list = randperm(total_number);
         rand_length = rand_list(1:object_number) * 4 + ...
             remain_length * ones(1, object_number);
@@ -96,7 +96,7 @@ else
             2 * remain_length) / interval);
         object_number = floor(density * ...
             (parking_list(jj).length - 2 * remain_length) / interval);
-        
+
         rand_list = randperm(total_number);
         rand_length = rand_list(1:object_number) * 4 + ...
             remain_length * ones(1, object_number);

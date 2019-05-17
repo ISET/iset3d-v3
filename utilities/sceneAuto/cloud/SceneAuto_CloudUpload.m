@@ -35,8 +35,8 @@ sessionname = [];
 % piAssetsDownload_cloud('session', 'pedestrian');
 % piAssetsDownload_cloud('session', 'others');
 % piAssetsDownload_cloud('session', 'tree');
-% 
-% 
+%
+%
 % piAssetsDownload_cloud('session', 'others', ...
 %     'acquisition', 'streetlight_short_001');
 % piAssetsDownload_cloud('session', 'others', ...

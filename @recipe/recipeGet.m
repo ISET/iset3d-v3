@@ -23,7 +23,7 @@ function val = recipeGet(thisR, param, varargin)
 %       Camera and scene
 %           objectDistance    - Numeric. The magnitude ||(from - to)|| of
 %                               the difference between from and to. Units
-%                               are from the scene, typically in meters. 
+%                               are from the scene, typically in meters.
 %           objectDirection   - Vector. Unit length vector of from and to.
 %           lookAt            - Struct. A structure with four components.
 %           from              - Matrix. 1x3 matrix of the camera location.
@@ -172,13 +172,12 @@ switch ieParamFormat(param)
                 val = 'pinhole (perspective)';
             otherwise
                 % realisticeye and realisticDiffraction both work here.
-                % Need to test 'omni'               
+                % Need to test 'omni'
                 try
                     [~, val, ~] = fileparts(thisR.camera.lensfile.value);
                 catch
                     error('Unknown lens file %s\n', subType);
                 end
-                
         end
     case 'focaldistance'
         opticsType = thisR.get('optics type');

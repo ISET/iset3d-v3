@@ -37,17 +37,17 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Colorful scene
 % A complex, colorful scene with lots of different material types and
-% edges. 
+% edges.
 
 scene3d = sceneEye('colorfulScene');
 % For those who don't have a populated option 'Colorful Scene', use cube.
 % scene3d = sceneEye('coloredCube');
-               
-scene3d.fov = 30; 
+
+scene3d.fov = 30;
 scene3d.resolution = 128;
 scene3d.numRays = 128;
 scene3d.numCABands = 0;
-scene3d.accommodation = 1/1.3; 
+scene3d.accommodation = 1/1.3;
 
 % For this scene, bounces must be >6 because of glass materials
 scene3d.numBounces = 6;
@@ -84,7 +84,7 @@ scene3d.accommodation = 1/0.3; % Accommodate to the white pawn
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Chess Set scaled');
 oiWindow(oi);
 
@@ -103,7 +103,7 @@ scene3d.accommodation = 1/2.78;
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'One Snellen E');
 ieAddObject(oi);
 oiWindow;
@@ -120,7 +120,7 @@ scene3d.accommodation = 1 / 0.8;
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Snellen at depth');
 oiWindow(oi);
 
@@ -145,7 +145,7 @@ scene3d.recipe = piAddSphere(scene3d.recipe, 'rgb', [0.05 1 0], ...
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-[oi, results] = scene3d.render(); %'reuse');
+[oi, results] = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'blankScene_with_spheres');
 oiWindow(oi);
 
@@ -161,7 +161,7 @@ scene3d.accommodation = 1 / (200e-3); % Accommodate to "200"
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Numbers at depth');
 oiWindow(oi);
 
@@ -180,7 +180,7 @@ scene3d.accommodation = 1 / 3; % Accommodate to the plane
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Slanted edge');
 oiWindow(oi);
 
@@ -199,7 +199,7 @@ scene3d.accommodation = 1 / 2; % Accommodate to the bottom plane
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Slanted edge texture');
 oiWindow(oi);
 
@@ -222,7 +222,7 @@ scene3d.accommodation = 1; % Accommodate to the plane
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Textured plane');
 oiWindow(oi);
 
@@ -250,7 +250,7 @@ scene3d.accommodation = 1; % Accommodate to the point
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Point');
 oiWindow(oi);
 
@@ -271,7 +271,7 @@ scene3d.accommodation = 1; % Accommodate to the point
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Letters at depth');
 oiWindow(oi);
 
@@ -289,7 +289,7 @@ scene3d.accommodation = 1 / 2.78;
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Colored cube 1');
 oiWindow(oi);
 
@@ -306,7 +306,7 @@ end
 
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = scene3d.render(); %'reuse');
+oi = scene3d.render(); %'reuse', true);
 oi = oiSet(oi, 'name', 'Colored cube 2');
 oiWindow(oi);
 

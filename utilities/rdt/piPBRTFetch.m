@@ -87,7 +87,7 @@ p.addRequired('aName', @ischar);
 p.addParameter('destinationfolder', fullfile(piRootPath, 'data'), @ischar);
 p.addParameter('unzip', true, @islogical);
 p.addParameter('deletezip', false, @islogical);
-p.addParameter('pbrtversion', 2, @(x)(x == 2 || x == 3));
+p.addParameter('pbrtversion', 3, @(x)(x == 2 || x == 3));
 p.addParameter('remotedirectory', '/resources/scenes/pbrt', @ischar);
 
 p.parse(aName, varargin{:});

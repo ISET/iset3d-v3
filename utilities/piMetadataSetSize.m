@@ -29,7 +29,7 @@ r = oiGet(oi, 'rows');
 c = oiGet(oi, 'cols');
 rSamples = (0:(r - 1));
 cSamples = (0:(c - 1));
-sampleHeight = oiGet(oi, 'hres'); 
+sampleHeight = oiGet(oi, 'hres');
 sampleWidth = oiGet(oi, 'wres');
 [theseRows, theseCols] = sample2space(rSamples, cSamples, ...
     sampleHeight, sampleWidth);
@@ -48,15 +48,15 @@ sampleHeight = sensorGet(sensor, 'hres');
 sampleWidth = sensorGet(sensor, 'wres');
 [newRows, newCols] = sample2space(rSamples, cSamples, ...
     sampleHeight, sampleWidth);
-[X, Y] = meshgrid(newCols, newRows); 
+[X, Y] = meshgrid(newCols, newRows);
 
 sensor.metadata.meshImage = interp2(U, V, ...
     double(sensor.metadata.meshImage), X, Y, 'nearest');
 sensor.metadata.depthMap = interp2(U, V, ...
     sensor.metadata.depthMap, X, Y, 'nearest');
-        
+       
 % % crop depth and mesh
-% 
+%
 % sensor.metadata.meshImage = imcrop(sensor.metadata.meshImage, crop_rec);
 % sensor.metadata.depthMap = imcrop(sensor.metadata.depthMap, crop_rec);
 

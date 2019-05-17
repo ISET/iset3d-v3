@@ -66,7 +66,7 @@ myScene.accommodation = 1 / distance;
 myScene.name = sprintf('%0.2fdiopters', myScene.accommodation);
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-[oi, result] = myScene.render; %('reuse');
+[oi, result] = myScene.render; %('reuse', true);
 vcAddAndSelectObject(oi);
 oiWindow
 
@@ -76,6 +76,6 @@ myScene.accommodation = 1 / 0.1;
 myScene.name = sprintf('%0.2fdiopters', myScene.accommodation);
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oi = myScene.render; %('reuse');
+oi = myScene.render; %('reuse', true);
 vcAddAndSelectObject(oi);
 oiWindow

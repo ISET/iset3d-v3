@@ -190,7 +190,7 @@ for kk = 1:length(objects.assets)
                 end
         end
 
-        % tmp = tmp + 1; 
+        % tmp = tmp + 1;
         % disp(tmp);
     end
 end

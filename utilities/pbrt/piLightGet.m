@@ -1,8 +1,8 @@
 function lightSources = piLightGet(thisR, varargin)
 % Read light sources struct from thisR
-% 
+%
 % Zhenyi, SCIEN, 2019
-% 
+%
 varargin = ieParamFormat(varargin);
 p  = inputParser;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));

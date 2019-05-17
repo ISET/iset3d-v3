@@ -10,11 +10,11 @@
 % isetbio.  But for now sign in to download them as isetbio.
 %
 % The remote path for V2 and V3 files is becoming
-%        
-%      RdtClient.crp('/resources/scenes/pbrt/V{2,3}') 
+%
+%      RdtClient.crp('/resources/scenes/pbrt/V{2,3}')
 %
 % where you choose 2 or 3.  The default in piPBRTFetch is V2.
-% 
+%
 % Wandell, January, 2018
 
 %{
@@ -45,7 +45,7 @@ unzip(file);
  % ChessSet, CityScene, NumbersAtDepth, MultiObject-City-1-Placement-2
  % plantsDusk, sanmiguel, whiteScene, yeahright, texturedPlane
  % SlantedBar, teapot-area, villaLights
- 
+
  zipFile = piPBRTFetch('whiteScene','unzip',false,'destination folder',fullfile(piRootPath,'local'));
  piPBRTPush(zipFile,'pbrt version','v2','rd',rdt);
 
@@ -105,7 +105,7 @@ rdt.publishArtifact(artifactPath);
 artifactPath = fullfile(pwd,'SlantedBar.zip');
 rdt.publishArtifact(artifactPath);
 
-% 5 
+% 5
 artifactPath = fullfile(pwd,'NumbersAtDepth.zip');
 rdt.publishArtifact(artifactPath);
 

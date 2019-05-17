@@ -1,6 +1,6 @@
 function thisR = piLightAdd(thisR, varargin)
 %% Add different type of light sources to a scene
-% 
+%
 % Inputs:
 %       thisR: render recipe
 %       types:
@@ -9,7 +9,7 @@ function thisR = piLightAdd(thisR, varargin)
 %             distant: It represents a directional light source "at infinity".
 %       other related parameters for each type of light source
 % Outputs:
-%        
+%
 % Required: ISETCam
 % See also: piSkymapAdd(Add HDR lighting for global illumination)
 % Zhenyi, SCIEN, 2019
@@ -32,9 +32,9 @@ p.addParameter('lightspectrum', 'D65');
 p.addParameter('pointfrom', [0 0 0]);
 % used for spot light
 p.addParameter('pointto', [0 0 1]);
-% The angle that the spotlight's cone makes with its primary axis. 
-% For directions up to this angle from the main axis, the full radiant 
-% intensity given by "I" is emitted. After this angle and up to 
+% The angle that the spotlight's cone makes with its primary axis.
+% For directions up to this angle from the main axis, the full radiant
+% intensity given by "I" is emitted. After this angle and up to
 % "coneangle" + "conedeltaangle", illumination falls off until it is zero.
 p.addParameter('coneangle', 30, @isnumeric); % It's 30 by default
 % The angle at which the spotlight intensity begins to fall off at the edges.
@@ -80,7 +80,7 @@ switch type
         else
             Lightsource{numLights+1}.line{2,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
                 lightSpectrum, pointFrom);
-        end    
+        end
     case 'spot'
         Lightsource{numLights+1}.line{2,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, pointFrom, pointTo);
@@ -89,7 +89,7 @@ switch type
         Lightsource{numLights+1}.line{2,:} = [Lightsource{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
         Lightsource{numLights+1}.line{2,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, pointFrom, pointTo);        
+                lightSpectrum, pointFrom, pointTo);
 end
 Lightsource{numLights+1}.line{end+1} = 'AttributeEnd';
 
