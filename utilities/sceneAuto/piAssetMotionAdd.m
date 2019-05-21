@@ -7,7 +7,7 @@ p.addParameter('Z',[],@iscell);
 p.addParameter('instancesNum',1)
 p.parse(varargin{:})
 translation = p.Results.translation;
-pos_d = p.Results.Pos_demention;
+pos_d = p.Results.instancesNum;
 Y     = p.Results.Y;
 Z     = p.Results.Z;
 %%

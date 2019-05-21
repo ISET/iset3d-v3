@@ -6,7 +6,7 @@ p.addParameter('instancesNum',1);
 p.addParameter('Y',[],@iscell);
 p.addParameter('Z',[],@iscell);
 p.parse(varargin{:})
-pos_d = p.Results.Pos_demention;
+pos_d = p.Results.instancesNum;
 Y     = p.Results.Y;
 Z     = p.Results.Z;
 %%

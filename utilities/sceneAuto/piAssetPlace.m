@@ -83,8 +83,8 @@ if nScene == 1
                 end
                 index = index+1;
             end
-            assets_updated.(assetClass)(ii).geometry = piAssetTranslate(assets.(assetClass)(ii).geometry,position,'Pos_demention',n);
-            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,'Y',rotationY,'Z',slope,'Pos_demention',n);
+            assets_updated.(assetClass)(ii).geometry = piAssetTranslate(assets.(assetClass)(ii).geometry,position,'instancesNum',n);
+            assets_updated.(assetClass)(ii).geometry = piAssetRotate(assets_updated.(assetClass)(ii).geometry,'Y',rotationY,'Z',slope,'instancesNum',n);
         end
     end
     assetsPosList{1} = assets_updated;

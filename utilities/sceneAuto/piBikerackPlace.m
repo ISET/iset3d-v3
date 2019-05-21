@@ -42,8 +42,8 @@ for ii = 1: length(assetPosList_tmp)
                 rotationY{gg} = assetPosList(jj).rotate;
                 gg = gg+1;
             end
-            assets_updated(ii).geometry(hh) = piAssetTranslate(asset(ii).geometry(hh),position,'Pos_demention',n);
-            assets_updated(ii).geometry(hh) = piAssetRotate(assets_updated(ii).geometry(hh),'Y',rotationY,'Pos_demention',n);
+            assets_updated(ii).geometry(hh) = piAssetTranslate(asset(ii).geometry(hh),position,'instancesNum',n);
+            assets_updated(ii).geometry(hh) = piAssetRotate(assets_updated(ii).geometry(hh),'Y',rotationY,'instancesNum',n);
             assets_updated(ii).fwInfo       = asset(ii).fwInfo;
         end
 %     end

@@ -1,8 +1,8 @@
-function [img, filename] = piSensorImage(oi,varargin)
+function [img, filename, sensor, ip] = piSensorImage(oi,varargin)
 % Make an image from the OI after passing through a sensor and ip pipeline
 %
 % Syntax
-%   [img,filename] = piSensorImage(oi, ...)
+%   [img, filename, sensor, ip] = piSensorImage(oi, ...)
 %
 % Description
 %  Convert the oi through a sensor and the ip into an RGB image. We do this
@@ -25,6 +25,11 @@ function [img, filename] = piSensorImage(oi,varargin)
 %
 % See also
 %
+% TODO:
+%   Return a camera, with the oi, sensor and ip, rather than separate
+%   items.
+%   Allow setting parameters here, or maybe just run cameraCompute with the
+%   returned camera.  To decide.
 
 % Examples:
 %{
