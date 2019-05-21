@@ -72,12 +72,6 @@ player = pcplayer([min(x(:)), nanmax(x(:))],...
 ptCloud = pointCloud([x(:),z(:),y(:)]);
 view(player,ptCloud);
 %}
-
-
-
-
-
-
 %% Render.  
 
 % Maybe we should speed this up by only returning radiance.

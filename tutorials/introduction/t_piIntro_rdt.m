@@ -33,8 +33,8 @@ end
 
 %% Read the scene file for the Remote Data site
 
-% sceneName = 'white-room'; sceneFileName = 'scene.pbrt';
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+sceneName = 'white-room'; sceneFileName = 'scene.pbrt';
+% sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
 % The output will be written here
 inFolder = fullfile(piRootPath,'local');

@@ -122,8 +122,10 @@ switch str
         fprintf('Number:  %d\n',nAssets);
         nMoving = 0;
         for ii=1:nAssets
-            if ~isempty(out(ii).motion)
-                nMoving = nMoving + 1;
+            if isfield(out, 'motion')
+                if ~isempty(out(ii).motion)
+                    nMoving = nMoving + 1;
+                end
             end
         end
         fprintf('Moving  assets: %d\n',nMoving);

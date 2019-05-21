@@ -8,6 +8,8 @@ p  = inputParser;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));
 p.addParameter('print',true);
 p.parse(thisR, varargin{:});
+lightSources = [];
+%%
 
 AttBegin = find(piContains(thisR.world,'AttributeBegin'));
 AttEnd   = find(piContains(thisR.world,'AttributeEnd'));
@@ -24,8 +26,12 @@ if p.Results.print
     disp('---------------------')
     disp('*****Light Type******')
     for ii = 1:length(lightSources)
+        if piContains(lightSources{ii}.line,'AreaLightSource')
+            lightType = 'Area';
+        else
         lightType = lightSources{ii}.line{piContains(lightSources{ii}.line,'LightSource')};
         lightType = strsplit(lightType, ' ');
+        end
         fprintf('%d: %s \n', ii, lightType{2});
     end
 end
