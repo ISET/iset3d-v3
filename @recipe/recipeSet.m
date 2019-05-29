@@ -162,15 +162,31 @@ switch param
             warning('focus distance parameter not applicable for version 2');
         end
     case 'fov'
+        % This sets a horizontal fov
         % We should check that this is a pinhole, I think
         % This is only used for pinholes, not realistic camera case. 
-        if isequal(thisR.camera.subtype,'pinhole')
-            thisR.camera.fov.value = val;
-            thisR.camera.fov.type = 'float';
+        if isequal(thisR.camera.subtype,'pinhole')||...
+                isequal(thisR.camera.subtype,'perspective')
+            if length(val)==1
+                thisR.camera.fov.value = val;
+                thisR.camera.fov.type = 'float';
+            else
+                % if two fov is given [hor, ver], we should resize film
+                % acoordingly
+                filmRes = thisR.get('film resolution');
+                fov = min(val);
+                thisR.camera.fov.value = fov;
+                thisR.camera.fov.type = 'float';
+                if fov == val(1)
+                    thisR.set('film resolution',[filmRes(1), filmRes(2)*val(2)/val(1)]);
+                else
+                    thisR.set('film resolution',[filmRes(1)*val(1)/val(2), filmRes(2)]);
+                end
+                disp('film ratio is changed!')
+            end
         else
             warning('fov not set for camera models');
-        end
-        
+        end    
     case 'diffraction'
         if(thisR.version == 2)
             thisR.camera.diffractionEnabled.value = val;

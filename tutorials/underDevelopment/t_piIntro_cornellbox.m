@@ -15,7 +15,8 @@ thisR.summarize;
 thisR = piLightAdd(thisR, 'type', 'area', 'lightspectrum', 'Tungsten');
 %%
 filmRes = thisR.get('film resolution');
-thisR.set('film resolution',filmRes/1.5);
+thisR.set('fov',[15 30]); % by default, the fov is setted as horizontal and vertical
+% thisR.set('film resolution',filmRes);
 thisR.set('pixel samples',16);
 thisR.set('nbounces',5);
 thisR.integrator.subtype ='directlighting'; 

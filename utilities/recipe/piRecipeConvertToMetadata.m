@@ -59,6 +59,8 @@ filter.ywidth.value = 0.5;
 filter.ywidth.type = 'float';
 metadataRecipe.filter = filter;
 
+% TODO: Add flag into film
+
 % Error checking
 if(isempty(recipe.outputFile))
     error('Recipe output file is empty.');
