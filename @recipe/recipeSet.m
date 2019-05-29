@@ -164,7 +164,8 @@ switch param
     case 'fov'
         % We should check that this is a pinhole, I think
         % This is only used for pinholes, not realistic camera case. 
-        if isequal(thisR.camera.subtype,'pinhole')
+        if isequal(thisR.camera.subtype,'pinhole') || ...
+            isequal(thisR.camera.subtype,'perspective')
             thisR.camera.fov.value = val;
             thisR.camera.fov.type = 'float';
         else
