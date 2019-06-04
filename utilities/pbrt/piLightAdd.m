@@ -82,13 +82,13 @@ switch type
                 lightSpectrum, from);
         end    
     case 'spot'
-        lightSources{numLights+1}.line{2,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        lightSources{numLights+1}.line{2,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
         lightSources{numLights+1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
-        lightSources{numLights+1}.line{2,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        lightSources{numLights+1}.line{2,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
     case 'area'
         % find area light geometry info
