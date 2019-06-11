@@ -11,6 +11,16 @@ function combinedLens  = piCameraInsertMicrolens(microLens,imagingLens,varargin)
 % Optional key/value pairs
 %   output name:   File name of the output combined lens
 %
+% These parameters were chosen for a 2 micron pixel, 4 micron super
+%       pixel, 3 super pixels behind each microlenses, 64 x 64
+%       microlenses
+%   xdim    - N microlens in xdim  (64)
+%   ydim    - N microlens in ydim  (64)
+%   filmwidth   -   6 microns for the 3 superpixels behind the microlens; 64 superpixels, so 0.384 (mm)
+%   filmheight  -   6 microns for the 3 superpixels behind the microlens; 64 superpixels, so 0.384 (mm)
+%   filmtomicrolens - 0 micron, but just guessing here.  Not sure
+%                     about units either, but 0 works for all of them.
+%
 % Output
 %   combinedLens - Full path to the output file
 %
@@ -74,6 +84,12 @@ p.addRequired('microLens',vFile);
 
 p.addParameter('outputname','',@ischar);
 
+p.addParameter('xdim',16,@isscalar);
+p.addParameter('ydim',16,@isscalar);
+p.addParameter('filmheight',0.384,@isscalar);
+p.addParameter('filmwidth',0.384,@isscalar);
+p.addParameter('filmtomicrolens',0,@isscalar);
+
 p.parse(imagingLens,microLens,varargin{:});
 
 % This should be a full path
@@ -83,7 +99,12 @@ else
     combinedLens = p.Results.outputname;
 end
 
+xdim = p.Results.xdim;
+ydim = p.Results.ydim;
+filmheight = p.Results.filmheight;
+filmwidth  = p.Results.filmwidth;
 
+filmtomicrolens = p.Results.filmtomicrolens;
 %% Remember where you started 
 
 % Basic docker command
@@ -119,7 +140,9 @@ end
 
 %% Set up the lens tool command to run
 
-lensToolCommand = sprintf('lenstool insertmicrolens -xdim 8 -ydim 8 %s %s %s',imagingLens,microLens,combinedLens);
+% Need to add the other parameters
+lensToolCommand = sprintf('lenstool insertmicrolens -xdim %d -ydim %d -filmheight %f -filmwidth %f -filmtomicrolens %f %s %s %s',...
+    xdim,ydim,filmheight,filmwidth,filmtomicrolens,imagingLens,microLens,combinedLens);
 
 cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, lensToolCommand);
 fprintf('Mounting folder %s\n',outputFolder);
