@@ -1,6 +1,6 @@
-%% Read and show a microlens
+%% Creating a microlens plus imaging lens calculation
 %
-% Requires the isetlens toolbox
+% Uses the isetlens toolbox
 %
 % See also
 %   piCameraInsertMicrolens
@@ -10,7 +10,9 @@
 ieInit
 piDockerConfig;
 
-%%
+%% Shows the lenses
+
+% This is just for clarification.  
 microLensName = 'microlens.2um.Example.json';
 microLens = lensC('filename','microlens.2um.Example.json');
 microLens.draw;
@@ -23,11 +25,26 @@ imagingLens.draw;
 %
 combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
 
+%% Set other than the default parameters
+
+chdir(fullfile(piRootPath,'local'));
+microLensName   = 'microlens.2um.Example.json';
+imagingLensName = 'dgauss.22deg.3.0mm.json';
+combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName, ...
+    'xdim',32, 'ydim',32);
+
+% Have a look at the output
+%  edit(combinedLens);
+lensInfo = jsonread(combinedLens);
+
+% Some questions -
+%  Given that we set the filmwidth and filmheight, should we be able to
+%  read these from the lens file?  Same with filmtomicrolens
 %% Help command for the lenstool insertmicrolens
 %
 % Copy and paste this into a terminal window
 %
-docker run -ti --rm vistalab/pbrt-v3-spectral lenstool 
+status = system('docker run -ti --rm vistalab/pbrt-v3-spectral lenstool');
 
 %% Example of a docker command for the lenstool insertmicrolens
 %
