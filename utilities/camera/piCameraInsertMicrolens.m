@@ -1,9 +1,13 @@
-function combinedLens  = piCameraInsertMicrolens(microLens,imagingLens,varargin)
-% Create a file that inserts a microlens behind an imaging lens.
+function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,varargin)
+% Combine a microlens with an imaging lens into a lens file
 %
 % Syntax
 %   combinedLens  = piCameraInsertMicrolens(microLens,imagingLens,varargin)
 %
+% Brief description:
+%   When the microlens is included in the lens file, PBRT-V3-SPECTRAL
+%   includes the microlens into the ray tracing calculation.
+%   
 % Inputs
 %    microLens:    File name
 %    imagingLens:  File name
@@ -23,6 +27,7 @@ function combinedLens  = piCameraInsertMicrolens(microLens,imagingLens,varargin)
 %
 % Output
 %   combinedLens - Full path to the output file
+%   cmd  - Full docker command that was built
 %
 % Description
 %
@@ -56,21 +61,28 @@ function combinedLens  = piCameraInsertMicrolens(microLens,imagingLens,varargin)
 
 % Example:
 %{
-chdir(fullfile(isetRootPath,'local'));
-microLensName   = 'microlens.2um.Example.json';
-imagingLensName = 'dgauss.22deg.3.0mm.json';
-combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
-edit(combinedLens);
+ chdir(fullfile(isetRootPath,'local'));
+ microLensName   = 'microlens.2um.Example.json';
+ imagingLensName = 'dgauss.22deg.3.0mm.json';
+ combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
+ % edit(combinedLens);
 %}
 %{
-chdir(fullfile(isetRootPath));
-microLensName   = 'microlens.2um.Example.json';
-imagingLensName = 'dgauss.22deg.3.0mm.json';
-combinedLens = fullfile(isetRootPath,'local','combinedLens.json');
-combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName,'output name',combinedLens);
-
-edit(combinedLens);
+ chdir(fullfile(isetRootPath));
+ microLensName   = 'microlens.2um.Example.json';
+ imagingLensName = 'dgauss.22deg.3.0mm.json';
+ combinedLens = fullfile(isetRootPath,'local','combinedLens.json');
+ combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName,...
+                 'output name','', ...
+                 'film height',1, 'film width',1);
+ % edit(combinedLens);
 %}
+
+%% Programming TODO
+%
+%   The filmheight and filmwidth seem to have an error when less than 1.
+%   Checking with Mike Mara.
+%
 
 %% Parse inputs
 
@@ -94,15 +106,18 @@ p.parse(imagingLens,microLens,varargin{:});
 
 % This should be a full path
 if isempty(p.Results.outputname)
-    combinedLens = fullfile(pwd,sprintf('%s+%s',imagingLens,microLens));
+    [~,imagingName,~]   = fileparts(imagingLens);
+    [~,microLensName,e] = fileparts(microLens);
+    combinedLens = fullfile(pwd,sprintf('%s+%s',imagingName,[microLensName,e]));
 else
     combinedLens = p.Results.outputname;
 end
 
 xdim = p.Results.xdim;
 ydim = p.Results.ydim;
-filmheight = p.Results.filmheight;
-filmwidth  = p.Results.filmwidth;
+
+filmheight = ceil(p.Results.filmheight);
+filmwidth  = ceil(p.Results.filmwidth);
 
 filmtomicrolens = p.Results.filmtomicrolens;
 %% Remember where you started 
@@ -149,7 +164,7 @@ fprintf('Mounting folder %s\n',outputFolder);
 
 status = system(cmd);
 if status
-    error('Docker command problem');
+    error('Docker command problem: %s\n',cmd);
 end
 
 
