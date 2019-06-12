@@ -20,8 +20,9 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 %       microlenses
 %   xdim    - N microlens in xdim  (64)
 %   ydim    - N microlens in ydim  (64)
-%   filmwidth   -   6 microns for the 3 superpixels behind the microlens; 64 superpixels, so 0.384 (mm)
-%   filmheight  -   6 microns for the 3 superpixels behind the microlens; 64 superpixels, so 0.384 (mm)
+%   filmwidth   -   4 microns for each of the 3 superpixels behind the
+%                   microlens; 84 superpixels, 84 * 12 (um) ~ 1 mm
+%   filmheight  -  
 %   filmtomicrolens - 0 micron, but just guessing here.  Not sure
 %                     about units either, but 0 works for all of them.
 %
@@ -65,7 +66,7 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
  microLensName   = 'microlens.2um.Example.json';
  imagingLensName = 'dgauss.22deg.3.0mm.json';
  combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
- % edit(combinedLens);
+ thisLens = jsonread(combinedLens);
 %}
 %{
  chdir(fullfile(isetRootPath));
@@ -75,7 +76,7 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
  combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName,...
                  'output name','', ...
                  'film height',1, 'film width',1);
- % edit(combinedLens);
+ thisLens = jsonread(combinedLens);
 %}
 
 %% Programming TODO
@@ -96,10 +97,10 @@ p.addRequired('microLens',vFile);
 
 p.addParameter('outputname','',@ischar);
 
-p.addParameter('xdim',16,@isscalar);
-p.addParameter('ydim',16,@isscalar);
-p.addParameter('filmheight',0.384,@isscalar);
-p.addParameter('filmwidth',0.384,@isscalar);
+p.addParameter('xdim',84,@isscalar);
+p.addParameter('ydim',84,@isscalar);
+p.addParameter('filmheight',1,@isscalar);
+p.addParameter('filmwidth',1,@isscalar);
 p.addParameter('filmtomicrolens',0,@isscalar);
 
 p.parse(imagingLens,microLens,varargin{:});
@@ -126,7 +127,7 @@ filmtomicrolens = p.Results.filmtomicrolens;
 dockerCommand   = 'docker run -ti --rm';
 
 % Where you want stuff to run
-outputFolder = fileparts(combinedLens);
+outputFolder  = pwd;
 dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
 dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
 

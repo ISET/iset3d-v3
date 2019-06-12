@@ -80,7 +80,8 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'realistic';
         camera.lensfile.type = 'string';
-        camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
+        camera.lensfile.value = which(lensFile);
+        % camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
         camera.aperturediameter.type = 'float';
         camera.aperturediameter.value = 5;    % mm
         camera.focusdistance.type = 'float';
@@ -95,7 +96,8 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'omni';
         camera.lensfile.type = 'string';
-        camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
+        camera.lensfile.value = which(lensFile);
+        % camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
         camera.aperturediameter.type = 'float';
         camera.aperturediameter.value = 5;    % mm
         camera.focusdistance.type = 'float';
@@ -106,7 +108,8 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
-        camera.specfile.value = fullfile(piRootPath,'data','lens',lensFile);
+        camera.specfile.value = which(lensFile);
+        % camera.specfile.value = fullfile(piRootPath,'data','lens',lensFile);
         camera.filmdistance.type = 'float';
         camera.filmdistance.value = 50;    % mm
         camera.aperture_diameter.type = 'float';
