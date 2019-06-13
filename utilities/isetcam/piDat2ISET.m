@@ -92,13 +92,37 @@ switch opticsType
         % If we used a lens, the ieObject is an optical image (irradiance).
         
         % We specify the mean illuminance of the OI mean illuminance
-        % with respect to a 1mm^2 aperture. That way, if we change the
-        % aperture, but nothing else, the level will scale correctly.
+        % with respect to a 1 mm^2 aperture. That way, if we change
+        % the aperture, but nothing else, the illuminance level will
+        % scale correctly.
 
-        % Try to find the optics parameters from the PBRT recipe
-        [focalLength, fNumber, filmDiag, ~, success] = ...
-            piRecipeFindOpticsParams(thisR);
+        % Try to find the optics parameters from the lensfile in the
+        % PBRT recipe.  The function looks for metadata, if it cannot
+        % find that slot it tries to decode the file name.  The file
+        % name part should go away before too long because we can just
+        % create the metadata once from the file name.
+        [focalLength, fNumber] = piRecipeFindOpticsParams(thisR);
         
+        % Start building the oi
+        ieObject = piOICreate(photons);
+        
+        % Set the parameters the best we can from the lens file.
+        if ~isempty(focalLength), oiSet(ieObject,'optics focal length',focalLength); end
+        if ~isempty(fNumber), oiSet(ieObject,'optics fnumber',fNumber); end
+        
+        % Calculate and set the oi 'fov' using the film diagonal size
+        % and the lens information
+        filmDiag = recipe.get('film diagonal')*10^-3;  % In meters
+        res = recipe.get('film resolution');
+        x = res(1); y = res(2);
+        d = sqrt(x^2 + y^2);          % Number of samples along the diagonal
+        fwidth = (filmDiag / d) * x;  % Diagonal size by d gives us mm per step
+        focalLength = oiGet(oi,'optics focal length');
+        fov = 2 * atan2d(fwidth / 2, focalLength);
+        oiSet(ieObject,'fov',fov);
+        
+        %{
+        % Old code.
         if(success)
             ieObject = piOICreate(photons,...
                 'focalLength',focalLength,...
@@ -107,9 +131,9 @@ switch opticsType
             aperture = (focalLength/fNumber);
         else
             % We could not find the optics parameters. Using default.
-            ieObject = piOICreate(photons);
             aperture = oiGet(ieObject,'optics aperture diameter');
         end
+        %}
         
         ieObject = oiSet(ieObject,'name',ieObjName);
 
@@ -121,9 +145,10 @@ switch opticsType
             warning('Render recipe is not specified.');
         end
         
-        % We always set meanIlluminance per square millimeter of the
-        % lens aperture
+        % We set meanIlluminance per square millimeter of the lens
+        % aperture.
         if(scaleIlluminance)
+            aperture = oiGet(ieObject,'optics aperture diameter');
             lensArea = pi*(aperture*1e3/2)^2;
             meanIlluminance = meanIlluminance*lensArea;
             

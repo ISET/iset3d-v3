@@ -1,9 +1,13 @@
-function [focalLength, fNumber, filmDiag, fov, success] = piRecipeFindOpticsParams(recipe)
-% Search through a recipe and return relevant optics parameters that will
-% be used to populate parameters with the optical image.
+function [focalLength, fNumber, metadata] = piRecipeFindOpticsParams(recipe)
+% Search through a recipe for optics parameters to use in the ISET optical image.
 %
 % Syntax:
-%    [focalLength, fNumber, filmDiag] = piRecipeFindOpticsParams(recipe)
+%    [focalLength, fNumber, metadata] = piRecipeFindOpticsParams(recipe)
+%
+% Despcription
+%  We are trying to add a 'metadata' slot to the lens file and put
+%  these values there.  Less reliably, we have some means for finding
+%  them in the file name.
 %
 % Input
 %  recipe
@@ -14,12 +18,17 @@ function [focalLength, fNumber, filmDiag, fov, success] = piRecipeFindOpticsPara
 %    filmDiag    - meters
 %
 % TL, SCIEN Stanford, 2017
+%
+% See also:
+%   piOICreate
 
 focalLength = [];
-fNumber = [];
-filmDiag = [];
-fov = [];
-success = 0;
+fNumber     = [];
+metadata    = false;
+
+% filmDiag = [];
+% fov = [];
+% success = 0;
 
 switch recipe.version
     case 2
@@ -42,7 +51,19 @@ if(strcmp(recipe.camera.subtype,'realisticEye'))
     return;
 end
 
+% The lensName is also the file name (minus the json extension)
+% Check for the metadata slot.  Mostly it should be there.
+thisLens = jsonread([lensName,'.json']);
+if isfield(thisLens,'metadata')
+    metadata = true;
+    focalLength = thisLens.metadata.focalLength;
+    fNumber     = thisLens.metadata.fNumber;
+    return;
+end
+
+% If we get here, we try to extract from the file name. Not preferred.
 try
+    warning('Decoding lens parameters from lens file name');
     % Guess focal length (effective) from lens name
     focalLength = str2double(extractBetween(lensName,'deg.','mm'));
     focalLength = focalLength*10^-3; % meters
@@ -104,16 +125,21 @@ try
     end
     
     fNumber = focalLength/(apertureDiameter*10^-3);
-    filmDiag = recipe.get('filmdiagonal')*10^-3;
     
-    res = recipe.get('filmresolution');
+    %{
+    % Try to get the film properties
+    % Though is this the right idea when we have a lens???
+    filmDiag = recipe.get('film diagonal')*10^-3;
+    
+    res = recipe.get('film resolution');
     x = res(1); y = res(2);
     
-    d = sqrt(x^2 + y^2);  % Number of samples along the diagonal
-    fwidth= (filmDiag / d) * x;    % Diagonal size by d gives us mm per step
+    d = sqrt(x^2 + y^2);         % Number of samples along the diagonal
+    fwidth= (filmDiag / d) * x;  % Diagonal size by d gives us mm per step
     fov = 2 * atan2d(fwidth / 2, focalLength);
     
     success = 1;
+    %}
     
 catch
     warning('Could not determine optics parameters from recipe. Leaving OI parameter values as default.')
