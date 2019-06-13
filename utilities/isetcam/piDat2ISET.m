@@ -128,20 +128,6 @@ switch opticsType
         fov         = 2 * atan2d(filmwidth / 2, focalLength);
         ieObject    = oiSet(ieObject,'fov',fov);
         
-        %{
-        % Old code.
-        if(success)
-            ieObject = piOICreate(photons,...
-                'focalLength',focalLength,...
-                'fNumber',fNumber,...
-                'filmDiag',filmDiag);
-            aperture = (focalLength/fNumber);
-        else
-            % We could not find the optics parameters. Using default.
-            aperture = oiGet(ieObject,'optics aperture diameter');
-        end
-        %}
-        
         ieObject = oiSet(ieObject,'name',ieObjName);
 
         ieObject = oiSet(ieObject,'optics model','iset3d');
