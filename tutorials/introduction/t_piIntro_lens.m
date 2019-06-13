@@ -51,8 +51,8 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*0.5));  % 1.5 is pretty high res
-thisR.set('pixel samples',64);                    % 4 is Lots of rays .
+thisR.set('film resolution',round([600 600]*2));  % 1.5 is pretty high res
+thisR.set('pixel samples',512);                    % 4 is Lots of rays .
 
 %% Set output file
 
@@ -64,7 +64,7 @@ outputDir = fileparts(outFile);
 %% Add camera with lens
 
 % 22deg is the half width of the field of view
-lensfile = 'dgauss.22deg.50.0mm.json';
+lensfile = 'wide.56deg.3.0mm.json';
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
@@ -85,7 +85,7 @@ thisR.set('focus distance',0.6);
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters (default 22)
-thisR.set('film diagonal',22);
+thisR.set('film diagonal',12);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
@@ -108,9 +108,10 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',6);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
-oi = piRender(thisR,'render type','both');
+oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
+%%
 depth = piRender(thisR,'render type','depth');imagesc(depth);
 %% Change this for depth of field effects.
 
