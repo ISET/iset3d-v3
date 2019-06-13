@@ -6,7 +6,6 @@
 % Check that you have the updated docker image by running
 %
 %    docker pull vistalab/pbrt-v3-spectral
-%    docker pull vistalab/pbrt-v3-spectral:test
 %
 % ZL, BW SCIEN 2018
 %
@@ -111,8 +110,11 @@ piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
+
 %%
-depth = piRender(thisR,'render type','depth');imagesc(depth);
+depth = piRender(thisR,'render type','depth');
+ieNewGraphWin;
+imagesc(depth);
 %% Change this for depth of field effects.
 
 
