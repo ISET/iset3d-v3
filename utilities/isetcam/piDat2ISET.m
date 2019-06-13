@@ -107,19 +107,26 @@ switch opticsType
         ieObject = piOICreate(photons);
         
         % Set the parameters the best we can from the lens file.
-        if ~isempty(focalLength), oiSet(ieObject,'optics focal length',focalLength); end
-        if ~isempty(fNumber), oiSet(ieObject,'optics fnumber',fNumber); end
+        if ~isempty(focalLength)
+            ieObject = oiSet(ieObject,'optics focal length',focalLength); 
+        end
+        if ~isempty(fNumber)
+            ieObject = oiSet(ieObject,'optics fnumber',fNumber); 
+        end
         
         % Calculate and set the oi 'fov' using the film diagonal size
-        % and the lens information
-        filmDiag = recipe.get('film diagonal')*10^-3;  % In meters
-        res = recipe.get('film resolution');
-        x = res(1); y = res(2);
-        d = sqrt(x^2 + y^2);          % Number of samples along the diagonal
-        fwidth = (filmDiag / d) * x;  % Diagonal size by d gives us mm per step
-        focalLength = oiGet(oi,'optics focal length');
-        fov = 2 * atan2d(fwidth / 2, focalLength);
-        oiSet(ieObject,'fov',fov);
+        % and the lens information.  First get width of the film size.
+        % This could be a function inside of get.
+        filmDiag = thisR.get('film diagonal')*10^-3;  % In meters
+        res      = thisR.get('film resolution');
+        x        = res(1); y = res(2);
+        d        = sqrt(x^2 + y^2);        % Number of samples along the diagonal
+        filmwidth   = (filmDiag / d) * x;  % Diagonal size by d gives us mm per step
+        
+        % Next calculate the fov
+        focalLength = oiGet(ieObject,'optics focal length');
+        fov         = 2 * atan2d(filmwidth / 2, focalLength);
+        ieObject    = oiSet(ieObject,'fov',fov);
         
         %{
         % Old code.

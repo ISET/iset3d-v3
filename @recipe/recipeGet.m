@@ -225,9 +225,9 @@ switch ieParamFormat(param)
         
         % Film
     case 'filmresolution'
-        if checkfields(thisR,'film','xresolution')
+        try
             val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
-        else
+        catch
             warning('Film resolution not specified');
             val = [];
         end
