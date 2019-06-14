@@ -52,21 +52,25 @@ conDeltaAngle = p.Results.conedeltaangle;
 
 %% Write out lightspectrum into a light.spd file
 [~,sceneName] = fileparts(thisR.inputFile);
-try
-    thisLight = load(lightSpectrum);
-catch
-    error('%s light is not recognized \n', lightSpectrum);
+if isstring(lightSpectrum)
+    try
+        thisLight = load(lightSpectrum);
+    catch
+        error('%s light is not recognized \n', lightSpectrum);
+    end
+    
+    lightSpdDir = fullfile(piRootPath, 'local', sceneName, 'spds', 'lights');
+    thisLightfile = fullfile(lightSpdDir,...
+        sprintf('%s.spd', lightSpectrum));
+    if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
+    fid = fopen(thisLightfile, 'w');
+    for ii = 1: length(thisLight.data)
+        fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii));
+    end
+    fclose(fid);
+else
+    % add lightspectrum array
 end
-
-lightSpdDir = fullfile(piRootPath, 'local', sceneName, 'spds', 'lights');
-thisLightfile = fullfile(lightSpdDir,...
-                sprintf('%s.spd', lightSpectrum));
-if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
-fid = fopen(thisLightfile, 'w');
-for ii = 1: length(thisLight.data)
-    fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii));
-end
-fclose(fid);
 %% Read light source struct from world struct
 lightSources = piLightGet(thisR, 'print', false);
 %% Construct a lightsource structure
@@ -83,6 +87,12 @@ switch type
         end    
     case 'spot'
         lightSources{numLights+1}.line{2,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+                lightSpectrum, from, to);
+        thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
+        thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+        lightSources{numLights+1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+    case 'laser'
+        lightSources{numLights+1}.line{2,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
@@ -121,6 +131,7 @@ world{numWorld+1,:} = thisR.world{index_m};
 world{numWorld+2,:} = thisR.world{index_g};
 world{end+1,:} = 'WorldEnd';
 thisR.world = world;
+disp('Light Added to the Scene.');
 end
 
 

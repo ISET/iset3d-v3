@@ -174,14 +174,14 @@ switch param
                 % if two fov is given [hor, ver], we should resize film
                 % acoordingly
                 filmRes = thisR.get('film resolution');
-                fov = min(val);
+                fov = min(val); 
+                if fov == val(1)
+                    thisR.set('film resolution',[max(filmRes)/(val(2)/val(1)), max(filmRes)]);
+                else
+                    thisR.set('film resolution',[max(filmRes), max(filmRes)/(val(1)/val(2))]);
+                end
                 thisR.camera.fov.value = fov;
                 thisR.camera.fov.type = 'float';
-                if fov == val(1)
-                    thisR.set('film resolution',[filmRes(1), filmRes(2)*val(2)/val(1)]);
-                else
-                    thisR.set('film resolution',[filmRes(1)*val(1)/val(2), filmRes(2)]);
-                end
                 disp('film ratio is changed!')
             end
         else
