@@ -229,7 +229,13 @@ switch ieParamFormat(param)
         
         % Film
     case 'filmresolution'
-        val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
+        try
+            val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
+        catch
+            warning('Film resolution not specified');
+            val = [];
+        end
+        
     case 'filmxresolution'
         % An integer
         val = thisR.film.xresolution.value;

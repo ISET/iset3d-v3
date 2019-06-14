@@ -4,6 +4,8 @@ classdef recipe < matlab.mixin.Copyable
 % Syntax
 %   thisR = recipe;
 %
+% Default version is no PBRT version 3.
+%
 % TL Scien Stanford, 2017
 
 % PROGRAMMING TODO
@@ -38,9 +40,9 @@ classdef recipe < matlab.mixin.Copyable
         inputFile = '';   
         
         outputFile = ''; % Where outputFile = piWrite(recipe);
-        version = 2;     % A PBRTv2 file or a PBRTv3 file
+        version = 3;     % A PBRTv2 file or a PBRTv3 file
         materials;       % material list parsed from *_material.pbrt file
-        assets;         % assets list parsed from *_geometry.pbrt file
+        assets;          % assets list parsed from *_geometry.pbrt file
         exporter = '';
         metadata;
     end
