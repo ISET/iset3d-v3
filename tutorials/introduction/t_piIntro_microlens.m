@@ -91,12 +91,11 @@ fprintf('Using microlens: %s\n',microlensfile);
 %
 % edit(microlensfile)
 
-
 combinedlens = 'dgaussMicrolens.json';
 
 combinedlens = piCameraInsertMicrolens(microlensfile,lensfile, ...
     'output name',combinedlens, ...
-    'xdim',32,'ydim',32);
+    'xdim',64,'ydim',64);
 %     'film width',filmwidth,'film height',filmheight, ...
 % thisLens = jsonread(combinedlens);
 %
