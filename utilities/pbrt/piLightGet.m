@@ -47,31 +47,33 @@ for ii = 1:length(find(light))
         lightType = lightSources{ii}.line{piContains(lightSources{ii}.line,'LightSource')};
         lightType = strsplit(lightType, ' ');
         lightSources{ii}.type = lightType{2};
-        thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')}, '%q');
-        thisLineStr = thisLineStr{1};
-        from = find(piContains(thisLineStr, 'point from'));
-        lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
-                                     piParseNumericString(thisLineStr{from+2});...
-                                     piParseNumericString(thisLineStr{from+3})];
-        to = find(piContains(thisLineStr, 'point to'));
-        if to, lightSources{ii}.direction = [piParseNumericString(thisLineStr{to+1});...
-                                             piParseNumericString(thisLineStr{to+2});...
-                                             piParseNumericString(thisLineStr{to+3})];
-        end
-        coneAngle = find(piContains(thisLineStr, 'float coneangle'));
-        if coneAngle,lightSources{ii}.coneangle = piParseNumericString(thisLineStr{coneAngle+1});
-        end
-        coneDeltaAngle =  find(piContains(thisLineStr, 'float conedelataangle'));
-        if coneDeltaAngle, lightSources{ii}.conedeltaangle = piParseNumericString(thisLineStr{coneDeltaAngle+1});
-        end
-        spectrum  = find(piContains(thisLineStr, 'spectrum L'));
-        if spectrum
-            if isnan(str2double(thisLineStr{spectrum+1}))
-                thisSpectrum = thisLineStr{spectrum+1};
-            else
-                thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
+        if ~piContains(lightSources{ii}.type, 'infinite')
+            thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')}, '%q');
+            thisLineStr = thisLineStr{1};
+            from = find(piContains(thisLineStr, 'point from'));
+            lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
+                piParseNumericString(thisLineStr{from+2});...
+                piParseNumericString(thisLineStr{from+3})];
+            to = find(piContains(thisLineStr, 'point to'));
+            if to, lightSources{ii}.direction = [piParseNumericString(thisLineStr{to+1});...
+                    piParseNumericString(thisLineStr{to+2});...
+                    piParseNumericString(thisLineStr{to+3})];
             end
-            lightSources{ii}.spectrum = thisSpectrum;
+            coneAngle = find(piContains(thisLineStr, 'float coneangle'));
+            if coneAngle,lightSources{ii}.coneangle = piParseNumericString(thisLineStr{coneAngle+1});
+            end
+            coneDeltaAngle =  find(piContains(thisLineStr, 'float conedelataangle'));
+            if coneDeltaAngle, lightSources{ii}.conedeltaangle = piParseNumericString(thisLineStr{coneDeltaAngle+1});
+            end
+            spectrum  = find(piContains(thisLineStr, 'spectrum L'));
+            if spectrum
+                if isnan(str2double(thisLineStr{spectrum+1}))
+                    thisSpectrum = thisLineStr{spectrum+1};
+                else
+                    thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
+                end
+                lightSources{ii}.spectrum = thisSpectrum;
+            end
         end
     end
 end

@@ -101,55 +101,61 @@ else
     % add customized lightspectrum array [400 1 600 1 800 1]
 end
 %% Read light source struct from world struct
-lightSources = piLightGet(thisR, 'print', false);
+currentlightSources = piLightGet(thisR, 'print', false);
 %% Construct a lightsource structure
-numLights = length(lightSources);
+numLights = length(currentlightSources);
 
 switch type
     case 'point'
+        lightSources{1}.type = 'point';
         if p.Results.cameracoordinate
-            lightSources{numLights+1}.line{1} = 'AttributeBegin';
-            lightSources{numLights+1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{numLights+1}.line{3,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd"', lightSpectrum);
-            lightSources{numLights+1}.line{end+1} = 'AttributeEnd';
+            lightSources{1}.line{1} = 'AttributeBegin';
+            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
+            lightSources{1}.line{3,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd"', lightSpectrum);
+            lightSources{1}.line{end+1} = 'AttributeEnd';
         else
-            lightSources{numLights+1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
+            lightSources{1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
                 lightSpectrum, from);
         end    
     case 'spot'
-        lightSources{numLights+1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        lightSources{1}.type = 'spot';
+        lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
-        lightSources{numLights+1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+        lightSources{1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'laser' % not supported for public
-        lightSources{numLights+1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        lightSources{1}.type = 'laser';
+        lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
-        lightSources{numLights+1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+        lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
-        lightSources{numLights+1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        lightSources{1}.type = 'distant';
+        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
     case 'area'
         % find area light geometry info
+        
         nlight = 1;
         for ii = 1:length(thisR.assets)
             if piContains(lower(thisR.assets(ii).name), 'area')
-                lightSources{numLights+nlight}.line{1} = 'AttributeBegin';
+                lightSources{nlight}.type = 'area';
+                lightSources{nlight}.line{1} = 'AttributeBegin';
                 if idxL
-                    lightSources{numLights+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
                                 from(2), from(3));
                 else
-                    lightSources{numLights+nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
                                 thisR.assets(ii).position(2), thisR.assets(ii).position(3));
                 end
-                lightSources{numLights+nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1)); 
-                lightSources{numLights+nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2)); 
-                lightSources{numLights+nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{numLights+nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
-                lightSources{numLights+nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
-                lightSources{numLights+nlight}.line{end+1} = 'AttributeEnd';
+                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1)); 
+                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2)); 
+                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
+                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
+                lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
+                lightSources{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
             end
         end
@@ -157,11 +163,14 @@ end
 %%
 index_m = piContains(thisR.world,'_materials.pbrt');
 index_g = piContains(thisR.world,'_geometry.pbrt');
-world{1} = 'WorldBegin';
+world = thisR.world(1:end-3);
 for jj = 1: length(lightSources)
     numWorld = length(world);
-    for kk = 1: length(lightSources{jj}.line)
-        world{numWorld+kk,:} = lightSources{jj}.line{kk};
+     % infinity light can be added by piSkymap add.
+    if ~piContains(lightSources{jj}.type, 'infinity')
+        for kk = 1: length(lightSources{jj}.line)
+            world{numWorld+kk,:} = lightSources{jj}.line{kk};
+        end
     end
 end
 numWorld = length(world);
