@@ -187,7 +187,7 @@ switch ieParamFormat(param)
                 val = thisR.camera.fov.value;
                 filmratio = thisR.film.xresolution.value/thisR.film.yresolution.value;
                 if filmratio>1
-                    val = val*filmratio; 
+                    val = 2*atand(tand(val/2)*filmratio); 
                 end
             else
                 val = atand(thisR.camera.filmdiag.value/2/thisR.camera.filmdistance.value);
