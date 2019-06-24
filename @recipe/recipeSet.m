@@ -164,7 +164,7 @@ switch param
     case 'fov'
         % We should check that this is a pinhole, I think
         % This is only used for pinholes, not realistic camera case. 
-        if isequal(thisR.camera.subtype,'pinhole')
+        if isequal(thisR.camera.subtype,'pinhole') || isequal(thisR.camera.subtype,'perspective')
             thisR.camera.fov.value = val;
             thisR.camera.fov.type = 'float';
         else
@@ -285,9 +285,12 @@ switch param
         if length(val) == 1, val(2) = val(1); end
         thisR.film.xresolution.value = val(1);
         thisR.film.yresolution.value = val(2);
+        thisR.film.xresolution.type = 'integer';
+        thisR.film.yresolution.type = 'integer';
     case {'pixelsamples','raysperpixel'}
         % Sampler
         thisR.sampler.pixelsamples.value = val;
+        thisR.sampler.pixelsamples.type = 'integer';
     case{'cropwindow','crop window'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
