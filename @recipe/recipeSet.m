@@ -147,20 +147,15 @@ switch param
             thisR.camera.specfile.type = 'string';
         end
     case {'aperture','aperturediameter'}
-        if(thisR.version == 3)
-            thisR.camera.aperturediameter.value = val;
-            thisR.camera.aperturediameter.type = 'float';
-        elseif(thisR.version == 2)
-            thisR.camera.aperture_diameter.value = val;
-            thisR.camera.aperture_diameter.type = 'float';
-        end
+        % This set should look at the aperture in the lens file, which
+        % represents the largest possible aperture.  It should not
+        % allow a value bigger than that.  (ZL/BW).
+        thisR.camera.aperturediameter.value = val;
+        thisR.camera.aperturediameter.type = 'float';
+        
     case {'focusdistance'}
-        if(thisR.version == 3)
-            thisR.camera.focusdistance.value = val;
-            thisR.camera.focusdistance.type = 'float';
-        else
-            warning('focus distance parameter not applicable for version 2');
-        end
+        thisR.camera.focusdistance.value = val;
+        thisR.camera.focusdistance.type = 'float';
     case 'fov'
         % This sets a horizontal fov
         % We should check that this is a pinhole, I think
@@ -190,12 +185,9 @@ switch param
             warning('fov not set for camera models');
         end    
     case 'diffraction'
-        if(thisR.version == 2)
-            thisR.camera.diffractionEnabled.value = val;
-            thisR.camera.diffractionEnabled.type = 'bool';
-        elseif(thisR.version == 3)
-            warning('diffraction parameter not applicable for version 3')
-        end
+        thisR.camera.diffractionEnabled.value = val;
+        thisR.camera.diffractionEnabled.type = 'bool';
+        
     case 'chromaticaberration'
         % Enable chrommatic aberration, and potentially set the number
         % of wavelength bands.  (Default is 8).
