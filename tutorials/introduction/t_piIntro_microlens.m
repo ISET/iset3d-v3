@@ -35,12 +35,19 @@ sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
 % The output directory will be written here to inFolder/sceneName
 inFolder = fullfile(piRootPath,'local','scenes');
-dest = piPBRTFetch(sceneName,'pbrtversion',3,...
-    'destinationFolder',inFolder,...
-    'delete zip',true);
 
 % This is the PBRT scene file inside the output directory
 inFile = fullfile(inFolder,sceneName,sceneFileName);
+
+if ~exist(inFile,'file')
+    % Sometimes the user runs this many times and so they already have
+    % the file.  We only fetch the file if it does not exist.
+    fprintf('Downloading %s from RDT',sceneName);
+    dest = piPBRTFetch(sceneName,'pbrtversion',3,...
+        'destinationFolder',inFolder,...
+        'delete zip',true);
+end
+
 thisR  = piRead(inFile);
 
 % We will output the calculations to a temp directory.  
@@ -50,8 +57,8 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*0.5));  % 1.5 is pretty high res
-thisR.set('pixel samples',64);                      % 4 is Lots of rays .
+thisR.set('film resolution',round([600 400]*0.05));  % 1.5 is pretty high res
+thisR.set('pixel samples',2);                      % 4 is Lots of rays .
 
 %% Set output file
 
@@ -62,8 +69,7 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-% For both of the dgauss lenses 22deg is the half width of the field
-% of view 
+% For the dgauss lenses 22deg is the half width of the field of view
 
 %{
 lensfile = 'dgauss.22deg.3.0mm.json';
@@ -72,7 +78,7 @@ filmheight = filmwidth;
 %}
 
 % {
-lensfile = 'dgauss.22deg.50.0mm.json';
+lensfile = '2ElLens.json'; % 'dgauss.22deg.50.0mm.json';
 filmwidth  = 11;
 filmheight = 11;
 %}
@@ -82,7 +88,7 @@ combinedlens = lensfile;
 % In millimeters.  Used to set diagonal and to set
 % piCameraInsertMicrolens, somehow.  ASK MM.
 
-% {
+%{
 % microlensfile = 'microlens.2um.Example.json';
 microlensfile = '2ElLens.json';
 fprintf('Using microlens: %s\n',microlensfile);
@@ -161,7 +167,13 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',6);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
-[oi, result] = piRender(thisR,'render type','both');
+[oi, result] = piRender(thisR,'render type','depth');
+
+% Parse the result for the lens to film distance and the in-focus
+% distance in the scene.
+[lensFilm, infocusDistance] = piRenderResult(result);
+
+%%
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 
