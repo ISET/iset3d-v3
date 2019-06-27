@@ -105,10 +105,19 @@ switch param
         
         % Scene and camera
     case 'objectdistance'
-        % Adjust the lookat 'from' field to match the distance in val
+        % Changes the distance from the camera (from) to the object
+        % pointed at by the camera (to).
+        %
+        % Adjusts the lookat 'from' field to match the distance in val.
+        % This needs some more thought.  At present this adjusts the
+        % 'from' spot, which is where the camera is.  It keeps the
+        % direction the same, just scales it.
+        
+        % Unit length vector between from and to.
         objDirection = thisR.get('object direction');
         
-        % Make the unit vector a val distance away and add
+        % Scale the unit length vector to match val, setting the
+        % distance between from and to.
         newDirection = objDirection*val;
         thisR.lookAt.from = thisR.lookAt.to + newDirection;
         
@@ -123,6 +132,7 @@ switch param
         
     case 'cameratype'
         thisR.camera.subtype = val;
+        
     case {'cameraexposure','exposuretime'}
         % Normally, openShutter is at time zero
         thisR.camera.shutteropen.type  = 'float';
@@ -154,6 +164,16 @@ switch param
         thisR.camera.aperturediameter.type = 'float';
         
     case {'focusdistance'}
+        % This is the distance to the object in the scene that will be
+        % in focus.  When this is set, the film distance is derived by
+        % PBRT.  It is possible that there is no film distance for
+        % certain (say very near) focus distances.
+        %
+        % This variable is related to the lookat settings and we
+        % should probably connect this with 'objectdistance'.  Though
+        % it is possible to look at an object but have it not be the
+        % object that is in focus.
+        %
         thisR.camera.focusdistance.value = val;
         thisR.camera.focusdistance.type = 'float';
     case 'fov'
