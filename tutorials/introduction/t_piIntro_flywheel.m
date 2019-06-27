@@ -124,12 +124,5 @@ piWrite(thisR,'creatematerials',true);
 
 scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
 sceneWindow(scene);
-sceneSet(scene,'display mode','hdr');
-coordMap = piRender(thisR,'renderType','coordinates');
-x  = coordMap(:,:,1) - thisR.lookAt.from(1);
-y  = coordMap(:,:,2)- thisR.lookAt.from(2);
-z  = coordMap(:,:,3)- thisR.lookAt.from(3); 
-player = pcplayer([-20 0],[0 10],[-1 1]);
-ptCloud = pointCloud([x(:),z(:),y(:)]);
-view(player,ptCloud);           
+sceneSet(scene,'display mode','hdr');         
 %% END

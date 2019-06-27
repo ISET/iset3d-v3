@@ -72,9 +72,19 @@ switch cameraType
         camera.fov.value = 45;  % deg of angle
         
     case {'realistic'}
+        % Check for lens .dat file
         [~,~,e] = fileparts(lensFile);
         if(~strcmp(e,'.dat'))
-            error('Realistic camera needs *.dat lens file.');
+            % Sometimes we are sent in the json file
+            warning('Realistic camera needs *.dat lens file. Checking.');
+            [p,n,~] = fileparts(lensFile);
+            lensFile = fullfile(p,[n '.dat']);
+            if ~exist(fullfile(p,[n '.dat']),'file')
+                error('No corresponding dat file found');
+            else
+                fprintf('Found %s\n',lensFile);
+            end
+            
         end
         
         camera.type = 'Camera';

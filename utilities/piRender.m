@@ -27,11 +27,17 @@ function [ieObject, result] = piRender(thisR,varargin)
 % RETURN
 %   ieObject - an ISET scene, oi, or a depth map image
 %   result   - PBRT output from the terminal, vital for debugging!
+%              The result contains useful parameters about the optics,
+%              too, including the distance from the back of the lens
+%              to film and the in-focus distance given the lens-film
+%              distance.
 %
-% See also s_piReadRender*.m
 %
 % TL SCIEN Stanford, 2017
 % JNM 03/19 Add reuse feature for renderings
+%
+% See also 
+%   s_piReadRender*.m, piRenderResult
 
 % Examples
 %{

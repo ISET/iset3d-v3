@@ -50,8 +50,8 @@ thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 600]*2));  % 1.5 is pretty high res
-thisR.set('pixel samples',512);                    % 4 is Lots of rays .
+thisR.set('film resolution',round([600 600]*0.25));  % 1.5 is pretty high res
+thisR.set('pixel samples',16);                    % 4 is Lots of rays .
 
 %% Set output file
 
@@ -65,7 +65,7 @@ outputDir = fileparts(outFile);
 % 22deg is the half width of the field of view
 lensfile = 'wide.56deg.3.0mm.json';
 fprintf('Using lens: %s\n',lensfile);
-thisR.camera = piCameraCreate('omni','lensFile',lensfile);
+thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 
 %{
 % You might adjust the focus for different scenes.  Use piRender with
