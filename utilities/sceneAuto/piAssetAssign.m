@@ -87,6 +87,7 @@ for ii = 1: length(assetRecipe)
         end
     end
     [~,n,~] = fileparts(assetRecipe{ii}.name);
+    if ~exist('name'), break;end
     asset(ii).name = name;
     asset(ii).index = n;
     asset(ii).geometry = geometry;

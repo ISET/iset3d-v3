@@ -39,6 +39,7 @@ p = inputParser;
 p.addParameter('sceneType','city',@ischar);
 p.addParameter('treeDensity','random',@ischar);
 p.addParameter('roadType','crossroad',@ischar);
+p.addParameter('trafficflow',[]);
 p.addParameter('trafficflowDensity','medium',@ischar);
 p.addParameter('timestamp',50,@isnumeric);
 p.addParameter('scitran',[],@(x)(isa(x,'scitran')));
@@ -50,6 +51,7 @@ sceneType      = p.Results.sceneType;
 treeDensity    = p.Results.treeDensity;  % Not yet used
 roadType       = p.Results.roadType;
 trafficflowDensity = p.Results.trafficflowDensity;
+trafficflow    = p.Results.trafficflow;
 timestamp      = p.Results.timestamp;
 st             = p.Results.scitran;
 cloudRenderFlag= p.Results.cloudRender;
@@ -89,7 +91,7 @@ if ~exist(trafficflowPath,'file')
     trafficflow = piTrafficflowGeneration(road);
     save(trafficflowPath,'trafficflow');
     disp('Generated traffic flow using SUMO')
-else
+elseif isempty(trafficflow)
     load(trafficflowPath,'trafficflow');
     disp('Loaded local file of traffic flow')
 end
