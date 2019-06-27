@@ -1,18 +1,20 @@
 function [ip,sensor]=piOI2IP(oi,varargin)
 p = inputParser;
+varargin = ieParamFormat(varargin);
 p.addParameter('sensor','default');
 p.addParameter('pixelSize',[]);
+p.addParameter('filmdiagonal',10); % [mm]
 p.parse(varargin{:});
 sensorName   = p.Results.sensor;
 pixelSize= p.Results.pixelSize;
-
+filmDiagonal = p.Results.filmdiagonal;
 %% oi to sensor
 if strcmp(sensorName,'default')
     sensor = sensorCreate;
 else
     load(sensorName,'sensor');
 end
-readnoise  =  1e-3;
+readnoise  = 1e-3;
 darkvoltage= 1e-3;
 [electrons,~] = iePixelWellCapacity(pixelSize*1e6);%
 converGain = 1/electrons;% voltage swing/electrons
@@ -21,20 +23,22 @@ sensor = sensorSet(sensor,'pixel read noise volts',readnoise);
 sensor = sensorSet(sensor,'pixel voltage swing',1);
 sensor = sensorSet(sensor,'pixel dark voltage',darkvoltage);
 sensor = sensorSet(sensor,'pixel conversion gain',converGain);
-
 if ~isempty(pixelSize)
     sensor = sensorSet(sensor,'pixel size same fill factor',pixelSize);
+%     sensor = sensorSet(sensor,'pixel size constant fill factor',[pixelSize pixelSize]);
 end
 
 % [~,rect] = ieROISelect(oi);
-rect = [718   698   200   198];% 
-sensor = sensorSet(sensor, 'size',[800,1920]);
-sensor   = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
+rect = [776   896   339   176];% for 1920*1080
+oiSize = oiGet(oi,'size');
+optimalPixel = sqrt(filmDiagonal^2/(oiSize(1)^2+oiSize(2)^2))*1e-3;
+sensor = sensorSet(sensor, 'size', oiGet(oi,'size')*optimalPixel/pixelSize);
+% sensor   = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
 eTime  = autoExposure(oi,sensor,0.90,'video','center rect',rect,'videomax',1/60);
 fprintf('eT: %s ms \n',eTime*1000);
 sensor = sensorSet(sensor,'exp time',eTime);
 sensor = sensorCompute(sensor,oi);
-    % sensorWindow(sensor);
+sensorWindow(sensor);
 if isfield(oi,'metadata')
     if ~isempty(oi.metadata)
      sensor.metadata = oi.metadata;

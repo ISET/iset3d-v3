@@ -36,12 +36,12 @@ if piContains(color,'random')
     % Choose a random color, I guess.
     index = rand;
     
-    if index <= 0.3, color = 'white';end
-    if index > 0.3 && index <= 0.8, color = 'black';end
-    if index > 0.8  && index <= 0.825, color = 'red';end
-    if index > 0.825  && index <= 0.85, color = 'blue';end
-    if index > 0.85 && index <= 0.875, color = 'green';end
-    if index > 0.875 && index <= 0.90, color = 'yellow';end
+    if index <= 0.35, color = 'white';end
+    if index > 0.35 && index <= 0.75, color = 'black';end
+    if index > 0.75 && index <= 0.8, color = 'red';end
+    if index > 0.8  && index <= 0.85, color = 'blue';end
+    if index > 0.85 && index <= 0.9, color = 'green';end
+    if index > 0.95 && index <= 0.90, color = 'yellow';end
     if index > 0.90 && index <= 1.00, color = 'silver';end
     rgb = colorswitch(color);
 else
@@ -53,39 +53,37 @@ end
 function rgb = colorswitch(color)
 switch color
     case 'white'
-        r = randi(5,1)+250;
-        g = r-5;
-        b = r-10;
-        rgb = [r/255 g/255 b/255];
+        r = 254+rand(1);
+        g = 253+rand(1);
+        b = 250+rand(1);
     case 'black'
-        r = 1;
-        g = 1;
-        b = 1;
-        rgb = [r/255 g/255 b/255];
+        r = 1+rand(1);
+        g = 1+rand(1);
+        b = 1+rand(1);
     case 'red'
-        r = randi(50,1)+200;
-        g = randi(30,1)+30;
-        b = randi(30,1)+30;
-        rgb = [r/255 g/255 b/255];
+        r = 134+rand(1);
+        g = 1+rand(1);
+        b = 17+rand(1);        
     case 'blue'
-        r = randi(50,1)+15;
-        g = 50+randi(50,1);
-        b = 205+randi(50,1);
-        rgb = [r/255 g/255 b/255];
+        r = 22+rand(1);
+        g = 54+rand(1);
+        b = 114+rand(1);
     case 'green'
-        r = randi(80,1)+10;
-        g = 120+randi(80,1);
-        b = randi(80,1)+10;
-        rgb = [r/255 g/255 b/255];
+        r = 84+rand(1);
+        g = 128+rand(1);
+        b = 66+rand(1);
     case 'yellow'
-        r = 170+randi(50,1);
-        g = r-10;
-        b = randi(50,1)+15;
-        rgb = [r/255 g/255 b/255];
+        r = 223+rand(1);
+        g = 192+rand(1);
+        b = 99+rand(1);
     case 'silver'
-        r = randi(20,1)+150;
+        r = 192+rand(1);
         g = r;
         b = g;
-        rgb = [r/255 g/255 b/255];
+    case 'gray'
+        r = 169+rand(1);
+        g = 169+rand(1);
+        b = 169+rand(1);  
 end
+rgb = [r/255 g/255 b/255];
 end
