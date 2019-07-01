@@ -44,10 +44,6 @@ dest = piPBRTFetch(sceneName,'pbrtversion',3,...
 inFile = fullfile(inFolder,sceneName,sceneFileName);
 thisR  = piRead(inFile);
 
-% We will output the calculations to a temp directory.  
-outFolder = fullfile(tempdir,sceneName);
-outFile   = fullfile(outFolder,[sceneName,'.pbrt']);
-thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
