@@ -7,17 +7,18 @@
 %
 %    docker pull vistalab/pbrt-v3-spectral
 %
-% ZL, BW SCIEN 2018
+% For more information about PBRT lens and camera formats:
 %
-% See also
-%   t_piIntro_*
-%   isetLens repository
-
 % Generally
-% https://www.pbrt.org/fileformat-v3.html#overview
+%   https://www.pbrt.org/fileformat-v3.html#overview
 % 
 % And specifically
-% https://www.pbrt.org/fileformat-v3.html#cameras
+%   https://www.pbrt.org/fileformat-v3.html#cameras
+%
+% ZLiu, BW 2018
+%
+% See also
+%   t_piIntro_start, isetlens, 
 %
 
 %% Initialize ISET and Docker
@@ -43,10 +44,6 @@ dest = piPBRTFetch(sceneName,'pbrtversion',3,...
 inFile = fullfile(inFolder,sceneName,sceneFileName);
 thisR  = piRead(inFile);
 
-% We will output the calculations to a temp directory.  
-outFolder = fullfile(tempdir,sceneName);
-outFile   = fullfile(outFolder,[sceneName,'.pbrt']);
-thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
@@ -91,6 +88,7 @@ thisR.set('film diagonal',12);
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
 thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
+thisR.set('object distance',0.7);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
