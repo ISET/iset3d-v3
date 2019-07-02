@@ -123,11 +123,11 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
         piMaterialAssign(thisR, material.name,target);
-    elseif piContains(lower(mlist(ii)),'bodymat')
-        name = cell2mat(mlist(ii));
-        material = thisR.materials.list.(name);
-        target = thisR.materials.lib.substrate;
-        piMaterialAssign(thisR, material.name,target);
+%     elseif piContains(lower(mlist(ii)),'bodymat')
+%         name = cell2mat(mlist(ii));
+%         material = thisR.materials.list.(name);
+%         target = thisR.materials.lib.substrate;
+%         piMaterialAssign(thisR, material.name,target);
     elseif piContains(mlist(ii),'translucent')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);

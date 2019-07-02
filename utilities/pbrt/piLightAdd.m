@@ -1,3 +1,4 @@
+
 function thisR = piLightAdd(thisR, varargin)
 %% Add different type of light sources to a scene
 % 
@@ -157,7 +158,25 @@ switch type
                 lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
                 lightSources{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
+            elseif piContains(lower(thisR.assets(ii).name), 'light')
+                lightSources{nlight}.type = 'area';
+                lightSources{nlight}.line{1} = 'AttributeBegin';
+                if idxL
+                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                        from(2), from(3));
+                else
+                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                        thisR.assets(ii).position(2), thisR.assets(ii).position(3));
+                end
+                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
+                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
+                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
+                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
+                lightSources{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
+                lightSources{nlight}.line{end+1} = 'AttributeEnd';
+                nlight = nlight+1;
             end
+            
         end
 end
 %%

@@ -15,15 +15,16 @@ AttBegin  =  find(piContains(thisR.world,'AttributeBegin'));
 AttEnd    =  find(piContains(thisR.world,'AttributeEnd'));
 arealight =  piContains(thisR.world,'AreaLightSource');
 light     =  piContains(thisR.world,'LightSource');
-for ii = 1:length(find(light))
+lightIdx  =  find(light);
+for ii = 1:length(lightIdx)
         lightSources{ii} = lightInit;
     if length(AttBegin)>=ii
         lightSources{ii}.line  = thisR.world(AttBegin(ii):AttEnd(ii));
         lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
     else
         light(arealight)=0;
-        lightSources{ii}.line  = thisR.world(light);
-        lightSources{ii}.range = find(light);
+        lightSources{ii}.line  = thisR.world(lightIdx(ii));
+        lightSources{ii}.range = lightIdx(ii);
     end
     
     if find(piContains(lightSources{ii}.line, 'AreaLightSource'))

@@ -28,8 +28,9 @@ if ~isempty(pixelSize)
 %     sensor = sensorSet(sensor,'pixel size constant fill factor',[pixelSize pixelSize]);
 end
 
-% [~,rect] = ieROISelect(oi);
-rect = [776   896   339   176];% for 1920*1080
+[~,rect] = ieROISelect(oi);
+% rect = [776   896   339   176];% for 1920*1080
+% rect = [253   208    25    21];
 oiSize = oiGet(oi,'size');
 optimalPixel = sqrt(filmDiagonal^2/(oiSize(1)^2+oiSize(2)^2))*1e-3;
 sensor = sensorSet(sensor, 'size', oiGet(oi,'size')*optimalPixel/pixelSize);
