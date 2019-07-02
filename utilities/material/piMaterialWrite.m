@@ -114,7 +114,7 @@ for jj = 1: length(textureLines)
     end
     textureLines{jj} = textureLines_tmp{1};
 end
-textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy" "float uscale" [512] "float vscale" [512] ';
+% textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy" "float uscale" [512] "float vscale" [512] ';
 %% Create txtLines for the material struct array
 field =fieldnames(thisR.materials.list);
 materialTxt = cell(1,length(field));
@@ -240,6 +240,10 @@ if isfield(materials, 'colorreflect')
         val = strcat(val, val_colortransmit);
     end
 end
+if ~isempty(materials.colormfp)
+    val_colormfp = sprintf(' "color mfp" [%0.5f %0.5f %0.5f] ',materials.colormfp);
+    val = strcat(val, val_colormfp);
+end
 if ~isempty(materials.floaturoughness)
     val_floaturoughness = sprintf(' "float uroughness" [%0.5f] ',materials.floaturoughness);
     val = strcat(val, val_floaturoughness);
@@ -254,7 +258,10 @@ if ~isempty(materials.floatroughness)
     val_floatroughness = sprintf(' "float roughness" [%0.5f] ',materials.floatroughness);
     val = strcat(val, val_floatroughness);
 end
-
+if ~isempty(materials.floateta)
+    val_floateta = sprintf(' "float eta" [%0.5f] ',materials.floateta);
+    val = strcat(val, val_floateta);
+end
 if ~isempty(materials.spectrumkd)
     val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
     val = strcat(val, val_spectrumkd);

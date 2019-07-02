@@ -26,10 +26,13 @@ m.colorkd = [];
 m.colorks = [];
 m.colorreflect = [];
 m.colortransmit = [];
+m.colormfp = [];
 
 m.floaturoughness = [];
 m.floatvroughness = [];
 m.floatroughness =[];
+m.floateta = [];
+
 m.spectrumkd = '';
 m.spectrumks ='';
 m.spectrumkr = '';

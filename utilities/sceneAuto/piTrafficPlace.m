@@ -153,6 +153,10 @@ if nScene == 1
             end
         end
         for ii = 1: length(assets.(assetClass))
+            if ~isfield(assets.(assetClass)(ii), 'geometry') 
+                fprintf('No geometry information found in %s \n', assets.(assetClass)(ii));
+                break;
+            end
             [~,n] = size(assets.(assetClass)(ii).geometry(1).position);
             position     =cell(n,1);
             rotationY    =cell(n,1); % rotationY is RotY

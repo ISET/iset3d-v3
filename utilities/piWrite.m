@@ -355,7 +355,6 @@ for ofns = outerFields'
     
     % Blank line.
     fprintf(fileID,'\n');
-    
 end
 
 
@@ -426,8 +425,6 @@ if piContains(renderRecipe.exporter, 'C4D')
             'thistrafficflow',thistrafficflow);
     end
 end
-
-
 %% Overwrite xxx.json
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);
 jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));

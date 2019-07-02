@@ -40,6 +40,11 @@ if(recipe.version == 3)
     metadataRecipe.camera.noweighting.value = 'true';
     metadataRecipe.camera.noweighting.type = 'bool';
 end
+% Assign film datatype
+film = metadataRecipe.film;
+film.datatype.value = metadata;
+film.datatype.type = 'string';
+metadataRecipe.film = film;
 
 % Change sampler type for better depth sampling
 sampler = struct('type','Sampler','subtype','stratified');
@@ -58,6 +63,8 @@ filter.xwidth.type = 'float';
 filter.ywidth.value = 0.5;
 filter.ywidth.type = 'float';
 metadataRecipe.filter = filter;
+
+% TODO: Add flag into film
 
 % Error checking
 if(isempty(recipe.outputFile))

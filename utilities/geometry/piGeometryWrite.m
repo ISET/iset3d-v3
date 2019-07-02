@@ -32,7 +32,8 @@ fid_obj = fopen(fname_obj,'w');
 fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%i/%i %i:%i:%f \n  \n',clock);
 for ii = 1: length(obj)
     % If empty, the obj is a camera, which we do not write out.
-    if ~isempty(obj(ii).children)
+    % Do not write out arealight here, it has been written in scene.pbrt
+    if ~isempty(obj(ii).children) && ~piContains(lower(obj(ii).name), 'arealight')
         fprintf(fid_obj,'ObjectBegin "%s"\n',obj(ii).name);
         for dd = 1:length(obj(ii).children)
             if isfield(obj(ii).children(dd),'material')

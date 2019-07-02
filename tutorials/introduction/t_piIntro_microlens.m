@@ -1,4 +1,4 @@
-%% Render using a lens
+%% Render using a lens plus a microlens
 %
 % Dependencies:
 %    ISET3d, ISETCam, JSONio
@@ -7,18 +7,17 @@
 %
 %    docker pull vistalab/pbrt-v3-spectral
 %
-% For more information about PBRT lens and camera formats:
-%
-% Generally
-%   https://www.pbrt.org/fileformat-v3.html#overview
-% 
-% And specifically
-%   https://www.pbrt.org/fileformat-v3.html#cameras
-%
-% ZLiu, BW 2018
+% ZL, BW SCIEN 2018
 %
 % See also
-%   t_piIntro_start, isetlens, 
+%   t_piIntro_*
+%   isetLens repository
+
+% Generally
+% https://www.pbrt.org/fileformat-v3.html#overview
+% 
+% And specifically
+% https://www.pbrt.org/fileformat-v3.html#cameras
 %
 
 %% Initialize ISET and Docker
@@ -36,19 +35,30 @@ sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
 % The output directory will be written here to inFolder/sceneName
 inFolder = fullfile(piRootPath,'local','scenes');
-dest = piPBRTFetch(sceneName,'pbrtversion',3,...
-    'destinationFolder',inFolder,...
-    'delete zip',true);
 
 % This is the PBRT scene file inside the output directory
 inFile = fullfile(inFolder,sceneName,sceneFileName);
+
+if ~exist(inFile,'file')
+    % Sometimes the user runs this many times and so they already have
+    % the file.  We only fetch the file if it does not exist.
+    fprintf('Downloading %s from RDT',sceneName);
+    dest = piPBRTFetch(sceneName,'pbrtversion',3,...
+        'destinationFolder',inFolder,...
+        'delete zip',true);
+end
+
 thisR  = piRead(inFile);
 
+% We will output the calculations to a temp directory.  
+outFolder = fullfile(tempdir,sceneName);
+outFile   = fullfile(outFolder,[sceneName,'.pbrt']);
+thisR.set('outputFile',outFile);
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 600]*0.25));  % 1.5 is pretty high res
-thisR.set('pixel samples',16);                    % 4 is Lots of rays .
+thisR.set('film resolution',round([600 400]*0.05));  % 1.5 is pretty high res
+thisR.set('pixel samples',2);                      % 4 is Lots of rays .
 
 %% Set output file
 
@@ -59,10 +69,63 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-% 22deg is the half width of the field of view
-lensfile = 'wide.56deg.3.0mm.json';
+% For the dgauss lenses 22deg is the half width of the field of view
+
+%{
+lensfile = 'dgauss.22deg.3.0mm.json';
+filmwidth = 1;
+filmheight = filmwidth;
+%}
+
+% {
+lensfile = '2ElLens.json'; % 'dgauss.22deg.50.0mm.json';
+filmwidth  = 11;
+filmheight = 11;
+%}
 fprintf('Using lens: %s\n',lensfile);
-thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
+combinedlens = lensfile;
+
+% In millimeters.  Used to set diagonal and to set
+% piCameraInsertMicrolens, somehow.  ASK MM.
+
+%{
+% microlensfile = 'microlens.2um.Example.json';
+microlensfile = '2ElLens.json';
+fprintf('Using microlens: %s\n',microlensfile);
+% mLens = lensC('file name',microlensfile);
+% mLens.draw;
+%
+% edit(microlensfile)
+
+combinedlens = 'dgaussMicrolens.json';
+
+combinedlens = piCameraInsertMicrolens(microlensfile,lensfile, ...
+    'output name',combinedlens, ...
+    'xdim',64,'ydim',64);
+%     'film width',filmwidth,'film height',filmheight, ...
+% thisLens = jsonread(combinedlens);
+%
+
+
+% Checking whether we might be able to add metadata to the lens file
+% during this operation
+% thisLens.metadata.test = 'test';
+% jsonwrite(combinedlens,thisLens);
+%
+% Seems OK. So maybe we should pull that information out somehow and
+% put it in the .json files, rather than using
+% piRecipeFindOpticsParams?
+%
+%
+% edit(combinedlens)
+%}
+
+%%
+%{
+ combinedlens = 'dgauss.22deg.50.0mm.json';
+%}
+
+thisR.camera = piCameraCreate('omni','lensFile',combinedlens);
 
 %{
 % You might adjust the focus for different scenes.  Use piRender with
@@ -80,15 +143,14 @@ thisR.set('focus distance',0.6);
 % The FOV is not used for the 'realistic' camera.
 % The FOV is determined by the lens. 
 
-% This is the size of the film/sensor in millimeters (default 22)
-thisR.set('film diagonal',12);
+% This is the size of the film/sensor in millimeters 
+thisR.set('film diagonal',sqrt(filmwidth^2 + filmheight^2));
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
 thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
-thisR.set('object distance',0.7);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
@@ -105,31 +167,23 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',6);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
-oi = piRender(thisR,'render type','radiance');
-oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
-oiWindow(oi);
+[oi, result] = piRender(thisR,'render type','depth');
+
+% Parse the result for the lens to film distance and the in-focus
+% distance in the scene.
+[lensFilm, infocusDistance] = piRenderResult(result);
 
 %%
-depth = piRender(thisR,'render type','depth');
-ieNewGraphWin;
-imagesc(depth);
-%% Change this for depth of field effects.
-
-
-thisR.set('aperture diameter',3);
-piWrite(thisR,'creatematerials',true);
-
-[oi,result] = piRender(thisR,'render type','both');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
 
-%% Change again for depth of field effects.
+%% The depth is not right any more
 
-thisR.set('aperture diameter',1);
-piWrite(thisR,'creatematerials',true);
+%{
+ depth = piRender(thisR,'render type','depth');
+ ieNewGraphWin;
+ imagesc(depth);
+%}
 
-oi = piRender(thisR,'render type','both');
-oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
-oiWindow(oi);
 
 %% END

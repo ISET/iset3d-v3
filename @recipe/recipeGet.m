@@ -165,15 +165,25 @@ switch ieParamFormat(param)
                 [p,flname,~] = fileparts(thisR.camera.lensfile.value);
                 focalLength = load(fullfile(p,[flname,'.FL.mat']));  % Millimeters
                 objDist = thisR.get('object distance');   % Units?  Where does this come from?
-                % objDist = objDist*1e3;
-                if objDist < min(focalLength.dist(:))
-                    fprintf('** Object too close to focus\n');
+                
+                % Pull out the valid distances and focal distances
+                ok = ~isnan(focalLength.focalDistance);
+                x = focalLength.dist(ok);
+                y = focalLength.focalDistance(ok);
+                if objDist < min(x(:))
+                    fprintf('** Object too close to focus (%f).  Min is %f\n',objDist, min(x(:)));
                     val = []; return;
-                elseif objDist > max(focalLength.dist(:))
-                    fprintf('** Object too far to focus\n');
+                elseif objDist > max(x(:))
+                    fprintf('** Object too far to focus (%f).  Max is %f\n', objDist,max(x(:)));
                     val = []; return;
                 else
-                    val = interp1(focalLength.dist,focalLength.focalDistance,objDist);
+                    %{
+                    ieNewGraphWin;
+                    semilogx(x, y);
+                    line([objDist objDist],[min(y),max(y)],'color','k');
+                    xlabel('Object distance'); ylabel('focal distance')
+                    %}
+                    val = interp1(x,y,objDist);
                 end
             otherwise
                 error('Unknown camera type %s\n',opticsType);
@@ -185,6 +195,10 @@ switch ieParamFormat(param)
             
             if isfield(thisR.camera,'fov')
                 val = thisR.camera.fov.value;
+                filmratio = thisR.film.xresolution.value/thisR.film.yresolution.value;
+                if filmratio>1
+                    val = 2*atand(tand(val/2)*filmratio); 
+                end
             else
                 val = atand(thisR.camera.filmdiag.value/2/thisR.camera.filmdistance.value);
             end
@@ -225,7 +239,13 @@ switch ieParamFormat(param)
         
         % Film
     case 'filmresolution'
-        val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
+        try
+            val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
+        catch
+            warning('Film resolution not specified');
+            val = [];
+        end
+        
     case 'filmxresolution'
         % An integer
         val = thisR.film.xresolution.value;
@@ -233,20 +253,31 @@ switch ieParamFormat(param)
         % An integer
         val = [thisR.film.yresolution.value];
     case 'aperturediameter'
+        if isfield(thisR.camera, 'aperturediameter') ||...
+            isfield(thisR.camera, 'aperture_diameter')
         switch thisR.version
             case 2
                 val = thisR.camera.aperture_diameter.value;
             case 3
                 val = thisR.camera.aperturediameter.value;
         end
+        else
+            val = nan;
+        end
         
     case {'filmdiagonal','diagonal'}
+        if isfield(thisR.film, 'diagonal') ||...
+                isfield(thisR.camera, 'filmdiag')
         switch thisR.version
             case 2
                 val = thisR.camera.filmdiag.value;
             case 3
                 val = thisR.film.diagonal.value;
         end
+        else
+            val = nan;
+        end
+
     case 'filmsubtype'
         % What are the legitimate options?
         val = thisR.film.subtype;
