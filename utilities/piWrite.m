@@ -235,7 +235,7 @@ if isfield(renderRecipe.camera,'motion')
 end
 % Required LookAt 
 fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
-    [renderRecipe.lookAt.from renderRecipe.lookAt.to renderRecipe.lookAt.up]);
+    [renderRecipe.lookAt.from(:); renderRecipe.lookAt.to(:); renderRecipe.lookAt.up(:)]);
 fprintf(fileID,'\n');
 
 %% Write all other blocks using a for loop

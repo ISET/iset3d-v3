@@ -1,13 +1,21 @@
-# Exported by PBRT exporter for Cinema 4D 
-Transform [1.0 2.10734242554e-08 -0.0 0  -2.10734242554e-08 1.0 0.0 0  0.0 0.0 1.0 0  1.05367121262e-07 -5.0 1.11022302463e-16 1]
-Camera "perspective" "float fov" [31.417275658] "float focaldistance" [2000.0] "float lensradius" [0]
-Sampler "halton" "integer pixelsamples" [32]
-Film "image" "string filename" ["checkerboard.exr"] "integer xresolution" [1280] "integer yresolution" [720]
-Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"
+# Exported by PBRT exporter for Cinema 4D
+
+LookAt 0 0 10 0 0 0  0.0 1.0 0    
+Camera "perspective" "float fov" 45
+
+Sampler "halton" "integer pixelsamples" 128
+Integrator "path"
+Film "image" "integer xresolution" [400] "integer yresolution" [400]
+
 WorldBegin
-	# Default Material
-	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
-	LightSource "distant" "rgb L" [1 1 1] "point from" [0 0 0] "point to" [-0.461022141621 -0.321637954768 0.827047481621]
-	Include "checkerboard_new_materials.pbrt"
-	Include "checkerboard_new_geometry.pbrt"
+
+# uniform blue-ish illumination from all directions
+LightSource "infinite" "rgb L" [.4 .45 .5]
+
+# approximate the sun
+LightSource "distant"  "point from" [ -30 40  100 ] "blackbody L" [3000 1.5]
+
+Include "checkerboard_materials.pbrt"
+Include "checkerboard_geometry.pbrt"
+
 WorldEnd
