@@ -80,6 +80,19 @@ overwritegeometry   = p.Results.overwritegeometry;
 creatematerials     = p.Results.creatematerials;
 lightsFlag          = p.Results.lightsFlag;
 thistrafficflow         = p.Results.thistrafficflow;
+
+%% Check exporter
+% TL: We seem to run into a lot of problems of overwriting the wrong files
+% when the exporter isn't C4D (i.e. when we don't or can't parse the PBRT
+% file). Here we do a pre-check: if the exporter isn't C4D don't touch the
+% materials or geometry at all. Just copy files over to the output
+% directory. Hopefully that will clean things up a bit.
+if(isempty(renderRecipe.exporter))
+    creatematerials = false;
+    overwritegeometry = false;
+    overwritematerials = false;
+end
+
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
