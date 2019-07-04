@@ -102,6 +102,13 @@ if ischar(thisR)
     % Read the pbrt file and produce the recipe.  A full path is
     % required.
     pbrtFile = which(thisR);
+    
+    % TL: If thisR is already a full path, "which" will sometimes returns
+    % empty. To avoid the error, let's try this:
+    if(isempty(pbrtFile))
+        pbrtFile = thisR;
+    end
+    
     thisR = piRead(pbrtFile,'version',version);
     
     % Stash the file in the local output
