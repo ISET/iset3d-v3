@@ -151,8 +151,8 @@ switch cameraType
         % parameters here.
         camera.type = 'Camera';
         camera.subtype = 'realisticEye';
-        camera.specfile.type = 'string';
-        camera.specfile.value = ''; % FILL IN
+        camera.lensfile.type = 'string';
+        camera.lensfile.value = ''; % FILL IN
         camera.retinaDistance.type = 'float';
         camera.retinaDistance.value = 16.32;
         camera.retinaRadius.type = 'float';
