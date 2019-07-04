@@ -4,7 +4,7 @@
 %
 % This script shows how to use ISET3d to generate images of a checkerboard
 % pattern that is used for camera calibration. Specifically to
-% derive camera inrinsic parameters and lens distortion coefficients.
+% derive camera intrinsic parameters and lens distortion coefficients.
 % 
 % Dependencies:
 %
@@ -40,7 +40,7 @@ recipe.set('pixel samples',32);
 recipe.set('film resolution',[1280 1024]);
 recipe.set('camera type','realistic');
 recipe.set('film diagonal', 5);
-recipe.set('lensfile',fullfile('/',piRootPath,'data','lens','wide.40deg.3.0mm.dat'));
+recipe.set('lensfile',fullfile(piRootPath,'data','lens','wide.40deg.3.0mm.dat'));
 recipe.set('focus distance',5);
 
 %% Render target from different viewpoints
@@ -96,9 +96,9 @@ try
     pixelSize = recipe.get('film diagonal') / sqrt(sum(fr.^2));
     estFocalLength = params.FocalLength * pixelSize;
 
-    fprintf("Focal length: estimated %f, mm\n",estFocalLength(1));
+    fprintf('Focal length: estimated %f, mm\n',estFocalLength(1));
 catch
-    fprintf("Please install Computer Vision Toolbox\n");a
+    fprintf('Please install Computer Vision Toolbox\n');
 end
 
                               
