@@ -183,10 +183,12 @@ if ~convertedflag
                 integer = strfind(currLine,'"integer indices"');
                 point = strfind(currLine, '"point P"');
                 normal = strfind(currLine, '"normal N"');
+                texturemap = strfind(currLine, '"float uv"');
                 fprintf(fid,'%s\n',currLine(1:(integer-1)));
                 fprintf(fid,'  %s\n',currLine(integer:(point-1)));
                 fprintf(fid,'  %s\n',currLine(point:(normal-1)));
-                fprintf(fid,'  %s\n',currLine(normal:end));
+                fprintf(fid,'  %s\n',currLine(normal:(texturemap-1)));
+                fprintf(fid,'  %s\n',currLine(texturemap:end));
                 fclose(fid);
                 groupobj(hh).children(ll) = obj(jj);jj= jj+1;ll=ll+1;
                 
