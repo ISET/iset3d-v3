@@ -149,7 +149,12 @@ if ~convertedflag
                 index = strfind(name, ':');
                 obj_name = name(1:(index-1));
                 obj(jj).name = sprintf('%d_%s',jj,groupobj(hh).name);
-                % for the case there is no material assigned.
+                
+                if piContains(txtLines(ii-2),'MediumInterface')
+                    obj(jj).mediumInterface = sprintf('%s',cell2mat(txtLines(ii-2)));
+                else
+                    obj(jj).mediumInterface = [];
+                end
                 if piContains(txtLines(ii-1),'NamedMaterial')
                     obj(jj).material = sprintf('%s',cell2mat(txtLines(ii-1)));
                 end

@@ -36,6 +36,11 @@ for ii = 1: length(obj)
     if ~isempty(obj(ii).children) && ~piContains(lower(obj(ii).name), 'arealight')
         fprintf(fid_obj,'ObjectBegin "%s"\n',obj(ii).name);
         for dd = 1:length(obj(ii).children)
+            if isfield(obj(ii).children(dd),'mediumInterface')
+                if(~isempty(obj(ii).children(dd).mediumInterface))
+                    fprintf(fid_obj, '%s\n', obj(ii).children(dd).mediumInterface);
+                end
+            end
             if isfield(obj(ii).children(dd),'material')
                 fprintf(fid_obj, '%s\n', obj(ii).children(dd).material);
             end
