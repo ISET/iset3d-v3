@@ -240,9 +240,11 @@ if isfield(materials, 'colorreflect')
         val = strcat(val, val_colortransmit);
     end
 end
-if ~isempty(materials.colormfp)
-    val_colormfp = sprintf(' "color mfp" [%0.5f %0.5f %0.5f] ',materials.colormfp);
-    val = strcat(val, val_colormfp);
+if isfield(materials, 'colormfp')
+    if ~isempty(materials.colormfp)
+        val_colormfp = sprintf(' "color mfp" [%0.5f %0.5f %0.5f] ',materials.colormfp);
+        val = strcat(val, val_colormfp);
+    end
 end
 if ~isempty(materials.floaturoughness)
     val_floaturoughness = sprintf(' "float uroughness" [%0.5f] ',materials.floaturoughness);
