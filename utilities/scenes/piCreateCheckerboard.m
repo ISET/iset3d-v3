@@ -20,6 +20,7 @@ function recipe = piCreateCheckerboard(outputfile, varargin)
 % HB 2019
 
 p = inputParser;
+p.KeepUnmatched = true;
 p.addRequired('outputfile',@ischar);
 p.addParameter('numX',8,@isnumeric);
 p.addParameter('numY',5,@isnumeric);
@@ -33,6 +34,11 @@ recipe = piRead(fullfile(piRootPath,'data','V3','checkerboard','checkerboard.pbr
 recipe.set('output file',inputs.outputfile);
 piWrite(recipe,'creatematerials',true);
 recipe = piRead(inputs.outputfile);
+
+recipe.metadata.numX = inputs.numX;
+recipe.metadata.numY = inputs.numY;
+recipe.metadata.dimX = inputs.dimX;
+recipe.metadata.dimY = inputs.dimY;
 
 totalWidth = inputs.numX * inputs.dimX;
 totalHeight = inputs.numY * inputs.dimY;

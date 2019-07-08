@@ -260,10 +260,12 @@ if ~isempty(materials.floatroughness)
     val_floatroughness = sprintf(' "float roughness" [%0.5f] ',materials.floatroughness);
     val = strcat(val, val_floatroughness);
 end
-if ~isempty(materials.floateta)
+ 
+if isfield(materials,'floateta') && ~isempty(materials.floateta)
     val_floateta = sprintf(' "float eta" [%0.5f] ',materials.floateta);
     val = strcat(val, val_floateta);
 end
+
 if ~isempty(materials.spectrumkd)
     val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
     val = strcat(val, val_spectrumkd);
