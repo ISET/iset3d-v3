@@ -24,7 +24,7 @@ try
     end
     thisR.materials.txtLines = unique(thisR.materials.txtLines);
 catch
-    disp('No material is found. \n');
+    disp('No material is found.');
 end
 
 
@@ -33,17 +33,23 @@ scene = thisR.assets;
 if isfield(scene,'scale'),scene=rmfield(scene,'scale');end
 numScene = length(scene);
 numObj   = length(thisR_asset.assets);
-for hh = 1:numObj
-    %%
-    if isfield(thisR_asset.assets,'scale')
-        thisR_asset.assets=rmfield(thisR_asset.assets,'scale');
+if isempty(scene)
+    scene = thisR_asset.assets;
+else
+    for hh = 1:numObj
+        %%
+        if isfield(thisR_asset.assets,'scale')
+            thisR_asset.assets=rmfield(thisR_asset.assets,'scale');
+        end        
+        scene(numScene+hh) = thisR_asset.assets(hh);         
+        %%
     end
-    scene(numScene+hh) = thisR_asset.assets(hh);
-    %%
 end
 
+textures = fullfile(fileparts(thisR_asset.inputFile), 'textures');
 assetPath = fileparts(thisR_asset.outputFile);
 scenePath = fileparts(thisR.outputFile);
 copyfile(assetPath, scenePath);
+copyfile(textures, [scenePath,'/textures']);
 thisR.assets = scene;
 end
