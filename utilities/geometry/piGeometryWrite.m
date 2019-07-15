@@ -45,7 +45,11 @@ for ii = 1: length(obj)
                 fprintf(fid_obj, '%s\n', obj(ii).children(dd).material);
             end
             [~,output] = fileparts(obj(ii).children(dd).output);
-            fprintf(fid_obj, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
+            if piContains(obj(ii).children(dd).output, 'Shape')
+                fprintf(fid_obj, '%s \n', obj(ii).children(dd).output);
+            else
+                fprintf(fid_obj, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
+            end
         end
         fprintf(fid_obj,'ObjectEnd \n \n');
         
@@ -57,9 +61,9 @@ for ii = 1: length(obj)
                 if m ==3 && n >= 1
                     for gg = 1:n
                         fprintf(fid_obj,'AttributeBegin \n');
-                        if isempty(obj(ii).position(:,gg))
-                            fprintf(fid_obj,'Translate 0 0 0 \n');
-                        else
+                        if ~isempty(obj(ii).position(:,gg))
+%                             fprintf(fid_obj,'Translate 0 0 0 \n');
+%                         else
                             obj_position = obj(ii).position(:,gg);
                             fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                                 obj_position(2),obj_position(3));
@@ -97,9 +101,9 @@ for ii = 1: length(obj)
                         fprintf(fid_obj,'AttributeBegin \n');
                         % ActiveTranform Start
                         fprintf(fid_obj,'ActiveTransform StartTime \n');
-                        if isempty(obj(ii).position(:,gg))
-                            fprintf(fid_obj,'Translate 0 0 0 \n');
-                        else
+                        if ~isempty(obj(ii).position(:,gg))
+%                             fprintf(fid_obj,'Translate 0 0 0 \n');
+%                         else
                             obj_position = obj(ii).position(:,gg);
                             fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                                 obj_position(2),obj_position(3));
@@ -121,9 +125,9 @@ for ii = 1: length(obj)
                         end
                         % ActiveTranform End
                         fprintf(fid_obj,'ActiveTransform EndTime \n');
-                        if isempty(obj(ii).motion.position(:,gg))
-                            fprintf(fid_obj,'Translate 0 0 0 \n');
-                        else
+                        if ~isempty(obj(ii).motion.position(:,gg))
+%                             fprintf(fid_obj,'Translate 0 0 0 \n');
+%                         else
                             obj_position = obj(ii).motion.position(:,gg);
                             fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                                 obj_position(2),obj_position(3));
@@ -151,9 +155,9 @@ for ii = 1: length(obj)
             obj(ii).position = [0 0 0];
             for gg = 1:n
                 fprintf(fid_obj,'AttributeBegin \n');
-                if isempty(obj(ii).position(:,gg))
-                    fprintf(fid_obj,'Translate 0 0 0 \n');
-                else
+                if ~isempty(obj(ii).position(:,gg))
+%                     fprintf(fid_obj,'Translate 0 0 0 \n');
+%                 else
                     obj_position = obj(ii).position(:,gg);
                     fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
                         obj_position(2),obj_position(3));

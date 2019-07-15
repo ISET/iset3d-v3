@@ -21,6 +21,7 @@ m.rgbkr =[];
 m.rgbks =[];
 m.rgbkd =[];
 m.rgbkt =[];
+m.rgbopacity = [];
 
 m.colorkd = [];
 m.colorks = [];

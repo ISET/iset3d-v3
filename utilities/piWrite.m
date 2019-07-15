@@ -92,6 +92,11 @@ if(isempty(renderRecipe.exporter))
     overwritegeometry = false;
     overwritematerials = false;
 end
+if ~isempty(renderRecipe.materials)
+    creatematerials = true;
+    overwritegeometry = true;
+    overwritematerials = true;
+end
 
 %% Copy the input directory to the Docker working directory
 
@@ -388,9 +393,20 @@ if creatematerials
                 [~,n] = fileparts(renderRecipe.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
+        end 
+        if ii == length(renderRecipe.world)
+            if ~piContains(renderRecipe.world, 'materials.pbrt')
+        [~,n] = fileparts(renderRecipe.outputFile);
+        mLine = sprintf('Include "%s_materials.pbrt"',n);
+        fprintf(fileID,'%s \n',mLine);
+        [~,n] = fileparts(renderRecipe.outputFile);
+        gLine = sprintf('Include "%s_geometry.pbrt"',n);
+        fprintf(fileID,'%s \n',gLine);
+            end
         end
         fprintf(fileID,'%s \n',currLine);
     end
+    
 else
     % No materials were created, so we just write out the world data
     % without any changes.
@@ -410,7 +426,7 @@ end
 fclose(fileID);
 
 %% Overwrite Materials.pbrt
-if piContains(renderRecipe.exporter, 'C4D')
+if piContains(renderRecipe.exporter, 'C4D')|| ~isempty(renderRecipe.materials)
     % If the scene is from Cinema 4D, 
     if ~creatematerials
         % We overwrite from the input directory, but we do not create
@@ -432,7 +448,7 @@ if piContains(renderRecipe.exporter, 'C4D')
 end
 
 %% Overwrite geometry.pbrt
-if piContains(renderRecipe.exporter, 'C4D')
+if piContains(renderRecipe.exporter, 'C4D')||~isempty(renderRecipe.assets)
     if overwritegeometry
         piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag, ...
             'thistrafficflow',thistrafficflow);

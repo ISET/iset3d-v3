@@ -35,7 +35,7 @@ oiSize = oiGet(oi,'size');
 optimalPixel = sqrt(filmDiagonal^2/(oiSize(1)^2+oiSize(2)^2))*1e-3;
 sensor = sensorSet(sensor, 'size', oiGet(oi,'size')*optimalPixel/pixelSize);
 % sensor   = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
-eTime  = autoExposure(oi,sensor,0.90,'video','center rect',rect,'videomax',1/60);
+eTime  = autoExposure(oi,sensor,0.90,'video','center rect',rect,'videomax',1/30);
 fprintf('eT: %s ms \n',eTime*1000);
 sensor = sensorSet(sensor,'exp time',eTime);
 sensor = sensorCompute(sensor,oi);
