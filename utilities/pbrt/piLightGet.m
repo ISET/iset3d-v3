@@ -29,10 +29,14 @@ for ii = 1:length(lightIdx)
     
     if find(piContains(lightSources{ii}.line, 'AreaLightSource'))
         lightSources{ii}.type = 'area';
-        translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
-        lightSources{ii}.position = [str2double(translate{2});...
-                                     str2double(translate{3});...
-                                     str2double(translate{4})];
+        if find(piContains(lower(lightSources{ii}.line), 'translate'))
+            translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
+            lightSources{ii}.position = [str2double(translate{2});...
+                str2double(translate{3});...
+                str2double(translate{4})];
+        else
+            lightSource{ii}.postion = [0;0;0];
+        end
         thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')}, '%q');
         thisLineStr = thisLineStr{1};
         spectrum  = find(piContains(thisLineStr, 'spectrum L'));

@@ -138,6 +138,8 @@ if ~convertedflag
                 % Check if concattranform is contained in a children attribute.
                 if piContains(txtLines(ii-1),':Vector(')
                     name = erase(txtLines(ii-1),'#ObjectName ');
+                elseif piContains(txtLines(ii-2),':Vector(')
+                    name = erase(txtLines(ii-3),'#ObjectName ');
                 elseif piContains(txtLines(ii-3),':Vector(')
                     name = erase(txtLines(ii-3),'#ObjectName ');
                 elseif piContains(txtLines(ii-4),':Vector(')
@@ -157,6 +159,8 @@ if ~convertedflag
                 end
                 if piContains(txtLines(ii-1),'NamedMaterial')
                     obj(jj).material = sprintf('%s',cell2mat(txtLines(ii-1)));
+                else
+                    obj(jj).material = [];
                 end
                 
                 % save obj to a pbrt file
@@ -207,7 +211,7 @@ if ~convertedflag
     
 else
     % The converted flag is true, so AssetInfo is already stored in a
-    % JSON file with the recipe information.  We just copy it isnto the
+    % JSON file with the recipe information.  We just copy it into the
     % recipe.
     renderRecipe_tmp = jsonread(AssetInfo);
     

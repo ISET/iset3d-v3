@@ -68,6 +68,9 @@ for ii=1:nLines
                     break;
                 end
             end
+            if blockBegin == length(txtLines)
+                blockEnd = blockBegin+1;
+            end
         end
     end
 end
