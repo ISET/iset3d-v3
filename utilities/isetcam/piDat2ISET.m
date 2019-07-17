@@ -46,7 +46,7 @@ p.parse(inputFile,varargin{:});
 label       = p.Results.label;
 thisR       = p.Results.recipe;
 meanLuminance   = p.Results.meanluminance;
-meanIlluminance = p.Results.meanilluminancepermm2;
+meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scaleIlluminance = p.Results.scaleIlluminance;
 
 %% Depending on label, assign the output data properly to ieObject
@@ -143,7 +143,7 @@ switch opticsType
         if(scaleIlluminance)
             aperture = oiGet(ieObject,'optics aperture diameter');
             lensArea = pi*(aperture*1e3/2)^2;
-            meanIlluminance = meanIlluminance*lensArea;
+            meanIlluminance = meanIlluminancepermm2*lensArea;
             
             ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
             ieObject.data.illuminance = oiCalculateIlluminance(ieObject);
