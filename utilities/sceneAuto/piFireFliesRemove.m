@@ -45,8 +45,8 @@ dLogIlluminance = conv2(logIlluminance,g,'same');
 brightSpots = (dLogIlluminance > log10(3.5));
 [r,c] = find(brightSpots);
 
-vcNewGraphWin;
-imagesc(brightSpots);
+% vcNewGraphWin;
+% imagesc(brightSpots);
 
 g = ones(3,3)/9;
 isolatedBrightSpots = conv2(brightSpots,g);
