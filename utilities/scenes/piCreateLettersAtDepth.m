@@ -2,9 +2,9 @@ function recipe = piCreateLettersAtDepth(varargin)
 %CREATELETTERSATDEPTH 
 % Create a recipe for a scene that consists of three letters (A,B,C) placed
 % at different distances away from the camera. The backdrop consists of a
-% checkerboard wall and ground. The letters area always placed +/- 10
-% degrees away from the optical axis. 
-
+% checkerboard wall and ground. The letters can be placed at arbitrary
+% degrees away from the optical axis.
+%
 % OPTIONAL input parameter/val
 %   Adist - distance from the camera to the letter A in meters
 %   Bdist - distance from the camera to the letter B in meters
@@ -75,7 +75,6 @@ Cx = tand(Cdeg)*Cdist ;
 for ii = 1:length(recipe.assets)
     
     if strcmp(recipe.assets(ii).name,'A')
-        % Doesn't work! Why?
         recipe.assets(ii).position(1) = Ax;
         recipe.assets(ii).position(3) = Adist;
     end
