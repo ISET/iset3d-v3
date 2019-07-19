@@ -19,12 +19,12 @@ try
     index = 1;
     for jj = length(thisR.materials.txtLines):(length(thisR.materials.txtLines) +...
             length(thisR_asset.materials.txtLines)-1)
-        thisR.materials.txtLines(jj+1,:) = thisR_asset.materials.txtLines(index);
+        thisR.materials.txtLines{jj+1} = thisR_asset.materials.txtLines{index};
         index = index+1;
     end
     thisR.materials.txtLines = unique(thisR.materials.txtLines);
 catch
-    disp('No material is found.');
+    warning('No material is found!');
 end
 
 
