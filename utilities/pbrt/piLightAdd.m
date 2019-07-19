@@ -1,4 +1,5 @@
 function thisR = piLightAdd(thisR, varargin)
+
 %% Add different types of light sources to a scene
 % 
 % Required Inputs:
@@ -38,15 +39,6 @@ function thisR = piLightAdd(thisR, varargin)
 %       Not al the lights and parameters can be represented in ISET3d at
 %       the moment, but our hope is that they will be in the future. 
 %
-%% Add different type of light sources to a scene
-%
-% Inputs:
-%       thisR: render recipe
-%       types:
-%             Point: Casts the same amount of illumination in all directions.
-%             Spot: Specify a cone of directions in which light is emitted.
-%             distant: It represents a directional light source "at infinity".
-%       other related parameters for each type of light source
 % Outputs:
 %
 % Required: ISETCam
@@ -95,7 +87,7 @@ spectrumScale = p.Results.spectrumscale;
 from = p.Results.from;
 to = p.Results.to;
 coneAngle = p.Results.coneangle;
-conDeltaAngle = p.Results.conedeltaangle;
+coneDeltaAngle = p.Results.conedeltaangle;
 idxL      = p.Results.update;
 
 %% check whether a light needs to be replaced
@@ -115,16 +107,12 @@ if idxL
     if find(piContains(varargin, 'coneAngle')), coneAngle = p.Results.coneangle;
     else, coneAngle = lightsource{idxL}.coneangle; end
     
-    if find(piContains(varargin, 'coneDeltaAngle')), conDeltaAngle = p.Results.conedeltaangle;
-    else, conDeltaAngle = lightsource{idxL}.conedeltaangle; end
+    if find(piContains(varargin, 'coneDeltaAngle')), coneDeltaAngle = p.Results.conedeltaangle;
+    else, coneDeltaAngle = lightsource{idxL}.conedeltaangle; end
     piLightDelete(thisR, idxL);
 end
 %% Write out lightspectrum into a light.spd file
-<<<<<<< HEAD
 
-=======
-% [~,sceneName] = fileparts(thisR.inputFile);
->>>>>>> clean up the code
 if ischar(lightSpectrum)
     try
         % Load from ISETCam/ISETBio ligt data
@@ -147,18 +135,12 @@ else
     % add customized lightspectrum array [400 1 600 1 800 1]
 end
 %% Read light source struct from world struct
-<<<<<<< HEAD
-currentlightSources = piLightGet(thisR, 'print', false);
 
-%% Construct a lightsource structure
-numLights = length(currentlightSources);
-
-=======
 % currentlightSources = piLightGet(thisR, 'print', false);
 % %% Construct a lightsource structure
 % numLights = length(currentlightSources);
 newlight = [];
->>>>>>> clean up the code
+
 switch type
     case 'point'
         newlight{1}.type = 'point';
@@ -176,28 +158,22 @@ switch type
         newlight{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
             lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-        thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+        thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
         newlight{1}.line{2,:} = [newlight{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'laser' % not supported for public
         newlight{1}.type = 'laser';
         newlight{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
             lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-        thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+        thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
         newlight{1}.line{1,:} = [newlight{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
-<<<<<<< HEAD
-        currlightSource{1}.type = 'distant';
-        currlightSource{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
-    case 'infinite'
-        currlightSource{1}.type = 'infinite';
-        currlightSource{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
-=======
         newlight{1}.type = 'distant';
         newlight{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-            lightSpectrum, from, to);
->>>>>>> clean up the code
+                lightSpectrum, from, to);
+    case 'infinite'
+        newlight{1}.type = 'infinite';
+        newlight{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
     case 'area'
         % find area light geometry info
         
@@ -284,5 +260,4 @@ else
     disp('Light Added to the Scene.');
 end
 end
-
 
