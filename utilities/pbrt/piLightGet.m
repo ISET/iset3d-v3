@@ -39,8 +39,13 @@ for ii = 1:length(lightIdx)
         end
         thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')}, '%q');
         thisLineStr = thisLineStr{1};
-        thisLineStr(piContains(thisLineStr,'['))=[];
-        thisLineStr(piContains(thisLineStr,']'))=[];
+        for jj = 1:length(thisLineStr)
+            if piContains(thisLineStr{jj},'[')||...
+                    piContains(thisLineStr{jj},']')
+                thisLineStr{jj} = strrep(thisLineStr{jj},'[','');
+                thisLineStr{jj} = strrep(thisLineStr{jj},']','');
+            end
+        end
         spectrum  = find(piContains(thisLineStr, 'spectrum L'));
         if spectrum
             if isnan(str2double(thisLineStr{spectrum+1}))
@@ -70,8 +75,11 @@ for ii = 1:length(lightIdx)
                     thisLineStr{jj} = strrep(thisLineStr{jj},']','');
                 end
             end
+<<<<<<< HEAD
             thisLineStr(piContains(thisLineStr,'['))=[];
             thisLineStr(piContains(thisLineStr,']'))=[];
+=======
+>>>>>>> fix bugs
             from = find(piContains(thisLineStr, 'point from'));
             lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
                 piParseNumericString(thisLineStr{from+2});...
@@ -98,7 +106,7 @@ for ii = 1:length(lightIdx)
             end
             rgbL = find(piContains(thisLineStr, 'rgb L'));
             if rgbL
-                thisRgbL = piParseNumericString(thisLineStr,rgbL);
+                thisRgbL = piParseRGB(thisLineStr,rgbL);
                 lightSources{ii}.rgbL = thisRgbL;
             end
         end
