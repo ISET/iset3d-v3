@@ -38,8 +38,17 @@ function thisR = piLightAdd(thisR, varargin)
 %       Not al the lights and parameters can be represented in ISET3d at
 %       the moment, but our hope is that they will be in the future. 
 %
+%% Add different type of light sources to a scene
+%
+% Inputs:
+%       thisR: render recipe
+%       types:
+%             Point: Casts the same amount of illumination in all directions.
+%             Spot: Specify a cone of directions in which light is emitted.
+%             distant: It represents a directional light source "at infinity".
+%       other related parameters for each type of light source
 % Outputs:
-%        
+%
 % Required: ISETCam
 % See also: piSkymapAdd(Add HDR lighting for global illumination)
 % Zhenyi, TL, SCIEN, 2019
@@ -65,9 +74,9 @@ p.addParameter('from', [0 0 0]);
 % used for spot light
 p.addParameter('to', [0 0 1]);
 
-% The angle that the spotlight's cone makes with its primary axis. 
-% For directions up to this angle from the main axis, the full radiant 
-% intensity given by "I" is emitted. After this angle and up to 
+% The angle that the spotlight's cone makes with its primary axis.
+% For directions up to this angle from the main axis, the full radiant
+% intensity given by "I" is emitted. After this angle and up to
 % "coneangle" + "conedeltaangle", illumination falls off until it is zero.
 p.addParameter('coneangle', 30, @isnumeric); % It's 30 by default
 % The angle at which the spotlight intensity begins to fall off at the edges.
@@ -141,96 +150,97 @@ numLights = length(currentlightSources);
 
 switch type
     case 'point'
-        lightSources{1}.type = 'point';
+        currlightSource{1}.type = 'point';
         if p.Results.cameracoordinate
-            lightSources{1}.line{1} = 'AttributeBegin';
-            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd"', lightSpectrum);
-            lightSources{1}.line{end+1} = 'AttributeEnd';
+            currlightSource{1}.line{1} = 'AttributeBegin';
+            currlightSource{1}.line{2,:} = 'CoordSysTransform "camera"';
+            currlightSource{1}.line{3,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd"', lightSpectrum);
+            currlightSource{1}.line{end+1} = 'AttributeEnd';
         else
-            lightSources{1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
+            currlightSource{1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
                 lightSpectrum, from);
-        end    
+        end
     case 'spot'
-        lightSources{1}.type = 'spot';
-        lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
+        currlightSource{1}.type = 'spot';
+        currlightSource{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+            lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
-        lightSources{1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+        currlightSource{1}.line{2,:} = [currlightSource{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'laser' % not supported for public
-        lightSources{1}.type = 'laser';
-        lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
+        currlightSource{1}.type = 'laser';
+        currlightSource{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+            lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
-        lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+        currlightSource{1}.line{1,:} = [currlightSource{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
-        lightSources{1}.type = 'distant';
-        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        currlightSource{1}.type = 'distant';
+        currlightSource{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
     case 'infinite'
-        lightSources{1}.type = 'infinite';
-        lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+        currlightSource{1}.type = 'infinite';
+        currlightSource{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
     case 'area'
         % find area light geometry info
         
         nlight = 1;
         for ii = 1:length(thisR.assets)
             if piContains(lower(thisR.assets(ii).name), 'area')
-                lightSources{nlight}.type = 'area';
-                lightSources{nlight}.line{1} = 'AttributeBegin';
+                currlightSource{nlight}.type = 'area';
+                currlightSource{nlight}.line{1} = 'AttributeBegin';
                 if ~isempty(idxL)
                     if ~isempty(from)
-                        lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                        currlightSource{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
                             from(2), from(3));
                     end
                 else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
-                                thisR.assets(ii).position(2), thisR.assets(ii).position(3));
-                end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1)); 
-                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2)); 
-                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd" "bool twosided" "true"', lightSpectrum);
-                lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
-                lightSources{nlight}.line{end+1} = 'AttributeEnd';
-                nlight = nlight+1;
-            elseif piContains(lower(thisR.assets(ii).name), 'sphere')
-                lightSources{nlight}.type = 'area';
-                lightSources{nlight}.line{1} = 'AttributeBegin';
-                if ~isempty(idxL)
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
-                        from(2), from(3));
-                else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                    currlightSource{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
                         thisR.assets(ii).position(2), thisR.assets(ii).position(3));
                 end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
-                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
-                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
-                lightSources{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
-                lightSources{nlight}.line{end+1} = 'AttributeEnd';
+                currlightSource{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
+                currlightSource{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
+                currlightSource{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
+                currlightSource{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd" "bool twosided" "true"', lightSpectrum);
+                currlightSource{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
+                currlightSource{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
-            else % update current lightsource
-               lightSources{nlight}.type = 'area';
-               lightSources{nlight}.line{1} = 'AttributeBegin'; 
-               if ~isempty(from)
-                   lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
-                       from(2), from(3));
-               end
-               lightSources{nlight}.line{3,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd" "bool twosided" "true"', lightSpectrum);
-               if find(piContains(lightsource{idxL}.line, 'Shape "trianglemesh"'))
-                   lightSources{nlight}.line{4} = lightsource{idxL}.line{piContains(lightsource{idxL}.line, 'Shape "trianglemesh"')};
-               elseif find(piContains(lightsource{idxL}.line, 'Include'))
-                   lightSources{nlight}.line{4,:} = lightsource{idxL}.line{piContains(lightsource{idxL}.line, 'Include')};
-               end
-               lightSources{nlight}.line{end+1} = 'AttributeEnd';
-               break;
+            elseif piContains(lower(thisR.assets(ii).name), 'sphere')
+                currlightSource{nlight}.type = 'area';
+                currlightSource{nlight}.line{1} = 'AttributeBegin';
+                if ~isempty(idxL)
+                    currlightSource{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                        from(2), from(3));
+                else
+                    currlightSource{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                        thisR.assets(ii).position(2), thisR.assets(ii).position(3));
+                end
+                currlightSource{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
+                currlightSource{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
+                currlightSource{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
+                currlightSource{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
+                currlightSource{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
+                currlightSource{nlight}.line{end+1} = 'AttributeEnd';
+                nlight = nlight+1;
             end
-            
         end
+        if isempty(currlightSource) % update current lightsource
+            currlightSource{nlight}.type = 'area';
+            currlightSource{nlight}.line{1} = 'AttributeBegin';
+            if ~isempty(from)
+                currlightSource{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                    from(2), from(3));
+            end
+            currlightSource{nlight}.line{3,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd" "bool twosided" "true"', lightSpectrum);
+            if find(piContains(lightsource{idxL}.line, 'Shape "trianglemesh"'))
+                currlightSource{nlight}.line{4} = lightsource{idxL}.line{piContains(lightsource{idxL}.line, 'Shape "trianglemesh"')};
+            elseif find(piContains(lightsource{idxL}.line, 'Include'))
+                currlightSource{nlight}.line{4,:} = lightsource{idxL}.line{piContains(lightsource{idxL}.line, 'Include')};
+            end
+            currlightSource{nlight}.line{end+1} = 'AttributeEnd';
+        end
+        
+        
 end
 %%
 index_m = find(piContains(thisR.world,'_materials.pbrt'));
@@ -238,20 +248,20 @@ index_g = find(piContains(thisR.world,'_geometry.pbrt'));
 if ~isempty(index_m) || ~isempty(index_g)
     world = thisR.world(1:end-3);
 elseif ~isempty(index_m)
-    world = thisR.world(1:index_m);  
+    world = thisR.world(1:index_m);
 elseif ~isempty(index_g)
     world = thisR.world(1:index_g);
 else
     world = thisR.world(1:end-1);
 end
-for jj = 1: length(lightSources)
+for jj = 1: length(currlightSource)
     numWorld = length(world);
     % infinity light can be added by piSkymap add.
-    if ~piContains(lightSources{jj}.type, 'infinity')
+    if ~piContains(currlightSource{jj}.type, 'infinity')
         ll=1;
-        for kk = 1: length(lightSources{jj}.line)
-            if ~isempty(lightSources{jj}.line{kk})
-                world{numWorld+ll,:} = lightSources{jj}.line{kk};
+        for kk = 1: length(currlightSource{jj}.line)
+            if ~isempty(currlightSource{jj}.line{kk})
+                world{numWorld+ll,:} = currlightSource{jj}.line{kk};
                 ll = ll+1;
             end
         end
