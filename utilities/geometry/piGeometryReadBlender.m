@@ -12,6 +12,7 @@ mlist(1:length(MaterialDefineList)) = [];
 % for now, only lights using attributebegin/end pairs, will use in the
 % future if other cases use this string pairs.
 attributeList = find(piContains(thisR.world, 'attribute'));
+assets = [];
 %% read geometry information
 for ii = 1:(length(mlist)-1)
     %List includes all the following transformation and geometry
