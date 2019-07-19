@@ -47,7 +47,7 @@ p.addParameter('cameracoordinate',false);
 % scale the spectrum
 p.addParameter('spectrumscale', 1);
 % update an exist light
-p.addParameter('update',0);
+p.addParameter('update',[]);
 p.parse(thisR, varargin{:});
 
 type = p.Results.type;
@@ -144,9 +144,11 @@ switch type
             if piContains(lower(thisR.assets(ii).name), 'area')
                 lightSources{nlight}.type = 'area';
                 lightSources{nlight}.line{1} = 'AttributeBegin';
-                if idxL
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
-                                from(2), from(3));
+                if ~isempty(idxL)
+                    if ~isempty(from)
+                        lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                            from(2), from(3));
+                    end
                 else
                     lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
                                 thisR.assets(ii).position(2), thisR.assets(ii).position(3));
@@ -158,10 +160,10 @@ switch type
                 lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
                 lightSources{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
-            elseif piContains(lower(thisR.assets(ii).name), 'light')
+            elseif piContains(lower(thisR.assets(ii).name), 'sphere')
                 lightSources{nlight}.type = 'area';
                 lightSources{nlight}.line{1} = 'AttributeBegin';
-                if idxL
+                if ~isempty(idxL)
                     lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
                         from(2), from(3));
                 else
@@ -175,26 +177,53 @@ switch type
                 lightSources{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
                 lightSources{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
+            else % update current lightsource
+               lightSources{nlight}.type = 'area';
+               lightSources{nlight}.line{1} = 'AttributeBegin'; 
+               if ~isempty(from)
+                   lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                       from(2), from(3));
+               end
+               lightSources{nlight}.line{3,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd" "bool twosided" "true"', lightSpectrum);
+               if find(piContains(lightsource{idxL}.line, 'Shape "trianglemesh"'))
+                   lightSources{nlight}.line{4} = lightsource{idxL}.line{piContains(lightsource{idxL}.line, 'Shape "trianglemesh"')};
+               elseif find(piContains(lightsource{idxL}.line, 'Include'))
+                   lightSources{nlight}.line{4,:} = lightsource{idxL}.line{piContains(lightsource{idxL}.line, 'Include')};
+               end
+               lightSources{nlight}.line{end+1} = 'AttributeEnd';
+               break;
             end
             
         end
 end
 %%
-index_m = piContains(thisR.world,'_materials.pbrt');
-index_g = piContains(thisR.world,'_geometry.pbrt');
-world = thisR.world(1:end-3);
+index_m = find(piContains(thisR.world,'_materials.pbrt'));
+index_g = find(piContains(thisR.world,'_geometry.pbrt'));
+if ~isempty(index_m) || ~isempty(index_g)
+    world = thisR.world(1:end-3);
+elseif ~isempty(index_m)
+    world = thisR.world(1:index_m);  
+elseif ~isempty(index_g)
+    world = thisR.world(1:index_g);
+else
+    world = thisR.world(1:end-1);
+end
 for jj = 1: length(lightSources)
     numWorld = length(world);
-     % infinity light can be added by piSkymap add.
+    % infinity light can be added by piSkymap add.
     if ~piContains(lightSources{jj}.type, 'infinity')
+        ll=1;
         for kk = 1: length(lightSources{jj}.line)
-            world{numWorld+kk,:} = lightSources{jj}.line{kk};
+            if ~isempty(lightSources{jj}.line{kk})
+                world{numWorld+ll,:} = lightSources{jj}.line{kk};
+                ll = ll+1;
+            end
         end
     end
 end
 numWorld = length(world);
-world{numWorld+1,:} = thisR.world{index_m};
-world{numWorld+2,:} = thisR.world{index_g};
+if ~isempty(index_m), world{numWorld+1,:} = thisR.world{index_m};end
+if ~isempty(index_g), world{numWorld+2,:} = thisR.world{index_g};end
 world{end+1,:} = 'WorldEnd';
 thisR.world = world;
 if idxL

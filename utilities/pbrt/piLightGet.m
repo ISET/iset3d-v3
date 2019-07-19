@@ -35,10 +35,12 @@ for ii = 1:length(lightIdx)
                 str2double(translate{3});...
                 str2double(translate{4})];
         else
-            lightSource{ii}.postion = [0;0;0];
+            lightSources{ii}.postion = [0;0;0];
         end
         thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')}, '%q');
         thisLineStr = thisLineStr{1};
+        thisLineStr(piContains(thisLineStr,'['))=[];
+        thisLineStr(piContains(thisLineStr,']'))=[];
         spectrum  = find(piContains(thisLineStr, 'spectrum L'));
         if spectrum
             if isnan(str2double(thisLineStr{spectrum+1}))
@@ -48,6 +50,12 @@ for ii = 1:length(lightIdx)
             end
             lightSources{ii}.spectrum = thisSpectrum;
         end
+        
+        rgbL = find(piContains(thisLineStr, 'rgb L'));
+        if rgbL
+            thisRgbL = piParseRGB(thisLineStr, rgbL);
+            lightSources{ii}.rgbL = thisRgbL;
+        end
     else
         lightType = lightSources{ii}.line{piContains(lightSources{ii}.line,'LightSource')};
         lightType = strsplit(lightType, ' ');
@@ -55,6 +63,9 @@ for ii = 1:length(lightIdx)
         if ~piContains(lightSources{ii}.type, 'infinite')
             thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')}, '%q');
             thisLineStr = thisLineStr{1};
+            thisLineStr(piContains(thisLineStr,'['))=[];
+            thisLineStr(piContains(thisLineStr,']'))=[];
+            
             from = find(piContains(thisLineStr, 'point from'));
             lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
                 piParseNumericString(thisLineStr{from+2});...
@@ -79,6 +90,11 @@ for ii = 1:length(lightIdx)
                 end
                 lightSources{ii}.spectrum = thisSpectrum;
             end
+            rgbL = find(piContains(thisLineStr, 'rgb L'));
+            if rgbL
+                thisRgbL = piParseNumericString(thisLineStr,rgbL);
+                lightSources{ii}.rgbL = thisRgbL;
+            end
         end
     end
 end
@@ -96,6 +112,12 @@ function val = piParseNumericString(str)
 str = strrep(str,'[','');
 str = strrep(str,']','');
 val = str2double(str);
+end
+function rgb = piParseRGB(thisLine,ss)
+r = piParseNumericString(thisLine{ss+1});
+g = piParseNumericString(thisLine{ss+2});
+b = piParseNumericString(thisLine{ss+3});
+rgb = [r,g,b];
 end
 function light = lightInit
 light.type           = [];
