@@ -222,7 +222,7 @@ scene3d.numRays = 128;
 scene3d.numCABands = 0;
 scene3d.accommodation = 1; % Accommodate to the plane 
 
-oi = scene3d.render();
+[oi,results] = scene3d.render();
 oi = oiSet(oi,'name','Textured plane');
 oiWindow(oi);
 

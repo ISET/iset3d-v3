@@ -352,10 +352,12 @@ if exporterFlag
 elseif ~isempty(find(piContains(thisR.world, 'Shape'),1)) &&...
         ~isempty(find(piContains(thisR.world, 'MakeNamedMaterial')))
     thisR = piGeometryReadBlender(thisR);
-    thisR.world(piContains(thisR.world, 'Shape "plymesh"'))=[];
-    thisR.world(piContains(thisR.world, 'Texture'))=[];
-    thisR.world(piContains(thisR.world, 'NamedMaterial'))=[];
-    thisR.world(piContains(thisR.world, 'Transform'))=[];
+    if ~isempty(thisR.assets)
+        thisR.world(piContains(thisR.world, 'Shape "plymesh"'))=[];
+        thisR.world(piContains(thisR.world, 'Texture'))=[];
+        thisR.world(piContains(thisR.world, 'NamedMaterial'))=[];
+        thisR.world(piContains(thisR.world, 'Transform'))=[];
+    end
 end
 
 end

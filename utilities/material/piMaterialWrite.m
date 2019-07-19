@@ -46,9 +46,10 @@ if isfield(thisR.materials, 'txtLines')
     output = thisR.materials.outputFile_materials;
     [~,materials_fname,~]=fileparts(output);
     txtLines = thisR.materials.txtLines;
-    for ii = 1:size(txtLines)
+    
+    for ii = 1:length(txtLines)
         if ~isempty(txtLines(ii))
-            if piContains(txtLines(ii),'MakeNamedMaterial')
+            if piContains(txtLines{ii},'MakeNamedMaterial')
                 txtLines{ii}=[];
             end
         end
@@ -60,8 +61,9 @@ if isfield(thisR.materials, 'txtLines')
 end
 for jj = 1: length(textureLines)
     textureLines_tmp = [];
-    textureLines{jj} = strrep(textureLines{jj}, '[ ', '');
-    textureLines{jj} = strrep(textureLines{jj}, '] ', '');
+    textureLines{jj} = strrep(textureLines{jj}, '" [ "', '" "');
+    textureLines{jj} = strrep(textureLines{jj}, '" ] "', '" "');
+    textureLines{jj} = strrep(textureLines{jj}, '" ] ', '" ');
     %     thisLine_tmp = textscan(textureLines{jj},'%q');
     thisLine_tmp= strsplit(textureLines{jj},' ');
     thisLine_tmp = thisLine_tmp(~cellfun(@isempty,thisLine_tmp));

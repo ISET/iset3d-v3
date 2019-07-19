@@ -1,3 +1,4 @@
+
 function workingDir = piWrite(renderRecipe,varargin)
 % Write a PBRT scene file based on its renderRecipe
 %
@@ -87,17 +88,18 @@ thistrafficflow         = p.Results.thistrafficflow;
 % file). Here we do a pre-check: if the exporter isn't C4D don't touch the
 % materials or geometry at all. Just copy files over to the output
 % directory. Hopefully that will clean things up a bit.
-if(isempty(renderRecipe.exporter))
+if isempty(renderRecipe.exporter)
     creatematerials = false;
     overwritegeometry = false;
     overwritematerials = false;
 end
 if ~isempty(renderRecipe.materials)
     creatematerials = true;
-    overwritegeometry = true;
     overwritematerials = true;
 end
-
+if ~isempty(renderRecipe.assets)
+    overwritegeometry = true;
+end
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
