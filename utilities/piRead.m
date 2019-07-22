@@ -350,7 +350,7 @@ if exporterFlag
     thisR = piGeometryRead(thisR); 
     % fprintf('Done with geometry read\n');
 elseif ~isempty(find(piContains(thisR.world, 'Shape'),1)) &&...
-        ~isempty(find(piContains(thisR.world, 'MakeNamedMaterial')))
+        ~isempty(find(piContains(thisR.world, 'MakeNamedMaterial'), 1))
     thisR = piGeometryReadBlender(thisR);
     if ~isempty(thisR.assets)
         thisR.world(piContains(thisR.world, 'Shape "plymesh"'))=[];
