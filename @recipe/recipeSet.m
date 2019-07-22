@@ -156,14 +156,24 @@ switch param
             thisR.camera.specfile.value = val;
             thisR.camera.specfile.type = 'string';
         end
+    case {'lensradius','lens radius'}
+        thisR.camera.lensradius.value = val;
+        thisR.camera.lensradius.type = 'float';
     case {'aperture','aperturediameter'}
         % This set should look at the aperture in the lens file, which
         % represents the largest possible aperture.  It should not
         % allow a value bigger than that.  (ZL/BW).
+        
+        % Throw a warning for perspective camera
+        if isequal(thisR.camera.subtype,'pinhole')||...
+                isequal(thisR.camera.subtype,'perspective')
+            Warning('Perspective/pinhole camera does not use the aperture diameter variable. Use "lensradius" instead.')
+        end
+        
         thisR.camera.aperturediameter.value = val;
         thisR.camera.aperturediameter.type = 'float';
-        
-    case {'focusdistance'}
+
+    case {'focusdistance','focaldistance'}
         % This is the distance to the object in the scene that will be
         % in focus.  When this is set, the film distance is derived by
         % PBRT.  It is possible that there is no film distance for
@@ -174,8 +184,16 @@ switch param
         % it is possible to look at an object but have it not be the
         % object that is in focus.
         %
-        thisR.camera.focusdistance.value = val;
-        thisR.camera.focusdistance.type = 'float';
+        % Depending on the camera type, it's either focusdistance or
+        % focaldistance. Not sure why there is a difference!
+        if isequal(thisR.camera.subtype,'pinhole')||...
+                isequal(thisR.camera.subtype,'perspective')
+            thisR.camera.focaldistance.value = val;
+            thisR.camera.focaldistance.type = 'float';
+        else
+            thisR.camera.focusdistance.value = val;
+            thisR.camera.focusdistance.type = 'float';
+        end
     case 'fov'
         % This sets a horizontal fov
         % We should check that this is a pinhole, I think
