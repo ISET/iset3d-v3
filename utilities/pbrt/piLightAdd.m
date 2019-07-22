@@ -1,19 +1,50 @@
-
 function thisR = piLightAdd(thisR, varargin)
-%% Add different type of light sources to a scene
+
+%% Add different types of light sources to a scene
+% 
+% Required Inputs:
+%       'thisR' -  Insert a light source in this recipe.
 %
-% Inputs:
-%       thisR: render recipe
-%       types:
-%             Point: Casts the same amount of illumination in all directions.
-%             Spot: Specify a cone of directions in which light is emitted.
-%             distant: It represents a directional light source "at infinity".
-%       other related parameters for each type of light source
+% Optional Inputs:
+%       'type'  - The type of light source to insert. Can be the following:
+%             'point'   - Casts the same amount of illumination in all
+%                         directions. Takes parameters 'to' and 'from'.
+%             'spot'    - Specify a cone of directions in which light is
+%                         emitted. Takes parameters 'to','from',
+%                         'coneangle', and 'conedeltaangle.'
+%             'distant' - A directional light source "at
+%                         infinity". Takes parameters 'to' and 'from'.
+%             'area'    - convert an object into an area light. (TL: Needs
+%                         more documentation; I'm not sure how it's used at
+%                         the moment.)
+%             'infinite' - an infinitely far away light source that
+%                          potentially casts illumination from all
+%                          directions. Takes no parameters.
+%
+%       'light spectrum' - The spectrum that the light will emit. Read
+%                          from ISETCam/ISETBio light data. See
+%                          "isetbio/isettools/data/lights" or
+%                          "isetcam/data/lights."
+%       'spectrumscale'  - scale the spectrum. Important for setting
+%                          relative weights for multiple light sources.
+%       'cameracoordinate' - true or false. automatically place the light
+%                            at the camera location.
+%       'update'         - update an existing light source.
+%
+%       For more information in the different light sources and their
+%       parameters, take a look at the PBRT web page: 
+%
+%       https://www.pbrt.org/fileformat-v3.html#lights
+%
+%       Not al the lights and parameters can be represented in ISET3d at
+%       the moment, but our hope is that they will be in the future. 
+%
 % Outputs:
 %
 % Required: ISETCam
 % See also: piSkymapAdd(Add HDR lighting for global illumination)
-% Zhenyi, SCIEN, 2019
+% Zhenyi, TL, SCIEN, 2019
+%
 % Example:
 %{
 lightSources = piLightGet(thisR);
@@ -56,8 +87,9 @@ spectrumScale = p.Results.spectrumscale;
 from = p.Results.from;
 to = p.Results.to;
 coneAngle = p.Results.coneangle;
-conDeltaAngle = p.Results.conedeltaangle;
+coneDeltaAngle = p.Results.conedeltaangle;
 idxL      = p.Results.update;
+
 %% check whether a light needs to be replaced
 if idxL
     lightsource = piLightGet(thisR, 'print', false);
@@ -75,14 +107,15 @@ if idxL
     if find(piContains(varargin, 'coneAngle')), coneAngle = p.Results.coneangle;
     else, coneAngle = lightsource{idxL}.coneangle; end
     
-    if find(piContains(varargin, 'conDeltaAngle')), conDeltaAngle = p.Results.conedeltaangle;
-    else, conDeltaAngle = lightsource{idxL}.conedeltaangle; end
+    if find(piContains(varargin, 'coneDeltaAngle')), coneDeltaAngle = p.Results.conedeltaangle;
+    else, coneDeltaAngle = lightsource{idxL}.conedeltaangle; end
     piLightDelete(thisR, idxL);
 end
 %% Write out lightspectrum into a light.spd file
-% [~,sceneName] = fileparts(thisR.inputFile);
+
 if ischar(lightSpectrum)
     try
+        % Load from ISETCam/ISETBio ligt data
         thisLight = load(lightSpectrum);
     catch
         error('%s light is not recognized \n', lightSpectrum);
@@ -102,10 +135,12 @@ else
     % add customized lightspectrum array [400 1 600 1 800 1]
 end
 %% Read light source struct from world struct
+
 % currentlightSources = piLightGet(thisR, 'print', false);
 % %% Construct a lightsource structure
 % numLights = length(currentlightSources);
 newlight = [];
+
 switch type
     case 'point'
         newlight{1}.type = 'point';
@@ -123,19 +158,22 @@ switch type
         newlight{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
             lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-        thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+        thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
         newlight{1}.line{2,:} = [newlight{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'laser' % not supported for public
         newlight{1}.type = 'laser';
         newlight{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
             lightSpectrum, from, to);
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-        thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+        thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
         newlight{1}.line{1,:} = [newlight{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
-        newlight{1}.type = 'distant';
-        newlight{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-            lightSpectrum, from, to);
+        lightSources{1}.type = 'distant';
+        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+                lightSpectrum, from, to);
+    case 'infinite'
+        lightSources{1}.type = 'infinite';
+        lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
     case 'area'
         % find area light geometry info
         

@@ -279,6 +279,30 @@ oi = scene3d.render();
 oi = oiSet(oi,'name','Letters at depth');
 oiWindow(oi);
 
+%% Letters at depth plus
+%  Now with five letters (A,B,C,D,and E) placed in a checkerboard backdrop.
+
+scene3d = sceneEye('lettersAtDepthPlus',...
+                    'Adist',1/1.8,...
+                    'Bdist',1/1.4,...
+                    'Cdist',1/1.2,...
+                    'Ddist',1,...
+                    'Edist',1/0.8,...
+                    'Adeg',5,...
+                    'Bdeg',2.5,...
+                    'Ddeg',2.5,...
+                    'Edeg',5);
+                
+scene3d.fov = 20; 
+scene3d.resolution = 128;
+scene3d.numRays = 128;
+scene3d.numCABands = 0;
+scene3d.accommodation = 1; % Accommodate to the point 
+
+oi = scene3d.render();
+oi = oiSet(oi,'name','Letters at depth');
+oiWindow(oi);
+
 %% Colored Cube
 % A cube with different colored sides. Another mdoel used primarily to test
 % rotations. You can see how ISET3d handles rotations in

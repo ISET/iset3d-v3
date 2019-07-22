@@ -80,6 +80,14 @@ end
 
 %% Read the data and set some of the ieObject parameters
 
+% Only do the following if the recipe exists, otherwise just return the
+% data
+if(isempty(thisR))
+    warning('Recipe not given. Returning photons directly.')
+    ieObject = photons;
+    return;
+end
+
 % Create a name for the ISET object
 pbrtFile   = thisR.outputFile;
 [~,name,~] = fileparts(pbrtFile);
