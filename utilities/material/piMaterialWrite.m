@@ -222,7 +222,7 @@ if ~isempty(materials.rgbkt)
 end
 if isfield(materials, 'rgbopacity')
     if ~isempty(materials.rgbopacity)
-        val_opacity = sprintf(' "rgb Opacity" [%0.5f %0.5f %0.5f] ',materials.rgbopacity);
+        val_opacity = sprintf(' "rgb opacity" [%0.5f %0.5f %0.5f] ',materials.rgbopacity);
         val = strcat(val, val_opacity);
     end
 end
