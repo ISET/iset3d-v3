@@ -51,6 +51,7 @@ function camera = piCameraCreate(cameraType, varargin)
 %    04/02/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
 %    05/09/19  JNM  Merge Master in again
+%    07/30/19  JNM  Rebase from Master
 
 %% Check input
 p = inputParser;
@@ -91,16 +92,25 @@ switch cameraType
         camera.fov.type = 'float';
         camera.fov.value = 45;  % deg of angle
     case {'realistic'}
-        % We used to allow 'realisticdiffraction', and 'lens'
+        % Check for lens .dat file
         [~, ~, e] = fileparts(lensFile);
         if ~strcmp(e, '.dat')
-            error('Realistic camera needs *.dat lens file.');
+            % Sometimes we are sent in the json file
+            warning('Realistic camera needs *.dat lens file. Checking.');
+            [p, n, ~] = fileparts(lensFile);
+            lensFile = fullfile(p, [n '.dat']);
+            if ~exist(fullfile(p, [n '.dat']), 'file')
+                error('No corresponding dat file found');
+            else
+                fprintf('Found %s\n', lensFile);
+            end
         end
         camera.type = 'Camera';
         camera.subtype = 'realistic';
         camera.lensfile.type = 'string';
-        camera.lensfile.value = fullfile(piRootPath, 'data', ...
-            'lens', lensFile);
+        camera.lensfile.value = which(lensFile);
+        % camera.lensfile.value = fullfile(piRootPath, 'data', ...
+        %    'lens', lensFile);
         camera.aperturediameter.type = 'float';
         camera.aperturediameter.value = 5;  % mm
         camera.focusdistance.type = 'float';
@@ -113,8 +123,9 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'omni';
         camera.lensfile.type = 'string';
-        camera.lensfile.value = fullfile(piRootPath, 'data', ...
-            'lens', lensFile);
+        camera.lensfile.value = which(lensFile);
+        % camera.lensfile.value = fullfile(piRootPath, 'data', ...
+        %     'lens', lensFile);
         camera.aperturediameter.type = 'float';
         camera.aperturediameter.value = 5;  % mm
         camera.focusdistance.type = 'float';
@@ -124,8 +135,9 @@ switch cameraType
         camera.type = 'Camera';
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
-        camera.specfile.value = ...
-            fullfile(piRootPath, 'data', 'lens', lensFile);
+        camera.specfile.value = which(lensFile);
+        % camera.specfile.value = ...
+        %     fullfile(piRootPath, 'data', 'lens', lensFile);
         camera.filmdistance.type = 'float';
         camera.filmdistance.value = 50;    % mm
         camera.aperture_diameter.type = 'float';
@@ -156,8 +168,8 @@ switch cameraType
         % missing parameters here.
         camera.type = 'Camera';
         camera.subtype = 'realisticEye';
-        camera.specfile.type = 'string';
-        camera.specfile.value = '';  % FILL IN
+        camera.lensfile.type = 'string';
+        camera.lensfile.value = ''; % FILL IN
         camera.retinaDistance.type = 'float';
         camera.retinaDistance.value = 16.32;
         camera.retinaRadius.type = 'float';

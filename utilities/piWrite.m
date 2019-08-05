@@ -46,6 +46,7 @@ function workingDir = piWrite(renderRecipe, varargin)
 %    01/25/19  JNM  Add Windows support 01/25/2019
 %    03/25/19  JNM  Documentation pass.
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    07/29/19  JNM  Rebase from master
 
 % Examples:
 %{
@@ -115,8 +116,25 @@ creatematerials = p.Results.creatematerials;
 lightsFlag = p.Results.lightsFlag;
 thistrafficflow = p.Results.thistrafficflow;
 
+%% Check exporter
+% TL: We seem to run into a lot of problems of overwriting the wrong files
+% when the exporter isn't C4D (i.e. when we don't or can't parse the PBRT
+% file). Here we do a pre-check: if the exporter isn't C4D don't touch the
+% materials or geometry at all. Just copy files over to the output
+% directory. Hopefully that will clean things up a bit.
+if isempty(renderRecipe.exporter)
+    creatematerials = false;
+    overwritegeometry = false;
+    overwritematerials = false;
+end
+if ~isempty(renderRecipe.materials)
+    creatematerials = true;
+    overwritegeometry = true;
+    overwritematerials = true;
+end
+
+
 %% Copy the input directory to the Docker working directory
-% Input must exist
 inputDir = fileparts(renderRecipe.inputFile);
 if ~exist(inputDir, 'dir'), error('Could not find %s\n', inputDir); end
 
@@ -256,6 +274,7 @@ if isfield(renderRecipe.camera, 'motion')
     fprintf(fileID, 'Rotate %f %f %f %f \n', motionEnd(:, 3)); % X
     fprintf(fileID, 'ActiveTransform All \n');
 end
+
 % Required LookAt
 fprintf(fileID, ...
     'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
@@ -274,7 +293,7 @@ for ofns = outerFields'
         continue;
     end
 
-    if(strcmp(ofn, 'world') || ...
+    if (strcmp(ofn, 'world') || ...
             strcmp(ofn, 'lookAt') || ...
             strcmp(ofn, 'inputFile') || ...
             strcmp(ofn, 'outputFile')|| ...
@@ -375,7 +394,6 @@ for ofns = outerFields'
     end
     % Blank line.
     fprintf(fileID, '\n');
-
 end
 
 %% Write out WorldBegin/WorldEnd
@@ -394,9 +412,20 @@ if creatematerials
                 [~, n] = fileparts(renderRecipe.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"', n);
             end
+        end 
+        if ii == length(renderRecipe.world)
+            if ~piContains(renderRecipe.world, 'materials.pbrt')
+        [~,n] = fileparts(renderRecipe.outputFile);
+        mLine = sprintf('Include "%s_materials.pbrt"',n);
+        fprintf(fileID,'%s \n',mLine);
+        [~,n] = fileparts(renderRecipe.outputFile);
+        gLine = sprintf('Include "%s_geometry.pbrt"',n);
+        fprintf(fileID,'%s \n',gLine);
+            end
         end
         fprintf(fileID, '%s \n', currLine);
     end
+    
 else
     % No materials were created, so we just write out the world data
     % without any changes.
@@ -415,8 +444,9 @@ end
 fclose(fileID);
 
 %% Overwrite Materials.pbrt
-if piContains(renderRecipe.exporter, 'C4D')
-    % If the scene is from Cinema 4D,
+if piContains(renderRecipe.exporter, 'C4D') || ...
+        ~isempty(renderRecipe.materials)
+    % If the scene is from Cinema 4D, 
     if ~creatematerials
         % We overwrite from the input directory, but we do not create
         % any new material files beyond what is already in the input
@@ -440,7 +470,7 @@ if piContains(renderRecipe.exporter, 'C4D')
 end
 
 %% Overwrite geometry.pbrt
-if piContains(renderRecipe.exporter, 'C4D')
+if piContains(renderRecipe.exporter, 'C4D')||~isempty(renderRecipe.assets)
     if overwritegeometry
         piGeometryWrite(renderRecipe, 'lightsFlag', lightsFlag, ...
             'thistrafficflow', thistrafficflow);

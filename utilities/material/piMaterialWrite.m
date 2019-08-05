@@ -26,6 +26,7 @@ function piMaterialWrite(thisR)
 %    03/29/19  JNM  Documentation pass. Ignore case added to piContains.
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
 %    05/09/19  JNM  Merge Master in again
+%    07/30/19  JNM  Rebase from Master
 
 %%
 p = inputParser;
@@ -34,52 +35,56 @@ p.parse(thisR);
 
 %% Parse the output file, working directory, stuff like that.
 % Converts any jpg file names in the PBRT files into png file names
-ntxtLines = length(thisR.materials.txtLines);
-for jj = 1:ntxtLines
-    str = thisR.materials.txtLines(jj);
-    % photoshop exports texture format with ".JPG "(with extra space) ext.
-    if piContains(str, '.jpg"', 'ignoreCase', 1)
-        thisR.materials.txtLines(jj) = strrep(str, 'jpg', 'png');
-    end
-    if piContains(str, '.jpg "', 'ignoreCase', 1)
-        thisR.materials.txtLines(jj) = strrep(str, 'jpg ', 'png');
-    end
-    %{
-    if piContains(str, '.JPG "')
-        thisR.materials.txtLines(jj) = strrep(str, 'JPG ', 'png');
-    end
-    %}
-    if piContains(str, 'bmp')
-        thisR.materials.txtLines(jj) = strrep(str, 'bmp', 'png');
-    end
-    if piContains(str, 'tif')
-        thisR.materials.txtLines(jj) = strrep(str, 'tif', 'png');
-    end
-end
-
-%% Empty any line that contains MakeNamedMaterial
-% The remaining lines have a texture definition.
-output = thisR.materials.outputFile_materials;
-txtLines = thisR.materials.txtLines;
-for ii = 1:size(txtLines)
-    if ~isempty(txtLines(ii))
-        if piContains(txtLines(ii), 'MakeNamedMaterial')
-            txtLines{ii} = [];
+if isfield(thisR.materials, 'txtLines')
+    ntxtLines = length(thisR.materials.txtLines);
+    for jj = 1:ntxtLines
+        str = thisR.materials.txtLines(jj);
+        if piContains(str, '.jpg"', 'ignoreCase', 1)
+            thisR.materials.txtLines(jj) = strrep(str, 'jpg', 'png');
+        end
+        if piContains(str, '.jpg "', 'ignoreCase', 1)
+            thisR.materials.txtLines(jj) = strrep(str, 'jpg ','png');
+        end
+        % photoshop exports texture format w/ ".JPG "(with extra space) ext
+        if piContains(str, '.JPG "')
+            thisR.materials.txtLines(jj) = strrep(str, 'JPG ', 'png');
+        end
+        if piContains(str, 'bmp')
+            thisR.materials.txtLines(jj) = strrep(str, 'bmp', 'png');
+        end
+        if piContains(str, 'tif')
+            thisR.materials.txtLines(jj) = strrep(str, 'tif', 'png');
         end
     end
+
+    %% Empty any line that contains MakeNamedMaterial
+    % The remaining lines have a texture definition.
+    output = thisR.materials.outputFile_materials;
+    [~,materials_fname,~] = fileparts(output);
+    txtLines = thisR.materials.txtLines;
+    for ii = 1:size(txtLines)
+        if ~isempty(txtLines(ii))
+            if piContains(txtLines(ii), 'MakeNamedMaterial')
+                txtLines{ii} = [];
+            end
+        end
+    end
+    
+    % Squeeze out the empty lines. Some day we might get the parsed
+    % textures here.
+    textureLines = txtLines(~cellfun('isempty',txtLines));
 end
 
-% Squeeze out the empty lines. Some day we might get the parsed
-% textures here.
-textureLines = txtLines(~cellfun('isempty', txtLines));
-
-for jj = 1:length(textureLines)
+for jj = 1: length(textureLines)
     textureLines_tmp = [];
-%     thisLine_tmp = textscan(textureLines{jj}, '%q');
+    textureLines{jj} = strrep(textureLines{jj}, '[ ', '');
+    textureLines{jj} = strrep(textureLines{jj}, '] ', '');
+    % thisLine_tmp = textscan(textureLines{jj},'%q');
     thisLine_tmp = strsplit(textureLines{jj}, ' ');
+    thisLine_tmp = thisLine_tmp(~cellfun(@isempty, thisLine_tmp));
     if ~strcmp(thisLine_tmp{length(thisLine_tmp)}(1), '"')
         for nn = length(thisLine_tmp):-1:1
-            if strcmp(thisLine_tmp{nn}(1), '"')
+            if strcmp(thisLine_tmp{nn}(1),'"')
                 for kk = nn:length(thisLine_tmp) - 1
                     % combine all the string from nn to end;
                     thisLine_tmp{nn} = ...
@@ -138,8 +143,6 @@ for jj = 1:length(textureLines)
     textureLines{jj} = textureLines_tmp{1};
 end
 
-textureLines{length(textureLines) + 1} = strcat('Texture "windy_bump"', ...
-    ' "float" "windy" "float uscale" [512] "float vscale" [512] ');
 %% Create txtLines for the material struct array
 field = fieldnames(thisR.materials.list);
 materialTxt = cell(1, length(field));
@@ -254,7 +257,12 @@ if ~isempty(materials.rgbkt)
     val_rgbkt = sprintf(' "rgb Kt" [%0.5f %0.5f %0.5f] ', materials.rgbkt);
     val = strcat(val, val_rgbkt);
 end
-
+if isfield(materials, 'rgbopacity')
+    if ~isempty(materials.rgbopacity)
+        val_opacity = sprintf(' "rgb Opacity" [%0.5f %0.5f %0.5f] ',materials.rgbopacity);
+        val = strcat(val, val_opacity);
+    end
+end
 if ~isempty(materials.rgbkd)
     val_rgbkd = sprintf(' "rgb Kd" [%0.5f %0.5f %0.5f] ', materials.rgbkd);
     val = strcat(val, val_rgbkd);
@@ -285,6 +293,12 @@ if isfield(materials, 'colorreflect')
         val = strcat(val, val_colortransmit);
     end
 end
+if isfield(materials, 'colormfp')
+    if ~isempty(materials.colormfp)
+        val_colormfp = sprintf(' "color mfp" [%0.5f %0.5f %0.5f] ',materials.colormfp);
+        val = strcat(val, val_colormfp);
+    end
+end
 if ~isempty(materials.floaturoughness)
     val_floaturoughness = sprintf(' "float uroughness" [%0.5f] ', ...
         materials.floaturoughness);
@@ -301,6 +315,11 @@ if ~isempty(materials.floatroughness)
     val_floatroughness = sprintf(' "float roughness" [%0.5f] ', ...
         materials.floatroughness);
     val = strcat(val, val_floatroughness);
+end
+ 
+if isfield(materials,'floateta') && ~isempty(materials.floateta)
+    val_floateta = sprintf(' "float eta" [%0.5f] ',materials.floateta);
+    val = strcat(val, val_floateta);
 end
 
 if ~isempty(materials.spectrumkd)

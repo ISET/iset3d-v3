@@ -1,14 +1,17 @@
-function [focalLength, fNumber, filmDiag, fov, success] = ...
+function [focalLength, fNumber, metadata] = ...
     piRecipeFindOpticsParams(recipe)
 % Return relevant optics parameters from a recipe
 %
 % Syntax:
-%   [focalLength, fNumber, filmDiag, fov, success] = ...
-%       piRecipeFindOpticsParams(recipe)
+%   [focalLength, fNumber, metadata] = piRecipeFindOpticsParams(recipe)
 %
 % Description:
 %    Search through a recipe and return relevant optics parameters that
 %    will be used to populate parameters with the optical image.
+%
+%    This will be accomplished through the use of a 'metadata' slot in the
+%    lens file. There is also a less reliable means through finding them in
+%    the file name.
 %
 % Inputs:
 %    recipe      - Object. The recipe object.
@@ -16,33 +19,39 @@ function [focalLength, fNumber, filmDiag, fov, success] = ...
 % Outputs:
 %    focalLength - Numeric. The focal length, in meters.
 %    fNumber     - Numeric. The dimensionless f number,
-%    filmDiag    - Numeric. The Film diagonal, in meters.
+%    metadata    - Struct. A structure containing the metadata.
 %
 % Optional key/value pairs:
 %    None.
+%
+% See Also:
+%   piOICreate
 %
 
 % History:
 %    XX/XX/17  TL   SCIEN Stanford, 2017
 %    03/26/19  JNM  Documentation pass
+%    07/30/19  JNM  Rebase from master
 
 focalLength = [];
 fNumber = [];
-filmDiag = [];
-fov = [];
-success = 0;
+metadata = false;
+
+% filmDiag = [];
+% fov = [];
+% success = 0;
 
 switch recipe.version
     case 2
         if ~isfield(recipe.camera, 'specfile')
-            warning(strcat('Recipe does not contain a lens file. ', ...
-                'Therefore, optics parameters cannot be found.'));
+            warning(['Recipe does not contain a lens file. ', ...
+                'Therefore, optics parameters cannot be found.']);
             return;
         end
     case 3
         if ~isfield(recipe.camera, 'lensfile')
-            warning(strcat('Recipe does not contain a lens file. ', ...
-                'Therefore, optics parameters cannot be found.'));
+            warning(['Recipe does not contain a lens file. ', ...
+                'Therefore, optics parameters cannot be found.']);
             return;
         end
 end
@@ -53,7 +62,19 @@ lensName = recipe.get('lensfile');
 % is unique.
 if strcmp(recipe.camera.subtype, 'realisticEye'), return; end
 
+% The lensName is also the file name (minus the json extension)
+% Check for the metadata slot.  Mostly it should be there.
+thisLens = jsonread([lensName, '.json']);
+if isfield(thisLens, 'metadata')
+    metadata = true;
+    focalLength = thisLens.metadata.focalLength;
+    fNumber = thisLens.metadata.fNumber;
+    return;
+end
+
+% If we get here, we try to extract from the file name. Not preferred.
 try
+    warning('Decoding lens parameters from lens file name %s', lensName);
     % Guess focal length (effective) from lens name
     focalLength = str2double(extractBetween(lensName, 'deg.', 'mm'));
     focalLength = focalLength * 10 ^ -3; % meters
@@ -114,18 +135,22 @@ try
     end
 
     fNumber = focalLength / (apertureDiameter * 10 ^ -3);
-    filmDiag = recipe.get('filmdiagonal') * 10 ^ -3;
 
-    res = recipe.get('filmresolution');
+    %{
+    % Try to get the film properties
+    % Though is this the right idea when we have a lens???
+    filmDiag = recipe.get('film diagonal') * 10 ^ -3;
+
+    res = recipe.get('film resolution');
     x = res(1);
     y = res(2);
 
-    d = sqrt(x ^ 2 + y ^ 2);    % Number of samples along the diagonal
-    fwidth= (filmDiag / d) * x; % Diagonal size by d gives us mm per step
+    d = sqrt(x ^ 2 + y ^ 2);      % Number of samples along the diagonal
+    fwidth = (filmDiag / d) * x;  % Diagonal size by d gives us mm per step
     fov = 2 * atan2d(fwidth / 2, focalLength);
 
     success = 1;
-
+    %}
 catch
     warning(strcat('Could not determine optics parameters from ', ...
         'recipe. Leaving OI parameter values as default.'));

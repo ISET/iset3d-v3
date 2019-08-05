@@ -19,6 +19,7 @@
 %    XX/XX/19   Z   Zhenyi SCIEN 2019
 %    04/22/19  JNM  Documentation pass
 %    05/09/19  JNM  Merge with master
+%    07/29/19  JNM  Rebase from master
 
 
 %% Initialize ISET and Docker
@@ -76,6 +77,7 @@ view(player, ptCloud);
 %}
 
 %% Render.
+
 % Maybe we should speed this up by only returning radiance.
 scene = piRender(thisR, 'render type', 'radiance'); %, 'reuse', true);
 sceneWindow(scene);

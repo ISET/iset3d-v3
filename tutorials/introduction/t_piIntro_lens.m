@@ -1,7 +1,7 @@
 %% A tutorial on how to render using a lens
 %
 % Dependencies:
-%    ISET3d, ISETCam, JSONio
+%   ISET3d, ISETCam, JSONio
 %
 % Notes:
 %    * Check that you have the updated docker image by running
@@ -11,14 +11,14 @@
 %    * And specifically - https://www.pbrt.org/fileformat-v3.html#cameras
 %
 % See Also:
-%   t_piIntro_*
-%   isetLens repository
+%   t_piIntro_*, isetlens
 %
 
 % History:
 %    XX/XX/18  ZL, BW  SCIEN 2018
 %    04/23/19  JNM     Documentation pass
 %    05/09/19  JNM     Merge with master
+%    07/30/19  JNM     Rebase from master
 
 %% Initialize ISET and Docker
 ieInit;
@@ -42,11 +42,6 @@ inFolder = fullfile(piRootPath, 'local', 'scenes');
 inFile = fullfile(inFolder, sceneName, sceneFileName);
 thisR = piRead(inFile);
 
-% We will output the calculations to a temp directory.
-outFolder = fullfile(tempdir, sceneName);
-outFile = fullfile(outFolder, [sceneName, '.pbrt']);
-thisR.set('outputFile', outFile);
-
 %% Set render quality
 % Set resolution for speed or quality.
 % 1.5 is pretty high res
@@ -63,10 +58,10 @@ outputDir = fileparts(outFile);
 %% Add camera with lens
 % 22deg is the half width of the field of view
 % lensfile = 'dgauss.22deg.50.0mm.json';
-lensfile = 'dgauss.22deg.50.0mm.dat';
+% lensfile = 'dgauss.22deg.50.0mm.dat';
+lensfile = 'wide.56deg.3.0mm.json';
 fprintf('Using lens: %s\n', lensfile);
 thisR.camera = piCameraCreate('realistic', 'lensFile', lensfile);
-% thisR.camera = piCameraCreate('omni', 'lensFile', lensfile);
 
 %{
 % You might adjust the focus for different scenes. Use piRender with the
@@ -84,13 +79,15 @@ thisR.set('focus distance', 0.6);
 % The FOV is determined by the lens.
 
 % This is the size of the film/sensor in millimeters (default 22)
-thisR.set('film diagonal', 22);
+% thisR.set('film diagonal', 22);
+thisR.set('film diagonal', 12);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from', [0 0.14 -0.7]);   % Get higher and back away than default
 thisR.set('to', [0.05 -0.07 0.5]);  % Look down default compared to default
+thisR.set('object distance', 0.7);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
@@ -106,12 +103,14 @@ thisR.sampler.subtype = 'sobol';
 thisR.set('aperture diameter', 6);  % thisR.summarize('all');
 piWrite(thisR, 'creatematerials', true);
 
-oi = piRender(thisR, 'render type', 'both');  %, 'reuse', true);
+oi = piRender(thisR, 'render type', 'radiance');  %, 'reuse', true);
 oi = oiSet(oi, 'name', ...
     sprintf('%s-%d', oiName, thisR.camera.aperturediameter.value));
 oiWindow(oi);
 
+%% Change this for depth of field effects.
 depth = piRender(thisR, 'render type', 'depth');  %, 'reuse', true);
+ieNewGraphWin;
 imagesc(depth);
 
 %% Change this for depth of field effects.

@@ -79,6 +79,7 @@ function val = recipeGet(thisR, param, varargin)
 %    XX/XX/17  BW   ISETBIO Team, 2017
 %    05/08/19  JNM  Documentation pass
 %    05/09/19  JNM  Merge with master
+%    07/29/19  JNM  Rebase from master
 
 % Examples
 %{
@@ -194,16 +195,29 @@ switch ieParamFormat(param)
                 focalLength = load(fullfile(p, [flname, '.FL.mat']));  % Mm
                 % objDist Units? Where does this come from?
                 objDist = thisR.get('object distance');
-                % objDist = objDist * 1e3;
-                if objDist < min(focalLength.dist(:))
-                    fprintf('** Object too close to focus\n');
+
+                % Pull out the valid distances and focal distances
+                ok = ~isnan(focalLength.focalDistance);
+                x = focalLength.dist(ok);
+                y = focalLength.focalDistance(ok);
+                if objDist < min(x(:))
+                    fprintf(['** Object too close to focus (%f)', ...
+                        '.  Min is %f\n'], objDist, min(x(:)));
                     val = []; return;
-                elseif objDist > max(focalLength.dist(:))
-                    fprintf('** Object too far to focus\n');
+                elseif objDist > max(x(:))
+                    fprintf(['** Object too far to focus (%f).  ', ...
+                        'Max is %f\n'], objDist, max(x(:)));
                     val = []; return;
                 else
-                    val = interp1(focalLength.dist, ...
-                        focalLength.focalDistance, objDist);
+                    %{
+                    ieNewGraphWin;
+                    semilogx(x, y);
+                    line([objDist objDist], [min(y), max(y)], ...
+                        'color', 'k');
+                    xlabel('Object distance');
+                    ylabel('focal distance')
+                    %}
+                    val = interp1(x, y, objDist);
                 end
             otherwise
                 error('Unknown camera type %s\n', opticsType);
@@ -214,6 +228,11 @@ switch ieParamFormat(param)
         if isequal(thisR.get('optics type'), 'pinhole')
             if isfield(thisR.camera, 'fov')
                 val = thisR.camera.fov.value;
+                filmratio = thisR.film.xresolution.value / ...
+                    thisR.film.yresolution.value;
+                if filmratio > 1
+                    val = 2 * atand(tand(val / 2) * filmratio); 
+                end
             else
                 val = atand(thisR.camera.filmdiag.value / 2 / ...
                     thisR.camera.filmdistance.value);
@@ -253,26 +272,42 @@ switch ieParamFormat(param)
         val(1) = thisR.camera.subpixels_h;
     % Film
     case 'filmresolution'
-        val = [thisR.film.xresolution.value, thisR.film.yresolution.value];
+        try
+            val = [thisR.film.xresolution.value, ...
+                thisR.film.yresolution.value];
+        catch
+            warning('Film resolution not specified');
+            val = [];
+        end
     case 'filmxresolution'
         val = thisR.film.xresolution.value;    % An integer
     case 'filmyresolution'
         val = [thisR.film.yresolution.value];  % An integer
     case 'aperturediameter'
-        switch thisR.version
-            case 2
-                val = thisR.camera.aperture_diameter.value;
-            case 3
-                val = thisR.camera.aperturediameter.value;
-            otherwise
-                error('Unsupported version number! Please use 2 or 3.');
+        if isfield(thisR.camera, 'aperturediameter') || ...
+                isfield(thisR.camera, 'aperture_diameter')
+            switch thisR.version
+                case 2
+                    val = thisR.camera.aperture_diameter.value;
+                case 3
+                    val = thisR.camera.aperturediameter.value;
+                otherwise
+                    error('Unsupported version number! Please use 2 or 3.');
+            end
+        else
+            val = nan;
         end
-    case {'filmdiagonal', 'diagonal'}
-        switch thisR.version
-            case 2
-                val = thisR.camera.filmdiag.value;
-            case 3
-                val = thisR.film.diagonal.value;
+    case {'filmdiagonal','diagonal'}
+        if isfield(thisR.film, 'diagonal') || ...
+                isfield(thisR.camera, 'filmdiag')
+            switch thisR.version
+                case 2
+                    val = thisR.camera.filmdiag.value;
+                case 3
+                    val = thisR.film.diagonal.value;
+            end
+        else
+            val = nan;
         end
     case 'filmsubtype'
         % What are the legitimate options?

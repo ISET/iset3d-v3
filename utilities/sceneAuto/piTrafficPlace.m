@@ -170,13 +170,18 @@ if nScene == 1
                      assets_shuffled.(assetClass)(jj).slope;
              end
         end
-        for ii = 1: length(assets.(assetClass))
-            [~, n] = size(assets.(assetClass)(ii).geometry(1).position);
+        for ii = 1:length(assets.(assetClass))
+            if ~isfield(assets.(assetClass)(ii), 'geometry') 
+                fprintf('No geometry information found in %s \n', ...
+                    assets.(assetClass)(ii));
+                break;
+            end
+            [~,n] = size(assets.(assetClass)(ii).geometry(1).position);
             position = cell(n, 1);
-            rotationY = cell(n, 1);    % rotationY is RotY
-            slope = cell(n, 1);        % Slope is RotZ
+            rotationY = cell(n, 1); % rotationY is RotY
+            slope = cell(n, 1); % Slope is RotZ
             motionPos = cell(n, 1);
-            motionRotY = cell(n, 1);   % rotationY is RotY
+            motionRotY = cell(n, 1); % rotationY is RotY
             motioinSlope = cell(n, 1); % Slope is RotZ
             for gg = 1:n
                 position{gg} = assets_shuffled.(assetClass)(index).pos;

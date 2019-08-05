@@ -41,6 +41,7 @@ function [materiallib_updated] = piMateriallib
 %    04/01/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
 %    05/08/19  JNM  Merge Master in again
+%    07/29/19  JNM  Rebase from master
 
 %% carpaintmix
 % A mixture of a specular (mirror like) material and a substrate material
@@ -118,9 +119,18 @@ materiallib.translucent.string = 'translucent';
 materiallib.translucent.colorreflect = [0.5 0.5 0.5];
 materiallib.translucent.colortransmit = [0.5 0.5 0.5];
 
-%% substrate
-% Human skin is assigned with this material.
-materiallib.substrate.string = 'substrate';
+%% Human skin
+% Human skin is assigned this material.
+materiallib.skin.string = 'kdsubsurface';
+% The mean free path--the average distance light travels in the medium
+% before scattering.
+%
+% mfp = inverse sigma_t value of Jensen's skin1 parameters (in meters)
+materiallib.skin.colormfp = [1.2953e-03 9.5238e-04 6.7114e-04];
+materiallib.skin.floaturoughness = 0.05;
+materiallib.skin.floateta = 1.333;
+materiallib.skin.floatvroughness = 0.05;
+materiallib.skin.boolremaproughness = 'false';
 
 %% fourier
 materiallib.fourier.string = 'fourier';

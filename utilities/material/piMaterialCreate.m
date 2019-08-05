@@ -42,15 +42,19 @@ m.rgbkr =[];
 m.rgbks =[];
 m.rgbkd =[];
 m.rgbkt =[];
+m.rgbopacity = [];
 
 m.colorkd = [];
 m.colorks = [];
 m.colorreflect = [];
 m.colortransmit = [];
+m.colormfp = [];
 
 m.floaturoughness = [];
 m.floatvroughness = [];
 m.floatroughness =[];
+m.floateta = [];
+
 m.spectrumkd = '';
 m.spectrumks ='';
 m.spectrumkr = '';

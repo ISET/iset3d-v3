@@ -108,6 +108,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %    XX/XX/17  BW   ISETBIO Team, 2017
 %    04/19/19  JNM  Documentation pass
 %    05/09/19  JNM  Merge with master
+%    07/29/19  JNM  Rebase from master
 
 % Examples
 %{
@@ -166,10 +167,19 @@ switch param
 
     % Scene and camera
     case 'objectdistance'
-        % Adjust the lookat 'from' field to match the distance in val
+        % Changes the distance from the camera (from) to the object
+        % pointed at by the camera (to).
+        %
+        % Adjusts the lookat 'from' field to match the distance in val.
+        % This needs some more thought. At present this adjusts the
+        % 'from' spot, which is where the camera is. It keeps the
+        % direction the same, just scales it.
+        
+        % Unit length vector between from and to.
         objDirection = thisR.get('object direction');
 
-        % Make the unit vector a val distance away and add
+        % Scale the unit length vector to match val, setting the
+        % distance between from and to.
         newDirection = objDirection * val;
         thisR.lookAt.from = thisR.lookAt.to + newDirection;
 
@@ -210,42 +220,62 @@ switch param
         end
 
     case {'aperture', 'aperturediameter'}
-        if thisR.version == 3
-            thisR.camera.aperturediameter.value = val;
-            thisR.camera.aperturediameter.type = 'float';
-        elseif thisR.version == 2
-            thisR.camera.aperture_diameter.value = val;
-            thisR.camera.aperture_diameter.type = 'float';
-        end
+        % This set should look at the aperture in the lens file, which
+        % represents the largest possible aperture. It should not allow a
+        % value bigger than that. (ZL/BW).
+        thisR.camera.aperturediameter.value = val;
+        thisR.camera.aperturediameter.type = 'float';
 
     case {'focusdistance'}
-        if thisR.version == 3
-            thisR.camera.focusdistance.value = val;
-            thisR.camera.focusdistance.type = 'float';
-        else
-            warning(strcat('focus distance parameter not applicable ', ...
-                'for version 2'));
-        end
+        % This is the distance to the object in the scene that will be in
+        % focus. When this is set, the film distance is derived by PBRT.
+        % It is possible that there is no film distance for certain (say
+        % very near) focus distances.
+        %
+        % This variable is related to the lookat settings and we should
+        % probably connect this with 'objectdistance'. Though it is
+        % possible to look at an object but have it not be the object that
+        % is in focus.
+        %
+        thisR.camera.focusdistance.value = val;
+        thisR.camera.focusdistance.type = 'float';
 
     case 'fov'
+        % This sets a horizontal fov
         % We should check that this is a pinhole, I think
-        % This is only used for pinholes, not realistic camera case.
-        if isequal(thisR.camera.subtype, 'pinhole')
-            thisR.camera.fov.value = val;
-            thisR.camera.fov.type = 'float';
+        % This is only used for pinholes, not realistic camera case. 
+        if isequal(thisR.camera.subtype,'pinhole') || ...
+                isequal(thisR.camera.subtype,'perspective')
+            if length(val) == 1
+                thisR.camera.fov.value = val;
+                thisR.camera.fov.type = 'float';
+            else
+                % if two fov is given [hor, ver], we should resize film
+                % acoordingly
+                filmRes = thisR.get('film resolution');
+                fov = min(val);
+                % horizontal resolution / vertical resolution
+                resRatio = tand(val(1) / 2) / tand(val(2) / 2);
+                if fov == val(1)
+                    thisR.set('film resolution', ...
+                        [max(filmRes) * resRatio, max(filmRes)]);
+                else
+                    thisR.set('film resolution', ...
+                        [max(filmRes), max(filmRes) / resRatio]);
+                end
+                thisR.camera.fov.value = fov;
+                thisR.camera.fov.type = 'float';
+                disp('film ratio is changed!')
+            end
         else
             warning('fov not set for camera models');
         end
 
     case 'diffraction'
-        if thisR.version == 2
-            thisR.camera.diffractionEnabled.value = val;
-            thisR.camera.diffractionEnabled.type = 'bool';
-        elseif thisR.version == 3
-            warning('diffraction parameter not applicable for version 3')
-        end
+        thisR.camera.diffractionEnabled.value = val;
+        thisR.camera.diffractionEnabled.type = 'bool';
 
-    case {'chroabb', 'chromaticaberration'}
+    case 'chromaticaberration'
         % Enable chrommatic aberration, and potentially set the number
         % of wavelength bands. (Default is 8).
         % thisR.set('chromatic aberration', true);
@@ -359,11 +389,15 @@ switch param
         thisR.film.xresolution.value = val(1);
         thisR.film.yresolution.value = val(2);
 
+        thisR.film.xresolution.type = 'integer';
+        thisR.film.yresolution.type = 'integer';
+
     case {'pixelsamples', 'raysperpixel'}
         % Sampler
         thisR.sampler.pixelsamples.value = val;
+        thisR.sampler.pixelsamples.type = 'integer';
 
-    case{'cropwindow', 'crop'}
+    case{'cropwindow', 'crop window'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
 
@@ -376,4 +410,6 @@ switch param
 
     otherwise
         error('Unknown parameter %s\n', param);
+end
+
 end

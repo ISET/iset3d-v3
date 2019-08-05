@@ -54,6 +54,7 @@ function thisR = piRead(fname, varargin)
 %    XX/XX/17  TL   Scienstanford 2017
 %    04/01/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    07/29/19  JNM  Rebase from master
 
 % Examples:
 %{
@@ -301,7 +302,7 @@ if ~isempty(concatTBlock)
     values = textscan(concatTBlock{1}, ...
         '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
     values = cell2mat(values(2:end));
-    concatTransform = reshape(values, [4 4]);
+    concatTransform = reshape(values,[4 4]);
 
     % Apply transform and update lookAt
     lookAtTransform = piLookat2Transform(from, to, up);
@@ -333,14 +334,15 @@ if flip, thisR.scale = [-1 1 1]; end
 %% Read Material.pbrt file if pbrt file is exported by C4D.
 % Is the read materials flag necessary? Can't we just check if this is an
 % exporterFlag case and see if there is a file?
+MaterialIndexList = find(piContains(thisR.world, 'MakeNamedMaterial'), 1);
 if exporterFlag
     if readmaterials
         % Check if a materials.pbrt exist
         if ~exist(inputFile_materials, 'file')
             error('File not found');
         end
-        [thisR.materials.list, thisR.materials.txtLines] = ...
-            piMaterialRead(inputFile_materials, 'version', 3);
+        [thisR.materials.list,thisR.materials.txtLines] = ...
+            piMaterialRead(inputFile_materials, 'recipe', thisR);
         thisR.materials.inputFile_materials = inputFile_materials;
         % Call material lib
         thisR.materials.lib = piMateriallib;
@@ -348,6 +350,12 @@ if exporterFlag
         % supported in pbrt.
         piTextureFileFormat(thisR);
     end
+elseif ~isempty(MaterialIndexList)
+    [thisR.materials.list,thisR.materials.txtLines] = ...
+        piMaterialRead(fname, 'recipe', thisR);
+    thisR.materials.inputFile_materials = inputFile_materials;
+    % Call material lib
+    thisR.materials.lib = piMateriallib;
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
@@ -355,6 +363,13 @@ if exporterFlag
     % fprintf('Reading geometry\n');
     thisR = piGeometryRead(thisR);
     % fprintf('Done with geometry read\n');
+elseif ~isempty(find(piContains(thisR.world, 'Shape'),1)) && ...
+        ~isempty(find(piContains(thisR.world, 'MakeNamedMaterial')))
+    thisR = piGeometryReadBlender(thisR);
+    thisR.world(piContains(thisR.world, 'Shape "plymesh"')) = [];
+    thisR.world(piContains(thisR.world, 'Texture')) = [];
+    thisR.world(piContains(thisR.world, 'NamedMaterial')) = [];
+    thisR.world(piContains(thisR.world, 'Transform')) = [];
 end
 
 end

@@ -28,6 +28,7 @@ function renderRecipe = piGeometryRead(renderRecipe)
 %    XX/XX/18   Z   Created Zhenyi, 2018
 %    04/01/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    07/29/19  JNM  Rebase from master
 
 %%
 p = inputParser;
@@ -154,7 +155,7 @@ if ~convertedflag
                 obj(jj).index = ii;
                 % Name is created by a pattern: '#ObjectName' + ...
                 %    'objname' + ':' +'Vector' + ...
-                %    '(width(x), height(y), lenght(z))'
+                %    '(width(x), height(y), length(z))'
                 % Check if concatTranform is contained in a child attribute
                 if piContains(txtLines(ii - 1), ':Vector(')
                     name = erase(txtLines(ii - 1), '#ObjectName ');
@@ -170,10 +171,18 @@ if ~convertedflag
                 index = strfind(name, ':');
                 obj_name = name(1:(index - 1));
                 obj(jj).name = sprintf('%d_%s', jj, groupobj(hh).name);
-                % for the case there is no material assigned.
-                if piContains(txtLines(ii - 1), 'NamedMaterial')
-                    obj(jj).material = ...
-                        sprintf('%s', cell2mat(txtLines(ii - 1)));
+
+                if piContains(txtLines(ii - 2), 'MediumInterface')
+                    obj(jj).mediumInterface = sprintf('%s', ...
+                        cell2mat(txtLines(ii - 2)));
+                else
+                    obj(jj).mediumInterface = [];
+                end
+                if piContains(txtLines(ii-1), 'NamedMaterial')
+                    obj(jj).material = sprintf('%s', ...
+                        cell2mat(txtLines(ii - 1)));
+                else
+                    obj(jj).material = [];
                 end
 
                 % save obj to a pbrt file
@@ -198,10 +207,12 @@ if ~convertedflag
                 integer = strfind(currLine, '"integer indices"');
                 point = strfind(currLine, '"point P"');
                 normal = strfind(currLine, '"normal N"');
-                fprintf(fid, '%s\n', currLine(1:(integer - 1)));
-                fprintf(fid, '  %s\n', currLine(integer:(point - 1)));
-                fprintf(fid, '  %s\n', currLine(point:(normal - 1)));
-                fprintf(fid, '  %s\n', currLine(normal:end));
+                texturemap = strfind(currLine, '"float uv"');
+                fprintf(fid,'%s\n', currLine(1:(integer - 1)));
+                fprintf(fid,'  %s\n', currLine(integer:(point - 1)));
+                fprintf(fid,'  %s\n', currLine(point:(normal - 1)));
+                fprintf(fid,'  %s\n', currLine(normal:(texturemap - 1)));
+                fprintf(fid,'  %s\n', currLine(texturemap:end));
                 fclose(fid);
                 groupobj(hh).children(ll) = obj(jj);
                 jj = jj + 1;

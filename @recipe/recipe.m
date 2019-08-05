@@ -28,6 +28,7 @@ classdef recipe < matlab.mixin.Copyable
 % History:
 %    XX/XX/17  TL   Scien Stanford, 2017
 %    05/09/19  JNM  Documentation pass
+%    07/29/19  JNM  Rebase from master
 
     properties (GetAccess=public, SetAccess=public)
         % Can be set by user
@@ -52,7 +53,7 @@ classdef recipe < matlab.mixin.Copyable
         inputFile = '';
 
         outputFile = ''; % Where outputFile = piWrite(recipe);
-        version = 2;     % A PBRTv2 file or a PBRTv3 file
+        version = 3;     % A PBRTv2 file or a PBRTv3 file
         materials;       % material list parsed from *_material.pbrt file
         assets;          % assets list parsed from *_geometry.pbrt file
         exporter = '';

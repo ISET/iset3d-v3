@@ -36,7 +36,7 @@ function [ieObject, result] = piRender(thisR, varargin)
 %                 of the correct size exists. Default false.
 %
 % See Also:
-%   s_piReadRender*.m
+%   s_piReadRender*.m, piRenderResult
 %
 
 % History:
@@ -45,6 +45,7 @@ function [ieObject, result] = piRender(thisR, varargin)
 %    03/25/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
 %    05/09/19  JNM  Merge Master in again
+%    07/30/19  JNM  Rebase from Master
 
 % Examples:
 %{
@@ -117,7 +118,11 @@ if ischar(thisR)
 
     % Read the pbrt file and produce the recipe. A full path is required.
     pbrtFile = which(thisR);
-    thisR = piRead(pbrtFile, 'version', version);
+    
+    % TL: If thisR is already a full path, "which" will sometimes returns
+    % empty. To avoid the error, let's try this:
+    if isempty(pbrtFile), pbrtFile = thisR; end
+    thisR = piRead(pbrtFile,'version',version);
 
     % Stash the file in the local output
     piWrite(thisR);
@@ -126,17 +131,17 @@ end
 %% We have a radiance recipe and we have written the pbrt radiance file
 % Set up the output folder. It will be mounted by the Docker image.
 outputFolder = fileparts(thisR.outputFile);
-if(~exist(outputFolder, 'dir'))
+if ~exist(outputFolder, 'dir')
     error('We need an absolute path for the working folder.');
 end
 pbrtFile = thisR.outputFile;
 
 % Set up any metadata render.
-if (~strcmp(renderType, 'radiance'))  % If radiance, no metadata
+if ~strcmp(renderType, 'radiance')  % If radiance, no metadata
     % Do some checks for the renderType.
-    if((thisR.version ~= 3) && strcmp(renderType, 'coordinates'))
-        error(strcat('Coordinates metadata render only available ', ...
-            'right now for pbrt-v3-spectral.'));
+    if (thisR.version ~= 3) && strcmp(renderType, 'coordinates')
+        error(['Coordinates metadata render only available ', ...
+            'right now for pbrt-v3-spectral.']);
     end
 
     if(strcmp(renderType, 'both')), metadataType = 'depth';

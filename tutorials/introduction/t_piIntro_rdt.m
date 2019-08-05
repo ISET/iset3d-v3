@@ -21,6 +21,7 @@
 % History:
 %    XX/XX/17  TL, ZL, BW  SCIEN 2017
 %    04/23/19  JNM         Documentation pass
+%    08/02/19  JNM         Rebase from master
 
 %% Initialize ISET and Docker
 % We start up ISET and check that the user is configured for docker
@@ -31,11 +32,10 @@ if isempty(which('RdtClient'))
 end
 
 %% Read the scene file for the Remote Data site
-
-% sceneName = 'white-room';
-% sceneFileName = 'scene.pbrt';
-sceneName = 'ChessSet';
-sceneFileName = 'ChessSet.pbrt';
+sceneName = 'white-room';
+sceneFileName = 'scene.pbrt';
+% sceneName = 'ChessSet';
+% sceneFileName = 'ChessSet.pbrt';
 
 % The output will be written here
 inFolder = fullfile(piRootPath, 'local');

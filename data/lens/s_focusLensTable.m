@@ -40,7 +40,7 @@ focalDistance = zeros(length(lensFiles),length(dist));
 for ii=1:length(lensFiles)
     fname = fullfile(lensDir,lensFiles(ii).name);
     for jj=1:length(dist)
-        focalDistance(ii,jj) = focusLens(lensFiles(ii).name,dist(jj));
+        focalDistance(ii,jj) = lensFocus(lensFiles(ii).name,dist(jj));
     end
 end
 

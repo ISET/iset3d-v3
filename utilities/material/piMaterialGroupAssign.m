@@ -38,6 +38,7 @@ function piMaterialGroupAssign(thisR)
 %    04/03/19  JNM  Documentation pass
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
 %    05/09/19  JNM  Merge Master in again
+%    07/29/19  JNM  Rebase from master
 
 %% A scene has a set of materials represented in its recipe
 % Check whether each entry in mlist contains a known string, such as
@@ -140,13 +141,13 @@ for ii = 1:length(mlist)
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.glass;
-        piMaterialAssign(thisR, material.name, target);
-    elseif piContains(lower(mlist(ii)), 'bodymat')
-        name = cell2mat(mlist(ii));
-        material = thisR.materials.list.(name);
-        target = thisR.materials.lib.substrate;
-        piMaterialAssign(thisR, material.name, target);
-    elseif piContains(mlist(ii), 'translucent')
+        piMaterialAssign(thisR, material.name,target);
+%     elseif piContains(lower(mlist(ii)),'bodymat')
+%         name = cell2mat(mlist(ii));
+%         material = thisR.materials.list.(name);
+%         target = thisR.materials.lib.substrate;
+%         piMaterialAssign(thisR, material.name,target);
+    elseif piContains(mlist(ii),'translucent')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.translucent;

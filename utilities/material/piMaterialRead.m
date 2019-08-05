@@ -26,25 +26,38 @@ function [materiallist, txtLines] = piMaterialRead(fname, varargin)
 %    XX/XX/18  ZL   SCIEN Stanford, 2018
 %    04/03/19  JNM  Documentation pass, changed default version 2 -> 3.
 %    04/18/19  JNM  Merge Master in (resolve conflicts)
+%    07/29/19  JNM  Rebase from master
 
 %%
 p = inputParser;
 p.addRequired('fname', @(x)(exist(fname, 'file')));
 p.addParameter('version', 3, @(x)isnumeric(x));
+p.addParameter('recipe', [], @(x)(isequal(class(x), 'recipe')));
 p.parse(fname, varargin{:});
-ver = p.Results.version;
 
+ver = p.Results.version;
+thisR = p.Results.recipe;
 %% Check version number
 if(ver ~= 3)
     error('Only PBRT version 3 Cinema 4D exporter is supported.');
 end
-
+%%
+TextureIndexList = find(piContains(thisR.world, 'texture'));
+MaterialIndexList = find(piContains(thisR.world, 'MakeNamedMaterial'));
+if ~isempty(TextureIndexList)
+    txtLines = thisR.world(TextureIndexList(1):MaterialIndexList(end));
+else
+    txtLines = [];
+end
 %% Read the text from the fname
-% Open, read, close
-fileID = fopen(fname);
-tmp = textscan(fileID, '%s', 'Delimiter', '\n', 'CommentStyle', {'#'});
-txtLines = tmp{1};
-fclose(fileID);
+
+if isempty(txtLines)
+    % Open, read, close
+    fileID = fopen(fname);
+    tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
+    txtLines = tmp{1};
+    fclose(fileID);
+end
 
 %% Extract lines that correspond to specified keyword
 materiallist = piBlockExtractMaterial(txtLines);
@@ -112,8 +125,10 @@ for ii = 1:nLines
 
         thisLine = textscan(thisLine, '%q');
         thisLine = thisLine{1};
+        % remove brackets
+        thisLine(strcmp(thisLine, '['))=[];
+        thisLine(strcmp(thisLine, ']'))=[];
         nStrings = size(thisLine);
-
         % It does, so this is the start
         materials(cnt) = piMaterialCreate;
         materials(cnt).linenumber = ii;
@@ -139,6 +154,8 @@ for ii = 1:nLines
                     materials(cnt).rgbks = piParseRGB(thisLine, ss);
                 case 'rgb Kd'
                     materials(cnt).rgbkd = piParseRGB(thisLine, ss);
+                case 'rgb opacity'
+                    materials(cnt).rgbopacity = piParseRGB(thisLine,ss);
                 case 'rgb Kt'
                     materials(cnt).rgbkt = piParseRGB(thisLine, ss);
                 case 'color Kd'

@@ -8,23 +8,38 @@
 % History:
 %    XX/XX/XX  ???  Created
 %    03/15/19  JNM  Documentation pass
+%    08/02/19  JNM  Rebase from Master
 
 %% Initialize
-if isequal(piCamBio,'isetcam')
-    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename);
+if isequal(piCamBio, 'isetcam')
+    fprintf('%s: requires ISETBio, not ISETCam\n', mfilename);
     return;
 end
 ieInit;
 clear; close all;
 
 %% Load up a scene
-thisScene = sceneEye('numbersAtDepth');
+% Three letters on a checkerboard background. A is at 1.4 dpt, B is at 1
+% dpt, and C is at 0.6 dpt. 
+thisScene = sceneEye('lettersAtDepth', 'Adist', 1/1.4, 'Bdist', 1/1, ...
+    'Cdist', 1/0.6, 'Adeg', 1.5, 'Cdeg', 1, 'nchecks', [128 64]);
+
+% Shrink the size of the letters so we can drop the FOV
+for ii = 1:length(thisScene.recipe.assets)
+    if (strcmp(thisScene.recipe.assets(ii).name, 'A') || ...
+       strcmp(thisScene.recipe.assets(ii).name, 'B') || ...
+       strcmp(thisScene.recipe.assets(ii).name, 'C'))
+        thisScene.recipe.assets(ii).scale = [0.5; 0.5; 0.5];
+    end
+end
+
+% A small FOV is required to see the difference between the models.
+thisScene.fov = 5;
 
 % Set general parameters
-thisScene.fov = 30;
 thisScene.resolution = 128;
 thisScene.numRays = 256;
-thisScene.numCABands = 0;
+thisScene.numCABands = 8;
 
 %% Try the Navarro eye model
 % This tell isetbio which model to use.
@@ -52,16 +67,14 @@ oiWindow;
 % thisScene.workingDir
 
 %% Try the Gullstrand-LeGrand Model
-% The gullstrand has no accommodation modeling.
-thisScene.modelName = 'Gullstrand';
-
-% Render!
-thisScene.name = 'gullstrand'; % The name of the optical image
+% The gullstrand has no accommodation modeling. 
+thisScene.modelName = 'LeGrand';
+thisScene.name = 'LeGrand'; % The name of the optical image
 % to reuse an existing rendered file of the correct size, uncomment the
 % parameter provided below.
-oiGullstrand = thisScene.render(); %'reuse', true);
+oiLeGrand = thisScene.render();  %'reuse', true);
 
-ieAddObject(oiGullstrand);
+ieAddObject(oiLeGrand);
 oiWindow;
 
 %% Try Arizona eye model

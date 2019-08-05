@@ -27,11 +27,13 @@
 %    XX/XX/18  ZL, BW  SCIEN 2018
 %    04/25/19  JNM     Documentation pass
 %    05/09/19  JNM     Merge with master
+%    07/29/19  JNM     Rebase from master, add in bio/cam check
 
 %% Initialize ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 if ~piScitranExists, error('scitran installation required'); end
+if piContains(piCamBio, 'isetcam'), cam = 1; else, cam = 0; end
 
 %% Read pbrt files
 sceneName = 'checkerboard_new';
@@ -110,7 +112,7 @@ thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type = 'float';
 thisR.integrator.subtype = 'bdpt';
 thisR.sampler.subtype = 'sobol';
-% Changing the name!!!!  Important to comment and explain!!! ZL, BW
+% Changing the name!!!! Important to comment and explain!!! ZL, BW
 outFile = fullfile(piRootPath, 'local', sceneName, ...
     sprintf('%s.pbrt', sceneName));
 thisR.set('outputFile', outFile);
@@ -124,13 +126,6 @@ piWrite(thisR, 'creatematerials', true);
 
 scene = sceneSet(scene, 'name', sprintf('Time: %s', thisTime));
 sceneWindow(scene);
-sceneSet(scene, 'display mode', 'hdr');
-coordMap = piRender(thisR, 'renderType', 'coordinates');
-x = coordMap(:, :, 1) - thisR.lookAt.from(1);
-y = coordMap(:, :, 2) - thisR.lookAt.from(2);
-z = coordMap(:, :, 3) - thisR.lookAt.from(3);
-player = pcplayer([-20 0], [0 10], [-1 1]);
-ptCloud = pointCloud([x(:), z(:), y(:)]);
-view(player, ptCloud);
 
+sceneSet(scene, 'display mode', 'hdr');         
 %% END

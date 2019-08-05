@@ -29,17 +29,18 @@ function [out, namelist] = summarize(thisR, str)
 % History:
 %    XX/XX/19  BW   Created by Wandell
 %    05/09/19  JNM  Documentation pass
+%    07/29/19  JNM  Rebase from master
 
 % Examples:
 %{
- c = thisR.summarize('camera');
+    c = thisR.summarize('camera');
 %}
 %{
- [assets, sortedNames] = thisR.summarize('assets');
-  sortedNames
+    [assets, sortedNames] = thisR.summarize('assets');
+    sortedNames
 %}
 %{
- [~, sortedNames] = thisR.summarize('all');
+    [~, sortedNames] = thisR.summarize('all');
 %}
 %% Parse
 
@@ -129,7 +130,17 @@ switch str
         fprintf('Number:  %d\n', nAssets);
         nMoving = 0;
         for ii = 1:nAssets
-            if ~isempty(out(ii).motion), nMoving = nMoving + 1; end
+            if isfield(out, 'motion')
+                if ~isempty(out(ii).motion)
+                    nMoving = nMoving + 1;
+                end
+            end
+        end
+        fprintf('Moving  assets: %d\n', nMoving);
+        fprintf('Static  assets: %d\n', nAssets - nMoving);
+        namelist = cell(nAssets,1);
+        for ii = 1:nAssets
+            namelist{ii} = thisR.assets(ii).name;
         end
         fprintf('Moving  assets: %d\n', nMoving);
         fprintf('Static  assets: %d\n', nAssets - nMoving);
