@@ -46,7 +46,7 @@ p.parse(inputFile,varargin{:});
 label       = p.Results.label;
 thisR       = p.Results.recipe;
 meanLuminance   = p.Results.meanluminance;
-meanIlluminance = p.Results.meanilluminancepermm2;
+meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scaleIlluminance = p.Results.scaleIlluminance;
 
 %% Depending on label, assign the output data properly to ieObject
@@ -79,6 +79,14 @@ elseif(strcmp(label,'coordinates'))
 end
 
 %% Read the data and set some of the ieObject parameters
+
+% Only do the following if the recipe exists, otherwise just return the
+% data
+if(isempty(thisR))
+    warning('Recipe not given. Returning photons directly.')
+    ieObject = photons;
+    return;
+end
 
 % Create a name for the ISET object
 pbrtFile   = thisR.outputFile;
@@ -143,7 +151,7 @@ switch opticsType
         if(scaleIlluminance)
             aperture = oiGet(ieObject,'optics aperture diameter');
             lensArea = pi*(aperture*1e3/2)^2;
-            meanIlluminance = meanIlluminance*lensArea;
+            meanIlluminance = meanIlluminancepermm2*lensArea;
             
             ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
             ieObject.data.illuminance = oiCalculateIlluminance(ieObject);

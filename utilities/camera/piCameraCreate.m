@@ -65,7 +65,7 @@ lensFile      = p.Results.lensfile;
 
 %% Initialize the default camera type
 switch cameraType
-    case {'pinhole'}
+    case {'pinhole','perspective'}
         camera.type      = 'Camera';
         camera.subtype   = 'perspective';
         camera.fov.type  = 'float';

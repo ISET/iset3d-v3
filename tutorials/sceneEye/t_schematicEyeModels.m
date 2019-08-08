@@ -11,13 +11,32 @@ clear; close all;
 
 %% Load up a scene
 
-thisScene = sceneEye('numbersAtDepth');
+% Three letters on a checkerboard background. A is at 1.4 dpt, B is at 1
+% dpt, and C is at 0.6 dpt. 
+thisScene = sceneEye('lettersAtDepth',...
+                    'Adist',1/1.4,...
+                    'Bdist',1/1,...
+                    'Cdist',1/0.6,...
+                    'Adeg',1.5,...
+                    'Cdeg',1,...
+                    'nchecks',[128 64]);
+
+% Shrink the size of the letters so we can drop the FOV
+for ii = 1:length(thisScene.recipe.assets)
+    if (strcmp(thisScene.recipe.assets(ii).name,'A') || ...
+       strcmp(thisScene.recipe.assets(ii).name,'B') || ...
+       strcmp(thisScene.recipe.assets(ii).name,'C'))
+        thisScene.recipe.assets(ii).scale = [0.5;0.5;0.5];
+    end
+end
+
+% A small FOV is required to see the difference between the models.
+thisScene.fov = 5; 
 
 % Set general parameters
-thisScene.fov = 30;
 thisScene.resolution = 128;
 thisScene.numRays = 256;
-thisScene.numCABands = 0;
+thisScene.numCABands = 8;
 
 %% Try the Navarro eye model
 
@@ -46,13 +65,11 @@ oiWindow;
 %% Try the Gullstrand-LeGrand Model
 
 % The gullstrand has no accommodation modeling. 
-thisScene.modelName = 'Gullstrand';
+thisScene.modelName = 'LeGrand';
+thisScene.name = 'LeGrand'; % The name of the optical image
+oiLeGrand = thisScene.render();
 
-% Render!
-thisScene.name = 'gullstrand'; % The name of the optical image
-oiGullstrand = thisScene.render();
-
-ieAddObject(oiGullstrand);
+ieAddObject(oiLeGrand);
 oiWindow;
 
 %% Try Arizona eye model
