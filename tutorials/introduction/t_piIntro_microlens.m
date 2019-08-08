@@ -71,61 +71,33 @@ outputDir = fileparts(outFile);
 
 % For the dgauss lenses 22deg is the half width of the field of view
 
-%{
-lensfile = 'dgauss.22deg.3.0mm.json';
-filmwidth = 1;
+microLensName   = 'microlens.2um.Example.json';
+microlens = lensC('filename',microlensName);
+
+imagingLensName = 'dgauss.22deg.3.0mm.json';
+% edit(imagingLensName)
+% thisLens = lensC('filename',imagingLensName);
+% thisLens.draw;
+
+filmwidth = 1;    %  mm
 filmheight = filmwidth;
-%}
 
-% {
-lensfile = '2ElLens.json'; % 'dgauss.22deg.50.0mm.json';
-filmwidth  = 11;
-filmheight = 11;
-%}
-fprintf('Using lens: %s\n',lensfile);
-combinedlens = lensfile;
+[combinedlens,cmd] = piCameraInsertMicrolens(microLensName,imagingLensName, ...
+    'xdim',128, 'ydim',128,'film width',filmwidth,'film height',filmheight);
 
-% In millimeters.  Used to set diagonal and to set
-% piCameraInsertMicrolens, somehow.  ASK MM.
-
-%{
-% microlensfile = 'microlens.2um.Example.json';
-microlensfile = '2ElLens.json';
-fprintf('Using microlens: %s\n',microlensfile);
-% mLens = lensC('file name',microlensfile);
-% mLens.draw;
+% Using isetlens to visualize
 %
-% edit(microlensfile)
+% edit(combinedLens)
+% thisLens = lensC('filename',combinedLens);
+% thisLens.draw;
 
-combinedlens = 'dgaussMicrolens.json';
+%%   Choose a lens
 
-combinedlens = piCameraInsertMicrolens(microlensfile,lensfile, ...
-    'output name',combinedlens, ...
-    'xdim',64,'ydim',64);
-%     'film width',filmwidth,'film height',filmheight, ...
-% thisLens = jsonread(combinedlens);
-%
+thisLens = combinedlens;
+% thisLens = imagingLensName;
 
-
-% Checking whether we might be able to add metadata to the lens file
-% during this operation
-% thisLens.metadata.test = 'test';
-% jsonwrite(combinedlens,thisLens);
-%
-% Seems OK. So maybe we should pull that information out somehow and
-% put it in the .json files, rather than using
-% piRecipeFindOpticsParams?
-%
-%
-% edit(combinedlens)
-%}
-
-%%
-%{
- combinedlens = 'dgauss.22deg.50.0mm.json';
-%}
-
-thisR.camera = piCameraCreate('omni','lensFile',combinedlens);
+fprintf('Using lens: %s\n',thisLens);
+thisR.camera = piCameraCreate('omni','lensFile',thisLens);
 
 %{
 % You might adjust the focus for different scenes.  Use piRender with
@@ -146,16 +118,20 @@ thisR.set('focus distance',0.6);
 % This is the size of the film/sensor in millimeters 
 thisR.set('film diagonal',sqrt(filmwidth^2 + filmheight^2));
 
+% Film resolution
+thisR.set('film resolution',[256 256]);
+
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
 thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
+thisR.set('rays per pixel',256);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
 thisR.integrator.subtype = 'path';  
-thisR.sampler.subtype    = 'sobol';
+% thisR.sampler.subtype    = 'sobol';
 
 % This value determines the number of ray bounces.  If the scene has
 % glass or mirrors, we need to have at least 2 or more.
@@ -167,7 +143,7 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',6);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
-[oi, result] = piRender(thisR,'render type','depth');
+[oi, result] = piRender(thisR,'render type','both');
 
 % Parse the result for the lens to film distance and the in-focus
 % distance in the scene.
