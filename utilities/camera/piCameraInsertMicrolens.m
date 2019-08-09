@@ -102,7 +102,7 @@ p.addParameter('xdim',84,@isscalar);
 p.addParameter('ydim',84,@isscalar);
 p.addParameter('filmheight',1,@isscalar);
 p.addParameter('filmwidth',1,@isscalar);
-p.addParameter('filmtomicrolens',0,@isscalar);
+p.addParameter('microlenstofilm',0,@isscalar);
 
 p.parse(imagingLens,microLens,varargin{:});
 
@@ -121,7 +121,7 @@ ydim = p.Results.ydim;
 filmheight = ceil(p.Results.filmheight);
 filmwidth  = ceil(p.Results.filmwidth);
 
-filmtomicrolens = p.Results.filmtomicrolens;
+microlenstofilm = p.Results.microlenstofilm;
 %% Remember where you started 
 
 % Basic docker command
@@ -159,7 +159,7 @@ end
 
 % Need to add the other parameters
 lensToolCommand = sprintf('lenstool insertmicrolens -xdim %d -ydim %d -filmheight %f -filmwidth %f -filmtomicrolens %f %s %s %s',...
-    xdim,ydim,filmheight,filmwidth,filmtomicrolens,imagingLens,microLens,combinedLens);
+    xdim,ydim,filmheight,filmwidth,microlenstofilm,imagingLens,microLens,combinedLens);
 
 cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, lensToolCommand);
 fprintf('Mounting folder %s\n',outputFolder);
@@ -168,6 +168,5 @@ status = system(cmd);
 if status
     error('Docker command problem: %s\n',cmd);
 end
-
 
 end

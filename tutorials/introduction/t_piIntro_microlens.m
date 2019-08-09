@@ -54,11 +54,6 @@ thisR  = piRead(inFile);
 outFolder = fullfile(tempdir,sceneName);
 outFile   = fullfile(outFolder,[sceneName,'.pbrt']);
 thisR.set('outputFile',outFile);
-%% Set render quality
-
-% Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*0.05));  % 1.5 is pretty high res
-thisR.set('pixel samples',2);                      % 4 is Lots of rays .
 
 %% Set output file
 
@@ -69,28 +64,35 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-% For the dgauss lenses 22deg is the half width of the field of view
-
+% This little microlens is only 2 um high.  So, we scale it to 6 um
 microLensName   = 'microlens.2um.Example.json';
-microlens = lensC('filename',microlensName);
+microlens = lensC('filename',microLensName);
+microlens.scale(50);
+% fprintf('Focal length =  %.3f (mm)\n',microlens.focalLength)
 
+% For the dgauss lenses 22deg is the half width of the field of view
 imagingLensName = 'dgauss.22deg.3.0mm.json';
-% edit(imagingLensName)
-% thisLens = lensC('filename',imagingLensName);
-% thisLens.draw;
+%{
+edit(imagingLensName)
+thisLens = lensC('filename',imagingLensName);
+thisLens.draw;
+fprintf('Focal length =  %.3f (mm)\n',thisLens.focalLength)
+%}
 
-filmwidth = 1;    %  mm
+filmwidth = 1;           %  mm
 filmheight = filmwidth;
-
+nMicrolens(1) = floor((filmheight/microlens.get('lens height')));
+nMicrolens(2) = floor((filmwidth/microlens.get('lens height')));
 [combinedlens,cmd] = piCameraInsertMicrolens(microLensName,imagingLensName, ...
-    'xdim',128, 'ydim',128,'film width',filmwidth,'film height',filmheight);
+    'xdim',nMicrolens(1), 'ydim',nMicrolens(2),...
+    'film width',filmwidth,'film height',filmheight);
 
 % Using isetlens to visualize
-%
-% edit(combinedLens)
-% thisLens = lensC('filename',combinedLens);
-% thisLens.draw;
-
+%{
+ % edit(combinedLens)
+ thisLens = lensC('filename',combinedLens);
+ thisLens.draw;
+%}
 %%   Choose a lens
 
 thisLens = combinedlens;
@@ -118,8 +120,18 @@ thisR.set('focus distance',0.6);
 % This is the size of the film/sensor in millimeters 
 thisR.set('film diagonal',sqrt(filmwidth^2 + filmheight^2));
 
-% Film resolution
-thisR.set('film resolution',[256 256]);
+% Film resolution - computes film samples to achieve a density per
+% microlens.  
+samplesPerMicrolens = 5;
+nSamples = floor((filmheight/microlens.get('lens height'))/samplesPerMicrolens);
+
+%{
+% We might make film resolution match a pixel size.
+pixelSize = 0.001; % mm
+nSamples = round(filmheight/pixelSize);
+samplesPerMicrolens = microlens.get('lens height')/pixelSize
+%}
+thisR.set('film resolution',[nSamples nSamples]);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
