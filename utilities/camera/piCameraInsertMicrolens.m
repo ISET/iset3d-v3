@@ -16,7 +16,7 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 %   output name:   File name of the output combined lens
 %
 % These parameters were chosen for a 2 micron pixel, 4 micron super
-%       pixel, 3 super pixels behind each microlenses, 64 x 64
+%       pixel, 3x3 super pixels behind each microlenses, 64 x 64
 %       microlenses
 %   xdim    - N microlens in xdim  (64)
 %   ydim    - N microlens in ydim  (64)
@@ -32,18 +32,19 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 %
 % Description
 %
-% The docker command to merge an imaging lens description with a
-% microlens description is:
+% The docker command that merges an imaging lens description into a
+% microlens description is 'lenstool'.  It is embedded in the docker
+% container and can be invoked this way
 %
 %   docker run vistalab/pbrt-v3-spectral lenstool insertmicrolens ...
 %       -xdim 64 -ydim 64 ...
-%          dgauss.22deg.3.0mm.json microlens.2um.Example.json combined.json 
+%        dgauss.22deg.3.0mm.json microlens.2um.Example.json combined.json 
 %
-% There are other parameters, defined here
+% There are other 'lenstool' options defined here
 %
-% usage: lenstool <command> [options] <filenames...>
+%   usage: lenstool <command> [options] <filenames...>
 %
-% commands: convert insertmicrolens
+%      commands: convert insertmicrolens
 %
 %convert options:
 %    --inputscale <n>    Input units per mm (which are used in the output). Default: 1.0
@@ -52,10 +53,10 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 % insertmicrolens options:
 %    --xdim <n>             How many microlenses span the X direction. Default: 16
 %    --ydim <n>             How many microlenses span the Y direction. Default: 16
-%    --filmwidth <n>        Width of target film in mm. Default: 20.0
-%    --filmheight <n>       Height of target film in mm. Default: 20.0
-%    --filmtolens <n>       Distance from film to back of main lens system (in mm). Default: 50.0
-%    --filmtomicrolens <n>  Distance from film to back of microlens. Default: 0.0 
+%    --filmwidth <n>        Width of target film  (mm). Default: 20.0
+%    --filmheight <n>       Height of target film (mm). Default: 20.0
+%    --filmtolens <n>       Distance (mm) from film to back of main lens system . Default: 50.0
+%    --filmtomicrolens <n>  Distance (mm) from film to back of microlens. Default: 0.0 
 %
 % See also
 %
@@ -126,7 +127,7 @@ filmtomicrolens = p.Results.filmtomicrolens;
 % Basic docker command
 dockerCommand   = 'docker run -ti --rm';
 
-% Where you want stuff to run
+% Where you want the output file
 outputFolder  = pwd;
 dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
 dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);

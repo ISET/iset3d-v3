@@ -6,6 +6,10 @@
 %   piCameraInsertMicrolens
 %
 
+%% Programming questions -
+%  Given that we set the filmwidth and filmheight, should we be able to
+%  read these from the lens file?  Same with filmtomicrolens
+
 %% 
 ieInit
 piDockerConfig;
@@ -21,36 +25,41 @@ imagingLensName = 'dgauss.22deg.3.0mm.json';
 imagingLens = lensC('filename','dgauss.22deg.3.0mm.json');
 imagingLens.draw;
 
-%% Matlab wrapper for the insert microlens docker tool
-%
-combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
+%% Call lenstool from Docker container to insert microlens 
 
-%% Set other than the default parameters
+% Just the default parameters
+combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
+thisLens = lensC('filename',combinedLens);
+
+%% Call lenstool from Docker container and set special parameters
 
 chdir(fullfile(piRootPath,'local'));
 microLensName   = 'microlens.2um.Example.json';
 imagingLensName = 'dgauss.22deg.3.0mm.json';
-combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName, ...
+[combinedLens, cmd]  = piCameraInsertMicrolens(microLensName,imagingLensName, ...
     'xdim',32, 'ydim',32);
 
-% Have a look at the output
-%  edit(combinedLens);
-lensInfo = jsonread(combinedLens);
+% cmd is the terminal command built up in the window
+disp(cmd)
 
-% Some questions -
-%  Given that we set the filmwidth and filmheight, should we be able to
-%  read these from the lens file?  Same with filmtomicrolens
+%% Have a look at the output file
+
+thisLens = lensC('filename',combinedLens);
+thisLens.draw;
+
 %% Help command for the lenstool insertmicrolens
 %
 % Copy and paste this into a terminal window
 %
 status = system('docker run -ti --rm vistalab/pbrt-v3-spectral lenstool');
 
-%% Example of a docker command for the lenstool insertmicrolens
+%% The command line docker command for "lenstool insertmicrolens"
 %
-% Copy and paste this into a terminal window - after putting the
-% relevant files into place ...
+% Copy and paste the command into a terminal window - after putting the
+% relevant files into place ...  This is the command that is built up in
+% piCameraInsertMicrolens
 %
-docker run -ti --rm vistalab/pbrt-v3-spectral lenstool insertmicrolens -xdim 64 -ydim 64 dgauss.22deg.3.0mm.json microlens.2um.Example.json combined.json
+% docker run -ti --rm vistalab/pbrt-v3-spectral lenstool insertmicrolens -xdim 64 -ydim 64 dgauss.22deg.3.0mm.json microlens.2um.Example.json combined.json
+system(cmd)
 
 %%
