@@ -22,7 +22,7 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 %   filmwidth   -   4 microns for each of the 3 superpixels behind the
 %                   microlens; 84 superpixels, 84 * 12 (um) ~ 1 mm
 %   filmheight  -  
-%   filmtomicrolens - 0 micron, but just guessing here.  Not sure
+%   microlenstofilm - 0 micron, but just guessing here.  Not sure
 %                     about units either, but 0 works for all of them.
 %                     Maybe we should make this the focal length of the
 %                     microlens?
@@ -98,11 +98,11 @@ p.addRequired('microLens',vFile);
 
 p.addParameter('outputname','',@ischar);
 
-p.addParameter('xdim',84,@isscalar);
-p.addParameter('ydim',84,@isscalar);
+p.addParameter('xdim',[],@isscalar);
+p.addParameter('ydim',[],@isscalar);
 p.addParameter('filmheight',1,@isscalar);
 p.addParameter('filmwidth',1,@isscalar);
-p.addParameter('microlenstofilm',0,@isscalar);
+p.addParameter('microlenstofilm',[],@isscalar);
 
 p.parse(imagingLens,microLens,varargin{:});
 
@@ -128,13 +128,28 @@ else
     combinedLens = p.Results.outputname;
 end
 
-xdim = p.Results.xdim;
-ydim = p.Results.ydim;
-
 filmheight = ceil(p.Results.filmheight);
 filmwidth  = ceil(p.Results.filmwidth);
 
+% If the user did not specify  xdim and ydim, set up the number of
+% microlenses so that the film is tiled based on the lens height.
+xdim = p.Results.xdim;
+ydim = p.Results.ydim;
+if isempty(xdim), xdim =  floor((filmheight/microlens.get('lens height'))); end
+if isempty(ydim), ydim =  floor((filmwidth/microlens.get('lens height'))); end
+
 microlenstofilm = p.Results.microlenstofilm;
+if isempty(microlenstofilm)
+    microlenstofilm = lensFocus(microLens,1e6);
+end
+
+%% Print out parameter summary
+fprintf('\n------\nMicrolens insertion summary\n');
+fprintf('Microlens dimensions %d %d \n',xdim,ydim);
+fprintf('Microlens to film distance %f\n',microlenstofilm);
+fprintf('Film height and width %f %f\n',filmheight,filmwidth);
+fprintf('------\n');
+
 %% Remember where you started 
 
 % Basic docker command

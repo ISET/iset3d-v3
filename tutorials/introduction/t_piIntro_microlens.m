@@ -67,23 +67,21 @@ outputDir = fileparts(outFile);
 % This little microlens is only 2 um high.  So, we scale it
 microlensName   = fullfile(piRootPath,'data','lens','microlens.json');
 microlens = lensC('filename',microlensName);
-microlens.scale(2);
+currentHeight = microlens.get('lens height');
+desiredHeight = 0.010;   % 10 microns
+microlens.scale(desiredHeight/currentHeight);
 microlens.name = sprintf('%s-scaled',microlens.name);
-fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',microlens.focalLength,microlens.get('lens height'))
+fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
+    microlens.focalLength,microlens.get('lens height'));
 
 % For the dgauss lenses 22deg is the half width of the field of view
 imagingLensName   = fullfile(piRootPath,'data','lens','dgauss.22deg.3.0mm.json');
 imagingLens = lensC('filename',imagingLensName);
-fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',imagingLens.focalLength,imagingLens.get('lens height'))
+fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
+    imagingLens.focalLength,imagingLens.get('lens height'))
 
-%{
-edit(imagingLensName)
-thisLens = lensC('filename',imagingLensName);
-thisLens.draw;
-fprintf('Focal length =  %.3f (mm)\n',thisLens.focalLength)
-%}
-
-filmwidth = 1;           %  mm
+% Set up the microlens array
+filmwidth  = 1;           %  1 mm makes a pretty good Chess Set image
 filmheight = filmwidth;
 nMicrolens(1) = floor((filmheight/microlens.get('lens height')));
 nMicrolens(2) = floor((filmwidth/microlens.get('lens height')));
@@ -91,12 +89,6 @@ nMicrolens(2) = floor((filmwidth/microlens.get('lens height')));
     'xdim',nMicrolens(1), 'ydim',nMicrolens(2),...
     'film width',filmwidth,'film height',filmheight);
 
-% Using isetlens to visualize
-%{
- % edit(combinedLens)
- thisLens = lensC('filename',combinedLens);
- thisLens.draw;
-%}
 %%   Choose a lens
 
 thisLens = combinedlens;
@@ -125,17 +117,11 @@ thisR.set('focus distance',0.6);
 thisR.set('film diagonal',sqrt(filmwidth^2 + filmheight^2));
 
 % Film resolution - computes film samples to achieve a density of samples
-% per microlens.
-samplesPerMicrolens = 3;
-nSamples = nMicrolens*samplesPerMicrolens;
-
-%{
-% We might make film resolution match a pixel size.
-pixelSize = 0.001; % mm
+% per microlens. We might make film resolution match a pixel size.
+pixelSize = 0.002;   % mm
 nSamples = round(filmheight/pixelSize);
-samplesPerMicrolens = microlens.get('lens height')/pixelSize
-%}
 thisR.set('film resolution',nSamples);
+% samplesPerMicrolens = microlens.get('lens height')/pixelSize;
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
