@@ -1,10 +1,10 @@
 %% Analyze minimal focal distance for various lenses
 %
-% After running this script, the closest represents the closest focal length and
-% name{ii} is the name of the lens file.
+% After running this script, the closest represents the closest focal
+% length and name{ii} is the name of the lens file.
 %
-% It appears that dgauss.22deg.3.0mm is the lens with the closest focal length,
-% about 4.4 mm.
+% It appears that dgauss.22deg.3.0mm is the lens with the closest focal
+% length, about 4.4 mm.
 %
 % BW SCIEN Stanford, 2017
 

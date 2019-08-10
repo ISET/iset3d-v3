@@ -61,22 +61,20 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 % See also
 %
 
-% Example:
+% Examples:
 %{
- chdir(fullfile(isetRootPath,'local'));
- microLensName   = 'microlens.2um.Example.json';
+ chdir(fullfile(piRootPath,'local','microlens'));
+ microLensName   = 'microlens.json';
  imagingLensName = 'dgauss.22deg.3.0mm.json';
  combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
  thisLens = jsonread(combinedLens);
 %}
 %{
- chdir(fullfile(isetRootPath));
- microLensName   = 'microlens.2um.Example.json';
- imagingLensName = 'dgauss.22deg.3.0mm.json';
- combinedLens = fullfile(isetRootPath,'local','combinedLens.json');
- combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName,...
-                 'output name','', ...
-                 'film height',1, 'film width',1);
+ chdir(fullfile(piRootPath,'local','microlens'));
+ microLens   = lensC('filename','microlens.json');
+ imagingLens = lensC('filename','dgauss.22deg.3.0mm.json');
+ combinedLens = piCameraInsertMicrolens(microLens,imagingLens);
+
  thisLens = jsonread(combinedLens);
 %}
 
@@ -92,7 +90,8 @@ varargin = ieParamFormat(varargin);
 
 p = inputParser;
 
-vFile = @(x)(exist(x,'file'));
+% Input can be the filename of the lens or the lens object
+vFile = @(x)(isa(x,'lensC') || (ischar(x) && exist(x,'file')));
 p.addRequired('imagingLens',vFile);
 p.addRequired('microLens',vFile);
 
@@ -106,10 +105,23 @@ p.addParameter('microlenstofilm',0,@isscalar);
 
 p.parse(imagingLens,microLens,varargin{:});
 
-% This should be a full path
+% If a lensC was input, the lensC might have been modified from the
+% original fullFileName. So we write out a local copy of the json file.
+if isa(imagingLens,'lensC')
+    thisName = [imagingLens.name,'.json']; 
+    imagingLens.fileWrite(thisName);
+    imagingLens = fullfile(pwd,thisName);
+end
+
+if isa(microLens,'lensC')
+    thisName = [microLens.name,'.json'];
+    microLens.fileWrite(thisName);
+    microLens = fullfile(pwd,thisName);
+end
+
 if isempty(p.Results.outputname)
     [~,imagingName,~]   = fileparts(imagingLens);
-    [~,microLensName,e] = fileparts(microLens);
+    [~,microLensName,e] = fileparts(microLens); 
     combinedLens = fullfile(pwd,sprintf('%s+%s',imagingName,[microLensName,e]));
 else
     combinedLens = p.Results.outputname;

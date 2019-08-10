@@ -16,28 +16,24 @@ piDockerConfig;
 
 %% Shows the lenses
 
-% This is just for clarification.  
-microLensName = 'microlens.2um.Example.json';
-microLens = lensC('filename','microlens.2um.Example.json');
+% Microlens with height of 2 um 
+microLensName = fullfile(piRootPath,'data','lens','microlens.json');   
+microLens = lensC('filename',microLensName);
+microLens.scale(4);                  % Increases the size to 8 um
+microLens.name = sprintf('%s-scale4',microLens.name);
 microLens.draw;
 
-imagingLensName = 'dgauss.22deg.3.0mm.json';
+imagingLensName = fullfile(piRootPath,'data','lens','dgauss.22deg.3.0mm.json');    % Size is 2 um
 imagingLens = lensC('filename','dgauss.22deg.3.0mm.json');
 imagingLens.draw;
 
-%% Call lenstool from Docker container to insert microlens 
-
-% Just the default parameters
-combinedLens = piCameraInsertMicrolens(microLensName,imagingLensName);
-thisLens = lensC('filename',combinedLens);
-
 %% Call lenstool from Docker container and set special parameters
 
-chdir(fullfile(piRootPath,'local'));
-microLensName   = 'microlens.2um.Example.json';
-imagingLensName = 'dgauss.22deg.3.0mm.json';
-[combinedLens, cmd]  = piCameraInsertMicrolens(microLensName,imagingLensName, ...
-    'xdim',32, 'ydim',32);
+chdir(fullfile(piRootPath,'local','microlens'));
+
+% Small dimensions to speed up the calculation
+[combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens, ...
+    'xdim', 8, 'ydim', 8);
 
 % cmd is the terminal command built up in the window
 disp(cmd)
