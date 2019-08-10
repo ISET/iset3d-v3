@@ -15,9 +15,8 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 % Optional key/value pairs
 %   output name:   File name of the output combined lens
 %
-% These parameters were chosen for a 2 micron pixel, 4 micron super
-%       pixel, 3x3 super pixels behind each microlenses, 64 x 64
-%       microlenses
+% Default parameters - not always useful.  Should create a routine to
+% generate default parameters
 %   xdim    - N microlens in xdim  (64)
 %   ydim    - N microlens in ydim  (64)
 %   filmwidth   -   4 microns for each of the 3 superpixels behind the
@@ -25,6 +24,8 @@ function [combinedLens, cmd]  = piCameraInsertMicrolens(microLens,imagingLens,va
 %   filmheight  -  
 %   filmtomicrolens - 0 micron, but just guessing here.  Not sure
 %                     about units either, but 0 works for all of them.
+%                     Maybe we should make this the focal length of the
+%                     microlens?
 %
 % Output
 %   combinedLens - Full path to the output file

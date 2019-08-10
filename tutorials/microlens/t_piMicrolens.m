@@ -3,7 +3,7 @@
 % Uses the isetlens toolbox
 %
 % See also
-%   piCameraInsertMicrolens
+%   piCameraInsertMicrolens, t_piIntro_microlens.m
 %
 
 %% Programming questions -
