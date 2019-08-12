@@ -181,6 +181,7 @@ switch type
                 lightSources{nlight}.type = 'area';
                 lightSources{nlight}.line{1} = 'AttributeBegin';
                 if idxL
+                    % Why is there a +nLight?
                     lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
                                 from(2), from(3));
                 else
