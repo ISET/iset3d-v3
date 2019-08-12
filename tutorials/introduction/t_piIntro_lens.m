@@ -1,7 +1,7 @@
 %% Render using a lens
 %
 % Dependencies:
-%    ISET3d, ISETCam, JSONio
+%    ISET3d, ISETCam, isetlens, JSONio
 %
 % Check that you have the updated docker image by running
 %
@@ -15,7 +15,7 @@
 % And specifically
 %   https://www.pbrt.org/fileformat-v3.html#cameras
 %
-% ZLiu, BW 2018
+% Z Liu, BW 2018
 %
 % See also
 %   t_piIntro_start, isetlens, 
@@ -34,11 +34,18 @@ end
 % sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
 sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
-% The output directory will be written here to inFolder/sceneName
 inFolder = fullfile(piRootPath,'local','scenes');
-dest = piPBRTFetch(sceneName,'pbrtversion',3,...
-    'destinationFolder',inFolder,...
-    'delete zip',true);
+
+inFile = fullfile(inFolder,sceneName,sceneFileName);
+
+if ~exist(inFile,'file')
+    % Sometimes the user runs this many times and so they already have
+    % the file.  We only fetch the file if it does not exist.
+    fprintf('Downloading %s from RDT',sceneName);
+    dest = piPBRTFetch(sceneName,'pbrtversion',3,...
+        'destinationFolder',inFolder,...
+        'delete zip',true);
+end
 
 % This is the PBRT scene file inside the output directory
 inFile = fullfile(inFolder,sceneName,sceneFileName);
@@ -48,7 +55,7 @@ thisR  = piRead(inFile);
 
 % Set resolution for speed or quality.
 thisR.set('film resolution',round([600 600]*0.25));  % 1.5 is pretty high res
-thisR.set('pixel samples',16);                    % 4 is Lots of rays .
+thisR.set('pixel samples',16);                       % 
 
 %% Set output file
 
@@ -59,8 +66,8 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-% 22deg is the half width of the field of view
-lensfile = 'wide.56deg.3.0mm.json';
+lensFiles = lensList;
+lensfile = lensFiles(9).name    % 30 38 18 10
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 
@@ -75,7 +82,8 @@ thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
 
 % PBRT estimates the distance.  It is not perfectly aligned to the depth
 % map, but it is close.
-thisR.set('focus distance',0.6);
+d = lensFocus(lensfile,0.7);
+thisR.set('focus distance',d);
 
 % The FOV is not used for the 'realistic' camera.
 % The FOV is determined by the lens. 
@@ -108,13 +116,13 @@ piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
-
+%{
 %%
 depth = piRender(thisR,'render type','depth');
 ieNewGraphWin;
 imagesc(depth);
-%% Change this for depth of field effects.
 
+%% Change this for depth of field effects.
 
 thisR.set('aperture diameter',3);
 piWrite(thisR,'creatematerials',true);
@@ -131,5 +139,5 @@ piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','both');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
-
+%}
 %% END
