@@ -1,27 +1,30 @@
 function [depthrange, depthmap] = piSceneDepth(thisR)
-% Compute the depth of the objects in the scene
+% Compute the depth (meters) of the objects in the scene
 %
 % Syntax
 %   [depthrange, depthmap] = piSceneDepth(thisR)
 %
 % Brief description
 %   Calculate the depth image quickly and return the depth range and a
-%   depth map.
+%   depth map (meters).
 %
-% Wandell
+% Wandell, 2019
 %
 % See also
-%
+%  t_piIntro_lens
 
-%% Go for speed
+%% Set the recipe to permit fast calculation
 
-thisR.set('max depth',1); % Number of bounces
-thisR.set('camera type','perspective');
-thisR.set('rays per pixel',1);
+% Not sure this is necessary
+thisCopy = thisR.copy;
+thisCopy.set('max depth',1); % Number of bounces
+% thisCopy.set('camera type','perspective');
+thisCopy.set('rays per pixel',1);
+thisCopy.camera = piCameraCreate('perspective');
 
-%% Render the depth map
+%% The render returns the depth map in meters
 
-depthmap   = piRender(thisR, 'render type','depth');
+depthmap   = piRender(thisCopy, 'render type','depth');
 tmp = depthmap(depthmap > 0);
 depthrange = [min(tmp(:)), max(tmp(:))];
 
@@ -30,7 +33,7 @@ depthrange = [min(tmp(:)), max(tmp(:))];
 if nargout == 0
     ieNewGraphWin;
     histogram(depthmap(:));
-    xlabel('meters'); ylabel('n pixels'); set(gca,'yscale','log');
+    xlabel('mm'); ylabel('n pixels'); set(gca,'yscale','log');
     grid on;
 end
 

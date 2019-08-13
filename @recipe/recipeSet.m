@@ -40,9 +40,8 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % See also
 %    recipeGet
 
-% Examples
+% Examples:
 %{
-  thisR.set('lensFile','dgauss.22deg.3.0mm.dat')
 %}
 
 %% Set up
@@ -102,24 +101,56 @@ switch param
     case {'inputfile'}
         thisR.inputFile = val;
         
-        
-        % Scene and camera
+        % Scene parameters
     case 'objectdistance'
-        % Changes the distance from the camera (from) to the object
-        % pointed at by the camera (to).
+        % The 'from' spot, is the camera location.  The 'to' spot is
+        % the point the camera is looking at.  Both are specified in
+        % meters.
         %
-        % Adjusts the lookat 'from' field to match the distance in val.
-        % This needs some more thought.  At present this adjusts the
-        % 'from' spot, which is where the camera is.  It keeps the
-        % direction the same, just scales it.
+        % This routine adjusts the the 'from' position, moving the
+        % camera position. It does so by keeping the 'to' position the
+        % same, so the camera is still looking at the same location.
+        % Thus, the point of this set is to move the camera closer or
+        % further from the 'to' position.
+        %
+        % What is the relationship to the focal distance?  If we move
+        % the camera, the focal distance is always with respect to the
+        % camera, right?
         
         % Unit length vector between from and to.
         objDirection = thisR.get('object direction');
         
-        % Scale the unit length vector to match val, setting the
-        % distance between from and to.
-        newDirection = objDirection*val;
-        thisR.lookAt.from = thisR.lookAt.to + newDirection;
+        % Scale the unit length vector to match val, thus setting the
+        % distance between 'from' and 'to'.  This adjust the 'from'
+        % (camera) position, but not the object position in the scene.
+        thisR.lookAt.from = thisR.lookAt.to + objDirection*val;
+        % warning('Object distance may not be important');
+        
+    case {'focusdistance','focaldistance'}
+        % lens.set('focus distance',m)
+        %
+        % This is the distance (m) to the object in the scene that
+        % will be in focus.  The film distance is derived by PBRT from
+        % this parameter.  It is possible that there is no film
+        % distance for certain (say very near) focus distances.
+        %
+        % This variable is related to the lookat settings.  That
+        % parameter says where the camera is pointing.  But the
+        % distance to the object (objectdistance) may not be the same
+        % as this focus distance. That is because it is possible to
+        % look at an object but have it not be the object that is in
+        % focus.
+        %
+        % Depending on the camera type, the parameter name is either
+        % focusdistance or focaldistance. Historical annoyance.
+        if isequal(thisR.camera.subtype,'pinhole')||...
+                isequal(thisR.camera.subtype,'perspective')
+            thisR.camera.focaldistance.value = val;
+            thisR.camera.focaldistance.type = 'float';
+        else
+            thisR.camera.focusdistance.value = val;
+            thisR.camera.focusdistance.type = 'float';
+        end
         
         % Camera
     case 'camera'
@@ -145,7 +176,7 @@ switch param
         end
         
         % Shutter duration in sec
-        thisR.camera.shutterclose.value = val + openShutter;   
+        thisR.camera.shutterclose.value = val + openShutter;
         
         % Lens related
     case 'lensfile'
@@ -156,48 +187,39 @@ switch param
             thisR.camera.specfile.value = val;
             thisR.camera.specfile.type = 'string';
         end
-    case {'lensradius','lens radius'}
-        thisR.camera.lensradius.value = val;
-        thisR.camera.lensradius.type = 'float';
+    case {'lensradius'}
+        % lens.set('lens radius','mm')
+        % Should only be set for perspective cameras
+        %
+        if isequal(thisR.camera.subtype,'perspective')
+            thisR.camera.lensradius.value = val;
+            thisR.camera.lensradius.type = 'float';
+        else
+            warning('Lens radius is only set for perspective camera.  Use aperture diameter for omni');
+        end
+        
     case {'aperture','aperturediameter'}
-        % This set should look at the aperture in the lens file, which
-        % represents the largest possible aperture.  It should not
-        % allow a value bigger than that.  (ZL/BW).
+        % lens.set('aperture diameter','mm')
+        %
+        % Set 'aperture diameter' should look at the aperture in the
+        % lens file, which represents the largest possible aperture.
+        % It should not allow a value bigger than that.  (ZL/BW).
         
         % Throw a warning for perspective camera
-        if isequal(thisR.camera.subtype,'pinhole')||...
+        if isequal(thisR.camera.subtype,'pinhole') ||...
                 isequal(thisR.camera.subtype,'perspective')
-            Warning('Perspective/pinhole camera does not use the aperture diameter variable. Use "lensradius" instead.')
+            warning('Perspective/pinhole camera - setting "lens radius".')
+            thisR.set('lens radius',val/2);
+            return;
         end
         
         thisR.camera.aperturediameter.value = val;
         thisR.camera.aperturediameter.type = 'float';
-
-    case {'focusdistance','focaldistance'}
-        % This is the distance to the object in the scene that will be
-        % in focus.  When this is set, the film distance is derived by
-        % PBRT.  It is possible that there is no film distance for
-        % certain (say very near) focus distances.
-        %
-        % This variable is related to the lookat settings and we
-        % should probably connect this with 'objectdistance'.  Though
-        % it is possible to look at an object but have it not be the
-        % object that is in focus.
-        %
-        % Depending on the camera type, it's either focusdistance or
-        % focaldistance. Not sure why there is a difference!
-        if isequal(thisR.camera.subtype,'pinhole')||...
-                isequal(thisR.camera.subtype,'perspective')
-            thisR.camera.focaldistance.value = val;
-            thisR.camera.focaldistance.type = 'float';
-        else
-            thisR.camera.focusdistance.value = val;
-            thisR.camera.focusdistance.type = 'float';
-        end
+        
     case 'fov'
         % This sets a horizontal fov
         % We should check that this is a pinhole, I think
-        % This is only used for pinholes, not realistic camera case. 
+        % This is only used for pinholes, not realistic camera case.
         if isequal(thisR.camera.subtype,'pinhole')||...
                 isequal(thisR.camera.subtype,'perspective')
             if length(val)==1
@@ -207,7 +229,7 @@ switch param
                 % if two fov is given [hor, ver], we should resize film
                 % acoordingly
                 filmRes = thisR.get('film resolution');
-                fov = min(val); 
+                fov = min(val);
                 % horizontal resolution/ vertical resolution
                 resRatio = tand(val(1)/2)/tand(val(2)/2);
                 if fov == val(1)
@@ -221,7 +243,7 @@ switch param
             end
         else
             warning('fov not set for camera models');
-        end    
+        end
     case 'diffraction'
         thisR.camera.diffractionEnabled.value = val;
         thisR.camera.diffractionEnabled.type = 'bool';
@@ -241,7 +263,7 @@ switch param
             return;
         elseif isequal(val,true)
             thisR.camera.chromaticAberrationEnabled.value = 'true';
-            val = 8; 
+            val = 8;
         elseif isnumeric(val)
             thisR.camera.chromaticAberrationEnabled.value = 'true';
         else
@@ -281,15 +303,6 @@ switch param
     case 'up'
         thisR.lookAt.up = val;
         
-        % Film parameters
-    case 'filmdiagonal'
-        thisR.film.diagonal.type = 'float';
-        thisR.film.diagonal.value = val;
-        
-    case {'filmdistance'}
-        thisR.camera.filmdistance.type = 'float';
-        thisR.camera.filmdistance.value = val;
-        
         % Rendering related
     case{'maxdepth','bounces','nbounces'}
         % Eliminated warning Nov. 11, 2018.
@@ -327,7 +340,13 @@ switch param
         thisR.camera.subpixels_h = val(1);
         thisR.camera.subpixels_w = val(2);
         
-        % Film
+        % Film parameters
+    case 'filmdiagonal'
+        thisR.film.diagonal.type = 'float';
+        thisR.film.diagonal.value = val;
+    case {'filmdistance'}
+        thisR.camera.filmdistance.type = 'float';
+        thisR.camera.filmdistance.value = val;
     case 'filmresolution'
         % This is printed out in the pbrt scene file
         if length(val) == 1, val(2) = val(1); end
@@ -348,7 +367,7 @@ switch param
         thisR.metadata.sumo.trafficflowdensity = val;
     case {'traffictimestamp'}
         thisR.metadata.sumo.timestamp = val;
-
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end

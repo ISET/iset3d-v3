@@ -36,9 +36,7 @@ end
 sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
 inFolder = fullfile(piRootPath,'local','scenes');
-
 inFile = fullfile(inFolder,sceneName,sceneFileName);
-
 if ~exist(inFile,'file')
     % Sometimes the user runs this many times and so they already have
     % the file.  We only fetch the file if it does not exist.
@@ -49,14 +47,13 @@ if ~exist(inFile,'file')
 end
 
 % This is the PBRT scene file inside the output directory
-inFile = fullfile(inFolder,sceneName,sceneFileName);
 thisR  = piRead(inFile);
 
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 600]*0.25));  % 1.5 is pretty high res
-thisR.set('rays per pixel',16);                       % 
+thisR.set('film resolution',round([600 600]*0.25));  % 2 is high res. 0.25 for speed
+thisR.set('rays per pixel',16);                      % 128 for high quality
 
 %% Set output file
 
@@ -67,33 +64,34 @@ thisR.set('outputFile',outFile);
 
 %% To determine the range of object depths in the scene
 
-% depthRange = piSceneDepth(thisR);
-depthRange = [0.0402, 2.5795];
+% [depthRange, depthHist] = piSceneDepth(thisR);
+% histogram(depthHist(:)); xlabel('Depth (m)'); grid on
+depthRange = [0.1674, 3.3153];  % Chess set distances in meters
 
 %% Add camera with lens
 
 % lensFiles = lensList;
-lensfile  = 'wide.56deg.3.0mm.json';    % 30 38 18 10
+lensfile  = 'dgauss.22deg.50.0mm.json';    % 30 38 18 10
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
 % Set the focus into the middle of the depth range of the objects in the
 % scene.
-d = lensFocus(lensfile,mean(depthRange));
-thisR.set('focus distance',d);
+% d = lensFocus(lensfile,mean(depthRange));   % Millimeters
+% thisR.set('film distance',d);
+thisR.set('focal distance',mean(depthRange));
 
 % The FOV is not used for the 'realistic' camera.
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters (default 22)
-thisR.set('film diagonal',22);
+thisR.set('film diagonal',33);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
-thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
-thisR.set('object distance',0.7);    % What is this?
+thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default 
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
