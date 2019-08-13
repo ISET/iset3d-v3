@@ -28,6 +28,7 @@ if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
     error('You must have the remote data toolbox on your path'); 
 end
+
 %% Read the pbrt files
 
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
@@ -55,34 +56,29 @@ thisR  = piRead(inFile);
 
 % Set resolution for speed or quality.
 thisR.set('film resolution',round([600 600]*0.25));  % 1.5 is pretty high res
-thisR.set('pixel samples',16);                       % 
+thisR.set('rays per pixel',16);                       % 
 
 %% Set output file
 
-oiName = sceneName;
-outFile = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
-thisR.set('outputFile',outFile);
+oiName    = sceneName;
+outFile   = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
 outputDir = fileparts(outFile);
+thisR.set('outputFile',outFile);
+
+%% To determine the range of object depths in the scene
+
+depthRange = piSceneDepth(thisR);
 
 %% Add camera with lens
 
 lensFiles = lensList;
-lensfile = lensFiles(9).name    % 30 38 18 10
+lensfile  = lensFiles(9).name;    % 30 38 18 10
 fprintf('Using lens: %s\n',lensfile);
-thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
+thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
-%{
-% You might adjust the focus for different scenes.  Use piRender with
-% the 'depth map' option to see how far away the scene objects are.
-% There appears to be some difference between the depth map and the
-% true focus.
-  dMap = piRender(thisR,'render type','depth');
-  ieNewGraphWin; imagesc(dMap); colormap(flipud(gray)); colorbar;
-%}
-
-% PBRT estimates the distance.  It is not perfectly aligned to the depth
-% map, but it is close.
-d = lensFocus(lensfile,0.7);
+% Set the focus into the middle of the depth range of the objects in the
+% scene.
+d = lensFocus(lensfile,mean(depthRange));
 thisR.set('focus distance',d);
 
 % The FOV is not used for the 'realistic' camera.

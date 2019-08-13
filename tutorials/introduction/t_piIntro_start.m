@@ -1,4 +1,4 @@
-%% This is the first in a series of scripts introducing iset3d calulcations
+%% The first in a series of scripts introducing iset3d calculations
 %
 % Brief description:
 %
@@ -7,17 +7,16 @@
 %  the docker command, and loads the result into an ISET scene structure.
 % 
 % Dependencies:
-%
 %    ISET3d, (ISETCam or ISETBio), JSONio
 %
 %  Check that you have the updated docker image by running
 %
-%   docker pull vistalab/pbrt-v3-spectral
+%    docker pull vistalab/pbrt-v3-spectral
 %
 % TL, BW, ZL SCIEN 2017
 %
 % See also
-%
+%   t_piIntro_*
 
 %% Initialize ISET and Docker
 
