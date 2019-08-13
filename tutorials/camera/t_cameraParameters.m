@@ -24,71 +24,51 @@
 %   t_piIntro_start, isetlens, 
 %
 
-%% Initialize ISET and Docker
+%%
+thisR = piChessInit(0.2);
 
-ieInit;
-if ~piDockerExists, piDockerConfig; end
-if isempty(which('RdtClient'))
-    error('You must have the remote data toolbox on your path'); 
-end
+%% For this object distance, what are the scene depths (m)
+objDistance = thisR.get('object distance');  % In meters
+fprintf('Distance between camera and scene position %f\n',objDistance);
 
-%% Read the pbrt files
+focalDistance = thisR.get('focal distance');
+fprintf('Distance to focal plane %f\n',focalDistance);
 
-% sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
-% sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+[depthRange, depthmap]= piSceneDepth(thisR);
+disp(depthRange)
+ieNewGraphWin; imagesc(depthmap);
 
-inFolder = fullfile(piRootPath,'local','scenes');
-inFile = fullfile(inFolder,sceneName,sceneFileName);
-if ~exist(inFile,'file')
-    % Sometimes the user runs this many times and so they already have
-    % the file.  We only fetch the file if it does not exist.
-    fprintf('Downloading %s from RDT',sceneName);
-    dest = piPBRTFetch(sceneName,'pbrtversion',3,...
-        'destinationFolder',inFolder,...
-        'delete zip',true);
-end
-
-% This is the PBRT scene file inside the output directory
-thisR  = piRead(inFile);
-
-%% Set render quality
-
-% Set resolution for speed or quality.
-thisR.set('film resolution',round([600 600]*0.25));  % 2 is high res. 0.25 for speed
-thisR.set('rays per pixel',16);                      % 128 for high quality
-
-%% Set output file
-
-oiName    = sceneName;
-outFile   = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
-outputDir = fileparts(outFile);
-thisR.set('outputFile',outFile);
-
-%% Create a camera with lens
-
-% lensFiles = lensList;
-lensfile  = 'dgauss.22deg.50.0mm.json';    % 30 38 18 10
-fprintf('Using lens: %s\n',lensfile);
-thisR.camera = piCameraCreate('omni','lensFile',lensfile);
-
-thisR.set('film diagonal',11);
-
-%% Set the focus plane
+%% Move the camera closer
 
 % Here are some critical parameters
-objDistance = 1.5;
+objDistance = 0.75;
+thisR.set('object distance',objDistance);   % In meters
+fprintf('Distance between camera and scene position %f\n',objDistance);
+[depthRange, depthmap]= piSceneDepth(thisR);
+disp(depthRange)
+ieNewGraphWin; imagesc(depthmap);
+
+%%  Now, set up the in-focus distance 
+
+thisR = piChessInit(1);   % Higher resolution to see focus.  Takes longer.
+
+objDistance = 0.75;
 thisR.set('object distance',objDistance);   % In meters
 
-objDistance = thisR.get('object distance')   % In meters
-thisR.get('focal distance')
+% Here are some critical parameters
+focalDistance = 0.25;
+thisR.set('focal distance',focalDistance);   % In meters
+fprintf('Focal distance %f\n',focalDistance);
+oi = piRender(thisR,'render type','radiance');
+oiWindow(oi);
+
+%%  Set up for different focal planes
+
 
 thisR.get('from')
 
 %%
-% For this object distance, what are the scene depths (m)
-[depthRange, depthmap]= piSceneDepth(thisR);
-ieNewGraphWin; imagesc(depthmap);
+
 
 thisR.camera
 disp(depthRange)

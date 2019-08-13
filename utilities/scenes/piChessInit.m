@@ -1,15 +1,17 @@
-function [outFile, dest] = piChessInit(resolution)
+function thisR = piChessInit(resolution)
 % Initialize Docker and ChessSet scene
 %
-%   piChessInit.m
+% Syntax:
 %
-% Many tutorial calculations use the Chess Set scene to demonstrate
-% ISET3d parameters.  Rather than reload the scene each time, we get
-% the data and recipe set up using this script
+%   thisR = piChessInit(resolution)
+%
+% Brief description
+%   Many tutorial calculations use the Chess Set scene to demonstrate
+%   ISET3d parameters.  Rather than reload the scene each time, we get
+%   the data and recipe set up using this script
 %
 % Wandell, 2019
 %
-%  
 
 % Maybe we should generalize.
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
