@@ -67,12 +67,13 @@ thisR.set('outputFile',outFile);
 
 %% To determine the range of object depths in the scene
 
-depthRange = piSceneDepth(thisR);
+% depthRange = piSceneDepth(thisR);
+depthRange = [0.0402, 2.5795];
 
 %% Add camera with lens
 
-lensFiles = lensList;
-lensfile  = lensFiles(9).name;    % 30 38 18 10
+% lensFiles = lensList;
+lensfile  = 'wide.56deg.3.0mm.json';    % 30 38 18 10
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
@@ -85,14 +86,14 @@ thisR.set('focus distance',d);
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters (default 22)
-thisR.set('film diagonal',12);
+thisR.set('film diagonal',22);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
 thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
-thisR.set('object distance',0.7);
+thisR.set('object distance',0.7);    % What is this?
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
@@ -106,12 +107,14 @@ thisR.sampler.subtype    = 'sobol';
 %% Render and display
 
 % Change this for depth of field effects.
-thisR.set('aperture diameter',6);   % thisR.summarize('all');
+thisR.set('aperture diameter',2);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
+
+%%
 %{
 %%
 depth = piRender(thisR,'render type','depth');
