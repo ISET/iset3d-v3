@@ -348,6 +348,11 @@ switch param
         thisR.metadata.sumo.trafficflowdensity = val;
     case {'traffictimestamp'}
         thisR.metadata.sumo.timestamp = val;
+        
+    case {'camera body','camerabody'}
+        thisR.camera = val.camera;
+        thisR.film = val.film;
+        thisR.filter = val.filter;
 
     otherwise
         error('Unknown parameter %s\n',param);
