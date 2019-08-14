@@ -70,7 +70,7 @@ switch str
     case 'file'
         fprintf('\nFile information\n-----------\n');
         fprintf('Input:  %s\n',thisR.get('input file'));
-        fprintf('Output:  %s\n',thisR.get('output file'));
+        fprintf('Output: %s\n',thisR.get('output file'));
         if isfield(thisR,'exporter'), fprintf('Exported by %s\n',thisR.exporter); end
         fprintf('\n');
         
@@ -93,8 +93,9 @@ switch str
         fprintf('Sub type: %s\n',thisR.camera.subtype);
         fprintf('Lens file name:   %s\n',thisR.get('lens file'));
         fprintf('Aperture diameter (mm): %0.2f\n',thisR.get('aperture diameter'));
-        fprintf('Focal distance (m):   %0.2f\n',thisR.get('focal distance'));
-        fprintf('Exposure time (s): %f\n',thisR.get('exposure time'));
+        fprintf('Focal distance (m):\t%0.2f\n',thisR.get('focal distance'));
+        fprintf('Exposure time (s):\t%f\n',thisR.get('exposure time'));
+        fprintf('Field of view (deg):\t%f\n',thisR.get('fov'));
         fprintf('\n');
         
     case 'film'
@@ -112,6 +113,7 @@ switch str
         fprintf('from:\t%.3f %.3f %.3f\n',thisR.get('from'));
         fprintf('to:\t%.3f %.3f %.3f\n',thisR.get('to'));
         fprintf('up:\t%.3f %.3f %.3f\n',thisR.get('up'));
+        fprintf('object distance: %.3f (m)',thisR.get('object distance'));
         fprintf('\n');
         
     case 'assets'

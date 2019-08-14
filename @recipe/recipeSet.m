@@ -158,7 +158,7 @@ switch param
         % To adjust the parameters use recipe.set() calls
         thisR.camera = piCameraCreate(val,'lensFile',p.Results.lensfile);
         
-        % For this camera, the film size should be
+        % For the default camera, the film size is 35 mm
         thisR.set('film diagonal',35);
         
     case 'cameratype'
@@ -180,26 +180,25 @@ switch param
         
         % Lens related
     case 'lensfile'
-        if(thisR.version == 3)
-            thisR.camera.lensfile.value = val;
-            thisR.camera.lensfile.type = 'string';
-        elseif(thisR.version == 2)
-            thisR.camera.specfile.value = val;
-            thisR.camera.specfile.type = 'string';
-        end
+        % lens.set('lens file',val)   (string)
+        % Should be the json file defining the camera.
+        thisR.camera.lensfile.value = val;
+        thisR.camera.lensfile.type = 'string';
+
     case {'lensradius'}
-        % lens.set('lens radius','mm')
+        % lens.set('lens radius',val (mm))
+        %
         % Should only be set for perspective cameras
         %
         if isequal(thisR.camera.subtype,'perspective')
             thisR.camera.lensradius.value = val;
             thisR.camera.lensradius.type = 'float';
         else
-            warning('Lens radius is only set for perspective camera.  Use aperture diameter for omni');
+            warning('Lens radius is set for perspective camera.  Use aperture diameter for omni');
         end
         
     case {'aperture','aperturediameter'}
-        % lens.set('aperture diameter','mm')
+        % lens.set('aperture diameter',val (mm))
         %
         % Set 'aperture diameter' should look at the aperture in the
         % lens file, which represents the largest possible aperture.
@@ -280,8 +279,12 @@ switch param
         thisR.integrator.numCABands.type = 'integer';
         
     case 'autofocus'
+        % Should deprecate this.  Let's run it for a while and see how
+        % often it turns up.
+        %
         % thisR.set('autofocus',true);
         % Sets the film distance so the lookAt to point is in good focus
+        warning('Bad autofocus set in recipe.  Fix!');
         if val
             fdist = thisR.get('focal distance');
             if isnan(fdist)
