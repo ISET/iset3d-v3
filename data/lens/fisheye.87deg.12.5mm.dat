@@ -1,13 +1,15 @@
 # Name: fisheye.87deg.12.5mm
 # Description: multi element lens
-# Focal length (mm) 
+# units are mm
+# Focal length 
 12.500
+
 # Each row is a surface.
-# The order of surfaces starts from the image and
-# heads to the sensor.  Zero is the position of the first lens surface.
-# Positive numbers are towards the lens, and negative numbers are towards
-# the image
-#    radius	 axpos	N	aperture
+# They are ordered from the image to the sensor.
+# Zero is the position of the first lens surface.
+# Positive is towards the sensor (right).
+# Negative is towards the scene (left).
+# radius 	 axpos 	 N 	 aperture
 52.242500	1.635000	1.713000	40.000000
 8.528750	7.191250	1.000000	17.000000
 42.850000	1.226250	1.620000	18.750000
@@ -18,9 +20,8 @@
 9.778750	3.088750	1.668000	13.500000
 -43.361250	0.386250	1.000000	13.500000
 12500.000000	1.158750	1.518000	12.500000
-0.000000	1.066250	0.000000	12.500000
-12500.000000	1.250000	1.000000	12.500000
-12500.000000	1.158750	1.000000	10.675000
+12500.000000	1.066250	1.000000	12.500000
+0.000000	1.250000	0.000000	12.500000
 -660.712500	2.626250	1.497000	11.125000
 -14.225000	0.077500	1.000000	12.500000
 82.652500	3.861250	1.487000	13.000000
