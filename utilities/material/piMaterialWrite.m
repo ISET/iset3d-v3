@@ -43,7 +43,7 @@ if isfield(thisR.materials, 'txtLines')
             thisR.materials.txtLines(jj) = strrep(str, 'jpg', 'png');
         end
         if piContains(str, '.jpg "', 'ignoreCase', 1)
-            thisR.materials.txtLines(jj) = strrep(str, 'jpg ','png');
+            thisR.materials.txtLines(jj) = strrep(str, 'jpg ', 'png');
         end
         % photoshop exports texture format w/ ".JPG "(with extra space) ext
         if piContains(str, '.JPG "')
@@ -60,7 +60,6 @@ if isfield(thisR.materials, 'txtLines')
     %% Empty any line that contains MakeNamedMaterial
     % The remaining lines have a texture definition.
     output = thisR.materials.outputFile_materials;
-    [~,materials_fname,~] = fileparts(output);
     txtLines = thisR.materials.txtLines;
     for ii = 1:size(txtLines)
         if ~isempty(txtLines(ii))
@@ -72,19 +71,21 @@ if isfield(thisR.materials, 'txtLines')
     
     % Squeeze out the empty lines. Some day we might get the parsed
     % textures here.
-    textureLines = txtLines(~cellfun('isempty',txtLines));
+    textureLines = txtLines(~cellfun('isempty', txtLines));
 end
 
 for jj = 1: length(textureLines)
     textureLines_tmp = [];
-    textureLines{jj} = strrep(textureLines{jj}, '[ ', '');
-    textureLines{jj} = strrep(textureLines{jj}, '] ', '');
-    % thisLine_tmp = textscan(textureLines{jj},'%q');
+    if ~ispc()
+        textureLines{jj} = strrep(textureLines{jj}, '[ ', ' ');
+        textureLines{jj} = strrep(textureLines{jj}, '] ', ' ');
+    end
+    % thisLine_tmp = textscan(textureLines{jj}, '%q');
     thisLine_tmp = strsplit(textureLines{jj}, ' ');
     thisLine_tmp = thisLine_tmp(~cellfun(@isempty, thisLine_tmp));
     if ~strcmp(thisLine_tmp{length(thisLine_tmp)}(1), '"')
         for nn = length(thisLine_tmp):-1:1
-            if strcmp(thisLine_tmp{nn}(1),'"')
+            if strcmp(thisLine_tmp{nn}(1), '"')
                 for kk = nn:length(thisLine_tmp) - 1
                     % combine all the string from nn to end;
                     thisLine_tmp{nn} = ...
@@ -259,7 +260,8 @@ if ~isempty(materials.rgbkt)
 end
 if isfield(materials, 'rgbopacity')
     if ~isempty(materials.rgbopacity)
-        val_opacity = sprintf(' "rgb Opacity" [%0.5f %0.5f %0.5f] ',materials.rgbopacity);
+        val_opacity = sprintf(' "rgb Opacity" [%0.5f %0.5f %0.5f] ', ...
+            materials.rgbopacity);
         val = strcat(val, val_opacity);
     end
 end
@@ -295,7 +297,8 @@ if isfield(materials, 'colorreflect')
 end
 if isfield(materials, 'colormfp')
     if ~isempty(materials.colormfp)
-        val_colormfp = sprintf(' "color mfp" [%0.5f %0.5f %0.5f] ',materials.colormfp);
+        val_colormfp = sprintf(' "color mfp" [%0.5f %0.5f %0.5f] ', ...
+            materials.colormfp);
         val = strcat(val, val_colormfp);
     end
 end
@@ -317,8 +320,8 @@ if ~isempty(materials.floatroughness)
     val = strcat(val, val_floatroughness);
 end
  
-if isfield(materials,'floateta') && ~isempty(materials.floateta)
-    val_floateta = sprintf(' "float eta" [%0.5f] ',materials.floateta);
+if isfield(materials, 'floateta') && ~isempty(materials.floateta)
+    val_floateta = sprintf(' "float eta" [%0.5f] ', materials.floateta);
     val = strcat(val, val_floateta);
 end
 
