@@ -103,7 +103,8 @@ tic
 tree_interval = rand(1)*4+2;
 if piContains(sceneType,'city')|| piContains(sceneType,'suburb')
     
-    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval);
+    susoPlaced = piSidewalkPlan(road,st,trafficflow(timestamp),'tree_interval',tree_interval,...
+        'tree_type','Mix');
     disp('Sidewalk generated');
     
     % place parked cars
@@ -150,10 +151,6 @@ for ii = 1: length(sumoPlaced)
 end
 % Update recipe material library.
 thisR_scene.materials.lib = piMateriallib;
-
-% Update the material lib to the recipe.
-thisR_scene.materials.lib = piMateriallib;
-
 road = fwInfoAppend(road,sumoPlaced{1}); % mobile objects
 
 disp('Completed SUMO combined with SUSO');
@@ -167,7 +164,9 @@ function road = fwInfoAppend(road,assets)
 assetFields = fieldnames(assets);
 for jj = 1:length(assetFields)
     for kk = 1: length(assets.(assetFields{jj}))
-        road.fwList = [road.fwList,' ',assets.(assetFields{jj})(kk).fwInfo];
+        if isfield(assets.(assetFields{jj})(kk), 'fwInfo')
+            road.fwList = [road.fwList,' ',assets.(assetFields{jj})(kk).fwInfo];
+        end
     end
 end
 
