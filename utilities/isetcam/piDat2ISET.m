@@ -76,6 +76,10 @@ elseif(strcmp(label,'coordinates'))
     coordMap = tmp(:,:,1:3); clear tmp;
     ieObject = coordMap;
     return;
+elseif(strcmp(label,'reflectance'))
+    reflectanceMap = piReadDAT(inputFile, 'maxPlanes', nWave);
+    ieObject = reflectanceMap;
+    return;
 end
 
 %% Read the data and set some of the ieObject parameters

@@ -75,7 +75,7 @@ else
     varargin =ieParamFormat(varargin);
 end
 
-rTypes = {'radiance','depth','both','coordinates','material','mesh'};
+rTypes = {'radiance','depth','both','coordinates','material','mesh','reflectance'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('meanluminance',100,@inumeric);
@@ -85,7 +85,7 @@ p.addParameter('reuse',false,@islogical);
 
 % If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
 
-thisDocker = 'vistalab/pbrt-v3-spectral';
+thisDocker = 'vistalab/pbrt-v3-spectral:test';
 fprintf('Docker container %s\n',thisDocker);
 p.addParameter('dockerimagename',thisDocker,@ischar);
 
@@ -181,6 +181,9 @@ switch renderType
     case{'material','mesh','depth'}
         filesToRender = {metadataFile};
         label{1} = 'metadata';
+    case{'reflectance'}
+        filesToRender = {metadataFile};
+        label{1} = 'reflectance';
     otherwise
         error('Cannot recognize render type.');
 end
@@ -285,7 +288,7 @@ for ii = 1:length(filesToRender)
                 'label','radiance',...
                 'recipe',thisR,...
                 'scaleIlluminance',scaleIlluminance);
-        case {'metadata'}
+        case 'metadata'
             metadata = piDat2ISET(outFile,'label','mesh');
             ieObject   = metadata;
         case 'depth'
@@ -296,6 +299,9 @@ for ii = 1:length(filesToRender)
         case 'coordinates'
             coordMap = piDat2ISET(outFile,'label','coordinates');
             ieObject = coordMap;
+        case 'reflectance'
+            reflectanceMap = piDat2ISET(outFile,'label','reflectance');
+            ieObject = reflectanceMap;
     end
 
 end
