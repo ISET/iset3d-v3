@@ -2,7 +2,7 @@
 %
 % Description:
 %    Use PBRT to render radiance image, depth matte,
-%    radiance image with all surfaces matte, and 
+%    radiance image with all surfaces matte, and %
 %    reflectance map.
 %
 %    The recipe is store in local/scences/ColorfulScene.
@@ -10,6 +10,12 @@
 %
 %    Wavelength sampling is [400 10 31], set by precompiled
 %    renders.
+%
+% There are some scenes available via RDT.  Run
+%     piPBRTList
+% to get a list.  Run
+%     piPBRTFetch('ColorfulScene','pbrt version',3,'destination folder',fullfile(piRootPath,'local','scenes'));
+% to get the one we use here.
 
 %% Initialize
 ieInit;
