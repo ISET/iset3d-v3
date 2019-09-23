@@ -37,7 +37,7 @@ if ~piDockerExists, piDockerConfig; end
 % A complex, colorful scene with lots of different material types and
 % edges. 
 
-scene3d = sceneEye('colorfulScene');
+scene3d = sceneEye('ColorfulScene');
                
 scene3d.fov = 30; 
 scene3d.resolution = 128;
