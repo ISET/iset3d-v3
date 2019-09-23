@@ -1,5 +1,7 @@
 %% Render using a lens plus a microlens
 %
+% Set up to work with the Chess Set scene.
+%
 % Dependencies:
 %    ISET3d, ISETCam, JSONio
 %
@@ -13,13 +15,6 @@
 %   t_piIntro_*
 %   isetLens repository
 
-% Generally
-% https://www.pbrt.org/fileformat-v3.html#overview
-% 
-% And specifically
-% https://www.pbrt.org/fileformat-v3.html#cameras
-%
-
 %% Initialize ISET and Docker
 
 ieInit;
@@ -27,9 +22,12 @@ if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
     error('You must have the remote data toolbox on your path'); 
 end
+
+chdir(fullfile(piRootPath,'local'))
+
 %% Read the pbrt files
 
-% sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
+% sceneName = 'kitchen';     sceneFileName = 'scene.pbrt';
 % sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
 sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
@@ -54,11 +52,6 @@ thisR  = piRead(inFile);
 outFolder = fullfile(tempdir,sceneName);
 outFile   = fullfile(outFolder,[sceneName,'.pbrt']);
 thisR.set('outputFile',outFile);
-%% Set render quality
-
-% Set resolution for speed or quality.
-thisR.set('film resolution',round([600 400]*0.05));  % 1.5 is pretty high res
-thisR.set('pixel samples',2);                      % 4 is Lots of rays .
 
 %% Set output file
 
@@ -69,63 +62,42 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
+% This little microlens is only 2 um high.  So, we scale it
+microlensName = fullfile(piRootPath,'data','lens','microlens.json');
+microlens     = lensC('filename',microlensName);
+currentHeight = microlens.get('lens height');
+desiredHeight = 0.012;   % millimeters
+microlens.scale(desiredHeight/currentHeight);
+microlens.name = sprintf('%s-scaled',microlens.name);
+fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
+    microlens.focalLength,microlens.get('lens height'));
+
 % For the dgauss lenses 22deg is the half width of the field of view
+imagingLensName = fullfile(piRootPath,'data','lens','dgauss.22deg.3.0mm.json');
+imagingLens     = lensC('filename',imagingLensName);
+fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
+    imagingLens.focalLength,imagingLens.get('lens height'))
 
-%{
-lensfile = 'dgauss.22deg.3.0mm.json';
-filmwidth = 1;
-filmheight = filmwidth;
-%}
+% Set up the microlens array and film size
+% Choose an even number for nMicrolens.  This assures that the sensor and
+% ip data have the right integer relationships.
+pixelsPerMicrolens = 5;
+nMicrolens = [512 512];   % Appears to work for rectangular case, too
+pixelSize  = microlens.get('lens height')/pixelsPerMicrolens;   % mm
+filmheight = nMicrolens(1)*pixelsPerMicrolens*pixelSize;
+filmwidth  = nMicrolens(2)*pixelsPerMicrolens*pixelSize;
+filmresolution = [filmheight, filmwidth]/pixelSize;
 
-% {
-lensfile = '2ElLens.json'; % 'dgauss.22deg.50.0mm.json';
-filmwidth  = 11;
-filmheight = 11;
-%}
-fprintf('Using lens: %s\n',lensfile);
-combinedlens = lensfile;
+% Build the combined lens file
+[combinedlens,cmd] = piCameraInsertMicrolens(microlens,imagingLens, ...
+    'xdim',nMicrolens(1),  'ydim',nMicrolens(2),...
+    'film width',filmwidth,'film height',filmheight);
 
-% In millimeters.  Used to set diagonal and to set
-% piCameraInsertMicrolens, somehow.  ASK MM.
+%% Set up the lens+microlens
 
-%{
-% microlensfile = 'microlens.2um.Example.json';
-microlensfile = '2ElLens.json';
-fprintf('Using microlens: %s\n',microlensfile);
-% mLens = lensC('file name',microlensfile);
-% mLens.draw;
-%
-% edit(microlensfile)
-
-combinedlens = 'dgaussMicrolens.json';
-
-combinedlens = piCameraInsertMicrolens(microlensfile,lensfile, ...
-    'output name',combinedlens, ...
-    'xdim',64,'ydim',64);
-%     'film width',filmwidth,'film height',filmheight, ...
-% thisLens = jsonread(combinedlens);
-%
-
-
-% Checking whether we might be able to add metadata to the lens file
-% during this operation
-% thisLens.metadata.test = 'test';
-% jsonwrite(combinedlens,thisLens);
-%
-% Seems OK. So maybe we should pull that information out somehow and
-% put it in the .json files, rather than using
-% piRecipeFindOpticsParams?
-%
-%
-% edit(combinedlens)
-%}
-
-%%
-%{
- combinedlens = 'dgauss.22deg.50.0mm.json';
-%}
-
-thisR.camera = piCameraCreate('omni','lensFile',combinedlens);
+thisLens = combinedlens;
+fprintf('Using lens: %s\n',thisLens);
+thisR.camera = piCameraCreate('omni','lensFile',thisLens);
 
 %{
 % You might adjust the focus for different scenes.  Use piRender with
@@ -146,20 +118,19 @@ thisR.set('focus distance',0.6);
 % This is the size of the film/sensor in millimeters 
 thisR.set('film diagonal',sqrt(filmwidth^2 + filmheight^2));
 
+% Film resolution -
+thisR.set('film resolution',filmresolution);
+
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
 thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
+thisR.set('rays per pixel',256);
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
 thisR.integrator.subtype = 'path';  
-thisR.sampler.subtype    = 'sobol';
-
-% This value determines the number of ray bounces.  If the scene has
-% glass or mirrors, we need to have at least 2 or more.
-% thisR.set('nbounces',4); 
 
 %% Render and display
 
@@ -167,7 +138,7 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',6);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
-[oi, result] = piRender(thisR,'render type','depth');
+[oi, result] = piRender(thisR,'render type','radiance');
 
 % Parse the result for the lens to film distance and the in-focus
 % distance in the scene.
@@ -176,6 +147,45 @@ piWrite(thisR,'creatematerials',true);
 %%
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
+
+%% Lightfield manipulations
+
+rgb = oiGet(oi,'rgb');
+LF = LFImage2buffer(rgb,nMicrolens(2),nMicrolens(1));
+imgArray = LFbuffer2SubApertureViews(LF);
+ieNewGraphWin; imagesc(imgArray);
+
+%% Move the OI through the sensor to the IP and visualize
+
+sensor = sensorCreate('light field',oi);
+sensor = sensorCompute(sensor,oi);
+ieAddObject(sensor); sensorWindow;
+
+%% Image process ... should really use the whiteScene here
+
+ip = ipCreate;
+ip = ipCompute(ip,sensor);
+ieAddObject(ip); ipWindow;
+
+%%  Show the different views
+
+lightfield = ip2lightfield(ip,'pinholes',nMicrolens,'colorspace','srgb');
+
+% Click on window and press Escape to close
+%
+% LFDispVidCirc(lightfield.^(1/2.2));
+
+%% Mouse around 
+
+LFDispMousePan(lightfield.^(1/2.2))
+
+%% Focus on a region
+
+%{
+outputImage = LFAutofocus(lightfield);
+ieNewGraphWin;
+imagescRGB(outputImage);
+%}
 
 %% The depth is not right any more
 
