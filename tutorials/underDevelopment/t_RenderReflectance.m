@@ -9,7 +9,7 @@ InputFile = fullfile(piRootPath, 'local', 'scenes', sceneName, [sceneName, '.pbr
 thisR = piRead(InputFile);
 
 thisR.set('film resolution',[1200 900]/2);
-thisR.set('pixel samples',32);
+thisR.set('pixel samples',16);
 thisR.set('max depth',5); 
 %% Render radiance and depth
 piWrite(thisR);
