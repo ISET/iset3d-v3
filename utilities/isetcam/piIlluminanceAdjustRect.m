@@ -1,4 +1,4 @@
-function [ scaled_input ] = oiIlluminanceAdjustRect(input,r_patch,desiredIlluminance)
+function [ scaled_input ] = piIlluminanceAdjustRect(input,r_patch,desiredIlluminance)
 % Scale a scene or optical image so that a given rectangular patch reaches
 % a specificed mean illuminance. 
 
