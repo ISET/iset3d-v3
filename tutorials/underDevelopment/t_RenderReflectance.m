@@ -26,6 +26,15 @@
 %    Results are written into the local directory of the iset3d repository,
 %    which is not uploaded to git.
 
+% ToolboxToolbox Command:
+%{
+    % BrainardLab toolbox is only needed for FigureSave, and that call is
+    % skipped if not available, so that this should run if iset3d and all
+    % dependencies as described in the TbTb registry iset3d.json configuration
+    % are available.
+    tbUse({'iset3d', 'BrainardLabToolbox'});
+%}
+
 % History
 %   xx/xx/19  zl      Written
 %   09/28/19  dhb     Comments, post-processing.
@@ -45,10 +54,13 @@ thisR = piRead(inputFile);
 %% Set rendering quality parameters
 %
 % These are for PBRT.  Reduce pixel samples to,
-% say, 16 for testing.  Could increase max depth
-% for more bounces.
+% say, 16 for testing.  Can increase max depth
+% for more bounces, reduce for faster.
+% thisR.set('film resolution',[1200 900]);
+% thisR.set('pixel samples',4096);
+% thisR.set('max depth',5); 
 thisR.set('film resolution',[1200 900]/2);
-thisR.set('pixel samples',2048);
+thisR.set('pixel samples',16);
 thisR.set('max depth',5); 
 
 %% Render radiance and depth
@@ -184,6 +196,8 @@ monoIlluminationImage = monoMatteRadianceImage ./ monoReflectanceDivideImage;
 % NaN
 if (any(isinf(monoIlluminationImage)))
     fprintf('Surprising infinite values in illumination intrinsic image\n')
+else
+    fprintf('No infinite values in illumination intrinsic image - good\n');
 end
 monoIlluminationImage(isinf(monoIlluminationImage)) = NaN;
 
@@ -238,8 +252,10 @@ saveDir = fullfile(piRootPath, 'local',  sceneName, 'processedRenderings');
 if (~exist(saveDir,'dir'))
     mkdir(saveDir);
 end
-FigureSave(fullfile(saveDir,sceneName,'_ReconstructedImage'),reconFigure,'pdf');
-FigureSave(fullfile(saveDir,sceneName,'_AllImages'),allFigure,'pdf');
+if (exist('FigureSave','file'))
+    FigureSave(fullfile(saveDir,[sceneName '_ReconstructedImage']),reconFigure,'pdf');
+    FigureSave(fullfile(saveDir,[sceneName '_AllImages']),allFigure,'pdf');
+end
 
 % Images saved:
 %   monoRadianceImage: monochromatic radiance image
@@ -250,4 +266,4 @@ FigureSave(fullfile(saveDir,sceneName,'_AllImages'),allFigure,'pdf');
 %      to the threshold.  Currently threshold is 0.001.
 %   monoHighlightImage: (monoRadianceImage-monoMatteRadianceImage)
 %   depthImage: distance to surface at each pixel
-save(fullfile(saveDir,sceneName,'_TestImages'),'monoRadianceImage','monoMatteRadianceImage','monoMatteReflectanceImage','monoIlluminationImage','monoHighlightImage','monoReconstructedImage','depthImage');
+save(fullfile(saveDir,[sceneName '_TestImages']),'monoRadianceImage','monoMatteRadianceImage','monoMatteReflectanceImage','monoIlluminationImage','monoHighlightImage','monoReconstructedImage','depthImage');
