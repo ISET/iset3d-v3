@@ -20,6 +20,7 @@
 % History:
 %    XX/XX/19  ZL   Zhenyi SCIEN 2019
 %    04/25/19  JNM  Documentation pass
+
 %% Initialize ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end

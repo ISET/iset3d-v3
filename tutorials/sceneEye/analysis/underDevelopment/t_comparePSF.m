@@ -55,7 +55,7 @@ calcPupilMM = 4.0;    % Calculate for this pupil size
 
 [sample_mean ~] = wvfLoadThibosVirtualEyes(measPupilMM);
 
-% Allocate space and fill in the lower order Zernicke coefficients
+% Allocate space and fill in the lower order Zernike coefficients
 z = zeros(65,1);
 z(1:13) = sample_mean(1:13);
 

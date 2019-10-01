@@ -1,4 +1,3 @@
-
 function thisR = piLightAdd(thisR, varargin)
 %% Add different type of light sources to a scene
 %
