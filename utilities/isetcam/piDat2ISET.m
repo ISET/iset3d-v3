@@ -39,6 +39,8 @@ function ieObject = piDat2ISET(inputFile, varargin)
 
 % Examples:
 %{
+    % Skipping uninitialized example
+    % ETTBSkip
     opticalImage = piDat2ISET('scene.dat', 'label', 'radiance', ...
         'recipe', thisR);
     meshImage = piDat2ISET('mesh.dat', 'label', 'mesh');

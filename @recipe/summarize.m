@@ -33,13 +33,21 @@ function [out, namelist] = summarize(thisR, str)
 
 % Examples:
 %{
+    % Skip uninitialized example
+    % ETTBSkip
     c = thisR.summarize('camera');
 %}
 %{
+
+    % Skip uninitialized example
+    % ETTBSkip
     [assets, sortedNames] = thisR.summarize('assets');
     sortedNames
 %}
 %{
+
+    % Skip uninitialized example
+    % ETTBSkip
     [~, sortedNames] = thisR.summarize('all');
 %}
 %% Parse

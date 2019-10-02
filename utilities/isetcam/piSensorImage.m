@@ -33,10 +33,12 @@ function [img, filename, sensor, ip] = piSensorImage(oi,varargin)
 
 % Examples:
 %{
-  oi = ieGetObject('oi');
-  img = piSensorImage(oi);
-  fname = fullfile(piRootPath,'local',oiGet(oi,'name'));
-  imwrite(img,fname,'png')
+    % Skipping uninitialized example
+    % ETTBSkip
+    oi = ieGetObject('oi');
+    img = piSensorImage(oi);
+    fname = fullfile(piRootPath,'local',oiGet(oi,'name'));
+    imwrite(img,fname,'png')
 %}
 
 %%

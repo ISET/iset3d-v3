@@ -24,6 +24,8 @@ function outputFile = piSpdFileWrite(matFile, varargin)
 
 % Examples:
 %{
+    % Skipping uninitialized example
+    % ETTBSkip
     spdFile = piSpdFileWrite(isetRootPath, 'data', ...
         'lights', 'equalEnergy.mat');
 %}
