@@ -21,7 +21,7 @@ function rootPath = piRootPath()
 
 % Examples:
 %{
-    fullfile(p2iRootPath, 'data')
+    fullfile(piRootPath, 'data')
 %}
 
 rootPath = which('piRootPath');
