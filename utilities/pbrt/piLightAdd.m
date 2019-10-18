@@ -130,7 +130,9 @@ if ischar(lightSpectrum)
     end
     fclose(fid);
     % Zheng Lyu added 10-2019
-    copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
+    if ~isfile(strcat(lightSpectrum, '.mat'))
+        copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
+    end
 else
     % to do
     % add customized lightspectrum array [400 1 600 1 800 1]
