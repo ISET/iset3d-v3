@@ -51,7 +51,7 @@ sceneName = 'ColorfulScene';
 inputFile = fullfile(piRootPath, 'local', 'scenes', sceneName, [sceneName, '.pbrt']);
 thisR = piRead(inputFile);
 
-%% Set rendering quality parameters
+%% Set rending quality parameters
 %
 % These are for PBRT.  Reduce pixel samples to,
 % say, 16 for testing.  Can increase max depth
