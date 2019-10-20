@@ -32,7 +32,7 @@
     % skipped if not available, so that this should run if iset3d and all
     % dependencies as described in the TbTb registry iset3d.json configuration
     % are available.
-    tbUse({'iset3d', 'RenderToolbox4', 'BrainardLabToolbox'});
+    tbUse({'iset3d', 'BrainardLabToolbox'}); % 'RenderToolbox4', 
 %}
 
 % History
