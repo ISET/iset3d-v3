@@ -105,7 +105,26 @@ for ii = 1: length(mlist)
                 imwrite(texImg,filename);
             end
         else
-            fprintf('\tFigure out how to handle EXR files: %s\n',fileRoot)
+            fprintf('\tFixing EXR file %s\n',filename)
+            
+            writeFlag = false;
+            [~,texImg] = rtbReadMultichannelEXR(filename);
+            [rows,cols,~] = size(texImg);
+            for mm = 1:rows
+                for nn = 1:cols
+                    if any(texImg(mm, nn, :) == 0)
+                        temp = texImg(mm, nn, :);
+                        temp(temp < minReflVal) = minReflVal;
+                        texImg(mm, nn, :) = temp;
+                        writeFlag = true;
+                    end
+                end
+            end
+            if (writeFlag)
+                fprintf('\tNeed to write exr file %s\n',filename);
+                %imwrite(texImg,filename);
+            end
+            
         end
     end 
     
