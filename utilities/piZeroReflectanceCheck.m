@@ -1,4 +1,4 @@
-function recipe = piZeroReflectanceCheck(recipe)
+function recipe = piZeroReflectanceCheck(recipe,varargin)
 % Check if there is zero reflectance for the materials of the objects
 %
 % Synopsis:
@@ -14,16 +14,32 @@ function recipe = piZeroReflectanceCheck(recipe)
 % Outputs:
 %   recipe -  render recipe
 %
-% Zhenyi, 2019
 %
+% Optional key/value pairs:
+%   minReflectance     - Scalar. Minimum reflectance or RGB value.  Default
+%                        0.03;
 % See also
-%   piRead, prWrite
+%   piRead, piWrite
+
+
+% History:
+%   Zhenyi, 2019
+%
+
+%% Parse input
+p = inputParser;
+p.addParameter('minReflectance',0.03,@isscalar);
+p.parse(varargin{:});
 
 %% Say hello
 fprintf('Fixing very small reflectance values\n');
 
 %% Set minimum reflectance
-minReflVal = 0.01;
+minReflVal = p.Results.minReflectance;
+
+%% Figure out where recipe lives
+[recipePath,recipeFile,recipeExt] = fileparts(recipe.inputFile);
+
 
 %% Loop over all the materials
 mlist = fieldnames(recipe.materials.list);
@@ -39,11 +55,16 @@ for ii = 1: length(mlist)
         thismaterial.rgbkd(thismaterial.rgbkd < minReflVal) = minReflVal;
     end
     
-    % Check if there is a spectral file
+    % Check and fix diffuse SPD files
     if (~isempty(thismaterial.spectrumkd))
-        % Need to find or write piSpdFileRead
-        fprintf('\tNeed to handle spectrum files %s\n',thismaterial.spectrumkd);
-        %piSpdFileWrite(  );
+        fprintf('\tSpectrum file %s\n',thismaterial.spectrumkd);
+        matrixData = piSpdFileRead(fullfile(recipePath,thismaterial.spectrumkd));
+        temp = matrixData(:,2);
+        if (any(temp < minReflVal))
+            temp(temp < minReflVal) = minReflVal;
+            matrixData(:,2) = temp;
+            piSpdFileWrite(matrixData,'outputFilename',fullfile(recipePath,thismaterial.spectrumkd));
+        end
     end
     
     % If it's a texture map file, get file fix RGB values, and 
@@ -66,6 +87,7 @@ for ii = 1: length(mlist)
         % For now just skip
         [~,fileRoot,fileExt] = fileparts(filename);
         if (~strcmpi(fileExt,'.exr'))
+            writeFlag = false;
             fprintf('\tFixing %s%s\n',fileRoot,fileExt);
             texImg = imread(filename);
             [rows,cols,~] = size(texImg);
@@ -75,10 +97,13 @@ for ii = 1: length(mlist)
                         temp = texImg(mm, nn, :);
                         temp(temp < minReflVal) = minReflVal;
                         texImg(mm, nn, :) = temp;
+                        writeFlag = true;
                     end
                 end
             end
-            imwrite(texImg,filename);
+            if (writeFlag)
+                imwrite(texImg,filename);
+            end
         else
             fprintf('\tFigure out how to handle EXR files: %s\n',fileRoot)
         end
