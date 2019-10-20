@@ -51,6 +51,9 @@ sceneName = 'ColorfulScene';
 inputFile = fullfile(piRootPath, 'local', 'scenes', sceneName, [sceneName, '.pbrt']);
 thisR = piRead(inputFile);
 
+%% Prevent zero reflectances
+thisR = piZeroReflectanceCheck(thisR);
+
 %% Set rending quality parameters
 %
 % These are for PBRT.  Reduce pixel samples to,
