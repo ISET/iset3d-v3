@@ -52,6 +52,7 @@ inputFile = fullfile(piRootPath, 'local', 'scenes', sceneName, [sceneName, '.pbr
 thisR = piRead(inputFile);
 
 %% Prevent zero reflectances
+%thisR.set('output file', fullfile(piRootPath, 'local', sceneName, [sceneName, '_blackfix', '.pbrt']));
 thisR = piZeroReflectanceCheck(thisR);
 
 %% Set rending quality parameters
@@ -78,7 +79,8 @@ sceneWindow(ieObject);
 % Sets output file to contain '_matte' so it does not overwrite the
 % rendering done just above.
 matteR = thisR;
-matteR.set('output file', fullfile(piRootPath, 'local', sceneName, [sceneName, '_matte', '.pbrt']));materialNameList = fieldnames(thisR.materials.list);
+matteR.set('output file', fullfile(piRootPath, 'local', sceneName, [sceneName, '_matte', '.pbrt']));
+materialNameList = fieldnames(thisR.materials.list);
 for ii = 1:length(materialNameList)
     target = matteR.materials.lib.matte;
     piMaterialAssign(matteR, materialNameList{ii}, target);
