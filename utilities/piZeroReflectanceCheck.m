@@ -108,7 +108,7 @@ for ii = 1: length(mlist)
             fprintf('\tFixing EXR file %s\n',filename)
             
             writeFlag = false;
-            [~,texImg] = rtbReadMultichannelEXR(filename);
+            [~,texImg] = ReadMultichannelEXR(filename);
             [rows,cols,~] = size(texImg);
             for mm = 1:rows
                 for nn = 1:cols
