@@ -85,7 +85,7 @@ p.addParameter('reuse',false,@islogical);
 
 % If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
 
-thisDocker = 'vistalab/pbrt-v3-spectral';
+thisDocker = 'vistalab/pbrt-v3-spectral:test';
 fprintf('Docker container %s\n',thisDocker);
 p.addParameter('dockerimagename',thisDocker,@ischar);
 
@@ -267,6 +267,7 @@ for ii = 1:length(filesToRender)
             warning('Docker did not run correctly');
             % The status may contain a useful error message that we should
             % look up.  The ones we understand should offer help here.
+            % error 137 not enough memory
             fprintf('Status:\n'); disp(status)
             fprintf('Result:\n'); disp(result)
             pause;

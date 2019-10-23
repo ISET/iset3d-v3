@@ -33,5 +33,5 @@ sceneWindow(scene);
 
 %% Change light to D65
 lightsource = piLightGet(thisR);
-piLightDelete(thisR, lightsource,'all');
+piLightDelete(thisR,'all');
 thisR = piLightAdd(thisR, 'type', 'area', 'lightspectrum', 'D65');

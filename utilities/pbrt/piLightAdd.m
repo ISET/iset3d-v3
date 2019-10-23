@@ -168,12 +168,12 @@ switch type
         thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
         newlight{1}.line{1,:} = [newlight{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
-        lightSources{1}.type = 'distant';
-        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        newlight{1}.type = 'distant';
+        newlight{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
     case 'infinite'
-        lightSources{1}.type = 'infinite';
-        lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+        newlight{1}.type = 'infinite';
+        newlight{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
     case 'area'
         % find area light geometry info
         
@@ -260,5 +260,4 @@ else
     disp('Light Added to the Scene.');
 end
 end
-
 
