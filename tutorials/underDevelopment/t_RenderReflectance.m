@@ -28,10 +28,7 @@
 
 % ToolboxToolbox Command:
 %{
-    % BrainardLab toolbox is only needed for FigureSave, and that call is
-    % skipped if not available, so that this should run if iset3d and all
-    % dependencies as described in the TbTb registry iset3d.json configuration
-    % are available.
+    % BrainardLab toolbox is needed for EXR read/write and also FigureSave.
     tbUse({'iset3d', 'BrainardLabToolbox'}); % 'RenderToolbox4', 
 %}
 
@@ -53,7 +50,11 @@ thisR = piRead(inputFile);
 
 %% Prevent zero reflectances
 %thisR.set('output file', fullfile(piRootPath, 'local', sceneName, [sceneName, '_blackfix', '.pbrt']));
-thisR = piZeroReflectanceCheck(thisR,'minReflectance',1);
+minReflectance = 0.05;
+thisR = piZeroReflectanceCheck(thisR,'minReflectance',minReflectance);
+
+%% Read again to make sure we get fixed scene
+thisR = piRead(inputFile);
 
 %% Set rending quality parameters
 %
@@ -179,6 +180,17 @@ figure(allFigure); subplot(5,2,5);
 imshow(monoMatteReflectanceImage);
 title(sprintf('Monochromatic Reflectance Image, %d nm',whichWavelength));
 
+% Figure out where we failed to enforce minimum reflectance
+tooSmallReflectanceImage = ones(size(monoMatteReflectanceImage));
+tooSmallReflectanceImage(monoMatteReflectanceImage(:) < 0.9*minReflectance) = 0;
+reflFixFigure = figure; clf; set(gcf,'Position',[100 100 1200 760]);
+subplot(1,2,1);
+imshow(monoMatteReflectanceImage);
+title('Reflectance Image');
+subplot(1,2,2);
+imshow(tooSmallReflectanceImage);
+title('Reflectance Too Small Image');
+
 % Get the depth map and show it
 depthRenderFile = fullfile(piRootPath, 'local',  sceneName, 'renderings',[sceneName,'_depth','.dat']);
 depthImage = piDat2ISET(depthRenderFile,'label', 'depth');
@@ -260,6 +272,7 @@ end
 if (exist('FigureSave','file'))
     FigureSave(fullfile(saveDir,[sceneName '_ReconstructedImage']),reconFigure,'pdf');
     FigureSave(fullfile(saveDir,[sceneName '_AllImages']),allFigure,'pdf');
+    FigureSave(fullfile(saveDir,[sceneName '_ReflTooSmall']),reflFixFigure,'pdf');
 end
 
 %% Median filter illumination image

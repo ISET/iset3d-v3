@@ -5,7 +5,7 @@ function recipe = piZeroReflectanceCheck(recipe,varargin)
 %    recipe = piZeroReflectanceCheck(recipe)
 %
 % Description:
-%    We take a render recipe read from pbrt files as input. 
+%    We take a render recipe read from pbrt files as input.
 %    We return a modified render recipe.
 %
 % Inputs:
@@ -78,7 +78,7 @@ for ii = 1: length(mlist)
         end
     end
     
-    % If it's a texture map file, get file fix RGB values, and 
+    % If it's a texture map file, get file fix RGB values, and
     if ~isempty(thismaterial.texturekd)
         % Parse out the file name
         tmpLine = recipe.materials.txtLines(piContains(recipe.materials.txtLines, thismaterial.texturekd));
@@ -130,33 +130,36 @@ for ii = 1: length(mlist)
                 imwrite(texImg,filename);
             end
         else
-            fprintf('\tReading EXR file %s\n',filename)
-            
-            writeFlag = false;
-            [texImg, texChannelNames] = importEXRImage(filename);
-            [rows,cols,~] = size(texImg);
-            minVal = Inf;
-            for mm = 1:rows
-                for nn = 1:cols
-                    if (min(texImg(mm, nn, :)) < minVal)
-                        minVal = min(texImg(mm, nn, :));
-                    end
-                    if any(texImg(mm, nn, :) < minReflVal)
-                        temp = texImg(mm, nn, :);
-                        temp(temp < minReflVal) = minReflVal;
-                        texImg(mm, nn, :) = temp;
-                        writeFlag = true;
+            if (exist('importEXRImage') == 3)
+                fprintf('\tReading EXR file %s\n',filename)
+                writeFlag = false;
+                [texImg, texChannelNames] = importEXRImage(filename);
+                [rows,cols,~] = size(texImg);
+                minVal = Inf;
+                for mm = 1:rows
+                    for nn = 1:cols
+                        if (min(texImg(mm, nn, :)) < minVal)
+                            minVal = min(texImg(mm, nn, :));
+                        end
+                        if any(texImg(mm, nn, :) < minReflVal)
+                            temp = texImg(mm, nn, :);
+                            temp(temp < minReflVal) = minReflVal;
+                            texImg(mm, nn, :) = temp;
+                            writeFlag = true;
+                        end
                     end
                 end
-            end
-            fprintf('\tMinimum value = %g\n',minVal);
-            if (writeFlag)
-                fprintf('\t\tWriting EXR file %s\n',filename);
-                exportEXRImage(filename, texImg, texChannelNames);
+                fprintf('\tMinimum value = %g\n',minVal);
+                if (writeFlag)
+                    fprintf('\t\tWriting EXR file %s\n',filename);
+                    exportEXRImage(filename, texImg, texChannelNames);
+                end
+            else
+                fprintf('Skipping EXR file %s, because EXR read/write not available\n',filename);
             end
             
         end
-    end 
+    end
     
     % Put material back now that its been fixed up
     recipe.materials.list.(mlist{ii}) = thismaterial;
