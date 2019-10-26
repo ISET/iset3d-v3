@@ -29,6 +29,8 @@
 % ToolboxToolbox Command:
 %{
     % BrainardLab toolbox is needed for EXR read/write and also FigureSave.
+    % Tried to code so that graceful things will happen if you don't have
+    % BLTB on your path, though.
     tbUse({'iset3d', 'BrainardLabToolbox'}); % 'RenderToolbox4', 
 %}
 
