@@ -40,19 +40,28 @@ minReflVal = p.Results.minReflectance;
 %% Figure out where recipe lives
 [recipePath,recipeFile,recipeExt] = fileparts(recipe.inputFile);
 
-
 %% Loop over all the materials
 mlist = fieldnames(recipe.materials.list);
 for ii = 1: length(mlist)
     % Grab current material
     thismaterial = recipe.materials.list.(mlist{ii});
     
+    % Say hello
+    fprintf('Material: %s\n',thismaterial.name);
+    
     % Check and fix rgbKd, colorKd
-    if any(thismaterial.colorkd < minReflVal)
-        thismaterial.colorkd(thismaterial.colorkd < minReflVal) = minReflVal;
+    if (~isempty(thismaterial.colorkd))
+        fprintf('\tMin color Kd: %g\n',min(thismaterial.colorkd));
+        if any(thismaterial.colorkd < minReflVal)
+            thismaterial.colorkd(thismaterial.colorkd < minReflVal) = minReflVal;
+        end
     end
-    if any(thismaterial.rgbkd < minReflVal)
-        thismaterial.rgbkd(thismaterial.rgbkd < minReflVal) = minReflVal;
+    
+    if (~isempty(thismaterial.rgbkd))
+        fprintf('\tMin color rgbkd: %g\n',min(thismaterial.rgbkd));
+        if any(thismaterial.rgbkd < minReflVal)
+            thismaterial.rgbkd(thismaterial.rgbkd < minReflVal) = minReflVal;
+        end
     end
     
     % Check and fix diffuse SPD files
@@ -60,9 +69,11 @@ for ii = 1: length(mlist)
         fprintf('\tSpectrum file %s\n',thismaterial.spectrumkd);
         matrixData = piSpdFileRead(fullfile(recipePath,thismaterial.spectrumkd));
         temp = matrixData(:,2);
+        fprintf('\t\tMin reflectance: %g\n',min(temp));
         if (any(temp < minReflVal))
             temp(temp < minReflVal) = minReflVal;
             matrixData(:,2) = temp;
+            fprintf('\t\tWriting spectrum file %s\n',fullfile(recipePath,thismaterial.spectrumkd));
             piSpdFileWrite(matrixData,'outputFilename',fullfile(recipePath,thismaterial.spectrumkd));
         end
     end
@@ -88,12 +99,21 @@ for ii = 1: length(mlist)
         [~,fileRoot,fileExt] = fileparts(filename);
         if (~strcmpi(fileExt,'.exr'))
             writeFlag = false;
-            fprintf('\tFixing %s%s\n',fileRoot,fileExt);
+            uint8Flag = false;
+            fprintf('\tReading %s%s\n',fileRoot,fileExt);
             texImg = imread(filename);
+            if (isa(texImg,'uint8'))
+                uint8Flag = true;
+                texImg = double(texImg)/255;
+            end
             [rows,cols,~] = size(texImg);
+            minVal = Inf;
             for mm = 1:rows
                 for nn = 1:cols
-                    if any(texImg(mm, nn, :) == 0)
+                    if (min(texImg(mm, nn, :)) < minVal)
+                        minVal = min(texImg(mm, nn, :));
+                    end
+                    if any(texImg(mm, nn, :) < minReflVal)
                         temp = texImg(mm, nn, :);
                         temp(temp < minReflVal) = minReflVal;
                         texImg(mm, nn, :) = temp;
@@ -101,18 +121,27 @@ for ii = 1: length(mlist)
                     end
                 end
             end
+            fprintf('\tMinimum value = %g\n',minVal);
             if (writeFlag)
+                fprintf('\t\tWriting file %s\n',filename);
+                if (uint8Flag)
+                    texImg = uint8(texImg*255);
+                end
                 imwrite(texImg,filename);
             end
         else
-            fprintf('\tFixing EXR file %s\n',filename)
+            fprintf('\tReading EXR file %s\n',filename)
             
             writeFlag = false;
-            [~,texImg] = ReadMultichannelEXR(filename);
+            [texImg, texChannelNames] = importEXRImage(filename);
             [rows,cols,~] = size(texImg);
+            minVal = Inf;
             for mm = 1:rows
                 for nn = 1:cols
-                    if any(texImg(mm, nn, :) == 0)
+                    if (min(texImg(mm, nn, :)) < minVal)
+                        minVal = min(texImg(mm, nn, :));
+                    end
+                    if any(texImg(mm, nn, :) < minReflVal)
                         temp = texImg(mm, nn, :);
                         temp(temp < minReflVal) = minReflVal;
                         texImg(mm, nn, :) = temp;
@@ -120,9 +149,10 @@ for ii = 1: length(mlist)
                     end
                 end
             end
+            fprintf('\tMinimum value = %g\n',minVal);
             if (writeFlag)
-                fprintf('\tNeed to write exr file %s\n',filename);
-                %imwrite(texImg,filename);
+                fprintf('\t\tWriting EXR file %s\n',filename);
+                exportEXRImage(filename, texImg, texChannelNames);
             end
             
         end

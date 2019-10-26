@@ -53,7 +53,7 @@ thisR = piRead(inputFile);
 
 %% Prevent zero reflectances
 %thisR.set('output file', fullfile(piRootPath, 'local', sceneName, [sceneName, '_blackfix', '.pbrt']));
-thisR = piZeroReflectanceCheck(thisR);
+thisR = piZeroReflectanceCheck(thisR,'minReflectance',1);
 
 %% Set rending quality parameters
 %
@@ -65,7 +65,7 @@ thisR = piZeroReflectanceCheck(thisR);
 % thisR.set('max depth',5); 
 thisR.set('film resolution',[1200 900]/2);
 thisR.set('pixel samples',16);
-thisR.set('max depth',5); 
+thisR.set('max depth',2); 
 
 %% Render radiance and depth
 %
@@ -261,6 +261,20 @@ if (exist('FigureSave','file'))
     FigureSave(fullfile(saveDir,[sceneName '_ReconstructedImage']),reconFigure,'pdf');
     FigureSave(fullfile(saveDir,[sceneName '_AllImages']),allFigure,'pdf');
 end
+
+%% Median filter illumination image
+medFiltSize = 7;
+monoIlluminationImageFilt = medfilt2(monoIlluminationImage,[medFiltSize medFiltSize]);
+meanLuminance = nanmean(monoIlluminationImageFilt(:));
+toneMappedMonoIlluminationImageFilt = monoIlluminationImageFilt;
+toneMappedMonoIlluminationImageFilt(monoIlluminationImageFilt(:) > toneMapFactor*meanLuminance) = toneMapFactor*meanLuminance;
+illumimationImageFigure = figure; clf; set(gcf,'Position',[100 100 1200 760]);
+subplot(1,2,1);
+imshow(monoIlluminationImageFilt/max(monoIlluminationImageFilt(:)));
+title(sprintf('Tone Mapped Illumination Image, %d nm', whichWavelength));
+subplot(1,2,2);
+imshow(toneMappedMonoIlluminationImageFilt/max(toneMappedMonoIlluminationImageFilt(:)));
+title(sprintf('Tone Mapped Median Filtered Illumination Image, %d nm', whichWavelength));
 
 % Images saved:
 %   monoRadianceImage: monochromatic radiance image
