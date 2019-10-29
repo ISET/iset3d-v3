@@ -129,6 +129,10 @@ if ischar(lightSpectrum)
         fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
     end
     fclose(fid);
+    % Zheng Lyu added 10-2019
+    if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
+        copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
+    end
 else
     % to do
     % add customized lightspectrum array [400 1 600 1 800 1]
