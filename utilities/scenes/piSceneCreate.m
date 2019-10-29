@@ -32,8 +32,9 @@ p.addParameter('wavelength', 400:10:700, @isvector);
 
 if length(varargin) > 1
     for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
-                | isobject(varargin{i}))
+        if ~(isnumeric(varargin{i}) || ...
+                islogical(varargin{i}) || ...
+                isobject(varargin{i}))
             varargin{i} = ieParamFormat(varargin{i});
         end
     end
@@ -52,7 +53,8 @@ end
 
 %% Set the photons into the scene
 
-scene = sceneCreate('macbeth', 8, p.Results.wavelength);
+patchSize = 8;
+scene = sceneCreate('macbeth', patchSize, p.Results.wavelength);
 scene = sceneSet(scene, 'wavelength', p.Results.wavelength);
 scene = sceneSet(scene,'photons',photons);
 [r,c] = size(photons(:,:,1)); depthMap = ones(r,c);

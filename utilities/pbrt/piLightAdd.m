@@ -131,7 +131,7 @@ if ischar(lightSpectrum)
     end
     fclose(fid);
     % Zheng Lyu added 10-2019
-    if ~isfile(strcat(lightSpectrum, '.mat'))
+    if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
         copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
     end
 else
