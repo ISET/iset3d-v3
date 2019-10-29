@@ -28,6 +28,7 @@ p.KeepUnmatched = true;
 p.addRequired('photons',@isnumeric);
 p.addParameter('fov',40,@isscalar)               % Horizontal fov, degrees
 p.addParameter('meanluminance',100,@isscalar);
+p.addParameter('wavelength', 400:10:700, @isvector);
 
 if length(varargin) > 1
     for i = 1:length(varargin)
@@ -51,7 +52,8 @@ end
 
 %% Set the photons into the scene
 
-scene = sceneCreate;
+scene = sceneCreate('macbeth', 8, p.Results.wavelength);
+scene = sceneSet(scene, 'wavelength', p.Results.wavelength);
 scene = sceneSet(scene,'photons',photons);
 [r,c] = size(photons(:,:,1)); depthMap = ones(r,c);
 
