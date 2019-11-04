@@ -289,6 +289,11 @@ switch ieParamFormat(param)
     case{'integrator'}
         val = thisR.integrator.subtype;
         
+    case{'camerabody','camera body'}
+        val.camera = thisR.camera;
+        val.film = thisR.film;
+        val.filter = thisR.filter;
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end

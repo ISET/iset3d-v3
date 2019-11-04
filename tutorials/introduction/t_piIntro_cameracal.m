@@ -39,18 +39,18 @@ recipe = piCreateCheckerboard(outFile,'numX',8,'numY',7,'dimX',squareSize,'dimY'
 recipe.set('pixel samples',32);
 recipe.set('film resolution',[1280 1024]);
 recipe.set('camera type','realistic');
-recipe.set('film diagonal', 5);
-recipe.set('lensfile',fullfile(piRootPath,'data','lens','wide.40deg.3.0mm.dat'));
-recipe.set('focus distance',5);
+recipe.set('film diagonal', 6);
+recipe.set('lensfile',fullfile(piRootPath,'data','lens','fisheye.87deg.6.0mm.dat'));
+recipe.set('focus distance',4);
 
 %% Render target from different viewpoints
 %  In real life, camera is held fixed, and the target is moved. In
 %  simulation it is more conveneint to move the camera around. These are
 %  equivalent.
 
-from = [0 0 5; 
-        0 0 6; 
-        0 0 7];
+from = [0 0 3; 
+        0 0 4; 
+        0 0 5];
     
 to = [0 0 0; 
       1 1 0; 
@@ -61,6 +61,7 @@ imageFolder = fullfile(recipe.get('working directory'),'Images');
 if ~exist(imageFolder,'dir'), mkdir(imageFolder); end
 
 imageNames = cell(size(from,1)*size(to,1),1);
+cntr = 1;
 for i=1:size(from,1)
     for j=1:size(to,1)
         recipe.set('from',from(i,:));
@@ -75,8 +76,9 @@ for i=1:size(from,1)
         % We should simulate the sensor and the ISP, but we skip this step 
         % for now.
         oiWindow(oi);
-        imageNames{i} = fullfile(imageFolder,sprintf('img_%i.png',i));
-        imwrite(oiGet(oi,'rgb image'),imageNames{i});
+        imageNames{cntr} = fullfile(imageFolder,sprintf('img_%i.png',cntr));
+        imwrite(oiGet(oi,'rgb image'),imageNames{cntr});
+        cntr = cntr + 1;
     end
 end
 
@@ -85,7 +87,7 @@ end
 try
     [imagePoints, boardSize] = detectCheckerboardPoints(imageNames);
 
-    squareSizeInMM = squareSize*1000;
+    squareSizeInMMs = squareSize*1000;
     worldPoints = generateCheckerboardPoints(boardSize,squareSizeInMMs);
 
     params = estimateCameraParameters(imagePoints,worldPoints, ...
@@ -97,6 +99,14 @@ try
     estFocalLength = params.FocalLength * pixelSize;
 
     fprintf('Focal length: estimated %f, mm\n',estFocalLength(1));
+    
+    sampleImage = imread(imageNames{1});
+    undistortedImage = undistortImage(sampleImage,params,'OutputView','full');
+    
+    figure; 
+    subplot(1,2,1); imshow(sampleImage); title('Input');
+    subplot(1,2,2); imshow(undistortedImage); title('Undistroted');
+    
 catch
     fprintf('Please install Computer Vision Toolbox\n');
 end

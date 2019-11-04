@@ -1,5 +1,5 @@
 # This scene consists of a textured plane that is illuminated by an
-# infinite, D65 light. By default the plane is 1 m x 1 m and is located
+# infinite, equal energy light. By default the plane is 1 m x 1 m and is located
 # at (0,0,0). You will probably want to translate the plane away from 
 # the camera and scale it appropriately. 
 
@@ -12,10 +12,9 @@ Sampler "lowdiscrepancy"
   "integer pixelsamples" [128] 
 
 # filter
-PixelFilter "gaussian" 
-  "float alpha" [2] 
-  "float xwidth" [2] 
-  "float ywidth" [2] 
+PixelFilter "box" 
+  "float xwidth" [0.5] 
+  "float ywidth" [0.5] 
 
 Film "image"
  "integer xresolution" [128]

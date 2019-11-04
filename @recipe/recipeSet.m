@@ -371,6 +371,12 @@ switch param
     case {'traffictimestamp'}
         thisR.metadata.sumo.timestamp = val;
         
+        % Getting read for camera level recipe information.
+        % Not really used get.
+    case {'camerabody'}
+        thisR.camera = val.camera;
+        thisR.film   = val.film;
+        thisR.filter = val.filter;
     otherwise
         error('Unknown parameter %s\n',param);
 end

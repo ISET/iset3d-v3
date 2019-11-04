@@ -1,1 +1,109 @@
-{"description":"multi element lens Focal length (mm) ","name":"fisheye.87deg.3.0mm","surfaces":[{"ior":1.713000059127808,"radius":12.53820037841797,"semi_aperture":4.800000190734863,"thickness":0.3923999965190887},{"ior":1,"radius":2.046900033950806,"semi_aperture":2.039999961853027,"thickness":1.725900053977966},{"ior":1.620000004768372,"radius":10.28400039672852,"semi_aperture":2.25,"thickness":0.294299989938736},{"ior":1,"radius":2.351999998092651,"semi_aperture":1.980000019073486,"thickness":0.6485999822616577},{"ior":1.669000029563904,"radius":2.881500005722046,"semi_aperture":1.919999957084656,"thickness":1.037999987602234},{"ior":1,"radius":-8.035799980163574,"semi_aperture":1.919999957084656,"thickness":0.129600003361702},{"ior":1.694000005722046,"radius":-4.76039981842041,"semi_aperture":1.740000009536743,"thickness":0.1853999942541122},{"ior":1.667999982833862,"radius":2.34689998626709,"semi_aperture":1.620000004768372,"thickness":0.7412999868392944},{"ior":1,"radius":-10.40670013427734,"semi_aperture":1.620000004768372,"thickness":0.09269999712705612},{"ior":1.51800000667572,"radius":3000,"semi_aperture":1.5,"thickness":0.2781000137329102},{"ior":0,"radius":0,"semi_aperture":1.5,"thickness":0.2558999955654144},{"ior":1,"radius":3000,"semi_aperture":1.5,"thickness":0.300000011920929},{"ior":1,"radius":3000,"semi_aperture":1.281000018119812,"thickness":0.2781000137329102},{"ior":1.496999979019165,"radius":-158.5709991455078,"semi_aperture":1.335000038146973,"thickness":0.630299985408783},{"ior":1,"radius":-3.414000034332275,"semi_aperture":1.5,"thickness":0.01860000006854534},{"ior":1.486999988555908,"radius":19.83659934997559,"semi_aperture":1.559999942779541,"thickness":0.9266999959945679},{"ior":1.804999947547913,"radius":-1.904999971389771,"semi_aperture":1.559999942779541,"thickness":0.1853999942541122},{"ior":1,"radius":-3.824700117111206,"semi_aperture":1.679999947547913,"thickness":0}],"metadata":{"focalLength":0.003,"fNumber":0.6}}
+{
+ "name": "fisheye.87deg.3.0mm",
+ "description": "description",
+ "type": "multi element lens",
+ "surfaces": [
+  {
+   "radius": 12.5382,
+   "thickness": 0.3924,
+   "ior": 1.713,
+   "semi_aperture": 4.8
+  },
+  {
+   "radius": 2.0469,
+   "thickness": 1.7259,
+   "ior": 1,
+   "semi_aperture": 2.04
+  },
+  {
+   "radius": 10.284,
+   "thickness": 0.2943,
+   "ior": 1.62,
+   "semi_aperture": 2.25
+  },
+  {
+   "radius": 2.352,
+   "thickness": 0.6486,
+   "ior": 1,
+   "semi_aperture": 1.98
+  },
+  {
+   "radius": 2.8815,
+   "thickness": 1.038,
+   "ior": 1.669,
+   "semi_aperture": 1.92
+  },
+  {
+   "radius": -8.0358,
+   "thickness": 0.1296,
+   "ior": 1,
+   "semi_aperture": 1.92
+  },
+  {
+   "radius": -4.7604,
+   "thickness": 0.1854,
+   "ior": 1.694,
+   "semi_aperture": 1.74
+  },
+  {
+   "radius": 2.3469,
+   "thickness": 0.7413,
+   "ior": 1.668,
+   "semi_aperture": 1.62
+  },
+  {
+   "radius": -10.4067,
+   "thickness": 0.0927,
+   "ior": 1,
+   "semi_aperture": 1.62
+  },
+  {
+   "radius": 3000,
+   "thickness": 0.2781,
+   "ior": 1.518,
+   "semi_aperture": 1.5
+  },
+  {
+   "radius": 3000,
+   "thickness": 0.2559,
+   "ior": 1,
+   "semi_aperture": 1.5
+  },
+  {
+   "radius": 0,
+   "thickness": 0.3,
+   "ior": 0,
+   "semi_aperture": 1.5
+  },
+  {
+   "radius": -158.571,
+   "thickness": 0.6303,
+   "ior": 1.497,
+   "semi_aperture": 1.335
+  },
+  {
+   "radius": -3.414,
+   "thickness": 0.0186,
+   "ior": 1,
+   "semi_aperture": 1.5
+  },
+  {
+   "radius": 19.8366,
+   "thickness": 0.9267,
+   "ior": 1.487,
+   "semi_aperture": 1.56
+  },
+  {
+   "radius": -1.905,
+   "thickness": 0.1854,
+   "ior": 1.805,
+   "semi_aperture": 1.56
+  },
+  {
+   "radius": -3.8247,
+   "thickness": 0,
+   "ior": 1,
+   "semi_aperture": 1.68
+  }
+ ]
+}
