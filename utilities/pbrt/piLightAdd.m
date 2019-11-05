@@ -1,10 +1,16 @@
 function thisR = piLightAdd(thisR, varargin)
-%% Add different types of light sources to a scene
+% Add different types of light sources to a scene
 % 
-% Required Inputs:
+% Syntax
+%
+% Brief description
+%
+% 
+% Inputs:
 %       'thisR' -  Insert a light source in this recipe.
 %
-% Optional Inputs:
+% Optional key/value pairs
+%
 %       'type'  - The type of light source to insert. Can be the following:
 %             'point'   - Casts the same amount of illumination in all
 %                         directions. Takes parameters 'to' and 'from'.
@@ -39,20 +45,26 @@ function thisR = piLightAdd(thisR, varargin)
 %       the moment, but our hope is that they will be in the future. 
 %
 % Outputs:
-%        
-% Required: ISETCam
-% See also: piSkymapAdd(Add HDR lighting for global illumination)
+%    the modified recipe
+%
 % Zhenyi, TL, SCIEN, 2019
 %
-% Example:
+% Requiresd: ISETCam
+%
+% See also: piSkymapAdd(Add HDR lighting for global illumination)
+%
+
+% Examples:
 %{
+% Need to get a recipe in here!
 lightSources = piLightGet(thisR);
 thisR = piLightDelete(thisR, 2);
 thisR = piLightAdd(thisR, 'type', 'point');
 thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
-
 %}
-%%
+
+%% Parse inputs
+
 varargin = ieParamFormat(varargin);  % Allow spaces and capitalization
 
 p = inputParser;
@@ -143,6 +155,7 @@ currentlightSources = piLightGet(thisR, 'print', false);
 %% Construct a lightsource structure
 numLights = length(currentlightSources);
 
+% Different types of lights that we know how to add.
 switch type
     case 'point'
         lightSources{1}.type = 'point';
@@ -199,6 +212,7 @@ switch type
                 lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
                 lightSources{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
+                
             elseif piContains(lower(thisR.assets(ii).name), 'light')
                 lightSources{nlight}.type = 'area';
                 lightSources{nlight}.line{1} = 'AttributeBegin';
@@ -220,7 +234,8 @@ switch type
             
         end
 end
-%%
+%% What does this do?  Closes up the World?
+
 index_m = piContains(thisR.world,'_materials.pbrt');
 index_g = piContains(thisR.world,'_geometry.pbrt');
 world = thisR.world(1:end-3);
@@ -233,6 +248,8 @@ for jj = 1: length(lightSources)
         end
     end
 end
+
+% What does this do?  Close up the World section?
 numWorld = length(world);
 world{numWorld+1,:} = thisR.world{index_m};
 world{numWorld+2,:} = thisR.world{index_g};
@@ -243,6 +260,7 @@ if idxL
 else
     disp('Light Added to the Scene.');
 end
+
 end
 
 

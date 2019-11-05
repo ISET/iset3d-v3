@@ -103,7 +103,12 @@ switch str
         fprintf('\nFilm parameters\n-----------\n');
         fprintf('subtype: %s\n',out.subtype);
         fprintf('x,y resolution: %d %d (samples)\n',thisR.get('film resolution'));
-        fprintf('diagonal:   %d (mm)\n',thisR.get('film diagonal'));
+        lensFile = thisR.get('lens file');
+        if isequal(lensFile,'pinhole (perspective)')
+            % We should do something smart here.  This is not smart.
+        else
+            fprintf('diagonal:   %d (mm)\n',thisR.get('film diagonal'));
+        end
         fprintf('\n');
         
     case 'lookat'

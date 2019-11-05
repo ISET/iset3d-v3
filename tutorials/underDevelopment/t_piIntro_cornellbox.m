@@ -3,6 +3,8 @@
 % Status:   Error on line 37.  Adding the light has a problem with the
 % translate parameter.  Error at the end with the iLightDelete().
 %
+% piLightDelete is a problem on line 53.
+%
 % Zhenyi, SCIEN
 
 %%
@@ -46,11 +48,14 @@ thisR = piLightAdd(thisR, 'type', 'point', 'from',[-0.25,-0.25,1.68]);
 piWrite(thisR, 'creatematerials', true);
 [scene, result] = piRender(thisR, 'rendertype', 'radiance');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.3);
 
 %% Change light to D65
 
 lightsource = piLightGet(thisR);
-piLightDelete(thisR, lightsource,'all');
+piLightDelete(thisR, 'all');   % This fails!!! Fix it.
+
+% When the light sources were all removed, this throws an error.
 thisR = piLightAdd(thisR, 'type', 'area', 'lightspectrum', 'D65');
 
 %% END

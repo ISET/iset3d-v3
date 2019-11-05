@@ -1,13 +1,30 @@
 function thisR = piLightDelete(thisR, index)
 % Remove a light source from a render recipe.
+%
+% Syntax:
+%   thisR = piLightDelete(thisR, index)
+%
+% Brief description
+%   Remove a specific light source from a scene.
+%
 % Input:
-%       thisR - the render Recipe
-%       index - the target index of lightsource to be removed. You can use
-%               piLightGet to see all the light sources currently in the
-%               scene. Can be a number or the string 'all'
+%  thisR - the render Recipe
+%  index - the index of the lightsource to be removed. You can use
+%          piLightGet to see all the light sources currently in the
+%          scene. Optionally, you can use the string 'all' to delete
+%          all the light sources in this scene.
+%
+% Optional key/val
+%   N/A
+%
+% Returns:
+%   The modified recipe
+%
+% Description
+%
+% Zhenyi, TL, SCIEN, 2019
 %
 % see also: piLightGet, piLightsAdd
-% Zhenyi, TL, SCIEN, 2019
 
 % Get list of light sources
 lightSource = piLightGet(thisR, 'print', false);
