@@ -126,7 +126,7 @@ gcp.PodDescribe(podname{1})
 thisROrg = thisR.copy;
 thisROrg.outputFile = fullfile(destDir, [sceneName, '.pbrt']);
 gcpOrg = gcp; % Copy the gcp instance, only for changing the targets
-gcpOrg.targets = []
+gcpOrg.targets = [];
 gcpOrg.addPBRTTarget(thisROrg);
 
 gcpOrg.targetsList;
@@ -147,7 +147,7 @@ ieAddObject(oi);
 ieAddObject(oiOrg);
 oiWindow(oiOrg);
 
-%% Show the rendered image using ISETCam
+%% Show the rendered image using ISETCam (Not working yet)
 
 % Some of the images have rendering artifiacts.  These are partially
 % removed using piFireFliesRemove
