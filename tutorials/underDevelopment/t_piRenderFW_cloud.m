@@ -1,26 +1,39 @@
-%% Automatically generate an automotive scene
+%% Replicate a scene that is stored in Flywheel using GCP
 %
-%    t_piRenderFW_cloud
+%    t_piRenderFW_cloud (might rename t_piRender_FW_GCP)
 %
 % Description:
-%   Illustrates (a) the use of ISETCloud, ISET3d, ISETCam and Flywheel to
-%   generate driving scenes and ?b) generate stereo camera images by moving
-%   camera positions.
+%   We created many automotive optical images and stored them in
+%   Flywheel, particularly in the project CameraEval2019.  This script
+%   shows how to recalculate one of these scenes using the google
+%   cloud platform (GCP).
+%
+%   We will use this approach to create slight variants of the
+%   existing OIs, say be adjusting the camera position a few times.
+%
+%   This script illustrates (a) the use of ISETCloud, ISET3d, ISETCam
+%   and Flywheel to generate driving scenes, and (b) generate stereo
+%   camera images by moving camera positions.
 %
 % Author: Zhenyi, Zheng and Brian Wandell, 2019
 %
 % See also
-%   piSceneAuto, piSkymapAdd, gCloud, SUMO
+%   piSceneAuto, piSkymapAdd, gCloud
 
-%% Initialize ISET and Docker
+%% Initialize ISET and Docker and GCP
+
 ieInit;
 if ~piDockerExists, piDockerConfig; end
+
+% The isetcloud toolbox must be on your path
 if ~mcGcloudExists, mcGcloudConfig; end
 
-%% Open the Flywheel site
+%% Open a connection to the Flywheel scitran site
+
+% The scitran toolbox must be on your path
 st = scitran('stanfordlabs');
 
-%% Initialize your GCP cluster
+%% Initialize the GCP cluster
 
 tic
 gcp = gCloud('configuration','cloudRendering-pbrtv3-west1-custom-50-56320-flywheel');
@@ -28,45 +41,69 @@ gcp = gCloud('configuration','cloudRendering-pbrtv3-west1-custom-50-56320-flywhe
 toc
 gcp.renderDepth = 1;  % Create the depth map
 gcp.renderMesh  = 1;  % Create the object mesh for subsequent use
-gcp.targets     =[];  % clear job list
+gcp.targets     = []; % clear job list
 
 % Print out the gcp parameters for the user
 str = gcp.configList;
 
 %% Helpful for debugging
 % clearvars -except gcp st thisR_scene
-%% Read a scene saved at Flywheel
 
+%% Download the two recipes needed to create the scene
+
+% Here is the name of the scene
 sceneName = 'city2_14:58_v12.6_f209.08right_o270.00_201962792132';
 sessionName = strsplit(sceneName,'_');
 sessionName = sessionName{1};
+
+% Here is where we will download it
 destDir = fullfile(piRootPath,'local',[sessionName,'_',date]);
 if ~exist(destDir, 'dir'), mkdir(destDir);end
+
+% The scene will have a JSON file that describes all of the assets and
+% general parameters
 RecipeName = [sceneName,'.json'];
+
+% It will have a 2nd JSON file that defines the Flywheel ID values for
+% the different assets in the RecipeName
 TargetName = [sceneName,'_target.json'];
 
-
+% The acquisition information is found using the Flywheel
+%   group/project/subject/session/acquisition format
 thisAcqName =sprintf('wandell/CameraEval20190626/scenes/%s/%s',sessionName,sceneName);
 thisAcq = st.fw.lookup(thisAcqName);
 
+% Get the particular files from the acquisition
 thisRecipe = stFileSelect(thisAcq.files,'name',RecipeName);
 thisTarget = stFileSelect(thisAcq.files,'name',TargetName);
 
+% Download them
 thisRecipe{1}.download(fullfile(destDir,RecipeName));
 thisTarget{1}.download(fullfile(destDir,TargetName));
 
-%% convert downloaded recipe.json to a recipe
+%% Convert downloaded recipe.json to a recipe
+
+% Read the recipe containing the assets
+
+%     thisR = piJson2Recipe(destName_recipe);
 thisR_tmp = jsonread(fullfile(destDir,RecipeName));
+
+% jsonread returns a struct.  We copy it into a recipe class.  This
+% could be new function.  This could be replaced by the
+thisR = piJson2Recipe(fullfile(destDir,RecipeName));
+%{
 fds = fieldnames(thisR_tmp);
 thisR = recipe;
-% assign the struct to a recipe class
 for ii = 1:length(fds)
     thisR.(fds{ii})= thisR_tmp.(fds{ii});
 end
+%}
+%
 thisR.materials.lib = piMateriallib;
 scene_target = jsonread(fullfile(destDir,TargetName));
 fwList = scene_target.fwAPI.InfoList;
 road.fwList = fwList;
+
 %% Write out the scene into a PBRT file
 thisR.outputFile = fullfile(destDir,[sceneName,'_stereo.pbrt']);
 
@@ -121,6 +158,19 @@ gcp.PodDescribe(podname{1})
 
 % Keep checking for the data, every 15 sec, and download it is there
 %% Add the original recipe and prepared to download the scene/oi
+
+% What we want to do is download the radiance output from PBRT that is
+% stored on Flywheel as a dat file.  Then we will read it in as an OI
+% using this code.
+%{
+st.fileDownload(filename, ... where to go (outfile));
+
+ieObject = piDat2ISET(outFile,...
+                'label','radiance',...
+                'recipe',thisR,...
+                'scaleIlluminance',scaleIlluminance);
+%}
+
 % This part is ugly written... Better to check with Zhenyi for a more
 % elegent way.
 thisROrg = thisR.copy;
@@ -132,6 +182,9 @@ gcpOrg.addPBRTTarget(thisROrg);
 gcpOrg.targetsList;
 
 %% Download files from Flywheel
+
+% We will download the relevant .dat file from the PBRT run using
+% scitran and then use 
 outputDir = fullfile(destDir, 'renderings');
 
 disp('*** Data downloading...');
