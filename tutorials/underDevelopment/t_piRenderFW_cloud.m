@@ -43,8 +43,10 @@ gcp.renderDepth = 1;  % Create the depth map
 gcp.renderMesh  = 1;  % Create the object mesh for subsequent use
 gcp.targets     = []; % clear job list
 
-% Print out the gcp parameters for the user
-str = gcp.configList;
+%{
+ %Print out the gcp parameters for the user if they want it.
+ str = gcp.configList;
+%}
 
 %% Helpful for debugging
 % clearvars -except gcp st thisR_scene
@@ -85,54 +87,82 @@ thisTarget{1}.download(fullfile(destDir,TargetName));
 
 % Read the recipe containing the assets
 
-%     thisR = piJson2Recipe(destName_recipe);
-thisR_tmp = jsonread(fullfile(destDir,RecipeName));
-
-% jsonread returns a struct.  We copy it into a recipe class.  This
-% could be new function.  This could be replaced by the
-thisR = piJson2Recipe(fullfile(destDir,RecipeName));
 %{
+ % jsonread returns a struct.  We copy it into a recipe class.  This
+ % could be new function.  This could be replaced by the
+ % thisR_tmp = jsonread(fullfile(destDir,RecipeName));
 fds = fieldnames(thisR_tmp);
 thisR = recipe;
 for ii = 1:length(fds)
     thisR.(fds{ii})= thisR_tmp.(fds{ii});
 end
 %}
-%
+
+%  Read the JSON file into the recipe
+thisR = piJson2Recipe(fullfile(destDir,RecipeName));
+
+%% We add relevant information to the recipe
+
+% Not sure why the materials library is needed.
 thisR.materials.lib = piMateriallib;
+
+% This is information on how to address Flywheel when running on the
+% GCP.  The fwAPI has critical information.  That is the only part of
+% the target.json file that we use.
 scene_target = jsonread(fullfile(destDir,TargetName));
+
+% Here is where the target information is stored.
+% The fwAPI is special for when we run using Flywheel on the GCP.
+% More explanation needed.
 fwList = scene_target.fwAPI.InfoList;
 road.fwList = fwList;
 
-%% Write out the scene into a PBRT file
+%% Adjust the input and output files to match this calculation
+
+% The input file will always be downloaded by the script on the GCP
+% from Flywheel.  So the string in the input file does not really
+% matter.
+% 
+% Normally piWrite copies resource files (textures, geometry files)
+% from the input to the output folder. But we have the rendering
+% resources saved on flywheel, we do not need to copy anything.  We
+% denote the Flywheel usage here in the inputFile and we do not call
+% piWrite, below.
+thisR.inputFile  = fullfile(tempdir,'Flywheel.pbrt');
 thisR.outputFile = fullfile(destDir,[sceneName,'_stereo.pbrt']);
 
-% Do the writing
-% Note: piWrite normally needs to copy resources files (textures, geometry files)
-% from input folder to output folder, however, we have all the related
-% rendering resources saved on flywheel, we do not need to copy anything
-% actually, however, in order to be compatible with other version of
-% rendering, we provide a fake input file here to avoid errors.
-thisR.inputFile = '/tmp/tmp.pbrt';
+%%  This is important and where we will put in a series of positions
+
 [~, name, ext] =fileparts(thisR.camera.lensfile.value);
 thisR.camera.lensfile.value = fullfile(piRootPath, 'data/lens',[name,ext]);
 
 % CHANGE THE POSITION OF CAMERA HERE:
+% We will write more routines that generate a sequence of positions
+% for stereo and for camera moving and so forth in this section.
 lookAt = thisR.get('lookAt');
 thisR.set('from', lookAt.from + [1;0;0]);
 
+% There is a new camera position that is stored in the <name>_geometry.pbrt
+% file.  We write out that geometry file locally, calling it
+% <name>_stereo_geometry.pbrt.  This will be part of the new
+% information we upload along with the new recipe file.
+%
 piWrite(thisR,'creatematerials',true,...
-    'overwriteresources',false,'lightsFlag',false);
-%%
-% Upload the information to Flywheel.
-gcp.fwUploadPBRT(thisR,'scitran',st,'road',road);
+   'overwriteresources',false,'lightsFlag',false);
+
+%% Upload the information to Flywheel
+
+% This uploads the modified recipe (thisR), the scitran object, and
+% information about where the road data are stored on Flywheel.
+gcp.fwUploadPBRT(thisR,'scitran',st,'road',road, ...
+    'session name','stereo');
 
 gcp.addPBRTTarget(thisR);
 fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
 % Describe the target to the user
-
 gcp.targetsList;
+
 %% This invokes the PBRT-V3 docker image
 gcp.render(); 
 %% Monitor the processes on GCP
