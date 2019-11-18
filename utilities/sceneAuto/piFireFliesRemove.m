@@ -1,10 +1,20 @@
-%% Find and remove fireflies(ray-tracing artifacts) in the image
-% 
-% The rendering algorithm sometimes produces these unwanted white spots
-% just, well, because of ray tracing.
-% copy from isetAuto
 function oi = piFireFliesRemove(ieObject)
-% now the ieOjbect is a scene, will add lens case --zhenyi0919
+% Find and remove fireflies(ray-tracing artifacts) in the image
+%
+% Syntax
+%   oi = piFireFliesRemove(ieObject)
+% 
+% Input
+%   ieObject - an optical image
+% 
+% Description
+%   The rendering algorithm sometimes produces these unwanted white
+%   spots just, well, because of ray tracing. copy from isetAuto. Now
+%   the ieOjbect is a scene, will add lens case --zhenyi0919 
+%
+% Zhenyi Liu
+%
+% See also
 
 %% Here is an image that has a bunch
 
@@ -85,7 +95,5 @@ end
 % They are white, and thus not matched in color to the surrounding pixels
 % We need to replace the full spectrum of the white points with the average
 % spectrum of the surrounding points, not just scale the white pixels
-
-
 oi = oiSet(oi,'photons',correctedPhotons);
 end

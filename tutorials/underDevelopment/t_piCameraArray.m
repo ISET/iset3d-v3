@@ -27,67 +27,47 @@ ieGCPInit
 
 %% Download the two recipes needed to create the scene
 
+% This can become a function to just get the two JSON recipes
+
 % Here an acquisition that contains a scene on Flywheel
+sceneGroup   = 'wandell';
 sceneProject = 'Graphics auto renderings';
 sceneSubject = 'scenes';
+sceneSession = 'city4';
 sceneAcquisition = 'city4_9:30_v0.0_f40.00front_o270.00_201952151746';
 
-sceneName = 'city2_14:58_v12.6_f209.08right_o270.00_201962792132';
-sessionName = strsplit(sceneName,'_');
-sessionName = sessionName{1};
+luString = sprintf('%s/%s/%s/%s/%s',sceneGroup,sceneProject,sceneSubject,sceneSession,sceneAcquisition);
+acquisition = st.lookup(luString);
+files = acquisition.files;
+targetFile = stSelect(files,'name','target.json');
+recipeFile = stSelect(files,'name',[sceneAcquisition,'.json']);
 
-% Here is where we will download it
-destDir = fullfile(piRootPath,'local',[sessionName,'_',date]);
-if ~exist(destDir, 'dir'), mkdir(destDir);end
+% Download the JSON files
+destDir = fullfile(piRootPath,'local',date,sceneSession);
+if ~exist(destDir,'dir'), mkdir(destDir); end
+recipeName = fullfile(destDir,recipeFile{1}.name);
+recipeFile{1}.download(fullfile(destDir,recipeFile{1}.name));
+targetFile{1}.download(fullfile(destDir,targetFile{1}.name));
 
-% The scene will have a JSON file that describes all of the assets and
-% general parameters
-RecipeName = [sceneName,'.json'];
+%% Read the JSON files 
 
-% It will have a 2nd JSON file that defines the Flywheel ID values for
-% the different assets in the RecipeName
-TargetName = [sceneName,'_target.json'];
+% The scene recipe with all the graphics information is stored here as
+% a recipe
+thisR = piJson2Recipe(recipeName);
 
-% The acquisition information is found using the Flywheel
-%   group/project/subject/session/acquisition format
-thisAcqName =sprintf('wandell/CameraEval20190626/scenes/%s/%s',sessionName,sceneName);
-thisAcq = st.fw.lookup(thisAcqName);
+% Set some defaults (low res for now)
+thisR.set('film resolution',[640 360]);
+thisR.set('pixel samples',256);
+thisR.set('n bounces',2);
 
-% Get the particular files from the acquisition
-thisRecipe = stFileSelect(thisAcq.files,'name',RecipeName);
-thisTarget = stFileSelect(thisAcq.files,'name',TargetName);
-
-% Download them
-thisRecipe{1}.download(fullfile(destDir,RecipeName));
-thisTarget{1}.download(fullfile(destDir,TargetName));
-
-%% Convert downloaded recipe.json to a recipe
-
-% Read the recipe containing the assets
-
-%{
- % jsonread returns a struct.  We copy it into a recipe class.  This
- % could be new function.  This could be replaced by the
- % thisR_tmp = jsonread(fullfile(destDir,RecipeName));
-fds = fieldnames(thisR_tmp);
-thisR = recipe;
-for ii = 1:length(fds)
-    thisR.(fds{ii})= thisR_tmp.(fds{ii});
-end
-%}
-
-%  Read the JSON file into the recipe
-thisR = piJson2Recipe(fullfile(destDir,RecipeName));
-
-%% We add relevant information to the recipe
-
-% Not sure why the materials library is needed.
+% Add relevant information to the recipe
 thisR.materials.lib = piMateriallib;
 
 % This is information on how to address Flywheel when running on the
 % GCP.  The fwAPI has critical information.  That is the only part of
 % the target.json file that we use.
-scene_target = jsonread(fullfile(destDir,TargetName));
+targetName = fullfile(destDir,targetFile{1}.name);
+scene_target = jsonread(targetName);
 
 % Here is where the target information is stored.
 % The fwAPI is special for when we run using Flywheel on the GCP.
@@ -95,48 +75,76 @@ scene_target = jsonread(fullfile(destDir,TargetName));
 fwList = scene_target.fwAPI.InfoList;
 road.fwList = fwList;
 
-%% Adjust the input and output files to match this calculation
+%%  This is where we define a series of camera positions
+
+% This is the project where will store the renderints
+renderProject = 'wandell/Graphics camera array';
+renderSubject = 'camera array';
+renderSession = sceneAcquisition;
 
 % The input file will always be downloaded by the script on the GCP
 % from Flywheel.  So the string in the input file does not really
 % matter.
 % 
 % Normally piWrite copies resource files (textures, geometry files)
-% from the input to the output folder. But we have the rendering
-% resources saved on flywheel, we do not need to copy anything.  We
-% denote the Flywheel usage here in the inputFile and we do not call
-% piWrite, below.
+% from the input to the output folder. Because the assets are on
+% Flywheel, we do not need to copy the assets (input files). We 
+% denote the Flywheel usage here by assigning the name Flywheel.pbrt.
+% But that file does not really exist.
 thisR.inputFile  = fullfile(tempdir,'Flywheel.pbrt');
-thisR.outputFile = fullfile(destDir,[sceneName,'_stereo.pbrt']);
 
-%%  This is important and where we will put in a series of positions
-
+% Set the lens
 [~, name, ext] =fileparts(thisR.camera.lensfile.value);
 thisR.camera.lensfile.value = fullfile(piRootPath, 'data/lens',[name,ext]);
 
-% CHANGE THE POSITION OF CAMERA HERE:
-% We will write more routines that generate a sequence of positions
-% for stereo and for camera moving and so forth in this section.
+% Get the original scene lookAt position
 lookAt = thisR.get('lookAt');
-thisR.set('from', lookAt.from + [1;0;0]);
 
-% There is a new camera position that is stored in the <name>_geometry.pbrt
-% file.  We write out that geometry file locally, calling it
-% <name>_stereo_geometry.pbrt.  This will be part of the new
-% information we upload along with the new recipe file.
-%
-piWrite(thisR,'creatematerials',true,...
-   'overwriteresources',false,'lightsFlag',false);
+% Specif the change in position vectors
+deltaPosition = [0 0.03 0; 0 0.07 0]';
 
-%% Upload the information to Flywheel
+%% Loop and upload the data 
 
-% This uploads the modified recipe (thisR), the scitran object, and
-% information about where the road data are stored on Flywheel.
-gcp.fwUploadPBRT(thisR,'scitran',st,'road',road, ...
-    'session name','stereo');
+gcp.targets     = []; % clear job list
 
-gcp.addPBRTTarget(thisR);
-fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
+for pp = 1:size(deltaPosition,2)
+    
+    % Store the position shift in millimeters
+    d = deltaPosition(:,pp)*1000;
+
+    % The output file for this position
+    str = sprintf('%s_(%d,%d,%d)',sceneAcquisition, d(1),d(2),d(3));
+    thisR.outputFile = fullfile(destDir,str);
+    
+    % CHANGE THE POSITION OF CAMERA HERE:
+    % We will write more routines that generate a sequence of positions
+    % for stereo and for camera moving and so forth in this section.
+    thisR.set('from', lookAt.from + deltaPosition(:,pp));
+    
+    % There is a new camera position that is stored in the
+    % <sceneName_position>.pbrt file.
+    piWrite(thisR,'creatematerials',true,...
+        'overwriteresources',false,'lightsFlag',false);
+    
+    % Upload the information to Flywheel
+    renderAcquisition = sprintf('pos (%d,%d,%d)',d(1),d(2),d(3));
+    
+    % This uploads the modified recipe (thisR), the scitran object, and
+    % information about where the road data are stored on Flywheel.
+    
+    gcp.fwUploadPBRT(thisR,'scitran',st,...
+        'road',road, ...
+        'render project lookup', renderProject, ...
+        'session name',renderSession, ...
+        'subject name',renderSubject, ...
+        'acquisition name',renderAcquisition);
+    
+    gcp.addPBRTTarget(thisR);
+    fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
+    
+end
+
+%% What are we planning?
 
 % Describe the target to the user
 gcp.targetsList;
@@ -179,8 +187,9 @@ ieObject = piDat2ISET('city2_14:58_v12.6_f209.08right_o270.00_201962792132_stere
     'label','radiance',...
     'recipe',thisR,...
     'scaleIlluminance',false);
+oiWindow(ieObject);
 
-% Get the corresponding scene
+%% Get the corresponding scene
 acqLabel = sceneName;
 renderAcq = st.search('acquisition',...
      'project label contains','CameraEval2019',...
