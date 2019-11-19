@@ -6,6 +6,19 @@
 % Initializes.
 %
 % Zheng, Brian 2019
+%
+% See also
+
+% Programming TODO
+%   Check if the cluster is already running, or being deleted, and
+%   handle those cases.  It could be the already running case is fine.
+%   But if it is being deleted, we can tell because the status value
+%   of 'STOPPING' is returned.
+%
+%   We might turn this into a function and take the dockerimage name
+%   as an argument to allow for 'latest' or 'flywheel-dev' or
+%   something else in the future.
+%
 
 %%  Initialize ISETcam
 ieInit;
@@ -34,6 +47,7 @@ gcp.targets     = []; % clear job list
 
 %% Print out the gcp parameters for the user if they want it.
 
+% We could check that this has the string status: 'RUNNING'
 str = gcp.configList;
 
 %% END

@@ -113,7 +113,7 @@ for pp = 1:size(deltaPosition,2)
     d = deltaPosition(:,pp)*1000;
 
     % The output file for this position
-    str = sprintf('%s_(%d,%d,%d)',sceneAcquisition, d(1),d(2),d(3));
+    str = sprintf('%s_%d_%d_%d.pbrt',sceneAcquisition, d(1),d(2),d(3));
     thisR.outputFile = fullfile(destDir,str);
     
     % CHANGE THE POSITION OF CAMERA HERE:
@@ -131,15 +131,20 @@ for pp = 1:size(deltaPosition,2)
     
     % This uploads the modified recipe (thisR), the scitran object, and
     % information about where the road data are stored on Flywheel.
-    
+    % The render session and subject and acquisition labels are stored
+    % on the gCloud object.  
     gcp.fwUploadPBRT(thisR,'scitran',st,...
         'road',road, ...
         'render project lookup', renderProject, ...
-        'session name',renderSession, ...
-        'subject name',renderSubject, ...
-        'acquisition name',renderAcquisition);
+        'session label',renderSession, ...
+        'subject label',renderSubject, ...
+        'acquisition label',renderAcquisition);
     
-    gcp.addPBRTTarget(thisR);
+    % Set up the rendering target.  The subject label changes from
+    % 'camera array' to 'renderings'.  But the session, acquisition
+    % and project remain the same.
+    gcp.addPBRTTarget(thisR,'subject label','renderings');
+    
     fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
     
 end
@@ -150,6 +155,10 @@ end
 gcp.targetsList;
 
 %% This invokes the PBRT-V3 docker image
+
+% These fwRender.sh script places the outputs into the
+% subject/session/acquisition specified on the gCloud object (see
+% above).
 gcp.render(); 
 
 %% Monitor the processes on GCP
