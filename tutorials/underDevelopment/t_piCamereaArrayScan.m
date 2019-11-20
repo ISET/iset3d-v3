@@ -34,7 +34,6 @@ sceneGroup   = 'wandell';
 sceneProject = 'Graphics auto renderings';
 sceneSubject = 'scenes';
 
-
 % st.lookup follows the syntax of:
 % groupID/projectLabel/subjectLabel/sessionLabel/acquisitionLabel
 luString = sprintf('%s/%s/%s',sceneGroup,sceneProject,sceneSubject);
@@ -44,10 +43,14 @@ sessions = subject.sessions();
 gcp.targets     = []; % clear job list
 
 for ii = 1:length(subject.sessions())
+    % The inputs are labeled as 'subject' 'scenes'.  In this Project
+    % sessions are collections of scenes read to render
     thisSession = sessions{ii};
     acquisitions = thisSession.acquisitions();
     sceneSession = thisSession.label;
     for jj = 1:length(acquisitions)
+        % Each session has a large number of acquisitions that are the
+        % scenes.
         acquisition = acquisitions{jj};
         sceneAcquisition = acquisition.label;
         files = acquisition.files;
@@ -105,7 +108,7 @@ for ii = 1:length(subject.sessions())
         % But that file does not really exist.
         thisR.inputFile  = fullfile(tempdir,'Flywheel.pbrt');
 
-        % Set the lens
+        % Set the lens - Sometimes it failed to find a lens file.
         if isfield(thisR.camera, 'lensfile')
             [~, name, ext] =fileparts(thisR.camera.lensfile.value);
             thisR.camera.lensfile.value = fullfile(piRootPath, 'data/lens',[name,ext]);
@@ -118,7 +121,6 @@ for ii = 1:length(subject.sessions())
         deltaPosition = [0 0.03 0; 0 0.07 0]';
 
         %% Loop and upload the data 
-
         for pp = 1:size(deltaPosition,2)
 
             % Store the position shift in millimeters
@@ -134,7 +136,8 @@ for ii = 1:length(subject.sessions())
             thisR.set('from', lookAt.from + deltaPosition(:,pp));
 
             % There is a new camera position that is stored in the
-            % <sceneName_position>.pbrt file.
+            % <sceneName_position>.pbrt file.  Everything including
+            % the lens file should get stored with this piWrite.
             piWrite(thisR,'creatematerials',true,...
                 'overwriteresources',false,'lightsFlag',false);
 
