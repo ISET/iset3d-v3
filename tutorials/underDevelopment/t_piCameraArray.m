@@ -149,6 +149,13 @@ for pp = 1:size(deltaPosition,2)
     
 end
 
+%% Set the session time stamp
+sessionLabel = sprintf('wandell/Graphics camera array/camera array/%s',renderSession);
+session = st.lookup(sessionLabel);
+
+% Set and update the info from here
+
+
 %% What are we planning?
 
 % Describe the target to the user
@@ -160,6 +167,8 @@ gcp.targetsList;
 % subject/session/acquisition specified on the gCloud object (see
 % above).
 gcp.render(); 
+
+%% Are the render time stamps set?
 
 %% Monitor the processes on GCP
 
