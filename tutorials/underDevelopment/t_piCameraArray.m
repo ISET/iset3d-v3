@@ -79,7 +79,7 @@ road.fwList = fwList;
 
 % This is the project where will store the renderints
 renderProject = 'wandell/Graphics camera array';
-renderSubject = 'camera array';
+renderSubject = 'camera array test';
 renderSession = sceneAcquisition;
 
 % The input file will always be downloaded by the script on the GCP
@@ -143,7 +143,7 @@ for pp = 1:size(deltaPosition,2)
     % Set up the rendering target.  The subject label changes from
     % 'camera array' to 'renderings'.  But the session, acquisition
     % and project remain the same.
-    gcp.addPBRTTarget(thisR,'subject label','renderings');
+    gcp.addPBRTTarget(thisR,'subject label','renderings test');
     
     fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
     
