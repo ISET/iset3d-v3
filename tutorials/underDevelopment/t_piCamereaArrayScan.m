@@ -48,6 +48,11 @@ for ii = 1:length(subject.sessions())
     thisSession = sessions{ii};
     acquisitions = thisSession.acquisitions();
     sceneSession = thisSession.label;
+    
+    % Only use acquisitions in city 3
+    if ~strcmp(sceneSession, 'city3')
+        continue;
+    end
     for jj = 1:length(acquisitions)
         % Each session has a large number of acquisitions that are the
         % scenes.
@@ -94,7 +99,7 @@ for ii = 1:length(subject.sessions())
 
         % This is the project where will store the renderints
         renderProject = 'wandell/Graphics camera array';
-        renderSubject = 'camera array ZL test';
+        renderSubject = 'camera array';
         renderSession = sceneAcquisition;
 
         % The input file will always be downloaded by the script on the GCP
@@ -158,7 +163,7 @@ for ii = 1:length(subject.sessions())
             % Set up the rendering target.  The subject label changes from
             % 'camera array' to 'renderings'.  But the session, acquisition
             % and project remain the same.
-            gcp.addPBRTTarget(thisR,'subjectlabel','renderings');
+            gcp.addPBRTTarget(thisR,'subject label','renderings');
 
             fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
@@ -199,17 +204,18 @@ end
 % stored on Flywheel as a dat file.  Then we will read it in as an OI
 % using this code.
 
-[~,acqLabel] = fileparts(thisR.outputFile);
 renderAcq = st.search('acquisition',...
-    'project label exact','Graphics auto renderings',...
-    'subject code','renderings',...
-    'acquisition label contains',acqLabel, ...
+    'project label exact','Graphics camera array',...
+    'subject code','renderings test',...
+    'session label', 'city4_9:30_v0.0_f40.00front_o270.00_201952151746',...
+    'acquisition label exact',renderAcquisition, ...
     'fw',true);
 rAcq = renderAcq{1};
-rAcq.downloadTar('foo.tar');         
+rAcq.downloadTar(fullfile(piRootPath, 'local','foo.tar'));         
 
 % Chdir to the right place ...
-ieObject = piDat2ISET('city2_14:58_v12.6_f209.08right_o270.00_201962792132_stereo.dat',...
+filename = str(1:end-5);
+ieObject = piDat2ISET(['city4_9:30_v0.0_f40.00front_o270.00_201952151746_0_70_0','.dat'],...
     'label','radiance',...
     'recipe',thisR,...
     'scaleIlluminance',false);

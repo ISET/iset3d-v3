@@ -45,9 +45,6 @@ thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
 thisR.set('nbounces',2); % Number of bounces
 
-%% Render
-piWrite(thisR);
-
 % Add relevant information to the recipe
 thisR.materials.lib = piMateriallib;
 
@@ -58,6 +55,46 @@ renderProject = 'wandell/Graphics camera array';
 renderSubject = 'simple test';
 renderSession = 'checkerboard';
 
+%% Write out the recipe for cgresources
+piWrite(thisR,'creatematerials',true);
+
+%% Upload the assets to FW for fwInfoList
+rFolder = fullfile(piRootPath, 'local', sceneName);
+folder = fullfile(piRootPath, 'local', sceneName, 'upload');
+if ~exist(folder, 'dir'), mkdir(folder); end
+
+resourceFile = fullfile(folder, sprintf('%s.cgresource.zip', sceneName));
+
+zip(resourceFile,{fullfile(rFolder, 'textures'),fullfile(rFolder, 'scene')});
+oldRecipeFile = fullfile(rFolder, sprintf('%s.json', sceneName));
+recipeFile = fullfile(folder, sprintf('%s.recipe.json', sceneName));
+copyfile(oldRecipeFile, recipeFile);
+
+% Render a pngfile
+[scene, ~] = piRender(thisR, 'rendertype', 'radiance');
+pngFigure = sceneGet(scene,'rgb image');
+pngFile = pngFigure.^(1/1.5); % for Tree, too dark.
+figure;
+imshow(pngFile);
+pngfile = fullfile(folder, sprintf('%s.png',sceneName));
+imwrite(pngFile,pngfile);
+
+%% Upload the cgresource.zip and .json file
+
+current_id = st.containerCreate('Wandell Lab', 'Graphics auto',...
+            'session', renderSession, 'acquisition', sceneName,...
+            'subject', 'assets');
+st.fileUpload(recipeFile, current_id.acquisition, 'acquisition');
+fprintf('%s uploaded \n',recipeFile);
+st.fileUpload(resourceFile, current_id.acquisition, 'acquisition');
+fprintf('%s uploaded \n',resourceFile);
+st.fileUpload(pngfile,current_id.acquisition,'acquisition');
+fprintf('%s uploaded \n',pngfile);
+
+%% Upload the road.fwList
+data_acq = st.fw.lookup(fullfile('wandell/Graphics auto/assets', sceneName));
+road.fwList = [data_acq.id,' ',[sceneName,'.zip']];
+%%
 % The input file will always be downloaded by the script on the GCP
 % from Flywheel.  So the string in the input file does not really
 % matter.
@@ -73,24 +110,27 @@ thisR.inputFile  = fullfile(tempdir,'Flywheel.pbrt');
 lookAt = thisR.get('lookAt');
 
 % Specif the change in position vectors
-deltaPosition = [0 0.03 0; 0 0.07 0]';
+deltaPosition = [0 0.03 0; 0 0.07 0];
 
+%%
+destDir = fullfile(piRootPath,'local',date,sceneSession);
+if ~exist(destDir,'dir'), mkdir(destDir); end
 %% Loop and upload the data 
 
 gcp.targets     = []; % clear job list
 
-for pp = 1:size(deltaPosition,2)
+for pp = 1:size(deltaPosition,1)
     
     % Store the position shift in millimeters
-    d = deltaPosition(:,pp)*1000;
+    d = deltaPosition(pp,:)*1000;
 
     % The output file for this position
-    str = sprintf('%s_%d_%d_%d.pbrt','pos', d(1),d(2),d(3));
-    
+    str = sprintf('%s_%d_%d_%d.pbrt',sceneName, d(1),d(2),d(3));
+    thisR.outputFile = fullfile(destDir,str);
     % CHANGE THE POSITION OF CAMERA HERE:
     % We will write more routines that generate a sequence of positions
     % for stereo and for camera moving and so forth in this section.
-    thisR.set('from', lookAt.from + deltaPosition(:,pp));
+    thisR.set('from', lookAt.from + deltaPosition(pp,:));
     
     % There is a new camera position that is stored in the
     % <sceneName_position>.pbrt file.
@@ -105,6 +145,7 @@ for pp = 1:size(deltaPosition,2)
     % The render session and subject and acquisition labels are stored
     % on the gCloud object.  
     gcp.fwUploadPBRT(thisR,'scitran',st,...
+        'road', road,...
         'render project lookup', renderProject, ...
         'session label',renderSession, ...
         'subject label',renderSubject, ...
@@ -130,6 +171,15 @@ session = st.lookup(sessionLabel);
 
 % Describe the target to the user
 gcp.targetsList;
+
+% You can get a lot of information about the job this way.  Examining this
+% is useful when there is an error.  It is not needed, but watching it
+% scroll lets you see what is happening moment to moment.
+%{   
+   podname = gcp.podsList
+   gcp.PodDescribe(podname{end})    % Prints out what has happened
+   cmd = gcp.Podlog(podname{end});  % Creates a command to show the running log
+%}
 
 %% This invokes the PBRT-V3 docker image
 
