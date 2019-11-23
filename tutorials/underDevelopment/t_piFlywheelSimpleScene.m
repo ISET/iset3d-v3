@@ -92,7 +92,8 @@ st.fileUpload(pngfile,current_id.acquisition,'acquisition');
 fprintf('%s uploaded \n',pngfile);
 
 %% Upload the road.fwList
-data_acq = st.fw.lookup(fullfile('wandell/Graphics auto/assets', sceneName));
+% Syntax is: Group/Project/Subject/Session/Acquisition
+data_acq = st.fw.lookup(fullfile('wandell/Graphics auto/assets', sceneName, sceneName));
 road.fwList = [data_acq.id,' ',[sceneName,'.cgresource.zip']];
 %%
 % The input file will always be downloaded by the script on the GCP
@@ -113,11 +114,14 @@ lookAt = thisR.get('lookAt');
 deltaPosition = [0 0.03 0; 0 0.07 0];
 
 %%
-destDir = fullfile(piRootPath,'local',date,sceneSession);
+destDir = fullfile(piRootPath,'local',date,renderSession);
 if ~exist(destDir,'dir'), mkdir(destDir); end
 %% Loop and upload the data 
 
 gcp.targets     = []; % clear job list
+
+renderAcqList = {};
+outputFileList = {};
 
 for pp = 1:size(deltaPosition,1)
     
@@ -127,6 +131,8 @@ for pp = 1:size(deltaPosition,1)
     % The output file for this position
     str = sprintf('%s_%d_%d_%d.pbrt',sceneName, d(1),d(2),d(3));
     thisR.outputFile = fullfile(destDir,str);
+    [~,acqLabel] = fileparts(thisR.outputFile);
+    outputFileList{pp} = acqLabel;
     % CHANGE THE POSITION OF CAMERA HERE:
     % We will write more routines that generate a sequence of positions
     % for stereo and for camera moving and so forth in this section.
@@ -138,7 +144,8 @@ for pp = 1:size(deltaPosition,1)
         'overwriteresources',false,'lightsFlag',false);
     
     % Upload the information to Flywheel
-    renderAcquisition = sprintf('pos (%d,%d,%d)',d(1),d(2),d(3));
+    renderAcquisition = sprintf('pos_%d_%d_%d',d(1),d(2),d(3));
+    renderAcqList{pp} = renderAcquisition;
     
     % This uploads the modified recipe (thisR), the scitran object, and
     % information about where the road data are stored on Flywheel.
@@ -211,64 +218,141 @@ end
 % stored on Flywheel as a dat file.  Then we will read it in as an OI
 % using this code.
 
-[~,acqLabel] = fileparts(thisR.outputFile);
 renderAcq = st.search('acquisition',...
     'project label exact','Graphics camera array',...
-    'subject code','renderings test',...,
+    'subject code','renderings test',...
     'session label','checkerboard',...
-    'acquisition label contains','pos (0,30,0)', ...
+    'acquisition label contains',renderAcqList{1},...
     'fw',true);
 rAcq = renderAcq{1};
-rAcq.downloadTar('foo.tar');         
+savePathTar = fullfile(destDir,'renderings',[sceneName,'.tar']);
+rAcq.downloadTar(fullfile(destDir,'renderings',[sceneName,'.tar']));
 
-% Chdir to the right place ...
-ieObject = piDat2ISET('/Users/zhenglyu/Desktop/Research/git/iset3d/local/21-Nov-2019/scitran/wandell/Graphics camera array/renderings test/checkerboard/pos 0300/checkerboard_0_30_0_mesh.dat',...
+% Unzip the tar file and display it
+untar(savePathTar,'left');
+
+ieRootPath = fullfile(destDir,'renderings','left','scitran',renderProject,...
+    'renderings test', sceneName, renderAcqList{1});
+
+iePath = fullfile(ieRootPath, [outputFileList{1},'.dat']);
+
+
+% Read radiance type
+ieObject = piDat2ISET(iePath,...
+    'label','radiance',...
+    'recipe',thisR,...
+    'scaleIlluminance',false);
+
+switch ieObject.type
+    case 'scene'
+        sceneWindow(ieObject);
+        img = sceneGet(ieObject, 'rgb image');
+    case 'optical image'
+        oiWindow(ieObject);
+        img = oiGet(ieObject, 'rgb image');
+end
+
+img = img.^(1/1.5);
+pngFile = fullfile(ieRootPath, [outputFileList{1},'.png']);
+imwrite(img,pngfile);
+
+st.fileUpload(pngfile,rAcq.id,'acquisition');
+fprintf('%s uploaded \n',pngfile);
+
+% Read depth radiance image
+iePath = fullfile(ieRootPath, [outputFileList{1},'_depth.dat']);
+depth = piDat2ISET(iePath,...
+    'label','depth',...
+    'recipe',thisR,...
+    'scaleIlluminance',false);
+imagesc(depth);
+depthFile = fullfile(ieRootPath, [outputFileList{1},'_depth.mat']);
+save(depthFile, 'depth');
+
+st.fileUpload(depthFile, rAcq.id,'acquisition');
+fprintf('%s uploaded \n',depthFile);
+
+% Read mesh type
+iePath = fullfile(ieRootPath, [outputFileList{1},'_mesh.dat']);
+mesh = piDat2ISET(iePath,...
     'label','mesh',...
     'recipe',thisR,...
     'scaleIlluminance',false);
-sceneWindow(ieObject);
+imagesc(mesh);
+meshFile = fullfile(ieRootPath, [outputFileList{1},'_mesh.mat']);
+save(meshFile, 'mesh');
 
-%% Get the corresponding scene
-acqLabel = sceneName;
+st.fileUpload(meshFile, rAcq.id,'acquisition');
+fprintf('%s uploaded \n',meshFile);
+
+%% Add the corresponding scene
+
 renderAcq = st.search('acquisition',...
-     'project label contains','CameraEval2019',...
-     'subject code','renderings',...
-     'acquisition label exact',acqLabel, ...
-     'fw',true);
+    'project label exact','Graphics camera array',...
+    'subject code','renderings test',...
+    'session label','checkerboard',...
+    'acquisition label contains',renderAcqList{2},...
+    'fw',true);
 rAcq = renderAcq{1};
-rAcq.downloadTar('foo.tar');
-tmp = stSelect(rAcq.files,'name',[sceneName,'.dat']);
-radianceFile = tmp{1};
-radianceFile.download('radiance.dat');
+savePathTar = fullfile(destDir,'renderings',[sceneName,'_2.tar']);
+rAcq.downloadTar(fullfile(destDir,'renderings',[sceneName,'_2.tar']));
 
-rAcq.downloadFile(acqLabel);
-ieObject = piDat2ISET('radiance.dat',...
+% Unzip the tar file and display it
+untar(savePathTar,'right');
+
+ieRootPath = fullfile(destDir,'renderings','right','scitran',renderProject,...
+    'renderings test', sceneName, renderAcqList{2});
+
+iePath = fullfile(ieRootPath, [outputFileList{2},'.dat']);
+
+
+% Read radiance type
+ieObject = piDat2ISET(iePath,...
     'label','radiance',...
     'recipe',thisR,...
-    'scaleIlluminance',true);
-ieObject = piFireFliesRemove(ieObject);
-oiWindow(ieObject);
+    'scaleIlluminance',false);
 
-% Chdir to the right place ...
-% chdir('/Users/wandell/Documents/MATLAB/iset3d/local/scitran/wandell/CameraEval20190626/renderings/city2/city2_1458_v12.6_f209.08right_o270.00_201962792132'
-ieObject = piDat2ISET('city2_14:58_v12.6_f209.08right_o270.00_201962792132.dat',...
-                'label','radiance',...
-                'recipe',thisR,...
-                'scaleIlluminance',true);
-oiWindow(ieObject);
-
-
-%% Show the rendered image using ISETCam (Not working yet)
-
-% Some of the images have rendering artifiacts.  These are partially
-% removed using piFireFliesRemove
-%
-for ii =1:length(oi)
-    oi_corrected{ii} = piFireFliesRemove(oi{ii});
-    ieAddObject(oi_corrected{ii}); 
-    oiWindow;
+switch ieObject.type
+    case 'scene'
+        sceneWindow(ieObject);
+        img = sceneGet(ieObject, 'rgb image');
+    case 'optical image'
+        oiWindow(ieObject);
+        img = oiGet(ieObject, 'rgb image');
 end
-% truesize;
+
+img = img.^(1/1.5);
+pngFile = fullfile(ieRootPath, [outputFileList{2},'.png']);
+imwrite(img,pngfile);
+
+st.fileUpload(pngfile,rAcq.id,'acquisition');
+fprintf('%s uploaded \n',pngfile);
+
+% Read depth radiance image
+iePath = fullfile(ieRootPath, [outputFileList{2},'_depth.dat']);
+depth = piDat2ISET(iePath,...
+    'label','depth',...
+    'recipe',thisR,...
+    'scaleIlluminance',false);
+imagesc(depth);
+depthFile = fullfile(ieRootPath, [outputFileList{2},'_depth.mat']);
+save(depthFile, 'depth');
+
+st.fileUpload(depthFile, rAcq.id,'acquisition');
+fprintf('%s uploaded \n',depthFile);
+
+% Read mesh type
+iePath = fullfile(ieRootPath, [outputFileList{2},'_mesh.dat']);
+mesh = piDat2ISET(iePath,...
+    'label','mesh',...
+    'recipe',thisR,...
+    'scaleIlluminance',false);
+imagesc(mesh);
+meshFile = fullfile(ieRootPath, [outputFileList{2},'_mesh.mat']);
+save(meshFile, 'mesh');
+
+st.fileUpload(meshFile, rAcq.id,'acquisition');
+fprintf('%s uploaded \n',meshFile);
 
 %% Remove all jobs.
 % Anything still running is a stray that never completed.  We should
@@ -277,46 +361,3 @@ end
 % gcp.jobsDelete();
 
 %% END
-
-%{
-    oiSet(oi_corrected{ii},'gamma',0.75);
-%     oiSet(scene_corrected{ii},'gamma',0.85);
-    pngFigure = oiGet(oi_corrected{ii},'rgb image');
-    figure;
-    imshow(pngFigure);
-    % Get the class labels, depth map, bounding boxes for ground
-    % truth. This usually takes about 15 secs
-    tic
-    scene_label{ii} = piSceneAnnotation(scene_mesh{ii},label{ii},st);toc
-    [sceneFolder,sceneName]=fileparts(label{ii});
-    sceneName = strrep(sceneName,'_mesh','');
-    irradiancefile = fullfile(sceneFolder,[sceneName,'_ir.png']);
-    imwrite(pngFigure,irradiancefile); % Save this scene file
-
-    %% Visualization of the ground truth bounding boxes
-    vcNewGraphWin;
-    imshow(pngFigure);
-    fds = fieldnames(scene_label{ii}.bbox2d);
-    for kk = 4
-    detections = scene_label{ii}.bbox2d.(fds{kk});
-    r = rand; g = rand; b = rand;
-    if r< 0.2 && g < 0.2 && b< 0.2
-        r = 0.5; g = rand; b = rand;
-    end
-    for jj=1:length(detections)
-        pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
-            detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
-            detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
-
-        rectangle('Position',pos,'EdgeColor',[r g b],'LineWidth',2);
-        t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,num2str(jj));
-       %t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,fds{kk});
-        t.Color = [0 0 0];
-        t.BackgroundColor = [r g b];
-        t.FontSize = 15;
-    end
-    end
-    drawnow;
-%}
-
-
