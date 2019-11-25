@@ -58,6 +58,7 @@ renderSession = 'checkerboard';
 %% Write out the recipe for cgresources
 piWrite(thisR,'creatematerials',true);
 
+%{
 %% Upload the assets to FW for fwInfoList
 rFolder = fullfile(piRootPath, 'local', sceneName);
 folder = fullfile(piRootPath, 'local', sceneName, 'upload');
@@ -90,7 +91,7 @@ st.fileUpload(resourceFile, current_id.acquisition, 'acquisition');
 fprintf('%s uploaded \n',resourceFile);
 st.fileUpload(pngfile,current_id.acquisition,'acquisition');
 fprintf('%s uploaded \n',pngfile);
-
+%}
 %% Upload the road.fwList
 % Syntax is: Group/Project/Subject/Session/Acquisition
 data_acq = st.fw.lookup(fullfile('wandell/Graphics auto/assets', sceneName, sceneName));
@@ -111,7 +112,7 @@ thisR.inputFile  = fullfile(tempdir,'Flywheel.pbrt');
 lookAt = thisR.get('lookAt');
 
 % Specif the change in position vectors
-deltaPosition = [0 0.03 0; 0 0.07 0];
+deltaPosition = [0 0 0; 1.5 0 0];
 
 %%
 destDir = fullfile(piRootPath,'local',date,renderSession);
@@ -129,15 +130,15 @@ for pp = 1:size(deltaPosition,1)
     d = deltaPosition(pp,:)*1000;
 
     % The output file for this position
-    str = sprintf('%s_%d_%d_%d.pbrt',sceneName, d(1),d(2),d(3));
+    str = sprintf('%s_pos_%d_%d_%d.pbrt',sceneName, d(1),d(2),d(3));
     thisR.outputFile = fullfile(destDir,str);
     [~,acqLabel] = fileparts(thisR.outputFile);
-    outputFileList{pp} = acqLabel;
+    
     % CHANGE THE POSITION OF CAMERA HERE:
     % We will write more routines that generate a sequence of positions
     % for stereo and for camera moving and so forth in this section.
     thisR.set('from', lookAt.from + deltaPosition(pp,:));
-    
+    thisR.set('to', lookAt.to + deltaPosition(pp,:));
     % There is a new camera position that is stored in the
     % <sceneName_position>.pbrt file.
     piWrite(thisR,'creatematerials',true,...
@@ -145,7 +146,6 @@ for pp = 1:size(deltaPosition,1)
     
     % Upload the information to Flywheel
     renderAcquisition = sprintf('pos_%d_%d_%d',d(1),d(2),d(3));
-    renderAcqList{pp} = renderAcquisition;
     
     % This uploads the modified recipe (thisR), the scitran object, and
     % information about where the road data are stored on Flywheel.
@@ -212,147 +212,84 @@ while cnt < length(nPODS)
 end
 
 % Keep checking for the data, every 15 sec, and download it is there
-%% Add the original recipe and prepared to download the scene/oi
+%% Generate and upload the preview image, depth and mesh label images
 
-% What we want to do is download the radiance output from PBRT that is
-% stored on Flywheel as a dat file.  Then we will read it in as an OI
-% using this code.
+% Search all the session (scenes)
 
-renderAcq = st.search('acquisition',...
+sessions = st.search('session',...
     'project label exact','Graphics camera array',...
     'subject code','renderings test',...
-    'session label','checkerboard',...
-    'acquisition label contains',renderAcqList{1},...
     'fw',true);
-rAcq = renderAcq{1};
-savePathTar = fullfile(destDir,'renderings',[sceneName,'.tar']);
-rAcq.downloadTar(fullfile(destDir,'renderings',[sceneName,'.tar']));
 
-% Unzip the tar file and display it
-untar(savePathTar,'left');
+fwDownloadPath = fullfile(piRootPath, 'local', date,'fwDownload');
+if ~exist(fwDownloadPath,'dir'), mkdir(fwDownloadPath); end
 
-ieRootPath = fullfile(destDir,'renderings','left','scitran',renderProject,...
-    'renderings test', sceneName, renderAcqList{1});
+for ii = 1:length(sessions)
+    thisSession = sessions{ii};
+    acquisitions = thisSession.acquisitions();
+    for jj = 1:length(acquisitions)
+        thisAcq = acquisitions{jj};
+        dlDir = fullfile(fwDownloadPath,...
+                [thisSession.label,'_',thisAcq.label]);
+        if ~exist(dlDir,'dir'), mkdir(dlDir); end
+        for kk = 1:length(thisAcq.files)
+            thisFile = thisAcq.files{kk}.name;
+            thisAcq.downloadFile(thisFile, fullfile(dlDir, thisFile));
+        end
+        
+        fileRootPath = fullfile(dlDir,...
+                        [thisSession.label,'_',thisAcq.label]);
+        % Read the radiance file
+        iePath = [fileRootPath, '.dat'];
+        ieObject = piDat2ISET(iePath,...
+                    'label','radiance',...
+                    'recipe',thisR,...
+                    'scaleIlluminance',false);
+        switch ieObject.type
+            case 'scene'
+                ieObject = sceneSet(ieObject, 'name', [thisSession.label,'_',thisAcq.label]);
+                % sceneWindow(ieObject);
+                img = sceneGet(ieObject, 'rgb image');
+            case 'opticalimage'
+                ieObject = oiSet(ieObject, 'name', [thisSession.label,'_',thisAcq.label]);
+                % oiWindow(ieObject);
+                img = oiGet(ieObject, 'rgb image');
+        end
+        
+        img = img.^(1/1.5);
+        pngFile = [fileRootPath,'.png'];
+        imwrite(img,pngFile);
+        
+        st.fileUpload(pngFile,thisAcq.id,'acquisition');
+        fprintf('%s uploaded \n',pngFile);
+        
+        % Read the depth file
+        iePath = [fileRootPath, '_depth.dat'];
+        depth = piDat2ISET(iePath,...
+            'label','depth',...
+            'recipe',thisR,...
+            'scaleIlluminance',false);
+        imagesc(depth);
+        depthFile = [fileRootPath,'_depth.mat'];
+        save(depthFile, 'depth');
 
-iePath = fullfile(ieRootPath, [outputFileList{1},'.dat']);
+        st.fileUpload(depthFile, thisAcq.id,'acquisition');
+        fprintf('%s uploaded \n',depthFile);
+        
+        % Read the mesh file
+        iePath = [fileRootPath, '_mesh.dat'];
+        mesh = piDat2ISET(iePath,...
+            'label','mesh',...
+            'recipe',thisR,...
+            'scaleIlluminance',false);
+        imagesc(mesh);
+        meshFile = [fileRootPath,'_mesh.mat'];
+        save(meshFile, 'mesh');
 
-
-% Read radiance type
-ieObject = piDat2ISET(iePath,...
-    'label','radiance',...
-    'recipe',thisR,...
-    'scaleIlluminance',false);
-
-switch ieObject.type
-    case 'scene'
-        sceneWindow(ieObject);
-        img = sceneGet(ieObject, 'rgb image');
-    case 'optical image'
-        oiWindow(ieObject);
-        img = oiGet(ieObject, 'rgb image');
+        st.fileUpload(meshFile, thisAcq.id,'acquisition');
+        fprintf('%s uploaded \n',meshFile);
+    end
 end
-
-img = img.^(1/1.5);
-pngFile = fullfile(ieRootPath, [outputFileList{1},'.png']);
-imwrite(img,pngfile);
-
-st.fileUpload(pngfile,rAcq.id,'acquisition');
-fprintf('%s uploaded \n',pngfile);
-
-% Read depth radiance image
-iePath = fullfile(ieRootPath, [outputFileList{1},'_depth.dat']);
-depth = piDat2ISET(iePath,...
-    'label','depth',...
-    'recipe',thisR,...
-    'scaleIlluminance',false);
-imagesc(depth);
-depthFile = fullfile(ieRootPath, [outputFileList{1},'_depth.mat']);
-save(depthFile, 'depth');
-
-st.fileUpload(depthFile, rAcq.id,'acquisition');
-fprintf('%s uploaded \n',depthFile);
-
-% Read mesh type
-iePath = fullfile(ieRootPath, [outputFileList{1},'_mesh.dat']);
-mesh = piDat2ISET(iePath,...
-    'label','mesh',...
-    'recipe',thisR,...
-    'scaleIlluminance',false);
-imagesc(mesh);
-meshFile = fullfile(ieRootPath, [outputFileList{1},'_mesh.mat']);
-save(meshFile, 'mesh');
-
-st.fileUpload(meshFile, rAcq.id,'acquisition');
-fprintf('%s uploaded \n',meshFile);
-
-%% Add the corresponding scene
-
-renderAcq = st.search('acquisition',...
-    'project label exact','Graphics camera array',...
-    'subject code','renderings test',...
-    'session label','checkerboard',...
-    'acquisition label contains',renderAcqList{2},...
-    'fw',true);
-rAcq = renderAcq{1};
-savePathTar = fullfile(destDir,'renderings',[sceneName,'_2.tar']);
-rAcq.downloadTar(fullfile(destDir,'renderings',[sceneName,'_2.tar']));
-
-% Unzip the tar file and display it
-untar(savePathTar,'right');
-
-ieRootPath = fullfile(destDir,'renderings','right','scitran',renderProject,...
-    'renderings test', sceneName, renderAcqList{2});
-
-iePath = fullfile(ieRootPath, [outputFileList{2},'.dat']);
-
-
-% Read radiance type
-ieObject = piDat2ISET(iePath,...
-    'label','radiance',...
-    'recipe',thisR,...
-    'scaleIlluminance',false);
-
-switch ieObject.type
-    case 'scene'
-        sceneWindow(ieObject);
-        img = sceneGet(ieObject, 'rgb image');
-    case 'optical image'
-        oiWindow(ieObject);
-        img = oiGet(ieObject, 'rgb image');
-end
-
-img = img.^(1/1.5);
-pngFile = fullfile(ieRootPath, [outputFileList{2},'.png']);
-imwrite(img,pngfile);
-
-st.fileUpload(pngfile,rAcq.id,'acquisition');
-fprintf('%s uploaded \n',pngfile);
-
-% Read depth radiance image
-iePath = fullfile(ieRootPath, [outputFileList{2},'_depth.dat']);
-depth = piDat2ISET(iePath,...
-    'label','depth',...
-    'recipe',thisR,...
-    'scaleIlluminance',false);
-imagesc(depth);
-depthFile = fullfile(ieRootPath, [outputFileList{2},'_depth.mat']);
-save(depthFile, 'depth');
-
-st.fileUpload(depthFile, rAcq.id,'acquisition');
-fprintf('%s uploaded \n',depthFile);
-
-% Read mesh type
-iePath = fullfile(ieRootPath, [outputFileList{2},'_mesh.dat']);
-mesh = piDat2ISET(iePath,...
-    'label','mesh',...
-    'recipe',thisR,...
-    'scaleIlluminance',false);
-imagesc(mesh);
-meshFile = fullfile(ieRootPath, [outputFileList{2},'_mesh.mat']);
-save(meshFile, 'mesh');
-
-st.fileUpload(meshFile, rAcq.id,'acquisition');
-fprintf('%s uploaded \n',meshFile);
 
 %% Remove all jobs.
 % Anything still running is a stray that never completed.  We should

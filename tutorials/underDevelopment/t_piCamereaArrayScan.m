@@ -77,8 +77,8 @@ for ii = 1:length(subject.sessions())
 
         % Set some defaults (low res for now)
         thisR.set('film resolution',[640 360]);
-        thisR.set('pixel samples',256);
-        thisR.set('n bounces',2);
+        thisR.set('pixel samples',1024);
+        thisR.set('n bounces',5);
 
         % Add relevant information to the recipe
         thisR.materials.lib = piMateriallib;
@@ -123,7 +123,7 @@ for ii = 1:length(subject.sessions())
         lookAt = thisR.get('lookAt');
 
         % Specif the change in position vectors
-        deltaPosition = [0 0.03 0; 0 0.07 0]';
+        deltaPosition = [0 0 0; 0.75 0 0]';
 
         %% Loop and upload the data 
         for pp = 1:size(deltaPosition,2)
@@ -132,14 +132,14 @@ for ii = 1:length(subject.sessions())
             d = deltaPosition(:,pp)*1000;
 
             % The output file for this position
-            str = sprintf('%s_%d_%d_%d.pbrt',sceneAcquisition, d(1),d(2),d(3));
+            str = sprintf('%s_pos_%d_%d_%d.pbrt',sceneAcquisition, d(1),d(2),d(3));
             thisR.outputFile = fullfile(destDir,str);
 
             % CHANGE THE POSITION OF CAMERA HERE:
             % We will write more routines that generate a sequence of positions
             % for stereo and for camera moving and so forth in this section.
             thisR.set('from', lookAt.from + deltaPosition(:,pp));
-
+            thisR.set('to', lookAt.to + deltaPosition(:,pp));
             % There is a new camera position that is stored in the
             % <sceneName_position>.pbrt file.  Everything including
             % the lens file should get stored with this piWrite.
@@ -147,7 +147,7 @@ for ii = 1:length(subject.sessions())
                 'overwriteresources',false,'lightsFlag',false);
 
             % Upload the information to Flywheel
-            renderAcquisition = sprintf('pos_%d_%d_%d)',d(1),d(2),d(3));
+            renderAcquisition = sprintf('pos_%d_%d_%d',d(1),d(2),d(3));
 
             % This uploads the modified recipe (thisR), the scitran object, and
             % information about where the road data are stored on Flywheel.
@@ -176,6 +176,14 @@ end
 % Describe the target to the user
 gcp.targetsList;
 
+% You can get a lot of information about the job this way.  Examining this
+% is useful when there is an error.  It is not needed, but watching it
+% scroll lets you see what is happening moment to moment.
+%{   
+   podname = gcp.podsList
+   gcp.PodDescribe(podname{end})    % Prints out what has happened
+   cmd = gcp.Podlog(podname{end});  % Creates a command to show the running log
+%}
 %% This invokes the PBRT-V3 docker image
 
 % These fwRender.sh script places the outputs into the
@@ -213,64 +221,72 @@ sessions = st.search('session',...
 fwDownloadPath = fullfile(piRootPath, 'local', date,'fwDownload');
 if ~exist(fwDownloadPath,'dir'), mkdir(fwDownloadPath); end
 
+%%
 for ii = 1:length(sessions)
     thisSession = sessions{ii};
     acquisitions = thisSession.acquisitions();
     for jj = 1:length(acquisitions)
         thisAcq = acquisitions{jj};
-        tarFolder = [thisSession.label,'_',thisAcq.label];
-        savePathTar = fullfile(fwDownloadPath,...
-                        [tarFolder, '.tar']);
-        thisAcq.downloadTar(savePathTar);
-        untar(savePathTar,tarFolder);
+        dlDir = fullfile(fwDownloadPath,...
+                [thisSession.label,'_',thisAcq.label]);
+        if ~exist(dlDir,'dir'), mkdir(dlDir); end
+        for kk = 1:length(thisAcq.files)
+            thisFile = thisAcq.files{kk}.name;
+            thisAcq.downloadFile(thisFile, fullfile(dlDir, thisFile));
+        end
         
-        ieRootPath = fullfile(fullfile(fwDownloadPath, tarFolder),...
-                            'scitran',sceneGroup,renderProject,...
-                            'renderings test', thisAcq.label);
-                        
+        fileRootPath = fullfile(dlDir,...
+                        [thisSession.label,'_',thisAcq.label]);
         % Read the radiance file
-        iePath = fullfile(ieRootPath, [tarFolder,'.dat']);
+        iePath = [fileRootPath, '.dat'];
         ieObject = piDat2ISET(iePath,...
                     'label','radiance',...
                     'recipe',thisR,...
                     'scaleIlluminance',false);
         switch ieObject.type
             case 'scene'
-                sceneWindow(ieObject);
+                ieObject = sceneSet(ieObject, 'name', [thisSession.label,'_',thisAcq.label]);
+                % sceneWindow(ieObject);
+%                 ieObject = sceneSet(ieObject,'gamma',0.67);
+                ieAddObject(ieObject);
                 img = sceneGet(ieObject, 'rgb image');
-            case 'optical image'
-                oiWindow(ieObject);
+            case 'opticalimage'
+                ieObject = oiSet(ieObject, 'name', [thisSession.label,'_',thisAcq.label]);
+                ieObject = piFireFliesRemove(ieObject);
+                % oiWindow(ieObject);
+%                 ieObject = oiSet(ieObject,'gamma',0.6);
+                ieAddObject(ieObject);
                 img = oiGet(ieObject, 'rgb image');
         end
         
         img = img.^(1/1.5);
-        pngFile = fullfile(ieRootPath, [tarFolder,'.png']);
-        imwrite(img,pngfile);
+        pngFile = [fileRootPath,'.png'];
+        imwrite(img,pngFile);
         
-        st.fileUpload(pngfile,thisAcq.id,'acquisition');
-        fprintf('%s uploaded \n',pngfile);
+        st.fileUpload(pngFile,thisAcq.id,'acquisition');
+        fprintf('%s uploaded \n',pngFile);
         
         % Read the depth file
-        iePath = fullfile(ieRootPath, [tarFolder,'_depth.dat']);
+        iePath = [fileRootPath, '_depth.dat'];
         depth = piDat2ISET(iePath,...
             'label','depth',...
             'recipe',thisR,...
             'scaleIlluminance',false);
-        imagesc(depth);
-        depthFile = fullfile(ieRootPath, [tarFolder,'_depth.mat']);
+        % imagesc(depth);
+        depthFile = [fileRootPath,'_depth.mat'];
         save(depthFile, 'depth');
 
         st.fileUpload(depthFile, thisAcq.id,'acquisition');
         fprintf('%s uploaded \n',depthFile);
         
         % Read the mesh file
-        iePath = fullfile(ieRootPath, [tarFolder,'_mesh.dat']);
+        iePath = [fileRootPath, '_mesh.dat'];
         mesh = piDat2ISET(iePath,...
             'label','mesh',...
             'recipe',thisR,...
             'scaleIlluminance',false);
-        imagesc(mesh);
-        meshFile = fullfile(ieRootPath, [tarFolder,'_mesh.mat']);
+        % imagesc(mesh);
+        meshFile = [fileRootPath,'_mesh.mat'];
         save(meshFile, 'mesh');
 
         st.fileUpload(meshFile, thisAcq.id,'acquisition');
@@ -278,12 +294,8 @@ for ii = 1:length(sessions)
     end
 end
 
-
-
-
-
-
-
+close all;
+fprintf('Done!');
 
 %% Remove all jobs.
 % Anything still running is a stray that never completed.  We should

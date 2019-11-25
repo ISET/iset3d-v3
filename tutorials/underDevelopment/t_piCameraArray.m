@@ -120,6 +120,7 @@ for pp = 1:size(deltaPosition,2)
     % We will write more routines that generate a sequence of positions
     % for stereo and for camera moving and so forth in this section.
     thisR.set('from', lookAt.from + deltaPosition(:,pp));
+    thisR.set('to', lookAt.to + deltaPosition(:,pp));
     
     % There is a new camera position that is stored in the
     % <sceneName_position>.pbrt file.
