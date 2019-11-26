@@ -124,7 +124,7 @@ gcp.targets     = []; % clear job list
 renderAcqList = {};
 outputFileList = {};
 
-for pp = 1:size(deltaPosition,1)
+for pp = 1:1%size(deltaPosition,1)
     
     % Store the position shift in millimeters
     d = deltaPosition(pp,:)*1000;
@@ -134,6 +134,10 @@ for pp = 1:size(deltaPosition,1)
     thisR.outputFile = fullfile(destDir,str);
     [~,acqLabel] = fileparts(thisR.outputFile);
     
+    % Change the lens file
+    lensfile = 'wide.56deg.3.0mm.json';
+    fprintf('Using lens: %s\n',lensfile);
+    thisR.camera = piCameraCreate('realistic','lensFile',lensfile);    
     % CHANGE THE POSITION OF CAMERA HERE:
     % We will write more routines that generate a sequence of positions
     % for stereo and for camera moving and so forth in this section.

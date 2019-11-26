@@ -31,7 +31,7 @@ ieGCPInit
 
 % Here an acquisition that contains a scene on Flywheel
 sceneGroup   = 'wandell';
-sceneProject = 'Graphics auto renderings';
+sceneProject = 'CameraEval20190626';
 sceneSubject = 'scenes';
 
 % st.lookup follows the syntax of:
@@ -76,9 +76,9 @@ for ii = 1:length(subject.sessions())
         thisR = piJson2Recipe(recipeName);
 
         % Set some defaults (low res for now)
-        thisR.set('film resolution',[640 360]);
-        thisR.set('pixel samples',1024);
-        thisR.set('n bounces',5);
+        % thisR.set('film resolution',[640 360]);
+        % thisR.set('pixel samples',1024);
+        % thisR.set('n bounces',5);
 
         % Add relevant information to the recipe
         thisR.materials.lib = piMateriallib;
@@ -153,12 +153,12 @@ for ii = 1:length(subject.sessions())
             % information about where the road data are stored on Flywheel.
             % The render session and subject and acquisition labels are stored
             % on the gCloud object.  
-            gcp.fwUploadPBRT(thisR,'scitran',st,...
-                'road',road, ...
-                'render project lookup', renderProject, ...
-                'session label',renderSession, ...
-                'subject label',renderSubject, ...
-                'acquisition label',renderAcquisition);
+%             gcp.fwUploadPBRT(thisR,'scitran',st,...
+%                 'road',road, ...
+%                 'render project lookup', renderProject, ...
+%                 'session label',renderSession, ...
+%                 'subject label',renderSubject, ...
+%                 'acquisition label',renderAcquisition);
 
             % Set up the rendering target.  The subject label changes from
             % 'camera array' to 'renderings'.  But the session, acquisition
@@ -189,7 +189,7 @@ gcp.targetsList;
 % These fwRender.sh script places the outputs into the
 % subject/session/acquisition specified on the gCloud object (see
 % above).
-gcp.render(); 
+gcp.render('renderList', [9], 'replaceJob', 1); 
 
 %% Monitor the processes on GCP
 
