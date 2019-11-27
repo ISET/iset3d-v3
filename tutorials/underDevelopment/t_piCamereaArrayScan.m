@@ -189,7 +189,7 @@ gcp.targetsList;
 % These fwRender.sh script places the outputs into the
 % subject/session/acquisition specified on the gCloud object (see
 % above).
-gcp.render('renderList', [9], 'replaceJob', 1); 
+gcp.render('renderList', [101:200], 'replaceJob', 1); 
 
 %% Monitor the processes on GCP
 

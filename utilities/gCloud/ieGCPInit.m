@@ -38,7 +38,7 @@ st = scitran('stanfordlabs');
 
 tic
 gcp = gCloud('configuration','cloudRendering-pbrtv3-west1-custom-50-56320-flywheel',...
-        'dockerimage', 'gcr.io/primal-surfer-140120/pbrt-v3-spectral-flywheel-dev');
+        'dockerimage', 'gcr.io/primal-surfer-140120/pbrt-v3-spectral-flywheel-dev-zhenyi');
 
 toc
 gcp.renderDepth = 1;  % Create the depth map
