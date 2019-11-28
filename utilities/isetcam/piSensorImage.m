@@ -1,8 +1,8 @@
-function [img, filename, sensor, ip] = piSensorImage(oi,varargin)
+function [img, filename, camera] = piSensorImage(oi,varargin)
 % Make an image from the OI after passing through a sensor and ip pipeline
 %
 % Syntax
-%   [img, filename, sensor, ip] = piSensorImage(oi, ...)
+%   [img, filename, camera] = piSensorImage(oi, ...)
 %
 % Description
 %  Convert the oi through a sensor and the ip into an RGB image. We do this
@@ -68,6 +68,13 @@ img = ipGet(ip,'srgb');
 %% Test for saving
 if ~isempty(filename)
     imwrite(img,filename);
+end
+
+if nargout > 2
+    camera = cameraCreate;
+    camera = cameraSet(camera,'oi',oi);
+    camera = cameraSet(camera,'sensor',sensor);
+    camera = cameraSet(camera,'ip',ip);
 end
 
 
