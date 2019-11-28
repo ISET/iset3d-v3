@@ -16,6 +16,7 @@ function [img, filename, camera] = piSensorImage(oi,varargin)
 % Key/value
 %   filename    - Output png file
 %   pixel size  - Default value is 2 (in microns)
+%   exp time    - Default value is 10 ms
 %
 % Outputs
 %   img         - RGB image
@@ -46,15 +47,18 @@ p = inputParser;
 p.addRequired('oi',@(x)(isequal(x.type,'opticalimage')));
 p.addParameter('filename','',@ischar);
 p.addParameter('pixelsize',2,@isscalar);
+p.addParameter('exptime',0.010,@isscalar);
 
 p.parse(oi,varargin{:});
 filename = p.Results.filename;
 pSize    = p.Results.pixelsize;
+expTime  = p.Results.exptime;
 
 %% High resolution sensor
 sensor = sensorCreate;
 sensor = sensorSet(sensor,'pixel size constant fill factor',[pSize pSize]*1e-6);
 sensor = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
+sensor = sensorSet(sensor,'exp time',expTime);
 sensor = sensorCompute(sensor,oi);
 % sensorWindow(sensor);
 
