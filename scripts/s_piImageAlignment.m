@@ -35,19 +35,26 @@ pbrtSession = tmp{1};
 pbrtSessionAcq = pbrtSession.acquisitions()
 pbrtFiles = pbrtSessionAcq{1}.files
 pbrtJSON = stSelect(pbrtFiles,'name','.json')
-pbrtJSON{1}.download('radiance.json');
+pbrtJSON{1}.download(fullfile(fwDownloadPath,...
+                ['radiance', '.json']));
 
 acquisitions = renderedSession.acquisitions();
 for ii=1:numel(acquisitions)
     files = acquisitions{ii}.files();
-    files{2}.download(fullfile(fwDownloadPath,...
+    radFile = stSelect(files, 'name',...
+        [pbrtSession.label, '_',acquisitions{ii}.label ,'.dat']);
+    radFile{1}.download(fullfile(fwDownloadPath,...
                 ['radiance_', acquisitions{ii}.label, '.dat']));
 end
 
-thisR = piJson2Recipe(fullfile(fwDownloadPath,...
-                ['radiance_', acquisitions{ii}.label, '.json']));
+%% An example of how to process the first image
 
-oi = piDat2ISET('radiance.dat','recipe',thisR);
+thisR = piJson2Recipe(fullfile(fwDownloadPath,...
+                ['radiance','.json']));
+
+
+oi = piDat2ISET(fullfile(fwDownloadPath,...
+                ['radiance_', acquisitions{1}.label, '.dat']),'recipe',thisR);
 oi = piFireFliesRemove(oi);
 
 img = piSensorImage(oi,'file name','radiance.png','exp time',0.002);
