@@ -81,3 +81,28 @@ for ii=1:numel(labels)
 end
 %}
 
+%% More modern approach
+
+%% Get the oi down from Flywheel
+st = scitran('stanfordlabs');
+
+sessionName = 'city3_10:42_v0.0_f66.66front_o270.00_2019712204934';
+acquisitionName = 'pos_0_0_0';
+lu = sprintf('wandell/Graphics camera array/renderings/%s/%s',sessionName,acquisitionName);
+acquisition = st.lookup(lu);
+oi = piAcquisition2ISET(acquisition,st);
+oi = piFireFliesRemove(oi);
+oiWindow(oi);
+
+sessionName = 'city3_10:42_v0.0_f66.66front_o270.00_2019712204934';
+acquisitionName = 'pos_750_0_0';
+lu = sprintf('wandell/Graphics camera array/renderings/%s/%s',sessionName,acquisitionName);
+acquisition = st.lookup(lu);
+oi = piAcquisition2ISET(acquisition,st);
+oi = piFireFliesRemove(oi);
+oiWindow(oi);
+
+ip = piOI2IP(oi);
+ipWindow(ip);
+ieNewGraphWin; imagesc(ip.metadata.depthMap); axis image
+ieNewGraphWin; imagesc(ip.metadata.meshImage); axis image
