@@ -3,6 +3,9 @@
 %%
 st = scitran('stanfordlabs');
 
+%% Make the download path
+fwDownloadPath = fullfile(piRootPath, 'local', date,'fwDownload');
+if ~exist(fwDownloadPath,'dir'), mkdir(fwDownloadPath); end
 
 %% Find the project and sessions
 
@@ -19,14 +22,14 @@ theseSessions = stSelect(sessions, 'label',thisSession.label);
 tmp = st.search('sessions',...
     'project label exact','Graphics camera array',...
     'session label exact',thisSession.label, ...
-    'subject label','renderings',...
+    'subject code','renderings',...
     'fw',true);
 renderedSession = tmp{1};
 
 tmp = st.search('sessions',...
     'project label exact','Graphics camera array',...
     'session label exact',thisSession.label, ...
-    'subject label','image alignment',...
+    'subject code','image alignment',...
     'fw',true);
 pbrtSession = tmp{1};
 pbrtSessionAcq = pbrtSession.acquisitions()
@@ -37,10 +40,12 @@ pbrtJSON{1}.download('radiance.json');
 acquisitions = renderedSession.acquisitions();
 for ii=1:numel(acquisitions)
     files = acquisitions{ii}.files();
-    files{2}.download('radiance.dat');
+    files{2}.download(fullfile(fwDownloadPath,...
+                ['radiance_', acquisitions{ii}.label, '.dat']));
 end
 
-thisR = piJson2Recipe('radiance.json');
+thisR = piJson2Recipe(fullfile(fwDownloadPath,...
+                ['radiance_', acquisitions{ii}.label, '.json']));
 
 oi = piDat2ISET('radiance.dat','recipe',thisR);
 oi = piFireFliesRemove(oi);
