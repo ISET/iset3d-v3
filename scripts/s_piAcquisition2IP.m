@@ -6,6 +6,10 @@
 % IP with the metadata
 %
 
+%%
+st = scitran('stanfordlabs');
+chdir(fullfile(piRootPath,'local'));
+
 %% Set a session and acquisition
 
 % Before too long we will loop over these.  For now, just one at a time.
@@ -28,16 +32,18 @@ ieNewGraphWin; imagesc(ip.metadata.meshImage); axis image
 
 %% Save out the corresponding images as PNG files
 
-chdir(fullfile(piRootPath,'local'));
+chdir(fullfile(piRootPath,'local','alignment'));
 rgb = ipGet(ip,'srgb');
-imwrite(rgb,'tmp-radiance.png')
-imwrite(ieScale(ip.metadata.depthMap,0,1),'tmp-depth.png')
-imwrite(ieScale(ip.metadata.meshImage),'tmp-mesh.png')
+this = strrep(strrep(datestr(now),' ','-'),':','');
 
-depthMap = ip.metadata.depthMap;
+imwrite(rgb,[this,'-radiance.png'])
+imwrite(ieScale(ip.metadata.depthMap,0,1),[this,'-depth.png'])
+imwrite(ieScale(ip.metadata.meshImage),[this,'-mesh.png'])
+
+depthMap   = ip.metadata.depthMap;
 meshNumber = ip.metadata.meshImage;
-meshLabel = ip.metadata.meshtxt;
-save('metadata',depthMap,meshNumber,meshLabel);
+meshLabel  = ip.metadata.meshtxt;
+save([this,'-metadata']','depthMap','meshNumber','meshLabel');
 
 
 %%
