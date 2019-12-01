@@ -1,4 +1,9 @@
 %% Make a sensor image from the image alignment cases
+%
+%     *** Deprecated ****
+%
+% Use s_piAcquisition2IP for downloading
+%
 
 %%
 st = scitran('stanfordlabs');
