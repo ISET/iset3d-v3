@@ -26,12 +26,23 @@ function ip = piAcquisition2IP(acquisition,st)
  group = 'wandell';
  project = 'Graphics camera array';
  subject = 'image alignment render';
- session = 'city3_13:00_v4.5_f7.00rear_o270.00_2019626181215';
- acquisition = 'pos_000_000_000'; 
+ % session = 'city3_13:00_v4.5_f7.00rear_o270.00_2019626181215';
+ session = 'city3_11:16_v12.0_f47.50front_o270.00_2019626181423';
+
+ acquisition = 'pos_000_000_000';
+ acquisition = 'pos_200_000_000';
+ acquisition = 'pos_453_000_000';
+ acquisition = 'pos_132_000_000';
+
  str = sprintf('%s/%s/%s/%s/%s',group,project,subject,session,acquisition);
  acq = st.lookup(str);
- ip = piAcquisition2IP(acq,st);
- ipWindow(ip);
+ oi = piAcquisition2ISET(acq,st);
+ oiWindow(oi); oiSet(oi,'displaymode','hdr');
+ % rgb = oiGet(oi,'rgb'); ieNewGraphWin; imagescRGB(rgb);
+ % title(oiGet(oi,'name'));
+ 
+ % ip = piAcquisition2IP(acq,st);
+ % ipWindow(ip);
 %}
 
 %%

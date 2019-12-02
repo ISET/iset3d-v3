@@ -48,21 +48,26 @@ for f=1:length(files)
     % files{f}.download(localName);
 
     if contains(localName,'depth')
+        disp('Downloading depth')
         depthMap = piDat2ISET(localName, 'label', 'depth');
         %         tmp = piReadDAT(localName, 'maxPlanes', nWave);
         %         depthMap = tmp(:,:,1); clear tmp;
        
     elseif contains(localName,'mesh.dat')
+        disp('Downloading mesh')
+
         meshImage = piDat2ISET(localName, 'label', 'mesh');
         meshImage = uint16(meshImage);
         %         meshData = piReadDAT(localName, 'maxPlanes', 31);
         %         meshImage = meshData(:,:,1);
         
     elseif contains(localName,'mesh_mesh.txt')
+        disp('Downloading labels')
         % These are the labels of each of the meshes
         data = importdata(localName);
         meshLabel = regexp(data, '\s+', 'split');
     else
+        disp('Downloading radiance/irradiance')
         % Irradiance data.  Should contain (ir)radiance in a good world.
         [~, pbrtFile, ~] = fileparts(localName);
         recipeName = sprintf('%s.json',pbrtFile);

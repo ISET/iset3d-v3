@@ -67,17 +67,18 @@ fprintf('Zhenyi has %d sessions\n',numel(sessions))
 
 %%  Define a series of camera positions and then process
 
-%{
- % Displace the camera by this many millimeters
- x = randi(100,[1,8]);
- z = zeros(size(x));
- deltaPosition = [x;z;z];
-%}
-%{
- % Used for stereo
- deltaPosition = [0 0 0; 0.75 0 0]'*1e3;
-%}
 % {
+ % Displace the camera by this many meters
+ % We want up to 500 millimeters
+ x = randi(500,[1,6]);
+ z = zeros(size(x));
+ deltaPosition = [x;z;z]*1e-3;
+%}
+%{
+ % Used for stereo (75 millimeters)
+ deltaPosition = [200 0 0]'* 1e-3;  % Puts this in millimeters
+%}
+%{
 % Render the original with no camera shift
 deltaPosition = [0 0 0]';
 %}
@@ -98,7 +99,7 @@ fprintf('Working on scenes in %s\n',sceneSession);
 acquisitions = thisSession.acquisitions();
 
 fprintf('Choosing from %d potential scenes\n',numel(acquisitions));
-whichAcquisitions = [36]; % 1:numel(acquisitions)
+whichAcquisitions = [25:10:75]; % 1:numel(acquisitions)
 for jj = whichAcquisitions 
     % jj = whichAcquisitions(1)
     acquisition = acquisitions{jj};
@@ -129,8 +130,8 @@ for jj = whichAcquisitions
     thisR = piJson2Recipe(recipeName);
     
     % Set some defaults (low res for now)
-    % thisR.set('film resolution',[640 360]);
-    thisR.set('pixel samples',128);
+    thisR.set('film resolution',2*[640 360]);
+    thisR.set('pixel samples',512);
     thisR.set('n bounces',2);
     
     % Add relevant information to the recipe
@@ -171,10 +172,11 @@ for jj = whichAcquisitions
     for pp = 1:size(deltaPosition,2)
         
         % Store the position shift in millimeters
-        d = deltaPosition(:,pp);
+        dLabel = deltaPosition(:,pp)*1e3; % So the label is in millimeters
         
         % The output file for this position
-        str = sprintf('%s_pos_%03d_%03d_%03d.pbrt',sceneSession,d(1),d(2),d(3));
+        str = sprintf('%s_pos_%03d_%03d_%03d.pbrt',...
+            sceneSession,dLabel(1),dLabel(2),dLabel(3));
         thisR.outputFile = fullfile(destDir,str);
         
         % CHANGE THE POSITION OF CAMERA HERE:
@@ -189,7 +191,7 @@ for jj = whichAcquisitions
             'overwriteresources',false,'lightsFlag',false);
         
         % Name the acquisition based on the camera position change
-        sceneAcquisition = sprintf('pos_%03d_%03d_%03d',d(1),d(2),d(3));
+        sceneAcquisition = sprintf('pos_%03d_%03d_%03d',dLabel(1),dLabel(2),dLabel(3));
         
         % This uploads the modified recipe (thisR), the scitran object, and
         % information about where the road data are stored on Flywheel.
@@ -243,6 +245,7 @@ gcp.targetsList;
 % gcp.render('renderList', 1:10, 'replaceJob', 1);
 gcp.render();
 
+%{
 %% Monitor the processes on GCP
 
 [podnames,result] = gcp.podsList('print',true);
@@ -279,3 +282,4 @@ if ~exist(fwDownloadPath,'dir'), mkdir(fwDownloadPath); end
 % gcp.jobsDelete();
 
 %% END
+%}
