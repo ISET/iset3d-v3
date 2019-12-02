@@ -174,10 +174,10 @@ switch param
         thisR.camera.aperturediameter.type = 'float';
 
     case {'focusdistance','focaldistance'}
-        % This is the distance to the object in the scene that will be
+        % This is the distance (units?) to the object in the scene that will be
         % in focus.  When this is set, the film distance is derived by
-        % PBRT.  It is possible that there is no film distance for
-        % certain (say very near) focus distances.
+        % PBRT.  It is possible that there is no film distance for certain
+        % (say very near) focus distances.
         %
         % This variable is related to the lookat settings and we
         % should probably connect this with 'objectdistance'.  Though
@@ -268,7 +268,7 @@ switch param
             thisR.set('film distance',fdist);
         end
         
-        % Camera position related
+        % Camera position related.  The units are in ????
     case 'lookat'
         % Includes the from, to and up in a struct
         if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')

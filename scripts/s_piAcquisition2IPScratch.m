@@ -22,17 +22,21 @@ for ss=1:numel(sessions)
     chdir(fullfile(piRootPath,'local'));
 
     sessionName = sessions{ss}.label;
-    lu = sprintf('wandell/Graphics camera array/%s/%s', subjectName,sessionName);
+
+    % sessionName  = 'city3_15:08_v12.1_f162.26front_o270.00_2019626181638'
+    lu = sprintf('wandell/Graphics camera array/image alignment/%s',sessionName);
+
     thisSession = st.lookup(lu);
     acquisitions = thisSession.acquisitions();
     
     ee = 0;   % Error counter
     for aa = 1:numel(acquisitions)
 
-        delete('city*');
+        delete('city*');  % Remove dat files
 
         %%  Download and build up the OI
         acquisitionName = acquisitions{aa}.label;
+        % acquisitionName = 'pos_100_000_000';
         lu = sprintf('wandell/Graphics camera array/renderings/%s/%s',sessionName,acquisitionName);
         try
             acquisition = st.lookup(lu);
