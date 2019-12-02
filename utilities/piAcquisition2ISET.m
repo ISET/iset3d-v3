@@ -1,6 +1,6 @@
 function ieObject = piAcquisition2ISET(acquisition, st)
-% Collects the PBRT files from a single acquisition (renderings)
-% and uses them to create an ISET object
+% Collects the PBRT files from a single acquisition (PBRT rendering)
+% and creates scene or oi object
 %
 % Syntax
 %

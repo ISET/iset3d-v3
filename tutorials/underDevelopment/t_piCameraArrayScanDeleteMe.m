@@ -25,28 +25,48 @@
 % This sets up the GCP, ISETCam and Docker for a scene
 ieGCPInit
 
-%% Download the two recipes needed to create the scene
+%% Set up where we get and put the PBRT files from
 
-% This can become a function to just get the two JSON recipes
+% Zhenyi created a large number of recipes and scene resources in this
+% project.  We start with those data as inputs and modify them.
+zhenyiGroup   = 'wandell';
+zhenyiProject = 'CameraEval20190626';
+zhenyiSubject = 'scenes';
 
-% Here an acquisition that contains a scene on Flywheel
+% This is where we put the recipes and scene data that we modify from the
+% original Zhenyi data
 sceneGroup   = 'wandell';
-sceneProject = 'CameraEval20190626';
-sceneSubject = 'scenes';
+sceneProject = 'Graphics camera array';
+sceneSubject = 'image alignment';
+sceneProjectLU = sprintf('%s/%s',sceneGroup,sceneProject);
 
-% st.lookup follows the syntax of:
-% groupID/projectLabel/subjectLabel/sessionLabel/acquisitionLabel
-luString = sprintf('%s/%s/%s',sceneGroup,sceneProject,sceneSubject);
-subject = st.lookup(luString);
-sessions = subject.sessions();
+% This is  where we store the renderings.  We match the project and session
+% and (ultimately) the acquisition.  We change the subject by adding
+% 'render'.
+renderGroup   = sceneGroup;
+renderProject = sceneProject;
+renderSubject = 'image alignment render';  % Stereo
+renderSession = sceneSession;
 
 %% Main routine
 
 % clear job list
 gcp.targets = [];
 
-% Specify the change in position vectors
-% {
+% The scenes are stored in Zhenyi's project as the subject 'scenes', and
+% the rendered outputs as the subject of 'render'.
+%
+% st.lookup for all the sessions with label 'scenes' is this:
+% groupID/projectLabel/subjectLabel
+luString = sprintf('%s/%s/%s',zhenyiGroup,zhenyiProject,zhenyiSubject);
+subject = st.lookup(luString);
+
+% These are the sessions in Zhenyi's data
+sessions = subject.sessions();
+
+%%  Define a series of camera positions and then process
+
+%{
  % Displace the camera by this many millimeters
  x = randi(100,[1,8]);
  z = zeros(size(x));
@@ -56,73 +76,77 @@ gcp.targets = [];
  % Used for stereo
  deltaPosition = [0 0 0; 0.75 0 0]'*1e3;
 %}
+% {
+  % Render the original with no camera shift
+  deltaPosition = [0 0 0]';
+%}
 
-% Testing with only one of the city scenes
+% In the original, sessions are all the scenes from, say, city3.
+% The acquisitions are the individual scenes.
 for ii = 1 % 1:length(subject.sessions())
-    % The inputs are labeled as 'subject' 'scenes'.  In this Project
+    
+    % The inputs are labeled as 'subject' 'scenes'.  In Zhenyi's project
     % sessions are collections of scenes read to render
     thisSession = sessions{ii};
-    acquisitions = thisSession.acquisitions();
     sceneSession = thisSession.label;
+    fprintf('Working on scenes in %s\n',sceneSession);
     
-    % Only use acquisitions in city 3
-    if ~strcmp(sceneSession, 'city3')
-        continue;
-    end
+    % These are all the scenes for that session
+    acquisitions = thisSession.acquisitions();  
+
+    fprintf('Choosing from %d potential scenes\n',numel(acquisitions));
+    
     for jj = [35 36 37] % 1:length(acquisitions)
-        % Each session (e.g., city3) has a large number of acquisitions
-        % that are the specific scenes.
+
         acquisition = acquisitions{jj};
-        sceneAcquisition = acquisition.label;
+        zhenyiAcquisition = acquisition.label;
+        fprintf('\n****Processing %s\n',zhenyiAcquisition);
+
+        % In our case, the scene name is Zhenyi's acquisition name
+        sceneSession = zhenyiAcquisition;
+
         files = acquisition.files;
         targetFile = stSelect(files,'name','target.json');
-        recipeFile = stSelect(files,'name',[sceneAcquisition,'.json']);
+        recipeFile = stSelect(files,'name',[sceneSession,'.json']);
 
-        % Download the JSON files
+        % Create a folder for this scene
         destDir = fullfile(piRootPath,'local',date,sceneSession);
         if ~exist(destDir,'dir'), mkdir(destDir); end
+        
+        % Download the two recipe files from Zhenyi's data into our scene
+        % folder
         recipeName = fullfile(destDir,recipeFile{1}.name);
         recipeFile{1}.download(fullfile(destDir,recipeFile{1}.name));
         targetFile{1}.download(fullfile(destDir,targetFile{1}.name));
 
-        %% Read the JSON files 
+        %% Read and modify the JSON files 
 
-        % The scene recipe with all the graphics information is stored here as
-        % a recipe
+        % The scene recipe with all the graphics information is stored here
+        % as a recipe
         thisR = piJson2Recipe(recipeName);
 
         % Set some defaults (low res for now)
-        % thisR.set('film resolution',[640 360]);
-        % thisR.set('pixel samples',1024);
-        % thisR.set('n bounces',5);
+        thisR.set('film resolution',[640 360]);
+        thisR.set('pixel samples',128);
+        thisR.set('n bounces',2);
 
         % Add relevant information to the recipe
         thisR.materials.lib = piMateriallib;
 
-        % This is information on how to address Flywheel when running on the
-        % GCP.  The fwAPI has critical information.  That is the only part of
-        % the target.json file that we use.
+        % This recipe has information on how to address Flywheel when
+        % running on the GCP.  The fwAPI has that critical information.
+        % That is the only part of the target.json file we use.
         targetName = fullfile(destDir,targetFile{1}.name);
         scene_target = jsonread(targetName);
 
-        % Here is where the target information is stored.
+        % We extract that Flywheel ID information from this slot.
         % The fwAPI is special for when we run using Flywheel on the GCP.
-        % More explanation needed.
         fwList = scene_target.fwAPI.InfoList;
         road.fwList = fwList;
 
-        %%  This is where we define a series of camera positions
-
-        % This is the project where will store the renderints
-        renderProject = 'wandell/Graphics camera array';
-        % renderSubject = 'camera array';  % Stereo
-        renderSubject = 'image alignment';  % Stereo
-        
-        renderSession = sceneAcquisition;
-
         % The input file will always be downloaded by the script on the GCP
-        % from Flywheel.  So the string in the input file does not really
-        % matter.
+        % from Flywheel.  So the string in the input file does not matter
+        % in this case.
         % 
         % Normally piWrite copies resource files (textures, geometry files)
         % from the input to the output folder. Because the assets are on
@@ -139,8 +163,8 @@ for ii = 1 % 1:length(subject.sessions())
         
         % Get the original scene lookAt position
         lookAt = thisR.get('lookAt');
-
-        %% Loop and upload the data 
+        
+        %% Loop on the change in camera positions, uploading the modified recipes
         for pp = 1:size(deltaPosition,2)
 
             % Store the position shift in millimeters
@@ -161,24 +185,30 @@ for ii = 1 % 1:length(subject.sessions())
             piWrite(thisR,'creatematerials',true,...
                 'overwriteresources',false,'lightsFlag',false);
 
-            % Upload the information to Flywheel
-            renderAcquisition = sprintf('pos_%03d_%03d_%03d',d(1),d(2),d(3));
+            % Name the acquisition based on the camera position change
+            sceneAcquisition = sprintf('pos_%03d_%03d_%03d',d(1),d(2),d(3));
 
             % This uploads the modified recipe (thisR), the scitran object, and
             % information about where the road data are stored on Flywheel.
             % The render session and subject and acquisition labels are stored
-            % on the gCloud object.  
+            % on the gCloud object.
+            %
+            % We put the scenes that will be rendered into the 'image
+            % alignment' subject section.  We render the scenes into the
+            % 'image alignment render' subject section.  But other than the
+            % name of the subject, they should match.
+            fprintf('Uploading\n');
             gcp.fwUploadPBRT(thisR,'scitran',st,...
                 'road',road, ...
-                'render project lookup', renderProject, ...
-                'session label',renderSession, ...
-                'subject label',renderSubject, ...
-                'acquisition label',renderAcquisition);
+                'render project lookup', sceneProjectLU, ...
+                'session label',sceneSession, ...
+                'subject label',sceneSubject, ...
+                'acquisition label',sceneAcquisition);
 
             % Set up the rendering target.  The subject label changes from
             % 'camera array' to 'renderings'.  But the session, acquisition
             % and project remain the same.
-            gcp.addPBRTTarget(thisR,'subject label','renderings');
+            gcp.addPBRTTarget(thisR,'subject label',renderSubject);
 
             fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 
@@ -210,7 +240,7 @@ gcp.render();
 
 %% Monitor the processes on GCP
 
-[podnames,result] = gcp.podsList('print',false);
+[podnames,result] = gcp.podsList('print',true);
 nPODS = length(result.items);
 cnt  = 0;
 time = 0;
@@ -227,7 +257,6 @@ end
 %% Generate and upload the preview image, depth and mesh label images
 
 % Search all the session (scenes)
-renderProject = 'Graphics camera array';
 luString = sprintf('%s/%s/%s',sceneGroup,renderProject,'renderings');
 
 sessions = st.search('session',...
@@ -237,82 +266,6 @@ sessions = st.search('session',...
 
 fwDownloadPath = fullfile(piRootPath, 'local', date,'fwDownload');
 if ~exist(fwDownloadPath,'dir'), mkdir(fwDownloadPath); end
-
-%%
-for ii = 1:length(sessions)
-    thisSession = sessions{ii};
-    acquisitions = thisSession.acquisitions();
-    for jj = 1:length(acquisitions)
-        thisAcq = acquisitions{jj};
-        dlDir = fullfile(fwDownloadPath,...
-                [thisSession.label,'_',thisAcq.label]);
-        if ~exist(dlDir,'dir'), mkdir(dlDir); end
-        for kk = 1:length(thisAcq.files)
-            thisFile = thisAcq.files{kk}.name;
-            thisAcq.downloadFile(thisFile, fullfile(dlDir, thisFile));
-        end
-        
-        fileRootPath = fullfile(dlDir,...
-                        [thisSession.label,'_',thisAcq.label]);
-        % Read the radiance file
-        iePath = [fileRootPath, '.dat'];
-        ieObject = piDat2ISET(iePath,...
-                    'label','radiance',...
-                    'recipe',thisR,...
-                    'scaleIlluminance',false);
-        switch ieObject.type
-            case 'scene'
-                ieObject = sceneSet(ieObject, 'name', [thisSession.label,'_',thisAcq.label]);
-                % sceneWindow(ieObject);
-                % ieObject = sceneSet(ieObject,'gamma',0.67);
-                ieAddObject(ieObject);
-                img = sceneGet(ieObject, 'rgb image');
-            case 'opticalimage'
-                ieObject = oiSet(ieObject, 'name', [thisSession.label,'_',thisAcq.label]);
-                ieObject = piFireFliesRemove(ieObject);
-                % oiWindow(ieObject);
-                %  ieObject = oiSet(ieObject,'gamma',0.6);
-                ieAddObject(ieObject);
-                img = oiGet(ieObject, 'rgb image');
-        end
-        
-        img = img.^(1/1.5);
-        pngFile = [fileRootPath,'.png'];
-        imwrite(img,pngFile);
-        
-        st.fileUpload(pngFile,thisAcq.id,'acquisition');
-        fprintf('%s uploaded \n',pngFile);
-        
-        % Read the depth file
-        iePath = [fileRootPath, '_depth.dat'];
-        depth = piDat2ISET(iePath,...
-            'label','depth',...
-            'recipe',thisR,...
-            'scaleIlluminance',false);
-        % imagesc(depth);
-        depthFile = [fileRootPath,'_depth.mat'];
-        save(depthFile, 'depth');
-
-        st.fileUpload(depthFile, thisAcq.id,'acquisition');
-        fprintf('%s uploaded \n',depthFile);
-        
-        % Read the mesh file
-        iePath = [fileRootPath, '_mesh.dat'];
-        mesh = piDat2ISET(iePath,...
-            'label','mesh',...
-            'recipe',thisR,...
-            'scaleIlluminance',false);
-        % imagesc(mesh);
-        meshFile = [fileRootPath,'_mesh.mat'];
-        save(meshFile, 'mesh');
-
-        st.fileUpload(meshFile, thisAcq.id,'acquisition');
-        fprintf('%s uploaded \n',meshFile);
-    end
-end
-
-close all;
-fprintf('Done!');
 
 %% Remove all jobs.
 % Anything still running is a stray that never completed.  We should
