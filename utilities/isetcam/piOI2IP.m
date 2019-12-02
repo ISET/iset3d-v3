@@ -25,14 +25,17 @@ function [ip,sensor] = piOI2IP(oi,varargin)
 %   piMetadataSetSize
 
 %%
-p = inputParser;
 varargin = ieParamFormat(varargin);
+
+p = inputParser;
+p.addRequired('oi',@isstruct);
+% p.addRequired('st',@(x)(isa(x,'scitran')));
 
 p.addParameter('sensor','',@ischar);   % A file name
 p.addParameter('pixelsize',2,@isscalar);
 p.addParameter('filmdiagonal',5,@isscalar); % [mm]
 
-p.parse(varargin{:});
+p.parse(oi,varargin{:});
 sensorName   = p.Results.sensor;
 pixelSize    = p.Results.pixelsize;
 filmDiagonal = p.Results.filmdiagonal;
@@ -60,11 +63,19 @@ if ~isempty(pixelSize)
     sensor = sensorSet(sensor,'pixel size same fill factor',pixelSize*1e-6);
 end
 
-% [~,rect] = ieROISelect(oi);
-rect = [568   264   708   410];
+% Saved examples for some big images.
+%
+% rect = [568   264   708   410];
 % rect = [776   896   339   176];% for 1920*1080
 % rect = [253   208    25    21];
+
+% [~,rect] = ieROISelect(oi);
+% [colmin,rowmin,width,height]
 oiSize = oiGet(oi,'size');
+fraction = 0.2;
+rect = [oiSize(2)*(1 - fraction)/2, oiSize(1)*(1 - fraction)/2, ...
+    oiSize(2)*fraction oiSize(1)*fraction];
+fprintf('Rectangle\n'); disp(rect); fprintf('\n');
 
 % Not sure what this is.  And the units are puzzling.  It seems like a
 % critical step, though.  
@@ -81,10 +92,11 @@ sensor = sensorSet(sensor, 'size', oiGet(oi,'size')* (optimalPixel/(pixelSize*1e
 % sensor   = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
 
 eTime  = autoExposure(oi,sensor,0.90,'video','center rect',rect,'videomax',1/60);
-fprintf('eT: %s ms \n',eTime*1000);
+fprintf('eT: %s ms \n',eTime*1e3);
 sensor = sensorSet(sensor,'exp time',eTime);
 sensor = sensorCompute(sensor,oi);
 % sensorWindow(sensor);
+
 if isfield(oi,'metadata')
     if ~isempty(oi.metadata)
      sensor.metadata          = oi.metadata;

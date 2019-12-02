@@ -1,10 +1,17 @@
 function ieObject = piAcquisition2ISET(acquisition, st)
-% Collects the PBRT files from a single acquisition (PBRT rendering)
-% and creates scene or oi object
+% Collects PBRT files from an acquisition and creates a scene or oi
 %
 % Syntax
+%  ieObject = piAcquisition2ISET(acquisition, st)
 %
 % Description
+%   A PBRT render places the radiance, depth, mesh and meshLabel files
+%   in an acquisition.  This routine downloads the four files, along
+%   with the corresponding recipe, and creates an ISETCam scene or oi.
+%
+%   The assumption is that the recipe exists somewhere on Flywheel
+%   with the same name as the PBRT radiance file, but with a json
+%   extension. This is a DANGEROUS assumption.
 %
 % Inputs
 %   acquisition - Flywheel acquisition containing rendered data

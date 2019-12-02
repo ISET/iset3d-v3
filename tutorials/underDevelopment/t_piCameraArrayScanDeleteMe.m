@@ -71,12 +71,14 @@ fprintf('Zhenyi has %d sessions\n',numel(sessions))
  % Displace the camera by this many meters
  % We want up to 500 millimeters
  x = randi(500,[1,6]);
+ y = randi(500,[1,6]);
  z = zeros(size(x));
- deltaPosition = [x;z;z]*1e-3;
+ deltaPosition = [x;y;z]*1e-3;
 %}
 %{
+ % Displace the camera by this many meters
  % Used for stereo (75 millimeters)
- deltaPosition = [200 0 0]'* 1e-3;  % Puts this in millimeters
+ deltaPosition = [75 0 0]'* 1e-3;  % Puts this in meters
 %}
 %{
 % Render the original with no camera shift
@@ -99,9 +101,10 @@ fprintf('Working on scenes in %s\n',sceneSession);
 acquisitions = thisSession.acquisitions();
 
 fprintf('Choosing from %d potential scenes\n',numel(acquisitions));
-whichAcquisitions = [25:10:75]; % 1:numel(acquisitions)
+whichAcquisitions = [40 50 60]; % 1:numel(acquisitions)
 for jj = whichAcquisitions 
-    % jj = whichAcquisitions(1)
+    % jj = whichAcquisitions(1);  % For debugging
+    
     acquisition = acquisitions{jj};
     zhenyiAcquisition = acquisition.label;
     fprintf('\n**** Processing %s **********\n',zhenyiAcquisition);
@@ -131,8 +134,8 @@ for jj = whichAcquisitions
     
     % Set some defaults (low res for now)
     thisR.set('film resolution',2*[640 360]);
-    thisR.set('pixel samples',512);
-    thisR.set('n bounces',2);
+    thisR.set('pixel samples',1024);
+    thisR.set('n bounces',3);
     
     % Add relevant information to the recipe
     thisR.materials.lib = piMateriallib;
