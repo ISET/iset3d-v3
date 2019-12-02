@@ -1,4 +1,4 @@
-function oi = piFireFliesRemove(ieObject)
+function oi = piFireFliesRemove(ieObject,varargin)
 % Find and remove fireflies(ray-tracing artifacts) in the image
 %
 % Syntax
@@ -7,28 +7,40 @@ function oi = piFireFliesRemove(ieObject)
 % Input
 %   ieObject - an optical image
 % 
+% Optional key/val pairs
+%   show flies -  logical, default false
+%
 % Description
 %   The rendering algorithm sometimes produces these unwanted white
 %   spots just, well, because of ray tracing. copy from isetAuto. Now
 %   the ieOjbect is a scene, will add lens case --zhenyi0919 
 %
-% Zhenyi Liu
+% Zhenyi Liu, 2019
 %
 % See also
+%  piAcquisition2IP
+
+% TODO
+%  The algorithm is incomplete and should be updated.  ZL has some network
+%  he thinks might be better.
+%
 
 %% Here is an image that has a bunch
 
-% ieAddObject(ieObject); sceneWindow;
-% oi = oiCreate('diffraction limited');
-% oi = oiCompute(ieObject,oi);
-% ieAddObject(oi); oiWindow;
+varargin = ieParamFormat(varargin);
+p = inputParser;
+p.addRequired('ieObject',@isstruct);
+p.addParameter('showflies',false,@islogical);
+p.parse(ieObject,varargin{:});
+
 oi = ieObject;
 
 %% Have a look.  I think you can see a bunch of white pixels
 illuminance = oiGet(oi,'illuminance');
 illuminance = ieScale(illuminance,0,1);
 logIlluminance = log10(illuminance);
-% vcNewGraphWin;
+
+% ieNewGraphWin;
 % imagesc(logIlluminance);
 % colorbar;
 
@@ -45,18 +57,21 @@ dLogIlluminance = conv2(logIlluminance,g,'same');
 %% Replace the Inf points with the average of their neighbors
 
 
-% vcNewGraphWin;
-% imagesc(dLogIlluminance);
-% colorbar;
-% hist(dLogIlluminance(:),100);
-
+%{
+ ieNewGraphWin;
+ imagesc(dLogIlluminance);
+ colorbar;
+ hist(dLogIlluminance(:),100);
+%}
 
 %% Find points  more than XX larger than the average of their neighbors 
 brightSpots = (dLogIlluminance > log10(3.5));
 [r,c] = find(brightSpots);
 
-vcNewGraphWin;
-imagesc(brightSpots);
+if p.Results.showflies
+    ieNewGraphWin;
+    imagesc(brightSpots);
+end
 
 g = ones(3,3)/9;
 isolatedBrightSpots = conv2(brightSpots,g);
@@ -73,10 +88,10 @@ sum(multipleSpots(:));
 % g(2,2) = 0;
 g= ones(5,5)/24;
 g(3,3) = 0;
-g(3,4)=0;
-g(3,2)=0;
-g(2,3)=0;
-g(4,3)=0;
+g(3,4) = 0;
+g(3,2) = 0;
+g(2,3) = 0;
+g(4,3) = 0;
 
 photons = oiGet(oi,'photons');
 localSurround = zeros(size(photons));
@@ -92,8 +107,10 @@ for ii = 1:length(r)
 end
 
 %% It seems like the photons have the wrong spectrum
+
 % They are white, and thus not matched in color to the surrounding pixels
 % We need to replace the full spectrum of the white points with the average
 % spectrum of the surrounding points, not just scale the white pixels
 oi = oiSet(oi,'photons',correctedPhotons);
+
 end

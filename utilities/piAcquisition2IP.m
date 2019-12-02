@@ -23,7 +23,13 @@ function ip = piAcquisition2IP(acquisition,st)
 % Examples:
 %{
  st = scitran('stanfordlabs');
- acq = st.lookup('wandell/Graphics camera array/image alignment render/city3/pos_000_000_000');
+ group = 'wandell';
+ project = 'Graphics camera array';
+ subject = 'image alignment render';
+ session = 'city3_13:00_v4.5_f7.00rear_o270.00_2019626181215';
+ acquisition = 'pos_000_000_000'; 
+ str = sprintf('%s/%s/%s/%s/%s',group,project,subject,session,acquisition);
+ acq = st.lookup(str);
  ip = piAcquisition2IP(acq,st);
  ipWindow(ip);
 %}
