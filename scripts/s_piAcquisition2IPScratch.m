@@ -12,7 +12,9 @@ chdir(fullfile(piRootPath,'local'));
 
 %% Set a session and acquisition
 
-lu = sprintf('wandell/Graphics camera array/image alignment');
+subjectName = 'camera array';
+
+lu = sprintf('wandell/Graphics camera array/%s', subjectName);
 subject = st.lookup(lu);
 sessions = subject.sessions();
 
@@ -20,7 +22,7 @@ for ss=1:numel(sessions)
     chdir(fullfile(piRootPath,'local'));
 
     sessionName = sessions{ss}.label;
-    lu = sprintf('wandell/Graphics camera array/image alignment/%s',sessionName);
+    lu = sprintf('wandell/Graphics camera array/%s/%s', subjectName,sessionName);
     thisSession = st.lookup(lu);
     acquisitions = thisSession.acquisitions();
     
@@ -49,7 +51,9 @@ for ss=1:numel(sessions)
             
             %% Save out the corresponding images as PNG files
             
-            chdir(fullfile(piRootPath,'local','alignment'));
+            savePath = fullfile(piRootPath,'local','stereo');
+            if ~exist(savePath,'dir'), mkdir(savePath); end
+            chdir(savePath);
             thisDir = sprintf('%s',sessionName);
             if ~exist(thisDir,'dir'), mkdir(thisDir); end
             chdir(thisDir);
