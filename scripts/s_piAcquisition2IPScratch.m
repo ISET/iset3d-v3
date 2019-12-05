@@ -11,15 +11,9 @@ st = scitran('stanfordlabs');
 
 %% Set a session and acquisition
 
-<<<<<<< HEAD
-renderSubject = 'image alignment render';
-
-lu = sprintf('wandell/Graphics camera array/%s',renderSubject);
-=======
 subjectName = 'camera array';
 
 lu = sprintf('wandell/Graphics camera array/%s', subjectName);
->>>>>>> 1faca1c5b8384fdc8b6269543cc6b6b0a7dd22b5
 subject = st.lookup(lu);
 
 % Scene sessions.  There are matching render sessions
@@ -31,14 +25,10 @@ for ss=1:numel(sessions)
     chdir(fullfile(piRootPath,'local'));
 
     sessionName = sessions{ss}.label;
-<<<<<<< HEAD
-    lu = sprintf('wandell/Graphics camera array/%s/%s',renderSubject,sessionName);
-=======
 
     % sessionName  = 'city3_15:08_v12.1_f162.26front_o270.00_2019626181638'
     lu = sprintf('wandell/Graphics camera array/image alignment/%s',sessionName);
 
->>>>>>> 1faca1c5b8384fdc8b6269543cc6b6b0a7dd22b5
     thisSession = st.lookup(lu);
     
     % These are acquisitions from different positions
@@ -71,16 +61,11 @@ for ss=1:numel(sessions)
              ieNewGraphWin; imagesc(ip.metadata.meshImage); axis image
             %}
             
-<<<<<<< HEAD
-            %% Save out the images as PNG files in the alignment subdirectory
-            chdir(fullfile(piRootPath,'local','alignment'));
-=======
             %% Save out the corresponding images as PNG files
             
             savePath = fullfile(piRootPath,'local','stereo');
             if ~exist(savePath,'dir'), mkdir(savePath); end
             chdir(savePath);
->>>>>>> 1faca1c5b8384fdc8b6269543cc6b6b0a7dd22b5
             thisDir = sprintf('%s',sessionName);
             if ~exist(thisDir,'dir'), mkdir(thisDir); end
             chdir(thisDir);   % Proper sub-directory
