@@ -10,7 +10,7 @@ function [ip,sensor] = piOI2IP(oi,varargin)
 %   the IP level.
 %
 % Input
-%   oi - This OI needs to have the metadata attached to it.
+%   oi - This OI should generally have metadata attached to it.
 %
 % Optional key/value pairs
 %   sensor        - File name containing the sensor (default sensorCreate)
@@ -77,26 +77,27 @@ rect = [oiSize(2)*(1 - fraction)/2, oiSize(1)*(1 - fraction)/2, ...
     oiSize(2)*fraction oiSize(1)*fraction];
 fprintf('Rectangle\n'); disp(rect); fprintf('\n');
 
-% Not sure what this is.  And the units are puzzling.  It seems like a
-% critical step, though.  
-% I think the film diagonal is in mm.  So the 1e-3 makes it meters.
-% The oiSize is the pixels.
-% The optimal pixel must be the sensor pixel size needed to match the
-% sampling of the oi samples?
-% But this seems to be in meters.
+% It appears we are figuring out how many pixels to use in the sensor to
+% match the field of view of the OI.
+%
+% The film diagonal is in mm.  So the 1e-3 makes it meters. The oiSize is
+% the pixels. The optimal pixel must be the sensor pixel size needed to
+% match the sampling of the oi samples? But this seems to be in meters.
 optimalPixel = sqrt(filmDiagonal^2/(oiSize(1)^2+oiSize(2)^2))*1e-3; % Meters
+sensor = sensorSet(sensor, 'size', oiGet(oi,'size') * (optimalPixel/(pixelSize*1e-6)));
 
-% We set the number of sensor pixels, then, so that 
-sensor = sensorSet(sensor, 'size', oiGet(oi,'size')* (optimalPixel/(pixelSize*1e-6)));
-
+% Not sure why we don't do this, except perhaps the fov is unreliable?
 % sensor   = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
 
-eTime  = autoExposure(oi,sensor,0.90,'video','center rect',rect,'videomax',1/60);
+%% Compute
+
+eTime  = autoExposure(oi,sensor,0.90,'weighted','center rect',rect);
 fprintf('eT: %s ms \n',eTime*1e3);
 sensor = sensorSet(sensor,'exp time',eTime);
 sensor = sensorCompute(sensor,oi);
 % sensorWindow(sensor);
 
+%% Copy metadata
 if isfield(oi,'metadata')
     if ~isempty(oi.metadata)
      sensor.metadata          = oi.metadata;
@@ -108,7 +109,7 @@ end
 % annotate the sensor?
 % sensor = piBatchSceneAnnotation(sensor);
 
-%% sensor to ip
+%% Sensor to IP
 ip = ipCreate;
 
 % Choose the likely set of signals the sensor will encounter
