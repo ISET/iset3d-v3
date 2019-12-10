@@ -1,12 +1,12 @@
 %% Replicate a scene that is stored in Flywheel using GCP
 %
-%    t_piRenderFW_cloud (might rename t_piRender_FW_GCP)
+%    s_piStereoImage
 %
 % Description:
 %   We created many automotive optical images and stored them in
 %   Flywheel, particularly in the project CameraEval2019.  This script
-%   shows how to recalculate one of these scenes using the google
-%   cloud platform (GCP).
+%   shows how to calculate a stereo pair from those PBRT scenes.  We
+%   use the google cloud platform (GCP).
 %
 %   We will use this approach to create slight variants of the
 %   existing OIs, say be adjusting the camera position a few times.
@@ -18,7 +18,7 @@
 % Author: Zhenyi, Zheng and Brian Wandell, 2019
 %
 % See also
-%   piSceneAuto, piSkymapAdd, gCloud
+%   s_piAlignmentRender, piSceneAuto, piSkymapAdd, gCloud
 
 %% Initialize ISET and Docker and GCP
 

@@ -1,19 +1,25 @@
-%% Replicate a scene that is stored in Flywheel using GCP
+%% Replicate a single scene that is stored in Flywheel using GCP
 %
-%    t_piRenderFW_cloud (might rename t_piRender_FW_GCP)
+%    t_piCameraArray 
 %
 % Description:
+%   This script illustrates how to modify a recipe from an existing
+%   PBRT scene and then render the modified scene/recipe.
+%
 %   We created many automotive optical images and stored them in
 %   Flywheel, particularly in the project CameraEval2019.  This script
 %   shows how to recalculate one of these scenes using the google
 %   cloud platform (GCP).
 %
-%   We will use this approach to create slight variants of the
-%   existing OIs, say be adjusting the camera position a few times.
+%   We used this approach to create slight variants of the existing
+%   OIs, say be adjusting the camera position a few times.  See the
+%   imageAlignment, imageStereo, and imageResolution folders.
 %
 %   This script illustrates (a) the use of ISETCloud, ISET3d, ISETCam
 %   and Flywheel to generate driving scenes, and (b) generate stereo
 %   camera images by moving camera positions.
+%
+%   Probably needs some more documentation here.
 %
 % Author: Zhenyi, Zheng and Brian Wandell, 2019
 %
@@ -29,12 +35,19 @@ ieGCPInit
 
 % This can become a function to just get the two JSON recipes
 
-% Here an acquisition that contains a scene on Flywheel
+% Here is an example acquisition that contains a scene on Flywheel
 sceneGroup   = 'wandell';
 sceneProject = 'Graphics auto renderings';
 sceneSubject = 'scenes';
 sceneSession = 'city4';
 sceneAcquisition = 'city4_9:30_v0.0_f40.00front_o270.00_201952151746';
+
+% This is the project where will store the renderings
+renderProject = 'wandell/Graphics camera array';
+renderSubject = 'camera array test';
+renderSession = sceneAcquisition;
+
+%% Now look up the information on Flywheel
 
 luString = sprintf('%s/%s/%s/%s/%s',sceneGroup,sceneProject,sceneSubject,sceneSession,sceneAcquisition);
 acquisition = st.lookup(luString);
@@ -77,11 +90,6 @@ road.fwList = fwList;
 
 %%  This is where we define a series of camera positions
 
-% This is the project where will store the renderints
-renderProject = 'wandell/Graphics camera array';
-renderSubject = 'camera array test';
-renderSession = sceneAcquisition;
-
 % The input file will always be downloaded by the script on the GCP
 % from Flywheel.  So the string in the input file does not really
 % matter.
@@ -100,7 +108,7 @@ thisR.camera.lensfile.value = fullfile(piRootPath, 'data/lens',[name,ext]);
 % Get the original scene lookAt position
 lookAt = thisR.get('lookAt');
 
-% Specif the change in position vectors
+% Specify the change in position vectors
 deltaPosition = [0 0.03 0; 0 0.07 0]';
 
 %% Loop and upload the data 
@@ -156,7 +164,6 @@ session = st.lookup(sessionLabel);
 
 % Set and update the info from here
 
-
 %% What are we planning?
 
 % Describe the target to the user
@@ -171,10 +178,14 @@ gcp.render();
 
 %% Are the render time stamps set?
 
-%% Monitor the processes on GCP
+%% Monitor the processes on GCP, waiting for them to all succeed
 
+%{
+% How many processes-on-demand have been started?  Each is a scene
 [podnames,result] = gcp.podsList('print',false);
 nPODS = length(result.items);
+
+% Loop waiting for all the PODS to report success.
 cnt  = 0;
 time = 0;
 while cnt < length(nPODS)
@@ -185,70 +196,7 @@ while cnt < length(nPODS)
     fprintf('******Elapsed Time: %d mins****** \n',time)
 end
 
-% Keep checking for the data, every 15 sec, and download it is there
-%% Add the original recipe and prepared to download the scene/oi
-
-% What we want to do is download the radiance output from PBRT that is
-% stored on Flywheel as a dat file.  Then we will read it in as an OI
-% using this code.
-
-[~,acqLabel] = fileparts(thisR.outputFile);
-renderAcq = st.search('acquisition',...
-    'project label exact','Graphics auto renderings',...
-    'subject code','renderings',...
-    'acquisition label contains',acqLabel, ...
-    'fw',true);
-rAcq = renderAcq{1};
-rAcq.downloadTar('foo.tar');         
-
-% Chdir to the right place ...
-ieObject = piDat2ISET('city2_14:58_v12.6_f209.08right_o270.00_201962792132_stereo.dat',...
-    'label','radiance',...
-    'recipe',thisR,...
-    'scaleIlluminance',false);
-oiWindow(ieObject);
-
-%% Get the corresponding scene
-acqLabel = sceneName;
-renderAcq = st.search('acquisition',...
-     'project label contains','CameraEval2019',...
-     'subject code','renderings',...
-     'acquisition label exact',acqLabel, ...
-     'fw',true);
-rAcq = renderAcq{1};
-rAcq.downloadTar('foo.tar');
-tmp = stSelect(rAcq.files,'name',[sceneName,'.dat']);
-radianceFile = tmp{1};
-radianceFile.download('radiance.dat');
-
-rAcq.downloadFile(acqLabel);
-ieObject = piDat2ISET('radiance.dat',...
-    'label','radiance',...
-    'recipe',thisR,...
-    'scaleIlluminance',true);
-ieObject = piFireFliesRemove(ieObject);
-oiWindow(ieObject);
-
-% Chdir to the right place ...
-% chdir('/Users/wandell/Documents/MATLAB/iset3d/local/scitran/wandell/CameraEval20190626/renderings/city2/city2_1458_v12.6_f209.08right_o270.00_201962792132'
-ieObject = piDat2ISET('city2_14:58_v12.6_f209.08right_o270.00_201962792132.dat',...
-                'label','radiance',...
-                'recipe',thisR,...
-                'scaleIlluminance',true);
-oiWindow(ieObject);
-
-
-%% Show the rendered image using ISETCam (Not working yet)
-
-% Some of the images have rendering artifiacts.  These are partially
-% removed using piFireFliesRemove
-%
-for ii =1:length(oi)
-    oi_corrected{ii} = piFireFliesRemove(oi{ii});
-    ieAddObject(oi_corrected{ii}); 
-    oiWindow;
-end
-% truesize;
+%}
 
 %% Remove all jobs.
 % Anything still running is a stray that never completed.  We should
@@ -258,45 +206,5 @@ end
 
 %% END
 
-%{
-    oiSet(oi_corrected{ii},'gamma',0.75);
-%     oiSet(scene_corrected{ii},'gamma',0.85);
-    pngFigure = oiGet(oi_corrected{ii},'rgb image');
-    figure;
-    imshow(pngFigure);
-    % Get the class labels, depth map, bounding boxes for ground
-    % truth. This usually takes about 15 secs
-    tic
-    scene_label{ii} = piSceneAnnotation(scene_mesh{ii},label{ii},st);toc
-    [sceneFolder,sceneName]=fileparts(label{ii});
-    sceneName = strrep(sceneName,'_mesh','');
-    irradiancefile = fullfile(sceneFolder,[sceneName,'_ir.png']);
-    imwrite(pngFigure,irradiancefile); % Save this scene file
-
-    %% Visualization of the ground truth bounding boxes
-    vcNewGraphWin;
-    imshow(pngFigure);
-    fds = fieldnames(scene_label{ii}.bbox2d);
-    for kk = 4
-    detections = scene_label{ii}.bbox2d.(fds{kk});
-    r = rand; g = rand; b = rand;
-    if r< 0.2 && g < 0.2 && b< 0.2
-        r = 0.5; g = rand; b = rand;
-    end
-    for jj=1:length(detections)
-        pos = [detections{jj}.bbox2d.xmin detections{jj}.bbox2d.ymin ...
-            detections{jj}.bbox2d.xmax-detections{jj}.bbox2d.xmin ...
-            detections{jj}.bbox2d.ymax-detections{jj}.bbox2d.ymin];
-
-        rectangle('Position',pos,'EdgeColor',[r g b],'LineWidth',2);
-        t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,num2str(jj));
-       %t=text(detections{jj}.bbox2d.xmin+2.5,detections{jj}.bbox2d.ymin-8,fds{kk});
-        t.Color = [0 0 0];
-        t.BackgroundColor = [r g b];
-        t.FontSize = 15;
-    end
-    end
-    drawnow;
-%}
 
 

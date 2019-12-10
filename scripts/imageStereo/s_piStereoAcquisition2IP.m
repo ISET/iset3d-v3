@@ -1,5 +1,9 @@
 %% Draft script
 %
+% *** Deprecated ***
+%
+%   See s_piAlignmentAcquisition2IP.m
+% 
 % Find a session and acquisition in Flywheel with rendered images
 %
 % Download the rendered data (from PBRT) and assemble them into an ISETCam
