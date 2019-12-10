@@ -183,8 +183,10 @@ for jj = whichAcquisitions
         % CHANGE THE POSITION OF CAMERA HERE:
         % We will write more routines that generate a sequence of positions
         % for stereo and for camera moving and so forth in this section.
-        thisR.set('from', lookAt.from + deltaPosition(:,pp));
-        thisR.set('to', lookAt.to + deltaPosition(:,pp));
+        v = piShiftVector('lookAt',lookAt, 'shift vector', deltaPosition(:,pp));
+
+        thisR.set('from', lookAt.from + v');
+        thisR.set('to', lookAt.to + v');
         % There is a new camera position that is stored in the
         % <sceneName_position>.pbrt file.  Everything including
         % the lens file should get stored with this piWrite.
