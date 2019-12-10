@@ -1,17 +1,46 @@
-function dShift = piShiftVector(varargin)
-% 
-% Calculate the actual shift position according to the current camera
-% direction and the shift vector.
+function [dShift, lookAt] = piShiftVector(varargin)
+% Create a vector displacement for the camera
+%
+% Syntax
 %
 % 
-%   % Example
-    %{
-        lookAt.from = [12.9, 2.7958, 65.4330]';
-        lookAt.to = [-16.0619, 2.6958, 73.2936]';
-        deltaPosition = [0.75, 0, 0]';
-        dShift = piShiftVector('lookAt',lookAt, 'shift vector', deltaPosition)
-    %}
+% Brief description
+%   ?? Should the input be the recipe?  Or the lookAt?
 %
+% Inputs
+%
+% Optional key/val pairs
+%
+% Outputs
+%
+%
+% Description
+%  The lookAt vector in a recipe points in a particular direction.
+%  YOu can find this direction using recipe.get('direction')
+%
+%  We want to displace the camera position by some amount in the (x,y)
+%  plane that is perpendicular to this direction.
+% 
+%  This routine calculates the shift that should be applied to the
+%  current lookAt to achieve the new position that is shifted in the,
+%  say, x-direction.
+%
+%  Calculate the actual shift position according to the current camera
+%  direction and the shift vector.
+%
+% 
+%  See also
+%   
+
+% Examples:
+%{
+  % thisR = piCameraShift(recipe,'x',xAmountMM,'y',yAmountMM);
+  lookAt.from = [12.9, 2.7958, 65.4330]';
+  lookAt.to = [-16.0619, 2.6958, 73.2936]';
+  deltaPosition = [0.75, 0, 0]';
+  dShift = piShiftVector('lookAt',lookAt, 'shift vector', deltaPosition)
+%}
+
 
 %%
 varargin = ieParamFormat(varargin);
@@ -25,6 +54,7 @@ lookAt = p.Results.lookAt;
 shiftVector = p.Results.shiftvector;
 
 %% Rotate the direction by 90 degrees
+
 % Currently we only address the shift in x-y plane, in the future we
 % probaly want to consider the shift in 3D world.
 
