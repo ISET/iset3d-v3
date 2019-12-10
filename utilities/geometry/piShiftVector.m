@@ -34,7 +34,9 @@ function [dShift, lookAt] = piShiftVector(varargin)
 
 % Examples:
 %{
-  % thisR = piCameraShift(recipe,'x',xAmountMM,'y',yAmountMM);
+  % thisR = piCameraShift(thisR,'x',xAmountMM,'y',yAmountMM,'z',zAmount);
+  % z means shift along the direction vector.
+  
   lookAt.from = [12.9, 2.7958, 65.4330]';
   lookAt.to = [-16.0619, 2.6958, 73.2936]';
   deltaPosition = [0.75, 0, 0]';
