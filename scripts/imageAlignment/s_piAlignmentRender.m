@@ -168,7 +168,7 @@ for jj = whichAcquisitions
     
     %% Loop on the change in camera positions, uploading the modified recipes
     for pp = 1:size(deltaPosition,2)
-        tmpRecipe = thisR;
+        tmpRecipe = thisR.copy;
 
         % Store the position shift in millimeters
         dLabel = deltaPosition(:,pp)*1e3; % So the label is in millimeters

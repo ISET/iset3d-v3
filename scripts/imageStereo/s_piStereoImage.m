@@ -125,7 +125,7 @@ for ii = 1:length(subject.sessions())
         %% Loop and upload the data 
         for pp = 1:size(deltaPosition,2)
             
-            tmpRecipe = thisR;
+            tmpRecipe = thisR.copy;
             % Store the position shift in millimeters
             d = deltaPosition(:,pp)*1000;
 
