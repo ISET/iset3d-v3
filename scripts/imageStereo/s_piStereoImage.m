@@ -119,15 +119,13 @@ for ii = 1:length(subject.sessions())
             thisR.camera.lensfile.value = fullfile(piRootPath, 'data/lens',[name,ext]);
         end
         
-        % Get the original scene lookAt position
-        lookAt = thisR.get('lookAt');
-
         % Specif the change in position vectors
         deltaPosition = [0 0 0; 0.75 0 0]';
 
         %% Loop and upload the data 
         for pp = 1:size(deltaPosition,2)
-
+            
+            tmpRecipe = thisR;
             % Store the position shift in millimeters
             d = deltaPosition(:,pp)*1000;
 
@@ -135,17 +133,13 @@ for ii = 1:length(subject.sessions())
             str = sprintf('%s_pos_%d_%d_%d.pbrt',sceneAcquisition, d(1),d(2),d(3));
             thisR.outputFile = fullfile(destDir,str);
 
-            % CHANGE THE POSITION OF CAMERA HERE:
-            % We will write more routines that generate a sequence of positions
-            % for stereo and for camera moving and so forth in this section.
-            v = piShiftVector('lookAt',lookAt, 'shift vector', deltaPosition(:,pp));
-
-            thisR.set('from', lookAt.from + v);
-            thisR.set('to', lookAt.to + v);
+            tmpRecipe = piCameraShift(tmpRecipe,'xAmount', deltaPosition(1,pp),...
+                                             'yAmount', deltaPosition(2,pp),...
+                                             'zAmount', deltaPosition(3,pp));
             % There is a new camera position that is stored in the
             % <sceneName_position>.pbrt file.  Everything including
             % the lens file should get stored with this piWrite.
-            piWrite(thisR,'creatematerials',true,...
+            piWrite(tmpRecipe,'creatematerials',true,...
                 'overwriteresources',false,'lightsFlag',false);
 
             % Upload the information to Flywheel
@@ -165,7 +159,7 @@ for ii = 1:length(subject.sessions())
             % Set up the rendering target.  The subject label changes from
             % 'camera array' to 'renderings'.  But the session, acquisition
             % and project remain the same.
-            gcp.addPBRTTarget(thisR,'subject label','renderings');
+            gcp.addPBRTTarget(tmpRecipe,'subject label','renderings');
 
             fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
 

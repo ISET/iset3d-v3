@@ -166,12 +166,10 @@ for jj = whichAcquisitions
         thisR.camera.lensfile.value = fullfile(piRootPath, 'data/lens',[name,ext]);
     end
     
-    % Get the original scene lookAt position
-    lookAt = thisR.get('lookAt');
-    
     %% Loop on the change in camera positions, uploading the modified recipes
     for pp = 1:size(deltaPosition,2)
-        
+        tmpRecipe = thisR;
+
         % Store the position shift in millimeters
         dLabel = deltaPosition(:,pp)*1e3; % So the label is in millimeters
         
@@ -183,14 +181,14 @@ for jj = whichAcquisitions
         % CHANGE THE POSITION OF CAMERA HERE:
         % We will write more routines that generate a sequence of positions
         % for stereo and for camera moving and so forth in this section.
-        v = piShiftVector('lookAt',lookAt, 'shift vector', deltaPosition(:,pp));
+        tmpRecipe = piCameraShift(tmpRecipe, 'xAmount', deltaPosition(1,pp),...
+                                             'yAmount', deltaPosition(2,pp),...
+                                             'zAmount', deltaPosition(3,pp));
 
-        thisR.set('from', lookAt.from + v');
-        thisR.set('to', lookAt.to + v');
         % There is a new camera position that is stored in the
         % <sceneName_position>.pbrt file.  Everything including
         % the lens file should get stored with this piWrite.
-        piWrite(thisR,'creatematerials',true,...
+        piWrite(tmpRecipe,'creatematerials',true,...
             'overwriteresources',false,'lightsFlag',false);
         
         % Name the acquisition based on the camera position change
@@ -206,7 +204,7 @@ for jj = whichAcquisitions
         % 'image alignment render' subject section.  But other than the
         % name of the subject, they should match.
         fprintf('Uploading\n');
-        gcp.fwUploadPBRT(thisR,'scitran',st,...
+        gcp.fwUploadPBRT(tmpRecipe,'scitran',st,...
             'road',road, ...
             'render project lookup', sceneProjectLU, ...
             'session label',sceneSession, ...
@@ -216,7 +214,7 @@ for jj = whichAcquisitions
         % Set up the rendering target.  The subject label changes from
         % 'camera array' to 'renderings'.  But the session, acquisition
         % and project remain the same.
-        gcp.addPBRTTarget(thisR,'subject label',renderSubject);
+        gcp.addPBRTTarget(tmpRecipe,'subject label',renderSubject);
         
         fprintf('Added one target.  Now %d current targets\n',length(gcp.targets));
         
