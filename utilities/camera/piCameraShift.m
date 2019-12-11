@@ -2,9 +2,9 @@ function thisR = piCameraShift(thisR, varargin)
 % Create a vector displacement for the camera
 %
 % Syntax:
-%  thisR = piCameraShift(recipe,'x',xAmount,...
-%                               'y',yAmount,...
-%                               'z',zAmount);
+%  thisR = piCameraShift(recipe,'xAmount',x,...
+%                               'yAmount',y,...
+%                               'zAmount',z);
 % 
 % Brief description:
 %  Calculate the new camera position given a shift in camera space
@@ -46,9 +46,12 @@ function thisR = piCameraShift(thisR, varargin)
   outFile = fullfile(piRootPath,'local',sceneName,'calChecker.pbrt');
   thisR = piCreateCheckerboard(outFile,'numX',8,'numY',7,...
                         'dimX',squareSize,'dimY',squareSize);
+  thisR.lookAt.from = [0;0;0];
+  thisR.lookAt.to = [1;1;1];
 
-  deltaPosition = [0.75, 0, 0]';
-  thisR = piCameraShift(thisR,'xAmount',deltaPosition(1),...
+  deltaPosition = [1, 0, 0]';
+  newR = thisR.copy;
+  newR = piCameraShift(newR,'xAmount',deltaPosition(1),...
                                'yAmount',deltaPosition(2),...
                                'zAmount',deltaPosition(3));
 %}
@@ -62,6 +65,7 @@ p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
 p.addParameter('xamount', 0, @isscalar);
 p.addParameter('yamount', 0, @isscalar);
 p.addParameter('zamount', 0, @isscalar);
+p.addParameter('fromto', 'both', @(x)ismember(x, {'from', 'to', 'both'}));
 
 p.parse(thisR, varargin{:});
 
@@ -69,6 +73,7 @@ thisR  = p.Results.thisR;
 xAmount = p.Results.xamount;
 yAmount = p.Results.yamount;
 zAmount = p.Results.zamount;
+fromto = p.Results.fromto;
 
 %% Rotate the direction by 90 degrees
 
@@ -76,11 +81,23 @@ zAmount = p.Results.zamount;
 % probaly want to consider the shift in 3D world.
 lookAt = thisR.get('lookAt');
 direction = -thisR.get('from to');
-theta = atand(direction(1)/direction(3));
-R = [cosd(theta) -sind(theta); sind(theta) cosd(theta)];
+thetaXZ = atand(direction(1)/direction(3));
+thetaY = acosd(direction(2) / norm(direction));
+R = [cosd(thetaXZ) -sind(thetaXZ); sind(thetaXZ) cosd(thetaXZ)];
 
-xShift = [xAmount, 0] * R;
-zShift = [0, zAmount] * R;
+
+xShiftXZPlane = [xAmount, 0] * R;
+xShiftWorldx = xShiftXZPlane(1);
+xShiftWorldz = xShiftXZPlane(2);
+xShiftWorldy = 0;
+
+yShiftWorldy = yAmount * sind(thetaY);
+yShiftWorldx = yAmount * cosd(thetaY) * sind(thetaXZ);
+yShiftWorldz = yAmount * cosd(thetaY) * cosd(thetaXZ);
+
+zShiftWorldy = zAmount * cosd(thetaY);
+zShiftWorldx = zAmount * sind(thetaY) * sind(thetaXZ);
+zShiftWorldz = zAmount * sind(thetaY) * cosd(thetaXZ);
 
 %{
     % Check the verDirection is perpendicular to the camera direction
@@ -91,8 +108,20 @@ zShift = [0, zAmount] * R;
     norm(verDirection)
 %}
 
-vShift = [xShift(1) + zShift(1), yAmount, xShift(2) + zShift(2)]';
+vShift = [xShiftWorldx + yShiftWorldx + zShiftWorldx,...
+          xShiftWorldy + yShiftWorldy + zShiftWorldy,...
+          xShiftWorldz + yShiftWorldz + zShiftWorldz]';
 
-thisR.set('from', lookAt.from + vShift);
-thisR.set('to', lookAt.to + vShift);
+switch fromto
+    case 'from'
+        thisR.set('from', lookAt.from + vShift);
+    case 'to'
+        thisR.set('to', lookAt.to + vShift);
+    case 'both'
+        thisR.set('from', lookAt.from + vShift);
+        thisR.set('to', lookAt.to + vShift);
+    otherwise
+        error('Unknown "from to" type %s', fromto);
+end
+
 end
