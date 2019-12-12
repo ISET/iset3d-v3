@@ -16,6 +16,8 @@ AttEnd    =  find(piContains(thisR.world,'AttributeEnd'));
 arealight =  piContains(thisR.world,'AreaLightSource');
 light     =  piContains(thisR.world,'LightSource');
 lightIdx  =  find(light);
+
+lightSources = cell(length(lightIdx),1);
 for ii = 1:length(lightIdx)
         lightSources{ii} = lightInit;
     if length(AttBegin)>=ii
@@ -29,10 +31,16 @@ for ii = 1:length(lightIdx)
     
     if find(piContains(lightSources{ii}.line, 'AreaLightSource'))
         lightSources{ii}.type = 'area';
+        
         translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
-        lightSources{ii}.position = [str2double(translate{2});...
-                                     str2double(translate{3});...
-                                     str2double(translate{4})];
+        if ~isempty(translate) && numel(translate) == 4    
+            lightSources{ii}.position = [str2double(translate{2});...
+                str2double(translate{3});...
+                str2double(translate{4})];
+        else
+            warning('No translate parameter for AreaLightSource');
+        end
+        
         thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')}, '%q');
         thisLineStr = thisLineStr{1};
         spectrum  = find(piContains(thisLineStr, 'spectrum L'));
@@ -88,11 +96,14 @@ if p.Results.print
 end
 end
 
+%% Helper functions
+
 function val = piParseNumericString(str)
 str = strrep(str,'[','');
 str = strrep(str,']','');
 val = str2double(str);
 end
+
 function light = lightInit
 light.type           = [];
 light.spectrum       = [];

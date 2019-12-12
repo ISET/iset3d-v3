@@ -1,7 +1,7 @@
 %% Render using a lens
 %
 % Dependencies:
-%    ISET3d, ISETCam, JSONio
+%    ISET3d, ISETCam, isetlens, JSONio
 %
 % Check that you have the updated docker image by running
 %
@@ -15,7 +15,7 @@
 % And specifically
 %   https://www.pbrt.org/fileformat-v3.html#cameras
 %
-% ZLiu, BW 2018
+% Z Liu, BW 2018
 %
 % See also
 %   t_piIntro_start, isetlens, 
@@ -28,67 +28,70 @@ if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
     error('You must have the remote data toolbox on your path'); 
 end
+
 %% Read the pbrt files
 
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
 % sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
 sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
-% The output directory will be written here to inFolder/sceneName
 inFolder = fullfile(piRootPath,'local','scenes');
-dest = piPBRTFetch(sceneName,'pbrtversion',3,...
-    'destinationFolder',inFolder,...
-    'delete zip',true);
+inFile = fullfile(inFolder,sceneName,sceneFileName);
+if ~exist(inFile,'file')
+    % Sometimes the user runs this many times and so they already have
+    % the file.  We only fetch the file if it does not exist.
+    fprintf('Downloading %s from RDT',sceneName);
+    dest = piPBRTFetch(sceneName,'pbrtversion',3,...
+        'destinationFolder',inFolder,...
+        'delete zip',true);
+end
 
 % This is the PBRT scene file inside the output directory
-inFile = fullfile(inFolder,sceneName,sceneFileName);
 thisR  = piRead(inFile);
 
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 600]*0.25));  % 1.5 is pretty high res
-thisR.set('pixel samples',16);                    % 4 is Lots of rays .
+thisR.set('film resolution',round([600 600]*0.25));  % 2 is high res. 0.25 for speed
+thisR.set('rays per pixel',16);                      % 128 for high quality
 
 %% Set output file
 
-oiName = sceneName;
-outFile = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
-thisR.set('outputFile',outFile);
+oiName    = sceneName;
+outFile   = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
 outputDir = fileparts(outFile);
+thisR.set('outputFile',outFile);
+
+%% To determine the range of object depths in the scene
+
+% [depthRange, depthHist] = piSceneDepth(thisR);
+% histogram(depthHist(:)); xlabel('Depth (m)'); grid on
+depthRange = [0.1674, 3.3153];  % Chess set distances in meters
 
 %% Add camera with lens
 
-% 22deg is the half width of the field of view
-lensfile = 'wide.56deg.3.0mm.json';
+% lensFiles = lensList;
+lensfile  = 'dgauss.22deg.50.0mm.json';    % 30 38 18 10
 fprintf('Using lens: %s\n',lensfile);
-thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
+thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
-%{
-% You might adjust the focus for different scenes.  Use piRender with
-% the 'depth map' option to see how far away the scene objects are.
-% There appears to be some difference between the depth map and the
-% true focus.
-  dMap = piRender(thisR,'render type','depth');
-  ieNewGraphWin; imagesc(dMap); colormap(flipud(gray)); colorbar;
-%}
-
-% PBRT estimates the distance.  It is not perfectly aligned to the depth
-% map, but it is close.
-thisR.set('focus distance',0.6);
+% Set the focus into the middle of the depth range of the objects in the
+% scene.
+% d = lensFocus(lensfile,mean(depthRange));   % Millimeters
+% thisR.set('film distance',d);
+thisR.set('focal distance',mean(depthRange));
 
 % The FOV is not used for the 'realistic' camera.
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters (default 22)
-thisR.set('film diagonal',12);
+thisR.set('film diagonal',33);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
 thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
-thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
-thisR.set('object distance',0.7);
+thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default 
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
@@ -102,7 +105,7 @@ thisR.sampler.subtype    = 'sobol';
 %% Render and display
 
 % Change this for depth of field effects.
-thisR.set('aperture diameter',6);   % thisR.summarize('all');
+thisR.set('aperture diameter',2);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
 oi = piRender(thisR,'render type','radiance');
@@ -110,11 +113,13 @@ oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value)
 oiWindow(oi);
 
 %%
+%{
+%%
 depth = piRender(thisR,'render type','depth');
 ieNewGraphWin;
 imagesc(depth);
-%% Change this for depth of field effects.
 
+%% Change this for depth of field effects.
 
 thisR.set('aperture diameter',3);
 piWrite(thisR,'creatematerials',true);
@@ -131,5 +136,5 @@ piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','both');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);
-
+%}
 %% END
