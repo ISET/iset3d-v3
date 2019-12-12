@@ -113,7 +113,10 @@ switch ieParamFormat(param)
     case 'fromto'
         % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
-        
+      case 'tofrom'
+        % Vector between from minus to
+        val = thisR.lookAt.to - thisR.lookAt.from;
+       
     case {'cameratype'}
     case {'exposuretime','cameraexposure'}
         try

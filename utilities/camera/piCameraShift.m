@@ -2,41 +2,61 @@ function thisR = piCameraShift(thisR, varargin)
 % Create a vector displacement for the camera
 %
 % Syntax:
-%  thisR = piCameraShift(recipe,'xAmount',x,...
-%                               'yAmount',y,...
-%                               'zAmount',z);
-% 
+%  thisR = piCameraShift(recipe,'x shift',x,...
+%                               'y shift',y,...
+%                               'z shift',z);
+%
 % Brief description:
-%  Calculate the new camera position given a shift in camera space
+%  Calculate a new camera position given by the specified shift in camera space
 %
 % Inputs:
-%  recipe  - The recipe of the scene 
-%  xAmount - The amount of the shift in x direction in camera space
-%  yAmount - The amount of the shift in y direction in camera space
-%  zAmount - The amount of the shift in z direction in camera space
+%  recipe  - The recipe of the scene
 %
 % Optional key/val pairs:
-%  None.
+%  xshift - The shift in x direction in camera space (meters)
+%  yshift - The shift in y direction in camera space (meters)
+%  zshift - The shift in z direction in camera space (meters)
+%  fromto - Whether to change the from, to or both {'from','to','both'}  
+%           (default 'both')
 %
 % Outputs
-%  New recipe with the camera position updated
+%  recipe - Camera position updated for the shift
 %
 % Description
 %  The lookAt vector in a recipe points in a particular direction.
-%  YOu can find this direction using recipe.get('direction')
+%  You can find this direction using recipe.get('direction')
 %
-%  We want to displace the camera position by some amount in the (x,y)
-%  plane that is perpendicular to this direction.
-% 
+%  By default this routine displaces the camera position by some
+%  amount in the (x,y) plane that is perpendicular to the lookAt
+%  direction (z)
+%
 %  This routine calculates the shift that should be applied to the
-%  current lookAt to achieve the new position that is shifted in the x, y
-%  and z direction, and update the recipe.
+%  current lookAt to shift the camera position in the x, y and z
+%  directions. The lookAt in the recipe is updated and returned.
+%
+
+
+%}
+%  Suppose the world coordinates of the scene are (x,y,z) space.
+%  The viewing direction is 'direction'
+%  In the camera space, 'direction' is the z-axis, call this the z'
+%  direction.
+%
+%  We need to define the x',y' dimensions in the camera space.
+%  We know that these are perpendicular to z'.  We make the x' axis
+%  perpendicular to (y,z') and the y' axis perpendicular to (x',z').
+%  We identify these directions using the cross product.
+%
+%  And we would like y' to be in the plane defined by (y,z')
+%  Then x' is perpendicular to z' and y'
+%
+%     x' = cross(direction,y) and y' = cross(direction,x)
+%  or
+%     y' = nullspace(x',z')
 %
 %
-%
-% 
 %  See also
-%   
+%
 
 % Examples:
 %{
@@ -45,93 +65,85 @@ function thisR = piCameraShift(thisR, varargin)
   squareSize = 0.3;
   outFile = fullfile(piRootPath,'local',sceneName,'calChecker.pbrt');
   thisR = piCreateCheckerboard(outFile,'numX',8,'numY',7,...
-                        'dimX',squareSize,'dimY',squareSize);
+      'dimX',squareSize,'dimY',squareSize);
   thisR.lookAt.from = [0;0;0];
   thisR.lookAt.to = [1;1;1];
-
+  
+  % Write a recipePlot and have it do things 
+  % recipePlot(thisR,'direction').  Maybe other stuff.
   deltaPosition = [1, 0, 0]';
   newR = thisR.copy;
-  newR = piCameraShift(newR,'xAmount',deltaPosition(1),...
-                               'yAmount',deltaPosition(2),...
-                               'zAmount',deltaPosition(3));
-
+  newR = piCameraShift(newR,'xshift',deltaPosition(1),...
+      'yshift',deltaPosition(2),...
+      'zshift',deltaPosition(3));
+  
   deltaPosition = [0, 1, 0]';
   newR = thisR.copy;
-  newR = piCameraShift(newR,'xAmount',deltaPosition(1),...
-                               'yAmount',deltaPosition(2),...
-                               'zAmount',deltaPosition(3));
-
+  newR = piCameraShift(newR,'xshift',deltaPosition(1),...
+      'yshift',deltaPosition(2),...
+      'zshift',deltaPosition(3));
+  
   deltaPosition = [0, 0, 1]';
   newR = thisR.copy;
-  newR = piCameraShift(newR,'xAmount',deltaPosition(1),...
-                               'yAmount',deltaPosition(2),...
-                               'zAmount',deltaPosition(3));
+  newR = piCameraShift(newR,'xshift',deltaPosition(1),...
+      'yshift',deltaPosition(2),...
+      'zshift',deltaPosition(3));
 %}
 
 
-%%
-varargin = ieParamFormat(varargin);
+%% Parse
 
+% Remove spaces, force lower case
+varargin = ieParamFormat(varargin);
 p = inputParser;
+
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
-p.addParameter('xamount', 0, @isscalar);
-p.addParameter('yamount', 0, @isscalar);
-p.addParameter('zamount', 0, @isscalar);
-p.addParameter('fromto', 'both', @(x)ismember(x, {'from', 'to', 'both'}));
+
+p.addParameter('xshift', 0, @isscalar);
+p.addParameter('yshift', 0, @isscalar);
+p.addParameter('zshift', 0, @isscalar);
+p.addParameter('fromto', 'both', @(x)(ismember(x,{'from','to','both'})));
 
 p.parse(thisR, varargin{:});
 
 thisR  = p.Results.thisR;
-xAmount = p.Results.xamount;
-yAmount = p.Results.yamount;
-zAmount = p.Results.zamount;
+xshift = p.Results.xshift;
+yshift = p.Results.yshift;
+zshift = p.Results.zshift;
 fromto = p.Results.fromto;
 
-%% Rotate the direction by 90 degrees
+%% Adjust the position
 
-% Currently we only address the shift in x-y plane, in the future we
-% probaly want to consider the shift in 3D world.
-lookAt = thisR.get('lookAt');
-direction = -thisR.get('from to');
-thetaXZ = atand(direction(1)/direction(3));
-thetaY = acosd(direction(2) / norm(direction));
-R = [cosd(thetaXZ) -sind(thetaXZ); sind(thetaXZ) cosd(thetaXZ)];
+% Find the looking direction
+lookAt    = thisR.get('lookAt');   % A structure with all the info
+direction = thisR.get('to from'); % The direction to - from.
+direction = direction/norm(direction);
 
-
-xShiftXZPlane = [xAmount, 0] * R;
-xShiftWorldx = xShiftXZPlane(1);
-xShiftWorldz = xShiftXZPlane(2);
-xShiftWorldy = 0;
-
-yShiftWorldy = yAmount * sind(thetaY);
-yShiftWorldx = yAmount * cosd(thetaY) * sind(thetaXZ);
-yShiftWorldz = yAmount * cosd(thetaY) * cosd(thetaXZ);
-
-zShiftWorldy = zAmount * cosd(thetaY);
-zShiftWorldx = zAmount * sind(thetaY) * sind(thetaXZ);
-zShiftWorldz = zAmount * sind(thetaY) * cosd(thetaXZ);
+% The three should follow the 'left hand rule' for the axis
+cameraX = cross([0 1 0],direction); cameraX = cameraX/norm(cameraX);
+cameraY = cross(cameraX,direction); cameraY = cameraY/norm(cameraY);
+% We want cameraY to be pointing in the same direction as lookAt.up
+up = thisR.get('up');
+if cameraY*up < 0, cameraY = -1* cameraY; end
+cameraX = cameraX(:); cameraY = cameraY(:);
 
 %{
-    % Check the verDirection is perpendicular to the camera direction
-    innerProduct = direction(1) * verDirection(1) + direction(3) *...
-    verDirection(2)
-
-    % Check the absolute value of the shift
-    norm(verDirection)
+ ieNewGraphWin;
+ line([0 direction(1)],[0,direction(2)],[0,direction(3)],'color','k');    hold on
+ line([0 cameraX(1)],[0,cameraX(2)],[0,cameraX(3)],'color','b')
+ line([0 cameraY(1)],[0,cameraY(2)],[0,cameraY(3)],'color','r')
+ grid on; axis equal; xlabel('X'); ylabel('Y'); zlabel('Z')
 %}
 
-vShift = [xShiftWorldx + yShiftWorldx + zShiftWorldx,...
-          xShiftWorldy + yShiftWorldy + zShiftWorldy,...
-          xShiftWorldz + yShiftWorldz + zShiftWorldz]';
-
+shift = xshift*cameraX + yshift*cameraY + zshift*direction;
 switch fromto
     case 'from'
-        thisR.set('from', lookAt.from + vShift);
+        thisR.set('from',lookAt.from + shift);
     case 'to'
-        thisR.set('to', lookAt.to + vShift);
+        thisR.set('to', lookAt.to + shift);
     case 'both'
-        thisR.set('from', lookAt.from + vShift);
-        thisR.set('to', lookAt.to + vShift);
+        thisR.set('from',lookAt.from + shift);
+        thisR.set('to',  lookAt.to + shift);
     otherwise
         error('Unknown "from to" type %s', fromto);
 end
