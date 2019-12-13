@@ -10,7 +10,7 @@ The general approach is the following
 * The user  builds a **recipe** for rendering the PBRT files into a spectral irradiance.  The recipe is a Matlab class that specifies spatial resolution, number of rays, viewing distance, type of optics (pinhole, lens or light field microlens array)
 * The recipe also specifies information about the lens (which can contain multiple elements, spherical and certain aspherical shapes) and microlens array on the film surface
 
-To see some examples, have a look at the tutorial directory.
+To see some examples, have a look at the tutorial directory.  If you want to read more, please look through the [wiki pages](https://github.com/ISET/iset3d/wiki)
 
 (Formerly pbrt2iset, and before that we relied on RenderToolbox4).
 
