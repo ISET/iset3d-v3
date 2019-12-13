@@ -8,3 +8,4 @@ The manipulations of the PBRT file include spatial resolution, number of rays, v
 
 This repository depends on ISET.  We have eliminated dependencies on RenderToolbox4.
 
+(Formerly isetpbrt2iset)
