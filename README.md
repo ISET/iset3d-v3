@@ -2,7 +2,7 @@
 
 The tools in this repository create spectral irradiance of realistic three-dimensional scenes. The tools work with a special version of PBRT **(pbrt-v3-spectral)** that we implemented.  The implementation is available in a Docker container.
 
-To use these tools you must have Docker and Matlab installed. This repository also depends on ISETCam, and some people in our lab also require isetcloud.  More on that in the wiki.
+To use these tools you must have Docker and Matlab installed. This repository also depends on ISETCam (or ISETBio), and some people in our lab also require isetcloud.  More on that in the wiki.
 
 The general approach is the following
 
