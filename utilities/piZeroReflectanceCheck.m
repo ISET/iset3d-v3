@@ -147,6 +147,7 @@ for ii = 1: length(mlist)
                             texImg(mm, nn, :) = temp;
                             writeFlag = true;
                         end
+
                     end
                 end
                 fprintf('\tMinimum value = %g\n',minVal);
