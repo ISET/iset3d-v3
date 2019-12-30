@@ -121,6 +121,11 @@ if ~convertedflag
                     groupobj(hh).position = reshape(transform(13:15),[3,1]);
                     % Add type of the object, get it from the file name,
                     % could be wrong, but this is how we named the object
+                    
+                    % ZLY: need to scale the vector as the scale is not
+                    % always [1 1 1]
+                    scaleFactor = abs([dcm(1);dcm(6);dcm(8)]);
+                    groupobj(hh).scale = groupobj(hh).scale .* scaleFactor;
                 else
                     groupobj(hh).rotate(:,3) = [0;1;0;0];
                     groupobj(hh).rotate(:,2) = [0;0;1;0];
