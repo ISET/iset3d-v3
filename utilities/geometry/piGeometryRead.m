@@ -79,7 +79,9 @@ if ~convertedflag
     
     %% Extract objects information and write out children objects
     
-    hh = 1;
+    % We do not know the number of scene objects.  We start with the
+    % first and increment at the end of the loop.
+    hh = 1;  
     for dd = 1:length(nestbegin)
         ll = 1; jj = 1;
         for ii = nestbegin(dd): nestend(dd)
@@ -93,13 +95,16 @@ if ~convertedflag
                 size_num = str2num(Groupobj_size);
                 
                 % size
-                groupobj(hh).size.l = size_num(1)*2;
+                groupobj(hh).size.l = size_num(1)*2; %#ok<*AGROW>
                 groupobj(hh).size.h = size_num(2)*2;
                 groupobj(hh).size.w = size_num(3)*2;
                 groupobj(hh).size.pmin = [-size_num(1) -size_num(3)];
                 groupobj(hh).size.pmax = [size_num(1) size_num(3)];
                 
-                % Always add a scaling factor
+                % Initialize a scale factor - Zhenyi assumes that the
+                % units are always in meters.  The user can change the
+                % scale by setting a parameter, if say the units are
+                % centimeters.  See around Line 130.
                 groupobj(hh).scale = [1;1;1];
                 
                 groupobj(hh).name = sprintf('%s',Groupobj_name);
@@ -108,6 +113,8 @@ if ~convertedflag
                     tmp  = textscan(tmp, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
                     values = cell2mat(tmp(2:end));
                     transform = reshape(values,[4,4]);
+                    % DCM is a 3x3 extracted from the 4x4 homogeneous
+                    % transform.
                     dcm = [transform(1:3);transform(5:7);transform(9:11)];
                     
                     [rotz,roty,rotx]= piDCM2angle(dcm);
@@ -122,9 +129,14 @@ if ~convertedflag
                     % Add type of the object, get it from the file name,
                     % could be wrong, but this is how we named the object
                     
-                    % ZLY: need to scale the vector as the scale is not
-                    % always [1 1 1]
+                    % If the spatial units are meters, the scale
+                    % factor will be 1. TO TEST!!! If the obj spatial
+                    % units are not in meters, then the true units
+                    % will be reflected in the these entries of the
+                    % dcm, placed there by the C4D exporter.
+                    % We need to explain 1,6,8 ....
                     scaleFactor = abs([dcm(1);dcm(6);dcm(8)]);
+                    if prod(scaleFactor) == 1, disp('Scale is meters'); end
                     groupobj(hh).scale = groupobj(hh).scale .* scaleFactor;
                 else
                     groupobj(hh).rotate(:,3) = [0;1;0;0];
