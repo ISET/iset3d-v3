@@ -345,4 +345,20 @@ if isfield(materials, 'amount')
         val = strcat(val, val_boolremaproughness);
     end
 end
+if isfield(materials, 'photolumifluorescence')
+    if ~isempty(materials.photolumifluorescence)
+        val_photolumifluorescence = [sprintf(' "photolumi fluorescence" '),...
+                                    '[ ', sprintf('%.5f ', materials.photolumifluorescence),' ]'];
+        val = strcat(val, val_photolumifluorescence);
+    end
+end
+if isfield(materials, 'floatconcentration')
+    if ~isempty(materials.floatconcentration)
+        val_floatconcentration = sprintf(' "float concentration" [ %0.5f ] ',...
+                                    materials.floatconcentration);
+        val = strcat(val, val_floatconcentration);
+    end
+end
+
+
 end

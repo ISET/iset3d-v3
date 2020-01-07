@@ -353,7 +353,32 @@ switch param
         thisR.camera = val.camera;
         thisR.film = val.film;
         thisR.filter = val.filter;
-
+    % ZLY added fluorescent 
+    case {'fluorescent'}
+        matName = val{1};
+        if ~isfield(thisR.materials.list, matName)
+            error('Unknown material name %s\n', matName);
+        end
+        if length(val) == 1
+            error('Donaldson matrix is empty\n');
+        end
+        if length(varargin) > 2
+            error('Accept only one Donaldson matrix\n');
+        end
+        thisR.materials.list.(matName).photolumifluorescence = val{2};
+    case {'concentration'}
+        matName = val{1};
+        if ~isfield(thisR.materials.list, matName)
+            error('Unknown material name %s\n', matName);
+        end
+        if length(val) == 1
+            error('Concentration is empty\n');
+        end
+        if length(val) > 2
+            error('Accept single number as concentration\n');
+        end
+        thisR.materials.list.(matName).floatconcentration = val{2};
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end
