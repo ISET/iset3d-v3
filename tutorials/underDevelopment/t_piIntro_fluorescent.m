@@ -7,7 +7,7 @@
 %
 % Dependencies:
 %
-%    ISET3d, (ISETCam or ISETBio), JSONio
+%    ISET3d, (ISETCam or ISETBio), JSONio, isetfluorescent
 %
 %
 % ZLY, BW, 2020
