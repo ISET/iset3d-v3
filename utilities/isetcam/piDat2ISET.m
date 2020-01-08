@@ -178,7 +178,6 @@ end
 lightSourcePath = fullfile(fileparts(thisR.outputFile), 'spds', 'lights', '*.mat');
 fileInfo = dir(lightSourcePath);
 ieObject = sceneAdjustIlluminant(ieObject, fullfile(fileInfo.folder, fileInfo.name));
-
 end
 
 
