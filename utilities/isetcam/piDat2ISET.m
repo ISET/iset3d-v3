@@ -174,21 +174,10 @@ switch opticsType
         error('Unknown optics type %s\n',opticsType);       
 end
 
-%% Adjust the illuminant
-
-% Usually there is a light inside of the spds directory.  In some
-% cases, however, there is no light (e.g. the teapot scene).  So we
-% check and add the light if it is there.
+%% Adjust the illuminant (added by Zheng Lyu, 10-2019)
 lightSourcePath = fullfile(fileparts(thisR.outputFile), 'spds', 'lights', '*.mat');
 fileInfo = dir(lightSourcePath);
-if ~isempty(fileInfo)
-    if numel(fileInfo.name) ~= 1
-        warning('Multiple light sources.  Not assigning a light to the scene. We will calculate the illuminant image and assign it - some day.'); 
-    else
-        illuEnergy = ieReadSpectra(fullfile(fileInfo.folder, fileInfo.name),wave);
-        ieObject = sceneSet(ieObject, 'illuminant Energy', illuEnergy);
-    end
-end
+ieObject = sceneAdjustIlluminant(ieObject, fullfile(fileInfo.folder, fileInfo.name));
 
 end
 
