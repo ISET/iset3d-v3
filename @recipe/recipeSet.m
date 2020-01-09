@@ -354,7 +354,8 @@ switch param
         thisR.film = val.film;
         thisR.filter = val.filter;
     % ZLY added fluorescent 
-    case {'fluorescent'}
+    case {'eem'}
+        % RecipeSet('eem', {'materialName', 'fluophoresName'});
         matName = val{1};
         if ~isfield(thisR.materials.list, matName)
             error('Unknown material name %s\n', matName);
@@ -365,7 +366,28 @@ switch param
         if length(varargin) > 2
             error('Accept only one Donaldson matrix\n');
         end
-        thisR.materials.list.(matName).photolumifluorescence = val{2};
+        
+        wave = 395:10:705; % By default it is the wavelength range used in pbrt
+        fluophoresName = val{2};
+        fluophores = fluorophoreRead(fluophoresName,'wave',wave);
+        % Here is the excitation emission matrix
+        eem = fluorophoreGet(fluophores,'eem');
+        %{
+             fluorophorePlot(Porphyrins,'donaldson mesh');
+        %}
+        %{
+             dWave = fluorophoreGet(FAD,'delta wave');
+             wave = fluorophoreGet(FAD,'wave');
+             ex = fluorophoreGet(FAD,'excitation');
+             ieNewGraphWin; 
+             plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
+        %}
+        
+        % The data are converted to a vector like this
+        flatEEM = eem';
+        vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
+        thisR.materials.list.(matName).photolumifluorescence = vec;
+        
     case {'concentration'}
         matName = val{1};
         if ~isfield(thisR.materials.list, matName)

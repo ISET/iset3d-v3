@@ -51,33 +51,8 @@ piMaterialList(thisR);
 
 %% Define the fluorescent properties for the second (uber) material
 
-% Use Porphyrins Donaldson matrix as an example.
-
-% Set the wavelength sampling you would like
-wave = 395:10:705; 
-
-% Here is one fluorophore, read in with that wavelength sampling.
-FAD = fluorophoreRead('Porphyrins','wave',wave);
-
-% Here is the excitation emission matrix
-eem = fluorophoreGet(FAD,'eem');
-%{
- fluorophorePlot(Porphyrins,'donaldson mesh');
-%}
-%{
- dWave = fluorophoreGet(FAD,'delta wave');
- wave = fluorophoreGet(FAD,'wave');
- ex = fluorophoreGet(FAD,'excitation');
- ieNewGraphWin; 
- plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
-%}
-
-% The data are converted to a vector like this
-wave = fluorophoreGet(FAD,'wave');
-flatEEM = eem';
-vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
-
-thisR.set('fluorescent', {'Material', vec});
+% Set the donaldson matrix based on the type of the materials
+thisR.set('eem', {'Material', 'Porphyrins'});
 
 % Give a concentration (scaling factor) to the fluophores
 thisR.set('concentration', {'Material', 1});
@@ -95,7 +70,7 @@ piWrite(thisR,'creatematerials',true);
 %% This is used to visualize the rendered result
 wave = 395:10:705;  % Hard coded in pbrt
 nWave = length(wave);
-filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/pbrt.dat';
+filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/floorFluorescentPorphyrins.dat';
 energy = piReadDAT(filename, 'maxPlanes', nWave);
 photon = Energy2Quanta(wave,energy);
 scene = piSceneCreate(photon, 'wavelength', wave);

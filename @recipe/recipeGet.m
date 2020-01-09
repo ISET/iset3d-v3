@@ -70,6 +70,7 @@ p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
+p.addOptional('material', [], @iscell);
 
 p.parse(thisR,param,varargin{:});
 
@@ -303,6 +304,44 @@ switch ieParamFormat(param)
         val.camera = thisR.camera;
         val.film = thisR.film;
         val.filter = thisR.filter;
+    case{'eem'}
+        % val = thisR.get('eem', 'material', {'materialName'});
+        if numel(varargin) == 0
+            matNames = fieldnames(thisR.materials.list);
+            val = cell(1, numel(matNames));
+            for ii = 1:numel(matNames)
+                val{ii} = thisR.materials.list.(matNames{ii}).photolumifluorescence;
+            end
+        else
+            matList = varargin{2};
+            val = cell(1, numel(matList));
+            for ii = 1:numel(matList)
+                if ~isfield(thisR.materials.list, matList{ii})
+                    error('Unknown material %s', matList{ii})
+                end
+                val{ii} = thisR.materials.list.(matList{ii}).photolumifluorescence; 
+            end
+        end
+        
+        
+    case{'concentration'}
+        % val = thisR.get(concentration', 'material', {'materialName'});
+        if numel(varargin) == 0
+            matNames = fieldnames(thisR.materials.list);
+            val = cell(1, numel(matNames));
+            for ii = 1:numel(matNames)
+                val{ii} = thisR.materials.list.(matNames{ii}).floatconcentration;
+            end
+        else
+            matList = varargin{2};
+            val = cell(1, numel(matList));
+            for ii = 1:numel(matList)
+                if ~isfield(thisR.materials.list, matList{ii})
+                    error('Unknown material %s', matList{ii})
+                end
+                val{ii} = thisR.materials.list.(matList{ii}).floatconcentration; 
+            end
+        end        
         
     otherwise
         error('Unknown parameter %s\n',param);
