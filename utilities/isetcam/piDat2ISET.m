@@ -177,7 +177,9 @@ end
 %% Adjust the illuminant (added by Zheng Lyu, 10-2019)
 lightSourcePath = fullfile(fileparts(thisR.outputFile), 'spds', 'lights', '*.mat');
 fileInfo = dir(lightSourcePath);
-ieObject = sceneAdjustIlluminant(ieObject, fullfile(fileInfo.folder, fileInfo.name));
+if ~isempty(fileInfo)
+    ieObject = sceneAdjustIlluminant(ieObject, fullfile(fileInfo.folder, fileInfo.name));
+end
 end
 
 

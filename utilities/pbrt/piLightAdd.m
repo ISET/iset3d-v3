@@ -60,7 +60,9 @@ p = inputParser;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));
 p.addParameter('type', 'point', @ischar);
 % Load in a light source saved in ISETCam/data/lights
-p.addParameter('lightspectrum', 'D65');
+p.addParameter('lightspectrum', '');
+p.addParameter('rgbspectrum',[0.5, 0.5, 0.5]);
+p.addParameter('blackbody',[6500, 1]); % [Color-Temperature, intensity]
 % used for point/spot/distant/laser light
 p.addParameter('from', [0 0 0]);
 % used for spot light
@@ -77,12 +79,15 @@ p.addParameter('conedeltaangle', 5, @isnumeric); % It's 5 by default
 p.addParameter('cameracoordinate',false);
 % scale the spectrum
 p.addParameter('spectrumscale', 1);
+
 % update an exist light
 p.addParameter('update',[]);
 p.parse(thisR, varargin{:});
 
 type = p.Results.type;
 lightSpectrum = p.Results.lightspectrum;
+rgbSpectrum = p.Results.rgbspectrum;
+blackbody = p.Results.blackbody;
 spectrumScale = p.Results.spectrumscale;
 from = p.Results.from;
 to = p.Results.to;
@@ -113,7 +118,7 @@ if idxL
 end
 %% Write out lightspectrum into a light.spd file
 
-if ischar(lightSpectrum)
+if ~isempty(lightSpectrum)
     try
         % Load from ISETCam/ISETBio ligt data
         thisLight = load(lightSpectrum);
@@ -170,12 +175,21 @@ switch type
         thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
         newlight{1}.line{1,:} = [newlight{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
-        lightSources{1}.type = 'distant';
-        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        newlight{1}.type = 'distant';
+        if ~isempty(lightSpectrum)
+            newlight{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
+        else
+            newlight{1}.line{1,:} = sprintf('LightSource "distant" "blackbody L" [%d %.1f] "point from" [%d %d %d]',...
+                blackbody(1), blackbody(2), from);
+        end
     case 'infinite'
-        lightSources{1}.type = 'infinite';
-        lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+        newlight{1}.type = 'infinite';
+        if ~isempty(lightSpectrum)
+            newlight{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+        else
+            newlight{1}.line{1,:} = sprintf('LightSource "infinite" "rgb L" [%.1f, %.1f, %.1f]',rgbSpectrum);
+        end
     case 'area'
         % find area light geometry info
         

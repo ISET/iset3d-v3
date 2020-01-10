@@ -10,6 +10,7 @@ if ~piDockerExists, piDockerConfig; end
 
 % The teapot is our test file
 inFile = fullfile(piRootPath,'data','V3','checkerboard','checkerboard.pbrt');
+% inFile = '/Users/zhenyi/git_repo/iset3d/local/sunPos.pbrt';
 recipe = piRead(inFile);
 
 % The output will be written here
@@ -18,7 +19,7 @@ outFile = fullfile(piRootPath,'local',sceneName,'checkerboard.pbrt');
 recipe.set('outputFile',outFile);
 
 %% Check the light list
-piLightGet(recipe);
+lights = piLightGet(recipe);
 
 %% Remove all the current light
 recipe = piLightDelete(recipe, 1);

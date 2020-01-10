@@ -33,7 +33,7 @@ if ~piDockerExists, piDockerConfig; end
 if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
-sceneName = 'checkerboard_new';
+sceneName = 'checkerboard';
 FilePath = fullfile(piRootPath,'data','V3',sceneName);
 fname = fullfile(FilePath,[sceneName,'.pbrt']);
 if ~exist(fname,'file'), error('File not found'); end
@@ -56,11 +56,11 @@ thisR = piAssetAddBatch(thisR, asset);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',64);
+thisR.set('film resolution',[1280 720]/2);
+thisR.set('pixel samples',16);
 
 %% Get a sky map from Flywheel, and use it in the scene
-thisTime = '16:30';
+thisTime = '10:15';
 % We will put a skymap in the local directory so people without
 % Flywheel can see the output
 if piScitranExists
@@ -88,7 +88,6 @@ end
 % This value determines the number of ray bounces.  The scene has
 % glass we need to have at least 2 or more.  We start with only 1
 % bounce, so it will not appear like glass or mirror.
-thisR.integrator.maxdepth.value = 10;
 
 %% This adds materials to all assets in this scene
 thisR.materials.lib=piMateriallib;
@@ -102,12 +101,19 @@ target = thisR.materials.lib.carpaint;  % This is the assignment
 piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
 
 % Assign a nice position.
-thisR.assets(end).position = [3.5 0 -2]';
+thisR.assets(end).position = [0 0 0]';
+
+thisR.assets(1).scale = [50;50;1];
+thisR.assets(1).rotate = piRotationMatrix('xrot',90);
 
 %% Write out the pbrt scene file, based on thisR.
+lensname = 'wide.40deg.3.0mm.dat';
+thisR_scene.camera = piCameraCreate('pinhole');
 
 thisR.set('fov',45);
 thisR.film.diagonal.value = 10;
+thisR.lookAt.from = [1 1.3 10];
+thisR.lookAt.to = [0 1.2 0];
 thisR.film.diagonal.type  = 'float';
 thisR.integrator.subtype = 'bdpt';  
 thisR.sampler.subtype = 'sobol';
@@ -117,12 +123,64 @@ thisR.set('outputFile',outFile);
 
 piWrite(thisR,'creatematerials',true);
 
+
 %% Render.
 
 % Maybe we should speed this up by only returning radiance.
 [scene, result] = piRender(thisR,'render type','radiance');
+if strcmp(scene.type, 'scene')
+%     scene = piAIdenoise(scene);
+    sceneWindow(scene);
+else
+    scene = piAIdenoise(scene);
+    oiWindow(scene);
+end
 
-scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
-sceneWindow(scene);
-sceneSet(scene,'display mode','hdr');         
+
 %% END
+function colorR = colorRemove(thisR)
+% convert all material surfaces to be gray
+colorR = thisR;
+materialNameList = fieldnames(thisR.materials.list);
+for ii = 1:length(materialNameList)
+    target = colorR.materials.lib.matte;
+    piMaterialAssign(colorR, ...
+        materialNameList{ii}, target,...
+        'rgbkd',[0.7 0.7 0.7], 'colorkd',[0.7 0.7 0.7]);
+end
+
+end
+
+function matteR = simpleMat(thisR)
+% convert all material to be matte material
+matteR = thisR;
+materialNameList = fieldnames(thisR.materials.list);
+for ii = 1:length(materialNameList)
+    target = matteR.materials.lib.matte;
+    piMaterialAssign(matteR, ...
+        materialNameList{ii}, target);
+end
+
+end
+
+function motionR = motionRemove(thisR)
+% remove all motion effect
+motionR = thisR;
+
+
+end
+
+function lightR = simpleLighting(thisR)
+% replace hdr skymap with color skymap
+lightR = thisR;
+lightR = piLightDelete(lightR, 'all');
+blackbody = randi([4500,6500],1);
+position = [-30 40 100];
+position(1) = position(1)+randi([-40,40],1);
+position(3) = position(3)+randi([-40,40],1);
+lightR = piLightAdd(lightR, 'type','infinite',...
+    'rgbSpectrum',[0.6 0.7 0.8]);
+lightR = piLightAdd(lightR, 'type','distant',...
+    'blackbody',[blackbody, 1.5],...
+    'from', position);
+end

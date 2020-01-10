@@ -92,7 +92,7 @@ for ii = 1:length(mlist)
         material = thisR.materials.list.(name);
         target = thisR.materials.lib.chrome_spd;
         piMaterialAssign(thisR, material.name,target);
-        copyfile(fullfile(piRootPath,'data','spds'), [fileparts(thisR.outputFile),'/spds']);
+        copyfile(fullfile(piRootPath,'data','spds'), [fileparts(thisR.inputFile),'/spds']);
     elseif piContains(lower(mlist(ii)),'wheel')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);
