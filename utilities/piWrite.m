@@ -381,6 +381,8 @@ end
 %% Write out WorldBegin/WorldEnd
 
 if creatematerials
+    gFlag = false;
+    mFlag = false;
     % We may have created new materials.
     % We write the material and geometry files based on the recipe,
     % which defines these new materials.
@@ -389,21 +391,32 @@ if creatematerials
         if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
+            mFlag = true; % indicates matieral line has been added.
         end
         if overwritegeometry
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(renderRecipe.outputFile);
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                % tmp: added by zhenyi; remove this in master branch !!!!!!
+                if piContains(n,'_mesh') || piContains(n,'_depth')
+                    n = strrep(n,'_mesh','');
+                    n = strrep(n,'_depth','');
+                end
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
+                 gFlag = true; % indicates matieral line has been added.
             end
         end 
         if ii == length(renderRecipe.world)
-            if ~piContains(renderRecipe.world, 'materials.pbrt')
-        [~,n] = fileparts(renderRecipe.outputFile);
-        mLine = sprintf('Include "%s_materials.pbrt"',n);
-        fprintf(fileID,'%s \n',mLine);
-        [~,n] = fileparts(renderRecipe.outputFile);
-        gLine = sprintf('Include "%s_geometry.pbrt"',n);
-        fprintf(fileID,'%s \n',gLine);
+            if ~mFlag
+                [~,n] = fileparts(renderRecipe.outputFile);
+                mLine = sprintf('Include "%s_materials.pbrt"',n);
+                fprintf(fileID,'%s \n',mLine);
+            end
+            if ~gFlag
+                [~,n] = fileparts(renderRecipe.outputFile);
+                gLine = sprintf('Include "%s_geometry.pbrt"',n);
+                fprintf(fileID,'%s \n',gLine);
             end
         end
         fprintf(fileID,'%s \n',currLine);

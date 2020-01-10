@@ -68,6 +68,7 @@ else
     else
         index = randi(4,1);
     end
+    skyname = '';
     switch index
         case 1
             % 06-41 to 17-60 inv:1
@@ -106,6 +107,13 @@ else
                 end
             end
 
+    end
+    % In case we can not find skymap for case 2-4, we use case 1.
+    if isempty(skyname)
+        acqName = sprintf('wandell/Graphics auto/assets/skymap_daytime/%02d00',str2double(time{1}));
+        thisAcq = st.fw.lookup(acqName);
+        dataId = thisAcq.id;
+        skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));
     end
 end
 

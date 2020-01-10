@@ -45,7 +45,7 @@ roadType = {'curve_6lanes_001',...
     'city_cross_6lanes_001_construct',...
     'city_cross_4lanes_002'};
 trafficflowDensity = {'low','medium','high'};
-%%
+%% start the process
 gcp.targets = [];
 for ll = 1:length(sceneType)
     for mm = 1 :length(roadType)
@@ -73,7 +73,7 @@ for ll = 1:length(sceneType)
                 
                 xRes = 1280;
                 yRes = 720;
-                pSamples = 64;
+                pSamples = 128;
                 
                 thisR.set('film resolution',[xRes yRes]);
                 thisR.set('pixel samples',pSamples);
@@ -299,6 +299,7 @@ for ii = 1:length(materialNameList)
         materialNameList{ii}, target,...
         'rgbkd',[0.5 0.5 0.5],...
         'colorkd',[0.5 0.5 0.5]);
+    colorR.materials.list.(materialNameList{ii}).texturekd=[];
 end
 
 end
