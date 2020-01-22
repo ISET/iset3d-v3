@@ -36,7 +36,7 @@ if ~piDockerExists, piDockerConfig; end
 filePath = fullfile(piRootPath, 'data', 'V3',...
                     'mouth', 'higher_res_mesh_segmentation.pbrt');
 %}
-filePath = '/Users/zhenglyu/Desktop/Research/3dmodel/mouth/final_c4d_resources/mesh_test/higher_res_mesh_segmentation.pbrt';
+filePath = '/Users/zhenglyu/Desktop/Research/3dmodel/mouth/final_c4d_resources/pbrt_files/segment_all_mouth/higher_res_mesh_segmentation_mouth.pbrt';
 thisR = piRead(filePath);
 thisR = piLightAdd(thisR,...
     'type','point',...
@@ -48,21 +48,21 @@ thisR = piLightAdd(thisR,...
 
 % All output needed to render this recipe will be written into this
 % directory. 
-sceneName = 'mouth_segmentation';
-outFile = fullfile(piRootPath,'local',sceneName,'mouth_segmentation.pbrt');
+sceneName = 'segmentation_all_mouth';
+outFile = fullfile(piRootPath,'local',sceneName,'segmentation_all_mouth.pbrt');
 thisR.set('outputfile',outFile);
 
 %% Write 
 
 % Write modified recipe out
-piWrite(thisR);
+piWrite(thisR, 'overwritematerials', false);
 
 %% Show the region/material options
 piMaterialList(thisR);
 
 %% Add fluorescent pattern 
 unhealthyRegion = 'Unhealthy';
-baseRegion = 'MouthPBR';
+baseRegion = 'Unhealthy';
 piFluorescentPattern(thisR, 'location', unhealthyRegion,...
                         'base', baseRegion);
 

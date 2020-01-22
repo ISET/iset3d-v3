@@ -51,6 +51,7 @@ algorithm = ieParamFormat(p.Results.algorithm);
 if isempty(location), error('Location must be specified.\n'); end
 if isempty(base), base = location; end 
 
+%% TODO: make a copy of all the current files to the current folder
 %% Read child geometry files from the written pbrt files
 
 [Filepath,sceneFileName] = fileparts(thisR.outputFile);
