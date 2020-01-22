@@ -70,7 +70,7 @@ piWrite(thisR,'creatematerials',true);
 %% This is used to visualize the rendered result
 wave = 395:10:705;  % Hard coded in pbrt
 nWave = length(wave);
-filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/floorFluorescentPorphyrins.dat';
+filename = '/Users/zhenglyu/Desktop/Research/presentation/mouth_random_material/pbrt_finer_mesh.dat';
 energy = piReadDAT(filename, 'maxPlanes', nWave);
 photon = Energy2Quanta(wave,energy);
 scene = piSceneCreate(photon, 'wavelength', wave);
