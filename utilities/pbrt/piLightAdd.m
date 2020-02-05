@@ -157,11 +157,24 @@ switch type
         end    
     case 'spot'
         lightSources{1}.type = 'spot';
-        lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
-        thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-        thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
-        lightSources{1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+        thisConeAngle = sprintf('"float coneangle" [%d]', coneAngle);
+        thisConeDelta = sprintf('"float conedeltaangle" [%d]', conDeltaAngle);
+        
+        if p.Results.cameracoordinate
+            lightSources{1}.line{1} = 'AttributeBegin';
+            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
+            lightSources{1}.line{3,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" %s %s',...
+                            lightSpectrum, thisConeAngle, thisConeDelta);
+            lightSources{1}.line{end+1} = 'AttributeEnd';
+        else
+            lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
+                lightSpectrum, from, to, thisConeAngle, thisConeDelta);
+        end
+%         lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+%                 lightSpectrum, from, to);
+%         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
+%         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+%         lightSources{1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'laser' % not supported for public
         lightSources{1}.type = 'laser';
         lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
@@ -171,7 +184,7 @@ switch type
         lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
         lightSources{1}.type = 'distant';
-        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
     case 'infinite'
         lightSources{1}.type = 'infinite';

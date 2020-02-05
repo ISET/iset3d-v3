@@ -30,6 +30,16 @@ if ~exist(fname,'file'), error('File not found'); end
 % This scene contains some glass and a mirror
 thisR = piRead(fname);
 
+%% Change the lights
+% Delete current lights
+thisR = piLightDelete(thisR, 'all');
+
+thisR = piLightAdd(thisR,...
+    'type','point',...
+    'light spectrum','blueLEDFlood',...
+    'spectrumscale', 10,...
+    'cameracoordinate', true);
+
 %% Set render quality
 
 % This is a low resolution for speed.
@@ -42,7 +52,6 @@ thisR.set('fov',45);
 thisR.film.diagonal.value = 10;
 thisR.film.diagonal.type  = 'float';
 thisR.integrator.subtype = 'path';% The fluorescent effect only implemented in path integrator for now.
-thisR.sampler.subtype = 'sobol';
 
 %% Display all the materials in the scene
 
@@ -52,10 +61,12 @@ piMaterialList(thisR);
 %% Define the fluorescent properties for the second (uber) material
 
 % Set the donaldson matrix based on the type of the materials
-thisR.set('eem', {'Material', 'Porphyrins'});
+thisR.set('eem', {'uber', 'FAD'});
+thisR.set('eem', {'uber_blue', 'Porphyrins'});
 
 % Give a concentration (scaling factor) to the fluophores
-thisR.set('concentration', {'Material', 1});
+thisR.set('concentration', {'uber', 0.05});
+thisR.set('concentration', {'uber_blue', 0.01});
 
 %% Changing the name
 outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
@@ -64,14 +75,20 @@ thisR.set('outputFile',outFile);
 piWrite(thisR,'creatematerials',true);
 
 
-%% NOTE: piRender is not ready to use yet as we used a edited version of pbrt for fluorescent effect
-
+%% Render(not applicable now since we don't have fluorescence version pbrt in Docker)
+%{
+[scene, result] = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('%s',sceneName));
+sceneWindow(scene);
+%}
 
 %% This is used to visualize the rendered result
+%{
 wave = 395:10:705;  % Hard coded in pbrt
 nWave = length(wave);
-filename = '/Users/zhenglyu/Desktop/Research/presentation/mouth_random_material/pbrt_finer_mesh.dat';
+filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/pbrt.dat';
 energy = piReadDAT(filename, 'maxPlanes', nWave);
 photon = Energy2Quanta(wave,energy);
 scene = piSceneCreate(photon, 'wavelength', wave);
 sceneWindow(scene,'display mode','hdr');
+%}

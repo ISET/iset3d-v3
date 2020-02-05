@@ -1,5 +1,5 @@
-function piFluorescentHalfDivision(thisR, indices, childGeometryPath,...
-                                    indicesSplit, txtLines, base)
+function piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
+                                   txtLines, base, location)
 %% Split the orignal area into two parts
 %
 %   piFluorescentHalfDivision
@@ -9,11 +9,13 @@ function piFluorescentHalfDivision(thisR, indices, childGeometryPath,...
 %   as fluophores on one part.
 %
 % Inputs:
-%   thisR           - scene recipe
-%   indices         - triangle meshes in the scene
-%   indicesSplit    - contains full pbrt geometry file format info
-%   txtLines        - geometry file text lines
+%   thisR               - scene recipe
+%   TR                  - triangulation object
+%   childGeometryPath   - path to the child pbrt geometry files
+%   indices             - triangle meshes in the scene
+%   txtLines            - geometry file text lines
 %   base                - reference material
+%   location            - target locaiton for pattern
 %
 % Outputs:
 %   None.
@@ -22,12 +24,38 @@ function piFluorescentHalfDivision(thisR, indices, childGeometryPath,...
 %   ZLY, BW, 2020
 %
 % See also:
-%   t_piFluorescentPattern, piFluorescentDivision, piFluorescentPattern.
+%   t_piFluorescentPattern, piFluorescentPattern.
+
+%% Generate verticeOne and verticeTwo
+vertice = TR.ConnectivityList;
+
+numVerticeOne = cast(size(vertice, 1)/2, 'uint32');
+
+% Generate verticeOne
+verticeOne = zeros(numVerticeOne, size(vertice, 2));
+
+for ii = 1:size(verticeOne, 1)
+    verticeOne(ii, :) = vertice(ii, :);
+end
+% Generate verticeTwo
+verticeTwo = zeros(size(vertice, 1) - numVerticeOne, size(vertice, 2));
+
+for ii = numVerticeOne + 1 : size(vertice, 1)
+    verticeTwo(ii - numVerticeOne, :) = vertice(ii, :);
+end
+
+%% Go edit PBRT files
+piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
+                                base, location, verticeOne, verticeTwo);
+
+%%
+%{
 %% Only write half of the indices back to the pbrt file
+
 % Should develop an algorithm 
 newIndicesLine = strcat(indicesSplit{1}, ' [ ');
 for ii = 1:numel(indices)/2
-    thisIndice = indices{ii};
+    thisIndice = indices(ii,:);
     newIndicesLine = strcat(newIndicesLine, num2str(thisIndice, '% d'), " ");
 
 end
@@ -121,4 +149,5 @@ thisR.materials.list(1).(materialName).linenumber = numel(txtLines);
 thisR.set('eem', {materialName, 'FAD'});
 thisR.set('concentration', {materialName, scaleFactor});
 piMaterialWrite(thisR);
+%}
 end

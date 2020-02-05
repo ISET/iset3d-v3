@@ -21,7 +21,7 @@
 %   ZLY, BW, 2020
 %
 % See also:
-%   piFluorescentPattern, piFluorescentDivision, piFluorescentHalfDivision
+%   piFluorescentPattern, piFluorescentHalfDivision
 
 
 
@@ -30,50 +30,70 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the recipe
+sceneName = 'slantedBar';
+FilePath = fullfile(piRootPath,'data','V3',sceneName);
+fname = fullfile(FilePath,[sceneName,'.pbrt']);
+if ~exist(fname,'file'), error('File not found'); end
+
+% This scene contains some glass and a mirror
+thisR = piRead(fname);
+
 %{
-% We might want to store it on the Flywheel so we can download it using
-% scitran.
-filePath = fullfile(piRootPath, 'data', 'V3',...
-                    'mouth', 'higher_res_mesh_segmentation.pbrt');
+    lightSources = piLightGet(thisR)
 %}
-filePath = '/Users/zhenglyu/Desktop/Research/3dmodel/mouth/final_c4d_resources/pbrt_files/segment_all_mouth/higher_res_mesh_segmentation_mouth.pbrt';
-thisR = piRead(filePath);
+
+% Delete current lights
+thisR = piLightDelete(thisR, 'all');
+
 thisR = piLightAdd(thisR,...
     'type','point',...
-    'light spectrum','equalEnergy',...
+    'light spectrum','blueLEDFlood',...
     'spectrumscale', 1,...
     'cameracoordinate', true);
 
-%% Set an output file
-
-% All output needed to render this recipe will be written into this
-% directory. 
-sceneName = 'segmentation_all_mouth';
-outFile = fullfile(piRootPath,'local',sceneName,'segmentation_all_mouth.pbrt');
-thisR.set('outputfile',outFile);
-
-%% Write 
-
-% Write modified recipe out
-piWrite(thisR, 'overwritematerials', false);
+%% Set the integrator
+thisR.integrator.subtype = 'path';
 
 %% Show the region/material options
 piMaterialList(thisR);
 
-%% Add fluorescent pattern 
-unhealthyRegion = 'Unhealthy';
-baseRegion = 'Unhealthy';
-piFluorescentPattern(thisR, 'location', unhealthyRegion,...
-                        'base', baseRegion);
+%% Assign fluorescent materials 
+concentrationUniform = 0.05;
 
+% Set the donaldson matrix based on the type of the materials
+thisR.set('eem', {'WhiteMaterial', 'FAD'});
+
+% Give a concentration (scaling factor) to the fluophores
+thisR.set('concentration', {'WhiteMaterial', concentrationUniform});
+
+%% Write 
+
+% Write modified recipe out
+piWrite(thisR, 'overwritematerials', true);
+
+%% Add fluorescent pattern 
+
+unhealthyRegion = 'WhiteMaterial';
+baseRegion = 'WhiteMaterial';
+
+algorithm = 'halfsplit';
+piFluorescentPattern(thisR, 'location', unhealthyRegion,...
+                     'base', baseRegion, 'algorithm', algorithm);
+
+%% Render(not applicable now since we don't have fluorescence version pbrt in Docker)
+%{
+[scene, result] = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('%s',sceneName));
+sceneWindow(scene);
+%}
 %% After render the scene
 %{
 %% Used to visualize the result
-wave = 395:10:705;  % Hard coded in pbrt
+wave = 400:10:700; 
 nWave = length(wave);
 filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/pbrt.dat';
 energy = piReadDAT(filename, 'maxPlanes', nWave);
 photon = Energy2Quanta(wave,energy);
 scene = piSceneCreate(photon, 'wavelength', wave);
-sceneWindow(scene);
+sceneWindow(scene,'display mode','hdr');
 %}

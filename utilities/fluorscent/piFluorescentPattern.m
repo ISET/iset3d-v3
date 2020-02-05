@@ -26,20 +26,19 @@ function piFluorescentPattern(thisR, varargin)
 %   ZLY, BW, 2020
 %
 % See also:
-%   t_piFluorescentPattern, pifluorescent Division,
-%   piFluorescentHalfDivision
-
-
+%   t_piFluorescentPattern
 
 %% Parse parameters
 
 p = inputParser;
 
+p.KeepUnmatched = true;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addParameter('location','',@ischar);
 p.addParameter('base','',@ischar);
 p.addParameter('algorithm','half split',@ischar);
+
 p.parse(thisR, varargin{:});
 
 thisR  = p.Results.thisR;
@@ -51,7 +50,9 @@ algorithm = ieParamFormat(p.Results.algorithm);
 if isempty(location), error('Location must be specified.\n'); end
 if isempty(base), base = location; end 
 
-%% TODO: make a copy of all the current files to the current folder
+%% TODO: make a copy of all the current files to the current folder?
+
+
 %% Read child geometry files from the written pbrt files
 
 [Filepath,sceneFileName] = fileparts(thisR.outputFile);
@@ -62,12 +63,12 @@ fid_rtGeo = fopen(rootGeometryFile,'r');
 tmp = textscan(fid_rtGeo,'%s','Delimiter','\n');
 rtGeomTxtLines = tmp{1};
 
-index = find(contains(rtGeomTxtLines, location)) + 1; % Need to see next line
+% We change the last object if selected material is used more than once.
+index = find(contains(rtGeomTxtLines, location),1,'last') + 1; % Need to see next line
 
 tmp = strsplit(rtGeomTxtLines{index}, '"');
 
 % Complete the child Geometry Path 
-
 childGeometryPath = fullfile(Filepath, tmp{2});
 
 % Edit the "unhealthy" region
@@ -78,41 +79,97 @@ tmp = textscan(fid_obj,'%s','Delimiter','\n');
 txtLines = tmp{1};
 
 indicesLine = txtLines{3};
-% pointPosLine = txtLines{4}; % Unused now
+pointPosLine = txtLines{4};
 
 % Process the indices (edges)
 indicesSplit = strsplit(indicesLine, {'[',']'}); 
 indicesStr = indicesSplit{2};
 
-indices = threePointsCreate(indicesStr);
+vertice = threeDCreate(indicesStr);
+vertice = vertice + 1;
 
-%{
 % Process the points (seems won't be used)
 pointsSplit = strsplit(pointPosLine, {'[', ']'});
 pointsStr = pointsSplit{2};
-points = threePointsCreate(pointsStr);
+points = threeDCreate(pointsStr);
+
+%% Create triangulation object using MATLAB Computational Geometry toolbox
+
+TR = triangulation(vertice, points);
+%{
+  % Visualization
+    trimesh(TR);   
 %}
 
-piFluorescentDivision('thisR', thisR,...
-                      'indices', indices,...
-                      'indicesSplit', indicesSplit,...
-                      'childGeometryPath', childGeometryPath,...
-                      'algorithm', algorithm,...
-                      'txtLines', txtLines,...
-                      'base', base);
-end
-%%
+%% Apply algorithm for mesh split
+switch algorithm
+    case 'halfsplit'
+        piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
+                                  txtLines, base, location);
+    case 'uniformspread'
 
-function points = threePointsCreate(pointsStr)
+        if isfield(p.Unmatched, 'depth')
+            if isfield(p.Unmatched, 'sTriangleIndex')
+                piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
+                                       txtLines, base, location,...
+                                       'depth', p.Unmatched.depth,...
+                                       'sTriangleIndex', p.Unmatched.sTriangleIndex);  
+            else
+                piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
+                           txtLines, base, location,...
+                           'depth', p.Unmatched.depth); 
+            end
+        else
+            if isfield(p.Unmatched, 'sTriangleIndex')
+                piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
+                                       txtLines, base, location,...
+                                       'sTriangleIndex', p.Unmatched.sTriangleIndex);   
+            else
+                piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
+                                           txtLines, base, location);                 
+            end
+        end
+        
+    case 'multiuniform'
+        if isfield(p.Unmatched, 'maxDepth')
+            if isfield(p.Unmatched, 'coreNumber')
+                piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
+                                           txtLines, base, location,...
+                                           'maxDepth', p.Unmatched.maxDepth,...
+                                           'coreNumber', p.Unmatched.coreNumber);
+            else
+                piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
+                           txtLines, base, location,...
+                           'maxDepth', p.Unmatched.maxDepth);
+            end
+        else
+            if isfield(p.Unmatched, 'coreNumber')
+                piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
+                           txtLines, base, location,...
+                           'coreNumber', p.Unmatched.coreNumber);
+            else
+                piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
+                           txtLines, base, location);
+            end
+        end
+
+    otherwise
+        error('Unknown algorithm: %s, maybe implement it in the future. \n', algorithm);
+    
+end
+end
+
+%%
+function points = threeDCreate(pointsStr)
 % Create cell array from a string. Suitable for situations where every
 % three numbers are considered as a data point.
     pointsNum = str2num(pointsStr);
-    points = cell(1, numel(pointsNum)/3); % xyz position & triangle mesh
+    points = []; % xyz position & triangle mesh
     for ii = 1:numel(pointsNum)/3
         pointList = zeros(1, 3);
         for jj = 1:3
             pointList(jj) = pointsNum((ii - 1) * 3 + jj);
         end
-        points{ii} = pointList;
+        points = [points; pointList];
     end
 end
