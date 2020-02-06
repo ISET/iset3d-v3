@@ -1,5 +1,5 @@
 function piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines, ...
-                                base, location, verticeOne, verticeTwo, varargin)
+                                base, location, verticesOne, verticesTwo, varargin)
 %% 
 %
 %   piFluorescentPBRTEdit
@@ -65,14 +65,14 @@ end
 
 %% Minus one so the numbers of vertice agree with the rule in PBRT
 
-verticeOne = verticeOne - 1;
-verticeTwo = verticeTwo - 1;
+verticesOne = verticesOne - 1;
+verticesTwo = verticesTwo - 1;
 %% Write verticeOne back to child geometry file
 
 % Should develop an algorithm 
 newVerticeOneLine = strcat("  ", '"integer indices"', ' [ ');
-for ii = 1:size(verticeOne, 1)
-    thisIndice = verticeOne(ii,:);
+for ii = 1:size(verticesOne, 1)
+    thisIndice = verticesOne(ii,:);
     newVerticeOneLine = strcat(newVerticeOneLine, num2str(thisIndice, '% d'), " ");
 end
 newVerticeOneLine = strcat(newVerticeOneLine, ' ]');
@@ -104,8 +104,8 @@ fprintf(fid_newGeoFile, strcat(txtLines{2}, '\n'));
 
 % Line 3
 newVerticeTwoLine = strcat("  ", '"integer indices"', ' [ ');
-for ii = 1:size(verticeTwo, 1)
-    thisIndice = verticeTwo(ii, :);
+for ii = 1:size(verticesTwo, 1)
+    thisIndice = verticesTwo(ii, :);
     newVerticeTwoLine = strcat(newVerticeTwoLine, num2str(thisIndice, '% d'), " ");
 end
 newVerticeTwoLine = strcat(newVerticeTwoLine, ' ]');

@@ -32,21 +32,21 @@ vertice = TR.ConnectivityList;
 numVerticeOne = cast(size(vertice, 1)/2, 'uint32');
 
 % Generate verticeOne
-verticeOne = zeros(numVerticeOne, size(vertice, 2));
+verticesOne = zeros(numVerticeOne, size(vertice, 2));
 
-for ii = 1:size(verticeOne, 1)
-    verticeOne(ii, :) = vertice(ii, :);
+for ii = 1:size(verticesOne, 1)
+    verticesOne(ii, :) = vertice(ii, :);
 end
 % Generate verticeTwo
-verticeTwo = zeros(size(vertice, 1) - numVerticeOne, size(vertice, 2));
+verticesTwo = zeros(size(vertice, 1) - numVerticeOne, size(vertice, 2));
 
 for ii = numVerticeOne + 1 : size(vertice, 1)
-    verticeTwo(ii - numVerticeOne, :) = vertice(ii, :);
+    verticesTwo(ii - numVerticeOne, :) = vertice(ii, :);
 end
 
 %% Go edit PBRT files
 piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
-                                base, location, verticeOne, verticeTwo);
+                                base, location, verticesOne, verticesTwo);
 
 %%
 %{

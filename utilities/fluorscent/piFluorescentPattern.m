@@ -85,8 +85,8 @@ pointPosLine = txtLines{4};
 indicesSplit = strsplit(indicesLine, {'[',']'}); 
 indicesStr = indicesSplit{2};
 
-vertice = threeDCreate(indicesStr);
-vertice = vertice + 1;
+vertices = threeDCreate(indicesStr);
+vertices = vertices + 1;
 
 % Process the points (seems won't be used)
 pointsSplit = strsplit(pointPosLine, {'[', ']'});
@@ -95,7 +95,7 @@ points = threeDCreate(pointsStr);
 
 %% Create triangulation object using MATLAB Computational Geometry toolbox
 
-TR = triangulation(vertice, points);
+TR = triangulation(vertices, points);
 %{
   % Visualization
     trimesh(TR);   

@@ -1,4 +1,4 @@
-function verticeOne = piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
+function verticesOne = piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
                                     txtLines, base, location, varargin)
 %% Generate a pattern from single triangle
 %
@@ -48,7 +48,7 @@ nCollection = neighbors(TR);
 indexList = [sTriangleIndex];
 qTriangleIndex = [sTriangleIndex];
 qDepthList = [0];
-verticeTwo = [TR.ConnectivityList(sTriangleIndex, :)];
+verticesTwo = [TR.ConnectivityList(sTriangleIndex, :)];
 
 visited = zeros(1, edgesNum);
 %% 
@@ -87,7 +87,7 @@ while(~isempty(qTriangleIndex))
                     qTriangleIndex = [qTriangleIndex newIndex];
                     qDepthList = [qDepthList curDepth];
                     indexList = [indexList newIndex];
-                    verticeTwo = [verticeTwo; TR.ConnectivityList(newIndex, :)];
+                    verticesTwo = [verticesTwo; TR.ConnectivityList(newIndex, :)];
                     visited(newIndex) = 1;
                 end
             end
@@ -101,27 +101,27 @@ while(~isempty(qTriangleIndex))
 end
 
 %{
-    verticePlot(verticeTwo, TR);
-    verticeReset(TR);
+    verticesPlot(verticeTwo, TR);
+    verticesReset(TR);
 %}
 
 %% Write verticeOne
 
 indexListOne = setdiff(1:edgesNum, indexList);
-verticeOne = zeros(numel(indexListOne), size(TR.ConnectivityList, 2));
+verticesOne = zeros(numel(indexListOne), size(TR.ConnectivityList, 2));
 for ii = 1:numel(indexListOne)
-    verticeOne(ii, :) = TR.ConnectivityList(indexListOne(ii), :);
+    verticesOne(ii, :) = TR.ConnectivityList(indexListOne(ii), :);
 end
 
 %% Go edit PBRT files
 piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
-                                base, location, verticeOne, verticeTwo);
+                                base, location, verticesOne, verticesTwo);
 
 
 end
 
 %% Some useful functions for mesh visualization
-function verticePlot(vertice, TR)
+function verticesPlot(vertice, TR)
 close all
 trimesh(TR)
 tmpTR = triangulation(vertice, TR.Points);
@@ -129,7 +129,7 @@ hold all
 trisurf(tmpTR);
 end
 
-function verticeReset(TR)
+function verticesReset(TR)
 hold off
 trimesh(TR)
 end
