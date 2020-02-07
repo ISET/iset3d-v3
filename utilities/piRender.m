@@ -82,6 +82,7 @@ p.addParameter('meanluminance',100,@inumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);
+p.addParameter('wave', 400:10:700, @isnumeric);
 
 % If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
 
@@ -94,6 +95,7 @@ renderType      = p.Results.rendertype;
 version         = p.Results.version;
 dockerImageName = p.Results.dockerimagename;
 scaleIlluminance = p.Results.scaleIlluminance;
+wave             = p.Results.wave;
 
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build
@@ -284,17 +286,18 @@ for ii = 1:length(filesToRender)
             ieObject = piDat2ISET(outFile,...
                 'label','radiance',...
                 'recipe',thisR,...
-                'scaleIlluminance',scaleIlluminance);
+                'scaleIlluminance',scaleIlluminance,...
+                'wave',wave);
         case {'metadata'}
-            metadata = piDat2ISET(outFile,'label','mesh');
+            metadata = piDat2ISET(outFile,'label','mesh','wave',wave);
             ieObject   = metadata;
         case 'depth'
-            depthImage = piDat2ISET(outFile,'label','depth');
+            depthImage = piDat2ISET(outFile,'label','depth','wave',wave);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject,'depth map',depthImage);
             end
         case 'coordinates'
-            coordMap = piDat2ISET(outFile,'label','coordinates');
+            coordMap = piDat2ISET(outFile,'label','coordinates','wave',wave);
             ieObject = coordMap;
     end
 

@@ -75,16 +75,18 @@ thisR.set('outputFile',outFile);
 piWrite(thisR,'creatematerials',true);
 
 
-%% Render(not applicable now since we don't have fluorescence version pbrt in Docker)
-%{
-[scene, result] = piRender(thisR);
+%% Render
+thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
+wave = 395:10:705;
+[scene, result] = piRender(thisR, 'dockerimagename', thisDocker,'wave',wave);
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
+
+scene = sceneSet(scene,'wavelength', wave);
 sceneWindow(scene);
-%}
 
 %% This is used to visualize the rendered result
 %{
-wave = 395:10:705;  % Hard coded in pbrt
+wave = 385:5:705;
 nWave = length(wave);
 filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/pbrt.dat';
 energy = piReadDAT(filename, 'maxPlanes', nWave);

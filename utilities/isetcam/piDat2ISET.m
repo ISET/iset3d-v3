@@ -41,6 +41,7 @@ p.addParameter('recipe',[],@(x)(isequal(class(x),'recipe')));
 p.addParameter('meanluminance',100,@isnumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
+p.addParameter('wave', 400:10:700, @isnumeric);
 
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;
@@ -48,10 +49,10 @@ thisR       = p.Results.recipe;
 meanLuminance   = p.Results.meanluminance;
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scaleIlluminance = p.Results.scaleIlluminance;
+wave = p.Results.wave;
 
 %% Depending on label, assign the output data properly to ieObject
 
-wave = 400:10:700; % Hard coded in pbrt
 nWave = length(wave);
 if(strcmp(label,'radiance'))
     
@@ -159,7 +160,8 @@ switch opticsType
         
     case {'pinhole','environment'}
         % A scene radiance, not an oi
-        ieObject = piSceneCreate(photons,'meanLuminance',meanLuminance);
+        ieObject = piSceneCreate(photons,'meanLuminance',meanLuminance,...
+                                    'wavelength', wave);
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if ~isempty(thisR)
             % PBRT may have assigned a field of view
