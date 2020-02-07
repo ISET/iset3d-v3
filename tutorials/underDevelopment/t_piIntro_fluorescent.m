@@ -43,8 +43,8 @@ thisR = piLightAdd(thisR,...
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',64);
+thisR.set('film resolution',[200 150]);
+thisR.set('pixel samples',16);
 
 %% Write out the pbrt scene file, based on thisR.
 
@@ -79,6 +79,8 @@ piWrite(thisR,'creatematerials',true);
 thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
 wave = 395:10:705;
 [scene, result] = piRender(thisR, 'dockerimagename', thisDocker,'wave',wave);
+
+%%
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 
 scene = sceneSet(scene,'wavelength', wave);
