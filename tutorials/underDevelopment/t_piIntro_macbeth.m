@@ -5,13 +5,13 @@
 %  
 % Index numbers for MacBeth checker:
 %          ---- ---- ---- ---- ---- ----
-%         | 01 | 02 | 03 | 04 | 05 | 06 |
+%         | 01 | 05 | 09 | 13 | 17 | 21 |
 %          ---- ---- ---- ---- ---- ----
-%         | 07 | 08 | 09 | 10 | 11 | 12 | 
+%         | 02 | 06 | 10 | 14 | 18 | 22 | 
 %          ---- ---- ---- ---- ---- ----
-%         | 13 | 14 | 15 | 16 | 17 | 18 | 
+%         | 03 | 07 | 11 | 15 | 19 | 23 | 
 %          ---- ---- ---- ---- ---- ----
-%         | 19 | 20 | 21 | 22 | 23 | 24 | 
+%         | 04 | 08 | 12 | 16 | 20 | 24 | 
 %          ---- ---- ---- ---- ---- ----
 %
 % Dependencies:
@@ -43,7 +43,7 @@ thisR = piLightDelete(thisR, 'all');
 thisR = piLightAdd(thisR,...
     'type','distant',...
     'light spectrum','D65',...
-    'spectrumscale', 1,...
+    'spectrumscale', 100,...
     'cameracoordinate', true);
 
 %% Set an output file
@@ -53,7 +53,7 @@ thisR = piLightAdd(thisR,...
 sceneName = 'macbeth';
 outFile = fullfile(piRootPath,'local',sceneName,'macbeth.pbrt');
 thisR.set('outputfile',outFile);
-thisR.integrator.subtype = 'path';
+thisR.integrator.subtype = 'directlighting';
 
 thisR.set('pixelsamples', 16);
 
