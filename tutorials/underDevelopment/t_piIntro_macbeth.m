@@ -40,10 +40,12 @@ thisR = piLightDelete(thisR, 'all');
 %{
     lightSources = piLightGet(thisR)
 %}
+spectrumScale = 1;
+lightSpectrum = 'EqualEnergy';
 thisR = piLightAdd(thisR,...
     'type','distant',...
-    'light spectrum','D65',...
-    'spectrumscale', 100,...
+    'light spectrum',lightSpectrum,...
+    'spectrumscale', spectrumScale,...
     'cameracoordinate', true);
 
 %% Set an output file
@@ -53,7 +55,7 @@ thisR = piLightAdd(thisR,...
 sceneName = 'macbeth';
 outFile = fullfile(piRootPath,'local',sceneName,'macbeth.pbrt');
 thisR.set('outputfile',outFile);
-thisR.integrator.subtype = 'directlighting';
+thisR.integrator.subtype = 'path';
 
 thisR.set('pixelsamples', 16);
 
@@ -65,7 +67,7 @@ piWrite(thisR, 'overwritematerials', true);
 
 %% Render the scene
 %{
-[scene, result] = piRender(thisR);
+[scene, result] = piRender(thisR, 'rendertype','illuminant');
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 sceneWindow(scene);
 %}
@@ -108,7 +110,7 @@ piWrite(thisR, 'overwritematerials', true);
 thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
 
 wave = 385:5:705;
-[scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave);
+[scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'illuminant');
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 
 scene = sceneSet(scene,'wavelength', wave);

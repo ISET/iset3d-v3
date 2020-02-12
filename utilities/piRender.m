@@ -75,7 +75,7 @@ else
     varargin =ieParamFormat(varargin);
 end
 
-rTypes = {'radiance','depth','both','coordinates','material','mesh'};
+rTypes = {'radiance','depth','both','coordinates','material','mesh', 'illuminant'};
 p.addParameter('rendertype','both',@(x)(ismember(x,rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('meanluminance',100,@inumeric);
@@ -83,6 +83,7 @@ p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);
 p.addParameter('wave', 400:10:700, @isnumeric);
+p.addParameter('reflectancerender', false, @islogical);
 
 % If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
 
@@ -129,7 +130,8 @@ end
 pbrtFile = thisR.outputFile;
 
 % Set up any metadata render.
-if (~strcmp(renderType,'radiance'))  % If radiance, no metadata
+% ZLY: added illuminant option here
+if ((~strcmp(renderType,'radiance')))  % If radiance, no metadata
     
     % Do some checks for the renderType.
     if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
@@ -183,6 +185,11 @@ switch renderType
     case{'material','mesh','depth'}
         filesToRender = {metadataFile};
         label{1} = 'metadata';
+    case{'illuminant'}
+        filesToRender{1} = pbrtFile;
+        label{1} = 'radiance';
+        filesToRender{2} = metadataFile;
+        label{2} = 'illuminant';
     otherwise
         error('Cannot recognize render type.');
 end
@@ -299,6 +306,15 @@ for ii = 1:length(filesToRender)
         case 'coordinates'
             coordMap = piDat2ISET(outFile,'label','coordinates','wave',wave);
             ieObject = coordMap;
+        case 'illuminant'
+            illuminantPhotons = piDat2ISET(outFile, 'label', 'illuminant', 'wave', wave);
+            if ~isempty(ieObject) && isstruct(ieObject)
+                ieObject = sceneSet(ieObject, 'illuminant photons', illuminantPhotons);
+            end
+        
+        % Scale the mean luminance here. It's a bit ugly now, but we'll
+        % chance that. ZLY
+        ieObject = sceneAdjustLuminance(ieObject, 100);
     end
 
 end

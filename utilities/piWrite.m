@@ -69,7 +69,13 @@ p.addParameter('lightsFlag',false,@islogical);
 
 % Read trafficflow variable
 p.addParameter('thistrafficflow',[]);
+
+% Second rendering for reflectance calculation
+p.addParameter('reflectancerender',false,@islogical);
+
 p.parse(renderRecipe,varargin{:});
+
+
 
 % workingDir          = p.Results.workingdir;
 overwriteresources  = p.Results.overwriteresources;
@@ -442,4 +448,5 @@ end
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);
 jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
 jsonwrite(jsonFile,renderRecipe);
+
 end
