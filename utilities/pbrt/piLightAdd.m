@@ -232,7 +232,9 @@ switch type
             
         end
 end
-%%
+
+%% Update the world data
+
 index_m = piContains(thisR.world,'_materials.pbrt');
 index_g = piContains(thisR.world,'_geometry.pbrt');
 world = thisR.world(1:end-3);
@@ -250,11 +252,16 @@ world{numWorld+1,:} = thisR.world{index_m};
 world{numWorld+2,:} = thisR.world{index_g};
 world{end+1,:} = 'WorldEnd';
 thisR.world = world;
-if idxL
-    disp('Light updated.');
-else
-    disp('Light Added to the Scene.');
+
+%% Tell the user the status.  We might turn this off some day.
+
+if idxL, fprintf('Existing lights updated.\n');
+else,    fprintf('New light added.\n');
 end
+
+piLightGet(thisR);
+
+
 end
 
 

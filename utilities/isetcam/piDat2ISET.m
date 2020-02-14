@@ -38,7 +38,7 @@ p.addRequired('inputFile',@(x)(exist(x,'file')));
 p.addParameter('label','radiance',@(x)ischar(x));
 
 p.addParameter('recipe',[],@(x)(isequal(class(x),'recipe')));
-p.addParameter('meanluminance',100,@isnumeric);
+% p.addParameter('meanluminance',100,@isnumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('wave', 400:10:700, @isnumeric);
@@ -46,7 +46,7 @@ p.addParameter('wave', 400:10:700, @isnumeric);
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;
 thisR       = p.Results.recipe;
-meanLuminance   = p.Results.meanluminance;
+% meanLuminance   = p.Results.meanluminance;
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scaleIlluminance = p.Results.scaleIlluminance;
 wave = p.Results.wave;
@@ -54,7 +54,7 @@ wave = p.Results.wave;
 %% Depending on label, assign the output data properly to ieObject
 
 nWave = length(wave);
-if(strcmp(label,'radiance') || strcmp(label, 'illuminant'))
+if(strcmp(label,'radiance') || strcmp(label, 'illuminant') || strcmp(label, 'illuminantonly'))
     
     % The PBRT output is in energy units.  Scenes and OIs data are
     % represented in photons
@@ -67,7 +67,7 @@ if(strcmp(label,'radiance') || strcmp(label, 'illuminant'))
     %
     % OLD:  photons = Energy2Quanta(wave,energy)*0.003664;
     %
-    if strcmp(label, 'illuminant')
+    if strcmp(label, 'illuminant') || strcmp(label, 'illuminantonly')
         ieObject = photons;
         return;
     end
@@ -77,6 +77,7 @@ elseif(strcmp(label,'depth') || strcmp(label,'mesh')||strcmp(label,'material') )
     ieObject = metadataMap;
     return;
 elseif(strcmp(label,'coordinates'))
+    % Not sure what this is.  Maybe the 3D coordinates of each point?
     tmp = piReadDAT(inputFile, 'maxPlanes', nWave);
     coordMap = tmp(:,:,1:3); clear tmp;
     ieObject = coordMap;
@@ -175,25 +176,6 @@ switch opticsType
     otherwise
         error('Unknown optics type %s\n',opticsType);       
 end
-
-
-%{
-%% Adjust the illuminant
-
-% Usually there is a light inside of the spds directory.  In some
-% cases, however, there is no light (e.g. the teapot scene).  So we
-% check and add the light if it is there.
-lightSourcePath = fullfile(fileparts(thisR.outputFile), 'spds', 'lights', '*.mat');
-fileInfo = dir(lightSourcePath);
-if ~isempty(fileInfo)
-    if numel(fileInfo) ~= 1
-        warning('Multiple light sources.  Not assigning a light to the scene. We will calculate the illuminant image and assign it - some day.'); 
-    else
-        illuEnergy = ieReadSpectra(fullfile(fileInfo.folder, fileInfo.name),wave);
-        ieObject = sceneSet(ieObject, 'illuminant Energy', illuEnergy);
-    end
-end
-%}
 
 end
 

@@ -1,9 +1,10 @@
-%% Render MacBeth checker 
+%% t_piIntro_macbeth
 %
-% t_mabceth
-%
+% Render a MacBeth color checker.  Then make an illuminant image to
+% return a spatio-spectral illuminant.
+% 
 %  
-% Index numbers for MacBeth checker:
+% Index numbers for MacBeth color checker:
 %          ---- ---- ---- ---- ---- ----
 %         | 01 | 05 | 09 | 13 | 17 | 21 |
 %          ---- ---- ---- ---- ---- ----
@@ -16,7 +17,7 @@
 %
 % Dependencies:
 %
-%    ISET3d, (ISETCam or ISETBio), JSONio, isetfluorescent
+%    ISET3d, (ISETCam or ISETBio), JSONio
 %
 % Author:
 %   ZLY, BW, 2020
@@ -34,12 +35,15 @@ if ~exist(fname,'file'), error('File not found'); end
 
 thisR = piRead(fname);
 
-%% Change the light condition
-thisR = piLightDelete(thisR, 'all');
+%% Change the light
 
+% There is a default point light.  We delete that.
 %{
     lightSources = piLightGet(thisR)
 %}
+thisR = piLightDelete(thisR, 'all');
+
+% Add an equal energy distant light
 spectrumScale = 1;
 lightSpectrum = 'EqualEnergy';
 thisR = piLightAdd(thisR,...
@@ -65,9 +69,13 @@ thisR.set('filmresolution', [640, 360]);
 % Write modified recipe out
 piWrite(thisR, 'overwritematerials', true);
 
-%% Render the scene
+%% Render the scene and then render again to calculate the illuminant
+
 %{
-[scene, result] = piRender(thisR, 'rendertype','illuminant');
+% When render type is illuminant it does both the scene and the
+% illuminant
+
+[scene, result] = piRender(thisR, 'render type','illuminant only');
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 sceneWindow(scene);
 %}

@@ -25,7 +25,8 @@ metadataRecipe = copy(recipe);
 
 %% Adjust the recipe values
 
-if strcmp(metadata, 'illuminant')
+if strcmp(metadata, 'illuminant') || strcmp(metadata, 'illuminantonly')
+    fprintf('Creating matte white surface version of the scene.\n');
     totalReflection = metadataRecipe.materials.lib.totalreflect;
     
     % piMaterialTotalAssign(thisR)
