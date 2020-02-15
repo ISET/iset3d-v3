@@ -175,7 +175,7 @@ if ((~strcmp(renderType,'radiance')))
             metadataType{1} = 'depth';
         case 'all'
             metadataType{1} = 'depth';
-            metadataType{2} = 'illuminantonly';
+            metadataType{2} = 'illuminant';
         otherwise
              metadataType{1} = renderType;
     end
@@ -213,7 +213,7 @@ switch renderType
     case {'all'}
         filesToRender{1} = pbrtFile;        label{1} = 'radiance';
         filesToRender{2} = metadataFile{1}; label{2} = 'depth';
-        filesToRender{3} = metadataFile{1}; label{3} = 'illuminant';
+        filesToRender{3} = metadataFile{2}; label{3} = 'illuminant';
     case {'both'}
         % Radiance and the metadata.  But not the illuminant.
         filesToRender{1} = pbrtFile;        label{1} = 'radiance';

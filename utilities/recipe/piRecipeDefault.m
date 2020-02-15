@@ -29,7 +29,6 @@ function thisR = piRecipeDefault(sceneName)
    sceneWindow(scene); sceneSet(scene,'gamma',0.5);
 %}
 %{
-   % Still does not work.
    thisR = piRecipeDefault;
    scene = piRender(thisR,'render type','all');
    sceneWindow(scene);
@@ -38,6 +37,11 @@ function thisR = piRecipeDefault(sceneName)
    thisR = piRecipeDefault('SimpleScene');
    scene = piRender(thisR);
    scene = piRender(thisR,'render type','illuminant only');
+%}
+%{
+   thisR = piRecipeDefault('SimpleScene');
+   scene = piRender(thisR, 'render type', 'all');
+   sceneWindow(scene); sceneSet(scene,'gamma',0.5);
 %}
 
 %%
