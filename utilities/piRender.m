@@ -17,17 +17,21 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               the illuminant, or some combinations.  The options
 %               are:
 %
-%      'both' - radiance and depth
+%    Spectral data
+%      'all'      - radiance, depth, illuminant
+%      'both'     - radiance and depth
 %      'radiance' - spectral radiance (or irradiance of an oi)
-%      'depth'    - depth map in meters
-%      'coordinates' - 
-%      'material'    - label for the material at each pixel
-%      'mesh'        - label for the mesh identity at each pixel
 %      'illuminant'  - radiance and illuminant data
 %      'illuminantonly' - The materials are set to matte white and
 %                         rendered.  The spatial-spectral energy is
 %                         returned in a form that can be used as a
 %                         scene illuminant.
+%    Metadata
+%      'depth'    - depth map in meters
+%      'coordinates' - A [row,col,3] tensor of the (x,y,z) coordinate of
+%                      each pixel
+%      'material'    - label for the material at each pixel
+%      'mesh'        - label for the mesh identity at each pixel
 %
 %       N.B. If thisR is a fullpath to a file, then we only renderType
 %       is forced to be 'radiance'.  
@@ -62,7 +66,7 @@ function [ieObject, result] = piRender(thisR,varargin)
    % Renders both radiance and depth
    pbrtFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
    scene = piRender(pbrtFile);
-   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+   sceneWindow(scene); sceneSet(scene,'gamma',0.5);
 %}
 %{
    % Render radiance and depth separately
@@ -71,15 +75,28 @@ function [ieObject, result] = piRender(thisR,varargin)
    ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
    dmap = piRender(pbrtFile,'render type','depth');
    scene = sceneSet(scene,'depth map',dmap);
-   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+   sceneWindow(scene); sceneSet(scene,'gamma',0.5);
 %}
 %{
   % Separately calculate the illuminant and the radiance
+  thisR = piRecipeDefault; piWrite(thisR);
   [scene, result]      = piRender(thisR, 'render type','radiance');
   [illPhotons, result] = piRender(thisR, 'render type','illuminant only');
   scene = sceneSet(scene,'illuminant photons',illPhotons);
   sceneWindow(scene);
 %}
+%{
+  % Calculate the (x,y,z) coordinates of every surface point in the
+  % scene.  If there is no surface a zero is returned.  This should
+  % probably either a Inf or a NaN when there is no surface.  We might
+  % replace those with a black color or something.   
+  thisR = piRecipeDefault; piWrite(thisR);
+  [coords, result] = piRender(thisR, 'render type','coordinates');
+  ieNewGraphWin; imagesc(coords(:,:,1));
+  ieNewGraphWin; imagesc(coords(:,:,2));
+  ieNewGraphWin; imagesc(coords(:,:,3));
+%}
+
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
 
 p = inputParser;
@@ -90,7 +107,7 @@ p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
 
 varargin = ieParamFormat(varargin);
 
-rTypes = {'radiance','depth','both','coordinates','material','mesh', 'illuminant','illuminantonly'};
+rTypes = {'radiance','depth','both','all','coordinates','material','mesh', 'illuminant','illuminantonly'};
 p.addParameter('rendertype','both',@(x)(ismember(ieParamFormat(x),rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('meanluminance',[],@inumeric);
@@ -145,37 +162,46 @@ end
 pbrtFile = thisR.outputFile;
 
 % Set up any metadata render.
-% ZLY: added illuminant option here
-if ((~strcmp(renderType,'radiance')))  % If radiance, no metadata
+% If radiance, no metadata
+if ((~strcmp(renderType,'radiance')))  
     
     % Do some checks for the renderType.
     if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
         error('Coordinates metadata render only available right now for pbrt-v3-spectral.');
     end
     
-    if(strcmp(renderType,'both')), metadataType = 'depth';
-    else,                          metadataType = renderType;
+    switch renderType
+        case 'both'
+            metadataType{1} = 'depth';
+        case 'all'
+            metadataType{1} = 'depth';
+            metadataType{2} = 'illuminantonly';
+        otherwise
+             metadataType{1} = renderType;
     end
     
-    metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType);
-    
-    % Depending on whether we used C4D to export, we create a new
-    % material files that we link with the main pbrt file.
-    if(strcmp(metadataRecipe.exporter,'C4D'))
-        creatematerials = true;
-        overwritegeometry = true;
-    else
-        creatematerials = false;
-        overwritegeometry = false;
+    for ii=1:numel(metadataType)
+        
+        metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType{ii});
+        
+        % Depending on whether we used C4D to export, we create a new
+        % material files that we link with the main pbrt file.
+        if(strcmp(metadataRecipe.exporter,'C4D'))
+            creatematerials = true;
+            overwritegeometry = true;
+        else
+            creatematerials = false;
+            overwritegeometry = false;
+        end
+        piWrite(metadataRecipe,...
+            'overwritepbrtfile', true,...
+            'overwritelensfile', false, ...
+            'overwriteresources', false,...
+            'creatematerials',creatematerials,...
+            'overwritegeometry',overwritegeometry);
+        
+        metadataFile{ii} = metadataRecipe.outputFile;
     end
-    piWrite(metadataRecipe,...
-        'overwritepbrtfile', true,...
-        'overwritelensfile', false, ...
-        'overwriteresources', false,...
-        'creatematerials',creatematerials,...
-        'overwritegeometry',overwritegeometry);
-    
-    metadataFile = metadataRecipe.outputFile;
 
 end
 
@@ -184,38 +210,35 @@ end
 filesToRender = {};
 label = {};
 switch renderType
-    case {'both','all'}
+    case {'all'}
+        filesToRender{1} = pbrtFile;        label{1} = 'radiance';
+        filesToRender{2} = metadataFile{1}; label{2} = 'depth';
+        filesToRender{3} = metadataFile{1}; label{3} = 'illuminant';
+    case {'both'}
         % Radiance and the metadata.  But not the illuminant.
-        filesToRender{1} = pbrtFile;
-        label{1} = 'radiance';
-        filesToRender{2} = metadataFile;
-        label{2} = 'depth';
+        filesToRender{1} = pbrtFile;        label{1} = 'radiance';
+        filesToRender{2} = metadataFile{1}; label{2} = 'depth';
     case {'radiance'}
         % Spectral radiance
-        filesToRender = {pbrtFile};
-        label{1} = 'radiance';
+        filesToRender{1} = pbrtFile;        label{1} = 'radiance';
     case {'coordinates'}
-        % We need coordinates to be separate since it's return type is
+        % We need coordinates to be separate since its return type is
         % different than the other metadata types.
-        filesToRender = {metadataFile};
-        label{1} = 'coordinates';
+        filesToRender{1} = metadataFile{1};    label{1} = 'coordinates';
     case{'material','mesh','depth'}
         % Returns one of the metadata types as an image
         % This could be depth, material, or the mesh (object) type
-        filesToRender = {metadataFile};
+        filesToRender{1} = metadataFile{1};
         label{1} = 'metadata';
     case{'illuminant'}
         % Illuminant and radiance
-        filesToRender{1} = pbrtFile;
-        label{1} = 'radiance';
-        filesToRender{2} = metadataFile;
-        label{2} = 'illuminant';
+        filesToRender{1} = pbrtFile;         label{1} = 'radiance';
+        filesToRender{2} = metadataFile{1};     label{2} = 'illuminant';
     case {'illuminantonly'}
         % Turn all the surfaces matte white and render
         % The returned spectral radiance is a measure of the
         % space-varying illumination.
-        filesToRender{1} = metadataFile;
-        label{1} = 'illuminantonly';
+        filesToRender{1} = metadataFile{1};     label{1} = 'illuminantonly';
     otherwise
         error('Cannot recognize render type.');
 end

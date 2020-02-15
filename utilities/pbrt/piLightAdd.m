@@ -40,18 +40,22 @@ function thisR = piLightAdd(thisR, varargin)
 %
 % Outputs:
 %        
-% Required: ISETCam
-% See also: piSkymapAdd(Add HDR lighting for global illumination)
 % Zhenyi, TL, SCIEN, 2019
 %
-% Example:
+% Required: ISETCam
+%
+% See also: 
+%   piSkymapAdd, piLight*
+%
+
+% Examples:
 %{
 lightSources = piLightGet(thisR);
 thisR = piLightDelete(thisR, 2);
 thisR = piLightAdd(thisR, 'type', 'point');
 thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
-
 %}
+
 %%
 varargin = ieParamFormat(varargin);  % Allow spaces and capitalization
 
@@ -138,10 +142,10 @@ else
     % add customized lightspectrum array [400 1 600 1 800 1]
 end
 %% Read light source struct from world struct
-currentlightSources = piLightGet(thisR, 'print', false);
+% currentlightSources = piLightGet(thisR, 'print', false);
 
 %% Construct a lightsource structure
-numLights = length(currentlightSources);
+% numLights = length(currentlightSources);
 
 switch type
     case 'point'
@@ -170,11 +174,7 @@ switch type
             lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
                 lightSpectrum, from, to, thisConeAngle, thisConeDelta);
         end
-%         lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-%                 lightSpectrum, from, to);
-%         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-%         thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
-%         lightSources{1}.line{2,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+
     case 'laser' % not supported for public
         lightSources{1}.type = 'laser';
         lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
@@ -195,7 +195,7 @@ switch type
         nlight = 1;
         for ii = 1:length(thisR.assets)
             if piContains(lower(thisR.assets(ii).name), 'area')
-                lightSources{nlight}.type = 'area';
+                lightSources{nlight}.type = 'area'; %#ok<*AGROW>
                 lightSources{nlight}.line{1} = 'AttributeBegin';
                 if idxL
                     lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
@@ -229,7 +229,6 @@ switch type
                 lightSources{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
             end
-            
         end
 end
 
