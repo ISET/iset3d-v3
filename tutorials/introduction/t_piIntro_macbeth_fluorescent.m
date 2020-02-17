@@ -1,9 +1,8 @@
-%% t_piIntro_macbeth
+%% t_piIntro_macbeth_fluorescent
 %
 % Render a MacBeth color checker.  Then make an illuminant image to
 % return a spatio-spectral illuminant.
 % 
-%  
 % Index numbers for MacBeth color checker:
 %          ---- ---- ---- ---- ---- ----
 %         | 01 | 05 | 09 | 13 | 17 | 21 |
@@ -28,29 +27,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read the recipe
 
-sceneName = 'MacBethChecker';
-FilePath = fullfile(piRootPath,'data','V3',sceneName);
-fname = fullfile(FilePath,[sceneName,'.pbrt']);
-if ~exist(fname,'file'), error('File not found'); end
-
-thisR = piRead(fname);
-
-%% Change the light
-
-% There is a default point light.  We delete that.
-%{
-    lightSources = piLightGet(thisR)
-%}
-thisR = piLightDelete(thisR, 'all');
-
-% Add an equal energy distant light
-spectrumScale = 1;
-lightSpectrum = 'EqualEnergy';
-thisR = piLightAdd(thisR,...
-    'type','distant',...
-    'light spectrum',lightSpectrum,...
-    'spectrumscale', spectrumScale,...
-    'cameracoordinate', true);
+thisR = piRecipeDefault('write',false);
 
 %% Set an output file
 
@@ -69,18 +46,8 @@ thisR.set('filmresolution', [640, 360]);
 % Write modified recipe out
 piWrite(thisR, 'overwritematerials', true);
 
-%% Render the scene and then render again to calculate the illuminant
+%% Now add a blue light
 
-%{
-% When render type is illuminant it does both the scene and the
-% illuminant
-
-[scene, result] = piRender(thisR, 'render type','illuminant only');
-scene = sceneSet(scene,'name',sprintf('%s',sceneName));
-sceneWindow(scene);
-%}
-
-%% Now add some fluorescent effect on the patterns
 % Change the light to 405 nm light source
 thisR = piLightDelete(thisR, 'all');
 thisR = piLightAdd(thisR,...
@@ -93,6 +60,7 @@ thisR = piLightAdd(thisR,...
 piMaterialList(thisR);
 
 %% Assign fluorescent materials on some patches
+
 concentrationUniform = 0.5;
 
 % Set the donaldson matrix based on the type of the materials
@@ -114,23 +82,15 @@ thisR.set('concentration', {'Patch18Material', concentrationUniform});
 % Write modified recipe out
 piWrite(thisR, 'overwritematerials', true);
 
-%% Render 
+%% Render - At some point we will make this the default (latest)
+
+% If you want to use the fluorescent modeling, specify this docker
+% container.  We will promote to the default after we test it more.
 thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
 
 wave = 385:5:705;
 [scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'illuminant');
-scene = sceneSet(scene,'name',sprintf('%s',sceneName));
-
 scene = sceneSet(scene,'wavelength', wave);
 sceneWindow(scene);
-%% After render the scene
-%{
-%% Used to visualize the result
-wave = 385:5:705;
-nWave = length(wave);
-filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/pbrt.dat';
-energy = piReadDAT(filename, 'maxPlanes', nWave);
-photon = Energy2Quanta(wave,energy);
-scene = piSceneCreate(photon, 'wavelength', wave);
-sceneWindow(scene,'display mode','hdr');
-%}
+
+%%

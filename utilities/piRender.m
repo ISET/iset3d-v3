@@ -380,11 +380,15 @@ for ii = 1:length(filesToRender)
 
 end
 
-%% If the return is a scene or an oi, and the user set a mean luminance or mean illuminance value, do it. 
-if isstruct(ieObject) 
+%% If the return is a scene or an oi, and the user set a mean luminance or mean illuminance value, do it.
+if isstruct(ieObject)
     switch ieObject.type
         case 'scene'
+            names = strsplit(fileparts(thisR.inputFile),'/');
+            ieObject = sceneSet(ieObject,'name',names{end});
         case 'opticalimage'
+            names = strsplit(fileparts(thisR.inputFile),'/');
+            ieObject = oiSet(ieObject,'name',names{end});
         otherwise
             error('Unknown struct type %s\n',ieObject.type);
     end
