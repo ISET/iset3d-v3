@@ -4,8 +4,20 @@ function lightSources = piLightGet(thisR, varargin)
 % This routine only works for light sources that are exported from
 % Cinema 4D.  It will not work in all cases.  We should fix that.
 %
+% Inputs
+%   thisR:  Recipe
+%
+% Optional key/val pairs
+%   print:   Printout the list of lights
+%
+% Returns
+%   lightSources:  Cell array of light source structures
+%
 % Zhenyi, SCIEN, 2019
 %
+% See also
+%   piLightDelete, piLightAdd
+
 
 %% Parse inputs
 
@@ -21,21 +33,24 @@ AttBegin  =  find(piContains(thisR.world,'AttributeBegin'));
 AttEnd    =  find(piContains(thisR.world,'AttributeEnd'));
 arealight =  piContains(thisR.world,'AreaLightSource');
 light     =  piContains(thisR.world,'LightSource');
-lightIdx  =  find(light);
+lightIdx  =  find(light);   % Find which lines have LightSource on them.
 
-%% Get the lights for each lightIdx
+%% Parse the properties of the light in each line in the lightIdx list
 
-if isempty(lightIdx), lightSources = [];
-else,                 lightSources = cell(length(lightIdx),1);
+if isequal(sum(lightIdx),0), lightSources = [];
+else,                        lightSources = cell(length(lightIdx),1);
 end
 
 for ii = 1:length(lightIdx)
+    % Initialize the light structure
     lightSources{ii} = lightInit;
-    if length(AttBegin)>=ii
+    
+    % Find the attributes sections of the world text
+    if length(AttBegin) >= ii
         lightSources{ii}.line  = thisR.world(AttBegin(ii):AttEnd(ii));
         lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
     else
-        light(arealight)=0;
+        light(arealight) = 0;
         lightSources{ii}.line  = thisR.world(lightIdx(ii));
         lightSources{ii}.range = lightIdx(ii);
     end
@@ -69,12 +84,21 @@ for ii = 1:length(lightIdx)
         lightSources{ii}.type = lightType{2};
         if ~piContains(lightSources{ii}.type, 'infinite')
             try
+                % Zheng Lyu to have a look here
+                % If this works, then we are C4D compatible
                 txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')};
             catch
+                % We are not C4D compatible.  So we do this
                 error('Cannot interpret this file.  Check for C4D compatibility.');
             end
+            
+            %  Get the string on the LightSource line
             thisLineStr = textscan(txt, '%q');
             thisLineStr = thisLineStr{1};
+            
+            % Find the from and to positions.  If C4D compatible, then
+            % do it this way.  If not, we need another approach to get
+            % these values.
             from = find(piContains(thisLineStr, 'point from'));
             lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
                 piParseNumericString(thisLineStr{from+2});...
@@ -84,12 +108,16 @@ for ii = 1:length(lightIdx)
                     piParseNumericString(thisLineStr{to+2});...
                     piParseNumericString(thisLineStr{to+3})];
             end
+            
+            % Set the cone angle 
             coneAngle = find(piContains(thisLineStr, 'float coneangle'));
             if coneAngle,lightSources{ii}.coneangle = piParseNumericString(thisLineStr{coneAngle+1});
             end
             coneDeltaAngle =  find(piContains(thisLineStr, 'float conedelataangle'));
             if coneDeltaAngle, lightSources{ii}.conedeltaangle = piParseNumericString(thisLineStr{coneDeltaAngle+1});
             end
+            
+            % Adjust the spectrum
             spectrum  = find(piContains(thisLineStr, 'spectrum L'));
             if spectrum
                 if isnan(str2double(thisLineStr{spectrum+1}))

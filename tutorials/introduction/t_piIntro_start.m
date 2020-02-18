@@ -27,10 +27,10 @@ if ~piDockerExists, piDockerConfig; end
 %% Read the file
 
 % The teapot is our test file
-inFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
-recipe = piRead(inFile);
+% inFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
+recipe = piRecipeDefault('scene name','teapot');
 
-% The output will be written here
+%% The output will be written here
 sceneName = 'teapot';
 outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
 recipe.set('outputFile',outFile);
@@ -55,4 +55,4 @@ scene = sceneSet(scene,'gamma',0.7);
 %% Notice that we also computed the depth map
 scenePlot(scene,'depth map');
 
-%% END
+%%

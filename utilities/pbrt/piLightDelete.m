@@ -27,6 +27,7 @@ function thisR = piLightDelete(thisR, index)
 % see also: piLightGet, piLightsAdd
 
 %% Get list of light sources
+
 lightSource = piLightGet(thisR, 'print', false);
 world = thisR.world;
 

@@ -1,4 +1,7 @@
-
+%% t_piIntro_light
+%
+% Render the checkerboard scene with two different light sources
+%
 
 %% Initialize ISET and Docker
 
@@ -7,26 +10,22 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
+thisR = piRecipeDefault('scene name','checkerboard');
 
-% The teapot is our test file
-inFile = fullfile(piRootPath,'data','V3','checkerboard','checkerboard.pbrt');
-recipe = piRead(inFile);
-
-% The output will be written here
+%% The output will be written here
 sceneName = 'checkerboard';
 outFile = fullfile(piRootPath,'local',sceneName,'checkerboard.pbrt');
-recipe.set('outputFile',outFile);
+thisR.set('outputFile',outFile);
 
 %% Check the light list
-piLightGet(recipe);
+piLightGet(thisR);
 
 %% Remove all the current light
-recipe = piLightDelete(recipe, 1);
-recipe = piLightDelete(recipe, 1);
-lightList = piLightGet(recipe);
+thisR    = piLightDelete(thisR, 'all');
+lightList = piLightGet(thisR);
 
 %% Add one equal energy light
-recipe = piLightAdd(recipe,... 
+thisR = piLightAdd(thisR,... 
     'type','point',...
     'light spectrum','equalEnergy',...
     'spectrumscale', 1,...
@@ -35,14 +34,34 @@ recipe = piLightAdd(recipe,...
 %% Set up the render quality
 
 % There are many different parameters that can be set.
-recipe.set('film resolution',[192 192]);
-recipe.set('pixel samples',128);
-recipe.set('max depth',1); % Number of bounces
+thisR.set('film resolution',[192 192]);
+thisR.set('pixel samples',128);
+thisR.set('max depth',1); % Number of bounces
 
 %% Render
-piWrite(recipe);
+piWrite(thisR);
 
 %% Used for scene
-[scene, result] = piRender(recipe, 'render type', 'radiance');
+[scene, result] = piRender(thisR, 'render type', 'radiance');
 
 sceneWindow(scene);
+
+%%  Change the light and render again
+
+thisR    = piLightDelete(thisR, 'all');
+thisR = piLightAdd(thisR,... 
+    'type','spot',...
+    'light spectrum','D65',...
+    'spectrumscale', 1,...
+    'cameracoordinate', true);
+
+%% Render
+piWrite(thisR);
+
+%% Used for scene
+[scene, result] = piRender(thisR, 'render type', 'radiance');
+
+sceneWindow(scene);
+
+
+%%

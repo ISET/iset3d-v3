@@ -18,6 +18,11 @@ t_piIntro_macbeth_zmap;          % Get the zmap
 
 v_piDataScenes;                  % Checks the local data scenes
 
-%%
+%%  Rotate the camera
+
+t_piIntro_cameramotion
 
 
+%%  Needs checking.
+
+t_piIntro_light

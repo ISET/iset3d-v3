@@ -5,10 +5,15 @@ function thisR = piRecipeDefault(varargin)
 %   thisR = piRecipeDefault(varargin)
 %
 % Inputs
+%   N/A  - Default returns the MCC scene
 %
 % Optional key/val pairs
-%   scene name - The PBRT scene
-%     Currently only MacBethChecker (default) and SimpleScene
+%   scene name - The PBRT scene name
+%     MacBethChecker (default)
+%     SimpleScene
+%     checkerboard
+%     teapot
+%
 %   write      -  Call piWrite (default is true).  Writes into iset3d/local
 %
 % Outputs
@@ -68,6 +73,17 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
+        
+    case 'checkerboard'
+        FilePath = fullfile(piRootPath,'data','V3','checkerboard');
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+
+    case 'teapot'
+        FilePath = fullfile(piRootPath,'data','V3','teapot');
+        fname = fullfile(FilePath,'teapot-area-light.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
+
     otherwise
         error('Can not identify the scene, %s\n',sceneName);
 end
