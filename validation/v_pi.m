@@ -8,15 +8,15 @@
 %
 
 %%  
-t_piIntro_macbeth;
+t_piIntro_macbeth;               % Gets the depth map
 
-t_piIntro_macbeth_fluorescent;
+t_piIntro_macbeth_fluorescent;   % Tests fluorescence
 
-t_piIntro_macbeth_zmap;
+t_piIntro_macbeth_zmap;          % Get the zmap
 
 %%  Check that the scenes in the data directory still run
 
-v_piDataScenes
+v_piDataScenes;                  % Checks the local data scenes
 
 %%
 
