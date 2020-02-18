@@ -1,6 +1,6 @@
 %% Create and upload PBRT files to flywheel
 %
-%   s_uploadMouthPBRTFiles
+%   s_mouthUpload.m
 %
 % Description
 %
