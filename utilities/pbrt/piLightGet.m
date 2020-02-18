@@ -15,7 +15,6 @@ p.addRequired('recipe', @(x)(isa(x,'recipe')));
 p.addParameter('print',true);
 
 p.parse(thisR, varargin{:});
-lightSources = [];
 %%   Find the indices of the lines the .world slot that are a LightSource
 
 AttBegin  =  find(piContains(thisR.world,'AttributeBegin'));
@@ -24,9 +23,14 @@ arealight =  piContains(thisR.world,'AreaLightSource');
 light     =  piContains(thisR.world,'LightSource');
 lightIdx  =  find(light);
 
-%%
+%% Get the lights for each lightIdx
+
+if isempty(lightIdx), lightSources = [];
+else,                 lightSources = cell(length(lightIdx),1);
+end
+
 for ii = 1:length(lightIdx)
-        lightSources{ii} = lightInit;
+    lightSources{ii} = lightInit;
     if length(AttBegin)>=ii
         lightSources{ii}.line  = thisR.world(AttBegin(ii):AttEnd(ii));
         lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
@@ -38,10 +42,16 @@ for ii = 1:length(lightIdx)
     
     if find(piContains(lightSources{ii}.line, 'AreaLightSource'))
         lightSources{ii}.type = 'area';
+        
         translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
-        lightSources{ii}.position = [str2double(translate{2});...
-                                     str2double(translate{3});...
-                                     str2double(translate{4})];
+        if ~isempty(translate) && numel(translate) == 4
+            lightSources{ii}.position = [str2double(translate{2});...
+                str2double(translate{3});...
+                str2double(translate{4})];
+        else
+            warning('No translate parameter for AreaLightSource');
+        end
+        
         thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')}, '%q');
         thisLineStr = thisLineStr{1};
         spectrum  = find(piContains(thisLineStr, 'spectrum L'));
@@ -97,16 +107,20 @@ if p.Results.print
     disp('---------------------')
     disp('*****Light Type******')
     for ii = 1:length(lightSources)
-        fprintf('%d: %s \n', ii, lightSources{ii}.type);       
+        fprintf('%d: %s \n', ii, lightSources{ii}.type);
     end
 end
+
 end
+
+%% Helper functions
 
 function val = piParseNumericString(str)
 str = strrep(str,'[','');
 str = strrep(str,']','');
 val = str2double(str);
 end
+
 function light = lightInit
 light.type           = [];
 light.spectrum       = [];

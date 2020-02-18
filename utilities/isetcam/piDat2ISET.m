@@ -12,6 +12,9 @@ function ieObject = piDat2ISET(inputFile,varargin)
 % Optional key/value pairs
 %   label            -  Specify the type of data: radiance, mesh, depth.
 %                       Default is radiance
+%   recipe           -  The recipe used to create the file
+%   mean luminance   -  Set the mean illuminance
+%   mean luminance per mm2 - Set the mean illuminance per square pupil mm
 %   scaleIlluminance -  if true, we scale the mean illuminance by the pupil
 %                       diameter.
 %
@@ -26,7 +29,7 @@ function ieObject = piDat2ISET(inputFile,varargin)
 
 %% Examples
 %{
- opticalImage = piDat2ISET('scene.dat','label','radiance','recipe',thisR);
+ opticalImage = piDat2ISET('radiance.dat','label','radiance','recipe',thisR);
  meshImage    = piDat2ISET('mesh.dat','label','mesh');
  depthImage   = piDat2ISET('depth.dat','label','depth');
 %}
@@ -40,16 +43,17 @@ p.addParameter('label','radiance',@(x)ischar(x));
 p.addParameter('recipe',[],@(x)(isequal(class(x),'recipe')));
 % p.addParameter('meanluminance',100,@isnumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
-p.addParameter('scaleIlluminance',true,@islogical);
+p.addParameter('scaleilluminance',true,@islogical);
 p.addParameter('wave', 400:10:700, @isnumeric);
 
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;
 thisR       = p.Results.recipe;
-% meanLuminance   = p.Results.meanluminance;
+
+% meanLuminance       = p.Results.meanluminance;
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
-scaleIlluminance = p.Results.scaleIlluminance;
-wave = p.Results.wave;
+scaleIlluminance      = p.Results.scaleilluminance;
+wave                  = p.Results.wave;
 
 %% Depending on label, assign the output data properly to ieObject
 

@@ -25,9 +25,14 @@ thisR_tmp = jsonread(JsonFile);
 fds = fieldnames(thisR_tmp);
 thisR = recipe;
 
-% Assign the struct to a recipe class
+% Assign the struct to a recipe class.  Some times we store extra fields in
+% the JSON files.  So we use try/catch rather than force the assignment.
 for dd = 1:length(fds)
-    thisR.(fds{dd})= thisR_tmp.(fds{dd});
+    try
+        thisR.(fds{dd})= thisR_tmp.(fds{dd});
+    catch
+        warning('Unrecognized field %s\n',fds{dd});
+    end
 end
 
 end
