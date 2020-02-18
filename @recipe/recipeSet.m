@@ -36,7 +36,6 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % And specifically
 % https://www.pbrt.org/fileformat-v3.html#cameras
 %
-%
 % See also
 %    recipeGet
 
@@ -45,6 +44,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %}
 
 %% Set up
+
 if isequal(param,'help')
     doc('recipe.recipeSet');
     return;
@@ -376,7 +376,56 @@ switch param
         thisR.camera = val.camera;
         thisR.film   = val.film;
         thisR.filter = val.filter;
+    % ZLY added fluorescent 
+    case {'eem'}
+        % RecipeSet('eem', {'materialName', 'fluophoresName'});
+        matName = val{1};
+        if ~isfield(thisR.materials.list, matName)
+            error('Unknown material name %s\n', matName);
+        end
+        if length(val) == 1
+            error('Donaldson matrix is empty\n');
+        end
+        if length(varargin) > 2
+            error('Accept only one Donaldson matrix\n');
+        end
+        
+        wave = 395:10:705; % By default it is the wavelength range used in pbrt
+        fluophoresName = val{2};
+        fluophores = fluorophoreRead(fluophoresName,'wave',wave);
+        % Here is the excitation emission matrix
+        eem = fluorophoreGet(fluophores,'eem');
+        %{
+             fluorophorePlot(Porphyrins,'donaldson mesh');
+        %}
+        %{
+             dWave = fluorophoreGet(FAD,'delta wave');
+             wave = fluorophoreGet(FAD,'wave');
+             ex = fluorophoreGet(FAD,'excitation');
+             ieNewGraphWin; 
+             plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
+        %}
+        
+        % The data are converted to a vector like this
+        flatEEM = eem';
+        vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
+        thisR.materials.list.(matName).photolumifluorescence = vec;
+        
+    case {'concentration'}
+        matName = val{1};
+        if ~isfield(thisR.materials.list, matName)
+            error('Unknown material name %s\n', matName);
+        end
+        if length(val) == 1
+            error('Concentration is empty\n');
+        end
+        if length(val) > 2
+            error('Accept single number as concentration\n');
+        end
+        thisR.materials.list.(matName).floatconcentration = val{2};
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end
 
+end

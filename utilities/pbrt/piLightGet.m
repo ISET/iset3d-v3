@@ -1,15 +1,21 @@
 function lightSources = piLightGet(thisR, varargin)
-% Read light sources struct from thisR
+% Read a light source struct based on the parameters in the recipe
+%
+% This routine only works for light sources that are exported from
+% Cinema 4D.  It will not work in all cases.  We should fix that.
 %
 % Zhenyi, SCIEN, 2019
 %
+
+%% Parse inputs
+
 varargin = ieParamFormat(varargin);
 p  = inputParser;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));
 p.addParameter('print',true);
+
 p.parse(thisR, varargin{:});
-lightSources = [];
-%%
+%%   Find the indices of the lines the .world slot that are a LightSource
 
 AttBegin  =  find(piContains(thisR.world,'AttributeBegin'));
 AttEnd    =  find(piContains(thisR.world,'AttributeEnd'));
@@ -17,9 +23,14 @@ arealight =  piContains(thisR.world,'AreaLightSource');
 light     =  piContains(thisR.world,'LightSource');
 lightIdx  =  find(light);
 
-lightSources = cell(length(lightIdx),1);
+%% Get the lights for each lightIdx
+
+if isempty(lightIdx), lightSources = [];
+else,                 lightSources = cell(length(lightIdx),1);
+end
+
 for ii = 1:length(lightIdx)
-        lightSources{ii} = lightInit;
+    lightSources{ii} = lightInit;
     if length(AttBegin)>=ii
         lightSources{ii}.line  = thisR.world(AttBegin(ii):AttEnd(ii));
         lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
@@ -33,7 +44,7 @@ for ii = 1:length(lightIdx)
         lightSources{ii}.type = 'area';
         
         translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
-        if ~isempty(translate) && numel(translate) == 4    
+        if ~isempty(translate) && numel(translate) == 4
             lightSources{ii}.position = [str2double(translate{2});...
                 str2double(translate{3});...
                 str2double(translate{4})];
@@ -57,7 +68,12 @@ for ii = 1:length(lightIdx)
         lightType = strsplit(lightType, ' ');
         lightSources{ii}.type = lightType{2};
         if ~piContains(lightSources{ii}.type, 'infinite')
-            thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')}, '%q');
+            try
+                txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')};
+            catch
+                error('Cannot interpret this file.  Check for C4D compatibility.');
+            end
+            thisLineStr = textscan(txt, '%q');
             thisLineStr = thisLineStr{1};
             from = find(piContains(thisLineStr, 'point from'));
             lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
@@ -91,9 +107,10 @@ if p.Results.print
     disp('---------------------')
     disp('*****Light Type******')
     for ii = 1:length(lightSources)
-        fprintf('%d: %s \n', ii, lightSources{ii}.type);       
+        fprintf('%d: %s \n', ii, lightSources{ii}.type);
     end
 end
+
 end
 
 %% Helper functions

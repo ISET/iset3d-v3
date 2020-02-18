@@ -41,22 +41,24 @@ p.addRequired('inputFile',@(x)(exist(x,'file')));
 p.addParameter('label','radiance',@(x)ischar(x));
 
 p.addParameter('recipe',[],@(x)(isequal(class(x),'recipe')));
-p.addParameter('meanluminance',100,@isnumeric);
+% p.addParameter('meanluminance',100,@isnumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleilluminance',true,@islogical);
+p.addParameter('wave', 400:10:700, @isnumeric);
 
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;
 thisR       = p.Results.recipe;
-meanLuminance         = p.Results.meanluminance;
+
+% meanLuminance       = p.Results.meanluminance;
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scaleIlluminance      = p.Results.scaleilluminance;
+wave                  = p.Results.wave;
 
 %% Depending on label, assign the output data properly to ieObject
 
-wave = 400:10:700; % Hard coded in pbrt
 nWave = length(wave);
-if(strcmp(label,'radiance'))
+if(strcmp(label,'radiance') || strcmp(label, 'illuminant') || strcmp(label, 'illuminantonly'))
     
     % The PBRT output is in energy units.  Scenes and OIs data are
     % represented in photons
@@ -69,12 +71,17 @@ if(strcmp(label,'radiance'))
     %
     % OLD:  photons = Energy2Quanta(wave,energy)*0.003664;
     %
+    if strcmp(label, 'illuminant') || strcmp(label, 'illuminantonly')
+        ieObject = photons;
+        return;
+    end
 elseif(strcmp(label,'depth') || strcmp(label,'mesh')||strcmp(label,'material') )
     tmp = piReadDAT(inputFile, 'maxPlanes', nWave);
     metadataMap = tmp(:,:,1); clear tmp;
     ieObject = metadataMap;
     return;
 elseif(strcmp(label,'coordinates'))
+    % Not sure what this is.  Maybe the 3D coordinates of each point?
     tmp = piReadDAT(inputFile, 'maxPlanes', nWave);
     coordMap = tmp(:,:,1:3); clear tmp;
     ieObject = coordMap;
@@ -162,7 +169,8 @@ switch opticsType
         
     case {'pinhole','environment'}
         % A scene radiance, not an oi
-        ieObject = piSceneCreate(photons,'meanLuminance',meanLuminance);
+        ieObject = piSceneCreate(photons,...
+                                    'wavelength', wave);
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if ~isempty(thisR)
             % PBRT may have assigned a field of view
@@ -171,22 +179,6 @@ switch opticsType
         
     otherwise
         error('Unknown optics type %s\n',opticsType);       
-end
-
-%% Adjust the illuminant
-
-% Usually there is a light inside of the spds directory.  In some
-% cases, however, there is no light (e.g. the teapot scene).  So we
-% check and add the light if it is there.
-lightSourcePath = fullfile(fileparts(thisR.outputFile), 'spds', 'lights', '*.mat');
-fileInfo = dir(lightSourcePath);
-if ~isempty(fileInfo)
-    if numel(fileInfo.name) ~= 1
-        warning('Multiple light sources.  Not assigning a light to the scene. We will calculate the illuminant image and assign it - some day.'); 
-    else
-        illuEnergy = ieReadSpectra(fullfile(fileInfo.folder, fileInfo.name),wave);
-        ieObject = sceneSet(ieObject, 'illuminant Energy', illuEnergy);
-    end
 end
 
 end

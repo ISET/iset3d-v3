@@ -11,27 +11,49 @@ function [ieObject, result] = piRender(thisR,varargin)
 % OPTIONAL input parameter/val
 %  oi/scene   - You can use parameters from oiSet or sceneSet that
 %               will be applied to the rendered ieObject prior to return.
-%  renderType - render radiance, depth or both (default).  If the input is
-%               a fullpath to a file, then we only render the radiance
-%               data. Ask if you want this changed to permit a depth map.
-%               We have multiple different metadata options. For pbrt-v2 we
-%               have depth, mesh, and material. For pbrt-v3 we have depth
-%               and coordinates at the moment.
-%  version    - PBRT version, 2 or 3
+%
+%  renderType - Determine which types to render.  PBRT can render
+%               radiance, metadata (e.g., depth, mesh, material), the
+%               the illuminant, or some combinations.  The options
+%               are:
+%
+%    Spectral data
+%      'all'      - radiance, depth, illuminant
+%      'both'     - radiance and depth
+%      'radiance' - spectral radiance (or irradiance of an oi)
+%      'illuminant'  - radiance and illuminant data
+%      'illuminantonly' - The materials are set to matte white and
+%                         rendered.  The spatial-spectral energy is
+%                         returned in a form that can be used as a
+%                         scene illuminant.
+%    Metadata
+%      'depth'    - depth map in meters
+%      'coordinates' - A [row,col,3] tensor of the (x,y,z) coordinate of
+%                      each pixel
+%      'material'    - label for the material at each pixel
+%      'mesh'        - label for the mesh identity at each pixel
+%
+%       N.B. If thisR is a fullpath to a file, then we only renderType
+%       is forced to be 'radiance'.  
+%
+%  version    - PBRT version, 2 or 3.   Default is 3.  2 will be
+%               deprecated.
+%  mean luminance -  If a scene, this mean luminance
+%                 (default 100 cd/m2) 
+%  mean illuminance per mm2 - default is 5 lux
 %  scaleIlluminance
-%             - if true, we scale the mean illuminance by the pupil
-%               diameter in piDat2ISET 
+%             - if true, scale the mean illuminance by the pupil
+%               diameter in piDat2ISET (default is true)
 %  reuse      - Boolean. Indicate whether to use an existing file if one of
-%               the correct size exists.
+%               the correct size exists (default is false)
 %
 % RETURN
-%   ieObject - an ISET scene, oi, or a depth map image
-%   result   - PBRT output from the terminal, vital for debugging!
-%              The result contains useful parameters about the optics,
-%              too, including the distance from the back of the lens
-%              to film and the in-focus distance given the lens-film
-%              distance.
-%
+%   ieObject - an ISET scene, oi, or a metadata image
+%   result   - PBRT output from the terminal.  This can be vital for
+%              debugging! The result contains useful parameters about
+%              the optics, too, including the distance from the back
+%              of the lens to film and the in-focus distance given the
+%              lens-film distance.
 %
 % TL SCIEN Stanford, 2017
 % JNM 03/19 Add reuse feature for renderings
@@ -44,7 +66,7 @@ function [ieObject, result] = piRender(thisR,varargin)
    % Renders both radiance and depth
    pbrtFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
    scene = piRender(pbrtFile);
-   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+   sceneWindow(scene); sceneSet(scene,'gamma',0.5);
 %}
 %{
    % Render radiance and depth separately
@@ -53,7 +75,26 @@ function [ieObject, result] = piRender(thisR,varargin)
    ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
    dmap = piRender(pbrtFile,'render type','depth');
    scene = sceneSet(scene,'depth map',dmap);
-   ieAddObject(scene); sceneWindow; sceneSet(scene,'gamma',0.5);
+   sceneWindow(scene); sceneSet(scene,'gamma',0.5);
+%}
+%{
+  % Separately calculate the illuminant and the radiance
+  thisR = piRecipeDefault; piWrite(thisR);
+  [scene, result]      = piRender(thisR, 'render type','radiance');
+  [illPhotons, result] = piRender(thisR, 'render type','illuminant only');
+  scene = sceneSet(scene,'illuminant photons',illPhotons);
+  sceneWindow(scene);
+%}
+%{
+  % Calculate the (x,y,z) coordinates of every surface point in the
+  % scene.  If there is no surface a zero is returned.  This should
+  % probably either a Inf or a NaN when there is no surface.  We might
+  % replace those with a black color or something.   
+  thisR = piRecipeDefault; piWrite(thisR);
+  [coords, result] = piRender(thisR, 'render type','coordinates');
+  ieNewGraphWin; imagesc(coords(:,:,1));
+  ieNewGraphWin; imagesc(coords(:,:,2));
+  ieNewGraphWin; imagesc(coords(:,:,3));
 %}
 
 %%  Name of the pbrt scene file and whether we use a pinhole or lens model
@@ -64,24 +105,17 @@ p.KeepUnmatched = true;
 % p.addRequired('pbrtFile',@(x)(exist(x,'file')));
 p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
 
-% Squeeze out spaces and force lower case
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) || islogical(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
+varargin = ieParamFormat(varargin);
 
-rTypes = {'radiance','depth','both','coordinates','material','mesh'};
-p.addParameter('rendertype','both',@(x)(ismember(x,rTypes)));
+rTypes = {'radiance','depth','both','all','coordinates','material','mesh', 'illuminant','illuminantonly'};
+p.addParameter('rendertype','both',@(x)(ismember(ieParamFormat(x),rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
-p.addParameter('meanluminance',100,@inumeric);
-p.addParameter('meanilluminancepermm2',5,@isnumeric);
+p.addParameter('meanluminance',[],@inumeric);
+p.addParameter('meanilluminancepermm2',[],@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);
+p.addParameter('wave', 400:10:700, @isnumeric);
+p.addParameter('reflectancerender', false, @islogical);
 
 % If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
 
@@ -90,10 +124,11 @@ fprintf('Docker container %s\n',thisDocker);
 p.addParameter('dockerimagename',thisDocker,@ischar);
 
 p.parse(thisR,varargin{:});
-renderType      = p.Results.rendertype;
-version         = p.Results.version;
-dockerImageName = p.Results.dockerimagename;
+renderType       = ieParamFormat(p.Results.rendertype);
+version          = p.Results.version;
+dockerImageName  = p.Results.dockerimagename;
 scaleIlluminance = p.Results.scaleIlluminance;
+wave             = p.Results.wave;
 
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build
@@ -127,36 +162,46 @@ end
 pbrtFile = thisR.outputFile;
 
 % Set up any metadata render.
-if (~strcmp(renderType,'radiance'))  % If radiance, no metadata
+% If radiance, no metadata
+if ((~strcmp(renderType,'radiance')))  
     
     % Do some checks for the renderType.
     if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
         error('Coordinates metadata render only available right now for pbrt-v3-spectral.');
     end
     
-    if(strcmp(renderType,'both')), metadataType = 'depth';
-    else,                          metadataType = renderType;
+    switch renderType
+        case 'both'
+            metadataType{1} = 'depth';
+        case 'all'
+            metadataType{1} = 'depth';
+            metadataType{2} = 'illuminant';
+        otherwise
+             metadataType{1} = renderType;
     end
     
-    metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType);
-    
-    % Depending on whether we used C4D to export, we create a new
-    % material files that we link with the main pbrt file.
-    if(strcmp(metadataRecipe.exporter,'C4D'))
-        creatematerials = true;
-        overwritegeometry = true;
-    else
-        creatematerials = false;
-        overwritegeometry = false;
+    for ii=1:numel(metadataType)
+        
+        metadataRecipe = piRecipeConvertToMetadata(thisR,'metadata',metadataType{ii});
+        
+        % Depending on whether we used C4D to export, we create a new
+        % material files that we link with the main pbrt file.
+        if(strcmp(metadataRecipe.exporter,'C4D'))
+            creatematerials = true;
+            overwritegeometry = true;
+        else
+            creatematerials = false;
+            overwritegeometry = false;
+        end
+        piWrite(metadataRecipe,...
+            'overwritepbrtfile', true,...
+            'overwritelensfile', false, ...
+            'overwriteresources', false,...
+            'creatematerials',creatematerials,...
+            'overwritegeometry',overwritegeometry);
+        
+        metadataFile{ii} = metadataRecipe.outputFile;
     end
-    piWrite(metadataRecipe,...
-        'overwritepbrtfile', true,...
-        'overwritelensfile', false, ...
-        'overwriteresources', false,...
-        'creatematerials',creatematerials,...
-        'overwritegeometry',overwritegeometry);
-    
-    metadataFile = metadataRecipe.outputFile;
 
 end
 
@@ -165,27 +210,40 @@ end
 filesToRender = {};
 label = {};
 switch renderType
-    case {'both','all'}
-        filesToRender{1} = pbrtFile;
-        label{1} = 'radiance';
-        filesToRender{2} = metadataFile;
-        label{2} = 'depth';
+    case {'all'}
+        filesToRender{1} = pbrtFile;        label{1} = 'radiance';
+        filesToRender{2} = metadataFile{1}; label{2} = 'depth';
+        filesToRender{3} = metadataFile{2}; label{3} = 'illuminant';
+    case {'both'}
+        % Radiance and the metadata.  But not the illuminant.
+        filesToRender{1} = pbrtFile;        label{1} = 'radiance';
+        filesToRender{2} = metadataFile{1}; label{2} = 'depth';
     case {'radiance'}
-        filesToRender = {pbrtFile};
-        label{1} = 'radiance';
+        % Spectral radiance
+        filesToRender{1} = pbrtFile;        label{1} = 'radiance';
     case {'coordinates'}
-        % We need coordinates to be separate since it's return type is
+        % We need coordinates to be separate since its return type is
         % different than the other metadata types.
-        filesToRender = {metadataFile};
-        label{1} = 'coordinates';
+        filesToRender{1} = metadataFile{1};    label{1} = 'coordinates';
     case{'material','mesh','depth'}
-        filesToRender = {metadataFile};
+        % Returns one of the metadata types as an image
+        % This could be depth, material, or the mesh (object) type
+        filesToRender{1} = metadataFile{1};
         label{1} = 'metadata';
+    case{'illuminant'}
+        % Illuminant and radiance
+        filesToRender{1} = pbrtFile;         label{1} = 'radiance';
+        filesToRender{2} = metadataFile{1};     label{2} = 'illuminant';
+    case {'illuminantonly'}
+        % Turn all the surfaces matte white and render
+        % The returned spectral radiance is a measure of the
+        % space-varying illumination.
+        filesToRender{1} = metadataFile{1};     label{1} = 'illuminantonly';
     otherwise
         error('Cannot recognize render type.');
 end
 
-%% Call the Docker contains for rendering
+%% Call the Docker for rendering
 for ii = 1:length(filesToRender)
     skipDocker = false;
     currFile = filesToRender{ii};
@@ -253,6 +311,7 @@ for ii = 1:length(filesToRender)
         end
     end
 
+    % When do we use this case?
     if skipDocker
         result = '';
     else
@@ -277,29 +336,62 @@ for ii = 1:length(filesToRender)
 
     %% Convert the returned data to an ieObject
 
-    % We should add in the mean luminance and mean illuminance here
-    % when we are ready.  piDat2ISET already handles those inputs.
+    % The cases that return the radiance (both, radiance, illuminant)
+    % should set the mean luminance or mean illuminance.
     switch label{ii}
         case 'radiance'
             ieObject = piDat2ISET(outFile,...
                 'label','radiance',...
                 'recipe',thisR,...
-                'scaleIlluminance',scaleIlluminance);
+                'scaleIlluminance',scaleIlluminance,...
+                'wave',wave);
         case {'metadata'}
-            metadata = piDat2ISET(outFile,'label','mesh');
+            metadata = piDat2ISET(outFile,...
+                'label','mesh',...
+                'wave',wave);
             ieObject   = metadata;
         case 'depth'
-            depthImage = piDat2ISET(outFile,'label','depth');
+            depthImage = piDat2ISET(outFile,...
+                'label','depth',...
+                'wave',wave);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject,'depth map',depthImage);
             end
         case 'coordinates'
-            coordMap = piDat2ISET(outFile,'label','coordinates');
+            coordMap = piDat2ISET(outFile,...
+                'label','coordinates',...
+                'wave',wave);
             ieObject = coordMap;
+        case {'illuminant'}
+            % PBRT rendered data for white matte surfaces
+            illuminantPhotons = piDat2ISET(outFile,...
+                'label', 'illuminant',...
+                'scaleIlluminance',scaleIlluminance,...
+                'wave', wave);
+            if ~isempty(ieObject) && isstruct(ieObject)
+                ieObject = sceneSet(ieObject, 'illuminant photons', illuminantPhotons);
+            end            
+        case {'illuminantonly'}
+            ieObject = piDat2ISET(outFile,...
+                'label', 'illuminantonly', ...
+                'scaleIlluminance',scaleIlluminance,...
+                'wave', wave);
     end
 
 end
 
+%% If the return is a scene or an oi, and the user set a mean luminance or mean illuminance value, do it.
+if isstruct(ieObject)
+    switch ieObject.type
+        case 'scene'
+            names = strsplit(fileparts(thisR.inputFile),'/');
+            ieObject = sceneSet(ieObject,'name',names{end});
+        case 'opticalimage'
+            names = strsplit(fileparts(thisR.inputFile),'/');
+            ieObject = oiSet(ieObject,'name',names{end});
+        otherwise
+            error('Unknown struct type %s\n',ieObject.type);
+    end
 end
 
 
