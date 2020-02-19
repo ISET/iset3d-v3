@@ -196,8 +196,16 @@ switch type
         lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
     case 'distant'
         lightSources{1}.type = 'distant';
-        lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-            lightSpectrum, from, to);
+        if p.Results.cameracoordinate
+            lightSources{1}.line{1} = 'AttributeBegin';
+            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
+            lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" %s',...
+                lightSpectrum);
+            lightSources{1}.line{end+1} = 'AttributeEnd';            
+        else
+            lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+                lightSpectrum, from, to);
+        end
     case 'infinite'
         lightSources{1}.type = 'infinite';
         lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);

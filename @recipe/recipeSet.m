@@ -390,26 +390,31 @@ switch param
             error('Accept only one Donaldson matrix\n');
         end
         
-        wave = 395:10:705; % By default it is the wavelength range used in pbrt
-        fluophoresName = val{2};
-        fluophores = fluorophoreRead(fluophoresName,'wave',wave);
-        % Here is the excitation emission matrix
-        eem = fluorophoreGet(fluophores,'eem');
-        %{
-             fluorophorePlot(Porphyrins,'donaldson mesh');
-        %}
-        %{
-             dWave = fluorophoreGet(FAD,'delta wave');
-             wave = fluorophoreGet(FAD,'wave');
-             ex = fluorophoreGet(FAD,'excitation');
-             ieNewGraphWin; 
-             plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
-        %}
-        
-        % The data are converted to a vector like this
-        flatEEM = eem';
-        vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
-        thisR.materials.list.(matName).photolumifluorescence = vec;
+        fluorophoresName = val{2};
+        if isempty(fluorophoresName)
+            thisR.materials.list.(matName).photolumifluorescence = '';
+            thisR.materials.list.(matName).floatconcentration = [];
+        else
+            wave = 395:10:705; % By default it is the wavelength range used in pbrt
+            fluophores = fluorophoreRead(fluorophoresName,'wave',wave);
+            % Here is the excitation emission matrix
+            eem = fluorophoreGet(fluophores,'eem');
+            %{
+                 fluorophorePlot(Porphyrins,'donaldson mesh');
+            %}
+            %{
+                 dWave = fluorophoreGet(FAD,'delta wave');
+                 wave = fluorophoreGet(FAD,'wave');
+                 ex = fluorophoreGet(FAD,'excitation');
+                 ieNewGraphWin; 
+                 plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
+            %}
+
+            % The data are converted to a vector like this
+            flatEEM = eem';
+            vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
+            thisR.materials.list.(matName).photolumifluorescence = vec;
+        end
         
     case {'concentration'}
         matName = val{1};

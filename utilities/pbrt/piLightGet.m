@@ -87,26 +87,42 @@ for ii = 1:length(lightIdx)
                 % Zheng Lyu to have a look here
                 % If this works, then we are C4D compatible
                 txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')};
+                compatability = 'C4D';
             catch
-                % We are not C4D compatible.  So we do this
-                error('Cannot interpret this file.  Check for C4D compatibility.');
+                % Exception happens when we use coordinate camera to place
+                % the light at the position of the camera
+                if any(piContains(lightSources{ii}.line, 'CoordSysTransform "camera"'))
+                    txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'LightSource')};
+                    compatability = 'ISET3d';
+                else
+                    % We are not C4D compatible.  So we do this
+                    error('Cannot interpret this file.  Check for C4D and ISET3d compatibility.');
+                end
+                
             end
             
             %  Get the string on the LightSource line
             thisLineStr = textscan(txt, '%q');
             thisLineStr = thisLineStr{1};
             
-            % Find the from and to positions.  If C4D compatible, then
-            % do it this way.  If not, we need another approach to get
-            % these values.
-            from = find(piContains(thisLineStr, 'point from'));
-            lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
-                piParseNumericString(thisLineStr{from+2});...
-                piParseNumericString(thisLineStr{from+3})];
-            to = find(piContains(thisLineStr, 'point to'));
-            if to, lightSources{ii}.direction = [piParseNumericString(thisLineStr{to+1});...
-                    piParseNumericString(thisLineStr{to+2});...
-                    piParseNumericString(thisLineStr{to+3})];
+            switch compatability
+                case 'C4D'
+                    % Find the from and to positions.  If C4D compatible, then
+                    % do it this way.  If not, we need another approach to get
+                    % these values.
+                    from = find(piContains(thisLineStr, 'point from'));
+                    lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
+                        piParseNumericString(thisLineStr{from+2});...
+                        piParseNumericString(thisLineStr{from+3})];
+                    to = find(piContains(thisLineStr, 'point to'));
+                    if to, lightSources{ii}.direction = [piParseNumericString(thisLineStr{to+1});...
+                            piParseNumericString(thisLineStr{to+2});...
+                            piParseNumericString(thisLineStr{to+3})];
+                    end
+                case 'ISET3d'
+                    lightSources{ii}.position = thisR.get('from')';
+                    lightSources{ii}.direction = thisR.get('to')';
+                    
             end
             
             % Set the cone angle 

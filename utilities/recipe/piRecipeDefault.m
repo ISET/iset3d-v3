@@ -83,6 +83,10 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3','teapot');
         fname = fullfile(FilePath,'teapot-area-light.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
+    case 'slantedBar'
+        FilePath = fullfile(piRootPath,'data','V3','slantedBar');
+        fname = fullfile(FilePath,'slantedBar.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
 
     otherwise
         error('Can not identify the scene, %s\n',sceneName);

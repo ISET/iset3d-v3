@@ -26,7 +26,7 @@ lightList = piLightGet(thisR);
 
 %% Add one equal energy light
 thisR = piLightAdd(thisR,... 
-    'type','point',...
+    'type','spot',...
     'light spectrum','equalEnergy',...
     'spectrumscale', 1,...
     'cameracoordinate', true);
@@ -36,7 +36,7 @@ thisR = piLightAdd(thisR,...
 % There are many different parameters that can be set.
 thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
-thisR.set('max depth',1); % Number of bounces
+thisR.set('max depth',5); % Number of bounces
 
 %% Render
 piWrite(thisR);
@@ -48,20 +48,22 @@ sceneWindow(scene);
 
 %%  Change the light and render again
 
+% Something wrong with the coordinate camera
 thisR    = piLightDelete(thisR, 'all');
 thisR = piLightAdd(thisR,... 
-    'type','spot',...
+    'type','point',...
     'light spectrum','D65',...
     'spectrumscale', 1,...
     'cameracoordinate', true);
+%% Check the light list
+piLightGet(thisR);
 
 %% Render
 piWrite(thisR);
 
 %% Used for scene
-[scene, result] = piRender(thisR, 'render type', 'radiance');
+[scene, result] = piRender(thisR, 'render type', 'both');
 
 sceneWindow(scene);
-
 
 %%
