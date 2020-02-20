@@ -1,4 +1,4 @@
-function thisR = piCameraShift(thisR, varargin)
+function thisR = piCameraTranslate(thisR, varargin)
 % Create a vector displacement for the camera
 %
 % Syntax:
@@ -56,7 +56,7 @@ function thisR = piCameraShift(thisR, varargin)
 %
 %
 %  See also
-%
+%   piCameraRotate
 
 % Examples:
 %{
@@ -124,8 +124,8 @@ cameraX = cross([0 1 0],direction); cameraX = cameraX/norm(cameraX);
 cameraY = cross(cameraX,direction); cameraY = cameraY/norm(cameraY);
 % We want cameraY to be pointing in the same direction as lookAt.up
 up = thisR.get('up');
-if cameraY*up < 0, cameraY = -1* cameraY; end
-cameraX = cameraX(:); cameraY = cameraY(:);
+if cameraY*up' < 0, cameraY = -1*cameraY; end
+cameraX = reshape(cameraX, size(direction)); cameraY = reshape(cameraY, size(direction));
 
 %{
  ieNewGraphWin;
@@ -138,12 +138,12 @@ cameraX = cameraX(:); cameraY = cameraY(:);
 shift = xshift*cameraX + yshift*cameraY + zshift*direction;
 switch fromto
     case 'from'
-        thisR.set('from',lookAt.from + shift);
+        thisR.set('from',lookAt.from + reshape(shift, size(lookAt.from)));
     case 'to'
-        thisR.set('to', lookAt.to + shift);
+        thisR.set('to', lookAt.to + reshape(shift, size(lookAt.to)));
     case 'both'
-        thisR.set('from',lookAt.from + shift);
-        thisR.set('to',  lookAt.to + shift);
+        thisR.set('from',lookAt.from + reshape(shift, size(lookAt.from)));
+        thisR.set('to',  lookAt.to + reshape(shift, size(lookAt.to)));
     otherwise
         error('Unknown "from to" type %s', fromto);
 end
