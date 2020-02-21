@@ -70,6 +70,7 @@ varargin = ieParamFormat(varargin);  % Allow spaces and capitalization
 
 p = inputParser;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));
+p.addParameter('name', 'Default light', @ischar);
 p.addParameter('type', 'point', @ischar);
 % Load in a light source saved in ISETCam/data/lights
 p.addParameter('lightspectrum', 'D65');
@@ -91,8 +92,11 @@ p.addParameter('cameracoordinate',false);
 p.addParameter('spectrumscale', 1);
 % update an exist light
 p.addParameter('update',0);
+
+p.addParameter('newlightsource',{},@iscell);
 p.parse(thisR, varargin{:});
 
+name = p.Results.name;
 type = p.Results.type;
 lightSpectrum = p.Results.lightspectrum;
 spectrumScale = p.Results.spectrumscale;
@@ -101,159 +105,187 @@ to = p.Results.to;
 coneAngle = p.Results.coneangle;
 conDeltaAngle = p.Results.conedeltaangle;
 idxL      = p.Results.update;
+newLightSource = p.Results.newlightsource;
 
 %% check whether a light needs to be replaced
 if idxL
-    lightsource = piLightGet(thisR, 'print', false);
-    type = lightsource{idxL}.type;
-    
-    if find(piContains(varargin, 'lightspectrum')), lightSpectrum = p.Results.lightspectrum;
-    else, [~,lightSpectrum] = fileparts(lightsource{idxL}.spectrum); end
-    
-    if find(piContains(varargin, 'from')), from = p.Results.from;
-    else, from = lightsource{idxL}.position; end
-    
-    if find(piContains(varargin, 'to')), to = p.Results.to;
-    else, to = lightsource{idxL}.direction; end
-    
-    if find(piContains(varargin, 'coneAngle')), coneAngle = p.Results.coneangle;
-    else, coneAngle = lightsource{idxL}.coneangle; end
-    
-    if find(piContains(varargin, 'coneDeltaAngle')), conDeltaAngle = p.Results.conedeltaangle;
-    else, conDeltaAngle = lightsource{idxL}.conedeltaangle; end
+    if isempty(newLightSource)
+        lightsource = piLightGet(thisR, 'print', false);
+        type = lightsource{idxL}.type(2:end-1);
+        
+        if find(piContains(varargin, 'name')), name = p.Results.name;
+        else, name = lightsource{idxL}.name; end
+        
+        if any(piContains(varargin, 'lightspectrum')) ||...
+           isempty(lightsource{idxL}.spectrum)
+            lightSpectrum = p.Results.lightspectrum;
+        else, [~,lightSpectrum] = fileparts(lightsource{idxL}.spectrum); 
+        end
+
+        if any(piContains(varargin, 'from')) ||...
+           isempty(lightsource{idxL}.position)
+            from = p.Results.from;
+        else, from = lightsource{idxL}.position; 
+        end
+
+        if any(piContains(varargin, 'to')) ||...
+           isempty(lightsource{idxL}.direction)
+            to = p.Results.to;
+        else, to = lightsource{idxL}.direction; 
+        end
+
+        if any(piContains(varargin, 'coneangle')) ||...
+           isempty(lightsource{idxL}.coneangle)
+            coneAngle = p.Results.coneangle;
+        else, coneAngle = lightsource{idxL}.coneangle; 
+        end
+
+        if any(piContains(varargin, 'coneDeltaangle')) ||...
+           isempty(lightsource{idxL}.conedeltaangle)
+            conDeltaAngle = p.Results.conedeltaangle;
+        else, conDeltaAngle = lightsource{idxL}.conedeltaangle; 
+        end
+    end
     piLightDelete(thisR, idxL);
 end
 
-%% Write out lightspectrum into a light.spd file
+if ~isempty(newLightSource)
+    lightSources = newLightSource;
+else 
+    %% Give the name to the lightSource
+    lightSources{1}.name = name;
+    
+    %% Write out lightspectrum into a light.spd file
 
-if ischar(lightSpectrum)
-    try
-        % Load from ISETCam/ISETBio ligt data
-        thisLight = load(lightSpectrum);
-    catch
-        error('%s light is not recognized \n', lightSpectrum);
-    end
-    outputDir = fileparts(thisR.outputFile);
-    lightSpdDir = fullfile(outputDir, 'spds', 'lights');
-    thisLightfile = fullfile(lightSpdDir,...
-        sprintf('%s.spd', lightSpectrum));
-    if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
-    fid = fopen(thisLightfile, 'w');
-    for ii = 1: length(thisLight.data)
-        fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
-    end
-    fclose(fid);
-    % Zheng Lyu added 10-2019
-    if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
-        copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
-    end
-else
-    % to do
-    % add customized lightspectrum array [400 1 600 1 800 1]
-end
-
-%% Read light source struct from world struct
-% currentlightSources = piLightGet(thisR, 'print', false);
-
-%% Construct a lightsource structure
-% numLights = length(currentlightSources);
-
-% Different types of lights that we know how to add.
-switch type
-    case 'point'
-        lightSources{1}.type = 'point';
-        if p.Results.cameracoordinate
-            lightSources{1}.line{1} = 'AttributeBegin';
-            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd"', lightSpectrum);
-            lightSources{1}.line{end+1} = 'AttributeEnd';
-        else
-            lightSources{1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
-                lightSpectrum, from);
+    if ischar(lightSpectrum)
+        try
+            % Load from ISETCam/ISETBio ligt data
+            thisLight = load(lightSpectrum);
+        catch
+            error('%s light is not recognized \n', lightSpectrum);
         end
-    case 'spot'
-        lightSources{1}.type = 'spot';
-        thisConeAngle = sprintf('"float coneangle" [%d]', coneAngle);
-        thisConeDelta = sprintf('"float conedeltaangle" [%d]', conDeltaAngle);
-        
-        if p.Results.cameracoordinate
-            lightSources{1}.line{1} = 'AttributeBegin';
-            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" %s %s',...
-                lightSpectrum, thisConeAngle, thisConeDelta);
-            lightSources{1}.line{end+1} = 'AttributeEnd';
-        else
-            lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
-                lightSpectrum, from, to, thisConeAngle, thisConeDelta);
+        outputDir = fileparts(thisR.outputFile);
+        lightSpdDir = fullfile(outputDir, 'spds', 'lights');
+        thisLightfile = fullfile(lightSpdDir,...
+            sprintf('%s.spd', lightSpectrum));
+        if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
+        fid = fopen(thisLightfile, 'w');
+        for ii = 1: length(thisLight.data)
+            fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
         end
-        
-    case 'laser' % not supported for public
-        lightSources{1}.type = 'laser';
-        lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-            lightSpectrum, from, to);
-        thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-        thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
-        lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
-    case 'distant'
-        lightSources{1}.type = 'distant';
-        if p.Results.cameracoordinate
-            lightSources{1}.line{1} = 'AttributeBegin';
-            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" %s',...
-                lightSpectrum);
-            lightSources{1}.line{end+1} = 'AttributeEnd';            
-        else
-            lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
+        fclose(fid);
+        % Zheng Lyu added 10-2019
+        if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
+            copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
         end
-    case 'infinite'
-        lightSources{1}.type = 'infinite';
-        lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
-    case 'area'
-        % find area light geometry info
-        
-        nlight = 1;
-        for ii = 1:length(thisR.assets)
-            if piContains(lower(thisR.assets(ii).name), 'area')
-                lightSources{nlight}.type = 'area'; %#ok<*AGROW>
-                lightSources{nlight}.line{1} = 'AttributeBegin';
-                if idxL
-                    % Why is there a +nLight?
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
-                        from(2), from(3));
-                else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
-                        thisR.assets(ii).position(2), thisR.assets(ii).position(3));
-                end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
-                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
-                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
-                lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
-                lightSources{nlight}.line{end+1} = 'AttributeEnd';
-                nlight = nlight+1;
-                
-            elseif piContains(lower(thisR.assets(ii).name), 'light')
-                lightSources{nlight}.type = 'area';
-                lightSources{nlight}.line{1} = 'AttributeBegin';
-                if idxL
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
-                        from(2), from(3));
-                else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
-                        thisR.assets(ii).position(2), thisR.assets(ii).position(3));
-                end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
-                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
-                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
-                lightSources{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
-                lightSources{nlight}.line{end+1} = 'AttributeEnd';
-                nlight = nlight+1;
+    else
+        % to do
+        % add customized lightspectrum array [400 1 600 1 800 1]
+    end
+
+    %% Read light source struct from world struct
+    % currentlightSources = piLightGet(thisR, 'print', false);
+
+    %% Construct a lightsource structure
+    % numLights = length(currentlightSources);
+
+    % Different types of lights that we know how to add.
+    switch type
+        case 'point'
+            lightSources{1}.type = 'point';
+            if p.Results.cameracoordinate
+                lightSources{1}.line{1} = 'AttributeBegin';
+                lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
+                lightSources{1}.line{3,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd"', lightSpectrum);
+                lightSources{1}.line{end+1} = 'AttributeEnd';
+            else
+                lightSources{1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
+                    lightSpectrum, from);
             end
-        end
-end
+        case 'spot'
+            lightSources{1}.type = 'spot';
+            thisConeAngle = sprintf('"float coneangle" [%d]', coneAngle);
+            thisConeDelta = sprintf('"float conedeltaangle" [%d]', conDeltaAngle);
 
+            if p.Results.cameracoordinate
+                lightSources{1}.line{1} = 'AttributeBegin';
+                lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
+                lightSources{1}.line{3,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" %s %s',...
+                    lightSpectrum, thisConeAngle, thisConeDelta);
+                lightSources{1}.line{end+1} = 'AttributeEnd';
+            else
+                lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
+                    lightSpectrum, from, to, thisConeAngle, thisConeDelta);
+            end
+
+        case 'laser' % not supported for public
+            lightSources{1}.type = 'laser';
+            lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+                lightSpectrum, from, to);
+            thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
+            thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+            lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
+        case 'distant'
+            lightSources{1}.type = 'distant';
+            if p.Results.cameracoordinate
+                lightSources{1}.line{1} = 'AttributeBegin';
+                lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
+                lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" %s',...
+                    lightSpectrum);
+                lightSources{1}.line{end+1} = 'AttributeEnd';            
+            else
+                lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+                    lightSpectrum, from, to);
+            end
+        case 'infinite'
+            lightSources{1}.type = 'infinite';
+            lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+        case 'area'
+            % find area light geometry info
+
+            nlight = 1;
+            for ii = 1:length(thisR.assets)
+                if piContains(lower(thisR.assets(ii).name), 'area')
+                    lightSources{nlight}.name = name;
+                    lightSources{nlight}.type = 'area'; %#ok<*AGROW>
+                    lightSources{nlight}.line{1} = 'AttributeBegin';
+                    if idxL
+                        % Why is there a +nLight?
+                        lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                            from(2), from(3));
+                    else
+                        lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                            thisR.assets(ii).position(2), thisR.assets(ii).position(3));
+                    end
+                    lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
+                    lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
+                    lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
+                    lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
+                    lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
+                    lightSources{nlight}.line{end+1} = 'AttributeEnd';
+                    nlight = nlight+1;
+
+                elseif piContains(lower(thisR.assets(ii).name), 'light')
+                    lightSources{nlight}.type = 'area';
+                    lightSources{nlight}.line{1} = 'AttributeBegin';
+                    if idxL
+                        lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                            from(2), from(3));
+                    else
+                        lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                            thisR.assets(ii).position(2), thisR.assets(ii).position(3));
+                    end
+                    lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
+                    lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
+                    lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
+                    lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
+                    lightSources{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
+                    lightSources{nlight}.line{end+1} = 'AttributeEnd';
+                    nlight = nlight+1;
+                end
+            end
+    end
+end
 %% Update the world data
 
 index_m = piContains(thisR.world,'_materials.pbrt');
@@ -282,6 +314,9 @@ if idxL, fprintf('Existing lights updated.\n');
 else,    fprintf('New light added.\n');
 end
 
+
+%% Add the lightSources into recipe.lights
+thisR.lights{numel(thisR.lights)+1:numel(thisR.lights)+numel(lightSources)} = lightSources{:};
 end
 
 

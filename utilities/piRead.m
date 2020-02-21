@@ -301,6 +301,11 @@ if(~isempty(concatTBlock))
 end
 
 thisR.lookAt = struct('from',from,'to',to,'up',up);
+%% Read the light sources
+thisR.lights = piLightGet(thisR, 'print', false);
+for ii = 1:numel(thisR.lights)
+    thisR.lights{ii}.name = ['Default light'];
+end
 
 %% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,

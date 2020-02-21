@@ -75,8 +75,12 @@ else
     else
         world(lightSource{index}.range) = [];
     end
-        
+    
     thisR.world = world;
+    
+    thisR.lights{index} = {};
 end
+
+thisR.lights = piLightGet(thisR, 'print', false);
 
 end

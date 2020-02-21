@@ -166,6 +166,7 @@ val = str2double(str);
 end
 
 function light = lightInit
+light.name           = [];
 light.type           = [];
 light.spectrum       = [];
 light.range          = [];

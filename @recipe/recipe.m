@@ -35,6 +35,7 @@ classdef recipe < matlab.mixin.Copyable
         lookAt;      % from/to/up struct
         scale;       % Optional scale factor to flip handedness
         world;       % A cell array with all the WorldBegin/End contents
+        lights;       % Light sources
         
         % INPUTFILE -  Original input file
         inputFile = '';   
