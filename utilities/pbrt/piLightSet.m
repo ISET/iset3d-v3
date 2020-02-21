@@ -35,7 +35,7 @@ function lightSource = piLightSet(thisR, lightName, param, val, varargin)
                         'spectrumscale', 10000,...
                         'cameracoordinate', true);
     lightNumber = 2;
-    % piLightSet(thisR, lightNumber, 'coneAngle', 20);
+    piLightSet(thisR, lightNumber, 'coneAngle', 20);
     piWrite(thisR, 'overwritematerials', true);
 
     % Render
@@ -89,6 +89,7 @@ else
     cameraCoordinate = false;
 end
 piLightAdd(thisR, param, val, 'update', idx,...
-            'cameracoordinate', cameraCoordinate);
+            'cameracoordinate', cameraCoordinate,...
+            'spectrum scale', thisLight.spectrumscale);
     
 %%

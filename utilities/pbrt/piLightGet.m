@@ -114,14 +114,16 @@ for ii = 1:length(lightIdx)
                     lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
                         piParseNumericString(thisLineStr{from+2});...
                         piParseNumericString(thisLineStr{from+3})];
+                    lightSources{ii}.from = from;
                     to = find(piContains(thisLineStr, 'point to'));
-                    if to, lightSources{ii}.direction = [piParseNumericString(thisLineStr{to+1});...
+                    if to
+                        lightSources{ii}.direction = [piParseNumericString(thisLineStr{to+1});...
                             piParseNumericString(thisLineStr{to+2});...
-                            piParseNumericString(thisLineStr{to+3})];
+                            piParseNumericString(thisLineStr{to+3})] - from;
                     end
                 case 'ISET3d'
-                    lightSources{ii}.position = thisR.get('from')';
-                    lightSources{ii}.direction = thisR.get('to')';
+                    lightSources{ii}.position = reshape(thisR.get('from'), [3, 1]);
+                    lightSources{ii}.direction = reshape(thisR.get('to'), [3, 1]);
                     
             end
             
@@ -142,6 +144,17 @@ for ii = 1:length(lightIdx)
                     thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
                 end
                 lightSources{ii}.spectrum = thisSpectrum;
+            end
+            
+            
+            % Set the light area
+            if numel(thisR.lights) >= ii
+                if isfield(thisR.lights{ii}, 'area')
+                    lightSources{ii}.area = thisR.lights{ii}.area;
+                end
+                if isfield(thisR.lights{ii}, 'name')
+                    lightSources{ii}.name = thisR.lights{ii}.name;
+                end
             end
         end
     end
@@ -167,12 +180,13 @@ end
 
 function light = lightInit
 light.name           = [];
-light.type           = [];
-light.spectrum       = [];
-light.range          = [];
-light.position       = [];
-light.direction      = [];
-light.conedeltaangle = [];
-light.coneangle      = [];
-light.line           = [];
+% light.type           = [];
+% light.spectrum       = [];
+% light.range          = [];
+% light.position       = [];
+% light.direction      = [];
+% light.conedeltaangle = [];
+% light.coneangle      = [];
+% light.area           = [];
+% light.line           = [];
 end

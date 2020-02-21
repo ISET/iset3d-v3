@@ -103,7 +103,7 @@ spectrumScale = p.Results.spectrumscale;
 from = p.Results.from;
 to = p.Results.to;
 coneAngle = p.Results.coneangle;
-conDeltaAngle = p.Results.conedeltaangle;
+coneDeltaAngle = p.Results.conedeltaangle;
 idxL      = p.Results.update;
 newLightSource = p.Results.newlightsource;
 
@@ -117,33 +117,39 @@ if idxL
         else, name = lightsource{idxL}.name; end
         
         if any(piContains(varargin, 'lightspectrum')) ||...
-           isempty(lightsource{idxL}.spectrum)
+           ~isfield(lightsource{idxL}, 'spectrum')
             lightSpectrum = p.Results.lightspectrum;
         else, [~,lightSpectrum] = fileparts(lightsource{idxL}.spectrum); 
         end
 
         if any(piContains(varargin, 'from')) ||...
-           isempty(lightsource{idxL}.position)
+           ~isfield(lightsource{idxL}, 'position')
             from = p.Results.from;
         else, from = lightsource{idxL}.position; 
         end
 
         if any(piContains(varargin, 'to')) ||...
-           isempty(lightsource{idxL}.direction)
+           ~isfield(lightsource{idxL}, 'direction')
             to = p.Results.to;
-        else, to = lightsource{idxL}.direction; 
+        else, to = lightsource{idxL}.direction + lightsource{idxL}.position; 
         end
 
         if any(piContains(varargin, 'coneangle')) ||...
-           isempty(lightsource{idxL}.coneangle)
+           ~isfield(lightsource{idxL}, 'coneangle')
             coneAngle = p.Results.coneangle;
         else, coneAngle = lightsource{idxL}.coneangle; 
         end
 
-        if any(piContains(varargin, 'coneDeltaangle')) ||...
-           isempty(lightsource{idxL}.conedeltaangle)
-            conDeltaAngle = p.Results.conedeltaangle;
-        else, conDeltaAngle = lightsource{idxL}.conedeltaangle; 
+        if any(piContains(varargin, 'conedeltaangle')) ||...
+           ~isfield(lightsource{idxL}, 'conedeltaangle')
+            coneDeltaAngle = p.Results.conedeltaangle;
+        else, coneDeltaAngle = lightsource{idxL}.conedeltaangle; 
+        end
+        
+        if any(piContains(varargin, 'spectrumscale')) ||...
+           ~isfield(lightsource{idxL}, 'spectrumscale')
+            spectrumScale = p.Results.spectrumscale;
+        else, spectrumScale = lightsource{idxL}.spectrumscale; 
         end
     end
     piLightDelete(thisR, idxL);
@@ -154,6 +160,9 @@ if ~isempty(newLightSource)
 else 
     %% Give the name to the lightSource
     lightSources{1}.name = name;
+    
+    %% Set the spectrumScale
+    lightSources{1}.spectrumscale = spectrumScale;
     
     %% Write out lightspectrum into a light.spd file
 
@@ -202,10 +211,17 @@ else
                 lightSources{1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
                     lightSpectrum, from);
             end
+            
+            % Set spectrum information
+            lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+            
+            % Set light position 
+            lightSources{1}.position = from;
+            
         case 'spot'
             lightSources{1}.type = 'spot';
             thisConeAngle = sprintf('"float coneangle" [%d]', coneAngle);
-            thisConeDelta = sprintf('"float conedeltaangle" [%d]', conDeltaAngle);
+            thisConeDelta = sprintf('"float conedeltaangle" [%d]', coneDeltaAngle);
 
             if p.Results.cameracoordinate
                 lightSources{1}.line{1} = 'AttributeBegin';
@@ -217,13 +233,24 @@ else
                 lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
                     lightSpectrum, from, to, thisConeAngle, thisConeDelta);
             end
+            
+            % Set spectrum information
+            lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+            
+            % Set coneAngle and coneDeltaAngle
+            lightSources{1}.coneangle = coneAngle;
+            lightSources{1}.conedeltaangle = coneDeltaAngle;
+            
+            %Set light position and direction
+            lightSources{1}.position = from;
+            lightSources{1}.direction = to - from;
 
         case 'laser' % not supported for public
             lightSources{1}.type = 'laser';
             lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                 lightSpectrum, from, to);
             thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
-            thisConeDelta = sprintf('float conedelataangle [%d]', conDeltaAngle);
+            thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
             lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
         case 'distant'
             lightSources{1}.type = 'distant';
@@ -237,16 +264,31 @@ else
                 lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
                     lightSpectrum, from, to);
             end
+            
+            % Set spectrum information
+            lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+            
+            %Set light position and direction
+            lightSources{1}.position = from;
+            lightSources{1}.direction = to - from;
         case 'infinite'
             lightSources{1}.type = 'infinite';
             lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+            
+            % Set spectrum information
+            lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
         case 'area'
             % find area light geometry info
 
             nlight = 1;
             for ii = 1:length(thisR.assets)
+                % Set the name
+                lightSources{nlight}.name = name;
+                
+                % Set the spectrumScale
+                lightSources{nlight}.spectrumscale = spectrumScale;
+                
                 if piContains(lower(thisR.assets(ii).name), 'area')
-                    lightSources{nlight}.name = name;
                     lightSources{nlight}.type = 'area'; %#ok<*AGROW>
                     lightSources{nlight}.line{1} = 'AttributeBegin';
                     if idxL
@@ -263,7 +305,15 @@ else
                     lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
                     lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
                     lightSources{nlight}.line{end+1} = 'AttributeEnd';
+                    
+                    % Set spectrum information
+                    lightSources{nlight}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+                    
+                    % Set spectrum area light
+                    lightSources{nlight}.area = thisR.assets(ii).children.output;
+                    
                     nlight = nlight+1;
+                    
 
                 elseif piContains(lower(thisR.assets(ii).name), 'light')
                     lightSources{nlight}.type = 'area';
@@ -281,6 +331,13 @@ else
                     lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
                     lightSources{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
                     lightSources{nlight}.line{end+1} = 'AttributeEnd';
+                    
+                    % Set spectrum information
+                    lightSources{nlight}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+                    
+                    % Set spectrum area light
+                    lightSources{nlight}.area = sprintf('Shape "sphere" "float radius" [.1]');
+                    
                     nlight = nlight+1;
                 end
             end
