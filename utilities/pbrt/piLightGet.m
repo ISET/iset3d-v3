@@ -134,7 +134,7 @@ for ii = 1:length(lightIdx)
             end
             
             % Adjust the spectrum
-            spectrum  = find(piContains(thisLineStr, 'spectrum L'));
+            spectrum  = find(piContains(thisLineStr, 'spectrum L') + piContains(thisLineStr, 'spectrum I'));
             if spectrum
                 if isnan(str2double(thisLineStr{spectrum+1}))
                     thisSpectrum = thisLineStr{spectrum+1};

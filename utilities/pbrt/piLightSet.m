@@ -29,6 +29,13 @@ function lightSource = piLightSet(thisR, lightName, param, val, varargin)
     piLightGet(thisR);
     lightNumber = 1;
     piLightSet(thisR, lightNumber, 'coneAngle', 2);
+
+    thisR = piLightAdd(thisR, 'type', 'spot',...
+                        'light spectrum', 'blueLEDFlood',...
+                        'spectrumscale', 10000,...
+                        'cameracoordinate', true);
+    lightNumber = 2;
+    % piLightSet(thisR, lightNumber, 'coneAngle', 20);
     piWrite(thisR, 'overwritematerials', true);
 
     % Render
@@ -76,6 +83,12 @@ end
 % 
 % thisLight.(param) = val;
 
-piLightAdd(thisR, param, val, 'update', idx);
+if any(piContains(thisLight.line, 'CoordSysTransform "camera"'))
+    cameraCoordinate = true;
+else
+    cameraCoordinate = false;
+end
+piLightAdd(thisR, param, val, 'update', idx,...
+            'cameracoordinate', cameraCoordinate);
     
 %%
