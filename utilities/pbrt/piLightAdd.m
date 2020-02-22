@@ -159,6 +159,7 @@ if ~isempty(newLightSource)
     lightSources = newLightSource;
 else 
     %% Give the name to the lightSource
+    lightSources{1} = piLightInit;
     lightSources{1}.name = name;
     
     %% Set the spectrumScale
@@ -226,8 +227,8 @@ else
             if p.Results.cameracoordinate
                 lightSources{1}.line{1} = 'AttributeBegin';
                 lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-                lightSources{1}.line{3,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" %s %s',...
-                    lightSpectrum, thisConeAngle, thisConeDelta);
+                lightSources{1}.line{3,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
+                    lightSpectrum, from, to, thisConeAngle, thisConeDelta);
                 lightSources{1}.line{end+1} = 'AttributeEnd';
             else
                 lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
@@ -237,13 +238,15 @@ else
             % Set spectrum information
             lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
             
+            %Set light position and direction
+            lightSources{1}.position = from;
+            lightSources{1}.direction = to;
+            
             % Set coneAngle and coneDeltaAngle
             lightSources{1}.coneangle = coneAngle;
             lightSources{1}.conedeltaangle = coneDeltaAngle;
             
-            %Set light position and direction
-            lightSources{1}.position = from;
-            lightSources{1}.direction = to - from;
+
 
         case 'laser' % not supported for public
             lightSources{1}.type = 'laser';
@@ -257,8 +260,8 @@ else
             if p.Results.cameracoordinate
                 lightSources{1}.line{1} = 'AttributeBegin';
                 lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-                lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" %s',...
-                    lightSpectrum);
+                lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+                    lightSpectrum, from, to);
                 lightSources{1}.line{end+1} = 'AttributeEnd';            
             else
                 lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
@@ -270,7 +273,7 @@ else
             
             %Set light position and direction
             lightSources{1}.position = from;
-            lightSources{1}.direction = to - from;
+            lightSources{1}.direction = to;
         case 'infinite'
             lightSources{1}.type = 'infinite';
             lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
@@ -282,6 +285,7 @@ else
 
             nlight = 1;
             for ii = 1:length(thisR.assets)
+                lightSources{nlight} = piLightInit;
                 % Set the name
                 lightSources{nlight}.name = name;
                 
@@ -374,6 +378,7 @@ end
 
 %% Add the lightSources into recipe.lights
 thisR.lights{numel(thisR.lights)+1:numel(thisR.lights)+numel(lightSources)} = lightSources{:};
+thisR.lights = piLightGet(thisR, 'print', false);
 end
 
 

@@ -1,4 +1,4 @@
-function lightSource = piLightSet(thisR, lightName, param, val, varargin)
+function [lightSource, idx] = piLightSet(thisR, lightName, param, val, varargin)
 % Set a light source struct parameter
 %
 %
@@ -28,14 +28,41 @@ function lightSource = piLightSet(thisR, lightName, param, val, varargin)
     
     piLightGet(thisR);
     lightNumber = 1;
-    piLightSet(thisR, lightNumber, 'coneAngle', 2);
+    [~, lightNumber] = piLightSet(thisR, lightNumber, 'light spectrum', 'D50')
+    [~, lightNumber] = piLightSet(thisR, lightNumber, 'coneAngle', 5);
 
     thisR = piLightAdd(thisR, 'type', 'spot',...
                         'light spectrum', 'blueLEDFlood',...
                         'spectrumscale', 10000,...
                         'cameracoordinate', true);
     lightNumber = 2;
-    piLightSet(thisR, lightNumber, 'coneAngle', 20);
+    [~, lightNumber] = piLightSet(thisR, lightNumber, 'coneAngle', 20);
+    piWrite(thisR, 'overwritematerials', true);
+
+    % Render
+    [scene, result] = piRender(thisR, 'render type','radiance');
+    sceneWindow(scene);
+%}
+
+%{
+    % Apply translation and rotation on light
+    thisR = piRecipeDefault;
+    thisR = piLightDelete(thisR, 'all');
+    thisR = piLightAdd(thisR, 'type', 'spot', 'cameracoordinate', true);
+    
+    piLightGet(thisR);
+    lightNumber = 1;
+    piLightSet(thisR, lightNumber, 'light spectrum', 'D50')
+    piLightSet(thisR, lightNumber, 'coneAngle', 10);
+    [~, lightNumber] = piLightRotate(thisR, lightNumber, 'x rot', 7);
+    [~, lightNumber] = piLightTranslate(thisR, lightNumber, 'x shift', 1.2);
+
+    thisR = piLightAdd(thisR, 'type', 'spot',...
+                        'light spectrum', 'blueLEDFlood',...
+                        'spectrumscale', 10000,...
+                        'cameracoordinate', true);
+    lightNumber = 2;
+    [~, lightNumber] = piLightSet(thisR, lightNumber, 'coneAngle', 20);
     piWrite(thisR, 'overwritematerials', true);
 
     % Render
@@ -91,5 +118,8 @@ end
 piLightAdd(thisR, param, val, 'update', idx,...
             'cameracoordinate', cameraCoordinate,...
             'spectrum scale', thisLight.spectrumscale);
-    
+fprintf("The light has been moved to the last one on the light list.\n");
+piLightGet(thisR);
+idx = numel(thisR.lights);
+lightSource = thisR.lights{idx};
 %%

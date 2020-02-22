@@ -34,18 +34,25 @@ if(iscell(str))
     % If cell loop through all entries.
     for ii = 1:length(str)
         currStr = str{ii};
-        if (~isempty(strfind(currStr,pattern))) %#ok<*STREMP>
-            tf(ii) = 1;
-        else
+        if ~ischar(currStr) && ~isstring(currStr)
             tf(ii) = 0;
+        else
+            if (~isempty(strfind(currStr,pattern))) %#ok<*STREMP>
+                tf(ii) = 1;
+            else
+                tf(ii) = 0;
+            end
         end
     end
 else
-    
-    if (~isempty(strfind(str,pattern)))
-        tf = 1;
-    else
+    if ~ischar(str) && ~isstring(str)
         tf = 0;
+    else
+        if (~isempty(strfind(str,pattern)))
+            tf = 1;
+        else
+            tf = 0;
+        end
     end
     
 end
