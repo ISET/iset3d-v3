@@ -2,6 +2,7 @@ function [lightSource, idx] = piLightRotate(thisR, idx,varargin)
 
 % Examples
 %{
+    ieInit;
     thisR = piRecipeDefault;
     thisR = piLightDelete(thisR, 'all');
     thisR = piLightAdd(thisR, 'type', 'spot', 'cameracoordinate', true);
