@@ -93,6 +93,7 @@ for ii = 1:length(lightIdx)
                 % Exception happens when we use coordinate camera to place
                 % the light at the from of the camera
                 if any(piContains(lightSources{ii}.line, 'CoordSysTransform "camera"'))
+                    lightSources{ii}.cameracoordinate = true;
                     txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'LightSource')};
                     compatability = 'ISET3d';
                 else
@@ -136,8 +137,8 @@ for ii = 1:length(lightIdx)
                             piParseNumericString(thisLineStr{to+3})];
                     end
                 case 'ISET3d'
-                    lightSources{ii}.from = reshape(thisR.get('from'), [3, 1]);
-                    lightSources{ii}.to = reshape(thisR.get('to'), [3, 1]);
+                    lightSources{ii}.from = reshape(thisR.get('from'), [1, 3]);
+                    lightSources{ii}.to = reshape(thisR.get('to'), [1, 3]);
                     
             end
             
