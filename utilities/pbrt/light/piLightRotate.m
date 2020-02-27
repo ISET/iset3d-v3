@@ -42,13 +42,13 @@ order  = p.Results.order;
 
 %% Rotate the light
 
-if ~isfield(thisR.lights{idx}, 'direction')
-    warning('This light does not have direction! Doing nothing.');
+if ~isfield(thisR.lights{idx}, 'to')
+    warning('This light does not have to! Doing nothing.');
 else
     for ii = 1:numel(order)
         thisAxis = order(ii);
 
-        direction = thisR.lights{idx}.direction - thisR.lights{idx}.position;
+        to = thisR.lights{idx}.to - thisR.lights{idx}.from;
         switch thisAxis
             case 'x'
                 rotationMatrix = rotx(xrot);
@@ -60,12 +60,12 @@ else
                 error('Unknown axis: %s.\n', thisAxis);
         end
 
-        newDirection = reshape(reshape(direction, [1, 3]) * rotationMatrix, size(thisR.lights{idx}.position));
+        newto = reshape(reshape(to, [1, 3]) * rotationMatrix, size(thisR.lights{idx}.from));
 
         if ii ~= 1
             idx = numel(thisR.lights);
         end
-        piLightSet(thisR, idx, 'to', thisR.lights{idx}.position + newDirection);
+        piLightSet(thisR, idx, 'to', thisR.lights{idx}.from + newto);
     end
 end
 

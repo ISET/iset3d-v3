@@ -379,6 +379,17 @@ end
 
 %% Write out WorldBegin/WorldEnd
 
+% Temporarily add light to world so it's easier for us to compose the PBRT
+% file
+for ii = 1:numel(renderRecipe.lights)
+    renderRecipe = piLightAddToWorld(renderRecipe, 'light source', renderRecipe.lights{ii});
+end
+
+%{
+    % Check if we write all the lights there
+    lightSources = piLightGetFromWorld(renderRecipe);
+%}
+
 if creatematerials
     % We may have created new materials.
     % We write the material and geometry files based on the recipe,
@@ -411,6 +422,12 @@ else
         fprintf(fileID,'%s \n',currLine);
     end
 end
+
+renderRecipe = piLightDeleteWorld(renderRecipe, 'all');
+%{
+    % Check if we removed all lights
+    piLightGetFromWorld(renderRecipe)
+%}
 %% Close file
 
 fclose(fileID);

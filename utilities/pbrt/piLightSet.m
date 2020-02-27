@@ -1,4 +1,4 @@
-function [lightSource, idx] = piLightSet(thisR, lightName, param, val, varargin)
+function thisR = piLightSet(thisR, lightName, param, val, varargin)
 % Set a light source struct parameter
 %
 %
@@ -36,7 +36,7 @@ function [lightSource, idx] = piLightSet(thisR, lightName, param, val, varargin)
                         'spectrumscale', 10000,...
                         'cameracoordinate', true);
     lightNumber = 2;
-    [~, lightNumber] = piLightSet(thisR, lightNumber, 'coneAngle', 20);
+    thisR = piLightSet(thisR, lightNumber, 'coneAngle', 20);
     piWrite(thisR, 'overwritematerials', true);
 
     % Render
@@ -52,7 +52,7 @@ function [lightSource, idx] = piLightSet(thisR, lightName, param, val, varargin)
     
     piLightGet(thisR);
     lightNumber = 1;
-    piLightSet(thisR, lightNumber, 'light spectrum', 'D50')
+    piLightSet(thisR, lightNumber, 'spectrum', 'D50')
     piLightSet(thisR, lightNumber, 'coneAngle', 10);
     [~, lightNumber] = piLightRotate(thisR, lightNumber, 'x rot', 7);
     [~, lightNumber] = piLightTranslate(thisR, lightNumber, 'x shift', 1.2);
@@ -62,7 +62,7 @@ function [lightSource, idx] = piLightSet(thisR, lightName, param, val, varargin)
                         'spectrumscale', 10000,...
                         'cameracoordinate', true);
     lightNumber = 2;
-    [~, lightNumber] = piLightSet(thisR, lightNumber, 'coneAngle', 20);
+    thisR = piLightSet(thisR, lightNumber, 'coneAngle', 20);
     piWrite(thisR, 'overwritematerials', true);
 
     % Render
@@ -71,7 +71,7 @@ function [lightSource, idx] = piLightSet(thisR, lightName, param, val, varargin)
 %}
 
 %% Parse inputs
-
+param = ieParamFormat(param);
 varargin = ieParamFormat(varargin);
 p  = inputParser;
 p.addRequired('recipe', @(x)(isa(x, 'recipe')));
@@ -109,17 +109,6 @@ end
 % end
 % 
 % thisLight.(param) = val;
+thisR.lights{idx}.(param) = val;
 
-if any(piContains(thisLight.line, 'CoordSysTransform "camera"'))
-    cameraCoordinate = true;
-else
-    cameraCoordinate = false;
-end
-piLightAdd(thisR, param, val, 'update', idx,...
-            'cameracoordinate', cameraCoordinate,...
-            'spectrum scale', thisLight.spectrumscale);
-fprintf("The light has been moved to the last one on the light list.\n");
-piLightGet(thisR);
-idx = numel(thisR.lights);
-lightSource = thisR.lights{idx};
 %%

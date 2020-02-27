@@ -301,12 +301,14 @@ if(~isempty(concatTBlock))
 end
 
 thisR.lookAt = struct('from',from,'to',to,'up',up);
-%% Read the light sources
-thisR.lights = piLightGet(thisR, 'print', false);
+%% Read the light sources and delete them in world
+thisR.lights = piLightGetFromWorld(thisR, 'print', false);
 for ii = 1:numel(thisR.lights)
-    thisR.lights{ii}.name = ['Default light'];
+    thisR.lights{ii}.name = 'Default light';
 end
 
+% Remove the light from the world as we already stored them in thisR.lights
+thisR = piLightDeleteWorld(thisR, 'all');
 %% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling

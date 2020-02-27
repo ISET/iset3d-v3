@@ -1,11 +1,12 @@
 function light = piLightInit
-light.name             = [];
-light.spectrumscale    = [];
-light.type           = [];
+light.name              = 'Default light';
+light.spectrumscale     = 1;
+light.type              = 'point';
+light.cameracoordinate  = false;
 % light.spectrum       = [];
 % light.range          = [];
-% light.position       = [];
-% light.direction      = [];
+% light.from       = [];
+% light.to      = [];
 % light.conedeltaangle = [];
 % light.coneangle      = [];
 % light.area           = [];
