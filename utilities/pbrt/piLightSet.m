@@ -1,10 +1,10 @@
-function thisR = piLightSet(thisR, lightName, param, val, varargin)
+function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
 % Set a light source struct parameter
 %
 %
 % Inputs
 %   thisR
-%   lightName
+%   lightIdx
 %   param
 %   val
 %
@@ -16,10 +16,14 @@ function thisR = piLightSet(thisR, lightName, param, val, varargin)
 %
 % Zheng,BW, SCIEN, 2020
 %
+% TODO
+%   Build a switch statement for the param value, checking it is a
+%   legitimate part of the light source structure
+%
 % See also
 %   piLightDelete, piLightAdd, piLightGet
 %
-%
+
 % Examples
 %{
     thisR = piRecipeDefault;
@@ -73,27 +77,31 @@ function thisR = piLightSet(thisR, lightName, param, val, varargin)
 %% Parse inputs
 param = ieParamFormat(param);
 varargin = ieParamFormat(varargin);
+
 p  = inputParser;
 p.addRequired('recipe', @(x)(isa(x, 'recipe')));
-p.addRequired('lightName');
+p.addRequired('lightIdx');
 p.addRequired('param', @ischar);
 p.addRequired('val');
 
-p.parse(thisR, lightName, param, val, varargin{:});
+p.parse(thisR, lightIdx, param, val, varargin{:});
+idx = p.Results.lightIdx;
 
 %%
-lightSources = thisR.lights;
+% lightSources = thisR.lights;
 
-if isnumeric(lightName)
+%{
+if isnumeric(lightIdx)
     % Record the light
-    thisLight = lightSources{lightName};
-    idx = lightName;
-elseif ischar(lightName)
+    thisLight = lightSources{lightIdx};
+    idx = lightIdx;
+elseif ischar(lightIdx)
     lightSourcesStruct = cell2mat(lightSources);
-    find(lightSourcesStruct.name == lightName);
+    find(lightSourcesStruct.name == lightIdx);
 else
     error('Unknown lightName. It must be an integer or a char.');
 end
+%}
 
 % if strcmp(param, 'from')
 %     param = 'position';

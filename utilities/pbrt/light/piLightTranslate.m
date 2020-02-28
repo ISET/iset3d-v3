@@ -1,4 +1,36 @@
-function [lightSource, idx] = piLightTranslate(thisR, idx, varargin)
+function thisR = piLightTranslate(thisR, idx, varargin)
+% Translate the from and to values of a light source
+%
+% Syntax
+%   thisR = piLightTranslate(thisR, idx, varargin)
+%
+% Brief summary
+%   A light source is at a position (from) and shines at a position
+%   (to). Translating a light means translating its 'from' and 'to
+%   positions.
+%
+% Inputs:
+%    thisR:  Rendering recipe
+%    idx:    Index of the light that we are changing
+%
+% Optional key/val pairs
+%    xshift, yshift, zshift:  Translation for each of the directions
+%                    (meters).  Default is 0.
+%                    
+%    fromto:  The value of the fromto flag governs whether the from,
+%             to or both are  shifted.
+%        from - Change the from position but keep light's direction
+%               pointed at the same spot  
+%        to   - Stay at the from position but adjust the to by the
+%               shift
+%        both - Change both the from and to by the same amount (default)
+%
+% Returns
+%    thisR:  The modified recipe
+%
+% See also
+%
+
 
 % Examples
 %{
@@ -84,6 +116,9 @@ switch fromto
         error('Unknown "from to" type %s', fromto);
 end
 
+%{
 idx = numel(thisR.lights);
 lightSource = thisR.lights{end};
+%}
+
 end

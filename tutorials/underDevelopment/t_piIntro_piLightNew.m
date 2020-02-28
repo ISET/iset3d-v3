@@ -18,12 +18,18 @@
 
 %% Init
 ieInit;
+if ~piDockerExists, piDockerConfig; end
 
-%% Init a default recipe and remove all lights
+%% Init a default recipe 
+
+% This the MCC scene
 thisR = piRecipeDefault;
+
+%% Delete all the lights
 thisR = piLightDelete(thisR, 'all');
 
 %% Add one equal energy light
+
 thisR = piLightAdd(thisR,... 
     'type','spot',...
     'light spectrum','equalEnergy',...
@@ -31,47 +37,54 @@ thisR = piLightAdd(thisR,...
     'cameracoordinate', true);
 
 %% Test new get light function
+
 lights = piLightGet(thisR);
+
+% This returns a cell array of the lights
+disp(lights{1})
 
 %% Test new delete light function
 thisR = piLightDelete(thisR, 'all');
 
-%%
+%%  Now add two different lights
+
+% The flag puts the lights at the position of the camera
 thisR = piLightAdd(thisR,... 
     'type','point',...
     'light spectrum','D65',...
-    'spectrumscale', 1,...
-    'cameracoordinate', true);
+    'spectrum scale', 1,...
+    'camera coordinate', true);
 
 thisR = piLightAdd(thisR,... 
     'type','spot',...
+    'cone angle',10, ...
+    'cone delta angle',1,...
     'light spectrum','blueLEDFlood',...
-    'spectrumscale', 100,...
-    'cameracoordinate', true);
+    'spectrum scale', 5000,...
+    'camera coordinate', true);
 
-%%
-piLightGet(thisR);
+%% Let's see what we have
 
-%% Write the recipe
-piWrite(thisR);
+thisR = piLightSet(thisR,1,'name','D65');
+thisR = piLightTranslate(thisR, 1, 'x shift', 1.2);
 
-%% Used for scene
-[scene, result] = piRender(thisR, 'render type', 'radiance');
+thisR = piLightSet(thisR,2,'name','BlueFlood');
+thisR = piLightTranslate(thisR, 2, 'x shift', -1);
 
-sceneWindow(scene);
 
-%% Change one of the light
-lightNumber = 2;
-thisR = piLightSet(thisR, lightNumber, 'spectrumscale', 10000);
-
-%%
-piLightGet(thisR);
+% This returns a cell array of the lights
+lights = piLightGet(thisR);
+for ii=1:length(lights)
+    disp(lights{ii})
+    fprintf('\n----\n');
+end
 
 %% Write the recipe
 piWrite(thisR);
 
 %% Used for scene
-[scene, result] = piRender(thisR, 'render type', 'radiance');
+[scene, result] = piRender(thisR, 'render type', 'all');
 
 sceneWindow(scene);
 
+%%
