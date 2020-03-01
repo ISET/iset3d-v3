@@ -44,7 +44,7 @@ end
 
 for ii = 1:length(lightIdx)
     % Initialize the light structure
-    lightSources{ii} = piLightInit;
+    lightSources{ii} = piLightInit(thisR);
     
     % Find the attributes sections of the world text
     if length(AttBegin) >= ii

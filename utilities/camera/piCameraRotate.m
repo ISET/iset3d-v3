@@ -84,11 +84,15 @@ for ii = 1:numel(order)
     direction = lookAt.to - lookAt.from;
     switch thisAxis
         case 'x'
-            rotationMatrix = rotx(xrot);
+            % rotationMatrix = rotx(xrot);
+            rotationMatrix = rotationMatrix3d([deg2rad(xrot),0,0]);
         case 'y'
-            rotationMatrix = roty(yrot);
+            % rotationMatrix = roty(yrot);
+            rotationMatrix = rotationMatrix3d([0,deg2rad(yrot),0]);
+
         case 'z'
-            rotationMatrix = rotz(zrot);
+            % rotationMatrix = rotz(zrot);
+            rotationMatrix = rotationMatrix3d([0,0,deg2rad(zrot)]);
         otherwise
             error('Unknown axis: %s.\n', thisAxis);
     end

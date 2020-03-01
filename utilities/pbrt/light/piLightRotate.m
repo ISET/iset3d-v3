@@ -1,4 +1,22 @@
-function [lightSource, idx] = piLightRotate(thisR, idx,varargin)
+function thisR = piLightRotate(thisR, idx,varargin)
+% Rotate the direction of a light source
+%
+% Synopsis
+%   thisR = piLightRotate(thisR, idx,varargin)
+%
+% Inputs:
+%   thisR:   recipe
+%   idx:     Index to a light
+%
+% Optional key/value pairs
+%   
+% Returns
+%   thisR:  the modified recipe
+%
+% Description
+%   
+%   Spot lights can be 
+
 
 % Examples
 %{
@@ -51,11 +69,11 @@ else
         to = thisR.lights{idx}.to - thisR.lights{idx}.from;
         switch thisAxis
             case 'x'
-                rotationMatrix = rotx(xrot);
+                rotationMatrix = rotationMatrix3d([deg2rad(xrot),0,0]);
             case 'y'
-                rotationMatrix = roty(yrot);
+                rotationMatrix = rotationMatrix3d([0,deg2rad(yrot),0]);
             case 'z'
-                rotationMatrix = rotz(zrot);
+                rotationMatrix = rotationMatrix3d([0,0,deg2rad(zrot)]);
             otherwise
                 error('Unknown axis: %s.\n', thisAxis);
         end
@@ -69,5 +87,5 @@ else
     end
 end
 
-lightSource = thisR.lights{end};
+% lightSource = thisR.lights{end};
 end

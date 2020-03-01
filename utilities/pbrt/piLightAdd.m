@@ -103,21 +103,30 @@ name = p.Results.name;
 type = p.Results.type;
 lightSpectrum = p.Results.lightspectrum;
 spectrumScale = p.Results.spectrumscale;
-from = p.Results.from;
-to = p.Results.to;
+from      = p.Results.from;
+to        = p.Results.to;
 coneAngle = p.Results.coneangle;
-coneDeltaAngle = p.Results.conedeltaangle;
-idxL      = p.Results.update;
-newLightSource = p.Results.newlightsource;
+coneDeltaAngle   = p.Results.conedeltaangle;
+idxL             = p.Results.update;
+newLightSource   = p.Results.newlightsource;
 cameraCoordinate = p.Results.cameracoordinate;
 
-%% If a light need to be updated
+%%
 
 if idxL
+    %% Updating the light at index idxL
+    
     if ~isempty(newLightSource)
         thisR.lights{idxL} = newLightSource;
+    else
+        for ii=1:2:numel(varargin)
+            piLightSet(thisR,idxL,varargin{ii},varargin{ii+1});
+            
+        end
     end
     
+
+    %{
     if find(piContains(varargin), 'type')
         thisR.lights{idxL}.type = type;
     end
@@ -156,38 +165,40 @@ if idxL
     
     return;
 end
-
-%% Else Create a new light
-newLight{1} = piLightInit;
-
-newLight{1}.name = name;
-newLight{1}.spectrumscale = spectrumScale;
-
-%% Write out lightspectrum into a light .spd file
-if ischar(lightSpectrum)
-    try
-        % Load from ISETCam/ISETBio ligt data
-        thisLight = load(lightSpectrum);
-    catch
-        error('%s light is not recognized \n', lightSpectrum);
-    end
-    outputDir = fileparts(thisR.outputFile);
-    lightSpdDir = fullfile(outputDir, 'spds', 'lights');
-    thisLightfile = fullfile(lightSpdDir,...
-        sprintf('%s.spd', lightSpectrum));
-    if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
-    fid = fopen(thisLightfile, 'w');
-    for ii = 1: length(thisLight.data)
-        fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
-    end
-    fclose(fid);
-    % Zheng Lyu added 10-2019
-    if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
-        copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
-    end
+%}
 else
-    % to do
-    % add customized lightspectrum array [400 1 600 1 800 1]
+    %% Create a new light
+    newLight{1} = piLightInit(thisR);
+    
+    newLight{1}.name = name;
+    newLight{1}.spectrumscale = spectrumScale;
+    
+    %% Write out lightspectrum into a light .spd file
+    if ischar(lightSpectrum)
+        try
+            % Load from ISETCam/ISETBio ligt data
+            thisLight = load(lightSpectrum);
+        catch
+            error('%s light is not recognized \n', lightSpectrum);
+        end
+        outputDir = fileparts(thisR.outputFile);
+        lightSpdDir = fullfile(outputDir, 'spds', 'lights');
+        thisLightfile = fullfile(lightSpdDir,...
+            sprintf('%s.spd', lightSpectrum));
+        if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
+        fid = fopen(thisLightfile, 'w');
+        for ii = 1: length(thisLight.data)
+            fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
+        end
+        fclose(fid);
+        % Zheng Lyu added 10-2019
+        if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
+            copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
+        end
+    else
+        % to do
+        % add customized lightspectrum array [400 1 600 1 800 1]
+    end
 end
 
 %% Construct a lightsource structure

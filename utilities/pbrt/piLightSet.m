@@ -1,12 +1,14 @@
 function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
-% Set a light source struct parameter
+% Set a light source parameter
 %
+% Synopsis
+%  thisR = piLightSet(thisR, lightIdx, param, val, varargin)
 %
 % Inputs
-%   thisR
-%   lightIdx
-%   param
-%   val
+%   thisR:    Recipe containing a lightSource cell array
+%   lightIdx: Index into which light in the cell array
+%   param:    The parameter to set
+%   val:      The new value
 %
 % Optional key/val pairs
 %   print:   Printout the list of lights

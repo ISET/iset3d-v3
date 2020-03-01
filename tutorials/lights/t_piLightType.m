@@ -1,6 +1,5 @@
-%% t_piIntro_light
+%% t_piLightType
 %
-% Render the checkerboard scene with two different light sources
 %
 
 %% Initialize ISET and Docker
@@ -16,6 +15,9 @@ thisR = piRecipeDefault('scene name','checkerboard');
 sceneName = 'checkerboard';
 outFile = fullfile(piRootPath,'local',sceneName,'checkerboard.pbrt');
 thisR.set('outputFile',outFile);
+
+%% Set up the render parameters
+piCameraTranslate(thisR,'z shift',2);
 
 %% Check the light list
 piLightGet(thisR);
@@ -36,46 +38,52 @@ thisR = piLightAdd(thisR,...
     'cone angle',20,...
     'cameracoordinate', true);
 
-%% Set up the render parameters
-piCameraTranslate(thisR,'z shift',2);
-
 %% Render
 piWrite(thisR);
 
 %% Used for scene
 scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene,'name','Equal energy (spot)');
+val   = piLightGet(thisR,'idx',1,'param','coneangle','print',false);
+scene = sceneSet(scene,'name',sprintf('EE spot %d',val));
 sceneWindow(scene);
 
 %%  Narrow the cone angle of the spot light a lot
 idx = 1;
 piLightSet(thisR,idx,'cone angle', 10);
+piWrite(thisR);
 
 %% Used for scene
 scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene,'name','Equal energy (spot)');
-val = piLightGet(thisR,'idx',1,'param','coneangle','print',false);
+val   = piLightGet(thisR,'idx',1,'param','coneangle','print',false);
 scene = sceneSet(scene,'name',sprintf('EE spot %d',val));
 sceneWindow(scene);
 
 %%  Change the light and render again
+piLightSet(thisR,idx,'type','spot');
+piLightTranslate(thisR,idx,...
+    'z shift',2,...
+    'x shift',2);
+piLightSet(thisR,idx,'cone angle', 25);
+piWrite(thisR);
 
-% Something wrong with the coordinate camera
-thisR    = piLightDelete(thisR, 'all');
-thisR = piLightAdd(thisR,... 
-    'type','point',...
-    'light spectrum','tungsten',...
-    'spectrumscale', 1,...
-    'cameracoordinate', true);
-%% Check the light list
-piLightGet(thisR);
+shiftedSpotLight = piLightGet(thisR,'idx',1);
 
-%% Render
+%% Used for scene
+scene = piRender(thisR, 'render type', 'radiance');
+val   = piLightGet(thisR,'idx',1,'param','from','print',false);
+scene = sceneSet(scene,'name',sprintf('EE point [%d,%d,%d]',val));
+sceneWindow(scene);
+
+%%  Change the light and render again
+piLightSet(thisR,idx,'type', 'infinite');
 piWrite(thisR);
 
 %% Used for scene
-[scene, result] = piRender(thisR, 'render type', 'both');
-scene = sceneSet(scene,'name','Tungsten (point)');
+scene = piRender(thisR, 'render type', 'radiance');
+val = piLightGet(thisR,'idx',idx,'param','type');
+scene = sceneSet(scene,'name',sprintf('EE type %s',val));
 sceneWindow(scene);
 
-%%
+%%  Add the shifted spot light to the infinite light source
+piLightAdd(thisR,'new light source',shiftedSpotLight);
+
