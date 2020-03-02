@@ -37,7 +37,7 @@ thisR = piLightAdd(thisR,...
     'cameracoordinate', true);
 
 %% Set up the render parameters
-piCameraTranslate(thisR,'z shift',2);
+piCameraTranslate(thisR,'z shift',2);  % Meters
 
 %% Render
 piWrite(thisR);
@@ -63,7 +63,6 @@ sceneWindow(scene);
 
 %%  Change the light and render again
 
-% Something wrong with the coordinate camera
 thisR    = piLightDelete(thisR, 'all');
 thisR = piLightAdd(thisR,... 
     'type','point',...
@@ -81,4 +80,4 @@ piWrite(thisR);
 scene = sceneSet(scene,'name','Tungsten (point)');
 sceneWindow(scene);
 
-%%
+%% END
