@@ -58,6 +58,7 @@ function thisR = piLightAdd(thisR, varargin)
 % Examples:
 %{
   % Need to get a recipe in here!
+  ieInit;
   thisR = piRecipeDefault;
   lightSources = piLightGet(thisR);
   thisR = piLightDelete(thisR, 1);
@@ -66,53 +67,23 @@ function thisR = piLightAdd(thisR, varargin)
 %}
 
 %% Parse inputs
-
 varargin = ieParamFormat(varargin);  % Allow spaces and capitalization
 
 p = inputParser;
+p.KeepUnmatched = true;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));
-p.addParameter('name', 'Default light', @ischar);
-p.addParameter('type', 'point', @ischar);
-% Load in a light source saved in ISETCam/data/lights
-p.addParameter('lightspectrum', 'D65');
-% used for point/spot/distant/laser light
-p.addParameter('from', [0 0 0]);
-% used for spot light
-p.addParameter('to', [0 0 1]);
 
-% The angle that the spotlight's cone makes with its primary axis.
-% For directions up to this angle from the main axis, the full radiant
-% intensity given by "I" is emitted. After this angle and up to
-% "coneangle" + "conedeltaangle", illumination falls off until it is zero.
-p.addParameter('coneangle', 30, @isnumeric); % It's 30 by default
-% The angle at which the spotlight intensity begins to fall off at the edges.
-p.addParameter('conedeltaangle', 5, @isnumeric); % It's 5 by default
-% place a lightsource at the camera's position
-p.addParameter('cameracoordinate',false);
-% scale the spectrum
-p.addParameter('spectrumscale', 1);
-% update an exist light
-p.addParameter('update',0);
-
+% update an exist light, zero means to add a new one
+p.addParameter('update',0); 
 % Directly assign update a light source with one
-p.addParameter('newlightsource', [], @isstruct);
+p.addParameter('newlightsource', [], @isstruct); 
 
 p.parse(thisR, varargin{:});
 
-name = p.Results.name;
-type = p.Results.type;
-lightSpectrum = p.Results.lightspectrum;
-spectrumScale = p.Results.spectrumscale;
-from      = p.Results.from;
-to        = p.Results.to;
-coneAngle = p.Results.coneangle;
-coneDeltaAngle   = p.Results.conedeltaangle;
 idxL             = p.Results.update;
 newLightSource   = p.Results.newlightsource;
-cameraCoordinate = p.Results.cameracoordinate;
 
 %%
-
 if idxL
     %% Updating the light at index idxL
     
@@ -120,133 +91,24 @@ if idxL
         thisR.lights{idxL} = newLightSource;
     else
         for ii=1:2:numel(varargin)
-            piLightSet(thisR,idxL,varargin{ii},varargin{ii+1});
-            
+            if ~strcmp(varargin{ii}, 'update') && ~strcmp(varargin{ii}, 'newlightsource')
+                piLightSet(thisR,idxL,varargin{ii},varargin{ii+1});
+            end
         end
     end
     
-
-    %{
-    if find(piContains(varargin), 'type')
-        thisR.lights{idxL}.type = type;
-    end
-    
-    if find(piContains(varargin, 'name'))
-        thisR.lights{idxL}.name = name;
-    end
-    
-    if any(piContains(varargin, 'lightspectrum'))
-        thisR.lights{idxL}.lightspectrum = lightSpectrum;
-    end
-   
-    if any(piContains(varargin, 'from'))
-        thisR.lights{idxL}.from = from;
-    end
-    
-    if any(piContains(varargin, 'to'))
-        thisR.lights{idxL}.to = to;
-    end
-
-    if any(piContains(varargin, 'coneangle'))
-        thisR.lights{idxL}.coneangle = coneAngle;
-    end
-
-    if any(piContains(varargin, 'conedeltaangle'))
-        thisR.lights{idxL}.conedeltaangle = coneDeltaAngle;
-    end
-
-    if any(piContains(varargin, 'spectrumscale'))
-        thisR.lights{idxL}.spectrumscale = spectrumScale;
-    end
-    
-    if any(piContains(varargin, 'cameracoordinate'))
-        thisR.lights{idxL}.cameracoordinate = cameraCoordinate;
-    end
-    
-    return;
-end
-%}
 else
     %% Create a new light
-    newLight{1} = piLightInit(thisR);
-    
-    newLight{1}.name = name;
-    newLight{1}.spectrumscale = spectrumScale;
-    
-    %% Write out lightspectrum into a light .spd file
-    if ischar(lightSpectrum)
-        try
-            % Load from ISETCam/ISETBio ligt data
-            thisLight = load(lightSpectrum);
-        catch
-            error('%s light is not recognized \n', lightSpectrum);
+    newVarargin = {};
+    for ii = 1:2:numel(varargin)
+        if ~strcmp(varargin{ii}, 'update') && ~strcmp(varargin{ii}, 'newlightsource')
+            newVarargin = [newVarargin, varargin{ii:ii+1}];
         end
-        outputDir = fileparts(thisR.outputFile);
-        lightSpdDir = fullfile(outputDir, 'spds', 'lights');
-        thisLightfile = fullfile(lightSpdDir,...
-            sprintf('%s.spd', lightSpectrum));
-        if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
-        fid = fopen(thisLightfile, 'w');
-        for ii = 1: length(thisLight.data)
-            fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
-        end
-        fclose(fid);
-        % Zheng Lyu added 10-2019
-        if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
-            copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
-        end
-    else
-        % to do
-        % add customized lightspectrum array [400 1 600 1 800 1]
     end
+    piLightInit(thisR, newVarargin{:});
+    thisR.lights = piLightGet(thisR, 'print', false);
+
 end
-
-%% Construct a lightsource structure
-% Different types of lights that we know how to add.
-
-if cameraCoordinate
-    newLight{1}.cameracoordinate = true;
-end
-
-switch type
-    case 'point'
-        newLight{1}.type = 'point';
-
-        newLight{1}.spectrum = lightSpectrum;
-        newLight{1}.from = from;
-        
-    case 'spot'
-        newLight{1}.type = 'spot';
-        newLight{1}.spectrum = lightSpectrum;
-        newLight{1}.from = from;
-        newLight{1}.to = to;
-        
-        newLight{1}.coneangle = coneAngle;
-        newLight{1}.conedeltaangle = coneDeltaAngle;
-    case 'laser'
-        newLight{1}.type = 'laser';
-        newLight{1}.spectrum = lightSpectrum;
-        newLight{1}.from = from;
-        newLight{1}.to = to;
-        
-        newLight{1}.coneangle = coneAngle;
-        newLight{1}.conedeltaangle = coneDeltaAngle;
-    case 'distant'
-        newLight{1}.spectrum = lightSpectrum;
-        newLight{1}.from = from;
-        newLight{1}.to = to;
-    case 'infinite'
-        newLight{1}.spectrum = lightSpectrum;
-    case 'area'
-        newLight{1}.name = name;
-        newLight{1}.spectrumscale = spectrumScale;
-        newLight{1}.type = 'area';
-        newLight{1}.spectrum = lightSpectrum;
-end
-
-%% Add the lightSources into recipe.lights
-thisR.lights{numel(thisR.lights)+1:numel(thisR.lights)+numel(newLight)} = newLight{:};
-thisR.lights = piLightGet(thisR, 'print', false);
 
 %% Tell the user the status.  We might turn this off some day.
 

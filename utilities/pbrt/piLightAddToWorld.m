@@ -75,26 +75,14 @@ p.addParameter('lightsource',[],@isstruct);
 p.parse(thisR, varargin{:});
 lightSource = p.Results.lightsource;
 
-
-%% Parameters we need to set:
-% name
-% type
-% lightspectrum
-% from
-% to
-% coneangle
-% conedeltaangle
-% spectrumscale
-
 %% Check all applicable parameters
 if isfield(lightSource, 'name'), name = lightSource.name;
 else, name = 'Default light'; end
 
-
 if isfield(lightSource, 'type'), type = lightSource.type;
 else, type = 'point'; end
 
-if isfield(lightSource, 'spectrum'), lightSpectrum = lightSource.spectrum;
+if isfield(lightSource, 'lightspectrum'), lightSpectrum = lightSource.lightspectrum;
 else, lightSpectrum = 'D65'; end
 
 if isfield(lightSource, 'from'), from = lightSource.from;
@@ -227,7 +215,6 @@ switch type
 
         nlight = 1;
         for ii = 1:length(thisR.assets)
-            lightSources{nlight} = piLightInit;
             % Set the name
             lightSources{nlight}.name = name;
 

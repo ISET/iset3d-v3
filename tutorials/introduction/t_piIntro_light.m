@@ -51,6 +51,9 @@ sceneWindow(scene);
 idx = 1;
 piLightSet(thisR,idx,'cone angle', 10);
 
+%% Render
+piWrite(thisR);
+
 %% Used for scene
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Equal energy (spot)');

@@ -43,8 +43,8 @@ else,                        lightSources = cell(length(lightIdx),1);
 end
 
 for ii = 1:length(lightIdx)
-    % Initialize the light structure
-    lightSources{ii} = piLightInit(thisR);
+%     % Initialize the light structure
+%     lightSources{ii} = piLightInit(thisR);
     
     % Find the attributes sections of the world text
     if length(AttBegin) >= ii
@@ -89,6 +89,7 @@ for ii = 1:length(lightIdx)
                 % If this works, then we are C4D compatible
                 txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')};
                 compatability = 'C4D';
+                lightSources{ii}.cameracoordinate = false;
             catch
                 % Exception happens when we use coordinate camera to place
                 % the light at the from of the camera
@@ -103,12 +104,9 @@ for ii = 1:length(lightIdx)
                 
             end
             
-            
-            
             %  Get the string on the LightSource line
             thisLineStr = textscan(txt, '%q');
             thisLineStr = thisLineStr{1};
-            
             
             % Adjust the spectrum
             spectrum  = find(piContains(thisLineStr, 'spectrum L') + piContains(thisLineStr, 'spectrum I'));

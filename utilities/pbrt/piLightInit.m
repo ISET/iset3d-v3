@@ -25,8 +25,8 @@ function light = piLightInit(thisR, varargin)
 %}
 %% Parse inputs
 varargin = ieParamFormat(varargin);
-
 p = inputParser;
+p.KeepUnmatched = true;
 p.addParameter('lightspectrum','D65',@ischar);
 p.addParameter('type','point',@ischar);
 p.parse(varargin{:});
@@ -39,8 +39,8 @@ type = p.Results.type;
 
 light.name = 'Default light';
 light.spectrumscale = 1;
-light.lightSpectrum = lightSpectrum;
-light.cameracoordinate = true;
+light.lightspectrum = lightSpectrum;
+light.cameracoordinate = false;
 light.type = type;
 if ~isequal(type,'infinite')
     light.from = [0 0 0];
@@ -57,6 +57,7 @@ catch
     error('%s light is not recognized \n', lightSpectrum);
 end
 
+%{
 %% Write out the SPD and copy it into the recipe output directory
 
 % Saved
@@ -76,6 +77,7 @@ fclose(fid);
 if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
     copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
 end
+%}
 %}
 
 %% Deal with cone angle stuff in these cases
