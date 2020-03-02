@@ -33,7 +33,8 @@ thisR = piLightAdd(thisR,...
     'to', thisR.lookAt.to);
 
 %% Used for scene
-[scene, result] = piRender(thisR, 'render type', 'all');
+piWrite(thisR);
+scene = piRender(thisR, 'render type', 'all');
 sceneWindow(scene);
 
 %% Translate the camera away by 5 meters
@@ -45,7 +46,7 @@ thisR = piCameraTranslate(thisR, ...
 piWrite(thisR);
 
 %% Used for scene
-[scene, result] = piRender(thisR, 'render type', 'all');
+scene = piRender(thisR, 'render type', 'all');
 sceneWindow(scene);
 
 %%  
@@ -69,7 +70,7 @@ thisR = piCameraRotate(thisR, 'y rot', -20);  % deg (CCW)
 piWrite(thisR);
 
 %% Used for scene
-[scene, result] = piRender(thisR, 'render type', 'all');
+scene = piRender(thisR, 'render type', 'all');
 sceneWindow(scene);
 
 %%

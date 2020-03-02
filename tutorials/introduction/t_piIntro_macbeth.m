@@ -29,6 +29,9 @@
 %
 % Author:
 %   ZLY, BW, 2020
+%
+% See also
+%   t_piIntro_cameraposition, piLightSet(examples)
 
 %% init
 ieInit;
@@ -36,17 +39,16 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read the recipe
 
-thisR = piRecipeDefault('write',false);
+% Reads the MCC by default.  We do not write it out yet because we are
+% going to change the parameters
+thisR = piRecipeDefault;
 
 %% Change the light
 
 % There is a default point light.  We delete that.
-%{
-    lightSources = piLightGet(thisR)
-%}
 thisR = piLightDelete(thisR, 'all');
 
-% Add an equal energy distant light
+% Add an equal energy distant light for uniform lighting
 spectrumScale = 1;
 lightSpectrum = 'EqualEnergy';
 thisR = piLightAdd(thisR,...
@@ -64,11 +66,12 @@ outFile = fullfile(piRootPath,'local',sceneName,'macbeth.pbrt');
 thisR.set('outputfile',outFile);
 thisR.integrator.subtype = 'path';
 
+% This is pretty high resolution given the nature of the target.
 thisR.set('pixelsamples', 16);
-
 thisR.set('filmresolution', [640, 360]);
 
 %% Write 
+
 % Write modified recipe out
 piWrite(thisR, 'overwritematerials', true);
 

@@ -194,7 +194,7 @@ if ~convertedflag
                 output_name = sprintf('%s.pbrt', obj(jj).name);
                 output_folder = fullfile(outFilepath,'scene','PBRT','pbrt-geometry');
                 outputGeometry = fullfile('scene','PBRT','pbrt-geometry',output_name);
-                fprintf('piGeometryRead: Saving geometry file %s.\n',outputGeometry);
+                % fprintf('piGeometryRead: Saving geometry file %s.\n',outputGeometry);
 
                 obj(jj).output = outputGeometry;
 
@@ -225,7 +225,7 @@ if ~convertedflag
                 
             end
         end
-        fprintf('Object:%s has %d children object(s) \n',groupobj(hh).name,jj-1);
+        fprintf('Object:%s saved %d children object(s) \n',groupobj(hh).name,jj-1);
         hh = hh+1;
     end
     
@@ -234,7 +234,7 @@ if ~convertedflag
     % passes this function to the else condition.
     renderRecipe.assets = groupobj;
     jsonwrite(AssetInfo,renderRecipe);
-    fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
+    fprintf('Saving render recipe as a JSON file %s.\npiGeometryRead done.\n',AssetInfo);
     
 else
     % The converted flag is true, so AssetInfo is already stored in a

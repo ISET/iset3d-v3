@@ -55,7 +55,7 @@ varargin = ieParamFormat(varargin);
 
 p = inputParser;
 p.addParameter('scenename','MacBethChecker',@ischar);
-p.addParameter('write',true,@islogical);
+p.addParameter('write',false,@islogical);
 p.parse(varargin{:});
 
 sceneName = p.Results.scenename;

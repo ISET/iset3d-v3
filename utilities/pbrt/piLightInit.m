@@ -50,6 +50,7 @@ if ~isequal(type,'infinite')
 end
 
 %% Write out lightspectrum into a light .spd file
+%{
 try
     % Load from ISETCam/ISETBio ligt data
     thisLight = load(lightSpectrum);
@@ -57,7 +58,6 @@ catch
     error('%s light is not recognized \n', lightSpectrum);
 end
 
-%{
 %% Write out the SPD and copy it into the recipe output directory
 
 % Saved
