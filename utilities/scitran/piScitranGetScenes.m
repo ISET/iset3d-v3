@@ -1,13 +1,13 @@
-function ieObject = piScitranGetScenes(st, projectDirectory, localDirectory, varargin)
+function [ieObject, localPaths] = piScitranGetScenes(st, projectDirectory, localDirectory, varargin)
 
 
 p =inputParser;
-p.AddParam('forceDownload',false,@islogical);
+p.addParameter('forceDownload',false,@islogical);
 
 p.parse(varargin{:});
 inputs = p.Results;
 
-ieObject = [];
+localPaths = {};
 
 % Search for scenes
 res = st.search('acquisition',...
@@ -20,6 +20,10 @@ for i=1:length(res)
         dest = fullfile(localDirectory,res{i}.label,res{i}.files{f}.name);
         if ~exist(fileparts(dest),'dir')
             mkdir(fileparts(dest))
+        end
+        
+        if isequal(sprintf('%s.pbrt',res{i}.label),res{i}.files{f}.name)
+            localPaths = cat(1,localPaths,dest);
         end
         
         if ~exist(dest,'file') || inputs.forceDownload

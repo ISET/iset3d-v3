@@ -164,7 +164,10 @@ switch ieParamFormat(param)
                 % Focal distance given the object distance and the lens file
                 [p,flname,~] = fileparts(thisR.camera.lensfile.value);
                 focalLength = load(fullfile(p,[flname,'.FL.mat']));  % Millimeters
-                objDist = thisR.get('object distance');   % Units?  Where does this come from?
+                objDist = 1000*thisR.get('object distance');   % Object distance is in meters 
+                % and is the length of the vector between camera pos and
+                % lookAt.
+                
                 
                 % Pull out the valid distances and focal distances
                 ok = ~isnan(focalLength.focalDistance);
@@ -183,7 +186,7 @@ switch ieParamFormat(param)
                     line([objDist objDist],[min(y),max(y)],'color','k');
                     xlabel('Object distance'); ylabel('focal distance')
                     %}
-                    val = interp1(x,y,objDist);
+                    val = interp1(x,y,objDist) / 1000; % Milimeters to meters
                 end
             otherwise
                 error('Unknown camera type %s\n',opticsType);

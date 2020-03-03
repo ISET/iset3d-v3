@@ -44,6 +44,7 @@ classdef recipe < matlab.mixin.Copyable
         materials;       % material list parsed from *_material.pbrt file
         assets;          % assets list parsed from *_geometry.pbrt file
         exporter = '';
+        media;           % Volumetric rendering media.
         metadata;
     end
     

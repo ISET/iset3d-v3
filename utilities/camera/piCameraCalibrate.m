@@ -5,6 +5,7 @@ p.KeepUnmatched = true;
 p.addRequired('cameraBody',@isstruct);
 p.addOptional('from',[0 0 5; 0 0 6; 0 0 7]);
 p.addOptional('to',[0 0 0; 1 1 0; -0.75 0.35 0]);
+p.addOptional('pixelSamples',128);
 p.parse(cameraBody,varargin{:});
 
 inputs = p.Results;
@@ -16,7 +17,7 @@ outFile = fullfile(piRootPath,'local',sceneName,'calChecker.pbrt');
 recipe = piCreateCheckerboard(outFile,varargin{:});
 
 %% Define the camera
-recipe.set('pixel samples',32);
+recipe.set('pixel samples',inputs.pixelSamples);
 recipe.set('camera body',inputs.cameraBody);
 
 %% Render target from different viewpoints
@@ -33,7 +34,7 @@ for i=1:size(inputs.from,1)
     for j=1:size(inputs.to,1)
         recipe.set('from',inputs.from(i,:));
         recipe.set('to',inputs.to(j,:));
-
+        recipe.set('focus distance',inputs.from(i,3));
         
         % Render the optical image
         piWrite(recipe);
@@ -57,7 +58,8 @@ try
     worldPoints = generateCheckerboardPoints(boardSize,squareSizeInMMs);
 
     cameraParams = estimateCameraParameters(imagePoints,worldPoints, ...
-                                      'ImageSize',recipe.get('film resolution'));
+                                      'ImageSize',recipe.get('film resolution'),...
+                                      'NumRadialDistortionCoefficients',2);
 
 catch
     error('Please install Computer Vision Toolbox\n');

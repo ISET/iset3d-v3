@@ -79,7 +79,7 @@ if isempty(acquisitionlabel)
                 thisResource{1}.download(destName_resource);
                 fprintf('%s is downloaded \n',thisResource{1}.name);
                 unzip(destName_resource);
-                delete([destName_resource,'.zip']);
+                delete(destName_resource);
             end
         else
             % fprintf('%s found \n',acqLabel);

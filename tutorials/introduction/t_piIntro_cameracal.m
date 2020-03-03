@@ -48,13 +48,9 @@ recipe.set('focus distance',4);
 %  simulation it is more conveneint to move the camera around. These are
 %  equivalent.
 
-from = [0 0 3; 
-        0 0 4; 
-        0 0 5];
+from = [0 0 3];
     
-to = [0 0 0; 
-      1 1 0; 
-      -0.75 0.35 0];
+to = [0 0 0];
 
   
 imageFolder = fullfile(recipe.get('working directory'),'Images');

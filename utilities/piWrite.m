@@ -373,6 +373,7 @@ end
 
 %% Write out WorldBegin/WorldEnd
 
+mediaIncluded = false;
 if creatematerials
     % We may have created new materials.
     % We write the material and geometry files based on the recipe,
@@ -382,15 +383,26 @@ if creatematerials
         if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
+            
+            if (isempty(renderRecipe.media) == false) && (mediaIncluded == false)
+                [~,n] = fileparts(renderRecipe.outputFile);
+                currLine = [currLine sprintf('\nInclude "%s_media.pbrt"',n)];
+            end
         end
+           
         if overwritegeometry
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(renderRecipe.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
         end
+        
+        
         fprintf(fileID,'%s \n',currLine);
     end
+    
+    
+    
 else
     % No materials were created, so we just write out the world data
     % without any changes.
@@ -431,6 +443,14 @@ if piContains(renderRecipe.exporter, 'C4D')
     end
 end
 
+%% Overwrite Media.pbrt
+if ~isempty(renderRecipe.media)
+    [~,n] = fileparts(renderRecipe.outputFile);
+    fname_media = sprintf('%s_media.pbrt',n);
+    renderRecipe.media.outputFile_media = fullfile(workingDir,fname_media);
+    piMediaWrite(renderRecipe);
+end
+
 %% Overwrite geometry.pbrt
 if piContains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
@@ -438,6 +458,7 @@ if piContains(renderRecipe.exporter, 'C4D')
             'thistrafficflow',thistrafficflow);
     end
 end
+
 %% Overwrite xxx.json
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);
 jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
