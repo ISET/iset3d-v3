@@ -1,10 +1,24 @@
-function underwater = piSceneSubmerge(scene, height, width, depth)
+function underwater = piSceneSubmerge(scene, varargin)
+
+p = inputParser;
+p.addOptional('height',1,@isnumeric);
+p.addOptional('width',1,@isnumeric);
+p.addOptional('depth',1,@isnumeric);
+p.addOptional('cPlankton',0,@isnumeric);
+p.addOptional('aCDOM440',0,@isnumeric);
+p.addOptional('aNAP400',0,@isnumeric);
+p.addOptional('cSmall',0,@isnumeric);
+p.addOptional('cLarge',0,@isnumeric);
+
+p.parse(varargin{:});
+inputs = p.Results;
+
 
 underwater = scene;
 
-dx = height/2;
-dy = depth/2;
-dz = width/2;
+dx = inputs.height/2;
+dy = inputs.depth/2;
+dz = inputs.width/2;
 
 
 % Vertices of the cube
@@ -30,7 +44,7 @@ P = [-dx -dy -dz;
             4 3 7
             4 0 3];
         
-        
+%{        
 figure;
 hold on; grid on; box on;
 for i=1:size(indices,1)
@@ -39,15 +53,15 @@ for i=1:size(indices,1)
    
     plot3(face(:,1),face(:,2),face(:,3),'lineWidth',2);
 end
-        
+%}      
         
 indices = indices';
         
 numFiles = numel(dir(fullfile(scene.get('working directory'),'scene','PBRT','pbrt-geometry','*.pbrt')));
 
-newAsset.size.l = height;
-newAsset.size.h = depth;
-newAsset.size.w = width;
+newAsset.size.l = inputs.height;
+newAsset.size.h = inputs.depth;
+newAsset.size.w = inputs.width;
 newAsset.size.pmin = [-dx; -dy; -dz];
 newAsset.size.pmax = [dx; dy; dz];
 newAsset.scale = [1; 1; 1];
@@ -83,6 +97,11 @@ if isempty(underwater.media)
     m = piMediumCreate;
     m.name = "seawater";
     m.type = "water";
+    m.cPlankton = inputs.cPlankton;
+    m.aCDOM440 = inputs.aCDOM440;
+    m.aNAP400 = inputs.aNAP400;
+    m.cSmall = inputs.cSmall;
+    m.cLarge = inputs.cLarge;
 
     underwater.media.list = m;
 end
