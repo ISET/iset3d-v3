@@ -318,7 +318,7 @@ switch ieParamFormat(param)
         
         
     case{'concentration'}
-        % val = thisR.get(concentration', 'material', {'materialName'});
+        % val = thisR.get('concentration', 'material', {'materialName'});
         if numel(varargin) == 0
             matNames = fieldnames(thisR.materials.list);
             val = cell(1, numel(matNames));

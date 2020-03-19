@@ -78,7 +78,7 @@ else
                 error('Unknown axis: %s.\n', thisAxis);
         end
 
-        newto = reshape(reshape(to, [1, 3]) * rotationMatrix, size(thisR.lights{idx}.from));
+        newto = reshape(to, [1, 3]) * rotationMatrix;
 
         if ii ~= 1
             idx = numel(thisR.lights);

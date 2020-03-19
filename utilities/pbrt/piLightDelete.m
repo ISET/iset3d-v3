@@ -33,10 +33,10 @@ else
     if numel(thisR.lights) <= 1 && index == 1
         thisR.lights = [];
     else
-        if index > numel(lights)
-            error('Total light number %d, but input index %d', numel(lights), index);
+        if index > numel(thisR.lights)
+            error('Total light number %d, but input index %d', numel(thisR.lights), index);
         end
-        thisR.lights{index} = [];
+        thisR.lights(index) = [];
     end
 end
 

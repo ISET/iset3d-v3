@@ -1,5 +1,5 @@
 function piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
-                                   txtLines, base, location)
+                                   txtLines, base, location, type)
 %% Split the orignal area into two parts
 %
 %   piFluorescentHalfDivision
@@ -16,6 +16,7 @@ function piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
 %   txtLines            - geometry file text lines
 %   base                - reference material
 %   location            - target locaiton for pattern
+%   type                - type of change on fluorescent effect
 %
 % Outputs:
 %   None.
@@ -46,7 +47,7 @@ end
 
 %% Go edit PBRT files
 piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
-                                base, location, verticesOne, verticesTwo);
+                                base, location, verticesOne, verticesTwo, type);
 
 %%
 %{

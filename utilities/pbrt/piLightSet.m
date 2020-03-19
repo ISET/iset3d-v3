@@ -90,9 +90,12 @@ p.parse(thisR, lightIdx, param, val, varargin{:});
 idx = p.Results.lightIdx;
 
 if isfield(thisR.lights{idx}, param)
+    if isnumeric(val) && isequal(size(val), [3 1])
+        val = val';
+    end
     thisR.lights{idx}.(param) = val;
 else
-    error('Unkown parameters: "%s" not applicable for light type: "%s"', param, thisR.lights{idx}.type)
+    warning('Unkown parameters: "%s" not applicable for light type: "%s"', param, thisR.lights{idx}.type)
 end
 
 %%

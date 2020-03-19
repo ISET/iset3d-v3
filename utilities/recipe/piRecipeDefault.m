@@ -87,6 +87,14 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3','slantedBar');
         fname = fullfile(FilePath,'slantedBar.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
+    case 'flatSurface'
+        FilePath = fullfile(piRootPath,'data','V3','flatSurface');
+        fname = fullfile(FilePath,'flatSurface.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
+    case 'sphere'
+        FilePath = fullfile(piRootPath,'data','V3','sphere');
+        fname = fullfile(FilePath,'sphere.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
 
     otherwise
         error('Can not identify the scene, %s\n',sceneName);

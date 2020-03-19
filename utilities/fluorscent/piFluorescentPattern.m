@@ -38,12 +38,14 @@ p.addRequired('thisR',vFunc);
 p.addParameter('location','',@ischar);
 p.addParameter('base','',@ischar);
 p.addParameter('algorithm','half split',@ischar);
+p.addParameter('type', 'darker', @ischar);
 
 p.parse(thisR, varargin{:});
 
 thisR  = p.Results.thisR;
 location = p.Results.location;
 base   = p.Results.base;
+type = p.Results.type;
 
 algorithm = ieParamFormat(p.Results.algorithm);
 
@@ -105,28 +107,28 @@ TR = triangulation(vertices, points);
 switch algorithm
     case 'halfsplit'
         piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
-                                  txtLines, base, location);
+                                  txtLines, base, location, type);
     case 'uniformspread'
 
         if isfield(p.Unmatched, 'depth')
             if isfield(p.Unmatched, 'sTriangleIndex')
                 piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
-                                       txtLines, base, location,...
+                                       txtLines, base, location, type,...
                                        'depth', p.Unmatched.depth,...
                                        'sTriangleIndex', p.Unmatched.sTriangleIndex);  
             else
                 piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
-                           txtLines, base, location,...
+                           txtLines, base, location, type,...
                            'depth', p.Unmatched.depth); 
             end
         else
             if isfield(p.Unmatched, 'sTriangleIndex')
                 piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
-                                       txtLines, base, location,...
+                                       txtLines, base, location, type,...
                                        'sTriangleIndex', p.Unmatched.sTriangleIndex);   
             else
                 piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
-                                           txtLines, base, location);                 
+                                           txtLines, base, location, type);                 
             end
         end
         
@@ -134,24 +136,27 @@ switch algorithm
         if isfield(p.Unmatched, 'maxDepth')
             if isfield(p.Unmatched, 'coreNumber')
                 piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
-                                           txtLines, base, location,...
+                                           txtLines, base, location, type,...
                                            'maxDepth', p.Unmatched.maxDepth,...
                                            'coreNumber', p.Unmatched.coreNumber);
             else
                 piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
-                           txtLines, base, location,...
+                           txtLines, base, location, type,...
                            'maxDepth', p.Unmatched.maxDepth);
             end
         else
             if isfield(p.Unmatched, 'coreNumber')
                 piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
-                           txtLines, base, location,...
+                           txtLines, base, location, type,...
                            'coreNumber', p.Unmatched.coreNumber);
             else
                 piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
-                           txtLines, base, location);
+                           txtLines, base, location, type);
             end
         end
+    case 'irregular'
+        piFluorescentIrregular(thisR, TR, childGeometryPath, txtLines, base,...
+                            location, type);
 
     otherwise
         error('Unknown algorithm: %s, maybe implement it in the future. \n', algorithm);

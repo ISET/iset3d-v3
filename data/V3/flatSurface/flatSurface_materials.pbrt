@@ -1,0 +1,1 @@
+MakeNamedMaterial "Mat" "string type" "matte" "spectrum Kd" "spds/totalreflect.spd"

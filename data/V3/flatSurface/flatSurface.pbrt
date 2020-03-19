@@ -1,0 +1,23 @@
+# Exported by PBRT exporter for Cinema 4D
+# PBRT file created with piWrite on 2020/3/4 11:56:43.38 
+# PBRT version = 3 
+
+LookAt 2.994000 549.728577 -0.145000 2.994000 548.728577 -0.145000 0.000000 0.000000 1.000000 
+ 
+Camera "perspective" "float fov" [31.417276] "float focaldistance" [2000.000000] "float lensradius" [0.000000] 
+
+Sampler "halton" "integer pixelsamples" [16] 
+
+Film "image" "integer xresolution" [320] "integer yresolution" [180] 
+
+Integrator "path" "integer maxdepth" [5] "string strategy" "all" 
+
+WorldBegin  
+Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]  
+AttributeBegin 
+CoordSysTransform "camera" 
+LightSource "point" "spectrum I" "spds/lights/D65.spd" 
+AttributeEnd 
+Include "flatSurface_materials.pbrt"  
+Include "flatSurface_geometry.pbrt"  
+WorldEnd 

@@ -1,5 +1,5 @@
 function verticesOne = piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
-                                    txtLines, base, location, varargin)
+                                    txtLines, base, location, type, varargin)
 %% Generate a pattern from single triangle
 %
 %   piFluorescentUniformSpread
@@ -115,7 +115,7 @@ end
 
 %% Go edit PBRT files
 piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
-                                base, location, verticesOne, verticesTwo);
+                                base, location, verticesOne, verticesTwo, type);
 
 
 end
