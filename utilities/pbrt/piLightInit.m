@@ -1,5 +1,7 @@
 function light = piLightInit(thisR, varargin)
-% Initialize a default light source for a recipe
+% Initialize a default light source struct for a recipe
+%
+% (This should be piLightCreate, I think)
 %
 % Synopsis
 %   light = piLightInit(thisR,varargin)
@@ -8,15 +10,18 @@ function light = piLightInit(thisR, varargin)
 %   thisR: 
 %
 % Optional key/val pairs
-%
+%   light spectrum:    SPD of the light, defined by a string
+%   type:              Type of light source (e.g., point, spot,
+%                      distant)
 % Returns
-%   thisR is modified
+%   thisR:  modified recipe.  But it is passed by pointer so the thisR
+%           is not needed on the return.
 %
 % Description
-%
+%   Light sources are a struct
 %
 % See also
-%
+%   piLightSet, piLightGet
 %
 
 % Examples
@@ -49,7 +54,33 @@ if ~isequal(type,'infinite')
     end
 end
 
-%% Write out lightspectrum into a light .spd file
+%% Deal with cone angle stuff in these cases
+switch type
+    case 'spot'
+        light.coneangle = 30;
+        light.conedeltaangle = 5;
+    case 'laser'       
+        light.coneangle = 5;
+        light.conedeltaangle = 1;
+    otherwise
+        % Do nothing
+end
+
+%% Add the light to the recipe
+
+val = numel(piLightGet(thisR,'print',false));
+thisR.lights{val+1} = light;
+idx = val + 1;
+
+%% Now if the user sent in any additional arguments ...
+
+for ii=1:2:length(varargin)
+    piLightSet(thisR,idx,varargin{ii},varargin{ii+1});
+end
+
+end
+
+%% OLD code: Write out lightspectrum into a light .spd file
 %{
 try
     % Load from ISETCam/ISETBio ligt data
@@ -79,29 +110,3 @@ if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
 end
 %}
 %}
-
-%% Deal with cone angle stuff in these cases
-switch type
-    case 'spot'
-        light.coneangle = 30;
-        light.conedeltaangle = 5;
-    case 'laser'       
-        light.coneangle = 5;
-        light.conedeltaangle = 1;
-    otherwise
-        % Do nothing
-end
-
-%% Add the light to the recipe
-
-val = numel(piLightGet(thisR,'print',false));
-thisR.lights{val+1} = light;
-idx = val + 1;
-
-%% Now if the user sent in any additional arguments ...
-
-for ii=1:2:length(varargin)
-    piLightSet(thisR,idx,varargin{ii},varargin{ii+1});
-end
-
-end
