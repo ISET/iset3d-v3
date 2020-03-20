@@ -1,79 +1,69 @@
-function r = pbrtRGB2Reflectance(rgb, varargin)
-% pbrtReflectance
+function [reflectance,wave] = pbrtRGB2Reflectance(rgb, varargin)
+% Implements the PBRT method for converting rgb to spectral reflectance
+%
 % Syntax:
 %   reflectance = pbrtRGB2Reflectance(rgbValues)
-%
-% Description:
-%   Copy the rgb2reflectance part from PBRT v3. Converts the RGB value
-%   into reflectance spectrum
 %
 % Inputs:
 %   rgbValues   - RGB values 3 numbers
 %
 % Outputs:
-%   r           - reflectance spectrum data with the basis functions from
-%   PBRT
+%   reflectance - Reflectance spectrum data derived from the formula in
+%                 the PBRT source code
+%   wave        - Sample wavelengths used in this calculation
+%
+% Description:
+%   We copied the rgb2reflectance part of the PBRT v3 code. That section
+%   converts RGB values into reflectance spectrum.  There are separate
+%   functions for the illuminant, and we are going to build different
+%   functions for body tissue.
 %
 % ZLY, 2020
 %
-% Examples
+% Examples:
+%    ieExamplesPrint('pbrtRGB2Reflectance');
+%
+% See also
+%  
+
+%Examples:
 %{
-    rgb = [1, 1, 1];
-    wave = [380:5:705];
+    % White
+    rgb = [1, 1, 1]; wave = [380:5:705];
     r = pbrtRGB2Reflectance(rgb, 'wave', wave);
-
-    ieNewGraphWin;
-    plot(wave, r);
-    xlabel('Wavelength (nm)');
-    ylabel('Reflectance');
-    
-    ylim([0 1])
+    ieNewGraphWin; 
+    plot(wave, r); grid on
+    xlabel('Wavelength (nm)'); ylabel('Reflectance'); ylim([0.8 1])
 %}
-
 %{
     % Red
-    rgb = [1, 0, 0];
-    wave = [380:5:705];
+    rgb = [1, 0, 0]; wave = [380:5:705];
     r = pbrtRGB2Reflectance(rgb, 'wave', wave);
-
     ieNewGraphWin;
-    plot(wave, r);
-    xlabel('Wavelength (nm)');
-    ylabel('Reflectance');
-    
-    ylim([0 1])
+    plot(wave, r); grid on
+    xlabel('Wavelength (nm)'); ylabel('Reflectance'); ylim([0 1])
 %}
-
 %{
     % Green
-    rgb = [0, 1, 0];
-    wave = [380:5:705];
+    rgb = [0, 1, 0]; wave = [380:5:705];
     r = pbrtRGB2Reflectance(rgb, 'wave', wave);
-
     ieNewGraphWin;
-    plot(wave, r);
-    xlabel('Wavelength (nm)');
-    ylabel('Reflectance');
-    
-    ylim([0 1])
+    plot(wave, r); grid on
+    xlabel('Wavelength (nm)'); ylabel('Reflectance'); ylim([0 1])
 %}
-
 %{
     % Blue
-    rgb = [0, 0, 1];
-    wave = [380:5:705];
+    rgb = [0, 0, 1]; wave = [380:5:705];
     r = pbrtRGB2Reflectance(rgb, 'wave', wave);
-
-    ieNewGraphWin;
+    ieNewGraphWin; 
     plot(wave, r);
-    xlabel('Wavelength (nm)');
-    ylabel('Reflectance');
-    
-    ylim([0 1])
+    xlabel('Wavelength (nm)'); ylabel('Reflectance'); ylim([0 1])
 %}
 
 
 %% Spectrum default
+
+% The default wavelength samples in PBRT.  Don't ask.
 wavelength = [
     380.000000, 390.967743, 401.935486, 412.903229, 423.870972,...
     434.838715, 445.806458, 456.774200, 467.741943, 478.709686,...
@@ -96,6 +86,7 @@ wave    = p.Results.wave;
 
 %% RGBRef2Spec*
 
+% These are copied from the source code and stored in ISET3d
 RGBRefl2SpectWhite   = ieReadSpectra('RGBRefl2SpectWhite.mat', wave);
 RGBRefl2SpectCyan    = ieReadSpectra('RGBRefl2SpectCyan.mat', wave);
 RGBRefl2SpectBlue    = ieReadSpectra('RGBRefl2SpectBlue.mat', wave);
@@ -107,46 +98,44 @@ RGBRefl2SpectRed     = ieReadSpectra('RGBRefl2SpectRed.mat', wave);
 %% Convert reflectance spectrum to RGB
 
 % Initialize the reflectance spectrum
-r = zeros(1, numel(wave));
-
-
+reflectance = zeros(numel(wave),1);
 
 if rgb(1) <= rgb(2) && rgb(1) <= rgb(3)
     % Compute reflectance with red channel as minimum
-    r = r + rgb(1) * RGBRefl2SpectWhite;
+    reflectance = reflectance + rgb(1) * RGBRefl2SpectWhite;
     
     if rgb(2) <= rgb(3)
-        r = r + (rgb(2) - rgb(1)) * RGBRefl2SpectCyan;
-        r = r + (rgb(3) - rgb(2)) * RGBRefl2SpectCyan;
+        reflectance = reflectance + (rgb(2) - rgb(1)) * RGBRefl2SpectCyan;
+        reflectance = reflectance + (rgb(3) - rgb(2)) * RGBRefl2SpectCyan;
     else
-        r = r + (rgb(3) - rgb(1)) * RGBRefl2SpectCyan;
-        r = r + (rgb(2) - rgb(3)) * RGBRefl2SpectGreen;
+        reflectance = reflectance + (rgb(3) - rgb(1)) * RGBRefl2SpectCyan;
+        reflectance = reflectance + (rgb(2) - rgb(3)) * RGBRefl2SpectGreen;
     end
     
 elseif rgb(2) <= rgb(1) && rgb(2) <= rgb(3)
     % Compute reflectance with green channel as minimum
-    r = r + rgb(2) * RGBRefl2SpectWhite;
+    reflectance = reflectance + rgb(2) * RGBRefl2SpectWhite;
     
     if rgb(1) <= rgb(3)
-        r = r + (rgb(1) - rgb(2)) * RGBRefl2SpectMagenta;
-        r = r + (rgb(3) - rgb(1)) * RGBRefl2SpectBlue;
+        reflectance = reflectance + (rgb(1) - rgb(2)) * RGBRefl2SpectMagenta;
+        reflectance = reflectance + (rgb(3) - rgb(1)) * RGBRefl2SpectBlue;
     else
-        r = r + (rgb(3) - rgb(2)) * RGBRefl2SpectMagenta;
-        r = r + (rgb(1) - rgb(3)) * RGBRefl2SpectRed;
+        reflectance = reflectance + (rgb(3) - rgb(2)) * RGBRefl2SpectMagenta;
+        reflectance = reflectance + (rgb(1) - rgb(3)) * RGBRefl2SpectRed;
     end
 else
     % Compute reflectance with blue channel as minimum
-    r = r + rgb(3) * RGBRefl2SpectWhite;
+    reflectance = reflectance + rgb(3) * RGBRefl2SpectWhite;
     
     if rgb(1) <= rgb(2)
-        r = r + (rgb(1) - rgb(3)) * RGBRefl2SpectYellow;
-        r = r + (rgb(2) - rgb(1)) * RGBRefl2SpectGreen;
+        reflectance = reflectance + (rgb(1) - rgb(3)) * RGBRefl2SpectYellow;
+        reflectance = reflectance + (rgb(2) - rgb(1)) * RGBRefl2SpectGreen;
     else
-        r = r + (rgb(2) - rgb(3)) * RGBRefl2SpectYellow;
-        r = r + (rgb(1) - rgb(2)) * RGBRefl2SpectRed;
+        reflectance = reflectance + (rgb(2) - rgb(3)) * RGBRefl2SpectYellow;
+        reflectance = reflectance + (rgb(1) - rgb(2)) * RGBRefl2SpectRed;
     end
 end
 
-r = r * 0.94;
+reflectance = reflectance * 0.94;
 
 end
