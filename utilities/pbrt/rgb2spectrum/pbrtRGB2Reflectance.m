@@ -106,7 +106,7 @@ if rgb(1) <= rgb(2) && rgb(1) <= rgb(3)
     
     if rgb(2) <= rgb(3)
         reflectance = reflectance + (rgb(2) - rgb(1)) * RGBRefl2SpectCyan;
-        reflectance = reflectance + (rgb(3) - rgb(2)) * RGBRefl2SpectCyan;
+        reflectance = reflectance + (rgb(3) - rgb(2)) * RGBRefl2SpectBlue;
     else
         reflectance = reflectance + (rgb(3) - rgb(1)) * RGBRefl2SpectCyan;
         reflectance = reflectance + (rgb(2) - rgb(3)) * RGBRefl2SpectGreen;
