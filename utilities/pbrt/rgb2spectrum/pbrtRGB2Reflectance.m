@@ -84,7 +84,7 @@ p.parse(rgb, varargin{:});
 rgb     = p.Results.rgb;
 wave    = p.Results.wave;
 
-%% RGBRef2Spec*
+%% RGBRefl2Spec*
 
 % These are copied from the source code and stored in ISET3d
 RGBRefl2SpectWhite   = ieReadSpectra('RGBRefl2SpectWhite.mat', wave);
@@ -95,7 +95,7 @@ RGBRefl2SpectMagenta = ieReadSpectra('RGBRefl2SpectMagenta.mat', wave);
 RGBRefl2SpectYellow  = ieReadSpectra('RGBRefl2SpectYellow.mat', wave);
 RGBRefl2SpectRed     = ieReadSpectra('RGBRefl2SpectRed.mat', wave);
 
-%% Convert reflectance spectrum to RGB
+%% Convert to RGB reflectance spectrum 
 
 % Initialize the reflectance spectrum
 reflectance = zeros(numel(wave),1);
