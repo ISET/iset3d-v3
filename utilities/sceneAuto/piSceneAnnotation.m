@@ -1,23 +1,36 @@
 function scene_label=piSceneAnnotation(meshImage, label,st)
 % Read primitive ID from _mesh.txt
 %
-%   NOT MUCH USED
+%   NOT MUCH USED - Does not run correctly when called from
+%   piAcquisition2ISET with the Graphics camera array project.
+%   That is because of the hard coding of the project and subject (see
+%   below).
 %
 % Add class information here: convert meshImage(instanceSeg) to A
 % classSeg.
 %
 % ZL/ST, Vistasoft Team, 2018
+%
+% See also
+%
+
 %% 
 if isempty(st), st = scitran('stanfordlabs'); end
-%% maybe we should get recipe first, so we will be able to assign size and pose info to detected object;
+
+%% maybe we should get recipe first
+% Then we will be able to assign size and pose info to detected object;
 [sceneFolder,sceneName]=fileparts(label);
 sceneName = strrep(sceneName,'_mesh','');
 destName_recipe = fullfile(sceneFolder,[sceneName,'.json']);
-% find acquisition
+
+% Find acquisition
+% Hard coded acquisition subject and project.
+% That means it can not be used in general.
 if ~exist(sceneFolder,'dir'),mkdir(sceneFolder);end
 acquisition = st.lookup(sprintf('wandell/Graphics auto/scenes_pbrt/scenes_pbrt/%s',sceneName));
 dataId = acquisition.id;
-% download the file
+
+% Download the file
 piFwFileDownload(destName_recipe, [sceneName,'.json'], dataId);
 
 fprintf('%s downloaded \n',[sceneName,'.json']);
@@ -84,12 +97,13 @@ end
 
 
 function [scenelabel,objectList] = instanceSeg(scene_mesh,label,objects)
-%% Create class and instacne label map for training, and colorize them for visulization
+%% Create class and instance label map for training, and colorize them for visulization
+%
 % labelPath: save the path for generated labels
 % colors for visulization uses the same color scheme with cityscape
 % dataset:
 %        
-%       https://github.com/ISET/iset3d/blob/zhenyi/utilities/sceneAuto/Notes.md
+%   https://github.com/ISET/iset3d/blob/zhenyi/utilities/sceneAuto/Notes.md
 %
 % objectList: visible objects list
 data=importdata(label);
@@ -384,6 +398,7 @@ for ii = 1:size(s,1)
         I_1=C_1;I_2=C_2;I_3=C_3;
     end    
 end
+
 ClassColorMap(:,:,1)=C_1;
 ClassColorMap(:,:,2)=C_2;
 ClassColorMap(:,:,3)=C_3;
@@ -403,6 +418,7 @@ scenelabel.class      = ClassMap;
 scenelabel.classVis   = ClassColorMap;
 scenelabel.Instance   = InstanceMap;
 scenelabel.InstanceVis= InstanceColorMap;
+
 end
 
 

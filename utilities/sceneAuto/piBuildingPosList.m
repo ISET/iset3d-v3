@@ -107,6 +107,7 @@ for kk = 1:length(objects.assets)
         
         %% test algotithm. Comment this part when using.
         
+%{         
         figure(1);
         hold on;xlim([-130, 130]);ylim([-30, 280]);hold on;
         switch type
@@ -158,7 +159,7 @@ for kk = 1:length(objects.assets)
                     rectangle('Position',[buildingPosList(jj).position(1)-xx,buildingPosList(jj).position(3)-yy,xx,yy]);title('back');
                 end
         end
-        
+        %}
         % tmp = tmp + 1; 
         % disp(tmp);
 

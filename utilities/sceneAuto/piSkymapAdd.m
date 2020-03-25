@@ -45,7 +45,6 @@ if ~piContains(skyName,':')
     % Get the information about the skymap so we can download from
     % Flywheel
 
-    % Is this data/data bit right?
     try
         acquisition = st.fw.lookup('wandell/Graphics auto/assets/data/skymaps');
         dataId      = acquisition.id;
@@ -61,11 +60,61 @@ if ~piContains(skyName,':')
     end
 else
     % Fix this with Flywheel and Justin E
+
     time = strsplit(skyName,':');
-    acqName = sprintf('wandell/Graphics auto/assets/skymap_daytime/%02d00',str2double(time{1}));
-    thisAcq = st.fw.lookup(acqName);
-    dataId = thisAcq.id;
-    skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));
+    roughTime = sprintf('%02d-%d', str2double(time{1}),str2double(time{2}(1)));
+    if str2double(time{1})<10 || str2double(time{1})>14
+        index = randi(3,1);
+    else
+        index = randi(4,1);
+    end
+    skyname = '';
+    switch index
+        case 1
+            % 06-41 to 17-60 inv:1
+            acqName = sprintf('wandell/Graphics auto/assets/skymap_daytime/%02d00',str2double(time{1}));
+            thisAcq = st.fw.lookup(acqName);
+            dataId = thisAcq.id;
+            skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));
+        case 2
+            % 06-59 to 18-00 inv: 2
+            acqName = 'wandell/Graphics auto/assets/skymap_skyhdr/20141108';
+            thisAcq = st.fw.lookup(acqName);
+            dataId = thisAcq.id;
+            for ii = 1:length(thisAcq.files)
+                if contains(thisAcq.files{ii}.name, roughTime)
+                    skyname = thisAcq.files{ii}.name;
+                end
+            end
+        case 3
+            %  07-24 to 17-54  inv: 2
+            acqName = 'wandell/Graphics auto/assets/skymap_skyhdr/20141003';
+            thisAcq = st.fw.lookup(acqName);
+            dataId = thisAcq.id;
+            for ii = 1:length(thisAcq.files)
+                if contains(thisAcq.files{ii}.name, roughTime)
+                    skyname = thisAcq.files{ii}.name;
+                end
+            end
+        case 4 
+            % 09-55 to 17-01 inv: 2
+            acqName = 'wandell/Graphics auto/assets/skymap_skyhdr/20141011';
+            thisAcq = st.fw.lookup(acqName);
+            dataId = thisAcq.id;
+            for ii = 1:length(thisAcq.files)
+                if contains(thisAcq.files{ii}.name, roughTime)
+                    skyname = thisAcq.files{ii}.name;
+                end
+            end
+
+    end
+    % In case we can not find skymap for case 2-4, we use case 1.
+    if isempty(skyname)
+        acqName = sprintf('wandell/Graphics auto/assets/skymap_daytime/%02d00',str2double(time{1}));
+        thisAcq = st.fw.lookup(acqName);
+        dataId = thisAcq.id;
+        skyname= sprintf('probe_%02d-%02d_latlongmap.exr',str2double(time{1}),str2double(time{2}));
+    end
 end
 
 skylights = sprintf('LightSource "infinite" "string mapname" "%s"',skyname);
@@ -74,8 +123,8 @@ index_m = find(piContains(thisR.world,'_materials.pbrt'));
 
 
 % skyview = randi(360,1);
-% skyview = randi(45,1)+45;% tmp
-skyview = 45;% tmp
+skyview = randi(135,1)+45;% tmp
+% skyview = 45;% tmp
 
 world(1,:) = thisR.world(1);
 world(2,:) = cellstr(sprintf('AttributeBegin'));

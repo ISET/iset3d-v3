@@ -90,6 +90,7 @@ end
 
 fseek(fid, dataPosition, 'bof');
 serializedImage = fread(fid, inf, 'double');
+
 fclose(fid);
 
 fprintf('  Read %d pixel elements for image.\n', numel(serializedImage));

@@ -35,6 +35,7 @@ p.addParameter('focalLength',0.004,@isscalar);   % Meters
 p.addParameter('fNumber',4,@isscalar);           % Dimensionless
 p.addParameter('filmDiag',[],@isscalar);         % Meters
 p.addParameter('fov',[],@isscalar)               % Horizontal fov, degrees
+p.addParameter('wavelength',[400:10:700],@isvector); % Spectral samples
 
 % Format arguments so that p.parse will run.
 for ii=1:2:length(varargin)
@@ -53,10 +54,14 @@ end
 
 %% Create a shift invariant optical image
 
-% There are some problems here.  What do we do about the OTF, in
-% particular, which does not really apply to this calculation?
+% There are some problems here.  What do we do about the OTF which
+% does not really apply to this calculation?
 oi = oiCreate('shift invariant');
-oi = initDefaultSpectrum(oi);
+
+% Also, we now adjust the wavelength to allow things to work with
+% fluorescence case.
+oi = initDefaultSpectrum(oi,'custom',p.Results.wavelength);
+
 oi = oiSet(oi,'photons',photons);
 oi = oiSet(oi,'optics focal length', p.Results.focalLength);
 oi = oiSet(oi,'optics fnumber',p.Results.fNumber);

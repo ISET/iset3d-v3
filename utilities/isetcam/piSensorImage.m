@@ -1,8 +1,8 @@
-function [img, filename, sensor, ip] = piSensorImage(oi,varargin)
+function [img, filename, camera] = piSensorImage(oi,varargin)
 % Make an image from the OI after passing through a sensor and ip pipeline
 %
 % Syntax
-%   [img, filename, sensor, ip] = piSensorImage(oi, ...)
+%   [img, filename, camera] = piSensorImage(oi, ...)
 %
 % Description
 %  Convert the oi through a sensor and the ip into an RGB image. We do this
@@ -16,6 +16,7 @@ function [img, filename, sensor, ip] = piSensorImage(oi,varargin)
 % Key/value
 %   filename    - Output png file
 %   pixel size  - Default value is 2 (in microns)
+%   exp time    - Default value is 10 ms
 %
 % Outputs
 %   img         - RGB image
@@ -46,15 +47,18 @@ p = inputParser;
 p.addRequired('oi',@(x)(isequal(x.type,'opticalimage')));
 p.addParameter('filename','',@ischar);
 p.addParameter('pixelsize',2,@isscalar);
+p.addParameter('exptime',0.010,@isscalar);
 
 p.parse(oi,varargin{:});
 filename = p.Results.filename;
 pSize    = p.Results.pixelsize;
+expTime  = p.Results.exptime;
 
 %% High resolution sensor
 sensor = sensorCreate;
 sensor = sensorSet(sensor,'pixel size constant fill factor',[pSize pSize]*1e-6);
 sensor = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
+sensor = sensorSet(sensor,'exp time',expTime);
 sensor = sensorCompute(sensor,oi);
 % sensorWindow(sensor);
 
@@ -68,6 +72,13 @@ img = ipGet(ip,'srgb');
 %% Test for saving
 if ~isempty(filename)
     imwrite(img,filename);
+end
+
+if nargout > 2
+    camera = cameraCreate;
+    camera = cameraSet(camera,'oi',oi);
+    camera = cameraSet(camera,'sensor',sensor);
+    camera = cameraSet(camera,'ip',ip);
 end
 
 

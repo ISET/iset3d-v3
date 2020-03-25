@@ -1,4 +1,4 @@
-%% This is the first in a series of scripts introducing iset3d calulcations
+%% The first in a series of scripts introducing iset3d calculations
 %
 % Brief description:
 %
@@ -7,17 +7,16 @@
 %  the docker command, and loads the result into an ISET scene structure.
 % 
 % Dependencies:
-%
 %    ISET3d, (ISETCam or ISETBio), JSONio
 %
 %  Check that you have the updated docker image by running
 %
-%   docker pull vistalab/pbrt-v3-spectral
+%    docker pull vistalab/pbrt-v3-spectral
 %
 % TL, BW, ZL SCIEN 2017
 %
 % See also
-%
+%   t_piIntro_*
 
 %% Initialize ISET and Docker
 
@@ -26,39 +25,28 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
-
-% The teapot is our test file
-% inFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
-% inFile = '/Users/zhenyi/Desktop/3dhuman/human.pbrt';
-inFile = '/Users/zhenyi/Desktop/eSFR_face/eSFRandFace.pbrt';
-recipe = piRead(inFile);
-
-% The output will be written here
+recipe = piRecipeDefault('scene name','teapot');
+%% The output will be written here
 sceneName = 'teapot';
 outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
 recipe.set('outputFile',outFile);
 
 %% Set up the render quality
+recipe.set('film resolution',[192 192]);
+recipe.set('pixel samples',128);
+recipe.set('max depth',1); % Number of bounces
 
-% There are many different parameters that can be set.
-recipe.set('film resolution',[300 300]);
-recipe.set('pixel samples',16);
-recipe.set('max depth',10); % Number of bounces
-recipe.set('fov',22);
-% recipe.lookAt.from = [0 0 -0.5];
-% recipe.lookAt.to = [0 0 0];
-% recipe.lookAt.up = [0 1 0];
 %% Render
 piWrite(recipe);
 
 %%  This is a pinhole case.  So we are rendering a scene.
 
-[scene, result] = piRender(recipe,'rendertype','radiance');
+[scene, result] = piRender(recipe,'render type','both');
 
 sceneWindow(scene);
 scene = sceneSet(scene,'gamma',0.7);
 
 %% Notice that we also computed the depth map
-% scenePlot(scene,'depth map');
+scenePlot(scene,'depth map');
 
-%% END
+%%

@@ -36,13 +36,15 @@ if piContains(color,'random')
     % Choose a random color, I guess.
     index = rand;
     
-    if index <= 0.35, color = 'white';end
-    if index > 0.35 && index <= 0.75, color = 'black';end
-    if index > 0.75 && index <= 0.8, color = 'red';end
-    if index > 0.8  && index <= 0.85, color = 'blue';end
-    if index > 0.85 && index <= 0.9, color = 'green';end
-    if index > 0.95 && index <= 0.90, color = 'yellow';end
-    if index > 0.90 && index <= 1.00, color = 'silver';end
+    if index <= 0.25, color = 'white';end
+    if index > 0.25 && index <= 0.45, color = 'black';end
+    if index > 0.45 && index <= 0.61, color = 'gray';end
+    if index > 0.61 && index <= 0.71, color = 'red';end
+    if index > 0.71  && index <= 0.79, color = 'blue';end
+    if index > 0.79 && index <= 82, color = 'green';end
+    if index > 0.82 && index <= 0.85, color = 'yellow';end
+    if index > 0.85 && index <= 0.99, color = 'silver';end
+    if index > 0.99 && index <= 1.00, color = 'random';end
     rgb = colorswitch(color);
 else
     rgb = colorswitch(color);    
@@ -53,13 +55,17 @@ end
 function rgb = colorswitch(color)
 switch color
     case 'white'
-        r = 254+rand(1);
-        g = 253+rand(1);
-        b = 250+rand(1);
+        r = 240+randi([0,15],1);
+        g = 240+randi([0,15],1);
+        b = 240+randi([0,15],1);
     case 'black'
-        r = 1+rand(1);
-        g = 1+rand(1);
-        b = 1+rand(1);
+        r = 15+randi([0,20],1);
+        g = r;
+        b = r;
+    case 'gray'
+        r = 169+rand(1);
+        g = 169+rand(1);
+        b = 169+rand(1);
     case 'red'
         r = 134+rand(1);
         g = 1+rand(1);
@@ -80,10 +86,10 @@ switch color
         r = 192+rand(1);
         g = r;
         b = g;
-    case 'gray'
-        r = 169+rand(1);
-        g = 169+rand(1);
-        b = 169+rand(1);  
+    case 'random'
+        r = randi([0,255],1);
+        g = randi([0,255],1);
+        b = randi([0,255],1);  
 end
 rgb = [r/255 g/255 b/255];
 end

@@ -70,7 +70,13 @@ p.addParameter('lightsFlag',false,@islogical);
 
 % Read trafficflow variable
 p.addParameter('thistrafficflow',[]);
+
+% Second rendering for reflectance calculation
+p.addParameter('reflectancerender',false,@islogical);
+
 p.parse(renderRecipe,varargin{:});
+
+
 
 % workingDir          = p.Results.workingdir;
 overwriteresources  = p.Results.overwriteresources;
@@ -359,7 +365,7 @@ for ofns = outerFields'
                 lineFormat = '  "%s %s" [%f %f %f] \n';
             elseif(strcmp(currType,'float'))
                 if(length(currValue) > 1)
-                    lineFormat = '  "%s %s" [%f %f %f %f] \n';
+                    lineFormat = '  "%s %s" [%.18f %.18f %.18f %.18f] \n';
                 else
                     lineFormat = '  "%s %s" [%f] \n';
                 end
@@ -381,6 +387,8 @@ end
 %% Write out WorldBegin/WorldEnd
 
 if creatematerials
+    gFlag = false;
+    mFlag = false;
     % We may have created new materials.
     % We write the material and geometry files based on the recipe,
     % which defines these new materials.
@@ -389,21 +397,35 @@ if creatematerials
         if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
+            mFlag = true; % indicates matieral line has been added.
         end
         if overwritegeometry
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(renderRecipe.outputFile);
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %Added by zhenyi; It seems like we dont need a seperate
+                %geometry file for meta scene since meta pbrt scenes are
+                %generated in piRender, there is always avialiable
+                %scene_gemometry.pbrt file.
+                if piContains(n,'_mesh') || piContains(n,'_depth')
+                    n = strrep(n,'_mesh','');
+                    n = strrep(n,'_depth','');
+                end
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
+                 gFlag = true; % indicates matieral line has been added.
             end
         end 
         if ii == length(renderRecipe.world)
-            if ~piContains(renderRecipe.world, 'materials.pbrt')
-        [~,n] = fileparts(renderRecipe.outputFile);
-        mLine = sprintf('Include "%s_materials.pbrt"',n);
-        fprintf(fileID,'%s \n',mLine);
-        [~,n] = fileparts(renderRecipe.outputFile);
-        gLine = sprintf('Include "%s_geometry.pbrt"',n);
-        fprintf(fileID,'%s \n',gLine);
+            if ~mFlag
+                [~,n] = fileparts(renderRecipe.outputFile);
+                mLine = sprintf('Include "%s_materials.pbrt"',n);
+                fprintf(fileID,'%s \n',mLine);
+            end
+            if ~gFlag
+                [~,n] = fileparts(renderRecipe.outputFile);
+                gLine = sprintf('Include "%s_geometry.pbrt"',n);
+                fprintf(fileID,'%s \n',gLine);
             end
         end
         fprintf(fileID,'%s \n',currLine);
@@ -460,4 +482,5 @@ end
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);
 jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
 jsonwrite(jsonFile,renderRecipe);
+
 end

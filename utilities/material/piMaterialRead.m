@@ -231,6 +231,8 @@ for ii=1:nLines
                     materials(cnt).boolremaproughness = thisLine{ss+1};
                 case 'string bsdffile'   
                     materials(cnt).bsdffile = thisLine{ss+1};
+                case 'photolumi fluorescence'
+                    materials(cnt).photolumifluorescence = thisLine{ss+1};
                 otherwise
                     % fprintf('Unknown case %s\n',thisLine{ss});
             end

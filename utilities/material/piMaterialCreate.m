@@ -46,4 +46,8 @@ m.texturebumpmap = '';
 m.bsdffile = '';
 m.boolremaproughness = '';
 
+% Added photolumi for fluorescence materials
+m.photolumifluorescence = '';
+m.floatconcentration = [];
+
 end

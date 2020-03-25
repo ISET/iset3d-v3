@@ -1,5 +1,13 @@
 function ieObject=piBatchSceneAnnotation(ieObject)
 % Read primitive ID from _mesh.txt
+%
+% We could really use some comments here
+%
+%
+% ZL?? 2019??
+%
+% See also
+
 objects = ieObject.metadata.objects; 
 %% Generate class map and instance map
 % check isetObj size, resize depthmap and meshImage accordingly
@@ -37,6 +45,8 @@ ieObject.metadata.Seg = scenelabel;
 
 
 end
+
+%%
 function [occluded,occludedRate,truncated,bbox2d,ignore] = getBBox(scene_mesh,index,depthmap)
 
 indicator = (scene_mesh==index);   
@@ -98,6 +108,7 @@ end
 end
 
 
+%%
 function [scenelabel,objectList] = instanceSeg(scene_mesh,label,objects,depthmap)
 %% Create class and instacne label map for training, and colorize them for visulization
 % labelPath: save the path for generated labels

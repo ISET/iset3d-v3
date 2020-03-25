@@ -62,7 +62,7 @@ outputDir = fileparts(outFile);
 
 %% Add camera with lens
 
-% This little microlens is only 2 um high.  So, we scale it
+% This microlens is only 2 um high.  So, we scale it
 microlensName = fullfile(piRootPath,'data','lens','microlens.json');
 microlens     = lensC('filename',microlensName);
 currentHeight = microlens.get('lens height');
@@ -81,8 +81,8 @@ fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
 % Set up the microlens array and film size
 % Choose an even number for nMicrolens.  This assures that the sensor and
 % ip data have the right integer relationships.
-pixelsPerMicrolens = 5;
-nMicrolens = [512 512];   % Appears to work for rectangular case, too
+pixelsPerMicrolens = 1;
+nMicrolens = [40 40];   % Appears to work for rectangular case, too
 pixelSize  = microlens.get('lens height')/pixelsPerMicrolens;   % mm
 filmheight = nMicrolens(1)*pixelsPerMicrolens*pixelSize;
 filmwidth  = nMicrolens(2)*pixelsPerMicrolens*pixelSize;
@@ -138,7 +138,7 @@ thisR.integrator.subtype = 'path';
 thisR.set('aperture diameter',6);   % thisR.summarize('all');
 piWrite(thisR,'creatematerials',true);
 
-[oi, result] = piRender(thisR,'render type','radiance');
+[oi, result] = piRender(thisR,'render type','both');
 
 % Parse the result for the lens to film distance and the in-focus
 % distance in the scene.

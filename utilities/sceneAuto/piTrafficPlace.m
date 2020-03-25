@@ -154,7 +154,7 @@ if nScene == 1
         end
         for ii = 1: length(assets.(assetClass))
             if ~isfield(assets.(assetClass)(ii), 'geometry') 
-                fprintf('No geometry information found in %s \n', assets.(assetClass)(ii));
+                disp('No geometry information found. \n');
                 break;
             end
             [~,n] = size(assets.(assetClass)(ii).geometry(1).position);
