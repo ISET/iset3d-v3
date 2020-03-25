@@ -1,4 +1,4 @@
-%% This is the first in a series of scripts introducing iset3d calulcations
+%% The first in a series of scripts introducing iset3d calculations
 %
 % Brief description:
 %
@@ -7,17 +7,16 @@
 %  the docker command, and loads the result into an ISET scene structure.
 % 
 % Dependencies:
-%
 %    ISET3d, (ISETCam or ISETBio), JSONio
 %
 %  Check that you have the updated docker image by running
 %
-%   docker pull vistalab/pbrt-v3-spectral
+%    docker pull vistalab/pbrt-v3-spectral
 %
 % TL, BW, ZL SCIEN 2017
 %
 % See also
-%
+%   t_piIntro_*
 
 %% Initialize ISET and Docker
 
@@ -27,14 +26,10 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
 
-% The teapot is our test file
-% inFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
-inFile = '/Users/zhenyi/Desktop/sunpos/sunPos.pbrt';
+recipe = piRecipeDefault('scene name','teapot');
 
-recipe = piRead(inFile);
-
-% The output will be written here
-sceneName = 'sunPosition';
+%% The output will be written here
+sceneName = 'teapot';
 outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
 recipe.set('outputFile',outFile);
 
@@ -58,4 +53,4 @@ sceneWindow(scene);
 %% Notice that we also computed the depth map
 % scenePlot(scene,'depth map');
 
-%% END
+%%

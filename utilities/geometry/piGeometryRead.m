@@ -127,24 +127,30 @@ if ~convertedflag
                     groupobj(hh).rotate(:,1)   = [rotz;0;0;1];
                     groupobj(hh).position = reshape(transform(13:15),[3,1]);
                     % Add type of the object, get it from the file name,
-                    % could be wrong, but this is how we named the object
+                    % could be wrong, but this is how we named the object                   
                     %{
-                    % If the spatial units are meters, the scale
-                    % factor will be 1. If the obj spatial units are
-                    % not in meters, then the true units will be
-                    % reflected in the these entries of the dcm,
-                    % placed there by the C4D exporter. The entries of
-                    % the matrix, 1,6,8, are strange because of the
-                    % way x,y,z are ordered in the transformation.  In
-                    % a normal world these would be the diagonal
-                    % terms.  But there is some flipping going on so
-                    % that the third row is the y dimension and the
-                    % second row is the z dimension.  That puts the
-                    % diagonals in these new locations.
-                    scaleFactor = abs([dcm(1);dcm(5);dcm(9)]);
-                    if prod(scaleFactor) == 1, disp('Scale is meters'); end
-                    groupobj(hh).scale = groupobj(hh).scale .* scaleFactor;
+                     % ZLY - This is some problem here, need further inspection
+                        % If the spatial units are meters, the scale
+                        % factor will be 1. If the obj spatial units are
+                        % not in meters, then the true units will be
+                        % reflected in the these entries of the dcm,
+                        % placed there by the C4D exporter. The entries of
+                        % the matrix, 1,6,8, are strange because of the
+                        % way x,y,z are ordered in the transformation.  In
+                        % a normal world these would be the diagonal
+                        % terms.  But there is some flipping going on so
+                        % that the third row is the y dimension and the
+                        % second row is the z dimension.  That puts the
+                        % diagonals in these new locations.
+                        % There is an exception: 
+                        scaleFactor = abs([dcm(1);dcm(5);dcm(9)]);
+                        scaleFactor(scaleFactor == 0) = 1;
+                        warning('scaleFactor has zero elements. Suggest change scale factor to 1 in C4D. \n');
+                        if prod(scaleFactor) == 1, disp('Scale is meters'); end
+                        groupobj(hh).scale = groupobj(hh).scale .* scaleFactor;
                     %}
+                    groupobj(hh).scale = groupobj(hh).scale;
+                    
                 else
                     groupobj(hh).rotate(:,3) = [0;1;0;0];
                     groupobj(hh).rotate(:,2) = [0;0;1;0];

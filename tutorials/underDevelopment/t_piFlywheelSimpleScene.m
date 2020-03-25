@@ -47,10 +47,7 @@ thisR.set('nbounces',2); % Number of bounces
 
 % Add relevant information to the recipe
 thisR.materials.lib = piMateriallib;
-%% add lens
-lensfile = 'wide.56deg.3.0mm.dat';
-fprintf('Using lens: %s\n',lensfile);
-thisR.camera = piCameraCreate('realistic','lensFile',lensfile);
+
 %%  This is where we define a series of camera positions
 
 % This is the project where will store the renderints
@@ -97,15 +94,10 @@ fprintf('%s uploaded \n',pngfile);
 %}
 %% Upload the road.fwList
 % Syntax is: Group/Project/Subject/Session/Acquisition
+base_acq = st.fw.lookup('wandell/Graphics auto/assets/data/others');
 data_acq = st.fw.lookup(fullfile('wandell/Graphics auto/assets', sceneName, sceneName));
-data_acq = st.fw.lookup('wandell/Graphics auto/assets/data/others');
-
-road.fwList = [data_acq.id,' ',[sceneName,'.cgresource.zip']];
-%% add other resources: spd/lens/
-data_acq = st.fw.lookup('wandell/Graphics auto/assets/data/others');
-road.fwList = [data_acq.id,' ','data.zip',' ',...
-    acqs.id,' ',...
-    thisResource{1}.name];
+road.fwList = [base_acq.id,' ','data.zip',' '...
+        data_acq.id,' ',[sceneName,'.cgresource.zip']];
 %%
 % The input file will always be downloaded by the script on the GCP
 % from Flywheel.  So the string in the input file does not really
@@ -134,8 +126,8 @@ gcp.targets     = []; % clear job list
 renderAcqList = {};
 outputFileList = {};
 
-for pp = 1:1%size(deltaPosition,1)
-    
+
+for pp = 1:size(deltaPosition,1)   
     % Store the position shift in millimeters
     d = deltaPosition(pp,:)*1000;
 
@@ -145,9 +137,12 @@ for pp = 1:1%size(deltaPosition,1)
     [~,acqLabel] = fileparts(thisR.outputFile);
     
     % Change the lens file
-    lensfile = 'wide.56deg.3.0mm.json';
-    fprintf('Using lens: %s\n',lensfile);
-    thisR.camera = piCameraCreate('realistic','lensFile',lensfile);    
+     lensfile = 'wide.56deg.3.0mm.json';
+     fprintf('Using lens: %s\n',lensfile);
+     thisR.camera = piCameraCreate('realistic','lensFile',lensfile);  
+    % Change the integrator
+    thisR.integrator.subtype = 'bdpt';
+
     % CHANGE THE POSITION OF CAMERA HERE:
     % We will write more routines that generate a sequence of positions
     % for stereo and for camera moving and so forth in this section.
@@ -207,7 +202,7 @@ gcp.targetsList;
 % These fwRender.sh script places the outputs into the
 % subject/session/acquisition specified on the gCloud object (see
 % above).
-gcp.render(); 
+gcp.render('replaceJob', 1); 
 
 %% Are the render time stamps set?
 

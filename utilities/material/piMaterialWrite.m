@@ -283,12 +283,20 @@ if isfield(materials,'floateta') && ~isempty(materials.floateta)
 end
 
 if ~isempty(materials.spectrumkd)
-    val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
+    if(ischar(materials.spectrumkd))
+        val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
+    else
+        val_spectrumkd = sprintf(' "spectrum Kd" [ %s ] ',num2str(materials.spectrumkd)); 
+    end
     val = strcat(val, val_spectrumkd);
 end
 
 if ~isempty(materials.spectrumks)
-    val_spectrumks = sprintf(' "spectrum Ks" "%s" ',materials.spectrumks);
+    if(ischar(materials.spectrumks))
+        val_spectrumks = sprintf(' "spectrum Ks" "%s" ',materials.spectrumks);
+    else
+        val_spectrumks = sprintf(' "spectrum Ks" [ %s ] ',num2str(materials.spectrumks)); 
+    end
     val = strcat(val, val_spectrumks);
 end
 
@@ -361,4 +369,20 @@ if isfield(materials, 'amount')
         val = strcat(val, val_boolremaproughness);
     end
 end
+if isfield(materials, 'photolumifluorescence')
+    if ~isempty(materials.photolumifluorescence)
+        val_photolumifluorescence = [sprintf(' "photolumi fluorescence" '),...
+                                    '[ ', sprintf('%.5f ', materials.photolumifluorescence),' ]'];
+        val = strcat(val, val_photolumifluorescence);
+    end
+end
+if isfield(materials, 'floatconcentration')
+    if ~isempty(materials.floatconcentration)
+        val_floatconcentration = sprintf(' "float concentration" [ %0.5f ] ',...
+                                    materials.floatconcentration);
+        val = strcat(val, val_floatconcentration);
+    end
+end
+
+
 end

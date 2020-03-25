@@ -6,7 +6,8 @@ function camera = piCameraCreate(cameraType,varargin)
 % Input parameters
 %  The type of cameras are
 %
-%    'pinhole'     - Default
+%    {'pinhole','perspective]     - Default
+%           
 %    'realistic'   - allows chromatic aberration and diffraction and a lens file
 %    'light field' - microlens array in front of the sensor 
 %    'human eye'   - T. Lian human eye model parameters
@@ -44,12 +45,13 @@ c = piCameraCreate('omni','lens file',lensname);
 varargin = ieParamFormat(varargin);
 
 p = inputParser;
-validCameraTypes = {'pinhole','realistic','omni', 'humaneye','lightfield'};
+validCameraTypes = {'pinhole','perspective','realistic','omni', 'humaneye','lightfield'};
 p.addRequired('cameraType',@(x)(ismember(x,validCameraTypes)));
 
 % This will work for realistic, but not omni.  Perhaps we should make the
 % default depend on the camera type.
 switch cameraType
+    % Omni and realistic have lenses.  We are using this default lens.
     case 'omni'
         lensDefault = 'dgauss.22deg.12.5mm.json';
     case 'realistic'
@@ -66,11 +68,14 @@ lensFile      = p.Results.lensfile;
 %% Initialize the default camera type
 switch cameraType
     case {'pinhole','perspective'}
+        % A perspective camera with zero aperture is a pinhole camera. 
         camera.type      = 'Camera';
         camera.subtype   = 'perspective';
         camera.fov.type  = 'float';
-        camera.fov.value = 45;  % deg of angle
-        
+        camera.fov.value = 45;         % angle in deg
+        camera.lensradius.type = 'float';
+        camera.lensradius.value = 0;   % Radius in mm???
+
     case {'realistic'}
         % Check for lens .dat file
         [~,~,e] = fileparts(lensFile);

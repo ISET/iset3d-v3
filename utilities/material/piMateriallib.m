@@ -145,6 +145,11 @@ materiallib.skin.boolremaproughness = 'false';
 
 materiallib.fourier.string = 'fourier';
 materiallib.fourier.bsdffile = 'bsdfs/roughglass_alpha_0.2.bsdf';
+
+%% TotalReflect
+materiallib.totalreflect.string = 'matte';
+materiallib.totalreflect.spectrumkd = [400 1 800 1];
+
 %%
 materiallib_updated = piMaterialEmptySlot(materiallib);
 end

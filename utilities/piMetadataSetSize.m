@@ -1,9 +1,34 @@
 function sensor = piMetadataSetSize(oi,sensor)
+% Convert metadata from OI to sensor; ultimately to IP through piOI2IP
+%
+% Syntax
+%
+% Description
+%
+% Inputs
+%   oi
+%  sensor
+%
+% Optional key/val pairs
+%
+% Return
+%  sensor
+%
+% Description
+%  Describe the issues and algorithm here
+%
+% Zhenyi Liu, 2019
+%
+% See also
+%
 
 % sensorSize = sensorGet(sensor,'size');
 % ImgSize    = size(sensor.metadata.meshImage);
 % crop_rec = [(ImgSize(2)-sensorSize(2))/2 (ImgSize(1)-sensorSize(1))/2 ...
 %             sensorSize(2) sensorSize(1)];
+
+%% We need to decribe the algorithm here
+
 spacing = 1;
 r = oiGet(oi,'rows'); c = oiGet(oi,'cols');
 rSamples = (0:(r-1));
@@ -32,6 +57,5 @@ sensor.metadata.depthMap  = interp2(U,V,sensor.metadata.depthMap,X,Y,'nearest');
 % 
 % sensor.metadata.meshImage = imcrop(sensor.metadata.meshImage,crop_rec);
 % sensor.metadata.depthMap  = imcrop(sensor.metadata.depthMap, crop_rec);
-
 
 end

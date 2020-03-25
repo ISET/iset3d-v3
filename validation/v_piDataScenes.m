@@ -1,11 +1,6 @@
-%% This is the second in a series of scripts introducing iset3d calulcations
+%% This is the second in a series of scripts introducing iset3d calculations
 %
 % Brief description:
-%
-%  Download and print out simple properties of the RDT scenes
-%
-%  You must have the Remote Data Toolbox on your path to run this.
-%
 % 
 % Dependencies
 %
@@ -17,15 +12,15 @@
 %
 % See also
 %
-
+%
 % Notes
 %
-%   Directory, sceneFileName
+%    sceneName,          sceneFileName
 %   ------------------------
-%    coloredCube, coloredCube
-%    slantedBar,  slantedBar
+%    coloredCube,        coloredCube
+%    slantedBar,         slantedBar
 %    slantedBarTexture,  slantedBarTexture
-%    cylinderTexture,  c ylinderTexture
+%    cylinderTexture,    cylinderTexture
 %    teapot,             teapot-area-light
 %    checkerboard,       checkerboard
 
@@ -38,7 +33,7 @@ if ~piDockerExists, piDockerConfig; end
 %% Read the white-room file for the Remote Data site
 
 % This is the INPUT file name
-sceneName = 'checkerboard'; sceneFileName = 'checkerboard.pbrt';
+sceneName = 'coloredCube'; sceneFileName = 'coloredCube.pbrt';
 
 % The output will be written here
 inFolder = fullfile(piRootPath,'data','V3');
@@ -64,21 +59,9 @@ piWrite(recipe);
 [scene, result] = piRender(recipe);
 
 %%  Show it and the depth map
-
 sceneWindow(scene);
-% sceneSet(scene,'gamma',0.5);
 
 %%
 scenePlot(scene,'depth map');
-
-%% Add a realistic camera
-%
-% Another time another script.  Show rendering with a lens.
-%
-%{
-recipe.set('camera','realistic');
-recipe.set('lensfile',fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat'));
-recipe.set('filmdiagonal',35); 
-%}
 
 %%

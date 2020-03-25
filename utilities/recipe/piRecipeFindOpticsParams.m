@@ -43,6 +43,7 @@ switch recipe.version
         end
 end
 
+% Now returns with the extension (json or dat)
 lensName = recipe.get('lensfile');
 
 % If we are using the realistic eye, we skip this step since the
@@ -51,9 +52,8 @@ if(strcmp(recipe.camera.subtype,'realisticEye'))
     return;
 end
 
-% The lensName is also the file name (minus the json extension)
 % Check for the metadata slot.  Mostly it should be there.
-thisLens = jsonread([lensName,'.json']);
+thisLens = jsonread(lensName);
 if isfield(thisLens,'metadata')
     metadata = true;
     focalLength = thisLens.metadata.focalLength;
@@ -143,4 +143,6 @@ try
     
 catch
     warning('Could not determine optics parameters from recipe. Leaving OI parameter values as default.')
+end
+
 end

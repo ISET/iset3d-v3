@@ -70,7 +70,13 @@ p.addParameter('lightsFlag',false,@islogical);
 
 % Read trafficflow variable
 p.addParameter('thistrafficflow',[]);
+
+% Second rendering for reflectance calculation
+p.addParameter('reflectancerender',false,@islogical);
+
 p.parse(renderRecipe,varargin{:});
+
+
 
 % workingDir          = p.Results.workingdir;
 overwriteresources  = p.Results.overwriteresources;
@@ -397,7 +403,10 @@ if creatematerials
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(renderRecipe.outputFile);
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                % tmp: added by zhenyi; remove this in master branch !!!!!!
+                %Added by zhenyi; It seems like we dont need a seperate
+                %geometry file for meta scene since meta pbrt scenes are
+                %generated in piRender, there is always avialiable
+                %scene_gemometry.pbrt file.
                 if piContains(n,'_mesh') || piContains(n,'_depth')
                     n = strrep(n,'_mesh','');
                     n = strrep(n,'_depth','');
@@ -473,4 +482,5 @@ end
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);
 jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
 jsonwrite(jsonFile,renderRecipe);
+
 end

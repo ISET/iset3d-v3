@@ -61,7 +61,7 @@ scene = sceneSet(scene,'photons',photons);
 
 scene = sceneSet(scene,'depth map',depthMap);
 scene = sceneSet(scene,'fov',p.Results.fov);
-% tmp comment
+
 % scene = sceneAdjustLuminance(scene,p.Results.meanluminance); % ISETBIO uses this...
 
 % Adjust other parameters
