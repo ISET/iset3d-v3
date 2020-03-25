@@ -324,8 +324,7 @@ for ii = 1:length(thisR.assets)
 end
 
 if isfield(thisR.camera, 'motion')
-    thisR.camera.motion.activeTransformEnd.pos = thisR.camera.motion.activeTransformStart.pos;
-    thisR.camera.motion.activeTransformEnd.rotate = thisR.camera.motion.activeTransformStart.rotate;
+    thisR.camera = rmfield(thisR.camera, 'motion');
 end
 
 end

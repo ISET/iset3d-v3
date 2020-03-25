@@ -163,7 +163,10 @@ switch opticsType
         
     case {'pinhole','environment'}
         % A scene radiance, not an oi
-        ieObject = piSceneCreate(photons,'meanLuminance',meanLuminance);
+        %         ieObject = piSceneCreate(photons,'meanLuminance',meanLuminance);
+        scene = sceneCreate;
+        ieObject = sceneSet(scene,'photons',photons);% do not scale luminance;
+        
         ieObject = sceneSet(ieObject,'name',ieObjName);
         if ~isempty(thisR)
             % PBRT may have assigned a field of view
@@ -171,15 +174,9 @@ switch opticsType
         end
         
     otherwise
-        error('Unknown optics type %s\n',opticsType);       
+        error('Unknown optics type %s\n',opticsType);
 end
 
-%% Adjust the illuminant (added by Zheng Lyu, 10-2019)
-lightSourcePath = fullfile(fileparts(thisR.outputFile), 'spds', 'lights', '*.mat');
-fileInfo = dir(lightSourcePath);
-if ~isempty(fileInfo)
-    ieObject = sceneAdjustIlluminant(ieObject, fullfile(fileInfo.folder, fileInfo.name));
-end
 end
 
 

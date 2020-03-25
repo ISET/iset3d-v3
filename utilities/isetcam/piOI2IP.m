@@ -2,8 +2,8 @@ function [ip,sensor]=piOI2IP(oi,varargin)
 p = inputParser;
 varargin = ieParamFormat(varargin);
 p.addParameter('sensor','default');
-p.addParameter('pixelSize',[]);
-p.addParameter('filmdiagonal',10); % [mm]
+p.addParameter('pixelSize',3e-6);
+p.addParameter('filmdiagonal',4); % [mm]
 p.parse(varargin{:});
 sensorName   = p.Results.sensor;
 pixelSize= p.Results.pixelSize;

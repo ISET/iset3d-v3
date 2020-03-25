@@ -211,9 +211,9 @@ switch param
                 % horizontal resolution/ vertical resolution
                 resRatio = tand(val(1)/2)/tand(val(2)/2);
                 if fov == val(1)
-                    thisR.set('film resolution',[max(filmRes)*resRatio, max(filmRes)]);
+                    thisR.set('film resolution',round([max(filmRes)*resRatio, max(filmRes)]));
                 else
-                    thisR.set('film resolution',[max(filmRes), max(filmRes)/resRatio]);
+                    thisR.set('film resolution',round([max(filmRes), max(filmRes)/resRatio]));
                 end
                 thisR.camera.fov.value = fov;
                 thisR.camera.fov.type = 'float';

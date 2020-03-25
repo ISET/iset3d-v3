@@ -6,6 +6,13 @@ function piMaterialWrite(thisR)
 % information in the recipe.
 %
 % ZL, SCIEN STANFORD, 2018
+%% optionally write mat for metadata rendering
+if strcmp(thisR.integrator.subtype, 'metadata')
+    if strcmp(thisR.integrator.strategy, 'mesh')||...
+            strcmp(thisR.integrator.strategy, 'depth')
+        return
+    end
+end
 
 %%
 p = inputParser;
@@ -13,7 +20,6 @@ p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 p.parse(thisR);
 
 %% Parse the output file, working directory, stuff like that.
-
 % Converts any jpg file names in the PBRT files into png file names
 if isfield(thisR.materials, 'txtLines')
     ntxtLines=length(thisR.materials.txtLines);

@@ -128,7 +128,7 @@ if ~convertedflag
                     groupobj(hh).position = reshape(transform(13:15),[3,1]);
                     % Add type of the object, get it from the file name,
                     % could be wrong, but this is how we named the object
-                    
+                    %{
                     % If the spatial units are meters, the scale
                     % factor will be 1. If the obj spatial units are
                     % not in meters, then the true units will be
@@ -141,9 +141,10 @@ if ~convertedflag
                     % that the third row is the y dimension and the
                     % second row is the z dimension.  That puts the
                     % diagonals in these new locations.
-                    scaleFactor = abs([dcm(1);dcm(6);dcm(8)]);
+                    scaleFactor = abs([dcm(1);dcm(5);dcm(9)]);
                     if prod(scaleFactor) == 1, disp('Scale is meters'); end
                     groupobj(hh).scale = groupobj(hh).scale .* scaleFactor;
+                    %}
                 else
                     groupobj(hh).rotate(:,3) = [0;1;0;0];
                     groupobj(hh).rotate(:,2) = [0;0;1;0];

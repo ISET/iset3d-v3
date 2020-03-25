@@ -229,7 +229,7 @@ switch type
                 newlight{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
                     from(2), from(3));
             end
-            newlight{nlight}.line{3,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd" "bool twosided" "true"', lightSpectrum);
+            newlight{nlight}.line{3,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd" "bool twosided" "false"', lightSpectrum);
             if find(piContains(lightsource{idxL}.line, 'Shape "trianglemesh"'))
                 newlight{nlight}.line{4} = lightsource{idxL}.line{piContains(lightsource{idxL}.line, 'Shape "trianglemesh"')};
             elseif find(piContains(lightsource{idxL}.line, 'Include'))
