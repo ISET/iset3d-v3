@@ -133,16 +133,33 @@ if ischar(lightSpectrum)
     catch
         error('%s light is not recognized \n', lightSpectrum);
     end
-    outputDir = fileparts(thisR.outputFile);
-    lightSpdDir = fullfile(outputDir, 'spds', 'lights');
-    thisLightfile = fullfile(lightSpdDir,...
-        sprintf('%s.spd', lightSpectrum));
-    if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
-    fid = fopen(thisLightfile, 'w');
-    for ii = 1: length(thisLight.data)
-        fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
+    % convert all light spectrum
+    wavelengthStart = 400;
+    wavelengthEnd   = 700;
+    if thisLight.wavelength(1)<=wavelengthStart &&...
+            thisLight.wavelength(end)>=wavelengthEnd
+        unitLight = load('D65_chart_1lux.mat');
+        wave = 400:5:700;
+        unitLight.data = interp1(unitLight.wavelength,unitLight.data,wave);
+        unitLight.wavelength=wave;
+        
+        thisLight.data = interp1(thisLight.wavelength,thisLight.data,wave);
+        thisLight.wavelength = wave;
+        
+        thisLight.data = thisLight.data/(sum(thisLight.data)/sum(unitLight.data));
+        outputDir = fileparts(thisR.outputFile);
+        lightSpdDir = fullfile(outputDir, 'spds', 'lights');
+        thisLightfile = fullfile(lightSpdDir,...
+            sprintf('%s.spd', lightSpectrum));
+        if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
+        fid = fopen(thisLightfile, 'w');
+        for ii = 1: length(thisLight.data)
+            fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
+        end
+        fclose(fid);
+    else
+        error('Spectrum range does not cover 400 to 700 nm');
     end
-    fclose(fid);
     % Zheng Lyu added 10-2019
     if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
         copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
