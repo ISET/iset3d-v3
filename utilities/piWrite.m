@@ -365,7 +365,7 @@ for ofns = outerFields'
                 lineFormat = '  "%s %s" [%f %f %f] \n';
             elseif(strcmp(currType,'float'))
                 if(length(currValue) > 1)
-                    lineFormat = '  "%s %s" [%.18f %.18f %.18f %.18f] \n';
+                    lineFormat = '  "%s %s" [%.7f %.7f %.7f %.7f] \n';
                 else
                     lineFormat = '  "%s %s" [%f] \n';
                 end
