@@ -58,6 +58,7 @@ end
 textureLines = txtLines(~cellfun('isempty',txtLines));
 
 for jj = 1: length(textureLines)
+    jj
     textureLines_tmp = [];
     %     thisLine_tmp = textscan(textureLines{jj},'%q');
     thisLine_tmp= strsplit(textureLines{jj},' ');
@@ -80,6 +81,7 @@ for jj = 1: length(textureLines)
         end
     end
     for ii = 1:length(thisLine_tmp)
+        ii
         if piContains(thisLine_tmp{ii},'.png')
             if piContains(thisLine_tmp{ii-1},'filename')
                 filename = thisLine_tmp{ii};
@@ -103,6 +105,7 @@ for jj = 1: length(textureLines)
                 end
             end
         end
+        % if ii == length(thisLine_tmp), break; end
     end
     for ii = 1:length(thisLine_tmp)
         if ii == 1
