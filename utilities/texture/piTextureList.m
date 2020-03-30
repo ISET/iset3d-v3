@@ -17,7 +17,7 @@ textureNames = fieldnames(thisR.textures.list);
 fprintf('--- Texture names ---\n');
 for ii=1:numel(textureNames)
     thisTexture = textureNames{ii};
-    fprintf('%d. eName: %s\n', ii, thisTexture);
+    fprintf('%d. Name: %s\n', ii, thisTexture);
 end
 fprintf('---------------------\n');
 
