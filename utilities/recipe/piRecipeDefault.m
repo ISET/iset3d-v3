@@ -95,6 +95,10 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3','sphere');
         fname = fullfile(FilePath,'sphere.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
+    case 'stopSign'
+        FilePath = fullfile(piRootPath,'data','V3','StopSign');
+        fname = fullfile(FilePath,'stop.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
 
     otherwise
         error('Can not identify the scene, %s\n',sceneName);

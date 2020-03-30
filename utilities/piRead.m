@@ -340,8 +340,13 @@ if exporterFlag
         thisR.materials.inputFile_materials = inputFile_materials;
         % Call material lib
         thisR.materials.lib = piMateriallib;
-        % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
-        piTextureFileFormat(thisR);
+        
+        %{
+            % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
+            piTextureFileFormat(thisR);
+        %}
+        [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(inputFile_materials, 'version', 3);
+        thisR.textures.inputFile_textures = inputFile_materials;
     end
 end
 
