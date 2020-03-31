@@ -31,20 +31,47 @@ P = [-dx -dy -dz;
       dx  dy  dz;
      -dx  dy  dz;];
 
- indices = [0 1 2
-            0 2 3
-            4 5 6
-            4 6 7
-            7 2 3
-            7 6 2
-            5 2 6
-            5 1 2
-            4 5 1
-            4 1 0
-            4 3 7
-            4 0 3];
+ indices = [0 1 2 %OK
+            0 2 3 %OK
+            4 6 5 
+            4 7 6
+            2 7 3 % OK
+            2 6 7 %OK
+            5 6 2 %OK
+            1 5 2 %OK
+            1 4 5 %OK
+            0 4 1 %OK
+            3 7 4 % OK
+            3 4 0]; % OK];
         
-%{        
+        
+        
+% Vertices of the cube
+P = [dx -dy dz;
+      dx -dy -dz;
+      dx  dy -dz;
+     dx  dy dz;
+     -dx -dy  dz;
+      -dx -dy  -dz;
+      -dx  dy  -dz;
+     -dx  dy  dz;];
+
+ indices = [4 0 3 %OK
+            4 3 7 %OK
+            0 1 2 
+            0 2 3 
+            1 5 6 % OK
+            1 6 2 %OK
+            5 4 7 %OK
+            5 7 6 %OK
+            7 3 2 %OK
+            7 2 6 %OK
+            0 5 1 % OK
+            0 4 5]; % OK];
+        
+% indices = fliplr(indices);
+        
+%{  
 figure;
 hold on; grid on; box on;
 for i=1:size(indices,1)
@@ -53,7 +80,12 @@ for i=1:size(indices,1)
    
     plot3(face(:,1),face(:,2),face(:,3),'lineWidth',2);
 end
-%}      
+
+for p=1:size(P,1)
+    text(P(p,1),P(p,2),P(p,3),sprintf('%i',p-1), 'fontsize',20); 
+end
+%}
+      
         
 indices = indices';
         
