@@ -26,7 +26,8 @@ fclose(fileID);
 %% Gather texture lines
 
 textureLines = piTexturesFromMaterialFile(txtLines);
-textureList  = piBlockExtractTexture(textureLines);
+if isempty(textureLines), textureList = [];
+else, textureList  = piBlockExtractTexture(textureLines);end
 end
 
 

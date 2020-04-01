@@ -82,7 +82,7 @@ piFluorescentPattern(thisR, 'location', unhealthyRegion,...
 
 %% Render
 thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
-wave = 385:5:705;
+wave = 365:5:705;
 [scene, result] = piRender(thisR, 'dockerimagename', thisDocker,'wave',wave, 'render type', 'illuminant');
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 sceneWindow(scene);

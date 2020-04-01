@@ -95,9 +95,13 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3','sphere');
         fname = fullfile(FilePath,'sphere.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
-    case 'stopSign'
-        FilePath = fullfile(piRootPath,'data','V3','StopSign');
-        fname = fullfile(FilePath,'stop.pbrt');
+    case 'flatSurfaceWhiteTexture'
+        FilePath = fullfile(piRootPath,'data','V3','flatSurfaceWhiteTexture');
+        fname = fullfile(FilePath,'flatSurfaceWhiteTexture.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
+    case 'flatSurfaceRandomTexture'
+        FilePath = fullfile(piRootPath,'data','V3','flatSurfaceRandomTexture');
+        fname = fullfile(FilePath,'flatSurfaceRandomTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
 
     otherwise

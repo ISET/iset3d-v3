@@ -15,11 +15,15 @@ p.parse(thisR);
 %% Create txtLines for texture struct array
 % Texture txt lines creation are moved into piTextureText function.
 
-field = fieldnames(thisR.textures.list);
-textureTxt = cell(1, numel(field));
+if ~isempty(thisR.textures.list)
+    field = fieldnames(thisR.textures.list);
+    textureTxt = cell(1, numel(field));
 
-for ii = 1:numel(textureTxt)
-    textureTxt{ii} = piTextureText(thisR.textures.list.(cell2mat(field(ii))));
+    for ii = 1:numel(textureTxt)
+        textureTxt{ii} = piTextureText(thisR.textures.list.(cell2mat(field(ii))));
+    end
+else
+    textureTxt = {};
 end
 %% Parse the output file, working directory, stuff like that.
 % Commented by ZLY. Does this section do any work?
@@ -65,9 +69,11 @@ output = thisR.materials.outputFile_materials;
 fileID = fopen(output,'w');
 fprintf(fileID,'# Exported by piMaterialWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 
-% Add textures
-for row=1:length(textureTxt)
-    fprintf(fileID,'%s\n',textureTxt{row});
+if ~isempty(textureTxt)
+    % Add textures
+    for row=1:length(textureTxt)
+        fprintf(fileID,'%s\n',textureTxt{row});
+    end
 end
 
 % Add the materials
