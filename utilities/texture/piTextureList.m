@@ -12,15 +12,14 @@ function piTextureList(thisR)
 %
 %
 %%
-if isempty(thisR.textures.list)
-    textureNames = {};
-else
-    textureNames = fieldnames(thisR.textures.list);
-end
+
+
 fprintf('--- Texture names ---\n');
-for ii=1:numel(textureNames)
-    thisTexture = textureNames{ii};
-    fprintf('%d. Name: %s\n', ii, thisTexture);
+if isfield(thisR.textures, 'list')
+    for ii=1:numel(thisR.textures.list)
+        thisTexture = thisR.textures.list{ii};
+        fprintf('%d. Name: %s\n', ii, thisTexture.name);
+    end
 end
 fprintf('---------------------\n');
 

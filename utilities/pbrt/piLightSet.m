@@ -95,7 +95,7 @@ if isfield(thisR.lights{idx}, param)
     end
     thisR.lights{idx}.(param) = val;
 else
-    warning('Unkown parameters: "%s" not applicable for light type: "%s"', param, thisR.lights{idx}.type)
+    warning('Unknown parameters: "%s" not applicable for light type: "%s"', param, thisR.lights{idx}.type)
 end
 
 %%

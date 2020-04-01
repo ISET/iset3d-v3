@@ -345,7 +345,7 @@ if exporterFlag
             % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
             piTextureFileFormat(thisR);
         %}
-        [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(inputFile_materials, 'version', 3);
+        [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials, 'version', 3);
         thisR.textures.inputFile_textures = inputFile_materials;
     end
 end

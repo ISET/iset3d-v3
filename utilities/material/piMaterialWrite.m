@@ -16,11 +16,11 @@ p.parse(thisR);
 % Texture txt lines creation are moved into piTextureText function.
 
 if ~isempty(thisR.textures.list)
-    field = fieldnames(thisR.textures.list);
-    textureTxt = cell(1, numel(field));
+    textureNum = numel(thisR.textures.list);
+    textureTxt = cell(1, textureNum);
 
     for ii = 1:numel(textureTxt)
-        textureTxt{ii} = piTextureText(thisR.textures.list.(cell2mat(field(ii))));
+        textureTxt{ii} = piTextureText(thisR.textures.list{ii});
     end
 else
     textureTxt = {};

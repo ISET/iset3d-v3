@@ -1,11 +1,12 @@
-function [textureList, textureLines] = piTextureRead(fname, varargin)
+function [textureList, textureLines] = piTextureRead(thisR, fname, varargin)
 %
 %% Parse inputs
 p = inputParser;
+p.addRequired('thiR', @(x)(isa(x, 'recipe')));
 p.addRequired('fname', @(x)(exist(fname, 'file')));
 p.addParameter('version', 3, @isnumeric);
 
-p.parse(fname, varargin{:});
+p.parse(thisR, fname, varargin{:});
 
 fname = p.Results.fname;
 ver = p.Results.version;
@@ -27,7 +28,7 @@ fclose(fileID);
 
 textureLines = piTexturesFromMaterialFile(txtLines);
 if isempty(textureLines), textureList = [];
-else, textureList  = piBlockExtractTexture(textureLines);end
+else, textureList  = piBlockExtractTexture(thisR, textureLines);end
 end
 
 

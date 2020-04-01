@@ -20,49 +20,49 @@ val_type = sprintf(' "%s"', texture.type);
 val = strcat(val, val_type);
 
 % Texture string mapping
-if ~isempty(texture.stringmapping)
+if isfield(texture, 'stringmapping')
     val_stringmapping = sprintf(' "string mapping" "%s" ', texture.stringmapping);
     val = strcat(val, val_stringmapping);
 end
 
 % Texture float uscale
-if ~isempty(texture.floatuscale)
+if isfield(texture, 'floatuscale')
     val_floatuscale = sprintf(' "float uscale" [%0.5f] ', texture.floatuscale);
     val = strcat(val, val_floatuscale);
 end
 
 % Texture float vscale
-if ~isempty(texture.floatvscale)
+if isfield(texture, 'floatvscale')
     val_floatvscale = sprintf(' "float vscale" [%0.5f] ', texture.floatvscale);
     val = strcat(val, val_floatvscale);
 end
 
 % Texture float udelta
-if ~isempty(texture.floatudelta)
+if isfield(texture, 'floatudelta')
     val_floatudelta = sprintf(' "float udelta" [%0.5f] ', texture.floatudelta);
     val = strcat(val, val_floatudelta);
 end
 
 % Texture float vdelta
-if ~isempty(texture.floatvdelta)
+if isfield(texture, 'floatvdelta')
     val_floatvdelta = sprintf(' "float vdelta" [%0.5f] ', texture.floatvdelta);
     val = strcat(val, val_floatvdelta);
 end
 
 % Texture vector v1
-if ~isempty(texture.vectorv1)
+if isfield(texture, 'vectorv1')
     val_vectorv1 = sprintf(' "vector3f v1" [%s] ', strrep(num2str(texture.vectorv1), '  ', ' '));
     val = strcat(val, val_vectorv1);
 end
 
 % Texture vector v2
-if ~isempty(texture.vectorv2)
+if isfield(texture, 'vector v2')
     val_vectorv2 = sprintf(' "vector3f v2" [%s] ', strrep(num2str(texture.vectorv2), '  ', ' '));
     val = strcat(val, val_vectorv2);
 end
 
 % Texture spectrum value
-if ~isempty(texture.spectrumvalue)
+if isfield(texture, 'spectrumvalue')
     if strcmp(texture.spectrumvalue(1), '[') % Spectrum is stored as vector
         val_spectrumvalue = sprintf(' "spectrum value" %s ', texture.spectrumvalue);
     else                                     % Spectrum is stored as string
@@ -72,7 +72,7 @@ if ~isempty(texture.spectrumvalue)
 end
 
 % Texture spectrum tex1
-if ~isempty(texture.spectrumtex1)
+if isfield(texture, 'spectrumtex1')
     if strcmp(texture.spectrumtex1(1), '[')
         val_spectrumtex1 = sprintf(' "spectrum tex1" %s ', texture.spectrumtex1);
     else
@@ -82,7 +82,7 @@ if ~isempty(texture.spectrumtex1)
 end
 
 % Texture spectrum tex2
-if ~isempty(texture.spectrumtex2)
+if isfield(texture, 'spectrumtex2')
     if strcmp(texture.spectrumtex2(1), '[')
         val_spectrumtex2 = sprintf(' "spectrum tex2" %s ', texture.spectrumtex2);
     else
@@ -92,25 +92,25 @@ if ~isempty(texture.spectrumtex2)
 end
 
 % Texture float tex1
-if ~isempty(texture.floattex1)
+if isfield(texture, 'floattex1')
     val_spectrumfloattex1 = sprintf(' "float tex1" [%0.5f] ', texture.floattex1);
     val = strcat(val, val_spectrumfloattex1);
 end
 
 % Texture float tex2
-if ~isempty(texture.floattex2)
+if isfield(texture, 'floattex2')
     val_spectrumfloattex2 = sprintf(' "float tex2" [%0.5f] ', texture.floattex2);
     val = strcat(val, val_spectrumfloattex2);
 end
 
 % Texture float amount
-if ~isempty(texture.floatamount)
+if isfield(texture, 'floatamount')
     val_floatamount = sprintf(' "float amount" [%0.5f] ', texture.floatamount);
     val = strcat(val, val_floatamount);
 end
 
 % Texture spectrum v00
-if ~isempty(texture.spectrumv00)
+if isfield(texture, 'spectrumv00')
     if strcmp(texture.spectrumv00(1), '[')
         val_spectrumv00 = sprintf(' "spectrum v00" %s ', texture.spectrumv00);
     else
@@ -120,7 +120,7 @@ if ~isempty(texture.spectrumv00)
 end
 
 % Texture spectrum v01
-if ~isempty(texture.spectrumv01)
+if isfield(texture, 'spectrumv01')
     if strcmp(texture.spectrumv01(1), '[')
         val_spectrumv01 = sprintf(' "spectrum v01" %s ', texture.spectrumv01);
     else
@@ -130,7 +130,7 @@ if ~isempty(texture.spectrumv01)
 end
 
 % Texture spectrum v10
-if ~isempty(texture.spectrumv10)
+if isfield(texture, 'spectrumv10')
     if strcmp(texture.spectrumv10(1), '[')
         val_spectrumv10 = sprintf(' "spectrum v10" %s ', texture.spectrumv10);
     else
@@ -140,7 +140,7 @@ if ~isempty(texture.spectrumv10)
 end
 
 % Texture spectrum v11
-if ~isempty(texture.spectrumv11)
+if isfield(texture, 'spectrumv11')
     if strcmp(texture.spectrumv11(1), '[')
         val_spectrumv11 = sprintf(' "spectrum v11" %s ', texture.spectrumv11);
     else
@@ -150,81 +150,81 @@ if ~isempty(texture.spectrumv11)
 end
 
 % Texture float v00
-if ~isempty(texture.floatv00)
+if isfield(texture, 'floatv00')
     val_floatv00 = sprintf(' "float v00" [%0.5f] ', texture.floatv00);
     val = strcat(val, val_floatv00);
 end
 
 % Texture float v01
-if ~isempty(texture.floatv01)
+if isfield(texture, 'floatv01')
     val_floatv01 = sprintf(' "float v01" [%0.5f] ', texture.floatv01);
     val = strcat(val, val_floatv01);
 end
 
 % Texture float v10
-if ~isempty(texture.floatv10)
+if isfield(texture, 'floatv10')
     val_floatv10 = sprintf(' "float v10" [%0.5f] ', texture.floatv10);
     val = strcat(val, val_floatv10);
 end
 
 % Texture float v11
-if ~isempty(texture.floatv11)
+if isfield(texture, 'floatv11')
     val_floatv11 = sprintf(' "float v11" [%0.5f] ', texture.floatv11);
     val = strcat(val, val_floatv11);
 end
 
 % Texture string filename
-if ~isempty(texture.stringfilename)
+if isfield(texture, 'stringfilename')
     val_stringfilename = sprintf(' "string filename" "%s" ', texture.stringfilename);
     val = strcat(val, val_stringfilename);
 end
 
 % Texture string wrap
-if ~isempty(texture.stringwrap)
+if isfield(texture, 'stringwrap')
     val_stringwrap = sprintf(' "string wrap" "%s" ', texture.stringwrap);
     val = strcat(val, val_stringwrap);
 end
 
 % Texture float maxanisotropy
-if ~isempty(texture.floatmaxanisotropy)
+if isfield(texture, 'floatmaxanisotropy')
     val_floatmaxanisotropy = sprintf(' "float maxanisotropy" [%0.5f] ',...
                                     texture.floatmaxanisotropy);
     val = strcat(val, val_floatmaxanisotropy);
 end
 
 % Texture bool trilinear
-if ~isempty(texture.booltrilinear)
+if isfield(texture, 'booltrilinear')
     val_booltrilinear = sprintf(' "bool trilinear" "%s" ', texture.booltrilinear);
     val = strcat(val, val_booltrilinear);
 end
 
 % Texture float scale
-if ~isempty(texture.floatscale)
+if isfield(texture, 'floatscale')
     val_floatscale = sprintf(' "float scale" [%0.5f] ', texture.floatscale);
     val = strcat(val, val_floatscale);
 end
 
 % Texture bool gamma
-if ~isempty(texture.boolgamma)
+if isfield(texture, 'boolgamma')
     val_boolgamma = sprintf(' "bool gamma" "%s" ', texture.boolgamma);
     val = strcat(val, val_boolgamma);
 end
 
 % Texture integer dimension
-if ~isempty(texture.integerdimension)
+if isfield(texture, 'integerdimension')
     val_integerdimension = sprintf(' "integer dimension" [%d] ',...
                                 int16(texture.integerdimension));
     val = strcat(val, val_integerdimension);
 end
 
 % Texture string aamode
-if ~isempty(texture.stringaamode)
+if isfield(texture, 'stringaamode')
     val_stringaamode = sprintf(' "string aamode" "%s" ', texture.stringaamode);
     val = strcat(val, val_stringaamode);
 end
 
 % Texture spectrum inside
-if ~isempty(texture.spectruminside)
+if isfield(texture, 'spectruminside')
     if strcmp(texture.spectruminside(1), '[')
         val_spectruminside = sprintf(' "spectrum inside" %s ',...
                                     texture.spectruminside);
@@ -236,13 +236,13 @@ if ~isempty(texture.spectruminside)
 end
 
 % Texture float inside
-if ~isempty(texture.floatinside)
+if isfield(texture, 'floatinside')
     val_floatinside = sprintf(' "float inside" [%0.5f] ', texture.floatinside);
     val = strcat(val, val_floatinside);
 end
 
 % Texture spectrum outside
-if ~isempty(texture.spectrumoutside)
+if isfield(texture, 'spectrumoutside')
     if strcmp(texture.spectrumoutside(1), '[')
         val_spectrumoutside = sprintf(' "spectrum outside" %s ',...
                                     texture.spectrumoutside);
@@ -254,31 +254,31 @@ if ~isempty(texture.spectrumoutside)
 end
 
 % Texture float outside
-if ~isempty(texture.floatoutside)
+if isfield(texture, 'floatoutside')
     val_floatoutside = sprintf(' "float outside" [%0.5f] ', texture.floatoutside);
     val = strcat(val, val_floatoutside);
 end
 
 % Texture integer octaves
-if ~isempty(texture.integeroctaves)
+if isfield(texture, 'integeroctaves')
     val_integeroctaves = sprintf(' "integer octaves" [%d] ', int16(texture.integeroctaves));
     val = strcat(val, val_integeroctaves);
 end
 
 % Texture float roughness
-if ~isempty(texture.floatroughness)
+if isfield(texture, 'floatroughness')
     val_floatroughness = sprintf(' "float roughness" [%0.5f] ', texture.floatroughness);
     val = strcat(val, val_floatroughness);
 end
 
 % Texture float variation
-if ~isempty(texture.floatvariation)
+if isfield(texture, 'floatvariation')
     val_floatvariation = sprintf(' "float variation" [%0.5f] ', texture.floatvariation);
     val = strcat(val, val_floatvariation);
 end
 
 % Texture spectrum basisone
-if ~isempty(texture.spectrumbasisone)
+if isfield(texture, 'spectrumbasisone')
     if strcmp(texture.spectrumbasisone, '[')
         val_spectrumbasisone = sprintf(' "spectrum basisone" %s ',...
                                 texture.spectrumbasisone);
@@ -290,7 +290,7 @@ if ~isempty(texture.spectrumbasisone)
 end
 
 % Texture spectrum basistwo
-if ~isempty(texture.spectrumbasistwo)
+if isfield(texture, 'spectrumbasistwo')
     if strcmp(texture.spectrumbasistwo, '[')
         val_spectrumbasistwo = sprintf(' "spectrum basistwo" %s ',...
                                 texture.spectrumbasistwo);
@@ -302,7 +302,7 @@ if ~isempty(texture.spectrumbasistwo)
 end
 
 % Texture spectrum basisthree
-if ~isempty(texture.spectrumbasisthree)
+if isfield(texture, 'spectrumbasisthree')
     if strcmp(texture.spectrumbasisthree, '[')
         val_spectrumbasisthree = sprintf(' "spectrum basisthree" %s ',...
                                 texture.spectrumbasisthree);
@@ -321,7 +321,7 @@ output = thisR.materials.outputFile_materials;
 [~,materials_fname,~]=fileparts(output);
 txtLines = thisR.materials.txtLines;
 for ii = 1:size(txtLines)
-    if ~isempty(txtLines(ii))
+    if isfield(txtLines(ii))
         if piContains(txtLines(ii),'MakeNamedMaterial')
             txtLines{ii}=[];
         end

@@ -1,76 +1,38 @@
-function texture = piTextureCreate
-% Template for the texture structure.
+function texture = piTextureCreate(thisR, varargin)
+% Initialize a texture with specific parameters
 %
-%
-%
-%% Create the texture
+% Synopsis
+%   texture = piTextureCreate(thisR);
 
-texture.name = '';
-texture.format = '';
-texture.type = '';
-texture.linenumber = [];
+% Examples
+%{
+    thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
+    texture = piTextureCreate(thisR);
+%}
+%% Parse inputs
+varargin = ieParamFormat(varargin);
+p = inputParser;
+p.KeepUnmatched = true;
+p.parse(varargin{:});
 
-%% 2-D textures parameters
-texture.stringmapping = ''; % Default uv
-texture.floatuscale = [];
-texture.floatvscale = [];
-texture.floatudelta = [];
-texture.floatvdelta = [];
-texture.vectorv1    = [];
-texture.vectorv2    = [];
+%% Get how many textures exist already
+val = numel(piTextureGet(thisR, 'print', false));
+idx = val + 1;
+%% Construct texture structure
+texture.name = strcat('Default texture ', num2str(idx));
+thisR.textures.list{idx} = texture;
 
-%% 3-D textures parameters
-% Constant texture
-texture.spectrumvalue = '';
-texture.floatvalue = [];
-
-% Scale texture
-texture.spectrumtex1 = '';
-texture.floattex1 = [];
-texture.spectrumtex2 = '';
-texture.floattex2 = [];
-
-% Mix texture
-texture.floatamount = [];
-
-% Bilinear interpolation
-texture.spectrumv00 = '';
-texture.spectrumv01 = '';
-texture.spectrumv10 = '';
-texture.spectrumv11 = '';
-texture.floatv00 = [];
-texture.floatv01 = [];
-texture.floatv10 = [];
-texture.floatv11 = [];
-
-% Image map
-texture.stringfilename = '';
-texture.stringwrap = '';
-texture.floatmaxanisotropy = [];
-texture.booltrilinear = '';
-texture.floatscale = [];
-texture.boolgamma = '';
-
-% Checkerboard
-texture.integerdimension = [];
-texture.stringaamode = '';
-
-% Dots
-texture.spectruminside = '';
-texture.floatinside = [];
-texture.spectrumoutside = '';
-texture.floatoutside = [];
-
-% Fbm and Wrinkled
-texture.integeroctaves = [];
-texture.floatroughness = [];
-
-% Marble
-texture.floatvariation = [];
-
-% Basis function
-texture.spectrumbasisone = '';
-texture.spectrumbasistwo = '';
-texture.spectrumbasisthree = '';
-
+if isempty(varargin)
+    % if no parameters, provide a default constant texture
+    texture.format = 'float';
+    texture.type = 'constant';
+    texture.floatvalue = 1;
+    thisR.textures.list{idx} = texture;
+else
+    for ii=1:2:length(varargin)
+        texture.(varargin{ii}) = varargin{ii+1};
+        typeNname = split(varargin{ii});
+        piTextureSet(thisR, idx, varargin{ii}, varargin{ii+1});
+    end
+end
 end
