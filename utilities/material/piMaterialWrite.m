@@ -116,12 +116,16 @@ for jj = 1: length(textureLines)
 end
 % textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy" "float uscale" [512] "float vscale" [512] ';
 %% Create txtLines for the material struct array
-field =fieldnames(thisR.materials.list);
-materialTxt = cell(1,length(field));
+if ~isempty(thisR.materials.list)
+    field =fieldnames(thisR.materials.list);
+    materialTxt = cell(1,length(field));
 
-for ii=1:length(materialTxt)
-    % Converts the material struct to text
-    materialTxt{ii} = piMaterialText(thisR.materials.list.(cell2mat(field(ii))));
+    for ii=1:length(materialTxt)
+        % Converts the material struct to text
+        materialTxt{ii} = piMaterialText(thisR.materials.list.(cell2mat(field(ii))));
+    end
+else
+    materialTxt{1} = '';
 end
 
 %% Write to scene_material.pbrt texture-material file

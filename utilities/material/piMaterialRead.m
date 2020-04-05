@@ -48,7 +48,11 @@ txtLines = tmp{1};
 fclose(fileID);
 
 %% Extract lines that correspond to specified keyword
-materiallist = piBlockExtractMaterial(txtLines);
+if isempty(txtLines)
+    materiallist = [];
+else
+    materiallist = piBlockExtractMaterial(txtLines);
+end
 
 
 %% pass materials to recipe.materials
@@ -189,8 +193,12 @@ for ii=1:nLines
         end
     end
 end
-for jj = 1:cnt
-materiallist.(materials(jj).name)= materials(jj);
+if exist('materials','var')
+    for jj = 1:cnt
+        materiallist.(materials(jj).name)= materials(jj);
+    end
+else
+    materiallist = [];
 end
 fprintf('Read %d materials on %d lines\n',cnt,nLines);
 

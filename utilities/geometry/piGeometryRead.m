@@ -14,6 +14,7 @@ function renderRecipe = piGeometryRead(renderRecipe)
 %    renderRecipe - Updated by the processing in this function
 %
 % Zhenyi, 2018
+% Henryk Blasinski 2020
 
 %%
 p = inputParser;
@@ -45,12 +46,6 @@ tmp = textscan(fileID,'%s','Delimiter','\n');
 txtLines = tmp{1};
 fclose(fileID);
 
-% Read it again, but this time with indents preserved
-fileID = fopen(inputFile);
-tmp_indent = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
-txtLines_indent = tmp_indent{1};
-fclose(fileID);
-
 %% Check whether the geometry have already been converted from C4D
 
 % If it was converted, we don't need to do much work.
@@ -61,149 +56,13 @@ else
 end
 
 if ~convertedflag
-    %% It was not converted, so we go to work.
+    % It was not converted, so we go to work.
     % Check if a nested structure is exists
     
-    % Find AttributeBegin/End Line Number.
-    kk = 1; gg=1;
-    for nn = 1: length(txtLines_indent)
-        if isequal(txtLines_indent{nn}, 'AttributeBegin')
-            nestbegin(kk) = nn;
-            kk = kk+1;
-        elseif isequal(txtLines_indent{nn}, 'AttributeEnd')
-            nestend(gg) = nn;
-            gg=gg+1;
-        end
-    end
-    disp('piGeometryRead starting...')
-    
-    %% Extract objects information and write out children objects
-    
-    hh = 1;
-    for dd = 1:length(nestbegin)
-        ll = 1; jj = 1;
-        for ii = nestbegin(dd): nestend(dd)
-            % Find the name of a grouped object
-            if piContains(txtLines{nestbegin(dd)+1}, '#ObjectName ')
-                GroupObj_name_tmp = erase(txtLines{nestbegin(dd)+1},'#ObjectName ');
-                index = strfind(GroupObj_name_tmp, ':');
-                Groupobj_name = GroupObj_name_tmp(1:(index-1));
-                Groupobj_size = GroupObj_name_tmp((index+8):end);
-                Groupobj_size = erase(Groupobj_size, ')');
-                size_num = str2num(Groupobj_size);
-                
-                % size
-                groupobj(hh).size.l = size_num(1)*2;
-                groupobj(hh).size.h = size_num(2)*2;
-                groupobj(hh).size.w = size_num(3)*2;
-                groupobj(hh).size.pmin = [-size_num(1) -size_num(3)];
-                groupobj(hh).size.pmax = [size_num(1) size_num(3)];
-                
-                % Always add a scaling factor
-                groupobj(hh).scale = [1;1;1];
-                
-                groupobj(hh).name = sprintf('%s',Groupobj_name);
-                if piContains(txtLines{nestbegin(dd)+2}, 'ConcatTransform')
-                    tmp = txtLines{nestbegin(dd)+2};
-                    tmp  = textscan(tmp, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
-                    values = cell2mat(tmp(2:end));
-                    transform = reshape(values,[4,4]);
-                    dcm = [transform(1:3);transform(5:7);transform(9:11)];
-                    
-                    [rotz,roty,rotx]= piDCM2angle(dcm);
-                    rotx = rotx*180/pi;
-                    roty = roty*180/pi;
-                    rotz = rotz*180/pi;
-                    
-                    groupobj(hh).rotate(:,3)   = [rotx;1;0;0];
-                    groupobj(hh).rotate(:,2)   = [roty;0;1;0];
-                    groupobj(hh).rotate(:,1)   = [rotz;0;0;1];
-                    groupobj(hh).position = reshape(transform(13:15),[3,1]);
-                    % Add type of the object, get it from the file name,
-                    % could be wrong, but this is how we named the object
-                else
-                    groupobj(hh).rotate(:,3) = [0;1;0;0];
-                    groupobj(hh).rotate(:,2) = [0;0;1;0];
-                    groupobj(hh).rotate(:,1) = [0;0;0;1];
-                    groupobj(hh).position = [0;0;0];
-                end
-                
-                
-            end
-            % find children objects
-            
-            if piContains(txtLines(ii),'Shape')
-                obj(jj).index = ii;
-                % Name is created by a pattern: '#ObjectName' + 'objname' + ':' +'Vector' + '(width(x), height(y), lenght(z))'
-                % Check if concattranform is contained in a children attribute.
-                if piContains(txtLines(ii-1),':Vector(')
-                    name = erase(txtLines(ii-1),'#ObjectName ');
-                elseif piContains(txtLines(ii-3),':Vector(')
-                    name = erase(txtLines(ii-3),'#ObjectName ');
-                elseif piContains(txtLines(ii-4),':Vector(')
-                    name = erase(txtLines(ii-4),'#ObjectName ');
-                else
-                    name = erase(txtLines(obj(jj-1).index-4),'#ObjectName ');
-                end
-                name = name{1};
-                index = strfind(name, ':');
-                obj_name = name(1:(index-1));
-                obj(jj).name = sprintf('%d_%s',jj,groupobj(hh).name);
-                
-                if piContains(txtLines(ii-2),'MediumInterface')
-                    obj(jj).mediumInterface = sprintf('%s',cell2mat(txtLines(ii-2)));
-                else
-                    obj(jj).mediumInterface = [];
-                end
-                if piContains(txtLines(ii-1),'NamedMaterial')
-                    obj(jj).material = sprintf('%s',cell2mat(txtLines(ii-1)));
-                end
-                
-                % save obj to a pbrt file
-                output_name = sprintf('%s.pbrt', obj(jj).name);
-                output_folder = fullfile(outFilepath,'scene','PBRT','pbrt-geometry');
-                outputGeometry = fullfile('scene','PBRT','pbrt-geometry',output_name);
-                fprintf('piGeometryRead: Saving geometry file %s.\n',outputGeometry);
+    renderRecipe.assets = parseText(txtLines);
 
-                obj(jj).output = outputGeometry;
-
-                if ~exist(output_folder,'dir')
-                    mkdir(output_folder);
-                end
-                
-                outputFileGeometry = fullfile(output_folder,output_name);
-                
-                fid = fopen(outputFileGeometry,'w');
-                fprintf(fid,'# %s\n',obj(jj).name);
-                currLine = cell2mat(txtLines(ii));
-                
-                % Find 'integer indices', point P, normal N and put
-                % them in their own geometry file.  We write the data
-                % here.
-                integer = strfind(currLine,'"integer indices"');
-                point = strfind(currLine, '"point P"');
-                normal = strfind(currLine, '"normal N"');
-                texturemap = strfind(currLine, '"float uv"');
-                fprintf(fid,'%s\n',currLine(1:(integer-1)));
-                fprintf(fid,'  %s\n',currLine(integer:(point-1)));
-                fprintf(fid,'  %s\n',currLine(point:(normal-1)));
-                fprintf(fid,'  %s\n',currLine(normal:(texturemap-1)));
-                fprintf(fid,'  %s\n',currLine(texturemap:end));
-                fclose(fid);
-                groupobj(hh).children(ll) = obj(jj);jj= jj+1;ll=ll+1;
-                
-            end
-        end
-        fprintf('Object:%s has %d children object(s) \n',groupobj(hh).name,jj-1);
-        hh = hh+1;
-    end
-    
-    % Save the render recipe, which can save us a lot of time in the
-    % future.  The next time through, use the JSON file, which then
-    % passes this function to the else condition.
-    renderRecipe.assets = groupobj;
-    jsonwrite(AssetInfo,renderRecipe);
-    fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
+    % jsonwrite(AssetInfo,renderRecipe);
+    % fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
     
 else
     % The converted flag is true, so AssetInfo is already stored in a
@@ -225,3 +84,176 @@ end
 
 end
 
+
+function [res, children, parsedUntil] = parseText(txt)
+
+res = [];
+groupobjs = [];
+children = [];
+
+i = 1;
+while i <= length(txt)
+    
+    currentLine = txt{i};
+
+    % Return if we've reached the current attribute
+    if strcmp(currentLine,'AttributeEnd')
+        
+        % Assemble all the read attributes into either a groub object, or a
+        % geometry object. Only group objects can have subnodes.
+        
+        if exist('rot','var') || exist('position','var')
+            resCurrent = createGroupObject();
+            if exist('name','var'), resCurrent.name = name; end
+            if exist('size','var'), resCurrent.size = sz; end
+            if exist('rotate','var'), resCurrent.rotate = rot; end
+            if exist('position','var'), resCurrent.position = position; end
+            
+            resCurrent.groupobjs = groupobjs;
+            resCurrent.children = children;
+            children = [];
+            res = cat(1,res,resCurrent);
+            
+        elseif exist('shape','var') || exist('mediumInterface','var') || exist('mat','var') || exist('areaLight','var') || exist('lght','var')
+            resChildren = createGeometryObject();
+            
+            if exist('shape','var'), resChildren.shape = shape; end
+            if exist('medium','var'), resChildren.medium = medium; end
+            if exist('mat','var'), resChildren.material = mat; end
+            if exist('lght','var'), resChildren.light = lght; end
+            if exist('areaLight','var'), resChildren.areaLight = areaLight; end
+            if exist('name','var'), resChildren.name = name; end
+            
+            children = cat(1,children, resChildren);
+        
+        elseif exist('name','var')
+            resCurrent = createGroupObject();
+            if exist('name','var'), resCurrent.name = name; end
+           
+            resCurrent.groupobjs = groupobjs;
+            resCurrent.children = children;
+            children = [];
+            res = cat(1,res,resCurrent);  
+        end
+           
+        parsedUntil = i;
+        return;
+        
+    elseif strcmp(currentLine,'AttributeBegin')
+        [subnodes, subchildren, retLine] = parseText(txt(i+1:end));
+        groupobjs = cat(1, groupobjs, subnodes);
+        children = cat(1, children, subchildren);
+        i =  i + retLine;
+        
+    elseif contains(currentLine,'#ObjectName')
+        [name, sz] = parseObjectName(currentLine);
+        
+    elseif contains(currentLine,'ConcatTransform')
+        [rot, position] = parseConcatTransform(currentLine);
+        
+    elseif piContains(currentLine,'MediumInterface')
+        medium = currentLine;
+        
+    elseif piContains(currentLine,'NamedMaterial')
+        mat = currentLine;
+        
+    elseif piContains(currentLine,'AreaLightSource')
+        areaLight = currentLine;
+        
+    elseif piContains(currentLine,'LightSource')
+        lght = currentLine;
+        
+    elseif piContains(currentLine,'Shape')
+        shape = currentLine;
+        
+    end
+
+    i = i+1;
+end
+
+res = createGroupObject();
+res.name = 'root';
+res.groupobjs = groupobjs;
+res.children = children;
+
+parsedUntil = i;
+
+end
+
+function [name, sz] = parseObjectName(txt)
+
+pattern = '#ObjectName';
+loc = strfind(txt,pattern);
+
+pos = strfind(txt,':');
+name = txt(loc(1)+length(pattern) + 1:max(pos(1)-1, 1));
+
+posA = strfind(txt,'(');
+posB = strfind(txt,')');
+res = sscanf(txt(posA(1)+1:posB(1)-1),'%f, %f, %f');
+
+sz.pmin = [-res(1) -res(3)];
+sz.pmax = [res(1) res(3)];
+
+sz.l = 2*res(1);
+sz.w = 2*res(2);
+sz.h = 2*res(3);
+
+end
+
+function [rotation, translation] = parseConcatTransform(txt)
+
+posA = strfind(txt,'[');
+posB = strfind(txt,']');
+
+tmp  = sscanf(txt(posA(1):posB(1)), '[%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
+tform = reshape(tmp,[4,4]);
+dcm = [tform(1:3); tform(5:7); tform(9:11)];
+                    
+[rotz,roty,rotx]= piDCM2angle(dcm);
+rotx = rotx*180/pi;
+roty = roty*180/pi;
+rotz = rotz*180/pi;
+                   
+rotation = [rotx, roty, rotz;
+            fliplr(eye(3));];
+
+translation = reshape(tform(13:15),[3,1]);
+end
+
+
+function obj = createGroupObject()
+
+obj.name = [];
+obj.size.l = 0;
+obj.size.w = 0;
+obj.size.h = 0;
+obj.size.pmin = [0 0];
+obj.size.pmax = [0 0];
+obj.scale = [1 1 1];
+obj.position = [0 0 0];
+obj.rotate = [0 0 0;
+              0 0 1;
+              0 1 0;
+              1 0 0];
+
+obj.children = [];
+obj.groupobjs = [];
+          
+
+end
+
+function obj = createGeometryObject()
+% This function creates a geometry object and initializes all fields to
+% empty values.
+
+obj.name = [];
+obj.index = [];
+obj.mediumInterface = [];
+obj.material = [];
+obj.light = [];
+obj.areaLight = [];
+obj.shape = [];
+obj.output = [];
+
+end
