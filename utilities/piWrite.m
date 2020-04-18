@@ -97,18 +97,38 @@ end
 
 % Input must exist
 inputDir   = fileparts(renderRecipe.inputFile);
-if ~exist(inputDir,'dir'), error('Could not find %s\n',inputDir); end
+if ~exist(inputDir,'dir'), warning('Could not find %s\n',inputDir); end
 
 % Make working dir if it does not already exist
 workingDir = fileparts(renderRecipe.outputFile);
 if ~exist(workingDir,'dir'), mkdir(workingDir); end
 
-% This is a full directory copy, so all of the resources in the
-% input directory are written to the docker working directory.  In some
+[pth, ~, ~] = fileparts(renderRecipe.outputFile);
+geometryDir = fullfile(pth,'scene','PBRT','pbrt-geometry');
+if ~exist(geometryDir, 'dir')
+    mkdir(geometryDir);
+end
+
+% Selectively copy data from the source to the working directory.  In some
 % cases we are looping so we can turn off the repeated copies with this
 % flag.
-if overwriteresources
-    status = copyfile(inputDir,workingDir);
+if overwriteresources && ~isempty(inputDir)
+    
+    sources = dir(inputDir);
+    status = true;
+    for i=1:length(sources)
+        if startsWith(sources(i).name(1),'.')
+            continue;
+        elseif sources(i).isdir && (strcmpi(sources(i).name,'spds') || strcmpi(sources(i).name,'textures'))
+            status = status && copyfile(fullfile(sources(i).folder, sources(i).name), fullfile(workingDir,sources(i).name));
+        else
+            [~, ~, extension] = fileparts(sources(i).name);
+            if ~(contains(extension,'pbrt') || contains(extension,'zip') || contains(extension,'json'))
+                status = status && copyfile(fullfile(sources(i).folder, sources(i).name), fullfile(workingDir,sources(i).name));
+            end
+        end
+    end
+    
     if(~status)
         error('Failed to copy input directory to docker working directory.');
     else
@@ -373,7 +393,6 @@ end
 
 %% Write out WorldBegin/WorldEnd
 
-mediaIncluded = false;
 if creatematerials
     % We may have created new materials.
     % We write the material and geometry files based on the recipe,
@@ -383,11 +402,6 @@ if creatematerials
         if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
-            
-            if (isempty(renderRecipe.media) == false) && (mediaIncluded == false)
-                [~,n] = fileparts(renderRecipe.outputFile);
-                currLine = [currLine sprintf('\nInclude "%s_media.pbrt"',n)];
-            end
         end
            
         if overwritegeometry
@@ -443,15 +457,9 @@ if piContains(renderRecipe.exporter, 'C4D')
     end
 end
 
-%% Overwrite Media.pbrt
-if ~isempty(renderRecipe.media)
-    [~,n] = fileparts(renderRecipe.outputFile);
-    fname_media = sprintf('%s_media.pbrt',n);
-    renderRecipe.media.outputFile_media = fullfile(workingDir,fname_media);
-    piMediaWrite(renderRecipe);
-end
 
 %% Overwrite geometry.pbrt
+
 if piContains(renderRecipe.exporter, 'C4D')
     if overwritegeometry
         piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag, ...

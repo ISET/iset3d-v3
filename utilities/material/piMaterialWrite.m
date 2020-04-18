@@ -43,7 +43,7 @@ end
 % The remaining lines have a texture definition.
 
 output = thisR.materials.outputFile_materials;
-[~,materials_fname,~]=fileparts(output);
+[workDir, materials_fname, ~]=fileparts(output);
 txtLines = thisR.materials.txtLines;
 for ii = 1:size(txtLines)
     if ~isempty(txtLines(ii))
@@ -167,6 +167,16 @@ else
         
     end
 end
+
+%% Write media to xxx_materials.pbrt
+
+if ~isempty(thisR.media)
+    for m=1:length(thisR.media.list)
+        fprintf(fileID, piMediumText(thisR.media.list(m), workDir));
+    end
+end
+
+
 fclose(fileID);
 
 [~,n,e] = fileparts(output);
@@ -271,7 +281,12 @@ if isfield(materials,'floateta') && ~isempty(materials.floateta)
 end
 
 if ~isempty(materials.spectrumkd)
-    val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
+    if ischar(materials.spectrumkd)
+        val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
+    else
+        dataStr = sprintf('%f ',materials.spectrumkd);
+        val_spectrumkd = sprintf(' "spectrum Kd" [%s] ',dataStr);
+    end
     val = strcat(val, val_spectrumkd);
 end
 
@@ -350,3 +365,72 @@ if isfield(materials, 'amount')
     end
 end
 end
+
+
+
+%% function that converts the struct to text
+function val = piMediumText(medium, workDir)
+% For each type of material, we have a method to write a line in the
+% material file.
+%
+
+val_name = sprintf('MakeNamedMedium "%s" ',medium.name);
+val = val_name;
+val_string = sprintf(' "string type" "%s" ',medium.type);
+val = strcat(val, val_string);
+
+if ~isempty(medium.absFile) || ~isempty(medium.vsfFile)
+    resDir = fullfile(fullfile(workDir,'spds'));
+    if ~exist(resDir,'dir')
+        mkdir(resDir);
+    end
+    
+    if ~isempty(medium.absFile)
+        fid = fopen(fullfile(resDir,sprintf('%s_abs.spd',medium.name)),'w');
+        fprintf(fid,'%s',medium.absFile);
+        fclose(fid);
+    
+        val_floatindex = sprintf(' "string absFile" "spds/%s_abs.spd"',medium.name);
+        val = strcat(val, val_floatindex);
+    end
+    
+    if ~isempty(medium.vsfFile)
+        fid = fopen(fullfile(resDir,sprintf('%s_vsf.spd',medium.name)),'w');
+        fprintf(fid,'%s',medium.vsfFile);
+        fclose(fid);
+    
+        val_floatindex = sprintf(' "string vsfFile" "spds/%s_vsf.spd"',medium.name);
+        val = strcat(val, val_floatindex);
+    end
+    
+else
+
+    if ~isempty(medium.cPlankton)
+        val_floatindex = sprintf(' "float cPlankton" %f ',medium.cPlankton);
+        val = strcat(val, val_floatindex);
+    end
+
+    if ~isempty(medium.aCDOM440)
+        val_texturekd = sprintf(' "float aCDOM440" %f ',medium.aCDOM440);
+        val = strcat(val, val_texturekd);
+    end
+
+    if ~isempty(medium.aNAP400)
+        val_texturekr = sprintf(' "float aNAP400" %f ',medium.aNAP400);
+        val = strcat(val, val_texturekr);
+    end
+
+    if ~isempty(medium.cSmall)
+        val_textureks = sprintf(' "float cSmall" %f ',medium.cSmall);
+        val = strcat(val, val_textureks);
+    end
+
+    if ~isempty(medium.cLarge)
+        val_textureks = sprintf(' "float cLarge" %f ',medium.cLarge);
+        val = strcat(val, val_textureks);
+    end
+
+end
+
+end
+

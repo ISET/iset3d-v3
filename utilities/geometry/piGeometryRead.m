@@ -59,7 +59,7 @@ if ~convertedflag
     % It was not converted, so we go to work.
     % Check if a nested structure is exists
     
-    renderRecipe.assets = parseText(txtLines);
+    renderRecipe.assets = parseText(txtLines,'');
 
     % jsonwrite(AssetInfo,renderRecipe);
     % fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
@@ -85,7 +85,10 @@ end
 end
 
 
-function [res, children, parsedUntil] = parseText(txt)
+function [res, children, parsedUntil] = parseText(txt, name)
+
+% Parse the lines of text in 'txt' cell array and recrursively create a
+% tree structure of geometric objects.
 
 res = [];
 groupobjs = [];
@@ -100,10 +103,14 @@ while i <= length(txt)
     if strcmp(currentLine,'AttributeEnd')
         
         % Assemble all the read attributes into either a groub object, or a
-        % geometry object. Only group objects can have subnodes.
+        % geometry object. Only group objects can have subnodes (not
+        % children). This can be confusing but is somewhat similar to
+        % previous representation.
         
         if exist('rot','var') || exist('position','var')
             resCurrent = createGroupObject();
+            
+            % If present populate fields.
             if exist('name','var'), resCurrent.name = name; end
             if exist('size','var'), resCurrent.size = sz; end
             if exist('rotate','var'), resCurrent.rotate = rot; end
@@ -140,7 +147,7 @@ while i <= length(txt)
         return;
         
     elseif strcmp(currentLine,'AttributeBegin')
-        [subnodes, subchildren, retLine] = parseText(txt(i+1:end));
+        [subnodes, subchildren, retLine] = parseText(txt(i+1:end), name);
         groupobjs = cat(1, groupobjs, subnodes);
         children = cat(1, children, subchildren);
         i =  i + retLine;
@@ -182,6 +189,8 @@ end
 
 function [name, sz] = parseObjectName(txt)
 
+% Parse a string in 'txt' to extract the object name and size.
+
 pattern = '#ObjectName';
 loc = strfind(txt,pattern);
 
@@ -202,6 +211,8 @@ sz.h = 2*res(3);
 end
 
 function [rotation, translation] = parseConcatTransform(txt)
+
+% Given a string 'txt' extract the information about transform.
 
 posA = strfind(txt,'[');
 posB = strfind(txt,']');
@@ -224,6 +235,8 @@ end
 
 function obj = createGroupObject()
 
+% Initialize a structure representing a group object.
+
 obj.name = [];
 obj.size.l = 0;
 obj.size.w = 0;
@@ -244,6 +257,7 @@ obj.groupobjs = [];
 end
 
 function obj = createGeometryObject()
+
 % This function creates a geometry object and initializes all fields to
 % empty values.
 
