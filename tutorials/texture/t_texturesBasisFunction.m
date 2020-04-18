@@ -24,7 +24,7 @@ piWrite(thisR, 'overwritematerials', true);
 %% Render the scene
 thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
 wave = 365:5:705;
-[scene, ~] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'radiance');
+[scene, ~] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'illuminant');
 sceneName = 'PBRT original basis';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
