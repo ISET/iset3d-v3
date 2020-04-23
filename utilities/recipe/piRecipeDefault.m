@@ -103,6 +103,10 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceRandomTexture');
         fname = fullfile(FilePath,'flatSurfaceRandomTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
+    case 'flatSurfaceMCCTexture'
+        FilePath = fullfile(piRootPath,'data','V3','flatSurfaceMCCTexture');
+        fname = fullfile(FilePath,'flatSurfaceMCCTexture.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
 
     otherwise
         error('Can not identify the scene, %s\n',sceneName);

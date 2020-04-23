@@ -1,5 +1,9 @@
 % t_textureBasisFunction
-% Apply new basis functions to texture
+%
+% Check if we can effectively use our basis function as new reflectance
+% estimation basis in PBRT for 2D texture map
+%
+% Zheng Lyu, 2020
 
 %% init
 ieInit;
@@ -22,7 +26,7 @@ thisR = piLightAdd(thisR, 'type', 'distant', 'camera coordinate', true,...
 piWrite(thisR, 'overwritematerials', true);
 
 %% Render the scene
-thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
+thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
 wave = 365:5:705;
 [scene, ~] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'illuminant');
 sceneName = 'PBRT original basis';
@@ -42,18 +46,9 @@ piTextureSetBasis(thisR, textureIdx, wave, 'basis functions', basisFunctions);
 piWrite(thisR, 'overwritematerials', true);
 
 %% Render the scene
-thisDocker = 'vistalab/pbrt-v3-spectral:fluorescent';
+thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
 wave = 365:5:705;
-[scene, ~] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'radiance');
+[scene, ~] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'illuminant');
 sceneName = 'SVD processed basis';
 scene = sceneSet(scene, 'scene name', sceneName);
-sceneWindow(scene);
-
-%% Use this for now
-wave = 365:5:705;
-nWave = length(wave);
-filename = '/Users/zhenglyu/Desktop/Research/git/pbrt_fluorescent/makefile/Release/pbrt.dat';
-energy = piReadDAT(filename, 'maxPlanes', nWave);
-photon = Energy2Quanta(wave,energy);
-scene = piSceneCreate(photon, 'wavelength', wave);
 sceneWindow(scene);

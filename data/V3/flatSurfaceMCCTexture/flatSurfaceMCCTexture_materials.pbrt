@@ -1,0 +1,2 @@
+Texture "mcc_color" "spectrum" "imagemap" "string filename" "mcc.png"
+MakeNamedMaterial "Mat" "string type" "matte" "texture Kd" "mcc_color"

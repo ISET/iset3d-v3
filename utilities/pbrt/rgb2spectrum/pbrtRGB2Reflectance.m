@@ -59,7 +59,14 @@ function [reflectance,wave] = pbrtRGB2Reflectance(rgb, varargin)
     plot(wave, r);
     xlabel('Wavelength (nm)'); ylabel('Reflectance'); ylim([0 1])
 %}
-
+%{
+    % White
+    rgb = [1, 1, 1]; wave = [365:5:705];
+    r = pbrtRGB2Reflectance(rgb, 'wave', wave);
+    ieNewGraphWin; 
+    plot(wave, r); grid on
+    xlabel('Wavelength (nm)'); ylabel('Reflectance'); ylim([0.8 1])
+%}
 
 %% Spectrum default
 
@@ -86,14 +93,17 @@ wave    = p.Results.wave;
 
 %% RGBRefl2Spec*
 
-% These are copied from the source code and stored in ISET3d
-RGBRefl2SpectWhite   = ieReadSpectra('RGBRefl2SpectWhite.mat', wave);
-RGBRefl2SpectCyan    = ieReadSpectra('RGBRefl2SpectCyan.mat', wave);
-RGBRefl2SpectBlue    = ieReadSpectra('RGBRefl2SpectBlue.mat', wave);
-RGBRefl2SpectGreen   = ieReadSpectra('RGBRefl2SpectGreen.mat', wave);
-RGBRefl2SpectMagenta = ieReadSpectra('RGBRefl2SpectMagenta.mat', wave);
-RGBRefl2SpectYellow  = ieReadSpectra('RGBRefl2SpectYellow.mat', wave);
-RGBRefl2SpectRed     = ieReadSpectra('RGBRefl2SpectRed.mat', wave);
+% These are copied from the source code and stored in ISET3d. Here we use
+% linear extrapolation if the range of wavelength specified is wider than
+% PBRT stored samples
+extrapVal = 'extrap';
+RGBRefl2SpectWhite   = ieReadSpectra('RGBRefl2SpectWhite.mat', wave, extrapVal);
+RGBRefl2SpectCyan    = ieReadSpectra('RGBRefl2SpectCyan.mat', wave, extrapVal);
+RGBRefl2SpectBlue    = ieReadSpectra('RGBRefl2SpectBlue.mat', wave, extrapVal);
+RGBRefl2SpectGreen   = ieReadSpectra('RGBRefl2SpectGreen.mat', wave, extrapVal);
+RGBRefl2SpectMagenta = ieReadSpectra('RGBRefl2SpectMagenta.mat', wave, extrapVal);
+RGBRefl2SpectYellow  = ieReadSpectra('RGBRefl2SpectYellow.mat', wave, extrapVal);
+RGBRefl2SpectRed     = ieReadSpectra('RGBRefl2SpectRed.mat', wave, extrapVal);
 
 %% Convert to RGB reflectance spectrum 
 
