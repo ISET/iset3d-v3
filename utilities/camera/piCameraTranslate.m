@@ -124,7 +124,7 @@ cameraX = cross([0 1 0],direction); cameraX = cameraX/norm(cameraX);
 cameraY = cross(cameraX,direction); cameraY = cameraY/norm(cameraY);
 % We want cameraY to be pointing in the same direction as lookAt.up
 up = thisR.get('up');
-if cameraY*up' < 0, cameraY = -1*cameraY; end
+if dot(cameraY,up) < 0, cameraY = -1*cameraY; end
 cameraX = reshape(cameraX, size(direction)); cameraY = reshape(cameraY, size(direction));
 
 %{

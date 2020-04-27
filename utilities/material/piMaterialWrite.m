@@ -15,7 +15,7 @@ p.parse(thisR);
 %% Create txtLines for texture struct array
 % Texture txt lines creation are moved into piTextureText function.
 
-if ~isempty(thisR.textures.list)
+if isfield(thisR.textures,'list') && ~isempty(thisR.textures.list)
     textureNum = numel(thisR.textures.list);
     textureTxt = cell(1, textureNum);
 
@@ -25,6 +25,7 @@ if ~isempty(thisR.textures.list)
 else
     textureTxt = {};
 end
+
 %% Parse the output file, working directory, stuff like that.
 % Commented by ZLY. Does this section do any work?
 
