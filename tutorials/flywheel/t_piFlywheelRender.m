@@ -39,7 +39,7 @@ zhenyiSubject = 'scenes';
 % When we modify them, we put the recipes and scene data here.  These
 % modified files will be the new inputs to the PBRT rendering.
 sceneGroup   = 'wandell';
-sceneProject = 'Graphics camera array';
+sceneProject = 'Graphics test';
 sceneSubject = 'image alignment';
 sceneProjectLU = sprintf('%s/%s',sceneGroup,sceneProject);
 
@@ -49,7 +49,7 @@ sceneProjectLU = sprintf('%s/%s',sceneGroup,sceneProject);
 % 'render' where as above the subject field is 'scenes'.
 renderGroup   = sceneGroup;
 renderProject = sceneProject;
-renderSubject = 'image alignment render';  % Stereo
+renderSubject = 'render';  % Stereo
 renderSession = sceneSession;
 
 %% Main routine

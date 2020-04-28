@@ -68,7 +68,7 @@ oi = piFireFliesRemove(oi);
 
 %% Convert the oi into an IP
 pixelSize = 3;           % Microns
-ip = piOI2IP(oi,'pixel size',pixelSize);
+[ip, sensor] = piOI2IP(oi,'pixel size',pixelSize);
 
 %%
 ipWindow(ip); ipSet(ip,'gamma',0.7);truesize;  
