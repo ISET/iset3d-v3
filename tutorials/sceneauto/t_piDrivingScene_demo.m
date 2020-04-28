@@ -18,6 +18,12 @@
 % See also
 %   piSceneAuto, piSkymapAdd, gCloud
 
+%% Initialize ISET and the GCP
+ieGCPInit;
+
+% When this is done we have the variable gcp
+%
+
 %% Initialize ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
