@@ -50,7 +50,7 @@ sceneProjectLU = sprintf('%s/%s',sceneGroup,sceneProject);
 renderGroup   = sceneGroup;
 renderProject = sceneProject;
 renderSubject = 'render';  % Stereo
-renderSession = sceneSession;
+% renderSession = sceneSession;
 
 %% Main routine
 
