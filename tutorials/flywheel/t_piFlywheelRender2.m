@@ -146,8 +146,7 @@ thisR.outputFile = fullfile(destDir,'testRender.pbrt');
 % That loads the JSON target file and sets the gcp parameters.
 
 targetName = fullfile(destDir,targetFile{1}.name);
-scene_target = jsonread(targetName);
-fwList = scene_target.fwAPI.InfoList;
+gcp.readTarget(targetName);
 
 %% Now get ready to process
 
