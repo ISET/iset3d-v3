@@ -337,11 +337,11 @@ if exporterFlag
         % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
         piTextureFileFormat(thisR);
     end
-elseif ~isempty(MaterialIndexList)
-    [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(fname,'recipe',thisR);
-    thisR.materials.inputFile_materials = inputFile_materials;
-    % Call material lib
-    thisR.materials.lib = piMateriallib;
+% elseif ~isempty(MaterialIndexList)
+%     [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(fname,'recipe',thisR);
+%     thisR.materials.inputFile_materials = inputFile_materials;
+%     % Call material lib
+%     thisR.materials.lib = piMateriallib;
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
@@ -349,15 +349,15 @@ if exporterFlag
     % fprintf('Reading geometry\n');
     thisR = piGeometryRead(thisR); 
     % fprintf('Done with geometry read\n');
-elseif ~isempty(find(piContains(thisR.world, 'Shape'),1)) &&...
-        ~isempty(find(piContains(thisR.world, 'MakeNamedMaterial'), 1))
-    thisR = piGeometryReadBlender(thisR);
-    if ~isempty(thisR.assets)
-        thisR.world(piContains(thisR.world, 'Shape "plymesh"'))=[];
-        thisR.world(piContains(thisR.world, 'Texture'))=[];
-        thisR.world(piContains(thisR.world, 'NamedMaterial'))=[];
-        thisR.world(piContains(thisR.world, 'Transform'))=[];
-    end
+% elseif ~isempty(find(piContains(thisR.world, 'Shape'),1)) &&...
+%         ~isempty(find(piContains(thisR.world, 'MakeNamedMaterial'), 1))
+%     thisR = piGeometryReadBlender(thisR);
+%     if ~isempty(thisR.assets)
+%         thisR.world(piContains(thisR.world, 'Shape "plymesh"'))=[];
+%         thisR.world(piContains(thisR.world, 'Texture'))=[];
+%         thisR.world(piContains(thisR.world, 'NamedMaterial'))=[];
+%         thisR.world(piContains(thisR.world, 'Transform'))=[];
+%     end
 end
 
 end

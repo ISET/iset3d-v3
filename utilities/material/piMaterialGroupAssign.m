@@ -86,7 +86,9 @@ for ii = 1:length(mlist)
         target = thisR.materials.lib.glass;
         rgbkr = [1 0.1 0.1];
         piMaterialAssign(thisR, material.name,target,'rgbkr',rgbkr);
-        thisR.materials.list.(name).rgbkt = [0.7 0.1 0.1];
+        thisR.materials.list.(name).rgbkt = [1 0.1 0.1];
+        thisR.materials.list.(name).spectrumkr =[];
+        thisR.materials.list.(name).spectrumkt =[];
     elseif piContains(lower(mlist(ii)),'chrome')
         name = cell2mat(mlist(ii));
         material = thisR.materials.list.(name);

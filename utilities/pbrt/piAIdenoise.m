@@ -17,12 +17,16 @@ DNImg_pth = fullfile(piRootPath,'local','tmp_dn.pfm');
 NewEnergy = zeros(rows, cols, chs);
 for ii = 1:chs
     img_sp(:,:,1) = energy(:,:,ii)/max2(energy(:,:,ii));
+    
     img_sp(:,:,2) = img_sp(:,:,1);
     img_sp(:,:,3) = img_sp(:,:,1);
-    writePFM(img_sp, outputTmp);
-    cmd  = [oidn_pth, '/denoise -hdr ', outputTmp, ' -o ',DNImg_pth];
+    ret = write_pfm(img_sp, outputTmp, 'l');
+    if ~ret, error('PFM file not written correctly');end
+%     writePFM(img_sp, outputTmp);
+    cmd  = [oidn_pth, '/denoise --hdr ', outputTmp, ' -o ',DNImg_pth];
     system(cmd);
-    DNImg = readPFM(DNImg_pth);
+%     DNImg = readPFM(DNImg_pth);
+    DNImg = read_pfm(DNImg_pth);
     NewEnergy(:,:,ii) = DNImg(:,:,1).* max2(energy(:,:,ii));
     fprintf('Denoise: Spectral Plane: %d \n', 400+(ii-1)*10);
 end

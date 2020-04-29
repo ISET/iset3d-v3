@@ -73,6 +73,9 @@ p.addRequired('recipe', @(x)(isa(x,'recipe')));
 p.addParameter('type', 'point', @ischar);
 % Load in a light source saved in ISETCam/data/lights
 p.addParameter('lightspectrum', 'D65');
+p.addParameter('rgbspectrum',[0.5 0.5 0.5]);
+p.addParameter('spectrumflag',true);% true: use spectrum; otherwise use rgb
+p.addParameter('blackbody',[6500,1]); % [Color-temperature, intensity]
 % used for point/spot/distant/laser light
 p.addParameter('from', [0 0 0]);
 % used for spot light
@@ -95,7 +98,10 @@ p.parse(thisR, varargin{:});
 
 type = p.Results.type;
 lightSpectrum = p.Results.lightspectrum;
+rgbSpectrum = p.Results.rgbspectrum;
+blackbody = p.Results.blackbody;
 spectrumScale = p.Results.spectrumscale;
+spectrumFlag = p.Results.spectrumflag;
 from = p.Results.from;
 to = p.Results.to;
 coneAngle = p.Results.coneangle;
@@ -139,7 +145,7 @@ if ischar(lightSpectrum)
     if thisLight.wavelength(1)<=wavelengthStart &&...
             thisLight.wavelength(end)>=wavelengthEnd
         unitLight = load('D65_chart_1lux.mat');
-        wave = 400:5:700;
+        wave = 400:2:700;
         unitLight.data = interp1(unitLight.wavelength,unitLight.data,wave);
         unitLight.wavelength=wave;
         
@@ -216,51 +222,68 @@ switch type
         if p.Results.cameracoordinate
             lightSources{1}.line{1} = 'AttributeBegin';
             lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" %s',...
-                lightSpectrum);
-            lightSources{1}.line{end+1} = 'AttributeEnd';            
+            if spectrumFlag
+                lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" %s',...
+                    lightSpectrum);
+            else
+                lightSources{1}.line{3,:} = sprintf('LightSource "distant" "blackbody L" [%d, %.1f]',...
+                    blackbody(1), blackbody(2));
+            end
+            lightSources{1}.line{end+1} = 'AttributeEnd';
         else
-            lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
+            if spectrumFlag
+                lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
+                    lightSpectrum, from, to);
+            else
+                lightSources{1}.line{1,:} = sprintf('LightSource "distant" "blackbody L" [%d, %.1f] "point from" [%d %d %d]',...
+                    blackbody(1), blackbody(2), from);
+            end
         end
     case 'infinite'
         lightSources{1}.type = 'infinite';
-        lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+        if spectrumFlag
+            lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
+        else
+            lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "rgb L" [%.1f, %.1f, %.1f]',rgbSpectrum);
+        end
     case 'area'
         % find area light geometry info
         
         nlight = 1;
         for ii = 1:length(thisR.assets)
-            if piContains(lower(thisR.assets(ii).name), 'area')
+            if piContains(lower(thisR.assets(ii).name), 'area') &&...
+                    ~isempty(thisR.assets(ii).children)
                 lightSources{nlight}.type = 'area'; %#ok<*AGROW>
                 lightSources{nlight}.line{1} = 'AttributeBegin';
+                lightSources{nlight}.line{2,:} = sprintf('Scale %f %f %f',thisR.assets(ii).scale);
                 if idxL
                     % Why is there a +nLight?
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                    lightSources{+nlight}.line{3,:} = sprintf('Translate %f %f %f',from(1),...
                         from(2), from(3));
                 else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                    lightSources{nlight}.line{3,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
                         thisR.assets(ii).position(2), thisR.assets(ii).position(3));
                 end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
-                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
-                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
-                lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
+                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
+                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
+                lightSources{nlight}.line{6,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
+                lightSources{nlight}.line{7,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
+                lightSources{nlight}.line{8,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
                 lightSources{nlight}.line{end+1} = 'AttributeEnd';
                 nlight = nlight+1;
                 
-            elseif piContains(lower(thisR.assets(ii).name), 'light')
+            elseif piContains(lower(thisR.assets(ii).name), 'light') &&...
+                    ~isempty(thisR.assets(ii).children)
                 lightSources{nlight}.type = 'area';
                 lightSources{nlight}.line{1} = 'AttributeBegin';
+                lightSources{nlight}.line{2,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
                 if idxL
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
+                    lightSources{+nlight}.line{3,:} = sprintf('Translate %f %f %f',from(1),...
                         from(2), from(3));
                 else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
+                    lightSources{nlight}.line{3,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
                         thisR.assets(ii).position(2), thisR.assets(ii).position(3));
                 end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
                 lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
                 lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
                 lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);

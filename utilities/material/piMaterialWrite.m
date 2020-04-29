@@ -211,6 +211,10 @@ if ~isempty(materials.textureks)
     val_textureks = sprintf(' "texture Ks" "%s" ',materials.textureks);
     val = strcat(val, val_textureks);
 end
+if ~isempty(materials.rgbkd)
+    val_rgbkd = sprintf(' "rgb Kd" [%0.5f %0.5f %0.5f] ',materials.rgbkd);
+    val = strcat(val, val_rgbkd);
+end
 
 if ~isempty(materials.rgbkr)
     val_rgbkr = sprintf(' "rgb Kr" [%0.5f %0.5f %0.5f] ',materials.rgbkr);
@@ -232,9 +236,22 @@ if isfield(materials, 'rgbopacity')
         val = strcat(val, val_opacity);
     end
 end
-if ~isempty(materials.rgbkd)
-    val_rgbkd = sprintf(' "rgb Kd" [%0.5f %0.5f %0.5f] ',materials.rgbkd);
-    val = strcat(val, val_rgbkd);
+
+if ~isempty(materials.xyzkd)
+    val_xyzkd = sprintf(' "xyz Kd" [%0.5f %0.5f %0.5f] ',materials.xyzkd);
+    val = strcat(val, val_xyzkd);
+end
+if ~isempty(materials.xyzkr)
+    val_xyzkr = sprintf(' "xyz Kr" [%0.5f %0.5f %0.5f] ',materials.xyzkr);
+    val = strcat(val, val_xyzkr);
+end
+if ~isempty(materials.xyzks)
+    val_xyzks = sprintf(' "xyz Ks" [%0.5f %0.5f %0.5f] ',materials.xyzks);
+    val = strcat(val, val_xyzks);
+end
+if ~isempty(materials.xyzkt)
+    val_xyzkt = sprintf(' "xyz Kt" [%0.5f %0.5f %0.5f] ',materials.xyzkt);
+    val = strcat(val, val_xyzkt);
 end
 
 if ~isempty(materials.colorkd)

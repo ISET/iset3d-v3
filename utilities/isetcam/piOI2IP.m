@@ -34,7 +34,7 @@ p.addRequired('oi',@isstruct);
 
 p.addParameter('sensor','',@ischar);   % A file name
 p.addParameter('pixelsize',2,@isscalar);
-p.addParameter('filmdiagonal',5,@isscalar); % [mm]
+p.addParameter('filmdiagonal',2,@isscalar); % [mm]
 
 p.parse(oi,varargin{:});
 
@@ -75,8 +75,8 @@ end
 % [colmin,rowmin,width,height]
 oiSize = oiGet(oi,'size');
 fraction = 0.2;
-rect = [oiSize(2)*(1 - fraction)/2, oiSize(1)*(1 - fraction)/2, ...
-    oiSize(2)*fraction oiSize(1)*fraction];
+rect = round([oiSize(2)*(1 - fraction)/2, oiSize(1)*(1 - fraction)/2, ...
+    oiSize(2)*fraction oiSize(1)*fraction]);
 fprintf('Rectangle\n'); disp(rect); fprintf('\n');
 
 % It appears we are figuring out how many pixels to use in the sensor to
@@ -87,11 +87,12 @@ fprintf('Rectangle\n'); disp(rect); fprintf('\n');
 % match the sampling of the oi samples? But this seems to be in meters.
 optimalPixel = sqrt(filmDiagonal^2/(oiSize(1)^2+oiSize(2)^2))*1e-3; % Meters
 sensor = sensorSet(sensor, 'size', oiGet(oi,'size') * (optimalPixel/(pixelSize*1e-6)));
-
+% sensor = sensorSet(sensor, 'size', [oiGet(oi,'size')*2+1]);
+sensor=sensorSet(sensor, 'cfa pattern',[3,2;2,1]);
 % Not sure why we don't do this, except perhaps the fov is unreliable?
 % sensor   = sensorSetSizeToFOV(sensor,oiGet(oi,'fov'));
 %% Compute
-eTime  = autoExposure(oi,sensor,0.90,'weighted','center rect',rect);
+eTime  = autoExposure(oi,sensor,0.90,'video','center rect',rect);
 fprintf('eT: %s ms \n',eTime*1e3);
 sensor = sensorSet(sensor,'exp time',eTime);
 sensor = sensorCompute(sensor,oi);
@@ -119,7 +120,6 @@ ip = ipSet(ip,'illuminant correction method','gray world');
 % demosaics = [{'Adaptive Laplacian'},{'Bilinear'}];
 ip = ipSet(ip,'demosaic method','Adaptive Laplacian'); 
 ip = ipCompute(ip,sensor);
-
 % ipWindow(ip);
 
 if isfield(sensor,'metadata')

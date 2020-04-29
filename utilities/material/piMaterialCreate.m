@@ -23,6 +23,11 @@ m.rgbkd =[];
 m.rgbkt =[];
 m.rgbopacity = [];
 
+m.xyzkr =[];
+m.xyzks =[];
+m.xyzkd =[];
+m.xyzkt =[];
+
 m.colorkd = [];
 m.colorks = [];
 m.colorreflect = [];

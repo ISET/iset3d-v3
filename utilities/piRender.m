@@ -230,7 +230,7 @@ switch renderType
         filesToRender{1} = metadataFile{1};
         label{1} = 'metadata';
     case{'reflectance'}
-        filesToRender{1} = {metadataFile};
+        filesToRender{1} = metadataFile{1};
         label{1} = 'reflectance';
     case{'illuminant'}
         % Illuminant and radiance
@@ -359,7 +359,10 @@ for ii = 1:length(filesToRender)
                 'wave',wave);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject,'depth map',depthImage);
+            else
+                ieObject   = depthImage;
             end
+            
         case 'coordinates'
             coordMap = piDat2ISET(outFile,...
                 'label','coordinates',...

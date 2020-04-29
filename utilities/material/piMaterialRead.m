@@ -46,12 +46,12 @@ if ~isempty(TextureIndexList)
         IndexTexture = TextureIndexList(ii);
         % check indentation
         TextureLines{ii} = thisR.world{IndexTexture};
-        while strcmp(thisR.world{IndexTexture+1}(1),'"')
-            
-            TextureLines{ii} = [TextureLines{ii},' ',thisR.world{IndexTexture+1}];
-            IndexTexture = IndexTexture+1;
-            if isempty(thisR.world{IndexTexture+1}),break;end
-        end
+%         while strcmp(thisR.world{IndexTexture+1}(1),'"')
+%             
+%             TextureLines{ii} = [TextureLines{ii},' ',thisR.world{IndexTexture+1}];
+%             IndexTexture = IndexTexture+1;
+%             if isempty(thisR.world{IndexTexture+1}),break;end
+%         end
     end
 end
 MaterialIndexList = find(piContains(thisR.world, 'MakeNamedMaterial '));
@@ -59,11 +59,11 @@ if ~isempty(MaterialIndexList)
     for ii = 1:length(MaterialIndexList)
         IndexMaterial = MaterialIndexList(ii);
         MaterialLines{ii} = thisR.world{IndexMaterial};
-        while strcmp(thisR.world{IndexMaterial+1}(1),'"')
-            MaterialLines{ii} = [MaterialLines{ii},' ',thisR.world{IndexMaterial+1}];
-            IndexMaterial = IndexMaterial+1;
-            if isempty(thisR.world{IndexMaterial+1}),break;end
-        end
+%         while strcmp(thisR.world{IndexMaterial+1}(1),'"')
+%             MaterialLines{ii} = [MaterialLines{ii},' ',thisR.world{IndexMaterial+1}];
+%             IndexMaterial = IndexMaterial+1;
+%             if isempty(thisR.world{IndexMaterial+1}),break;end
+%         end
     end
 end
 txtLines = [];
