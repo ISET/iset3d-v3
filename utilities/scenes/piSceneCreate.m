@@ -57,12 +57,17 @@ scene = sceneSet(scene,'photons',photons);
 
 scene = sceneSet(scene,'depth map',depthMap);
 scene = sceneSet(scene,'fov',p.Results.fov);
-scene = sceneAdjustLuminance(scene,p.Results.meanluminance); % ISETBIO uses this...
+if p.Results.meanluminance > 0
+    scene = sceneAdjustLuminance(scene,p.Results.meanluminance); % ISETBIO uses this...
+end
 
 % Adjust other parameters
 if ~isempty(varargin)
     for ii=1:2:length(varargin) 
         param = varargin{ii}; 
+        if strcmp(param,'meanluminance') || strmp(param,'fov')
+            continue;
+        end
         val = varargin{ii+1};
         scene = sceneSet(scene,param,val);
     end

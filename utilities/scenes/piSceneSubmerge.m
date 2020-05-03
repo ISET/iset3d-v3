@@ -1,9 +1,12 @@
 function [underwater, waterProperties] = piSceneSubmerge(scene, varargin)
 
 p = inputParser;
-p.addOptional('height',1,@isnumeric);
-p.addOptional('width',1,@isnumeric);
-p.addOptional('depth',1,@isnumeric);
+p.addOptional('sizeX',1,@isnumeric);
+p.addOptional('sizeY',1,@isnumeric);
+p.addOptional('sizeZ',1,@isnumeric);
+p.addOptional('offsetX',0, @isnumeric);
+p.addOptional('offsetY',0, @isnumeric);
+p.addOptional('offsetZ',0, @isnumeric);
 p.addOptional('waterAbs',true,@islogical);
 p.addOptional('waterSct',true,@islogical);
 p.addOptional('cPlankton',0,@isnumeric);
@@ -12,7 +15,9 @@ p.addOptional('aNAP400',0,@isnumeric);
 p.addOptional('cSmall',0,@isnumeric);
 p.addOptional('cLarge',0,@isnumeric);
 p.addOptional('wallOnly',0,@islogical);
-p.addOptional('wall',0,@islogical);
+p.addOptional('wallXY',0,@islogical);
+p.addOptional('wallXZ',0,@islogical);
+p.addOptional('wallYZ',0,@islogical);
 
 p.parse(varargin{:});
 inputs = p.Results;
@@ -58,17 +63,27 @@ vsf = vsfWater * inputs.waterSct + inputs.cSmall * vsfSmall + inputs.cLarge * vs
 vsfFile = sprintf('%f %f\n%f %f\n',length(wave), numAngles, [vsfWave(:), vsf(:)]');
 
 waterProperties.vsf = vsf;
-waterProperties.scattering = sum(vsf .* repmat(sin(angles),length(wave),1) * angles(2) * 2 * pi, 2);
+waterProperties.scattering = sum(vsf .* repmat(sin(pi - angles),length(wave),1) * angles(2) * 2 * pi, 2);
+waterProperties.phaseFunction = vsf ./ repmat(waterProperties.scattering, [1, numAngles]);
 waterProperties.angles = angles;
+
+%{
+testAngle = 37;
+figure; 
+hold on; grid on; box on;
+plot(waterProperties.vsf(:,testAngle));
+plot(waterProperties.scattering .* waterProperties.phaseFunction(:,testAngle),'x');
+%}
+
 
 %%
 
 underwater = copy(scene);
 underwater.integrator.subtype = 'spectralvolpath';
 
-dx = inputs.height/2;
-dy = inputs.depth/2;
-dz = inputs.width/2;
+dx = inputs.sizeX/2;
+dy = inputs.sizeY/2;
+dz = inputs.sizeZ/2;
    
         
 % Vertices of the cube
@@ -92,7 +107,7 @@ P = [ dx -dy  dz;
             7 3 2 
             7 2 6 
             0 5 1 
-            0 4 5]; 
+            0 4 5]'; 
         
 %{  
 figure;
@@ -111,21 +126,19 @@ end
             ylabel('y');
             zlabel('z');
 %}
-      
-indices = indices';
-            
+                  
 if inputs.wallOnly == false
         
 newAsset.groupobjs = [];
-newAsset.size.l = inputs.height;
-newAsset.size.h = inputs.depth;
-newAsset.size.w = inputs.width;
+newAsset.size.l = inputs.sizeX;
+newAsset.size.h = inputs.sizeY;
+newAsset.size.w = inputs.sizeZ;
 newAsset.size.pmin = [-dx; -dy; -dz];
 newAsset.size.pmax = [dx; dy; dz];
 newAsset.scale = [1; 1; 1];
 newAsset.name = 'Water';
 newAsset.rotate = [ 0 0 0; 0 0 1; 0 1 0; 1 0 0];
-newAsset.position = [0; 0; 0];
+newAsset.position = [inputs.offsetX; inputs.offsetY; inputs.offsetZ];
 newAsset.children.name = 'WaterMesh';
 newAsset.children.index  = [];
 newAsset.children.mediumInterface = 'MediumInterface "seawater" ""';
@@ -136,24 +149,9 @@ newAsset.children.light = [];
 
 shape = 'Shape "trianglemesh" "integer indices"';
 indStr = sprintf('%i ',indices);
-pointStr = sprintf('%.3f ',P');
+pointStr = sprintf('%f ',P');
 
 newAsset.children.shape = sprintf('#Water medium\n%s [%s] "point P" [%s]\n', shape, indStr, pointStr); 
-
-%{ 
-fid = fopen(fullfile(scene.get('working directory'),newAsset.children.output),'w');
-fprintf(fid,"# Water medium\n");
-fprintf(fid,"Shape ""trianglemesh""\n");
-fprintf(fid,"""integer indices"" [");
-fprintf(fid,"%i ",indices);
-fprintf(fid,"]\n");
-fprintf(fid,"""point P"" [");
-for j=1:size(P,1)
-    fprintf(fid,"%f ",P(j,:));
-end
-fprintf(fid,"]\n");
-fclose(fid);
-%}
 
 underwater.assets.groupobjs = cat(1,underwater.assets.groupobjs, newAsset);
 
@@ -172,23 +170,51 @@ if isempty(underwater.media)
 
     underwater.media.list = m;
 end
+
+% Submerge the camera if needed
+xstart = -dx + inputs.offsetX;
+xend = dx + inputs.offsetX;
+
+ystart = -dy + inputs.offsetY;
+yend = dy + inputs.offsetY;
+
+zstart = -dz + inputs.offsetZ;
+zend = dz + inputs.offsetZ;
+
+camPos = underwater.get('from');
+
+if xstart <= camPos(1) && camPos(1) <= xend && ...
+   ystart <= camPos(2) && camPos(2) <= yend && ...
+   zstart <= camPos(3) && camPos(3) <= zend
+
+    underwater.camera.medium = "seawater";
+
 end
 
-%% Add a black wall
-if inputs.wall
+
+end
+
+%% Add a black wall around water volume
+if inputs.wallXY || inputs.wallXZ || inputs.wallYZ
+    
+    wallIDs = [];
+    
+    if inputs.wallXY, wallIDs = cat(1,wallIDs, [1, 2, 5, 6]); end
+    if inputs.wallYZ, wallIDs = cat(1,wallIDs, [3, 4, 7, 8]); end
+    if inputs.wallXZ, wallIDs = cat(1,wallIDs, [9, 10, 11, 12]); end
+
     P = P * 1.01;
-    wallIDs = [3, 4, 7, 8, 9, 10, 11, 12];
     
     newAsset.groupobjs = [];
-    newAsset.size.l = inputs.height;
-    newAsset.size.h = inputs.depth;
-    newAsset.size.w = inputs.width;
+    newAsset.size.l = inputs.sizeX;
+    newAsset.size.h = inputs.sizeY;
+    newAsset.size.w = inputs.sizeZ;
     newAsset.size.pmin = [-dx; -dy; -dz];
     newAsset.size.pmax = [dx; dy; dz];
     newAsset.scale = [1; 1; 1];
     newAsset.name = 'Wall';
     newAsset.rotate = [ 0 0 0; 0 0 1; 0 1 0; 1 0 0];
-    newAsset.position = [0; 0; 0];
+    newAsset.position = [inputs.offsetX; inputs.offsetY; inputs.offsetZ];
     newAsset.children.name = 'WallMesh';
     newAsset.children.index  = [];
     newAsset.children.mediumInterface = '';
@@ -199,7 +225,7 @@ if inputs.wall
     
     shape = 'Shape "trianglemesh" "integer indices"';
     indStr = sprintf('%i ',indices(:,wallIDs));
-    pointStr = sprintf('%.3f ',P');
+    pointStr = sprintf('%f ',P');
     
     newAsset.children.shape = sprintf('#Wall\n%s [%s] "point P" [%s]\n', shape, indStr, pointStr);
     

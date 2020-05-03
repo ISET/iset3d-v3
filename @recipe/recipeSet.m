@@ -240,8 +240,7 @@ switch param
             thisR.camera.chromaticAberrationEnabled.value = 'false';
             return;
         elseif isequal(val,true)
-            thisR.camera.chromaticAberrationEnabled.value = 'true';
-            val = 8; 
+            thisR.camera.chromaticAberrationEnabled.value = 'true'; 
         elseif isnumeric(val)
             thisR.camera.chromaticAberrationEnabled.value = 'true';
         else

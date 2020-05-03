@@ -296,6 +296,19 @@ for ofns = outerFields'
     end
     
     % fprintf('outer field %s\n',ofn);
+    if strcmp(ofn,'camera') && isfield(renderRecipe.(ofn),'medium') 
+       if ~isempty(renderRecipe.(ofn).medium)
+           currentMedium = [];
+           for j=1:length(renderRecipe.media.list)
+                if strcmp(renderRecipe.media.list(j).name,renderRecipe.(ofn).medium)
+                    currentMedium = renderRecipe.media.list;
+                end
+           end           
+           fprintf(fileID,'MakeNamedMedium "%s" "string type" "water" "string absFile" "spds/%s_abs.spd" "string vsfFile" "spds/%s_vsf.spd"\n',currentMedium.name,...
+               currentMedium.name,currentMedium.name);
+           fprintf(fileID,'MediumInterface "" "%s"\n',currentMedium.name);
+       end
+    end
     
     % Write header for block
     fprintf(fileID,'# %s \n',ofn);
@@ -319,7 +332,8 @@ for ofns = outerFields'
                     strcmp(ifn,'subpixels_h') || ...
                     strcmp(ifn,'subpixels_w') || ...
                     strcmp(ifn,'motion') || ...
-                    strcmp(ifn,'subpixels_w'))
+                    strcmp(ifn,'subpixels_w') || ...
+                    strcmp(ifn,'medium'))
                 continue;
             end
             
