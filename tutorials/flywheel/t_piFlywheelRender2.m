@@ -144,10 +144,34 @@ thisR = piJson2Recipe(recipeName);
 % The output file for this position
 thisR.outputFile = fullfile(destDir,'testRender.pbrt');
 
-%% Set up the rendering target for the kubernetes process.  
+% Next TODO:  If you ahve the target then all you should have to do is
+% download the target.json file and copy the slots from that JSON file
+% into the gcp.fwAPI slots.
+%
+% Then run gcp.addPBRTTarget with the recipe (thisR)
+%
+% So this should become a function like this
+%
+%    gcp.readTarget(targetName);
+%
+% That loads the JSON target file and sets the gcp parameters.
 
-% Add the job to the target list
-gcp.addPBRTTarget(thisR,'subject label',renderSubject);
+targetName = fullfile(destDir,targetFile{1}.name);
+% gcp.readTarget(targetName);
+
+%% Now get ready to process
+
+% Set up the rendering target for the kubernetes process.  The subject
+% label changes from 'camera array' to 'renderings'.  But the session,
+% acquisition and project remain the same.
+
+gcp.addPBRTTarget(targetName,'subject label',renderSubject);
+% the json file we loaded does not include sessionlabel and
+% acquisitionlabel information, so we add them here.
+gcp.targets(1).fwAPI.sessionLabel = renderSession;
+gcp.targets(1).fwAPI.acquisitionLabel = renderAcquisition;
+% give a different name
+% gcp.targets(1).fwAPI.subjectLabel = 'rendertest';
 
 % Describe the jobs (targets) to the user
 gcp.targetsList;
