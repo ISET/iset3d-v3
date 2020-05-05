@@ -13,7 +13,7 @@ function thisR = piJson2Recipe(JsonFile)
 % Output
 %   thisR:     Scene recipe object
 %
-% ZL, maybe
+% ZL, Zheng Lyu maybe
 %
 % See also
 %
