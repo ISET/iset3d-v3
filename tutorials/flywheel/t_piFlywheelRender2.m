@@ -190,13 +190,26 @@ gcp.render();
 
 %% Find the session where the data were rendered
 
+%{
+% Find the rendered acquisition
 % The project ID and session label
 projectID    = gcp.targets.remote;
 sessionLabel = gcp.targets.fwAPI.sessionLabel;
+fwRenderSession = st.search('session',...
+    'project id',projectID,...
+    'session label',sessionLabel,...
+    'subject code',renderSubject,...
+    'fw',true);
+thisAcquisition = fwRenderSession{1}.acquisitions();
 
-%
-fwRenderSession = st.search('session','project id',projectID,'session label',sessionLabel);
+% Create the OI from the rendered acquisition.
+% Providing the File.Entry to the recipe directly.
+oi = piAcquisition2ISET(thisAcquisition{1},st,'recipe file',recipeFile{1});
 
+% Ask Zhenyi why this looks bad
+oiWindow(oi);
+
+%}
 %% Only comments from here to the end
 
 %{
