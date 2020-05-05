@@ -1,4 +1,4 @@
-e%% Automatically assemble an automotive scene and render using Google Cloud
+%% Automatically assemble an automotive scene and render using Google Cloud
 %
 %    t_piDrivingScene_demo
 %

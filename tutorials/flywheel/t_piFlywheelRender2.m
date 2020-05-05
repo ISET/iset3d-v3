@@ -131,7 +131,7 @@ targetFile{1}.download(fullfile(destDir,targetFile{1}.name));
 targetName = fullfile(destDir,targetFile{1}.name);
 if ~exist(targetName,'file'), error('File not downloaded'); end
 
-gcp.readTarget(targetName);
+% gcp.readTarget(targetName);
 
 %% Load the rendering recipe
 
@@ -187,6 +187,15 @@ gcp.targetsList;
 
 % Invoke the PBRT-V3 docker image
 gcp.render();
+
+%% Find the session where the data were rendered
+
+% The project ID and session label
+projectID    = gcp.targets.remote;
+sessionLabel = gcp.targets.fwAPI.sessionLabel;
+
+%
+fwRenderSession = st.search('session','project id',projectID,'session label',sessionLabel);
 
 %% Only comments from here to the end
 
