@@ -35,4 +35,9 @@ for dd = 1:length(fds)
     end
 end
 
+% piUpdateRecipe - convert the old version of recipe to newer one
+% where texture is a separate slot.
+thisR = piUpdateRecipe(thisR);
+
+
 end

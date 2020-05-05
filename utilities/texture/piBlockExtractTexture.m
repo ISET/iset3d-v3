@@ -106,6 +106,7 @@ for ii=1:nLines
     end
 end
 
+thisR.textures.list = thisR.textures.list';
 texturelist = thisR.textures.list;
 fprintf('Read %d textures\n', nLines);
 end
