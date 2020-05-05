@@ -21,11 +21,11 @@ basisFunctions = p.Results.basisfunctions;
 %%
 
 thisR.textures.list{textureIdx}.spectrumbasisone = ...
-                            'spds/lights/basisone.spd';
+                            'spds/basis/basisone.spd';
 thisR.textures.list{textureIdx}.spectrumbasistwo = ...
-                            'spds/lights/basistwo.spd';           
+                            'spds/basis/basistwo.spd';           
 thisR.textures.list{textureIdx}.spectrumbasisthree = ...
-                            'spds/lights/basisthree.spd';     
+                            'spds/basis/basisthree.spd';     
 
 %%
 %{
@@ -67,8 +67,8 @@ filenames = {'basisone', 'basistwo', 'basisthree'};
 
 % Specify the save path to the three basis functions
 outputDir = fileparts(thisR.outputFile);
-lightSpdDir = fullfile(outputDir, 'spds', 'lights');
-if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
+basisSpdDir = fullfile(outputDir, 'spds', 'basis');
+if ~exist(basisSpdDir, 'dir'), mkdir(basisSpdDir); end
 
 
 if isnumeric(basisFunctions)
@@ -83,9 +83,9 @@ end
 
 for ii = 1:3
     thisBasis = loadedFunctions(:,ii);
-    thisLightfile = fullfile(lightSpdDir,...
+    thisSpdfile = fullfile(basisSpdDir,...
                     sprintf('%s.spd', filenames{ii}));
-    fid = fopen(thisLightfile, 'w');
+    fid = fopen(thisSpdfile, 'w');
     for jj = 1: length(wave)
         fprintf(fid, '%d %d \n', wave(jj), thisBasis(jj));
     end

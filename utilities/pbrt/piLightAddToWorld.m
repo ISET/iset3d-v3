@@ -104,8 +104,10 @@ else, spectrumScale = 1; end
 
 if ischar(lightSpectrum)
     try
-        % Load from ISETCam/ISETBio ligt data
-        thisLight = load(lightSpectrum);
+        % ZLY: Wave is hardcoded in PBRT. In the future we might want to change
+        % it so that we can use customized wave.
+        wavelength = 365:5:705;
+        data = ieReadSpectra(lightSpectrum, wavelength, 0);
     catch
         error('%s light is not recognized \n', lightSpectrum);
     end
@@ -115,8 +117,8 @@ if ischar(lightSpectrum)
         sprintf('%s.spd', lightSpectrum));
     if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
     fid = fopen(thisLightfile, 'w');
-    for ii = 1: length(thisLight.data)
-        fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*spectrumScale);
+    for ii = 1: length(data)
+        fprintf(fid, '%d %d \n', wavelength(ii), data(ii)*spectrumScale);
     end
     fclose(fid);
     % Zheng Lyu added 10-2019
