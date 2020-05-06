@@ -44,6 +44,8 @@ end
 
 % piUpdateRecipe - convert the old version of recipe to newer one
 % where texture is a separate slot.
-thisR = piUpdateRecipe(thisR);
+if isempty(thisR.textures)
+    thisR = piUpdateRecipe(thisR);
+end
 
 end

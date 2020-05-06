@@ -39,6 +39,15 @@ function ieObject = piAcquisition2ISET(acquisition, st, varargin)
   oi = piFireFliesRemove(oi);
   oiWindow(oi);
 %}
+%{
+  sessName = 'suburb';
+  acqName = 'suburb_09:39_v7.1_f147.15left_o270.00_2019626192129';
+  lu = sprintf('wandell/CameraEval20190626/renderings/%s/%s',sessName,acqName);
+  acquisition = st.lookup(lu);
+  oi = piAcquisition2ISET(acquisition,st);
+  oi = piFireFliesRemove(oi);
+  oiWindow(oi);
+%}
 
 %% Parameters
 wave = 400:10:700; % Hard coded in pbrt
@@ -46,9 +55,9 @@ nWave = length(wave);
 
 varargin = ieParamFormat(varargin);
 p = inputParser;
-p.addRequired('acquisition',@(x)(isequal(class(x),'flywheel.model.Acquisition')));
+p.addRequired('acquisition',@(x)(piContains(class(x),'Acquisition')));
 p.addRequired('st',@(x)(isequal(class(x),'scitran')));
-p.addParameter('recipefile',[],@(x)(isequal(class(x),'flywheel.model.FileEntry')));
+p.addParameter('recipefile',[],@(x)(piContains(class(x),'FileEntry')));
 
 p.parse(acquisition,st,varargin{:});
 

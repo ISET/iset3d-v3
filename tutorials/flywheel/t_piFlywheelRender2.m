@@ -35,6 +35,8 @@ ieGCPInit
 inGroup   = 'wandell';
 inProject = 'Graphics test';
 inSubject = 'scenes';
+inSession = 'suburb';
+inAcquisition = 'CityTestScene';
 
 % The PBRT outputs will be stored here.  We match the project and
 % session and (ultimately) the acquisition labels. We know these are
@@ -42,8 +44,9 @@ inSubject = 'scenes';
 % 'render' where as above the subject field is 'scenes'.
 renderGroup   = inGroup;
 renderProject = inProject;
+renderSession = inSession;
+renderAcquisition = inAcquisition;
 renderSubject = 'renderings'; 
-
 %% Main routine - Flywheel files
 
 % The st object interfaces with the Flywheel database.  It has various
@@ -54,50 +57,16 @@ renderSubject = 'renderings';
 % luString. In this case we find the 'scenes' in zhenyi's project.
 
 % groupID/projectLabel/subjectLabel
-luString = sprintf('%s/%s/%s',inGroup,inProject,inSubject);
+luString = sprintf('%s/%s/%s/%s/%s',inGroup,inProject,inSubject,inSession,inAcquisition);
 
 % 'subject' is an object that lets us address the various sessions and
 % other properties of the subject.
-subject = st.lookup(luString);
-
-% These are the sessions in Zhenyi's data
-sessions = subject.sessions();
-fprintf('Input has %d sessions\n',numel(sessions))
-
-% In Zhenyi's project sessions are collections of scenes read to
-% render.  We pick the first one.  'thisSession' is another scitran
-% object that we can use to find out the information about the
-% session.
-whichSession = 1;
-thisSession = sessions{whichSession};
-
-% Here is the label of the input session.  We use the same label for
-% the render session.
-inSession = thisSession.label;
-fprintf('Working on scenes in this session: %s\n',inSession);
-renderSession = inSession;
-
-%%  Choose an acquisition from the session.
-
-% The acquisitions each represent a single scene that we might render.
-% There are a lot of possible scenes, so the read here takes a few
-% seconds.
-acquisitions = thisSession.acquisitions();
-fprintf('Choosing from %d potential scenes\n',numel(acquisitions));
-
-% We pick one acquisition (scene).  
-thisAcquisition = 1;
-
-% 'acquisition' is a scitran object that can be used to find the files
-% and other properties of the scene.
-acquisition = acquisitions{thisAcquisition};
-fprintf('\n**** Processing the scene: %s **********\n',acquisition.label);
-renderAcquisition = acquisition.label;
+thisAcquisition = st.lookup(luString);
 
 %% Now we find the files we need to render the scene
 
 % We find all the files in the acquisition this way
-files = acquisition.files;
+files = thisAcquisition.files;
 stPrint(files,'name');
 
 % There are two files we will need that defines the scene properties.
@@ -108,7 +77,7 @@ targetFile = stSelect(files,'name','target.json');
 % This is the recipe file that instructs PBRT how to render the data.
 % We might modify the recipe, say by changing the camera or light or
 % other scene properties.
-recipeFile = stSelect(files,'name',[renderAcquisition,'.json']);
+recipeFile = stSelect(files,'name',['city3_11:16_v12.0_f47.50front_o270.00_2019626181423_pos_163_000_000','.json']);
 
 % Create a folder for where we will download the target and recipe
 % files.
@@ -130,7 +99,6 @@ gcp.targets = [];
 targetFile{1}.download(fullfile(destDir,targetFile{1}.name));
 targetName = fullfile(destDir,targetFile{1}.name);
 if ~exist(targetName,'file'), error('File not downloaded'); end
-
 % gcp.readTarget(targetName);
 
 %% Load the rendering recipe
@@ -140,8 +108,6 @@ if ~exist(targetName,'file'), error('File not downloaded'); end
 recipeName = fullfile(destDir,recipeFile{1}.name);
 recipeFile{1}.download(recipeName);
 thisR = piJson2Recipe(recipeName);
-% jsonwrite(recipeName,thisR);
-% testR=jsonread(recipeName);
 
 % The output file for this position
 thisR.outputFile = fullfile(destDir,'testRender.pbrt');
