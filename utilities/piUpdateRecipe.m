@@ -18,6 +18,7 @@ function thisR = piUpdateRecipe(thisR)
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
+p.parse(thisR);
 
 %% 
 txtLines     = thisR.materials.txtLines;

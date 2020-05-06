@@ -140,6 +140,8 @@ if ~exist(targetName,'file'), error('File not downloaded'); end
 recipeName = fullfile(destDir,recipeFile{1}.name);
 recipeFile{1}.download(recipeName);
 thisR = piJson2Recipe(recipeName);
+% jsonwrite(recipeName,thisR);
+% testR=jsonread(recipeName);
 
 % The output file for this position
 thisR.outputFile = fullfile(destDir,'testRender.pbrt');
