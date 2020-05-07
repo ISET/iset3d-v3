@@ -38,10 +38,9 @@ inSubject = 'scenes';
 inSession = 'suburb';
 inAcquisition = 'city3_11:16_v12.0_f47.50front_o270.00_2019626181423_pos_163_000_000';
 
-% The PBRT outputs will be stored here.  We match the project and
-% session and (ultimately) the acquisition labels. We know these are
-% the renderings because we change the subject field, calling it
-% 'render' where as above the subject field is 'scenes'.
+% The PBRT outputs will be stored in this acquisition.  We match the
+% project and session and (ultimately) the acquisition labels. We mark
+% these as renderings by the subject field,
 renderProjectID   = inProject.id;
 renderSession     = inSession;
 renderAcquisition = inAcquisition;
@@ -97,8 +96,27 @@ fprintf('\nData will be rendered into\n  project %s\n  subject: %s\n  session: %
 % Describe the jobs (targets) to the user
 gcp.targetsList;
 
-% Invoke the PBRT-V3 docker image
+%% Invoke the PBRT-V3 docker image
 gcp.render();
+
+%% When done, check the render
+%{
+
+% Find the rendered acquisition.  You must pass the scitran object.
+thisAcq = gcp.fwGet('acquisition container','scitran',st);
+
+% Create the OI from the rendered acquisition.  This depends on the
+% recipe file having the same name as the spectral radiance file,
+% except for the extension
+oi = piAcquisition2ISET(thisAcq,st);
+
+% Clean it up and show it nice
+oi = piFireFliesRemove(oi);
+oiWindow(oi); oiSet(oi,'gamma',0.6); truesize;
+
+%}
+
+%% Only comments from here to the end
 
 %% Find the session where the data were rendered
 
@@ -110,37 +128,6 @@ gcp.render();
    gcp.PodDescribe(podname{end})    % Prints out what has happened
    cmd = gcp.Podlog(podname{end});  % Creates a command to show the running log
 %}
-
-%{
-% Find the rendered acquisition
-% The project ID and session label
-%
-% Maybe 
-%
-%  function acquisition = gcp.acquisition;
-%
-projectID    = gcp.targets(1).remote;
-sessionLabel = gcp.targets(1).fwAPI.sessionLabel;
-subjectLabel = gcp.targets(1).fwAPI.subjectLabel;
-acquisitionLabel = gcp.targets(1).fwAPI.acquisitionLabel;
-
-thisAcq = st.search('acquisition',...
-    'project id',projectID,...
-    'session label',sessionLabel,...
-    'subject code',subjectLabel,...
-    'acquisition label exact',acquisitionLabel ,...
-    'fw',true);
-
-% Create the OI from the rendered acquisition.
-% Providing the File.Entry to the recipe directly.
-oi = piAcquisition2ISET(thisAcquisition{1},st,'recipe file',recipeFile{1});
-
-% Ask Zhenyi why this looks bad
-oiWindow(oi);
-
-%}
-
-%% Only comments from here to the end
 
 %{
 %

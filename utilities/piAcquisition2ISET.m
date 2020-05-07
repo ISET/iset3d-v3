@@ -200,7 +200,7 @@ switch opticsType
         errror('Unknown optics type %s\n',opticsType);       
 end
 
-% Add mesh label information
+%% Add mesh label information
 ieObject.metadata.meshImage  = meshImage;
 ieObject.metadata.meshtxt    = meshLabel;
 
