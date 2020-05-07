@@ -1,32 +1,30 @@
 % s_texturesMCCMeasuredRef
+% 
+% Render MCC with measured reflectance.
+% 
+% Warning: doesn't work very well.
 %
-% Use measured reflectances of MCC checker to generate texture
-%
+% Zheng Lyu, 2020
 %% Init
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read measured MCC reflectances
-wave = 400:10:700;
-% Allow extrapolation
-extrapVal = 'extrap';
-mccRefl = ieReadSpectra('macbethChart', wave, extrapVal);
-nSamples = size(mccRefl, 2);
+%% Read mcc basis function and related parameters
+% Specify wavelength range
+wave = 365:5:705;
+load('mccReflectance');
+
+% Some parameter name translation
+wgts = mcCOEF;
+mWgts2lrgb = comment.mWgts2lrgb;
+lrgb = mWgts2lrgb * wgts;
 
 %{
-% Plot 4x6
-rows = 6; cols = 4;
+eRefl = basis * wgts;
+thisRefl = 4;
 ieNewGraphWin;
-for ii = 1:size(mccRefl, 2)
-subplot(rows, cols, ii)
-plot(wave, mccRefl(:,ii))
-title(sprintf('Number %d', ii))
-end
+plot(wave, eRefl(:,thisRefl));
 %}
-
-%% Basis function analysis
-[mccBasis, wgts] = basisAnalysis(mccRefl, wave, 'vis', true, 'nBasis', 3);
-
 %%
 
 % Read image and get RGB values
@@ -50,60 +48,14 @@ ieNewGraphWin;
 imagesc(mccTextureMask);
 %}
 
-%% Goal here is convert wgts to lrgb space (finally) use a matrix tranasformation
-% We can later inverse the matrix so we can put linear RGB values in the texture
-% map
-% The euqation should be:
-% tmp = ((xyz2lrgb)' * xyz' * basisFunction * wgts);
-% maxRGB = max(tmp(:));
-% lrgb = tmp / maxRGB;
-% 
-% So let M = (xyz2lrgb)' * xyz' * basisFunction / maxRGB; then
-% lrgb = M * wgts
-
-% Read in XYZ
-xyz = ieReadSpectra('XYZ', wave);
-
-matrix = colorTransformMatrix('xyz2lrgb');
-tmp = matrix' * xyz' * mccBasis * wgts;
-maxRGB = max(tmp(:));
-M = matrix' * xyz' * mccBasis / maxRGB;
-
-% The direct transformation is:
-lrgb = M * wgts;
-%{
-lrgb = XW2RGBFormat(lrgb', 4, 6);
-
-rgbLarge = imageIncreaseImageRGBSize(lrgb, 20);
-ieNewGraphWin;
-
-imagesc(rgbLarge);
-%}
-% Clip the rgb values so they are in (0, 1) range.
-lrgb = ieClip(lrgb, 0, 1);
-
-%{
-% Validate the reflectance from basis * wgts vs basis * M^-1 * lrgb
-refTrue = mccBasis * wgts;
-refLrgb = mccBasis * inv(M) * lrgb;
-
-thisRefl = 11;
-ieNewGraphWin;
-plot(wave, refTrue(:,thisRefl), 'r', wave, refLrgb(:,thisRefl), 'b', wave, mccRefl(:,thisRefl));
-legend('Basis with wgts', 'Basis with lrgb', 'Real')
-%}
-
 %% Create the texture map here, use it later after writing out the recipe
 mccTextureWgts = piTextureImgMap(mccTextureMask, wgts);
 mccTextureLrgb = piTextureImgMap(mccTextureMask, lrgb);
-%% Save basis functions
 
-% Save the basis functions
-comment = 'MCC reflection basis functions';
-fname = fullfile(piRootPath,'data','basisFunctions','mccReflectance');
-ieSaveSpectralFile(wave, mccBasis * inv(M), comment, fname);
-% ieSaveSpectralFile(wave, mccBasis, comment, fname);
-
+%{
+ieNewGraphWin;
+imagesc(mccTextureWgts);
+%}
 %% Now create a recipe
 thisR = piRecipeDefault('scene name', 'flatSurfaceMCCTexture');
 
@@ -116,7 +68,7 @@ thisR = piLightAdd(thisR, 'type', 'distant', 'camera coordinate', true,...
 %% Set texture don't use gamma correction
 textureIdx = 1;
 piTextureSet(thisR, textureIdx, 'bool gamma', 'false');
-
+piTextureSet(thisR, textureIdx, 'stringwrap', 'absolute');
 %% Check texture list
 piTextureList(thisR);
 
@@ -124,18 +76,21 @@ piTextureList(thisR);
 basisFunctionsFileName = 'mccReflectance.mat';
 piTextureSetBasis(thisR, textureIdx, wave, 'basis functions', basisFunctionsFileName);
 
-%% Write the mccTexture file.
+%% Set mccTexture file.
 % Change texture file name
 textureIdx = 1;
-% piTextureSet(thisR, textureIdx, 'stringfilename', 'mcc_wgts.exr');
-piTextureSet(thisR, textureIdx, 'stringfilename', 'mcc_lrgb.exr');
+piTextureSet(thisR, textureIdx, 'stringfilename', 'mcc_wgts.exr');
 
-% Write out the exr file
+%% Write out the exr texture file
 [fPath, ~, ~] = fileparts(thisR.outputFile);
-% textureImgPath = fullfile(fPath, 'mcc_wgts.exr');
-% exrwrite(mccTextureWgts, textureImgPath);
+
+textureImgPath = fullfile(fPath, 'mcc_wgts.exr');
+exrwrite(mccTextureWgts, textureImgPath);
+
+% Save for visualization
 textureImgPath = fullfile(fPath, 'mcc_lrgb.exr');
 exrwrite(mccTextureLrgb, textureImgPath);
+
 %% Write the recipe
 piWrite(thisR, 'overwritematerials', true);
 

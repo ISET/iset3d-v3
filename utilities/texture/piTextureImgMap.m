@@ -83,4 +83,8 @@ for ii = 1:numel(indices)
         textureMap = textureMap + tmpMap;
     end
 end
+%{
+ieNewGraphWin;
+imagesc(textureMap);
+%}
 end

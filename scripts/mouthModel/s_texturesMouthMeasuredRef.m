@@ -1,69 +1,23 @@
 % s_texturesMouthMeasuredRef
 %
-% Generate basis functions for Use measured reflectances of mouth 
+% Render mouth model with measured mouth reflectance data. Evaluate the
+% effectiveness by checking chromaticity map.
 %
+% Zheng Lyu, 2020
 %% Init
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read measured mouth reflectances
+%% Read mouth basis function and related parameters
+% Specify wavelength range
 wave = 365:5:705;
-% Allow extrapolation
-% extrapVal = 'extrap';
-extrapVal = 0;
-mouthRefl = ieReadSpectra('reflectances', wave, extrapVal);
-% Manually set reflectance out of 380:5:700 to be zero
-% mouthRefl(wave < 380 | wave > 700, :) = 0;
-nSamples = size(mouthRefl, 2);
+load('mouthReflectance');
 
-%% Basis function analysis
-[mouthBasis, wgts] = basisAnalysis(mouthRefl, wave, 'vis', true);
-
-%% Goal here is convert wgts to lrgb space (finally) use a matrix tranasformation
-% We can later inverse the matrix so we can put linear RGB values in the texture
-% map
-% The euqation should be:
-% tmp = ((xyz2lrgb)' * xyz' * basisFunction * wgts);
-% maxRGB = max(tmp(:));
-% lrgb = tmp / maxRGB;
-% 
-% So let M = (xyz2lrgb)' * xyz' * basisFunction / maxRGB; then
-% lrgb = M * wgts
-
-% Read in XYZ
-xyz = ieReadSpectra('XYZ', wave);
-
-matrix = colorTransformMatrix('xyz2lrgb');
-tmp = matrix' * xyz' * mouthBasis * wgts;
-maxRGB = max(tmp(:));
-M = matrix' * xyz' * mouthBasis / maxRGB;
-
-% The direct transformation is:
-lrgb = M * wgts;
-
-% Clip the rgb values so they are in (0, 1) range (this can cost some error).
-lrgb = ieClip(lrgb, 0, 1);
-
-%{
-% Validate the reflectance from basis * wgts vs basis * M^-1 * lrgb
-refTrue = mouthBasis * wgts;
-refLrgb = mouthBasis * inv(M) * lrgb;
-
-max(abs(refTrue - refLrgb))
-thisRefl = 1;
-ieNewGraphWin;
-plot(wave, refTrue(:,thisRefl), 'r', wave, refLrgb(:,thisRefl), 'b');
-legend('Basis with wgts', 'Basis with lrgb')
-
-%}
-
-%% Save basis functions
-comment = 'Mouth reflection basis functions';
-fname = fullfile(piRootPath,'data','basisFunctions','mouthReflectance');
-newMouthBasis = mouthBasis * inv(M);
-ieSaveSpectralFile(wave, newMouthBasis, comment, fname);
-
-%%
+% Some parameter name translation
+wgts = mcCOEF;
+mWgts2lrgb = comment.mWgts2lrgb;
+lrgb = mWgts2lrgb * wgts;
+%% Generate texture map with 2D texture map
 
 % Read in the image
 mouthFolder = fullfile(piRootPath, 'local', 'mouth_model');
@@ -77,16 +31,14 @@ imagesc(mouthImg);
 [rows, cols, ~] = size(mouthImg);
 mouthTextureMask = zeros(rows, cols);
 
+whichSample = 1;
 mouthTextureMask(mouthImg(:,:, 1) ~= 0 | mouthImg(:,:, 2) ~= 0 |...
-                 mouthImg(:,:, 3) ~= 0) = 1;
+                 mouthImg(:,:, 3) ~= 0) = whichSample;
 
 mouthTextureWgts = piTextureImgMap(mouthTextureMask, wgts);
+
+% This is used for visualization
 mouthTextureLrgb = piTextureImgMap(mouthTextureMask, lrgb);
-%{
-mouthTexture(:,:,1) = mouthTextureMask * lrgb(1, 1);
-mouthTexture(:,:,2) = mouthTextureMask * lrgb(2, 1);
-mouthTexture(:,:,3) = mouthTextureMask * lrgb(3, 1);
-%}
 
 %{
 ieNewGraphWin;
@@ -97,7 +49,7 @@ imagesc(mouthTextureLrgb);
 % Check the estimated reflectance and measured data
 thisRefl = 1;
 eReflectance1 = mouthBasis * wgts(:,thisRefl);
-eReflectance2 = mouthBasis * inv(M) * lrgb(:,thisRefl);
+eReflectance2 = mouthBasis * inv(mWgts2lrgb) * lrgb(:,thisRefl);
 
 ieNewGraphWin;
 plot(wave, eReflectance1, wave, eReflectance2, wave, mouthRefl(:,thisRefl));
@@ -110,6 +62,7 @@ xlabel('wavelength (nm)'); ylabel('Reflectance')
 textureImgPathWgts = fullfile(mouthFolder, 'Mouth_color_map_wgts.exr');
 exrwrite(mouthTextureWgts, textureImgPathWgts);
 
+% For visualization
 textureImgPathLrgb = fullfile(mouthFolder, 'Mouth_color_map_lrgb.exr');
 exrwrite(mouthTextureLrgb, textureImgPathLrgb);
 %% Check image
@@ -148,8 +101,8 @@ piTextureList(thisR);
 %% Change the texture info
 textureIdx = 3;
 piTextureSet(thisR, textureIdx, 'bool gamma', 'false');
-piTextureSet(thisR, textureIdx, 'stringfilename', 'Mouth_color_map_lrgb.exr');
-% piTextureSet(thisR, textureIdx, 'stringfilename', 'Mouth_color_map_wgts.exr');
+piTextureSet(thisR, textureIdx, 'stringwrap', 'absolute');
+piTextureSet(thisR, textureIdx, 'stringfilename', 'Mouth_color_map_wgts.exr');
 
 %%
 basisFunctionsFileName = 'mouthReflectance.mat';
@@ -163,6 +116,10 @@ thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
 sceneName = 'Mouth rendered with basis functions';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
+
+%% Validate the effectiveness of this method by evaluating chromaticity map.
+% To do so, we need to run through the rest parts of imaging pipeline:
+% Optical image, sensor, and ip.
 
 %% Compute optical image
 oi = oiCreate;

@@ -73,16 +73,18 @@ if ~exist(basisSpdDir, 'dir'), mkdir(basisSpdDir); end
 
 if isnumeric(basisFunctions)
     % Assume the shape of the basisFunctions is nWave x 3
-    loadedFunctions = basisFunctions;
+    basis = basisFunctions;
    
 elseif exist(basisFunctions, 'file') % basis functions are stored in a file
-    loadedFunctions = ieReadSpectra(basisFunctions, wave);
+    load(basisFunctions, 'basis');
+    load(basisFunctions, 'illuminant');
+    basis = interp1(illuminant(:), basis, wave(:), 'linear'); %#ok
 else
     error('Unable to assign this set basis functions.');
 end
 
 for ii = 1:3
-    thisBasis = loadedFunctions(:,ii);
+    thisBasis = basis(:,ii);
     thisSpdfile = fullfile(basisSpdDir,...
                     sprintf('%s.spd', filenames{ii}));
     fid = fopen(thisSpdfile, 'w');
