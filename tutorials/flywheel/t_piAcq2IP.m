@@ -1,22 +1,23 @@
-%% Convert rendered data to an IP
+%% Convert rendered data to an ISETCam image processing (IP) struct
 %
 % Description
-%   Find a Flywheel session and acquisition with PBRT rendered images.
-%   Download the rendered data and assemble them into an ISETCam IP with
-%   the metadata.
+%   Find a Flywheel acquisition with data that were rendered using PBRT. 
+%   Download the rendered data and assemble them into an ISETCam IP,
+%   including the metadata.
 %
 %   We can save these locally for zipping and handing out to students.
 %   For example we created AlignmentData.zip file on the Canvas site.
 %
 % See also
-%   s_piAlignmentAcquisition2IP
+%   t_piFlywheelRender, s_piAlignmentRender, s_piStereoImage
 %
 % Wandell, 12/2019
 
 %% Channel to Flywheel
 st = scitran('stanfordlabs');
 
-%% Find the acquisition
+%% Specify the acquisition with the rendered data
+
 inGroup   = 'wandell';
 inProject = st.lookup('wandell/Graphics test');
 inSubject = 'renderings';
@@ -40,11 +41,13 @@ oi = piFireFliesRemove(oi);
 oiWindow(oi); oiSet(oi,'gamma',0.7); truesize;
 
 %% Convert the oi into an IP
+
 pixelSize = 3;           % Microns
 [ip, sensor] = piOI2IP(oi,'pixel size',pixelSize);
 ipWindow(ip); ipSet(ip,'gamma',0.7); truesize;  
 
-%%
+%% Show the metadata
+
 ieNewGraphWin; imagesc(ip.metadata.depthMap); axis image; colorbar;
 ieNewGraphWin; imagesc(ip.metadata.meshImage); axis image; colorbar;
 

@@ -1,17 +1,18 @@
 %% Read and render a scene that is stored in Flywheel using GCP
 %
-%   This script illustrates the use of ISETCloud, ISET3d, ISETCam and
-%   Flywheel to render driving scenes that were previously generated.
-%
 % Description:
-%   Zhenyi created many automotive optical images and stored them in
-%   Flywheel in the project CameraEval2019.  This script shows how to
-%   recalculate one of these scenes using the google cloud platform
-%   (GCP).
+%   This script illustrates the use of ISETCloud, ISET3d, ISETCam and
+%   Flywheel to render driving scenes that were assembled and stored
+%   in a Flywheel acquisition container. Zhenyi created many such
+%   scenes and stored them in the Flywheel in the project
+%   CameraEval2019.
 %
-%   We used this approach to create slight variants of the existing
-%   OIs, say be adjusting the camera position a few times for burst
-%   photography simulation and for stereo camera simulation.
+%   This script shows how to recalculate the rendered scene starting
+%   with one such acquisition and using the google cloud platform (GCP).
+%
+%   We used a variant of this approach to create slight variants of
+%   the existing OIs, say by adjusting the camera position a few times
+%   for burst photography simulation and for stereo camera simulation.
 %
 % Dependencies
 %  ISETCAM, ISET3D, ISETCLOUD, SCITRAN
@@ -19,7 +20,7 @@
 % Author: Zhenyi, Zheng and Brian Wandell, 2019
 %
 % See also
-%   t_piAcq2IP.m s_piAlignmentRender, s_piStereoImage, piSceneAuto, piSkymapAdd, gCloud
+%   t_piAcq2IP, s_piAlignmentRender, s_piStereoImage
 
 %% Initialize ISET and Docker and GCP
 
@@ -99,7 +100,7 @@ gcp.targetsList;
 %% Invoke the PBRT-V3 docker image
 gcp.render();
 
-%% When done, check the render
+%% When done, check the render using this code
 %{
 
 % Find the rendered acquisition.  You must pass the scitran object.
@@ -116,7 +117,7 @@ oiWindow(oi); oiSet(oi,'gamma',0.6); truesize;
 
 %}
 
-%% Only comments from here to the end
+%% Only more comments from here to the end
 
 %% Find the session where the data were rendered
 
