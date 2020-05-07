@@ -13,66 +13,38 @@
 %
 % Wandell, 12/2019
 
-%%
+%% Channel to Flywheel
 st = scitran('stanfordlabs');
 
-% One of the 10 sessions
-ss = 2;
+%% Find the acquisition
+inGroup   = 'wandell';
+inProject = st.lookup('wandell/Graphics test');
+inSubject = 'renderings';
+inSession = 'suburb';
+inAcquisition = 'city3_11:16_v12.0_f47.50front_o270.00_2019626181423_pos_163_000_000';
 
-% One of the acquisitions in that session
-aa = 2;
-
-%% Set a session and acquisition
-
-% The rendered data are stored as this subject
-renderSubject = 'image alignment render';
-lu = sprintf('wandell/Graphics camera array/%s',renderSubject);
-subject = st.lookup(lu);
-
-% The sessions for this subject are the rendered data.
-sessions = subject.sessions();
-fprintf('Found %d sessions in the render subject.\n',numel(sessions));
-
-%% For each session
-chdir(fullfile(piRootPath,'local'));
-
-sessionName = sessions{ss}.label;
-lu = sprintf('wandell/Graphics camera array/%s/%s',renderSubject,sessionName);
-thisSession = st.lookup(lu);
-
-% Find the acquisitions.  These are rendereding from different
-% camera positions
-acquisitions = thisSession.acquisitions();
-fprintf('Found %d acquisitions for session %s\n',numel(acquisitions),sessionName);
-stPrint(acquisitions,'label');
-
-% Remove old downloaded dat-files.
-chdir(fullfile(piRootPath,'local'));
-delete('city*');
-
-%%  Download and build up the OI
-acquisitionName = acquisitions{aa}.label;
-
-lu = sprintf('wandell/Graphics camera array/%s/%s/%s',renderSubject,sessionName,acquisitionName);
+lu = sprintf('wandell/%s/%s/%s/%s',inProject.label,inSubject,inSession,inAcquisition);
 thisAcquisition = st.lookup(lu);
+if isempty(thisAcquisition), error('Acquisition not found.'); end
 
-%% Download and read the files 
+%% Download and read the spectral radiance and metadata files 
 
-% Go to Flywheel to download into the local directory
-oi = piAcquisition2ISET(thisAcquisition,st);  % Note:  Remove dat files when done.
+% Note:  Remove dat files when done.
+oi = piAcquisition2ISET(thisAcquisition,st);  
 
 % The returned oi can have some rendering artifacts.  We clean them
 % here.
 oi = piFireFliesRemove(oi);
-% oiWindow(oi);
+
+% Show the rendered optical image
+oiWindow(oi); oiSet(oi,'gamma',0.7); truesize;
 
 %% Convert the oi into an IP
 pixelSize = 3;           % Microns
 [ip, sensor] = piOI2IP(oi,'pixel size',pixelSize);
+ipWindow(ip); ipSet(ip,'gamma',0.7); truesize;  
 
 %%
-ipWindow(ip); ipSet(ip,'gamma',0.7);truesize;  
-
 ieNewGraphWin; imagesc(ip.metadata.depthMap); axis image; colorbar;
 ieNewGraphWin; imagesc(ip.metadata.meshImage); axis image; colorbar;
 

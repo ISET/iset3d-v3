@@ -19,7 +19,7 @@
 % Author: Zhenyi, Zheng and Brian Wandell, 2019
 %
 % See also
-%   s_piAlignmentRender, s_piStereoImage, piSceneAuto, piSkymapAdd, gCloud
+%   t_piAcq2IP.m s_piAlignmentRender, s_piStereoImage, piSceneAuto, piSkymapAdd, gCloud
 
 %% Initialize ISET and Docker and GCP
 
@@ -33,99 +33,41 @@ ieGCPInit
 % Zhenyi created a large number of scene recipes and scene resources
 % in this project.  We start with those as inputs.
 inGroup   = 'wandell';
-inProject = 'Graphics test';
+inProject = st.lookup('wandell/Graphics test');
 inSubject = 'scenes';
 inSession = 'suburb';
-inAcquisition = 'CityTestScene';
+inAcquisition = 'city3_11:16_v12.0_f47.50front_o270.00_2019626181423_pos_163_000_000';
 
 % The PBRT outputs will be stored here.  We match the project and
 % session and (ultimately) the acquisition labels. We know these are
 % the renderings because we change the subject field, calling it
 % 'render' where as above the subject field is 'scenes'.
-renderGroup   = inGroup;
-renderProject = inProject;
-renderSession = inSession;
+renderProjectID   = inProject.id;
+renderSession     = inSession;
 renderAcquisition = inAcquisition;
-renderSubject = 'renderings'; 
+renderSubject     = 'renderings';
+
 %% Main routine - Flywheel files
 
 % The st object interfaces with the Flywheel database.  It has various
 % functions (in the scitran repository) that call the Flywheel SDK.
 
-% st.lookup is a method that lets you find a particular Flywheel
-% object. We form a string, which is like the path to the object, in
-% luString. In this case we find the 'scenes' in zhenyi's project.
+% We need to download the target.json and recipe.json files for the
+% scene.  These are in the input acquisition container.  Here we form
+% a string, which is like the path to the object.  The function
+% fwSceneGet will download the two JSON files.
 
+% This is the string from Zhenyi's project.  The format is
 % groupID/projectLabel/subjectLabel
-luString = sprintf('%s/%s/%s/%s/%s',inGroup,inProject,inSubject,inSession,inAcquisition);
+luString = sprintf('%s/%s/%s/%s/%s',...
+    inGroup,inProject.label,inSubject,inSession,inAcquisition);
 
-% 'subject' is an object that lets us address the various sessions and
-% other properties of the subject.
-thisAcquisition = st.lookup(luString);
+[recipeFile, targetFile, acq] = piFWSceneGetJSON(st,luString);
 
-%% Now we find the files we need to render the scene
-
-% We find all the files in the acquisition this way
-files = thisAcquisition.files;
-stPrint(files,'name');
-
-% There are two files we will need that defines the scene properties.
-% This one contains information about the assets in the scene.  It has
-% the string 'target' in it.
-targetFile = stSelect(files,'name','target.json');
-
-% This is the recipe file that instructs PBRT how to render the data.
-% We might modify the recipe, say by changing the camera or light or
-% other scene properties.
-recipeFile = stSelect(files,'name',['city3_11:16_v12.0_f47.50front_o270.00_2019626181423_pos_163_000_000','.json']);
-
-% Create a folder for where we will download the target and recipe
-% files.
-destDir = fullfile(piRootPath,'local',date,inSession);
-if ~exist(destDir,'dir'), mkdir(destDir); end
-
-%% Load the gCloud information from the target.json file
-
-% The gcp object is part of ISETCloud.  It implements the calls to
-% gcloud that manage the Kubernetes jobs and cluster.
-
-% First we clear job list
-gcp.targets = [];
-
-% After PBRT runs we store the Flywheel target information in the
-% target.json file.  We download the file and read it into the
-% gcp.fwAPI slots
-%
-targetFile{1}.download(fullfile(destDir,targetFile{1}.name));
-targetName = fullfile(destDir,targetFile{1}.name);
-if ~exist(targetName,'file'), error('File not downloaded'); end
-% gcp.readTarget(targetName);
-
-%% Load the rendering recipe
-
-% The scene recipe with all the graphics information is stored here
-% as a recipe
-recipeName = fullfile(destDir,recipeFile{1}.name);
-recipeFile{1}.download(recipeName);
-thisR = piJson2Recipe(recipeName);
+thisR = piJson2Recipe(recipeFile);
 
 % The output file for this position
 thisR.outputFile = fullfile(destDir,'testRender.pbrt');
-
-% Next TODO:  If you ahve the target then all you should have to do is
-% download the target.json file and copy the slots from that JSON file
-% into the gcp.fwAPI slots.
-%
-% Then run gcp.addPBRTTarget with the recipe (thisR)
-%
-% So this should become a function like this
-%
-%    gcp.readTarget(targetName);
-%
-% That loads the JSON target file and sets the gcp parameters.
-
-targetName = fullfile(destDir,targetFile{1}.name);
-% gcp.readTarget(targetName);
 
 %% Now get ready to process
 
@@ -133,16 +75,32 @@ targetName = fullfile(destDir,targetFile{1}.name);
 % label changes from 'camera array' to 'renderings'.  But the session,
 % acquisition and project remain the same.
 
-gcp.addPBRTTarget(targetName,'subject label',renderSubject);
-% the json file we loaded does not include sessionlabel and
-% acquisitionlabel information, so we add them here.
-gcp.targets(1).fwAPI.sessionLabel = renderSession;
-gcp.targets(1).fwAPI.acquisitionLabel = renderAcquisition;
-% give a different name
-% gcp.targets(1).fwAPI.subjectLabel = 'rendertest';
+% First we clear job list
+gcp.targets = [];
+
+% Then we add the target information from the original calculation
+gcp.addPBRTTarget(targetFile,'subject label',renderSubject);
+
+% Set the Flywheel information for the rendering
+gcp.fwSet('project id',renderProjectID, ...
+    'subject',    renderSubject,...
+    'session',    renderSession,...
+    'acquisition',renderAcquisition);
+
+project = st.fw.get(gcp.targets(1).fwAPI.projectID);
+fprintf('\nData will be rendered into\n  project %s\n  subject: %s\n  session: %s\n  acquisition: %s\n', ...
+     project.label, ...
+     gcp.targets(1).fwAPI.subjectLabel, ...
+     gcp.targets(1).fwAPI.sessionLabel,...
+     gcp.targets(1).fwAPI.acquisitionLabel);
 
 % Describe the jobs (targets) to the user
 gcp.targetsList;
+
+% Invoke the PBRT-V3 docker image
+gcp.render();
+
+%% Find the session where the data were rendered
 
 % You can get a lot of information about the job this way.  Examining this
 % is useful when there is an error.  It is not needed, but watching it
@@ -153,22 +111,25 @@ gcp.targetsList;
    cmd = gcp.Podlog(podname{end});  % Creates a command to show the running log
 %}
 
-% Invoke the PBRT-V3 docker image
-gcp.render();
-
-%% Find the session where the data were rendered
-
 %{
 % Find the rendered acquisition
 % The project ID and session label
-projectID    = gcp.targets.remote;
-sessionLabel = gcp.targets.fwAPI.sessionLabel;
-fwRenderSession = st.search('session',...
+%
+% Maybe 
+%
+%  function acquisition = gcp.acquisition;
+%
+projectID    = gcp.targets(1).remote;
+sessionLabel = gcp.targets(1).fwAPI.sessionLabel;
+subjectLabel = gcp.targets(1).fwAPI.subjectLabel;
+acquisitionLabel = gcp.targets(1).fwAPI.acquisitionLabel;
+
+thisAcq = st.search('acquisition',...
     'project id',projectID,...
     'session label',sessionLabel,...
-    'subject code',renderSubject,...
+    'subject code',subjectLabel,...
+    'acquisition label exact',acquisitionLabel ,...
     'fw',true);
-thisAcquisition = fwRenderSession{1}.acquisitions();
 
 % Create the OI from the rendered acquisition.
 % Providing the File.Entry to the recipe directly.
@@ -178,6 +139,7 @@ oi = piAcquisition2ISET(thisAcquisition{1},st,'recipe file',recipeFile{1});
 oiWindow(oi);
 
 %}
+
 %% Only comments from here to the end
 
 %{

@@ -27,7 +27,7 @@ function ieObject = piAcquisition2ISET(acquisition, st, varargin)
 % Henryk Blasinski, 2019
 %
 % See also (update these as we simplify)
-%   gCloud.fwBatchProcessPBRT, fwBatchProcessPBRT, scitran
+%   t_piAcq2IP.m, gCloud.fwBatchProcessPBRT, fwBatchProcessPBRT, scitran
 
 %{
   st = scitran('stanfordlabs')
