@@ -42,8 +42,8 @@ classdef recipe < matlab.mixin.Copyable
         
         outputFile = ''; % Where outputFile = piWrite(recipe);
         version = 3;     % A PBRTv2 file or a PBRTv3 file
-        materials;       % material list parsed from *_material.pbrt file
-        textures = struct();
+        materials;       % struct containing info about the materials, parsed from *_material.pbrt file
+        textures;        % struct containing info about the textures used in the scene
         assets;          % assets list parsed from *_geometry.pbrt file
         exporter = '';
         metadata;

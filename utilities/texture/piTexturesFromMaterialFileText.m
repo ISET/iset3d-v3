@@ -1,4 +1,4 @@
-function textureLines = piTexturesFromMaterialFile(txtLines)
+function textureLines = piTexturesFromMaterialFileText(txtLines)
 
 for ii = 1:size(txtLines)
     if ~isempty(txtLines(ii))
