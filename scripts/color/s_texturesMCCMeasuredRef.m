@@ -21,7 +21,7 @@ lrgb = mWgts2lrgb * wgts;
 
 %{
 eRefl = basis * wgts;
-thisRefl = 4;
+thisRefl = 7;
 ieNewGraphWin;
 plot(wave, eRefl(:,thisRefl));
 %}
