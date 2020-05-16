@@ -68,7 +68,14 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
-
+    case 'MacBethCheckerBox'
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+    case 'MacBethCheckerCus'
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
     case 'SimpleScene'
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);

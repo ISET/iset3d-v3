@@ -64,7 +64,7 @@ piLightGet(thisR); % Should be nothing
 
 % Add a new equalEnergy light
 thisR = piLightAdd(thisR, 'type', 'distant', 'camera coordinate', true,...
-                    'light spectrum', 'equalEnergy');
+                    'light spectrum', 'D65');
 %% Set texture don't use gamma correction
 textureIdx = 1;
 piTextureSet(thisR, textureIdx, 'bool gamma', 'false');
