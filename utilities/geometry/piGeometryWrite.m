@@ -11,7 +11,7 @@ function  piGeometryWrite(thisR,varargin)
 %%
 p = inputParser;
 
-varargin =ieParamFormat(varargin);
+% varargin =ieParamFormat(varargin);
 
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 % default is flase, will turn on for night scene

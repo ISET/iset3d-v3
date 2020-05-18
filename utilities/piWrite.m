@@ -37,7 +37,7 @@ p = inputParser;
 
 % When varargin contains a number, the ieParamFormat() method fails.
 % It takes only a string or cell.  We should look into that.
-varargin = ieParamFormat(varargin);
+% varargin = ieParamFormat(varargin);
 
 
 p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
