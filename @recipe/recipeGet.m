@@ -70,6 +70,7 @@ p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
+p.addOptional('material', [], @iscell);
 
 p.parse(thisR,param,varargin{:});
 
@@ -113,7 +114,10 @@ switch ieParamFormat(param)
     case 'fromto'
         % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
-        
+      case 'tofrom'
+        % Vector between from minus to
+        val = thisR.lookAt.to - thisR.lookAt.from;
+       
     case {'cameratype'}
     case {'exposuretime','cameraexposure'}
         try
@@ -145,71 +149,71 @@ switch ieParamFormat(param)
                 % realisticeye and realisticDiffraction both work here.
                 % Need to test 'omni'               
                 try
-                    [~,val,~] = fileparts(thisR.camera.lensfile.value);
+                    [~,name,ext] = fileparts(thisR.camera.lensfile.value);
+                    val = [name,ext];
                 catch
                     error('Unknown lens file %s\n',subType);
                 end
                 
         end
-    case 'focaldistance'
+    case {'focusdistance','focaldistance'}
+        % recipe.get('focal distance')  (m)
+        %
+        % Distance in object space to the focal plane. If a lens type,
+        % we check whether the lens can bring this distance into focus
+        % on the film plane.
         opticsType = thisR.get('optics type');
         switch opticsType
             case {'pinhole','perspective'}
-                disp('Pinhole optics.  No focal distance');
-                val = NaN;
+                % Everything is in focus for a pinhole camera
+                val = thisR.camera.focaldistance.value;
+                warning('Pinhole optics.  No real focal distance');
             case {'environment'}
+                % Everything is in focus for the panorama
                 disp('Panorama rendering. No focal distance');
                 val = NaN;
             case 'lens'
                 % Focal distance given the object distance and the lens file
-                [p,flname,~] = fileparts(thisR.camera.lensfile.value);
-                focalLength = load(fullfile(p,[flname,'.FL.mat']));  % Millimeters
-                objDist = 1000*thisR.get('object distance');   % Object distance is in meters 
-                % and is the length of the vector between camera pos and
-                % lookAt.
+                % [p,flname,ext] = fileparts(thisR.camera.lensfile.value);
+                % focalLength = load(fullfile(p,[flname,'.FL.mat']));  % Millimeters
+                val = thisR.camera.focusdistance.value;
+                lensFile = thisR.get('lens file');
                 
-                
-                % Pull out the valid distances and focal distances
-                ok = ~isnan(focalLength.focalDistance);
-                x = focalLength.dist(ok);
-                y = focalLength.focalDistance(ok);
-                if objDist < min(x(:))
-                    fprintf('** Object too close to focus (%f).  Min is %f\n',objDist, min(x(:)));
-                    val = []; return;
-                elseif objDist > max(x(:))
-                    fprintf('** Object too far to focus (%f).  Max is %f\n', objDist,max(x(:)));
-                    val = []; return;
-                else
-                    %{
-                    ieNewGraphWin;
-                    semilogx(x, y);
-                    line([objDist objDist],[min(y),max(y)],'color','k');
-                    xlabel('Object distance'); ylabel('focal distance')
-                    %}
-                    val = interp1(x,y,objDist) / 1000; % Milimeters to meters
+                % Not required, but aiming to be helpful.  Convert the
+                % distance to the focal plane into millimeters and see
+                % whether the lens can adjust the film distance so
+                % that the plane is in focus.
+                if lensFocus(lensFile,1e+3*val) < 0
+                    warning('%s lens cannot focus at this distance.', lensFile);
                 end
+                
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
-    case 'fov'
-        % If pinhole optics, this works.  Should check and deal with other
-        % cases, I suppose.
+    case {'fov','fieldofview'}
+        % recipe.get('fov') - degrees
+        % 
+        % Correct for pinhole, but just an approximation for lens
+        % camera.
         if isequal(thisR.get('optics type'),'pinhole')
-            
             if isfield(thisR.camera,'fov')
                 val = thisR.camera.fov.value;
                 filmratio = thisR.film.xresolution.value/thisR.film.yresolution.value;
-                if filmratio>1
+                if filmratio > 1
                     val = 2*atand(tand(val/2)*filmratio); 
                 end
             else
                 val = atand(thisR.camera.filmdiag.value/2/thisR.camera.filmdistance.value);
             end
         else
-            % Perhaps we could figure out the FOV here for the lens or
-            % light field type cameras.  Should be possible.
-            warning('Not a pinhole camera.  Setting fov to 40');
-            val = 40;
+            % Coarse estimate of the diagonal FOV (degrees) for the
+            % lens case. Film diagonal size and distance from the film
+            % to the back of the lens.
+            focusDistance = thisR.get('focus distance');    % meters
+            lensFile      = thisR.get('lens file');
+            filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm
+            filmDiag      = thisR.get('film diagonal');     % mm
+            val           = atand(filmDiag/2/filmDistance);
         end
     case 'pupildiameter'
         % Default is millimeters
@@ -256,31 +260,18 @@ switch ieParamFormat(param)
         % An integer
         val = [thisR.film.yresolution.value];
     case 'aperturediameter'
+        % Needs to be checked.
         if isfield(thisR.camera, 'aperturediameter') ||...
             isfield(thisR.camera, 'aperture_diameter')
-        switch thisR.version
-            case 2
-                val = thisR.camera.aperture_diameter.value;
-            case 3
                 val = thisR.camera.aperturediameter.value;
-        end
         else
             val = nan;
         end
         
-    case {'filmdiagonal','diagonal'}
-        if isfield(thisR.film, 'diagonal') ||...
-                isfield(thisR.camera, 'filmdiag')
-        switch thisR.version
-            case 2
-                val = thisR.camera.filmdiag.value;
-            case 3
-                val = thisR.film.diagonal.value;
-        end
-        else
-            val = nan;
-        end
-
+    case {'filmdiagonal','filmdiag'}
+        % recipe.get('film diagonal');  in mm
+        val = thisR.film.diagonal.value;
+  
     case 'filmsubtype'
         % What are the legitimate options?
         val = thisR.film.subtype;
@@ -306,6 +297,44 @@ switch ieParamFormat(param)
         val.camera = thisR.camera;
         val.film = thisR.film;
         val.filter = thisR.filter;
+    case{'eem'}
+        % val = thisR.get('eem', 'material', {'materialName'});
+        if numel(varargin) == 0
+            matNames = fieldnames(thisR.materials.list);
+            val = cell(1, numel(matNames));
+            for ii = 1:numel(matNames)
+                val{ii} = thisR.materials.list.(matNames{ii}).photolumifluorescence;
+            end
+        else
+            matList = varargin{2};
+            val = cell(1, numel(matList));
+            for ii = 1:numel(matList)
+                if ~isfield(thisR.materials.list, matList{ii})
+                    error('Unknown material %s', matList{ii})
+                end
+                val{ii} = thisR.materials.list.(matList{ii}).photolumifluorescence; 
+            end
+        end
+        
+        
+    case{'concentration'}
+        % val = thisR.get('concentration', 'material', {'materialName'});
+        if numel(varargin) == 0
+            matNames = fieldnames(thisR.materials.list);
+            val = cell(1, numel(matNames));
+            for ii = 1:numel(matNames)
+                val{ii} = thisR.materials.list.(matNames{ii}).floatconcentration;
+            end
+        else
+            matList = varargin{2};
+            val = cell(1, numel(matList));
+            for ii = 1:numel(matList)
+                if ~isfield(thisR.materials.list, matList{ii})
+                    error('Unknown material %s', matList{ii})
+                end
+                val{ii} = thisR.materials.list.(matList{ii}).floatconcentration; 
+            end
+        end        
         
     otherwise
         error('Unknown parameter %s\n',param);

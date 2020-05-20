@@ -1,0 +1,12 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [1.0 0.0 0.0 0  0.0 -8.26946079743e-16 -1.0 0  0.0 1.0 -8.26946079743e-16 0  -0.0 5.49627498372e-13 664.647323249 1]
+Camera "perspective" "float fov" [93.2107785903] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["flatSurfaceRandomTexture.exr"] "integer xresolution" [704] "integer yresolution" [640]
+Integrator "path" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	Include "flatSurfaceRandomTexture_materials.pbrt"
+	Include "flatSurfaceRandomTexture_geometry.pbrt"
+WorldEnd

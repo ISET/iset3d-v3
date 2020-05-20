@@ -1,105 +1,87 @@
-function lightSources = piLightGet(thisR, varargin)
-% Read light sources struct from thisR
+function val = piLightGet(thisR, varargin)
+% Read a light source struct in the recipe
 %
-% Zhenyi, SCIEN, 2019
+% Inputs
+%   thisR:  Recipe
 %
+% Optional key/val pairs
+%   idx:     Index of the light to address
+%   param:   Parameter of the indexed light to return
+%   print:   Printout the list of lights
+%
+% Returns
+%   val:  Depending on the input arguments
+%      - Cell array of light source structures (idx and param both empty)
+%      - One of the light sources  (param empty)
+%      - A parameter of one of the light sources  (idx and param both set)
+%
+% ZLY, SCIEN, 2020
+%
+% See also
+%   piLightDelete, piLightAdd, piLightSet
+
+% Examples:
+%{
+   thisR = piRecipeDefault;
+   piLightGet(thisR)
+   piLightGet(thisR,'idx',1)
+   piLightGet(thisR,'idx',1,'param','range')
+   piLightGet(thisR,'idx',1,'param','type')
+   piLightGet(thisR,'idx',1,'param','from')
+%}
+%% Parse inputs
+
 varargin = ieParamFormat(varargin);
 p  = inputParser;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));
+p.addParameter('idx',[],@isnumeric);
+p.addParameter('param','',@ischar);
 p.addParameter('print',true);
-p.parse(thisR, varargin{:});
-lightSources = [];
-%%
 
-AttBegin  =  find(piContains(thisR.world,'AttributeBegin'));
-AttEnd    =  find(piContains(thisR.world,'AttributeEnd'));
-arealight =  piContains(thisR.world,'AreaLightSource');
-light     =  piContains(thisR.world,'LightSource');
-lightIdx  =  find(light);
-for ii = 1:length(lightIdx)
-        lightSources{ii} = lightInit;
-    if length(AttBegin)>=ii
-        lightSources{ii}.line  = thisR.world(AttBegin(ii):AttEnd(ii));
-        lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
+% Add this parameter to determine if we want to use the new piLightAdd
+p.addParameter('newversion', 0, @islogical);
+
+p.parse(thisR, varargin{:});
+idx = p.Results.idx;
+param = p.Results.param;
+
+%% Directly get the results 
+lightSources = thisR.lights;
+
+%% If an index and param are sent, just return that value
+
+if ~isempty(idx)
+    % Just one of the lights
+    thisLight = lightSources{idx};
+    if ~isempty(param)
+        % A parameter of that light
+        val = thisLight.(param);
     else
-        light(arealight)=0;
-        lightSources{ii}.line  = thisR.world(lightIdx(ii));
-        lightSources{ii}.range = lightIdx(ii);
+        val = thisLight;
     end
-    
-    if find(piContains(lightSources{ii}.line, 'AreaLightSource'))
-        lightSources{ii}.type = 'area';
-        translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
-        lightSources{ii}.position = [str2double(translate{2});...
-                                     str2double(translate{3});...
-                                     str2double(translate{4})];
-        thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')}, '%q');
-        thisLineStr = thisLineStr{1};
-        spectrum  = find(piContains(thisLineStr, 'spectrum L'));
-        if spectrum
-            if isnan(str2double(thisLineStr{spectrum+1}))
-                thisSpectrum = thisLineStr{spectrum+1};
-            else
-                thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
-            end
-            lightSources{ii}.spectrum = thisSpectrum;
-        end
-    else
-        lightType = lightSources{ii}.line{piContains(lightSources{ii}.line,'LightSource')};
-        lightType = strsplit(lightType, ' ');
-        lightSources{ii}.type = lightType{2};
-        if ~piContains(lightSources{ii}.type, 'infinite')
-            thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')}, '%q');
-            thisLineStr = thisLineStr{1};
-            from = find(piContains(thisLineStr, 'point from'));
-            lightSources{ii}.position = [piParseNumericString(thisLineStr{from+1});...
-                piParseNumericString(thisLineStr{from+2});...
-                piParseNumericString(thisLineStr{from+3})];
-            to = find(piContains(thisLineStr, 'point to'));
-            if to, lightSources{ii}.direction = [piParseNumericString(thisLineStr{to+1});...
-                    piParseNumericString(thisLineStr{to+2});...
-                    piParseNumericString(thisLineStr{to+3})];
-            end
-            coneAngle = find(piContains(thisLineStr, 'float coneangle'));
-            if coneAngle,lightSources{ii}.coneangle = piParseNumericString(thisLineStr{coneAngle+1});
-            end
-            coneDeltaAngle =  find(piContains(thisLineStr, 'float conedelataangle'));
-            if coneDeltaAngle, lightSources{ii}.conedeltaangle = piParseNumericString(thisLineStr{coneDeltaAngle+1});
-            end
-            spectrum  = find(piContains(thisLineStr, 'spectrum L'));
-            if spectrum
-                if isnan(str2double(thisLineStr{spectrum+1}))
-                    thisSpectrum = thisLineStr{spectrum+1};
-                else
-                    thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
-                end
-                lightSources{ii}.spectrum = thisSpectrum;
-            end
-        end
-    end
+else
+    % OK, all of the lights
+    val = lightSources;
 end
+
+
+%% Print all the light sources
 
 if p.Results.print
     disp('---------------------')
     disp('*****Light Type******')
     for ii = 1:length(lightSources)
-        fprintf('%d: %s \n', ii, lightSources{ii}.type);       
+        if isfield(lightSources{ii},'spectrum')
+            fprintf('%d: name: %s     type: %s     spectrum:  %s\n', ii,...
+                lightSources{ii}.name,lightSources{ii}.type,lightSources{ii}.spectrum);
+        else
+            fprintf('%d: name: %s     type: %s\n', ii,...
+                lightSources{ii}.name,lightSources{ii}.type);
+        end
+            
     end
-end
+    disp('*********************')
+    disp('---------------------')
 end
 
-function val = piParseNumericString(str)
-str = strrep(str,'[','');
-str = strrep(str,']','');
-val = str2double(str);
-end
-function light = lightInit
-light.type           = [];
-light.spectrum       = [];
-light.range          = [];
-light.position       = [];
-light.direction      = [];
-light.conedeltaangle = [];
-light.coneangle      = [];
-light.line           = [];
 end

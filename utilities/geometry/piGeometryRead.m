@@ -1,20 +1,23 @@
 function renderRecipe = piGeometryRead(renderRecipe)
-%% Read a C4d geometry file and extract object information into a recipe
+% Read a C4d geometry file and extract object information into a recipe
 %
 % Syntax:
 %   renderRecipe = piGeometryRead(renderRecipe)
 %
 % Input
 %   renderRecipe:  an iset3d recipe object describing the rendering
-%     parameters.  This includes the inputFile and the outputFile,
-%     which are used to find the  directories containing all of the
-%     pbrt scene data.
+%     parameters.  This object includes the inputFile and the
+%     outputFile, which are used to find the  directories containing
+%     all of the pbrt scene data.
 %
 % Return
 %    renderRecipe - Updated by the processing in this function
 %
 % Zhenyi, 2018
 % Henryk Blasinski 2020
+%
+% See also
+%   
 
 %%
 p = inputParser;

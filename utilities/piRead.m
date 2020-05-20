@@ -301,7 +301,14 @@ if(~isempty(concatTBlock))
 end
 
 thisR.lookAt = struct('from',from,'to',to,'up',up);
+%% Read the light sources and delete them in world
+thisR.lights = piLightGetFromWorld(thisR, 'print', false);
+for ii = 1:numel(thisR.lights)
+    thisR.lights{ii}.name = 'Default light';
+end
 
+% Remove the light from the world as we already stored them in thisR.lights
+thisR = piLightDeleteWorld(thisR, 'all');
 %% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
@@ -333,8 +340,13 @@ if exporterFlag
         thisR.materials.inputFile_materials = inputFile_materials;
         % Call material lib
         thisR.materials.lib = piMateriallib;
-        % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
-        piTextureFileFormat(thisR);
+        
+        %{
+            % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
+            piTextureFileFormat(thisR);
+        %}
+        [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials, 'version', 3);
+        thisR.textures.inputFile_textures = inputFile_materials;
     end
 end
 

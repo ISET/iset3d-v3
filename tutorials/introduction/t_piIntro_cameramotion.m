@@ -33,15 +33,15 @@ thisR = piRead(fname);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',64);
+thisR.set('film resolution',[200 150]);
+thisR.set('pixel samples',16);
 
 %% List material library
 
 % This value determines the number of ray bounces.  The scene has
 % glass we need to have at least 2 or more.  We start with only 1
 % bounce, so it will not appear like glass or mirror.
-thisR.set('bounces',5);
+thisR.set('bounces',2);
 
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on

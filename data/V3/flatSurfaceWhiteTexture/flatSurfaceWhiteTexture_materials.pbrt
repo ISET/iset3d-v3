@@ -1,0 +1,2 @@
+Texture "flatwhite_color" "spectrum" "imagemap" "string filename" "flatwhite.png"
+MakeNamedMaterial "Mat" "string type" "matte" "texture Kd" "flatwhite_color"

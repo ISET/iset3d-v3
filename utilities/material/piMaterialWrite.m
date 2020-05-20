@@ -12,8 +12,24 @@ p = inputParser;
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 p.parse(thisR);
 
-%% Parse the output file, working directory, stuff like that.
+%% Create txtLines for texture struct array
+% Texture txt lines creation are moved into piTextureText function.
 
+if isfield(thisR.textures,'list') && ~isempty(thisR.textures.list)
+    textureNum = numel(thisR.textures.list);
+    textureTxt = cell(1, textureNum);
+
+    for ii = 1:numel(textureTxt)
+        textureTxt{ii} = piTextureText(thisR.textures.list{ii});
+    end
+else
+    textureTxt = {};
+end
+
+%% Parse the output file, working directory, stuff like that.
+% Commented by ZLY. Does this section do any work?
+
+%{
 % Converts any jpg file names in the PBRT files into png file names
 ntxtLines=length(thisR.materials.txtLines);
 for jj = 1:ntxtLines
@@ -38,7 +54,9 @@ for jj = 1:ntxtLines
         thisR.materials.txtLines(jj) = strrep(str,'tif','png');
     end
 end
+%}
 
+<<<<<<< HEAD
 %% Empty any line that contains MakeNamedMaterial
 % The remaining lines have a texture definition.
 
@@ -115,6 +133,8 @@ for jj = 1: length(textureLines)
     textureLines{jj} = textureLines_tmp{1};
 end
 % textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy" "float uscale" [512] "float vscale" [512] ';
+=======
+>>>>>>> master
 %% Create txtLines for the material struct array
 if ~isempty(thisR.materials.list)
     field =fieldnames(thisR.materials.list);
@@ -129,11 +149,15 @@ else
 end
 
 %% Write to scene_material.pbrt texture-material file
-
+output = thisR.materials.outputFile_materials;
 fileID = fopen(output,'w');
 fprintf(fileID,'# Exported by piMaterialWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
-for row=1:length(textureLines)
-    fprintf(fileID,'%s\n',textureLines{row});
+
+if ~isempty(textureTxt)
+    % Add textures
+    for row=1:length(textureTxt)
+        fprintf(fileID,'%s\n',textureTxt{row});
+    end
 end
 
 % Add the materials
@@ -159,12 +183,10 @@ if ~isempty(nPaintLines)
     %     nmaterialTxt = length(materialTxt)-length(nPaintLines);
     for row=1:length(materialTxt)
         fprintf(fileID,'%s\n',materialTxt{row});
-        
     end
 else
     for row=1:length(materialTxt)
         fprintf(fileID,'%s\n',materialTxt{row});
-        
     end
 end
 
@@ -281,17 +303,28 @@ if isfield(materials,'floateta') && ~isempty(materials.floateta)
 end
 
 if ~isempty(materials.spectrumkd)
+<<<<<<< HEAD
     if ischar(materials.spectrumkd)
         val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
     else
         dataStr = sprintf('%f ',materials.spectrumkd);
         val_spectrumkd = sprintf(' "spectrum Kd" [%s] ',dataStr);
+=======
+    if(ischar(materials.spectrumkd))
+        val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
+    else
+        val_spectrumkd = sprintf(' "spectrum Kd" [ %s ] ',num2str(materials.spectrumkd)); 
+>>>>>>> master
     end
     val = strcat(val, val_spectrumkd);
 end
 
 if ~isempty(materials.spectrumks)
-    val_spectrumks = sprintf(' "spectrum Ks" "%s" ',materials.spectrumks);
+    if(ischar(materials.spectrumks))
+        val_spectrumks = sprintf(' "spectrum Ks" "%s" ',materials.spectrumks);
+    else
+        val_spectrumks = sprintf(' "spectrum Ks" [ %s ] ',num2str(materials.spectrumks)); 
+    end
     val = strcat(val, val_spectrumks);
 end
 
@@ -364,6 +397,22 @@ if isfield(materials, 'amount')
         val = strcat(val, val_boolremaproughness);
     end
 end
+if isfield(materials, 'photolumifluorescence')
+    if ~isempty(materials.photolumifluorescence)
+        val_photolumifluorescence = [sprintf(' "photolumi fluorescence" '),...
+                                    '[ ', sprintf('%.5f ', materials.photolumifluorescence),' ]'];
+        val = strcat(val, val_photolumifluorescence);
+    end
+end
+if isfield(materials, 'floatconcentration')
+    if ~isempty(materials.floatconcentration)
+        val_floatconcentration = sprintf(' "float concentration" [ %0.5f ] ',...
+                                    materials.floatconcentration);
+        val = strcat(val, val_floatconcentration);
+    end
+end
+
+
 end
 
 

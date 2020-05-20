@@ -34,8 +34,15 @@ p.addParameter('rgbkr',[]);
 p.addParameter('rgbkt',[]);
 p.addParameter('colorkd',[]);
 p.addParameter('colorks',[]);
+p.addParameter('colorreflect',[]);
+p.addParameter('colortransmit',[]);
 
-
+p.addParameter('spectrumkd',[]);
+p.addParameter('spectrumks',[]);
+p.addParameter('spectrumkr',[]);
+p.addParameter('spectrumkt',[]);
+p.addParameter('spectrumeta',[]);
+p.addParameter('spectrumk',[]); % Not sure what is this
 
 p.parse(thisR, material,target,varargin{:});
 

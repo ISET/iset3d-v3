@@ -69,7 +69,13 @@ p.addParameter('lightsFlag',false,@islogical);
 
 % Read trafficflow variable
 p.addParameter('thistrafficflow',[]);
+
+% Second rendering for reflectance calculation
+p.addParameter('reflectancerender',false,@islogical);
+
 p.parse(renderRecipe,varargin{:});
+
+
 
 % workingDir          = p.Results.workingdir;
 overwriteresources  = p.Results.overwriteresources;
@@ -407,6 +413,17 @@ end
 
 %% Write out WorldBegin/WorldEnd
 
+% Temporarily add light to world so it's easier for us to compose the PBRT
+% file
+for ii = 1:numel(renderRecipe.lights)
+    renderRecipe = piLightAddToWorld(renderRecipe, 'light source', renderRecipe.lights{ii});
+end
+
+%{
+    % Check if we write all the lights there
+    lightSources = piLightGetFromWorld(renderRecipe);
+%}
+
 if creatematerials
     % We may have created new materials.
     % We write the material and geometry files based on the recipe,
@@ -445,6 +462,12 @@ else
         fprintf(fileID,'%s \n',currLine);
     end
 end
+
+renderRecipe = piLightDeleteWorld(renderRecipe, 'all');
+%{
+    % Check if we removed all lights
+    piLightGetFromWorld(renderRecipe)
+%}
 %% Close file
 
 fclose(fileID);
@@ -485,4 +508,5 @@ end
 [~,scene_fname,~] = fileparts(renderRecipe.outputFile);
 jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
 jsonwrite(jsonFile,renderRecipe);
+
 end

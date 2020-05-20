@@ -1,0 +1,12 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [1.0 0.0 0.0 0  0.0 -8.26946079743e-16 -1.0 0  0.0 1.0 -8.26946079743e-16 0  -2.994 0.145 664.647323249 1]
+Camera "perspective" "float fov" [88.5182618285] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["flatSurfaceWhiteTexture.exr"] "integer xresolution" [1280] "integer yresolution" [720]
+Integrator "path" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	Include "flatSurfaceWhiteTexture_materials.pbrt"
+	Include "flatSurfaceWhiteTexture_geometry.pbrt"
+WorldEnd

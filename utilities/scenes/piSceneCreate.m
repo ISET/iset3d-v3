@@ -28,11 +28,13 @@ p.KeepUnmatched = true;
 p.addRequired('photons',@isnumeric);
 p.addParameter('fov',40,@isscalar)               % Horizontal fov, degrees
 p.addParameter('meanluminance',100,@isscalar);
+p.addParameter('wavelength', 400:10:700, @isvector);
 
 if length(varargin) > 1
     for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
-                | isobject(varargin{i}))
+        if ~(isnumeric(varargin{i}) || ...
+                islogical(varargin{i}) || ...
+                isobject(varargin{i}))
             varargin{i} = ieParamFormat(varargin{i});
         end
     end
@@ -51,15 +53,15 @@ end
 
 %% Set the photons into the scene
 
-scene = sceneCreate;
+patchSize = 8;
+scene = sceneCreate('macbeth', patchSize, p.Results.wavelength);
+scene = sceneSet(scene, 'wavelength', p.Results.wavelength);
 scene = sceneSet(scene,'photons',photons);
 [r,c] = size(photons(:,:,1)); depthMap = ones(r,c);
 
 scene = sceneSet(scene,'depth map',depthMap);
 scene = sceneSet(scene,'fov',p.Results.fov);
-if p.Results.meanluminance > 0
-    scene = sceneAdjustLuminance(scene,p.Results.meanluminance); % ISETBIO uses this...
-end
+% scene = sceneAdjustLuminance(scene,p.Results.meanluminance); % ISETBIO uses this...
 
 % Adjust other parameters
 if ~isempty(varargin)
