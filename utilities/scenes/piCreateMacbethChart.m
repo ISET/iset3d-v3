@@ -1,5 +1,8 @@
 function [macbethRecipe] = piCreateMacbethChart(varargin)
-
+% Would be best to integrate other existing MCC routines
+%
+% TODO: Create some examples to show how to call this function.
+%
 % [macbethRecipe] = piCreateMacbethChart(varargin)
 %
 % Create an iset3d scene with a 6x4 Macbeth chart target.
@@ -20,6 +23,13 @@ function [macbethRecipe] = piCreateMacbethChart(varargin)
 % Henryk Blasinski, 2020
 %
 
+% Examples:
+%{
+thisR = piCreateMacbethChart;
+piWrite(thisR, 'creatematerial', true);
+[scene, ~] = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+%}
 p = inputParser;
 p.addOptional('width',1);
 p.addOptional('height',1);
@@ -100,7 +110,7 @@ macbethRecipe.assets.size.pmin = [-dx; -dy; -dz];
 macbethRecipe.assets.size.pmax = [dx; dy; dz];
 
 wave = 400:10:700;
-macbethSpectra = ieReadSpectra(fullfile(isetRootPath,'data','surfaces','macbethChart'),wave);
+macbethSpectra = ieReadSpectra(which('macbethChart.mat'),wave);
 
 for x=1:6
     for y=1:4
@@ -150,8 +160,8 @@ macbethRecipe.set('outputfile',fullfile(piRootPath,'local','MacbethChart',sprint
 
 world{1} = 'WorldBegin';
 world{2} = 'LightSource "distant" "point from" [1 1 1] "point to" [0 0 0]';
-world{3} = sprintf('Include "%s_materials.pbrt',outputName);
-world{4} = sprintf('Include "%s_geometry.pbrt',outputName);
+world{3} = sprintf('Include "%s_materials.pbrt"',outputName);
+world{4} = sprintf('Include "%s_geometry.pbrt"',outputName);
 world{5} = 'WorldEnd';
 
 macbethRecipe.world = world;

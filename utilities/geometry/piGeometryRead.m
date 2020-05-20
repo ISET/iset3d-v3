@@ -10,7 +10,7 @@ function renderRecipe = piGeometryRead(renderRecipe)
 %     which are used to find the  directories containing all of the
 %     pbrt scene data.
 %
-%Return
+% Return
 %    renderRecipe - Updated by the processing in this function
 %
 % Zhenyi, 2018
@@ -59,7 +59,7 @@ if ~convertedflag
     % It was not converted, so we go to work.
     % Check if a nested structure is exists
     
-    renderRecipe.assets = parseText(txtLines,'');
+    renderRecipe.assets = parseGeometryText(txtLines,'');
 
     % jsonwrite(AssetInfo,renderRecipe);
     % fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
@@ -85,8 +85,8 @@ end
 end
 
 
-function [res, children, parsedUntil] = parseText(txt, name)
-
+function [res, children, parsedUntil] = parseGeometryText(txt, name)
+% The geometry text comes from C4D export.
 % Parse the lines of text in 'txt' cell array and recrursively create a
 % tree structure of geometric objects.
 
@@ -99,7 +99,7 @@ while i <= length(txt)
     
     currentLine = txt{i};
 
-    % Return if we've reached the current attribute
+    % Return if we've reached the end of current attribute
     if strcmp(currentLine,'AttributeEnd')
         
         % Assemble all the read attributes into either a groub object, or a
@@ -147,18 +147,20 @@ while i <= length(txt)
         return;
         
     elseif strcmp(currentLine,'AttributeBegin')
-        [subnodes, subchildren, retLine] = parseText(txt(i+1:end), name);
+        % This is an Attribute inside an Attribute
+        [subnodes, subchildren, retLine] = parseGeometryText(txt(i+1:end), name);
         groupobjs = cat(1, groupobjs, subnodes);
         children = cat(1, children, subchildren);
         i =  i + retLine;
         
-    elseif contains(currentLine,'#ObjectName')
+    elseif piContains(currentLine,'#ObjectName')
         [name, sz] = parseObjectName(currentLine);
         
-    elseif contains(currentLine,'ConcatTransform')
+    elseif piContains(currentLine,'ConcatTransform')
         [rot, position] = parseConcatTransform(currentLine);
         
     elseif piContains(currentLine,'MediumInterface')
+        % MediumInterface could be water or other scattering media.
         medium = currentLine;
         
     elseif piContains(currentLine,'NamedMaterial')
@@ -172,7 +174,8 @@ while i <= length(txt)
         
     elseif piContains(currentLine,'Shape')
         shape = currentLine;
-        
+    else
+        warning('Current line skipped: %s', currentLine);
     end
 
     i = i+1;
