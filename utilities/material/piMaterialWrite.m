@@ -56,85 +56,6 @@ for jj = 1:ntxtLines
 end
 %}
 
-<<<<<<< HEAD
-%% Empty any line that contains MakeNamedMaterial
-% The remaining lines have a texture definition.
-
-output = thisR.materials.outputFile_materials;
-[workDir, materials_fname, ~]=fileparts(output);
-txtLines = thisR.materials.txtLines;
-for ii = 1:size(txtLines)
-    if ~isempty(txtLines(ii))
-        if piContains(txtLines(ii),'MakeNamedMaterial')
-            txtLines{ii}=[];
-        end
-    end
-end
-
-% Squeeze out the empty lines. Some day we might get the parsed
-% textures here.
-textureLines = txtLines(~cellfun('isempty',txtLines));
-
-for jj = 1: length(textureLines)
-    textureLines_tmp = [];
-    %     thisLine_tmp = textscan(textureLines{jj},'%q');
-    thisLine_tmp= strsplit(textureLines{jj},' ');
-    if ~strcmp(thisLine_tmp{length(thisLine_tmp)}(1),'"')
-        for nn= length(thisLine_tmp):-1:1
-            if strcmp(thisLine_tmp{nn}(1),'"')
-                for kk = nn:length(thisLine_tmp)-1
-                    % combine all the string from nn to end;
-                    thisLine_tmp{nn} = [thisLine_tmp{nn},' ',thisLine_tmp{kk+1}];
-                end
-                thisLine_tmp((nn+1):length(thisLine_tmp))=[];
-                break;
-            end
-        end
-    end
-    %     thisLine_tmp = thisLine_tmp{1};
-    for ii = 1:length(thisLine_tmp)
-        if piContains(thisLine_tmp{ii},'filename')
-            index = ii;
-        end
-    end
-    for ii = 1:length(thisLine_tmp)
-        if piContains(thisLine_tmp{ii},'.png')
-            if piContains(thisLine_tmp{ii-1},'filename')
-                filename = thisLine_tmp{ii};
-                if ~piContains(filename,'"textures/')
-                    if ispc
-                        thisLine_tmp{ii} = strrep(fullfile('"textures',filename(2:length(filename))),'\','/');
-                    else
-                        thisLine_tmp{ii} = fullfile('"textures',filename(2:length(filename)));
-                    end
-                end
-            else
-                thisLine_tmp{index+1} = thisLine_tmp{ii};
-                thisLine_tmp(index+2:ii)   = '';
-                filename = thisLine_tmp{index+1};
-                if ~piContains(filename,'"textures/')
-                    if ispc
-                        thisLine_tmp{index+1} = strrep(fullfile('"textures',filename(2:length(filename))),'\','/');
-                    else
-                        thisLine_tmp{index+1} = fullfile('"textures',filename(2:length(filename)));
-                    end
-                end
-            end
-        end
-    end
-    for ii = 1:length(thisLine_tmp)
-        if ii == 1
-            textureLines_tmp = strcat(textureLines_tmp,thisLine_tmp{ii});
-        else
-            %             string = sprintf('%s"',thisLine_tmp{ii});
-            textureLines_tmp = strcat(textureLines_tmp,{' '},thisLine_tmp{ii});
-        end
-    end
-    textureLines{jj} = textureLines_tmp{1};
-end
-% textureLines{length(textureLines)+1} = 'Texture "windy_bump" "float" "windy" "float uscale" [512] "float vscale" [512] ';
-=======
->>>>>>> master
 %% Create txtLines for the material struct array
 if ~isempty(thisR.materials.list)
     field =fieldnames(thisR.materials.list);
@@ -303,18 +224,10 @@ if isfield(materials,'floateta') && ~isempty(materials.floateta)
 end
 
 if ~isempty(materials.spectrumkd)
-<<<<<<< HEAD
-    if ischar(materials.spectrumkd)
-        val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
-    else
-        dataStr = sprintf('%f ',materials.spectrumkd);
-        val_spectrumkd = sprintf(' "spectrum Kd" [%s] ',dataStr);
-=======
     if(ischar(materials.spectrumkd))
         val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
     else
         val_spectrumkd = sprintf(' "spectrum Kd" [ %s ] ',num2str(materials.spectrumkd)); 
->>>>>>> master
     end
     val = strcat(val, val_spectrumkd);
 end

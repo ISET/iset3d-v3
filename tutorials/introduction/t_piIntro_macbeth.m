@@ -80,7 +80,9 @@ piWrite(thisR, 'overwritematerials', true);
 % This case uses the default docker image, that does not incorporate
 % fluorescence rendering.  'all' means the illuminant, depth, and
 % radiance.
-[scene, result] = piRender(thisR, 'render type','all');
+thisDocker = 'vistalab/pbrt-v3-spectral';
+wave = 400:10:700;
+[scene, result] = piRender(thisR, 'wave', wave, 'dockerimage name', thisDocker, 'render type','radiance');
 sceneWindow(scene);
 
 %%
