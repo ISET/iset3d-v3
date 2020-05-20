@@ -104,6 +104,10 @@ for ii = 1:length(lightIdx)
                 
             end
             
+            % Remove blank to avoid error
+            txt = strrep(txt,'[ ','[');
+            txt = strrep(txt,' ]',']');
+
             %  Get the string on the LightSource line
             thisLineStr = textscan(txt, '%q');
             thisLineStr = thisLineStr{1};

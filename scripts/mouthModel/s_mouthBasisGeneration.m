@@ -23,6 +23,7 @@ nSamples = size(mouthRefl, 2);
 %% Save basis functions, wgts, and wgts2lrgb matrix
 comment = 'Mouth reflection basis functions';
 commentStruct = struct('comment', comment, 'mWgts2lrgb', mWgts2lrgb);
-
+illuminant.wave = wave;
+illuminant.data = [];
 fname = fullfile(piRootPath,'data','basisFunctions','mouthReflectance');
-ieSaveMultiSpectralImage(fname, wgts, mouthBasis, commentStruct, [], wave, 0);
+ieSaveMultiSpectralImage(fname, wgts, mouthBasis, commentStruct, [], illuminant, 0);
