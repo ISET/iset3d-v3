@@ -103,12 +103,15 @@ else, spectrumScale = 1; end
 if isfield(lightSource, 'mapname'), mapname = lightSource.mapname;
 else, mapname = ''; end
 
+% This is a marker for the position where we define the light source
 if isfield(lightSource, 'pos'), pos = lightSource.pos;
 else, pos = 1; end
 
+% This is the text defining the whole attribute section of light
 if isfield(lightSource, 'line'), line = lightSource.line;
 else, line = {}; end
 
+% This is the parameter especially used by infinite light
 if isfield(lightSource, 'integer'), int = lightSource.integer;
 else, int = 1; end 
 
