@@ -101,7 +101,7 @@ i = 1;
 while i <= length(txt)
     
     currentLine = txt{i};
-
+    
     % Return if we've reached the end of current attribute
     if strcmp(currentLine,'AttributeEnd')
         
@@ -172,8 +172,14 @@ while i <= length(txt)
     elseif piContains(currentLine,'AreaLightSource')
         areaLight = currentLine;
         
-    elseif piContains(currentLine,'LightSource')
-        lght = currentLine;
+    elseif piContains(currentLine,'LightSource') ||...
+            piContains(currentLine, 'Rotate') ||...
+            piContains(currentLine, 'Scale')
+        if ~exist('lght','var')
+            lght{1} = currentLine;
+        else
+            lght{end+1} = currentLine;
+        end
         
     elseif piContains(currentLine,'Shape')
         shape = currentLine;

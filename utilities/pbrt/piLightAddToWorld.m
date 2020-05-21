@@ -100,6 +100,18 @@ else, coneDeltaAngle = 5; end
 if isfield(lightSource, 'spectrumscale'), spectrumScale = lightSource.spectrumscale;
 else, spectrumScale = 1; end
 
+if isfield(lightSource, 'mapname'), mapname = lightSource.mapname;
+else, mapname = ''; end
+
+if isfield(lightSource, 'pos'), pos = lightSource.pos;
+else, pos = 1; end
+
+if isfield(lightSource, 'line'), line = lightSource.line;
+else, line = {}; end
+
+if isfield(lightSource, 'integer'), int = lightSource.integer;
+else, int = 1; end 
+
 %% Write out lightspectrum into a light.spd file
 
 if ischar(lightSpectrum)
@@ -208,10 +220,16 @@ switch type
         lightSources{1}.direction = to;
     case 'infinite'
         lightSources{1}.type = 'infinite';
-        lightSources{1}.line{1,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd"',lightSpectrum);
-
-        % Set spectrum information
-        lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+        
+        lightSources{1}.line = line;
+        if isempty(mapname)
+            % Set spectrum information
+            lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+            lightSources{1}.line{pos,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd" "integer nsamples" [%d]',lightSpectrum, int);
+        else
+            lightSources{1}.mapname = mapname;
+            lightSources{1}.line{pos,:} = sprintf('LightSource "infinite" "string mapname" "%s" "integer nsamples" [%d]', mapname, int);
+        end
     case 'area'
         % find area light geometry info
 
@@ -284,11 +302,8 @@ index_g = piContains(thisR.world,'_geometry.pbrt');
 world = thisR.world(1:end-3);
 for jj = 1: length(lightSources)
     numWorld = length(world);
-    % infinity light can be added by piSkymap add.
-    if ~piContains(lightSources{jj}.type, 'infinity')
-        for kk = 1: length(lightSources{jj}.line)
-            world{numWorld+kk,:} = lightSources{jj}.line{kk};
-        end
+    for kk = 1: length(lightSources{jj}.line)
+        world{numWorld+kk,:} = lightSources{jj}.line{kk};
     end
 end
 

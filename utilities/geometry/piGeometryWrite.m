@@ -248,7 +248,13 @@ for i=1:length(objects.children)
         if ~isempty(objects.children(i).areaLight)
             fprintf(fid, '%s\n', objects.children(i).areaLight);
         end
-
+        if ~isempty(objects.children(i).light)
+            if ~isempty(objects.children(i).light)
+                for ii = 1:numel(objects.children(i).light)
+                    fprintf(fid, '%s\n', objects.children(i).light{ii});
+                end
+            end 
+        end        
         if ~isempty(objects.children(i).output)
             [~,output] = fileparts(objects.children(i).output);
             fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
@@ -308,7 +314,7 @@ for n=1:length(objects)
     
     for j=1:length(currentObject.children)
        if isempty(currentObject.children(j).areaLight)
-            fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name); 
+            fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name);  
        else
            if ~isempty(objects.children(j).mediumInterface)
             fprintf(fid, '%s\n', objects.children(j).mediumInterface);
@@ -316,6 +322,7 @@ for n=1:length(objects)
             if ~isempty(objects.children(j).material)
                 fprintf(fid, '%s\n', objects.children(j).material);
             end
+
             if ~isempty(objects.children(j).areaLight)
                 fprintf(fid, '%s\n', objects.children(j).areaLight);
             end

@@ -3,7 +3,7 @@ AttributeBegin
 	AttributeBegin
 		#ObjectName Null:Vector(0, 0, 0)
 		AttributeBegin
-			#ObjectName Sky:Vector(0, 0, 0)
+			#ObjectName Sky1:Vector(0, 0, 0)
 			Rotate 90 -1 0 0
 			Scale 1 -1 1
 			LightSource "infinite" "string mapname" ["environment_Reflection.exr"] "color L" [1 1 1] "integer nsamples" [128]

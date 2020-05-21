@@ -50,6 +50,7 @@ for ii = 1:length(lightIdx)
     if length(AttBegin) >= ii
         lightSources{ii}.line  = thisR.world(AttBegin(ii):AttEnd(ii));
         lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
+        lightSources{ii}.pos   = lightIdx - AttBegin(ii) + 1;
     else
         light(arealight) = 0;
         lightSources{ii}.line  = thisR.world(lightIdx(ii));
@@ -80,49 +81,42 @@ for ii = 1:length(lightIdx)
             lightSources{ii}.spectrum = thisSpectrum;
         end
     else
+        % Assign type
         lightType = lightSources{ii}.line{piContains(lightSources{ii}.line,'LightSource')};
         lightType = strsplit(lightType, ' ');
         lightSources{ii}.type = lightType{2}(2:end-1); % Remove the quote mark
-        if ~piContains(lightSources{ii}.type, 'infinite')
-            try
-                % Zheng Lyu to have a look here
-                % If this works, then we are C4D compatible
-                txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from')};
-                compatability = 'C4D';
-                lightSources{ii}.cameracoordinate = false;
-            catch
-                % Exception happens when we use coordinate camera to place
-                % the light at the from of the camera
-                if any(piContains(lightSources{ii}.line, 'CoordSysTransform "camera"'))
-                    lightSources{ii}.cameracoordinate = true;
-                    txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'LightSource')};
-                    compatability = 'ISET3d';
-                else
-                    % We are not C4D compatible.  So we do this
-                    error('Cannot interpret this file.  Check for C4D and ISET3d compatibility.');
-                end
-                
+        
+        try
+            % Zheng Lyu to have a look here
+            % If this works, then we are C4D compatible
+            txt = lightSources{ii}.line{find(piContains(lightSources{ii}.line, 'point from') + ...
+                                        piContains(lightSources{ii}.line, 'infinite'))};
+            compatability = 'C4D';
+            lightSources{ii}.cameracoordinate = false;
+        catch
+            % Exception happens when we use coordinate camera to place
+            % the light at the from of the camera
+            if any(piContains(lightSources{ii}.line, 'CoordSysTransform "camera"'))
+                lightSources{ii}.cameracoordinate = true;
+                txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'LightSource')};
+                compatability = 'ISET3d';
+            else
+                % We are not C4D compatible.  So we do this
+                error('Cannot interpret this file.  Check for C4D and ISET3d compatibility.');
             end
+
+        end        
+        
+        %  Get the string on the LightSource line
+        thisLineStr = textscan(txt, '%q');
+        thisLineStr = thisLineStr{1};
+        
+        if ~piContains(lightSources{ii}.type, 'infinite')
             
             % Remove blank to avoid error
             txt = strrep(txt,'[ ','[');
             txt = strrep(txt,' ]',']');
-
-            %  Get the string on the LightSource line
-            thisLineStr = textscan(txt, '%q');
-            thisLineStr = thisLineStr{1};
-            
-            % Adjust the spectrum
-            spectrum  = find(piContains(thisLineStr, 'spectrum L') + piContains(thisLineStr, 'spectrum I'));
-            if spectrum
-                if isnan(str2double(thisLineStr{spectrum+1}))
-                    thisSpectrum = thisLineStr{spectrum+1};
-                else
-                    thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
-                end
-                lightSources{ii}.spectrum = thisSpectrum;
-            end
-            
+                        
             switch compatability
                 case 'C4D'
                     % Find the from and to froms.  If C4D compatible, then
@@ -144,6 +138,18 @@ for ii = 1:length(lightIdx)
                     
             end
             
+            % Adjust spectrum
+            spectrum  = find(piContains(thisLineStr, 'spectrum L') + piContains(thisLineStr, 'spectrum I'));
+
+            if spectrum
+                if isnan(str2double(thisLineStr{spectrum+1}))
+                    thisSpectrum = thisLineStr{spectrum+1};
+                else
+                    thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
+                end
+                lightSources{ii}.spectrum = thisSpectrum;
+            end
+            
             % Set the cone angle 
             coneAngle = find(piContains(thisLineStr, 'float coneangle'));
             if coneAngle,lightSources{ii}.coneangle = piParseNumericString(thisLineStr{coneAngle+1});
@@ -151,7 +157,14 @@ for ii = 1:length(lightIdx)
             coneDeltaAngle =  find(piContains(thisLineStr, 'float conedelataangle'));
             if coneDeltaAngle, lightSources{ii}.conedeltaangle = piParseNumericString(thisLineStr{coneDeltaAngle+1});
             end
+        else
+            mapname = find(piContains(thisLineStr, 'string mapname'));
+            if mapname, lightSources{ii}.mapname = thisLineStr{mapname+1};
+            end
             
+            int = find(piContains(thisLineStr, 'integer nsamples'));
+            if int, lightSources{ii}.integer = piParseNumericString(thisLineStr{int+1});
+            end
         end
     end
 end
