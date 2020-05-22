@@ -1,8 +1,9 @@
 %% The first in a series of scripts introducing iset3d calculations
+% Underdevelopment for the area light
 %
 % Brief description:
 %
-%  This introduction renders the sphere scene in the data directory of the
+%  This introduction renders the teapot scene in the data directory of the
 %  ISET3d repository. This introduction sets up a very simple recipe, runs
 %  the docker command, and loads the result into an ISET scene structure.
 % 
@@ -26,10 +27,14 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
 
-thisR = piRecipeDefault('scene name','sphere');
+% The teapot is our test file
+% inFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
+thisR = piRecipeDefault('scene name','teapot');
 
-%% Add a point light
-thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
+%% The output will be written here
+sceneName = 'teapot';
+outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
+thisR.set('outputFile',outFile);
 
 %% Set up the render quality
 
@@ -44,7 +49,9 @@ piWrite(thisR);
 %% This is a pinhole case. So we are rendering a scene.
 
 [scene, result] = piRender(thisR);
+
 sceneWindow(scene);
+scene = sceneSet(scene,'gamma',0.7);
 
 %% Notice that we also computed the depth map
 scenePlot(scene,'depth map');

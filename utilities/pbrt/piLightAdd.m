@@ -27,7 +27,7 @@ function thisR = piLightAdd(thisR, varargin)
 %                          potentially casts illumination from all
 %                          directions. Takes no parameters.
 %
-%       'light spectrum' - The spectrum that the light will emit. Read
+%       'spectrum' - The spectrum that the light will emit. Read
 %                          from ISETCam/ISETBio light data. See
 %                          "isetbio/isettools/data/lights" or
 %                          "isetcam/data/lights."
@@ -42,7 +42,7 @@ function thisR = piLightAdd(thisR, varargin)
 %
 %       https://www.pbrt.org/fileformat-v3.html#lights
 %
-%       Not al the lights and parameters can be represented in ISET3d at
+%       Not all the lights and parameters can be represented in ISET3d at
 %       the moment, but our hope is that they will be in the future.
 %
 % Outputs:
@@ -57,7 +57,6 @@ function thisR = piLightAdd(thisR, varargin)
 
 % Examples:
 %{
-  % Need to get a recipe in here!
   ieInit;
   thisR = piRecipeDefault;
   lightSources = piLightGet(thisR);

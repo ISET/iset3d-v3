@@ -76,14 +76,18 @@ p.parse(thisR, varargin{:});
 lightSource = p.Results.lightsource;
 
 %% Check all applicable parameters
-if isfield(lightSource, 'name'), name = lightSource.name;
-else, name = 'Default light'; end
 
 if isfield(lightSource, 'type'), type = lightSource.type;
 else, type = 'point'; end
 
-if isfield(lightSource, 'lightspectrum'), lightSpectrum = lightSource.lightspectrum;
-else, lightSpectrum = 'D65'; end
+if isfield(lightSource, 'lightspectrum')
+    if isnumeric(lightSource.lightspectrum)
+        lightSpectrum = ['[ ' num2str(lightSource.lightspectrum), ']'];
+    else
+        lightSpectrum = sprintf('"spds/lights/%s.spd"', lightSource.lightspectrum);
+    end
+else
+end
 
 if isfield(lightSource, 'from'), from = lightSource.from;
 else, from = [0 0 0]; end
@@ -112,44 +116,59 @@ if isfield(lightSource, 'line'), line = lightSource.line;
 else, line = {}; end
 
 % This is the parameter especially used by infinite light
-if isfield(lightSource, 'integer'), int = lightSource.integer;
-else, int = 1; end 
+if isfield(lightSource, 'nsamples'), nsamples = lightSource.nsamples;
+else, nsamples = 16; end 
 
-%% Write out lightspectrum into a light.spd file
-
-if ischar(lightSpectrum)
-    try
-        % ZLY: Wave is hardcoded in PBRT. In the future we might want to change
-        % it so that we can use customized wave.
-        wavelength = 365:5:705;
-        data = ieReadSpectra(lightSpectrum, wavelength, 0);
-    catch
-        error('%s light is not recognized \n', lightSpectrum);
-    end
-    outputDir = fileparts(thisR.outputFile);
-    lightSpdDir = fullfile(outputDir, 'spds', 'lights');
-    thisLightfile = fullfile(lightSpdDir,...
-        sprintf('%s.spd', lightSpectrum));
-    if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
-    fid = fopen(thisLightfile, 'w');
-    for ii = 1: length(data)
-        fprintf(fid, '%d %d \n', wavelength(ii), data(ii)*spectrumScale);
-    end
-    fclose(fid);
-    % Zheng Lyu added 10-2019
-    if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
-        copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
+if isfield(lightSource, 'twosided')
+    if lightSource.twosided == 1
+        twosided = 'true';
+    else
+        twosided = 'false';
     end
 else
-    % to do
-    % add customized lightspectrum array [400 1 600 1 800 1]
+    twosided = 'false';
 end
 
-%% Read light source struct from world struct
-% currentlightSources = piLightGet(thisR, 'print', false);
+%% Write out lightspectrum
+if exist('lightSpectrum', 'var')
+    if ischar(lightSource.lightspectrum)
+        try
+            wavelength = 365:5:705;
+            data = ieReadSpectra(lightSource.lightspectrum, wavelength, 0);
+        catch
+            error('%s light is not recognized \n', lightSource.lightspectrum);
+        end
+        outputDir = fileparts(thisR.outputFile);
+        lightSpdDir = fullfile(outputDir, 'spds', 'lights');
+        thisLightfile = fullfile(lightSpdDir,...
+            sprintf('%s.spd', lightSource.lightspectrum));
+        if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
+        fid = fopen(thisLightfile, 'w');
+        for ii = 1: length(data)
+            fprintf(fid, '%d %d \n', wavelength(ii), data(ii)*spectrumScale);
+        end
+        fclose(fid);
+    else
+        % Do nothing
+    end
+    
+    %% Determine the spectrum type
+    if isnumeric(lightSpectrum)
+        % It's in RGB or number defined spectrum
+        if numel(lightSource.lightspectrum) == 3
+            spectrumType = "rgb";
+        elseif numel(lightSource.lightspectrum) == 2
+            spectrumType = "blackbody";
+        else
+            spectrumType = "spectrum";
+        end
+    else
+        % Else it is a path to spd file
+        spectrumType = "spectrum";
+    end
+end
 
 %% Construct a lightsource structure
-% numLights = length(currentlightSources);
 
 % Different types of lights that we know how to add.
 switch type
@@ -158,32 +177,32 @@ switch type
         if lightSource.cameracoordinate
             lightSources{1}.line{1} = 'AttributeBegin';
             lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd"', lightSpectrum);
+            lightSources{1}.line{3,:} = sprintf('LightSource "point" "%s I" %s', spectrumType, lightSpectrum);
             lightSources{1}.line{end+1} = 'AttributeEnd';
         else
-            lightSources{1}.line{1,:} = sprintf('LightSource "point" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d]',...
-                lightSpectrum, from);
+            lightSources{1}.line{1,:} = sprintf('LightSource "point" "%s I" %s "point from" [%.4f %.4f %.4f]',...
+                spectrumType, lightSpectrum, from(1), from(2), from(3));
         end
 
 
     case 'spot'
         lightSources{1}.type = 'spot';
-        thisConeAngle = sprintf('"float coneangle" [%d]', coneAngle);
-        thisConeDelta = sprintf('"float conedeltaangle" [%d]', coneDeltaAngle);
+        thisConeAngle = sprintf('"float coneangle" [%.4f]', coneAngle);
+        thisConeDelta = sprintf('"float conedeltaangle" [%.4f]', coneDeltaAngle);
 
         if lightSource.cameracoordinate
             lightSources{1}.line{1} = 'AttributeBegin';
             lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
-                lightSpectrum, from, to, thisConeAngle, thisConeDelta);
+            lightSources{1}.line{3,:} = sprintf('LightSource "spot" "%s I" %s %s %s',...
+                spectrumType, lightSpectrum, thisConeAngle, thisConeDelta);
             lightSources{1}.line{end+1} = 'AttributeEnd';
         else
-            lightSources{1}.line{1,:} = sprintf('LightSource "spot" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d] %s %s',...
-                lightSpectrum, from, to, thisConeAngle, thisConeDelta);
+            lightSources{1}.line{1,:} = sprintf('LightSource "spot" "%s I" %s "point from" [%.4f %.4f %.4f] "point to" [%.4f %.4f %.4f] %s %s',...
+                spectrumType, lightSpectrum, from(1), from(2), from(3), to(1), to(2), to(3), thisConeAngle, thisConeDelta);
         end
 
         % Set spectrum information
-        lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+        lightSources{1}.lightspectrum = lightSpectrum;
 
         %Set light position and direction
         lightSources{1}.position = from;
@@ -197,8 +216,8 @@ switch type
 
     case 'laser' % not supported for public
         lightSources{1}.type = 'laser';
-        lightSources{1}.line{1,:} = sprintf('LightSource "laser" "spectrum I" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-            lightSpectrum, from, to);
+        lightSources{1}.line{1,:} = sprintf('LightSource "laser" "%s I" %s "point from" [%.4f %.4f %.4f] "point to" [%.4f %.4f %.4f]',...
+            spectrumType, lightSpectrum, from(1), from(2), from(3), to(1), to(2), to(3));
         thisConeAngle = sprintf('float coneangle [%d]', coneAngle);
         thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
         lightSources{1}.line{1,:} = [lightSources{end+1}.line{2}, thisConeAngle, thisConeDelta];
@@ -206,17 +225,17 @@ switch type
         lightSources{1}.type = 'distant';
         if lightSource.cameracoordinate
             lightSources{1}.line{1} = 'AttributeBegin';
-            lightSources{1}.line{2,:} = 'CoordSysTransform "camera"';
-            lightSources{1}.line{3,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
+            lightSources{1}.line{2} = 'CoordSysTransform "camera"';
+            
+            lightSources{1}.line{3} = sprintf('LightSource "distant" "%s L" %s', spectrumType, lightSpectrum);
             lightSources{1}.line{end+1} = 'AttributeEnd';            
         else
-            lightSources{1}.line{1,:} = sprintf('LightSource "distant" "spectrum L" "spds/lights/%s.spd" "point from" [%d %d %d] "point to" [%d %d %d]',...
-                lightSpectrum, from, to);
+            lightSources{1}.line{1,:} = sprintf('LightSource "distant" "%s L" %s "point from" [%.4f %.4f %.4f] "point to" [%.4f %.4f %.4f]',...
+                spectrumType, lightSpectrum, from, to);
         end
 
         % Set spectrum information
-        lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
+        lightSources{1}.lightspectrum = lightSpectrum;
 
         %Set light position and direction
         lightSources{1}.position = from;
@@ -227,13 +246,20 @@ switch type
         lightSources{1}.line = line;
         if isempty(mapname)
             % Set spectrum information
-            lightSources{1}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
-            lightSources{1}.line{pos,:} = sprintf('LightSource "infinite" "spectrum L" "spds/lights/%s.spd" "integer nsamples" [%d]',lightSpectrum, int);
+            lightSources{1}.lightspectrum = lightSpectrum;
+            lightSources{1}.line{pos} = sprintf('LightSource "infinite" "%s L" %s "integer nsamples" [%d]', spectrumType, lightSpectrum, nsamples);
         else
             lightSources{1}.mapname = mapname;
-            lightSources{1}.line{pos,:} = sprintf('LightSource "infinite" "string mapname" "%s" "integer nsamples" [%d]', mapname, int);
+            lightSources{1}.line{pos} = sprintf('LightSource "infinite" "string mapname" "%s" "integer nsamples" [%d]', mapname, nsamples);
         end
     case 'area'
+        lightSources{1}.type = 'area';
+        lightSources{1}.line = line;
+        lightSources{1}.line{pos} = sprintf('AreaLightSource "diffuse" "%s L" %s "bool twosided" "%s" "integer nsamples" [%d]',...
+                                                spectrumType, lightSpectrum, twosided, nsamples);
+        
+        % Below is the old area light exporting, we are trying to deprecate these
+        %{
         % find area light geometry info
 
         nlight = 1;
@@ -297,12 +323,14 @@ switch type
                 nlight = nlight+1;
             end
         end
+        %}
 end
 %% Update the world data
 
 index_m = piContains(thisR.world,'_materials.pbrt');
 index_g = piContains(thisR.world,'_geometry.pbrt');
-world = thisR.world(1:end-3);
+insertIndex = sum(index_m + index_g)+1;
+world = thisR.world(1:end-insertIndex);
 for jj = 1: length(lightSources)
     numWorld = length(world);
     for kk = 1: length(lightSources{jj}.line)
@@ -312,8 +340,12 @@ end
 
 % What does this do?  Close up the World section?
 numWorld = length(world);
-world{numWorld+1,:} = thisR.world{index_m};
-world{numWorld+2,:} = thisR.world{index_g};
+if any(index_m)
+    world{numWorld+1,:} = thisR.world{index_m};
+end
+if any(index_g)
+    world{numWorld+2,:} = thisR.world{index_g};
+end
 world{end+1,:} = 'WorldEnd';
 thisR.world = world;
 

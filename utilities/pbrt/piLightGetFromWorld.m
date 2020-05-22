@@ -50,7 +50,7 @@ for ii = 1:length(lightIdx)
     if length(AttBegin) >= ii
         lightSources{ii}.line  = thisR.world(AttBegin(ii):AttEnd(ii));
         lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
-        lightSources{ii}.pos   = lightIdx - AttBegin(ii) + 1;
+        lightSources{ii}.pos   = lightIdx(ii) - AttBegin(ii) + 1;
     else
         light(arealight) = 0;
         lightSources{ii}.line  = thisR.world(lightIdx(ii));
@@ -59,8 +59,9 @@ for ii = 1:length(lightIdx)
     
     if find(piContains(lightSources{ii}.line, 'AreaLightSource'))
         lightSources{ii}.type = 'area';
-        
+        %{
         translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
+
         if ~isempty(translate) && numel(translate) == 4
             lightSources{ii}.from = [str2double(translate{2});...
                 str2double(translate{3});...
@@ -68,18 +69,29 @@ for ii = 1:length(lightIdx)
         else
             warning('No translate parameter for AreaLightSource');
         end
-        
-        thisLineStr = textscan(lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')}, '%q');
+        %}
+        txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')};
+        % Remove blank to avoid error
+        txt = strrep(txt,'[ ','[');
+        txt = strrep(txt,' ]',']');
+        thisLineStr = textscan(txt, '%q');
         thisLineStr = thisLineStr{1};
-        spectrum  = find(piContains(thisLineStr, 'spectrum L'));
-        if spectrum
-            if isnan(str2double(thisLineStr{spectrum+1}))
-                thisSpectrum = thisLineStr{spectrum+1};
-            else
-                thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
-            end
-            lightSources{ii}.spectrum = thisSpectrum;
+        
+        % nsamples
+        int = find(piContains(thisLineStr, 'integer nsamples'));
+        if int, lightSources{ii}.nsamples = piParseNumericString(thisLineStr{int+1});
         end
+        
+        % two sided
+        twoside = find(piContains(thisLineStr, 'bool twosided'));
+        if twoside
+            if strcmp(thisLineStr{int+1}, 'false')
+                lightSources{ii}.twosided = 0;
+            else
+                lightSources{ii}.twosided = 1;
+            end
+        end
+        
     else
         % Assign type
         lightType = lightSources{ii}.line{piContains(lightSources{ii}.line,'LightSource')};
@@ -107,16 +119,15 @@ for ii = 1:length(lightIdx)
 
         end        
         
+        % Remove blank to avoid error
+        txt = strrep(txt,'[ ','[');
+        txt = strrep(txt,' ]',']');
         %  Get the string on the LightSource line
         thisLineStr = textscan(txt, '%q');
         thisLineStr = thisLineStr{1};
+
         
         if ~piContains(lightSources{ii}.type, 'infinite')
-            
-            % Remove blank to avoid error
-            txt = strrep(txt,'[ ','[');
-            txt = strrep(txt,' ]',']');
-                        
             switch compatability
                 case 'C4D'
                     % Find the from and to froms.  If C4D compatible, then
@@ -137,19 +148,7 @@ for ii = 1:length(lightIdx)
                     lightSources{ii}.to = reshape(thisR.get('to'), [1, 3]);
                     
             end
-            
-            % Adjust spectrum
-            spectrum  = find(piContains(thisLineStr, 'spectrum L') + piContains(thisLineStr, 'spectrum I'));
-
-            if spectrum
-                if isnan(str2double(thisLineStr{spectrum+1}))
-                    thisSpectrum = thisLineStr{spectrum+1};
-                else
-                    thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
-                end
-                lightSources{ii}.spectrum = thisSpectrum;
-            end
-            
+                        
             % Set the cone angle 
             coneAngle = find(piContains(thisLineStr, 'float coneangle'));
             if coneAngle,lightSources{ii}.coneangle = piParseNumericString(thisLineStr{coneAngle+1});
@@ -163,9 +162,48 @@ for ii = 1:length(lightIdx)
             end
             
             int = find(piContains(thisLineStr, 'integer nsamples'));
-            if int, lightSources{ii}.integer = piParseNumericString(thisLineStr{int+1});
+            if int, lightSources{ii}.nsamples = piParseNumericString(thisLineStr{int+1});
             end
         end
+    end
+    
+
+        % Set spectrum
+        % Look for spectrum L/I
+        spectrum  = find(piContains(thisLineStr, 'spectrum L')+piContains(thisLineStr, 'spectrum I'));
+        if spectrum
+            if isnan(str2double(thisLineStr{spectrum+1}))
+                thisSpectrum = thisLineStr{spectrum+1};
+            else
+                thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
+            end
+        end
+
+        % Look for rgb/color L/I
+        rgb = find(piContains(thisLineStr, 'color L') +...
+                   piContains(thisLineStr, 'rgb L')+...
+                   piContains(thisLineStr, 'color I') +...
+                   piContains(thisLineStr, 'rgb I'));
+        if rgb
+            if isnan(str2double(thisLineStr{rgb+1}))
+                thisSpectrum = str2num([thisLineStr{rgb+1}, ' ',...
+                                thisLineStr{rgb+2}, ' ',...
+                                thisLineStr{rgb+3}]);
+            else
+                thisSpectrum = piParseNumericString([thisLineStr{rgb+1}, ' ',...
+                                thisLineStr{rgb+2}, ' ',...
+                                thisLineStr{rgb+3}]);
+            end
+        end
+        
+        % Look for blackbody L
+        blk = find(piContains(thisLineStr, 'blackbody L'));
+        if blk
+            thisSpectrum = piParseNumericString([thisLineStr{blk+1}, ' ',...
+                thisLineStr{blk+2}]);
+        end
+    if exist('thisSpectrum', 'var')
+        lightSources{ii}.lightspectrum = thisSpectrum;
     end
 end
 
@@ -186,5 +224,5 @@ end
 function val = piParseNumericString(str)
 str = strrep(str,'[','');
 str = strrep(str,']','');
-val = str2double(str);
+val = str2num(str);
 end

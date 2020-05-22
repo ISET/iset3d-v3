@@ -51,7 +51,7 @@ fclose(fileID);
 
 %% Check whether the geometry have already been converted from C4D
 
-% If it was converted, we don't need to do much work.
+% If it was converted into ISET3d format, we don't need to do much work.
 if piContains(txtLines(1),'# PBRT geometry file converted from C4D exporter output')
     convertedflag = true;
 else
@@ -60,7 +60,6 @@ end
 
 if ~convertedflag
     % It was not converted, so we go to work.
-    % Check if a nested structure is exists
     
     renderRecipe.assets = parseGeometryText(txtLines,'');
 
@@ -89,9 +88,21 @@ end
 
 
 function [res, children, parsedUntil] = parseGeometryText(txt, name)
-% The geometry text comes from C4D export.
-% Parse the lines of text in 'txt' cell array and recrursively create a
-% tree structure of geometric objects.
+%%
+% Inputs:
+%
+%   txt         - remaining text to parse
+%   name        - current object name
+%
+% Outputs:
+%   res         - struct of results
+%   children    - Attributes under the current object
+%   parsedUntil - line number of the parsing end
+%
+% Description:
+%
+%   The geometry text comes from C4D export. We parse the lines of text in 
+%   'txt' cell array and recrursively create a tree structure of geometric objects.
 
 res = [];
 groupobjs = [];
@@ -153,6 +164,14 @@ while i <= length(txt)
         % This is an Attribute inside an Attribute
         [subnodes, subchildren, retLine] = parseGeometryText(txt(i+1:end), name);
         groupobjs = cat(1, groupobjs, subnodes);
+        
+        % Give an index to the subchildren to make it different from its
+        % parents and brothers (we are not sure if it works for more than
+        % two levels). We name the subchildren based on the line number and
+        % how many subchildren there are already.
+        if ~isempty(subchildren)
+            subchildren.name = sprintf('%d_%d_%s', i, numel(children)+1, subchildren.name);
+        end
         children = cat(1, children, subchildren);
         i =  i + retLine;
         

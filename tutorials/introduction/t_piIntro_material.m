@@ -47,9 +47,7 @@ thisR.set('pixel samples',64);
 % These all the possible materials. 
 mType = piMateriallib;
 disp(mType);
-
-% In fact, this whole library is always stored as part of any recipe
-%    thisR.materials.lib
+   thisR.materials.lib
 
 % These are the materials in this particular scene.
 piMaterialList(thisR);
@@ -95,6 +93,8 @@ thisR.set('nbounces',10);
 % Because we changed the material assignment, we need to set the
 % 'creatematerials' argument to true.
 piWrite(thisR,'creatematerials',true);
+% In fact, this whole library is always stored as part of any recipe
+% 
 
 %% Render
 
