@@ -46,30 +46,28 @@ for ii = 1: length(assetRecipe)
     thisR.assets(ll).motion = [];
     
     %% Assign random color for carpaint
-    mlist = fieldnames(thisR.materials.list);
-    for kk = 1:length(mlist)
-        if  piContains(mlist{kk},'paint_base') && ~piContains(mlist{kk},'paint_mirror')
-            name = mlist{kk};
-            material = thisR.materials.list.(name);    % A string labeling the material
+    for kk = 1:numel(thisR.materials.list)
+        if  piContains(lower(thisR.materials.list{kk}.name),'paint_base') &&...
+                ~piContains(lower(thisR.materials.list{kk}.name),'paint_mirror')
+            material = thisR.materials.list{kk};    % A string labeling the material
             target = thisR.materials.lib.carpaintmix.paint_base;  %
             colorkd = piColorPick('random');
             piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
-        elseif piContains(mlist{kk},'carpaint') && ~piContains(mlist{kk},'paint_base')
-            name = cell2mat(mlist(kk));
-            material = thisR.materials.list.(name);    % A string labeling the material
+        elseif piContains(lower(thisR.materials.list{kk}.name),'carpaint') &&...
+                ~piContains(lower(thisR.materials.list{kk}.name),'paint_base')
+            material = thisR.materials.list{kk};    % A string labeling the material
             target = thisR.materials.lib.carpaintmix;  %
             colorkd = piColorPick('random');
             piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
-        elseif piContains(mlist(kk),'lightsback') || piContains(mlist(kk),'lightback')
-            name = cell2mat(mlist(kk));
-            material = thisR.materials.list.(name);
+        elseif piContains(lower(thisR.materials.list{kk}.name),'lightsback') ||...
+                piContains(lower(thisR.materials.list{kk}.name),'lightback')
+            material = thisR.materials.list{kk};
             target = thisR.materials.lib.glass;
             rgbkr = [1 0.1 0.1];
             piMaterialAssign(thisR,material.name,target,'rgbkr',rgbkr);
             thisR.materials.list.(name).rgbkt = [0.7 0.1 0.1];
-        elseif piContains(mlist(kk),'tire') % empty the slot if there is a texture assigned
-            name = cell2mat(mlist(kk));
-            thisR.materials.list.(name).texturekd = [];
+        elseif piContains(lower(thisR.materials.list{kk}.name),'tire') % empty the slot if there is a texture assigned
+            thisR.materials.list{kk}.texturekd = [];
         end
     end
     

@@ -473,6 +473,7 @@ renderRecipe = piLightDeleteWorld(renderRecipe, 'all');
 fclose(fileID);
 
 %% Overwrite Materials.pbrt
+% Write both materials and textures in piMaterialWrite function
 if piContains(renderRecipe.exporter, 'C4D')
     % If the scene is from Cinema 4D, 
     if ~creatematerials

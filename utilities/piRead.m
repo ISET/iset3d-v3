@@ -336,7 +336,7 @@ if exporterFlag
     if readmaterials
         % Check if a materials.pbrt exist
         if ~exist(inputFile_materials,'file'), error('File not found'); end
-        [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
+        [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(thisR, inputFile_materials,'version',3);
         thisR.materials.inputFile_materials = inputFile_materials;
         % Call material lib
         thisR.materials.lib = piMateriallib;

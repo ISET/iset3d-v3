@@ -297,8 +297,9 @@ switch ieParamFormat(param)
         val.camera = thisR.camera;
         val.film = thisR.film;
         val.filter = thisR.filter;
+    %{
     case{'eem'}
-        % val = thisR.get('eem', 'material', {'materialName'});
+        % val = thisR.get('eem', idx, {'materialName'});
         if numel(varargin) == 0
             matNames = fieldnames(thisR.materials.list);
             val = cell(1, numel(matNames));
@@ -318,7 +319,7 @@ switch ieParamFormat(param)
         
         
     case{'concentration'}
-        % val = thisR.get('concentration', 'material', {'materialName'});
+        % val = thisR.get('concentration', idx, {'materialName'});
         if numel(varargin) == 0
             matNames = fieldnames(thisR.materials.list);
             val = cell(1, numel(matNames));
@@ -334,7 +335,8 @@ switch ieParamFormat(param)
                 end
                 val{ii} = thisR.materials.list.(matList{ii}).floatconcentration; 
             end
-        end        
+        end 
+    %}
         
     otherwise
         error('Unknown parameter %s\n',param);

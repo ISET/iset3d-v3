@@ -1,4 +1,4 @@
-function materiallist = piBlockExtractMaterial(txtLines)
+function materialList = piBlockExtractMaterial(thisR, txtLines)
 % Extract parameters of a material from a block of text
 %
 % Syntax:
@@ -10,7 +10,7 @@ function materiallist = piBlockExtractMaterial(txtLines)
 %
 %
 % Inputs
-%  txtLines
+%  thisR, txtLines
 %
 % Outputs:
 %   materialR:  An array of structs defining the material
@@ -18,7 +18,7 @@ function materiallist = piBlockExtractMaterial(txtLines)
 % Optional key/value pairs
 %
 % ZL SCIEN Stanford, 2018;
-
+% Zheng Lyu, 2020
 % Notes
 %  The format for PBRT V2 differs noticeably from V3.  In particular,
 %    MakeNamedMaterial is just Material.
@@ -39,9 +39,9 @@ function materiallist = piBlockExtractMaterial(txtLines)
 %
 
 %%
-nLetters = length('MakeNamedMaterial');
-nLines = length(txtLines);
+nLines = numel(txtLines);
 
+%{
 %% Parse the string on the material line
 cnt = 0;
 for ii=1:nLines
@@ -136,5 +136,80 @@ for jj = 1:cnt
 materiallist.(materials(jj).name)= materials(jj);
 end
 fprintf('Read %d materials on %d lines\n',cnt,nLines);
+%}
+
+%% Parse the string on the material line
+for ii=1:nLines
+    thisLine = txtLines{ii};
+
+    thisLine = textscan(thisLine,'%q');
+    thisLine = thisLine{1};
+    nStrings = size(thisLine);
+
+    piMaterialCreate(thisR, 'name', thisLine{2}, 'linenumber', ii);
+
+    % For strings 3 to the end, parse
+    for ss=3:nStrings
+        switch thisLine{ss}
+            case 'string type'
+                thisR.materials.list{ii}.stringtype = thisLine{ss+1};
+            case 'float index'
+                thisR.materials.list{ii}.floatindex = piParseNumericString(thisLine{ss+1});
+            case 'texture Kd'
+                thisR.materials.list{ii}.texturekd = thisLine{ss+1};
+            case 'texture Ks'
+                thisR.materials.list{ii}.textureks = thisLine{ss+1};
+            case 'texture Kr'
+                thisR.materials.list{ii}.texturekr = thisLine{ss+1};
+            case 'rgb Kr'
+                thisR.materials.list{ii}.rgbkr = piParseRGB(thisLine,ss);
+            case 'rgb Ks'
+                thisR.materials.list{ii}.rgbks = piParseRGB(thisLine,ss); 
+            case 'rgb Kd'
+                thisR.materials.list{ii}.rgbkd = piParseRGB(thisLine,ss);
+            case 'rgb Kt'
+                thisR.materials.list{ii}.rgbkt = piParseRGB(thisLine,ss);
+            case 'color Kd'
+                thisR.materials.list{ii}.colorkd = piParseRGB(thisLine,ss);
+            case 'color Ks'
+                thisR.materials.list{ii}.colorks = piParseRGB(thisLine,ss);
+            case 'float uroughness'
+                thisR.materials.list{ii}.floaturoughness = piParseNumericString(thisLine{ss+1});
+            case 'float vroughness'
+                thisR.materials.list{ii}.floatvroughness = piParseNumericString(thisLine{ss+1});
+            case 'float roughness'
+                thisR.materials.list{ii}.floatroughness = piParseNumericString(thisLine{ss+1});
+            case 'spectrum Kd'
+                thisR.materials.list{ii}.spectrumkd = thisLine{ss+1};
+            case 'spectrum Ks'
+                thisR.materials.list{ii}.spectrumks = thisLine{ss+1};
+            case 'spectrum k'
+                thisR.materials.list{ii}.spectrumk = thisLine{ss+1};
+            case 'spectrum Kr'
+                % How do we check if it's going to be a string or numeric values?  
+                thisR.materials.list{ii}.spectrumkr = piParseNumericSpectrum(thisLine,ss); 
+            case 'spectrum Kt'
+                thisR.materials.list{ii}.spectrumkt = piParseNumericSpectrum(thisLine,ss); 
+            case 'spectrum eta'
+                thisR.materials.list{ii}.spectrumeta = thisLine{ss+1};
+            case 'string namedmaterial1'
+                thisR.materials.list{ii}.stringnamedmaterial1 = thisLine{ss+1};
+            case 'string namedmaterial2'
+                thisR.materials.list{ii}.stringnamedmaterial2 = thisLine{ss+1};
+            case 'texture bumpmap'
+                thisR.materials.list{ii}.texturebumpmap = thisLine{ss+1};
+            case 'bool remaproughness'
+                thisR.materials.list{ii}.boolremaproughness = thisLine{ss+1};
+            case 'string bsdffile'   
+                thisR.materials.list{ii}.bsdffile = thisLine{ss+1};
+            case 'photolumi fluorescence'
+                thisR.materials.list{ii}.photolumifluorescence = thisLine{ss+1};
+        end
+    end
+end
+
+thisR.materials.list = thisR.materials.list';
+materialList = thisR.materials.list;
+fprintf('Read %d materials\n', nLines);
 
 end

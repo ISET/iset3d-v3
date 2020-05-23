@@ -1,4 +1,4 @@
-function [materiallist, txtLines] = piMaterialRead(fname,varargin)
+function [materialList, materialLines] = piMaterialRead(thisR, fname,varargin)
 % Parses a *_material.pbrt file written by the PBRT Cinema 4D exporter
 %
 % Syntax:
@@ -27,10 +27,11 @@ materials = piReadMaterial('carandbuilding_materials.pbrt','version',3);
 
 %%
 p = inputParser;
+p.addRequired('thiR', @(x)(isa(x, 'recipe')));
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('version',2,@(x)isnumeric(x));
 
-p.parse(fname,varargin{:});
+p.parse(thisR, fname,varargin{:});
 
 ver = p.Results.version;
 
@@ -39,26 +40,15 @@ if(ver ~= 3)
     error('Only PBRT version 3 Cinema 4D exporter is supported.');
 end
 
-%% Read the text from the fname
 
-% Open, read, close
-fileID = fopen(fname);
-tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
-txtLines = tmp{1};
-fclose(fileID);
 
 %% Extract lines that correspond to specified keyword
-if isempty(txtLines)
-    materiallist = [];
-else
-    materiallist = piBlockExtractMaterial(txtLines);
+
+materialLines = piMaterialsFromFile(fname);
+if isempty(materialLines), materialList = [];
+else,materialList = piBlockExtractMaterial(thisR, materialLines);
 end
 
-
-%% pass materials to recipe.materials
-% thisR = recipe;
-% thisR.materials = materials;
-% thisR.txtLines = txtLines;
 end
 
 

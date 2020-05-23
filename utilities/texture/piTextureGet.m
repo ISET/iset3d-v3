@@ -38,9 +38,9 @@ p.parse(thisR, varargin{:});
 idx = p.Results.idx;
 param = p.Results.param;
 
-%% Get all textures
+%% Check if any textures exist
 if ~isfield(thisR.textures, 'list'), textureNames = {}; end
-%% Return different values depending on certain conditions
+%% Return different values depending on inputs
 
 if ~isempty(idx)
     % Just one of the textures
