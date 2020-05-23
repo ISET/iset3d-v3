@@ -442,11 +442,8 @@ if creatematerials
             end
         end
         
-        
         fprintf(fileID,'%s \n',currLine);
     end
-    
-    
     
 else
     % No materials were created, so we just write out the world data

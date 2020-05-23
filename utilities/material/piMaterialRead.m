@@ -44,7 +44,13 @@ end
 
 %% Extract lines that correspond to specified keyword
 
-materialLines = piMaterialsFromFile(fname);
+% Open, read, close
+fileID = fopen(fname);
+tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
+txtLines = tmp{1};
+fclose(fileID);
+
+materialLines = piMaterialsFromText(txtLine);
 if isempty(materialLines), materialList = [];
 else,materialList = piBlockExtractMaterial(thisR, materialLines);
 end

@@ -18,7 +18,13 @@ end
 
 %% Gather texture lines
 
-textureLines = piTexturesFromFile(fname);
+% Open, read, close
+fileID = fopen(fname);
+tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
+txtLines = tmp{1};
+fclose(fileID);
+
+textureLines = piTexturesFromFile(txtLines);
 if isempty(textureLines), textureList = [];
 else, textureList  = piBlockExtractTexture(thisR, textureLines);end
 end

@@ -23,7 +23,7 @@ thisR.materials.list{idx} = material;
 
 if isempty(varargin)
     material.stringtype = 'matte';
-    thisR.materials.list{idx} = material
+    thisR.materials.list{idx} = material;
 else
     for ii=1:2:length(varargin)
         material.(varargin{ii}) = varargin{ii+1};

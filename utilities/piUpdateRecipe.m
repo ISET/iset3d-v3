@@ -21,12 +21,14 @@ p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
 p.parse(thisR);
 
 %% 
-txtLines     = thisR.materials.txtLines;
-materiallist = piBlockExtractMaterial(txtLines);
-thisR.materials.list = materiallist;
+txtLines = thisR.materials.txtLines;
+thisR = piMaterialField2Cell(thisR);
+% Material number mismatch observed from some of Zhenyi's recipe on
+% FlyWheel between the materials in the list nad in txtLines.
+thisR.materials.txtLines= piMaterialsFromText(txtLines); 
 
 % Gather texture lines and assign texture info.
-textureLines = piTexturesFromMaterialFileText(txtLines);
+textureLines = piTexturesFromText(txtLines);
 texturelist  = piBlockExtractTexture(thisR, textureLines);
 thisR.textures.list = texturelist;
 thisR.textures.txtLines = textureLines;

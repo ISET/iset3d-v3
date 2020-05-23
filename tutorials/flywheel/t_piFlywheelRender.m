@@ -44,7 +44,7 @@ inAcquisition = 'city3_11:16_v12.0_f47.50front_o270.00_2019626181423_pos_163_000
 % these as renderings by the subject field,
 renderProjectID   = inProject.id;
 renderSession     = inSession;
-renderAcquisition = inAcquisition;
+renderAcquisition = strcat(date, '-', inAcquisition);
 renderSubject     = 'renderings';
 
 %% Main routine - Flywheel files
@@ -78,10 +78,12 @@ thisR.outputFile = fullfile(destDir,'testRender.pbrt');
 % First we clear job list
 gcp.targets = [];
 
-% Then we add the target information from the original calculation
+% Then we add the target information from the original calculation into the
+% Google Cloud object
 gcp.addPBRTTarget(targetFile,'subject label',renderSubject);
 
-% Set the Flywheel information for the rendering
+% Set the Flywheel information for the rendering into the Google Cloud
+% object
 gcp.fwSet('project id',renderProjectID, ...
     'subject',    renderSubject,...
     'session',    renderSession,...
