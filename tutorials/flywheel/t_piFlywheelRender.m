@@ -66,6 +66,10 @@ luString = sprintf('%s/%s/%s/%s/%s',...
 
 thisR = piJson2Recipe(recipeFile);
 
+destDir = fullfile(piRootPath, 'local', date);
+if ~exist(destDir, 'dir'), mkdir(destDir);
+end
+
 % The output file for this position
 thisR.outputFile = fullfile(destDir,'testRender.pbrt');
 
