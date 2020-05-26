@@ -9,23 +9,28 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %   has many fields specifying camera and rendering parameters. This
 %   method is only capable of setting one parameter at a time.
 %
-% Parameter list (in progress)
+% Parameter list (in progress, many more to be added)
+%
 %   Data management
-%     outputfile
-%     inputfile
+%    outputfile
+%    inputfile
 %
-%   Scene and camera
-%     object distance
-%     camera
-%     exposure time
+%  Scene and camera
+%    object distance
+%    camera
+%    exposure time
 %
-%   Lens
-%     lensfile - json format for omni case.  dat format for realistic.
+%  Film/sensor
+%    filmdiagonal
+%    filmdistance
+%    filmresolution
+%    pixelsamples or raysperpixel
 %
-%   Film/sensor
+%  Lens
+%    lensfile - json format for omni case.  dat format for realistic.
 %
-%   Rendering
-%     nbounces
+%  Rendering
+%    nbounces
 %
 % BW ISETBIO Team, 2017
 %
@@ -33,7 +38,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % Generally
 % https://www.pbrt.org/fileformat-v3.html#overview
 %
-% And specifically
+% Specifically 
 % https://www.pbrt.org/fileformat-v3.html#cameras
 %
 % See also
