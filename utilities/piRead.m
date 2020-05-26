@@ -93,7 +93,7 @@ readmaterials   = p.Results.readmaterials;
 [~,scene_fname]  = fileparts(fname);
 outFilepath      = fullfile(piRootPath,'local',scene_fname);
 outputFile       = fullfile(outFilepath,[scene_fname,'.pbrt']);
-% thisR.set('outputFile',outputFile);
+thisR.set('outputFile',outputFile);
 
 %% Check version number
 if(ver ~= 2 && ver ~=3)
