@@ -14,7 +14,11 @@ p.KeepUnmatched = true;
 p.parse(varargin{:});
 
 %% Get how many materials exist already
-val = numel(piMaterialGet(thisR, 'print', false));
+if isfield(thisR.materials, 'list')
+    val = numel(piMaterialGet(thisR.materials.list, 'print', false));
+else
+    val = 0;
+end
 idx = val + 1;
 
 %% Construct material structure

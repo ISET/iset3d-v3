@@ -23,7 +23,8 @@ function val = piMaterialGet(materials, varargin)
 % Examples:
 %{
     thisR = piRecipeDefault;
-    materials = piMaterialGet(thisR);
+    mat   = thisR.get('material');
+    materials = piMaterialGet(mat);
 %}
 %% Parse inputs
 
@@ -53,11 +54,11 @@ if ~isempty(idx)
         val = thisMaterial;
     end
 else
-    % Return all material
-    if isempty(material)
+    % Return all materials
+    if isempty(materials)
         val = {};
     else
-        val = material;
+        val = materials;
     end
 end
 
