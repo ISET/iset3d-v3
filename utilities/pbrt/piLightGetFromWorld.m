@@ -14,10 +14,19 @@ function lightSources = piLightGetFromWorld(thisR, varargin)
 %   lightSources:  Cell array of light source structures
 %
 % Zhenyi, SCIEN, 2019
-%
+% Zheng Lyu    , 2020
 % See also
 %   piLightDeleteWorld, piLightAddToWorld
 
+% Examples
+%{
+  thisR = piRecipeDefault;
+  lightSources = piLightGet(thisR);
+  thisR = piLightDelete(thisR, 1);
+  thisR = piLightAdd(thisR, 'type', 'point');
+  thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
+  piLightGet(thisR);
+%}
 
 %% Parse inputs
 
@@ -38,11 +47,10 @@ lightIdx  =  find(light);   % Find which lines have LightSource on them.
 
 %% Parse the properties of the light in each line in the lightIdx list
 
-if isequal(sum(lightIdx),0), lightSources = [];
-else,                        lightSources = cell(length(lightIdx),1);
-end
+nLights = sum(light);
+lightSources = cell(1, nLights);
 
-for ii = 1:length(lightIdx)
+for ii = 1:nLights
 %     % Initialize the light structure
 %     lightSources{ii} = piLightInit(thisR);
     
@@ -59,17 +67,6 @@ for ii = 1:length(lightIdx)
     
     if find(piContains(lightSources{ii}.line, 'AreaLightSource'))
         lightSources{ii}.type = 'area';
-        %{
-        translate = strsplit(lightSources{ii}.line{piContains(lightSources{ii}.line, 'Translate')}, ' ');
-
-        if ~isempty(translate) && numel(translate) == 4
-            lightSources{ii}.from = [str2double(translate{2});...
-                str2double(translate{3});...
-                str2double(translate{4})];
-        else
-            warning('No translate parameter for AreaLightSource');
-        end
-        %}
         txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')};
         % Remove blank to avoid error
         txt = strrep(txt,'[ ','[');
@@ -101,9 +98,9 @@ for ii = 1:length(lightIdx)
         try
             % Zheng Lyu to have a look here
             % If this works, then we are C4D compatible
-            txt = lightSources{ii}.line{find(piContains(lightSources{ii}.line, 'point from') + ...
-                                        piContains(lightSources{ii}.line, 'infinite'))};
-            compatability = 'C4D';
+            txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'point from') |...
+                                        piContains(lightSources{ii}.line, 'infinite')};
+            compatibility = 'C4D';
             lightSources{ii}.cameracoordinate = false;
         catch
             % Exception happens when we use coordinate camera to place
@@ -111,7 +108,7 @@ for ii = 1:length(lightIdx)
             if any(piContains(lightSources{ii}.line, 'CoordSysTransform "camera"'))
                 lightSources{ii}.cameracoordinate = true;
                 txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'LightSource')};
-                compatability = 'ISET3d';
+                compatibility = 'ISET3d';
             else
                 % We are not C4D compatible.  So we do this
                 error('Cannot interpret this file.  Check for C4D and ISET3d compatibility.');
@@ -128,11 +125,11 @@ for ii = 1:length(lightIdx)
 
         
         if ~piContains(lightSources{ii}.type, 'infinite')
-            switch compatability
+            switch compatibility
                 case 'C4D'
-                    % Find the from and to froms.  If C4D compatible, then
-                    % do it this way.  If not, we need another approach to get
-                    % these values.
+                    % Find the from and to. If C4D compatible, then the
+                    % number are on three consecutive. If not, we read the
+                    % from and to info from the recipe.
                     from = find(piContains(thisLineStr, 'point from'));
                     lightSources{ii}.from = [piParseNumericString(thisLineStr{from+1});...
                         piParseNumericString(thisLineStr{from+2});...
@@ -153,10 +150,12 @@ for ii = 1:length(lightIdx)
             coneAngle = find(piContains(thisLineStr, 'float coneangle'));
             if coneAngle,lightSources{ii}.coneangle = piParseNumericString(thisLineStr{coneAngle+1});
             end
+            
             coneDeltaAngle =  find(piContains(thisLineStr, 'float conedelataangle'));
             if coneDeltaAngle, lightSources{ii}.conedeltaangle = piParseNumericString(thisLineStr{coneDeltaAngle+1});
             end
         else
+            % Two parameters acceptable by infinite light
             mapname = find(piContains(thisLineStr, 'string mapname'));
             if mapname, lightSources{ii}.mapname = thisLineStr{mapname+1};
             end
@@ -196,7 +195,8 @@ for ii = 1:length(lightIdx)
             end
         end
         
-        % Look for blackbody L
+        % Look for blackbody L, the first parameter is the temperature in
+        % Kelvin, and the second giving a scale factor.
         blk = find(piContains(thisLineStr, 'blackbody L'));
         if blk
             thisSpectrum = piParseNumericString([thisLineStr{blk+1}, ' ',...

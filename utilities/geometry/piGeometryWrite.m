@@ -82,6 +82,31 @@ for i=1:length(objects.children)
                 fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
             end
         end
+        
+        %{
+        % Not sure if we need this
+            if isfield(objects.children(i), 'motion') &&...
+                    ~isempty(objects.children(i).motion)
+                for kk = 1:size(objects.children(i).position, 2)
+                    fprintf(fid, 'ActiveTransform EndTime \n');
+                    if isempty(objects.children(i).motion.position(:,kk))
+                        fprintf(fid,'Translate 0 0 0 \n');
+                    else
+                        pos = objects.children(i).motion.position(:,kk);
+                        fprintf(fid,'Translate %f %f %f \n',pos(1),...
+                            pos(2),pos(3));
+                    end
+
+                    if ~isempty(objects.children(i).motion.rotate)
+                        rot = objects.children(i).motion.rotate;
+                        % Write out rotation
+                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z
+                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-1)); % Y
+                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3));   % X
+                    end
+                end
+            end
+        %}
         fprintf(fid, 'ObjectEnd\n\n');
     else
         
@@ -121,30 +146,84 @@ for n=1:length(objects)
                                                             currentObject.size.l, ...
                                                             currentObject.size.w, ...
                                                             currentObject.size.h);
+    % If a motion exists in the current object, prepare to write it out by
+    % having an additional line below.
+    if isfield(currentObject, 'motion') &&...
+            ~isempty(currentObject.motion)
+        fprintf(fid,'ActiveTransform StartTime \n');
+    end
     fprintf(fid,'Translate %.3f %.3f %.3f\n',currentObject.position(1), currentObject.position(2), currentObject.position(3));
     fprintf(fid,'Rotate %.3f %.3f %.3f %.3f \n',currentObject.rotate(:,1)); % Z
     fprintf(fid,'Rotate %.3f %.3f %.3f %.3f \n',currentObject.rotate(:,2)); % Y
     fprintf(fid,'Rotate %.3f %.3f %.3f %.3f \n',currentObject.rotate(:,3));   % X 
     fprintf(fid,'Scale %.3f %.3f %.3f \n',currentObject.scale);
     
+    % Write out this motion
+    if isfield(currentObject, 'motion') &&...
+            ~isempty(currentObject.motion)
+        for kk = 1:size(currentObject.position, 2)
+            fprintf(fid, 'ActiveTransform EndTime \n');
+            if isempty(currentObject.motion.position(:,kk))
+                fprintf(fid,'Translate 0 0 0 \n');
+            else
+                pos = currentObject.motion.position(:,kk);
+                fprintf(fid,'Translate %f %f %f \n',pos(1),...
+                    pos(2),pos(3));
+            end
+            
+            if ~isempty(currentObject.motion.rotate)
+                rot = currentObject.motion.rotate;
+                % Write out rotation
+                fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z
+                fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-1)); % Y
+                fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3));   % X
+            end
+        end
+    end
+    
     for j=1:length(currentObject.children)
        if isempty(currentObject.children(j).areaLight)
-            fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name);  
-       else
-           if ~isempty(objects.children(j).mediumInterface)
-            fprintf(fid, '%s\n', objects.children(j).mediumInterface);
+           if ~isempty(currentObject.children(j).mediumInterface)
+               fprintf(fid, '%s\n', currentObject.children(j).mediumInterface);
            end
-            if ~isempty(objects.children(j).material)
-                fprintf(fid, '%s\n', objects.children(j).material);
-            end
-
-            if ~isempty(objects.children(j).areaLight)
-                fprintf(fid, '%s\n', objects.children(j).areaLight);
-            end
-
-            if ~isempty(objects.children(j).shape)
-                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', objects.children(j).name);
-            end
+           if ~isempty(currentObject.children(j).material)
+               fprintf(fid, '%s\n', currentObject.children(j).material);
+           end
+           
+           if ~isempty(currentObject.children(j).areaLight)
+               fprintf(fid, '%s\n', currentObject.children(j).areaLight);
+           end
+           
+           if ~isempty(currentObject.children(j).shape)
+               fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', currentObject.children(j).name);
+           end
+           %{
+           % Not sure if we need this
+           if isfield(currentObject.children(j), 'motion') &&...
+                   ~isempty(currentObject.children(j).motion)
+               for kk = 1:size(currentObject.children(j).position, 2)
+                   fprintf(fid, 'ActiveTransform EndTime \n');
+                   if isempty(currentObject.children(j).motion.position(:,kk))
+                       fprintf(fid,'Translate 0 0 0 \n');
+                   else
+                       pos = currentObject.children(j).motion.position(:,kk);
+                       fprintf(fid,'Translate %f %f %f \n',pos(1),...
+                           pos(2),pos(3));
+                   end
+                   
+                   if ~isempty(currentObject.children(j).motion.rotate)
+                       rot = currentObject.children(j).motion.rotate;
+                       % Write out rotation
+                       fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z
+                       fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-1)); % Y
+                       fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3));   % X
+                   end
+               end
+           end
+           %}
+                   
+       else
+           fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name);
        end
     end
     

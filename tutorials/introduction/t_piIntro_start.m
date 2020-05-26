@@ -30,7 +30,8 @@ thisR = piRecipeDefault('scene name','sphere');
 
 %% Add a point light
 thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
-
+thisR = piLightAdd(thisR, 'type', 'distant', 'light spectrum', [9000 0.001],...
+                        'camera coordinate', true);
 %% Set up the render quality
 
 % There are many different parameters that can be set.

@@ -1,5 +1,6 @@
 function recipe = piCreateCheckerboard(outputfile, varargin)
-
+% TODO: This is broken, we should fix it.
+%
 % recipe = piCreateCheckerboard(outputfile, varargin)
 %
 % This function creates a simple scene with a black and white checkerboard
@@ -54,7 +55,7 @@ P = [-cornerX, -cornerY, 0;
 
 %% Update geometry
 
-geometryFile = fullfile(recipe.get('working directory'),recipe.assets.children.output);
+geometryFile = fullfile(recipe.get('working directory'),recipe.assets.groupobjs(1).children.output);
 fid = fopen(geometryFile,'r');
 geometry = textscan(fid,'%s','delimiter','\n');
 geometry = geometry{1};

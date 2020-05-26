@@ -50,7 +50,7 @@ tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
 txtLines = tmp{1};
 fclose(fileID);
 
-materialLines = piMaterialsFromText(txtLine);
+materialLines = piMaterialsFromText(txtLines);
 if isempty(materialLines), materialList = [];
 else,materialList = piBlockExtractMaterial(thisR, materialLines);
 end

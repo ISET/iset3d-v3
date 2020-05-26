@@ -297,6 +297,21 @@ switch ieParamFormat(param)
         val.camera = thisR.camera;
         val.film = thisR.film;
         val.filter = thisR.filter;
+    case{'material'}
+        if isfield(thisR.materials, 'list')
+            val = thisR.materials.list;
+        else
+            val = {};
+        end
+    case{'texture'}
+        if isfield(thisR.textures, 'list')
+            val = thisR.textures.list;
+        else
+            val = {};
+        end
+    case{'light'}
+        val = thisR.light;
+        
     %{
     case{'eem'}
         % val = thisR.get('eem', idx, {'materialName'});

@@ -83,7 +83,7 @@ sceneSet(scene,'gamma',0.7);
 
 % The motion blur is assigned to a particular asset.  In this example,
 % we are moving the third asset, assets(3)
-fprintf('Moving asset named: %s\n',thisR.assets(3).name);
+fprintf('Moving asset named: %s\n',thisR.assets.groupobjs(3).name);
 
 % Check current object position
 %
@@ -93,8 +93,8 @@ fprintf('Moving asset named: %s\n',thisR.assets(3).name);
 %  y represents vertical position
 
 fprintf('Object position: \n    x: %.1f, depth: %.1f \n', ...
-    thisR.assets(3).position(1), ...
-    thisR.assets(3).position(3));
+    thisR.assets.groupobjs(3).position(1), ...
+    thisR.assets.groupobjs(3).position(3));
 
 % To add a motion blur you need to define the shutter speed of the
 % camera. This is supposed in the shutter open time and close time.
@@ -109,14 +109,14 @@ thisR.camera.shutterclose.type = 'float';
 thisR.camera.shutterclose.value = 0.5;
 
 % Copy the asset position and rotation into the motion slot.
-thisR.assets(3).motion.position = thisR.assets(3).position;
-thisR.assets(3).motion.rotate   = thisR.assets(3).rotate;
+thisR.assets.groupobjs(3).motion.position = thisR.assets.groupobjs(3).position;
+thisR.assets.groupobjs(3).motion.rotate   = thisR.assets.groupobjs(3).rotate;
 
 % We will change the position, but not the rotation.  The change in
 % position is during the shutter open period.  In this case, in half a
 % second the object changes 0.1 meters in the x-direction.  To make
 % him jump, we would change the y-position.
-thisR.assets(3).motion.position(1) = thisR.assets(3).position(1) + 0.1;
+thisR.assets.groupobjs(3).motion.position(1) = thisR.assets.groupobjs(3).position(1) + 0.1;
 
 %% Render the motion blur
 
@@ -145,10 +145,10 @@ sceneSet(scene,'gamma',0.7);
 % The rotation is around the center of the asset
 
 % No translation
-thisR.assets(3).motion.position = thisR.assets(3).position;
+thisR.assets.groupobjs(3).motion.position = thisR.assets.groupobjs(3).position;
 
 % Rotate 30 deg around the z-axis (depth direction)
-thisR.assets(3).motion.rotate(1,1) = 30;
+thisR.assets.groupobjs(3).motion.rotate(1,1) = 30;
 
 %% Write and render the motion blur
 piWrite(thisR,'creatematerials',true);

@@ -29,18 +29,20 @@ label = p.Results.label;
 
 %% Reads the json file for the recipe and assigns fields to the asset
 for ii = 1: length(assetRecipe)
-    
+    %{
     % Read the json recipe into the Matlab recipe class
-    thisR_tmp = jsonread(assetRecipe{ii}.name);
+    thisR_tmp =  (assetRecipe{ii}.name);
     fds = fieldnames(thisR_tmp);
     thisR = recipe;
     % assign the struct to a recipe class
     for dd = 1:length(fds)
         thisR.(fds{dd})= thisR_tmp.(fds{dd});
     end
+    %}
+    thisR = piJson2Recipe(assetRecipe{ii}.name);
     thisR.materials.lib = piMateriallib;
     %% force y=0
-    for ll = 1:length(thisR.assets)
+    for ll = 1:length(thisR.assets.groupobjs)
         thisR.assets(ll).position = [0;0;0];
     end
     thisR.assets(ll).motion = [];

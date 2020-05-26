@@ -32,7 +32,7 @@ function light = piLightInit(thisR, varargin)
 varargin = ieParamFormat(varargin);
 p = inputParser;
 p.KeepUnmatched = true;
-p.addParameter('lightspectrum','D65',@ischar);
+p.addParameter('lightspectrum','D65',@(x)(ischar(x)||isnumeric(x)));
 p.addParameter('type','point',@ischar);
 p.parse(varargin{:});
 

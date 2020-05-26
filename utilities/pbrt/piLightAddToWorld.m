@@ -47,7 +47,8 @@ function thisR = piLightAddToWorld(thisR, varargin)
 % Outputs:
 %
 % Zhenyi, TL, SCIEN, 2019
-%
+% Zheng Lyu, 2020
+% 
 % Required: ISETCam
 %
 % See also:
@@ -59,9 +60,10 @@ function thisR = piLightAddToWorld(thisR, varargin)
   % Need to get a recipe in here!
   thisR = piRecipeDefault;
   lightSources = piLightGet(thisR);
-  thisR = piLightDelete(thisR, 2);
+  thisR = piLightDelete(thisR, 1);
   thisR = piLightAdd(thisR, 'type', 'point');
-  thisR = piLightAdd(thisR, 'type', 'point', 'camera cameracoordinate', true);
+  thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
+  piLightGet(thisR);
 %}
 
 %% Parse inputs
@@ -119,6 +121,7 @@ else, line = {}; end
 if isfield(lightSource, 'nsamples'), nsamples = lightSource.nsamples;
 else, nsamples = 16; end 
 
+% This is the parameter for area light
 if isfield(lightSource, 'twosided')
     if lightSource.twosided == 1
         twosided = 'true';
@@ -133,6 +136,7 @@ end
 if exist('lightSpectrum', 'var')
     if ischar(lightSource.lightspectrum)
         try
+            % This is the wavelength hardcoded in PBRT
             wavelength = 365:5:705;
             data = ieReadSpectra(lightSource.lightspectrum, wavelength, 0);
         catch
@@ -148,23 +152,28 @@ if exist('lightSpectrum', 'var')
             fprintf(fid, '%d %d \n', wavelength(ii), data(ii)*spectrumScale);
         end
         fclose(fid);
-    else
-        % Do nothing
-    end
-    
-    %% Determine the spectrum type
-    if isnumeric(lightSpectrum)
+        
+        % It is a path to spd file
+        spectrumType = "spectrum";
+    elseif isnumeric(lightSource.lightspectrum) 
+        %% Determine the color representation
         % It's in RGB or number defined spectrum
         if numel(lightSource.lightspectrum) == 3
+            % Use three numbers for RGB values.
             spectrumType = "rgb";
         elseif numel(lightSource.lightspectrum) == 2
+            % User present two values for temperature and scale factor.
             spectrumType = "blackbody";
         else
-            spectrumType = "spectrum";
+            % User put values in pair with wavelength and value.
+            if mod(numel(lightSource.lightspectrum), 2) == 0
+                spectrumType = "spectrum";
+            else
+                error('Bad light spectrum');
+            end
         end
     else
-        % Else it is a path to spd file
-        spectrumType = "spectrum";
+        error('Incorrect light spectrum.');
     end
 end
 
@@ -258,74 +267,12 @@ switch type
         lightSources{1}.line{pos} = sprintf('AreaLightSource "diffuse" "%s L" %s "bool twosided" "%s" "integer nsamples" [%d]',...
                                                 spectrumType, lightSpectrum, twosided, nsamples);
         
-        % Below is the old area light exporting, we are trying to deprecate these
-        %{
-        % find area light geometry info
-
-        nlight = 1;
-        for ii = 1:length(thisR.assets)
-            % Set the name
-            lightSources{nlight}.name = name;
-
-            % Set the spectrumScale
-            lightSources{nlight}.spectrumscale = spectrumScale;
-
-            if piContains(lower(thisR.assets(ii).name), 'area')
-                lightSources{nlight}.type = 'area'; %#ok<*AGROW>
-                lightSources{nlight}.line{1} = 'AttributeBegin';
-                if idxL
-                    % Why is there a +nLight?
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
-                        from(2), from(3));
-                else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
-                        thisR.assets(ii).position(2), thisR.assets(ii).position(3));
-                end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
-                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
-                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
-                lightSources{nlight}.line{7,:} = sprintf('Include "%s"', thisR.assets(ii).children.output);
-                lightSources{nlight}.line{end+1} = 'AttributeEnd';
-
-                % Set spectrum information
-                lightSources{nlight}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
-
-                % Set spectrum area light
-                lightSources{nlight}.area = thisR.assets(ii).children.output;
-
-                nlight = nlight+1;
-
-
-            elseif piContains(lower(thisR.assets(ii).name), 'light')
-                lightSources{nlight}.type = 'area';
-                lightSources{nlight}.line{1} = 'AttributeBegin';
-                if idxL
-                    lightSources{+nlight}.line{2,:} = sprintf('Translate %f %f %f',from(1),...
-                        from(2), from(3));
-                else
-                    lightSources{nlight}.line{2,:} = sprintf('Translate %f %f %f',thisR.assets(ii).position(1),...
-                        thisR.assets(ii).position(2), thisR.assets(ii).position(3));
-                end
-                lightSources{nlight}.line{3,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,1));
-                lightSources{nlight}.line{4,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,2));
-                lightSources{nlight}.line{5,:} = sprintf('Rotate %f %f %f %f',thisR.assets(ii).rotate(:,3));
-                lightSources{nlight}.line{6,:} = sprintf('AreaLightSource "diffuse" "spectrum L" "spds/lights/%s.spd"', lightSpectrum);
-                lightSources{nlight}.line{7,:} = sprintf('Shape "sphere" "float radius" [.1]');
-                lightSources{nlight}.line{end+1} = 'AttributeEnd';
-
-                % Set spectrum information
-                lightSources{nlight}.spectrum = sprintf("spds/lights/%s.spd", lightSpectrum);
-
-                % Set spectrum area light
-                lightSources{nlight}.area = sprintf('Shape "sphere" "float radius" [.1]');
-
-                nlight = nlight+1;
-            end
-        end
-        %}
 end
 %% Update the world data
+
+% index_m and index_g are the lines that include the path to materials and
+% geometry files. We insert information about the light sources above thse
+% two lines.
 
 index_m = piContains(thisR.world,'_materials.pbrt');
 index_g = piContains(thisR.world,'_geometry.pbrt');
@@ -338,7 +285,8 @@ for jj = 1: length(lightSources)
     end
 end
 
-% What does this do?  Close up the World section?
+% Append the materials and geometry lines below the information about the
+% light sources.
 numWorld = length(world);
 if any(index_m)
     world{numWorld+1,:} = thisR.world{index_m};

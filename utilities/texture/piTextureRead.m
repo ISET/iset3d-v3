@@ -24,7 +24,7 @@ tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
 txtLines = tmp{1};
 fclose(fileID);
 
-textureLines = piTexturesFromFile(txtLines);
+textureLines = piTexturesFromText(txtLines);
 if isempty(textureLines), textureList = [];
 else, textureList  = piBlockExtractTexture(thisR, textureLines);end
 end

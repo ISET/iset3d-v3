@@ -31,6 +31,7 @@ end
 
 %% Read the pbrt files
 
+%{
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
 % sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
 sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
@@ -47,7 +48,11 @@ if ~exist(inFile,'file')
 end
 
 % This is the PBRT scene file inside the output directory
+
 thisR  = piRead(inFile);
+%}
+
+thisR = piRecipeDefault;
 
 %% Set render quality
 

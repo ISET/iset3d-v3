@@ -11,8 +11,6 @@ function bool = piScitranExists
 
 if isempty(which('scitran'))
     error('You must have scitran with a stanfordlabs Flywheel account');
-elseif stFlywheelSDK('installed version') < 410
-    error('You must have version 4.1.0 or higher installed');
 else
     bool = true;
 end
