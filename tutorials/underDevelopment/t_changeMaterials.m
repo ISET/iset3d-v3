@@ -18,8 +18,7 @@ piMaterialList(thisR)
 idx = piMaterialFind(thisR, 'name', 'InnerLeft');
 piMaterialSet(thisR, idx, 'spectrumkd', 'spds/macbeth-4.spd');
 piMaterialSet(thisR, idx, 'stringtype', 'matte');
-mats = thisR.get('material');
-tmp = piMaterialGet(mats, 'idx', idx, 'param', 'name');
+tmp = piMaterialGet(thisR, 'idx', idx, 'param', 'name');
 
 %% To determine the range of object depths in the scene
 

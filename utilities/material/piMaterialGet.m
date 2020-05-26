@@ -1,4 +1,4 @@
-function val = piMaterialGet(materials, varargin)
+function val = piMaterialGet(thisR, varargin)
 % Read a material struct in the recipe
 %
 % Inputs
@@ -23,42 +23,41 @@ function val = piMaterialGet(materials, varargin)
 % Examples:
 %{
     thisR = piRecipeDefault;
-    mat   = thisR.get('material');
-    materials = piMaterialGet(mat);
+    materials = piMaterialGet(thisR);
 %}
 %% Parse inputs
 
 varargin = ieParamFormat(varargin);
 p = inputParser;
-p.addRequired('materials', @iscell);
+p.addRequired('recipe', @(x)(isa(x, 'recipe')));
 p.addParameter('idx', [], @isnumeric);
 p.addParameter('param', '', @ischar);
 p.addParameter('print', false);
 
-p.parse(materials, varargin{:});
+p.parse(thisR, varargin{:});
 idx = p.Results.idx;
 param = p.Results.param;
 
 %% Check if any material exist
-if isempty(materials), materialNames = {}; end
+if ~isfield(thisR.textures, 'list'), materialNames = {}; end
 
 %% Return different values depending on inputs
 
 if ~isempty(idx)
-    % Just one of materials
-    thisMaterial = materials{idx};
+    % Just one of the textures
+    thisMaterial = thisR.materials.list{idx};
     if ~isempty(param)
-        % A parameter of that material
+        % A parameter of that texture
         val = thisMaterial.(param);
     else
         val = thisMaterial;
     end
 else
-    % Return all materials
-    if isempty(materials)
+    % Return all textures
+    if ~isfield(thisR.materials, 'list')
         val = {};
     else
-        val = materials;
+        val = thisR.materials.list;
     end
 end
 
@@ -69,8 +68,8 @@ if p.Results.print
     disp('****Material Type****')
     for ii = 1:length(materialNames)
         fprintf('%d: name: %s     format: %s    type: %s\n', ii,...
-                materials{ii}.name,...
-                materials{ii}.type);
+                thisR.materials.list{ii}.name,...
+                thisR.materials.list{ii}.type);
     end
     disp('********************')
     disp('--------------------')    

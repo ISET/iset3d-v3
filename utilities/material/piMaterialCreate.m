@@ -15,7 +15,7 @@ p.parse(varargin{:});
 
 %% Get how many materials exist already
 if isfield(thisR.materials, 'list')
-    val = numel(piMaterialGet(thisR.materials.list, 'print', false));
+    val = numel(piMaterialGet(thisR, 'print', false));
 else
     val = 0;
 end
