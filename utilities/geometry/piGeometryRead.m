@@ -127,7 +127,7 @@ while i <= length(txt)
             % If present populate fields.
             if exist('name','var'), resCurrent.name = name; end
             if exist('size','var'), resCurrent.size = sz; end
-            if exist('rotate','var'), resCurrent.rotate = rot; end
+            if exist('rot','var'), resCurrent.rotate = rot; end
             if exist('position','var'), resCurrent.position = position; end
             
             resCurrent.groupobjs = groupobjs;
@@ -257,12 +257,11 @@ rotx = rotx*180/pi;
 roty = roty*180/pi;
 rotz = rotz*180/pi;
                    
-rotation = [rotx, roty, rotz;
-            fliplr(eye(3));];
+rotation = [rotz, roty, rotx;
+                fliplr(eye(3))];
 
 translation = reshape(tform(13:15),[3,1]);
 end
-
 
 function obj = createGroupObject()
 
