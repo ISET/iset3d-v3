@@ -4,20 +4,22 @@
 %
 % Brief description:
 %   This script shows how to use ISET3d to generate images of a
-%   checkerboard pattern that is used for camera calibration. Specifically
-%   to derive camera intrinsic parameters and lens distortion coefficients.
+%   checkerboard pattern that are analyzed by Matlab's camera calibration.
+%   toolbox. That toolbox derives camera intrinsic parameters and lens
+%   distortion coefficients.
 % 
 % Dependencies:
 %
-%    ISET3d, (ISETCam or ISETBio), JSONio
+%    Computer Vision Toolbox, ISET3d, (ISETCam or ISETBio), JSONio
 %
-%  Check that you have the updated docker image by running
+% Check that you have the updated docker image by running
 %
 %   docker pull vistalab/pbrt-v3-spectral
 %
 % HB SCIEN 2019
 %
 % See also
+%  t_piIntro_*
 %
 
 %% Initialize ISET and Docker
@@ -28,60 +30,74 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Create a checkerboard 
 
-thisR = piRecipeDefault('scene name','checkerboard');
-
-%{
-% We need to be able to adjust the parameters of the checkerboard
+% There is a default checkerboard
+%
+%    thisR = piRecipeDefault('scene name','checkerboard');
+%
+% But here we start with that and adjust the parameters of the checkerboard
+% for calibration testing.
 %
 % The board wll have 8 x 7 blocks and be 2.4 x 2.1 meter in size.
-squareSize = 0.3;
-
-% The output will be written here
-sceneName = 'calChecker';
-outFile = fullfile(piRootPath,'local',sceneName,'calChecker.pbrt');
-thisR = piCreateCheckerboard(outFile,'numX',8,'numY',7,'dimX',squareSize,'dimY',squareSize);
-%}
+squareSize = 0.1; xsquares = 8; ysquares = 7;
+thisR = piCreateCheckerboard('numX',xsquares,'numY',ysquares,'dimX',squareSize,'dimY',squareSize);
 
 %% Define the camera
 
 thisR.set('pixel samples',32);
-thisR.set('film resolution',[1280 1024]);
+thisR.set('film resolution',[1280 1024]/2);
 thisR.set('camera type','realistic');
 thisR.set('film diagonal', 6);
 thisR.set('lensfile',fullfile(piRootPath,'data','lens','fisheye.87deg.6.0mm.dat'));
 thisR.set('focus distance',4);
 
 %% Render target from different viewpoints
+
+% This is where we will place the simulated images
+imageFolder = fullfile(thisR.get('working directory'),'Images');
+if ~exist(imageFolder,'dir'), mkdir(imageFolder); end
+
 %  In real life, camera is held fixed, and the target is moved. In
 %  simulation it is more conveneint to move the camera around. These are
 %  equivalent.
 
-from = [0 0 3];
-    
+% We generate size(from,1) images with the camera at these positions
+from = [
+    0.3 1 8;
+    1 0.3 8;
+    1 0 7;
+    0 1 9];
+
+% This is where we are pointing the camera.  Could have multiple points.
 to = [0 0 0];
 
-  
-imageFolder = fullfile(thisR.get('working directory'),'Images');
-if ~exist(imageFolder,'dir'), mkdir(imageFolder); end
+nImages = size(from,1)*size(to,1);
+% Label the images
+imageNames = cell(nImages,1);
 
-imageNames = cell(size(from,1)*size(to,1),1);
+%%  Render and then save the images
+
 cntr = 1;
+fprintf('**** Rendering %d images for camera calibration testing.\n',nImages);
+
 for i=1:size(from,1)
     for j=1:size(to,1)
         thisR.set('from',from(i,:));
         thisR.set('to',to(j,:));
 
-        
         % Render the optical image
         piWrite(thisR);
         [oi, result] = piRender(thisR);
+        oi = oiSet(oi,'name',sprintf('img_%d',cntr));
+        ieAddObject(oi);
+        % oiWindow;
 
-        % Save image as a png file.
-        % We should simulate the sensor and the ISP, but we skip this step 
-        % for now.
-        oiWindow(oi);
+        % Save image as a png file. We could simulate the sensor and the
+        % ISP, but we skip this step for now.
         imageNames{cntr} = fullfile(imageFolder,sprintf('img_%i.png',cntr));
-        imwrite(oiGet(oi,'rgb image'),imageNames{cntr});
+        img = oiGet(oi,'rgb image');
+        imwrite(img,imageNames{cntr});
+        fprintf('**** Finished image %d.\n',cntr);
+
         cntr = cntr + 1;
     end
 end
@@ -92,13 +108,24 @@ end
 % done yet.  It was done by HB previously, but we need to update.
 %
 try
-    [imagePoints, boardSize] = detectCheckerboardPoints(imageNames);
-
+    [imagePoints,boardSize,imagesUsed] = detectCheckerboardPoints(imageNames);
+    %{
+     % Overlay the image with the detected points
+     imageFileNames = imageNames(imagesUsed); 
+     for i = 1:numel(imageFileNames) 
+      I = imread(imageFileNames{i}); subplot(2, 2,i); 
+      imshow(I); hold on;
+      plot(imagePoints(:,1,i),imagePoints(:,2,i),'ro'); 
+     end
+    %}
+    
     squareSizeInMMs = squareSize*1000;
     worldPoints = generateCheckerboardPoints(boardSize,squareSizeInMMs);
 
+    % Apparently the ISET3D and Computer Vision toolbox resolutions
+    % dimensions differ.  So I had to flip to film resolution.
     params = estimateCameraParameters(imagePoints,worldPoints, ...
-                                      'ImageSize',thisR.get('film resolution'));
+                                      'ImageSize',fliplr(thisR.get('film resolution')));
 
     % Convert focal length units from pixels to mm.
     fr = thisR.get('film resolution');
@@ -110,7 +137,7 @@ try
     sampleImage = imread(imageNames{1});
     undistortedImage = undistortImage(sampleImage,params,'OutputView','full');
     
-    figure; 
+    ieNewGraphWin([],'wide'); 
     subplot(1,2,1); imshow(sampleImage); title('Input');
     subplot(1,2,2); imshow(undistortedImage); title('Undistroted');
     
@@ -118,4 +145,5 @@ catch
     fprintf('Please install Computer Vision Toolbox\n');
 end
 
-                              
+
+%% END

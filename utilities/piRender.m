@@ -318,7 +318,7 @@ for ii = 1:length(filesToRender)
         tic
         [status, result] = piRunCommand(cmd);
         elapsedTime = toc;
-        disp(result)
+        % disp(result)
         %% Check the return
 
         if status
