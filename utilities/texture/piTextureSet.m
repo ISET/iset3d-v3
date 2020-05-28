@@ -1,4 +1,21 @@
 function thisR = piTextureSet(thisR, textureIdx, param, val, varargin)
+% Set the parameter of a texture (idx)
+%
+% Inputs
+%   thisR
+%   textureIdx
+%   param
+%   val
+%
+% Optional key/val
+%
+% Returns
+%   thisR
+% 
+%
+% See also
+
+
 %% Parse inputs
 param = ieParamFormat(param);
 varargin = ieParamFormat(varargin);

@@ -1,7 +1,5 @@
 %% This scripts demonstrates camera calibration using a checkerboard pattern
 %
-%     UNDER DEVELOPMENT
-%
 % Brief description:
 %   This script shows how to use ISET3d to generate images of a
 %   checkerboard pattern that are analyzed by Matlab's camera calibration.
@@ -37,8 +35,11 @@ if ~piDockerExists, piDockerConfig; end
 % But here we start with that and adjust the parameters of the checkerboard
 % for calibration testing.
 %
-% The board wll have 8 x 7 blocks and be 2.4 x 2.1 meter in size.
-squareSize = 0.1; xsquares = 8; ysquares = 7;
+% The board must have even/odd numbers of blocks for the computer vision
+% toolbox below.
+% The physical size should be calculable from the oi data. Something like
+% using the size of the image in deg and the distance to the object.
+squareSize = 0.1; xsquares = 6; ysquares = 7;
 thisR = piCreateCheckerboard('numX',xsquares,'numY',ysquares,'dimX',squareSize,'dimY',squareSize);
 
 %% Define the camera
@@ -49,6 +50,10 @@ thisR.set('camera type','realistic');
 thisR.set('film diagonal', 6);
 thisR.set('lensfile',fullfile(piRootPath,'data','lens','fisheye.87deg.6.0mm.dat'));
 thisR.set('focus distance',4);
+
+%% This piWrite writes the PBRT file and material file
+
+piWrite(thisR);
 
 %% Render target from different viewpoints
 
@@ -139,7 +144,7 @@ try
     
     ieNewGraphWin([],'wide'); 
     subplot(1,2,1); imshow(sampleImage); title('Input');
-    subplot(1,2,2); imshow(undistortedImage); title('Undistroted');
+    subplot(1,2,2); imshow(undistortedImage); title('Undistorted');
     
 catch
     fprintf('Please install Computer Vision Toolbox\n');

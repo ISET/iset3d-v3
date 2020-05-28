@@ -29,8 +29,6 @@ p.addParameter('dimX',0.1,@isnumeric);
 p.addParameter('dimY',0.1,@isnumeric);
 p.parse(varargin{:});
 
-inputs = p.Results;
-
 %% Read in the base checkerboard file and set metadata
 
 thisR = piRecipeDefault('scene name','checkerboard');
@@ -43,7 +41,7 @@ thisR.metadata.dimY = p.Results.dimY;
 totalWidth  = p.Results.numX * p.Results.dimX;
 totalHeight = p.Results.numY * p.Results.dimY;
 
-cornerX = totalWidth * 0.5;
+cornerX = totalWidth  * 0.5;
 cornerY = totalHeight * 0.5;
 
 % Point coordinates starting from lower left, going counter-clockwise
@@ -62,6 +60,7 @@ geometryFile = fullfile(thisR.get('working directory'),'checkerboard_geometry.pb
 
 if ~exist(geometryFile,'file'), error('No geometry file'); end
 
+% This code needs an explanation. (BW).
 fid = fopen(geometryFile,'r');
 geometry = textscan(fid,'%s','delimiter','\n');
 geometry = geometry{1};
@@ -79,9 +78,12 @@ end
 fclose(fid);
 
 %% Update texture dimensions
-newTexture = strrep(thisR.materials.txtLines{1},'"float uscale" [8]',sprintf('"float uscale" [%i]',inputs.numX));
-newTexture = strrep(newTexture,'"float vscale" [8]',sprintf('"float vscale" [%i]',inputs.numY));
-thisR.materials.txtLines{1} = newTexture;
+
+% We specify the number of checks in the material here.  In the original
+% checkerboard PBRT file there is no definition of the uscale and vscale.
+% So we add it here
+piTextureSet(thisR,1,'floatuscale',thisR.metadata.numX);
+piTextureSet(thisR,1,'floatvscale',thisR.metadata.numY);
 
 materialFile = fullfile(thisR.get('working directory'),'checkerboard_materials.pbrt');
 if ~exist(materialFile,'file'), error('No material file'); end
