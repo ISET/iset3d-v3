@@ -46,6 +46,7 @@ piMaterialGroupAssign(thisR);
 % We have to check what happens when the sceneName is the same as the
 % original, but we have added materials.  This section here is
 % important to clarify for us.
+sceneName = thisR.get('input basename');
 outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
 thisR.set('outputFile',outFile);
 

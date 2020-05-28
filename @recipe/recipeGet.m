@@ -332,6 +332,18 @@ switch ieParamFormat(param)
         % gnames{idx(1)}{dx(2)}
         if isempty(varargin), error('group name required'); end
         val = piAssetNames(thisR,'group find',varargin{1});
+    case {'groupobj'}
+        % groupobj = thisR.get('groupobj',idx);
+        % idx from group index
+        %
+        % idx = piAssetNames(thisR,'group find','figure_3m');
+        thisG = thisR.assets;
+        % Work through the levels
+        for level = 1:idx(1)
+            thisG = thisG.groupobjs;
+        end
+        % Select the group
+        val = thisG(idx(2));
         
     case {'childrennames'}
         % cnames = thisR.get('children names')
@@ -343,10 +355,29 @@ switch ieParamFormat(param)
         % idx = thisR.get('children index',childName)
         % cnames = thisR.get('children names')
         %
+        % These are 3-vectors (level, group, idx)
+        %
         % cnames{idx(1)}{dx(2)}
         %
         if isempty(varargin), error('child name required'); end
         val = piAssetNames(thisR,'children find',varargin{1});
+    case {'child'}
+        % child = thisR.get('child',idx); 
+        %
+        % idx from child index is a 3 vector. There can be multiple
+        % groupobjs at this level and we need to know which one has the
+        % specific child.  So we need
+        %
+        %   [level, groupidx, childidx]
+        %
+        % idx = piAssetNames(thisR,'children find','3_1_Moon Light');
+        thisG = thisR.assets;
+        for level = 1:idx(1)
+            % Work through the levels
+            thisG = thisG.groupobjs;
+        end
+        % Find the group and child
+        val = thisG(idx(2)).children(idx(3));
         
     otherwise
         error('Unknown parameter %s\n',param);
