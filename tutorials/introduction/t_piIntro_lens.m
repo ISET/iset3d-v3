@@ -62,7 +62,7 @@ thisR.set('rays per pixel',64);                      % 128 for high quality
 
 %% Set output file
 
-oiName    = sceneName;
+[~,oiName] = fileparts(thisR.get('inputfile')) ;
 outFile   = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
 outputDir = fileparts(outFile);
 thisR.set('outputFile',outFile);
