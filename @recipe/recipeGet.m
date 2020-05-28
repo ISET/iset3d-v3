@@ -45,6 +45,10 @@ function val = recipeGet(thisR, param, varargin)
 %      'integrator'
 %      'n bounces'
 %
+%    %  Asset information
+%       'assets'      - Not sure I am doing this right
+%       'asset names' - The names in groupobjs.name
+%
 % BW, ISETBIO Team, 2017
 
 % Examples
@@ -70,9 +74,9 @@ p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
-p.addOptional('material', [], @iscell);
+% p.addOptional('material', [], @iscell);
 
-p.parse(thisR,param,varargin{:});
+p.parse(thisR,param);
 
 switch ieParamFormat(param)
     
@@ -312,46 +316,37 @@ switch ieParamFormat(param)
     case{'light'}
         val = thisR.light;
         
-    %{
-    case{'eem'}
-        % val = thisR.get('eem', idx, {'materialName'});
-        if numel(varargin) == 0
-            matNames = fieldnames(thisR.materials.list);
-            val = cell(1, numel(matNames));
-            for ii = 1:numel(matNames)
-                val{ii} = thisR.materials.list.(matNames{ii}).photolumifluorescence;
-            end
-        else
-            matList = varargin{2};
-            val = cell(1, numel(matList));
-            for ii = 1:numel(matList)
-                if ~isfield(thisR.materials.list, matList{ii})
-                    error('Unknown material %s', matList{ii})
-                end
-                val{ii} = thisR.materials.list.(matList{ii}).photolumifluorescence; 
-            end
-        end
+    % Assets - more work needed here.
+    case {'assetroot'}
+        % The root of all assets
+        val = thisR.assets;
         
+    case {'groupnames'}
+        % Cell array (2D) of the groupobj names
+        % val{level}{idx}
+        val = piAssetNames(thisR);
+    case {'groupindex'}
+        % thisR.get('groupindex',groupName)
+        % gnames = thisR.get('group names')
+        %
+        % gnames{idx(1)}{dx(2)}
+        if isempty(varargin), error('group name required'); end
+        val = piAssetNames(thisR,'group find',varargin{1});
         
-    case{'concentration'}
-        % val = thisR.get('concentration', idx, {'materialName'});
-        if numel(varargin) == 0
-            matNames = fieldnames(thisR.materials.list);
-            val = cell(1, numel(matNames));
-            for ii = 1:numel(matNames)
-                val{ii} = thisR.materials.list.(matNames{ii}).floatconcentration;
-            end
-        else
-            matList = varargin{2};
-            val = cell(1, numel(matList));
-            for ii = 1:numel(matList)
-                if ~isfield(thisR.materials.list, matList{ii})
-                    error('Unknown material %s', matList{ii})
-                end
-                val{ii} = thisR.materials.list.(matList{ii}).floatconcentration; 
-            end
-        end 
-    %}
+    case {'childrennames'}
+        % cnames = thisR.get('children names')
+        % Cell array (2D) of the children names
+        %
+        [~,val] = piAssetNames(thisR);
+        
+    case {'childrenindex'}
+        % idx = thisR.get('children index',childName)
+        % cnames = thisR.get('children names')
+        %
+        % cnames{idx(1)}{dx(2)}
+        %
+        if isempty(varargin), error('child name required'); end
+        val = piAssetNames(thisR,'children find',varargin{1});
         
     otherwise
         error('Unknown parameter %s\n',param);

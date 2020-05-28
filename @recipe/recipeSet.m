@@ -86,8 +86,9 @@ switch param
         newDir     = fileparts(val);
         if ~exist(newDir,'dir'), mkdir(newDir); end
         
-        % Are we changing the output directory?
-        if isequal(currentDir,newDir)
+        % Are we changing the output directory?  On the MAC, directory case
+        % is not respected, so ...
+        if isequal(lower(currentDir),lower(newDir))
             % Nothing needs to be done
         else
             % We start copying from the current to the new

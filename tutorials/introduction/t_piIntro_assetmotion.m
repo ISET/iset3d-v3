@@ -1,18 +1,18 @@
 %% Add motion blur of an asset to the scene
 %
-% This script shows how to add motion blur to individual objects in
-% a scene.
+% Brief description:
+%   This script shows how to add motion blur to individual objects in a
+%   scene.
 %
 % Dependencies:
-%
 %    ISET3d, ISETCam 
 %
 % Check that you have the updated docker image by running
 %
 %    docker pull vistalab/pbrt-v3-spectral
-%    docker pull vistalab/pbrt-v3-spectral:test
 %
-% Zhenyi SCIEN 2019
+% Authors:
+%   Zhenyi SCIEN 2019
 %
 % See also
 %   t_piIntro_*
@@ -24,25 +24,17 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt files
 
-sceneName = 'simpleScene';
-
-FilePath = fullfile(piRootPath,'data','V3',sceneName);
-fname = fullfile(FilePath,[sceneName,'.pbrt']);
-if ~exist(fname,'file'), error('File not found'); end
-
-thisR = piRead(fname);
+thisR = piRecipeDefault('scene name','SimpleScene');
 
 %% Set render quality
 
 % This is a low resolution for speed.
 thisR.set('film resolution',[200 150]);
-thisR.set('pixel samples',32);
+thisR.set('rays per pixel',32);
+thisR.set('fov',45);
+thisR.set('nbounces',5); 
 
 %% List material library
-
-% This value determines the number of ray bounces.  The scene has
-% glass we need to have at least 2 or more.
-thisR.integrator.maxdepth.value = 5;
 
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on
@@ -50,7 +42,6 @@ thisR.integrator.maxdepth.value = 5;
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-thisR.set('fov',45);
 
 % We have to check what happens when the sceneName is the same as the
 % original, but we have added materials.  This section here is
@@ -60,17 +51,23 @@ thisR.set('outputFile',outFile);
 
 % The first time, we create the materials folder.
 piWrite(thisR,'creatematerials',true);
+
 %{
-coordMap = piRender(thisR,'renderType','coordinates');
-coordMap((coordMap(:,:,1)==0) & (coordMap(:,:,2)==0) & (coordMap(:,:,3)==0)) = NaN;
-x  = coordMap(:,:,1) - thisR.lookAt.from(1);
-y  = coordMap(:,:,2) - thisR.lookAt.from(2);
-z  = coordMap(:,:,3) - thisR.lookAt.from(3);
-player = pcplayer([min(x(:)), nanmax(x(:))],...
-[min(z(:)), nanmax(z(:))],...
-[min(y(:)), nanmax(y(:))]);
+% Just showing off that we can do some stuff with point clouds.
+% Not sure why this is here!
+
+ coordMap = piRender(thisR,'renderType','coordinates');
+ coordMap((coordMap(:,:,1)==0) & (coordMap(:,:,2)==0) & (coordMap(:,:,3)==0)) = NaN;
+ x  = coordMap(:,:,1) - thisR.lookAt.from(1);
+ y  = coordMap(:,:,2) - thisR.lookAt.from(2);
+ z  = coordMap(:,:,3) - thisR.lookAt.from(3);
+
+ player = pcplayer([min(x(:)), nanmax(x(:))],...
+                   [min(z(:)), nanmax(z(:))],...
+                   [min(y(:)), nanmax(y(:))]);
 ptCloud = pointCloud([x(:),z(:),y(:)]);
 view(player,ptCloud);
+
 %}
 %% Render.  
 
@@ -79,10 +76,11 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.7);
 
-%% Introduce motion blur
+%% Introduce asset (object) motion blur (not camera motion)
 
 % The motion blur is assigned to a particular asset.  In this example,
 % we are moving the third asset, assets(3)
+
 fprintf('Moving asset named: %s\n',thisR.assets.groupobjs(3).name);
 
 % Check current object position

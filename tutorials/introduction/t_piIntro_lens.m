@@ -58,7 +58,7 @@ thisR = piRecipeDefault;
 
 % Set resolution for speed or quality.
 thisR.set('film resolution',round([600 600]*0.25));  % 2 is high res. 0.25 for speed
-thisR.set('rays per pixel',16);                      % 128 for high quality
+thisR.set('rays per pixel',64);                      % 128 for high quality
 
 %% Set output file
 
@@ -90,7 +90,7 @@ thisR.set('focal distance',mean(depthRange));
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters (default 22)
-thisR.set('film diagonal',33);
+thisR.set('film diagonal',66);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
