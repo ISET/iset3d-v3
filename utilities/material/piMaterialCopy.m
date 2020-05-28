@@ -1,4 +1,4 @@
-function thisMaterial = piMaterialCopy(thisMaterial,target)
+function thisMaterial = piMaterialCopy(thisMaterial, target)
 
 materialProperties = fieldnames(target);
 nProperties = length(materialProperties);

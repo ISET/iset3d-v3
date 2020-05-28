@@ -82,7 +82,7 @@ piWrite(thisR, 'overwritematerials', true);
 % radiance.
 thisDocker = 'vistalab/pbrt-v3-spectral';
 wave = 400:10:700;
-[scene, result] = piRender(thisR, 'wave', wave, 'dockerimage name', thisDocker, 'render type','radiance');
+[scene, result] = piRender(thisR, 'wave', wave, 'dockerimage name', thisDocker, 'render type','illuminant');
 sceneWindow(scene);
 
 %%

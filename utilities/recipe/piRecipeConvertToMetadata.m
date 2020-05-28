@@ -34,9 +34,7 @@ if strcmp(metadata, 'illuminant') || strcmp(metadata, 'illuminantonly')
 
     for ii = 1:numel(mlist)
         totalReflection.name = mlist{ii}.name;
-        material = metadataRecipe.materials.list{ii};    % A string labeling the material 
-        piMaterialAssign(metadataRecipe, material.name, totalReflection);
-        piMaterialSet(metadataRecipe, ii, 'eem', '')
+        metadataRecipe.materials.list{ii} = totalReflection;
     end
     
 else
