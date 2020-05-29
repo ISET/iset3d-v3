@@ -119,6 +119,7 @@ for i=1:length(objects.children)
     end
 end
 
+
 for j=1:length(objects.groupobjs)
     recursiveWriteObjects(fid,objects.groupobjs(j), rootPath);
 end
@@ -171,7 +172,7 @@ for n=1:length(objects)
                     pos(2),pos(3));
             end
             
-            if ~isempty(currentObject.motion.rotate)
+            if isfield(currentObject.motion, 'rotate') && ~isempty(currentObject.motion.rotate)
                 rot = currentObject.motion.rotate;
                 % Write out rotation
                 fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z

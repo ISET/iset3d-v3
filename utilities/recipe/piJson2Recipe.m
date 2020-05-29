@@ -42,6 +42,14 @@ for dd = 1:length(fds)
     end
 end
 
+%% Change the path to the lens file
+if isfield(thisR.camera, 'lensfile')    
+    [~,lensName, extend] = fileparts(thisR.camera.lensfile.value);
+    if ~isempty(which(strcat(lensName, extend)))
+        thisR.camera.lensfile.value = which(strcat(lensName, extend));
+    end
+end
+%%
 % piUpdateRecipe - convert the old version of recipe to newer one
 % where texture is a separate slot.
 if isempty(thisR.textures)

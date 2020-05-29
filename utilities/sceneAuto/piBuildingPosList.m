@@ -52,14 +52,14 @@ end
 aveW = sum/length(buildingList)+10; % calculate the average width of all the buildings
                                     % variable aveW can be used to delete
                                     % unnecessary buildings in the scene
-for kk = 1:length(objects.assets)
-    name = strsplit(objects.assets(kk).name, '_');
+for kk = 1:length(objects.assets.groupobjs)
+    name = strsplit(objects.assets.groupobjs(kk).name, '_');
     if strcmp(name{1}, 'Plane') % if the object is a building region.
         count_before = count;
         type = name{2};     % extract region information
-        lenx_tmp = objects.assets(kk).size.l;
-        leny_tmp = objects.assets(kk).size.w;
-        coordination = objects.assets(kk).position;
+        lenx_tmp = objects.assets.groupobjs(kk).size.l;
+        leny_tmp = objects.assets.groupobjs(kk).size.w;
+        coordination = objects.assets.groupobjs(kk).position;
         y_up = coordination(2);
         coordination = [coordination(1),coordination(3)];
         switch type

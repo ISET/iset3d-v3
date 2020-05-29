@@ -2,7 +2,7 @@ function thisR = piUpdateRecipe(thisR)
 % Convert recipe from old structure to newer structure. The change(s) are:
 %   1. Change material format: Extract texture from material slot and make it 
 %      a separate slot.
-% 
+%   2. Rearrange assets to new structure
 % Syntax:
 %
 % Description:
@@ -33,5 +33,11 @@ texturelist  = piBlockExtractTexture(thisR, textureLines);
 thisR.textures.list = texturelist;
 thisR.textures.txtLines = textureLines;
 thisR.textures.inputFile_textures = thisR.materials.inputFile_materials;
+
+%% Update assets
+if isprop(thisR, 'assets') && ~isfield(thisR.assets, 'groupobjs')
+    thisR = piAssetsRebuild(thisR);
+end
+
 
 end
