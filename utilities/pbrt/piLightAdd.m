@@ -8,51 +8,57 @@ function thisR = piLightAdd(thisR, varargin)
 %   Change the light structs in recipe
 %
 % Inputs:
-%       'thisR' -  Insert a light source in this recipe.
+%       'thisR' -  Insert a light source into this recipe.
 %
 % Optional key/value pairs
 %
-%       'type'  - The type of light source to insert. Can be the following:
-%             'point'   - Casts the same amount of illumination in all
+%  Many key/value pairs to define the light are acceptable in the varargin.
+%  This routine calls piLightCreate with the variables in varargin, and that
+%  function in turn calls  piLightSet to set all the key/value pairs here.
+%  
+%  The list of settable light parameters is determined by the light
+%  parameters in PBRT. Those parameters are defined on this web-page in the
+%  PBRT web site.
+%
+%      https://www.pbrt.org/fileformat-v3.html#lights
+%
+%  Some of the most important variables are listed here for convenience.
+%  See some of the examples in piLightSet, also.
+%
+%    'type'  - The type of light source to insert. Can be the following:
+%          'point'   - Casts the same amount of illumination in all
 %                         directions. Takes parameters 'to' and 'from'.
-%             'spot'    - Specify a cone of directions in which light is
+%          'spot'    - Specify a cone of directions in which light is
 %                         emitted. Takes parameters 'to','from',
 %                         'coneangle', and 'conedeltaangle.'
-%             'distant' - A directional light source "at
+%          'distant' - A directional light source "at
 %                         infinity". Takes parameters 'to' and 'from'.
-%             'area'    - convert an object into an area light. (TL: Needs
+%          'area'    - convert an object into an area light. (TL: Needs
 %                         more documentation; I'm not sure how it's used at
 %                         the moment.)
-%             'infinite' - an infinitely far away light source that
+%          'infinite' - an infinitely far away light source that
 %                          potentially casts illumination from all
 %                          directions. Takes no parameters.
 %
-%       'spectrum' - The spectrum that the light will emit. Read
+%     'spectrum' - The spectrum that the light will emit. Read
 %                          from ISETCam/ISETBio light data. See
 %                          "isetbio/isettools/data/lights" or
 %                          "isetcam/data/lights."
-%       'spectrumscale'  - scale the spectrum. Important for setting
+%      'spectrum scale'  - scale the spectrum. Important for setting
 %                          relative weights for multiple light sources.
-%       'cameracoordinate' - true or false. automatically place the light
+%      'camera coordinate' - true or false. automatically place the light
 %                            at the camera location.
-%       'update'         - update an existing light source.
+%      'update'         - update an existing light source.
 %
-%       For more information in the different light sources and their
-%       parameters, take a look at the PBRT web page:
-%
-%       https://www.pbrt.org/fileformat-v3.html#lights
-%
-%       Not all the lights and parameters can be represented in ISET3d at
-%       the moment, but our hope is that they will be in the future.
 %
 % Outputs:
+%   thisR - Returned, but not really necessary because it is pass by
+%           reference.
 %
 % Zhenyi, TL, SCIEN, 2019
 %
-% Required: ISETCam
-%
 % See also:
-%   piSkymapAdd, piLight*
+%   piLightSet, piLightCreate
 %
 
 % Examples:
@@ -84,11 +90,12 @@ newLightSource   = p.Results.newlightsource;
 
 %%
 if idxL
-    %% Updating the light at index idxL
+    %% Update an existing light with index idxL
     
     if ~isempty(newLightSource)
         thisR.lights{idxL} = newLightSource;
     else
+        % Set all the variables except for 'update' and 'newlightsource'
         for ii=1:2:numel(varargin)
             if ~strcmp(varargin{ii}, 'update') && ~strcmp(varargin{ii}, 'newlightsource')
                 piLightSet(thisR,idxL,varargin{ii},varargin{ii+1});
@@ -98,14 +105,20 @@ if idxL
     
 else
     %% Create a new light
+    
+    % These are the parameters for initializing the new light.  They are
+    % built up from the varargin sent here.  We remove the 'update' and
+    % 'newlightsource' parameters because they are not part of PBRT.
     newVarargin = {};
     for ii = 1:2:numel(varargin)
         if ~strcmp(varargin{ii}, 'update') && ~strcmp(varargin{ii}, 'newlightsource')
             newVarargin = [newVarargin, varargin{ii:ii+1}];
         end
     end
-    piLightInit(thisR, newVarargin{:});
-    thisR.lights = piLightGet(thisR, 'print', false);
+    
+    % We create the light with parameters sent in by varargin. We call
+    % piLightCreate.  The new light is attached to the recipe upon return.
+    piLightCreate(thisR, newVarargin{:});
 
 end
 

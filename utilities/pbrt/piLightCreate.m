@@ -1,10 +1,8 @@
-function light = piLightInit(thisR, varargin)
-% Initialize a default light source struct for a recipe
-%
-% (This should be piLightCreate, I think)
+function light = piLightCreate(thisR, varargin)
+% Create a default light source struct for a recipe
 %
 % Synopsis
-%   light = piLightInit(thisR,varargin)
+%   light = piLightCreate(thisR,varargin)
 %
 % Inputs:
 %   thisR: 
@@ -79,34 +77,3 @@ for ii=1:2:length(varargin)
 end
 
 end
-
-%% OLD code: Write out lightspectrum into a light .spd file
-%{
-try
-    % Load from ISETCam/ISETBio ligt data
-    thisLight = load(lightSpectrum);
-catch
-    error('%s light is not recognized \n', lightSpectrum);
-end
-
-%% Write out the SPD and copy it into the recipe output directory
-
-% Saved
-outputDir     = fileparts(thisR.outputFile);
-lightSpdDir   = fullfile(outputDir, 'spds', 'lights');
-thisLightfile = fullfile(lightSpdDir,...
-    sprintf('%s.spd', lightSpectrum));
-if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
-fid = fopen(thisLightfile, 'w');
-for ii = 1: length(thisLight.data)
-    fprintf(fid, '%d %d \n', thisLight.wavelength(ii), thisLight.data(ii)*light.spectrumscale);
-end
-fclose(fid);
-
-%{
-% Copy the spectrum to the proper spd directory
-if ~isfile(fullfile(lightSpdDir,strcat(lightSpectrum, '.mat')))
-    copyfile(which(strcat(lightSpectrum, '.mat')), lightSpdDir);
-end
-%}
-%}

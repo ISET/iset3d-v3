@@ -11,19 +11,45 @@ function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
 %   val:      The new value
 %
 % Optional key/val pairs
-%   print:   Printout the list of lights
+%   print:   - Printout the list of lights
+%  'update'  - update an existing light source.
 %
-% Returns
-%   lightSource:  Modified light source
+% The list of settable light parameters is determined by the light
+% parameters in PBRT. That is defined on this web-page
+%
+%      https://www.pbrt.org/fileformat-v3.html#lights
+%
+% Here is a partial list and there are some examples below
+%
+%  'type'  - The type of light source to insert. Can be the following:
+%             'point'   - Casts the same amount of illumination in all
+%                         directions. Takes parameters 'to' and 'from'.
+%             'spot'    - Specify a cone of directions in which light is
+%                         emitted. Takes parameters 'to','from',
+%                         'coneangle', and 'conedeltaangle.'
+%             'distant' - A directional light source "at
+%                         infinity". Takes parameters 'to' and 'from'.
+%             'area'    - convert an object into an area light. (TL: Needs
+%                         more documentation; I'm not sure how it's used at
+%                         the moment.)
+%             'infinite' - an infinitely far away light source that
+%                          potentially casts illumination from all
+%                          directions. Takes no parameters.
+%
+%  'spectrum' - The spectrum that the light will emit. Read
+%                          from ISETCam/ISETBio light data. See
+%                          "isetbio/isettools/data/lights" or
+%                          "isetcam/data/lights."
+%  'spectrum scale'  - scale the spectrum. Important for setting
+%                          relative weights for multiple light sources.
+%  'camera coordinate' - true or false. automatically place the light
+%                            at the camera location.
+%
 %
 % Zheng,BW, SCIEN, 2020
 %
-% TODO
-%   Build a switch statement for the param value, checking it is a
-%   legitimate part of the light source structure
-%
 % See also
-%   piLightDelete, piLightAdd, piLightGet
+%   piLightCreate, piLightDelete, piLightAdd, piLightGet
 %
 
 % Examples
@@ -69,6 +95,7 @@ function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
                         'cameracoordinate', true);
     lightNumber = 2;
     thisR = piLightSet(thisR, lightNumber, 'coneAngle', 20);
+
     piWrite(thisR, 'overwritematerials', true);
 
     % Render

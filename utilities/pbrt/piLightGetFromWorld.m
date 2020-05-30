@@ -52,7 +52,7 @@ lightSources = cell(1, nLights);
 
 for ii = 1:nLights
 %     % Initialize the light structure
-%     lightSources{ii} = piLightInit(thisR);
+%     lightSources{ii} = piLightCreae(thisR);
     
     % Find the attributes sections of the world text
     if length(AttBegin) >= ii
