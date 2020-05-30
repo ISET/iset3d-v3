@@ -61,6 +61,7 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
         % it? ZLY
         
         piMaterialCreate(thisR, 'name', 'paint_mirror');
+        
         thisR.materials.list{end} = ...
             piMaterialCopy(thisR.materials.list{end},target.paint_mirror);
         

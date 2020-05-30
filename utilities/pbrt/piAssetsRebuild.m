@@ -9,7 +9,7 @@ p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
 p.parse(thisR);
 
-%%
+%% Make sure the modern fields exist in all assets in the old format recipe
 fieldList = {"name", "index", "mediumInterface", "material",...
                 "light", "areaLight", "shape", "output", "motion", "scale"};
 for ii = 1:numel(thisR.assets)
@@ -34,11 +34,16 @@ for ii = 1:numel(thisR.assets)
 end
 
 
-%%
+%% The old assets are flat structure. 
+% We created a root node and put all the old assets into the groupobj. So
+% when new assets are created from the old ones, they will always be flat.
+% You'll have to rearrange if you want them to be hierarcichal.
+
 newAssets = createGroupObject();
 newAssets.name = 'root';
-newAssets.groupobjs = thisR.assets;
+newAssets.groupobjs = thisR.assets; % All the assets in the first and only level
 thisR.assets = newAssets;
+
 end
 
 function obj = createGroupObject()

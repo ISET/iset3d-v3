@@ -48,6 +48,7 @@ classdef recipe < matlab.mixin.Copyable
         exporter = '';
         media;           % Volumetric rendering media.
         metadata;
+        recipeVer = 2;
     end
     
     properties (Dependent)

@@ -18,8 +18,8 @@ assetsnameList = fieldnames(assets);
 trafficAssets = {'car', 'pedestrian', 'bus', 'truck', 'bicycle'};
 for ll = 1: length(assetsnameList)
     if find(piContains(trafficAssets,assetsnameList{ll}))
-        if ~isfield(thisR.assets.groupobjs,'motion')
-            [thisR.assets.groupobjs(:).motion] = deal([]);
+        if ~isfield(thisR.assets,'motion')
+            [thisR.assets.motion] = deal([]);
         end        
         thisR = AddMaterialandGeometry(assets,assetsnameList{ll},material,geometry,thisR);
     else
@@ -40,8 +40,7 @@ for ii = 1:length(assets.(assetname))
         end
         % add objects.material to thisR.materials.list
         for nn = 1:length(nObj)
-            thisR.materials.list{end+1} = piMaterialCopy(struct(),...
-                            assets.(assetname)(ii).material.list.(nObj{nn}));
+            thisR.materials.list.(nObj{nn}) = assets.(assetname)(ii).material.list.(nObj{nn});
         end
         index = 1;
         for jj = length(thisR.materials.txtLines):(length(thisR.materials.txtLines) +...
@@ -51,7 +50,7 @@ for ii = 1:length(assets.(assetname))
         end
     end
     %% add objects.geometry to scene(geometry struct)
-    scene = thisR.assets.groupobjs;
+    scene = thisR.assets;
     if isfield(scene,'scale'),scene=rmfield(scene,'scale');end
     % add motion slot
     if geometry
@@ -71,7 +70,7 @@ for ii = 1:length(assets.(assetname))
         scenePath = fileparts(thisR.outputFile);
         copyfile(assetPath, scenePath);
     end
-    thisR.assets.groupobjs = scene;
+    thisR.assets = scene;
 end
 
 end
