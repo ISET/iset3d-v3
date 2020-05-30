@@ -1,67 +1,28 @@
-function obj = piAssetCreate(varargin)
-% Create a struct defining a graphics object in recipe
+function asset = piFWAssetCreate(varargin)
+% Create a struct of Flywheel assets 
 %
-% Synopsis
-%  asset = piAssetCreate(varargin)
+% Description
+%  The assets are found on Flywheel.  Each asset is stored with a
+%  generic recipe that defines how to render it. The information about
+%  all of the assets in the scene are placed in the returned asset
+%  struct. This has slots like asset.bicycle()
 %
-% Brief description
-%  The objects form a tree within the thisR.assets.  They define the
-%  rotations, translations and material properties of the object either at
-%  the node level or at the individual leafs of the tree.  The material
-%  properties are usually in the leafs, and the transformations apply from
-%  the nodes on down and are concatenated.
+% Inputs
+%   N/A
 %
-%  The original form of this function downloaded assets from flywheel and
-%  assembled them into an asset structure.  That has been renamed to
-%  piFWAssetCreate();
+% Optional key/value parameters
+%   ncars
+%   ntrucks
+%   nped
+%   nbuses
+%   ncyclist
+%   scitran
 %
-% ZLY, BW
+% Returns
+%   assets - Struct with the asset geometries and materials
 %
-% See also
-%   piFWAssetCreate;
+% Zhenyi, Vistasoft Team, 2018
 
-% Examples:
-%{
-  % Small tree of graphics objects
-  obj(1) = piAssetCreate;
-  obj(2) = piAssetCreate;
-  obj(1).obj = piAssetCreate;
-%}
-
-%%
-obj.name = [];
-obj.size.l = 0;
-obj.size.w = 0;
-obj.size.h = 0;
-obj.size.pmin = [0 0];
-obj.size.pmax = [0 0];
-obj.scale = [1 1 1];
-obj.position = [0 0 0];
-obj.rotate = [0 0 0;
-              0 0 1;
-              0 1 0;
-              1 0 0];
- 
-obj.children = [];
-obj.index = [];
-obj.mediumInterface = [];
-obj.material = [];
-obj.light = [];
-obj.areaLight = [];
-obj.shape = {};
-obj.output = {};
-
-%{
-% Set the parameters requested by the user
-if ~isempty(varargin)
-    for ii=1:2:numel(varargin)
-       obj = piAssetSet(obj,varargin{ii},varargin{ii+1});
-    end
-%}
-
-end
-%
-%{
 %% Parse input parameters
 varargin =ieParamFormat(varargin);
 
@@ -158,4 +119,3 @@ end
 disp('Assets are assembled!')
 
 end
-%}

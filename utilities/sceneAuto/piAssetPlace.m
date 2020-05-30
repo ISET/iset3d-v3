@@ -49,13 +49,13 @@ if isfield(trafficflow(timestamp).objects,'truck')
 else
     ntrucks = 0;
 end
-assets = piAssetCreate('ncars',ncars);
-% assets = piAssetCreate('ncars',ncars,'nped',nped,...
+assets = piFWAssetCreate('ncars',ncars);
+% assets = piFWAssetCreate('ncars',ncars,'nped',nped,...
 %                        'nbuses',nbuses,'ntrucks',ntrucks);
 
 % if isfield(lower(trafficflow(timestamp).objects),'bus')
 % nBuses = trafficflow(timestamp).objects.Bus;
-% assets_bus = piAssetCreate('nbus',nbuses);end
+% assets_bus = piFWAssetCreate('nbus',nbuses);end
 %% objects positions are classified by class, building/trees might be different.
 assets_updated = assets;
 

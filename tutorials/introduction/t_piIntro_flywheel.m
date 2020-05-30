@@ -43,7 +43,7 @@ thisR = piRead(fname);
 
 %% get a random car and a random person from flywheel
 % take some time, maybe you dont want to run this everytime when you debug
-% assets = piAssetCreate('ncars',1, 'nped',1);
+% assets = piFWAssetCreate('ncars',1, 'nped',1);
 st = scitran('stanfordlabs');
 subject = st.lookup('wandell/Graphics auto/assets');
 session = subject.sessions.findOne('label=car');

@@ -64,7 +64,7 @@ scene_1 = piGeometryRead(thisR);
 
 %% Add two cars from the Flywheel database
 
-assets = piAssetCreate('ncars',2,'nbuses',1);
+assets = piFWAssetCreate('ncars',2,'nbuses',1);
 
 
 %% Move assets
