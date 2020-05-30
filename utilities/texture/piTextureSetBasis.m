@@ -78,7 +78,8 @@ if isnumeric(basisFunctions)
 elseif exist(basisFunctions, 'file') % basis functions are stored in a file
     load(basisFunctions, 'basis');
     load(basisFunctions, 'illuminant');
-    basis = interp1(illuminant(:), basis, wave(:), 'linear'); %#ok
+    basisWave = illuminant.wave;
+    basis = interp1(basisWave, basis, wave(:), 'linear'); %#ok
 else
     error('Unable to assign this set basis functions.');
 end

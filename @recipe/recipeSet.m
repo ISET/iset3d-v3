@@ -401,9 +401,9 @@ switch param
             thisR.materials.list.(matName).floatconcentration = [];
         else
             wave = 365:5:705; % By default it is the wavelength range used in pbrt
-            fluophores = fluorophoreRead(fluorophoresName,'wave',wave);
+            fluorophores = fluorophoreRead(fluorophoresName,'wave',wave);
             % Here is the excitation emission matrix
-            eem = fluorophoreGet(fluophores,'eem');
+            eem = fluorophoreGet(fluorophores,'eem');
             %{
                  fluorophorePlot(Porphyrins,'donaldson mesh');
             %}
