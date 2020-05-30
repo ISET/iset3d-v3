@@ -89,6 +89,9 @@ if isfield(lightSource, 'lightspectrum')
         lightSpectrum = sprintf('"spds/lights/%s.spd"', lightSource.lightspectrum);
     end
 else
+    % There is no specified light spectrum.  So we assign D65.
+    lightSpectrum = sprintf('"spds/lights/%s.spd"', 'D65');
+    lightSource.lightspectrum = 'D65';
 end
 
 if isfield(lightSource, 'from'), from = lightSource.from;
