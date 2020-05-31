@@ -141,15 +141,21 @@ for x=1:6
 
         macbethRecipe.assets.groupobjs = cat(1,macbethRecipe.assets.groupobjs,newAsset);
         
+        data = [wave(:), macbethSpectra(:,cubeID)]';
         
+        currentMaterial = piMaterialCreate(macbethRecipe, 'name', sprintf('Cube_%02i_material',cubeID),...
+            'stringtype','matte','spectrumkd',data(:));
+        
+        %{
         currentMaterial = piMaterialCreate();
         currentMaterial.name = sprintf('Cube_%02i_material',cubeID);
         currentMaterial.string = 'matte';
         
-        data = [wave(:), macbethSpectra(:,cubeID)]';
+        
         currentMaterial.spectrumkd = data(:);
         
         macbethRecipe.materials.list.(currentMaterial.name) = currentMaterial;
+           %}
     end
 end
 macbethRecipe.materials.txtLines = {};

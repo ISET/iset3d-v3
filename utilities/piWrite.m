@@ -413,10 +413,16 @@ end
 
 %% Write out WorldBegin/WorldEnd
 
+
+fprintf(fileID,'WorldBegin\n');
+
+
+
 % Temporarily add light to world so it's easier for us to compose the PBRT
 % file
 for ii = 1:numel(renderRecipe.lights)
-    renderRecipe = piLightAddToWorld(renderRecipe, 'light source', renderRecipe.lights{ii});
+    light = piLightAddToWorld(renderRecipe, 'light source', renderRecipe.lights{ii});
+    fprintf(fileID,'%s\n',light{1}.line{1});
 end
 
 %{
@@ -430,6 +436,11 @@ if creatematerials
     % which defines these new materials.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
+        
+        if piContains(currLine, 'WorldBegin')
+            continue;
+        end
+        
         if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
@@ -450,6 +461,11 @@ else
     % without any changes.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
+        
+        if piContains(currLine, 'WorldBegin')
+            continue;
+        end
+        
         if overwritegeometry
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(renderRecipe.outputFile);
@@ -460,7 +476,7 @@ else
     end
 end
 
-renderRecipe = piLightDeleteWorld(renderRecipe, 'all');
+% renderRecipe = piLightDeleteWorld(renderRecipe, 'all');
 %{
     % Check if we removed all lights
     piLightGetFromWorld(renderRecipe)

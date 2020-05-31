@@ -1,4 +1,4 @@
-function thisR = piLightAddToWorld(thisR, varargin)
+function lightSources = piLightAddToWorld(thisR, varargin)
 % Add different types of light sources to world struct
 %
 % Syntax
@@ -84,7 +84,7 @@ else, type = 'point'; end
 
 if isfield(lightSource, 'lightspectrum')
     if isnumeric(lightSource.lightspectrum)
-        lightSpectrum = ['[ ' num2str(lightSource.lightspectrum), ']'];
+        lightSpectrum = ['[ ' num2str(reshape(lightSource.lightspectrum, [1, numel(lightSource.lightspectrum)])), ']'];
     else
         lightSpectrum = sprintf('"spds/lights/%s.spd"', lightSource.lightspectrum);
     end
@@ -271,34 +271,6 @@ switch type
                                                 spectrumType, lightSpectrum, twosided, nsamples);
         
 end
-%% Update the world data
-
-% index_m and index_g are the lines that include the path to materials and
-% geometry files. We insert information about the light sources above thse
-% two lines.
-
-index_m = piContains(thisR.world,'_materials.pbrt');
-index_g = piContains(thisR.world,'_geometry.pbrt');
-insertIndex = sum(index_m + index_g)+1;
-world = thisR.world(1:end-insertIndex);
-for jj = 1: length(lightSources)
-    numWorld = length(world);
-    for kk = 1: length(lightSources{jj}.line)
-        world{numWorld+kk,:} = lightSources{jj}.line{kk};
-    end
-end
-
-% Append the materials and geometry lines below the information about the
-% light sources.
-numWorld = length(world);
-if any(index_m)
-    world{numWorld+1,:} = thisR.world{index_m};
-end
-if any(index_g)
-    world{numWorld+2,:} = thisR.world{index_g};
-end
-world{end+1,:} = 'WorldEnd';
-thisR.world = world;
 
 end
 

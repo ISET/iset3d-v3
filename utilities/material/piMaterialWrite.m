@@ -115,7 +115,7 @@ end
 
 if ~isempty(thisR.media)
     for m=1:length(thisR.media.list)
-        fprintf(fileID, piMediumText(thisR.media.list(m), workDir));
+        fprintf(fileID, piMediumText(thisR.media.list(m), thisR.get('working directory')));
     end
 end
 
