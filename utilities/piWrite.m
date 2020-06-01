@@ -415,9 +415,17 @@ end
 
 % Temporarily add light to world so it's easier for us to compose the PBRT
 % file
+% We are planning to change piLightAddToWorld to something like
+% piLightWrite(recipe). Planning to wrap the light information into another
+% file called "sceneName_lights.pbrt". We will write 
+% "curLine = sprintf('Include "%s_lights.pbrt"',n);" into world.
+%{
 for ii = 1:numel(renderRecipe.lights)
     renderRecipe = piLightAddToWorld(renderRecipe, 'light source', renderRecipe.lights{ii});
 end
+%}
+
+piLightWrite(renderRecipe);
 
 %{
     % Check if we write all the lights there
@@ -442,6 +450,10 @@ if creatematerials
             end
         end
         
+        if piContains(currLine, 'WorldEnd')
+            [~,n] = fileparts(renderRecipe.outputFile);
+            fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
+        end
         fprintf(fileID,'%s \n',currLine);
     end
     
@@ -456,11 +468,15 @@ else
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
         end
+        if piContains(currLine, 'WorldEnd')
+            [~,n] = fileparts(renderRecipe.outputFile);
+            fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
+        end
         fprintf(fileID,'%s \n',currLine);
     end
 end
 
-renderRecipe = piLightDeleteWorld(renderRecipe, 'all');
+% renderRecipe = piLightDeleteWorld(renderRecipe, 'all');
 %{
     % Check if we removed all lights
     piLightGetFromWorld(renderRecipe)

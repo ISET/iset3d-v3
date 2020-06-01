@@ -62,6 +62,7 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
         
         piMaterialCreate(thisR, 'name', 'paint_mirror');
         
+        
         thisR.materials.list{end} = ...
             piMaterialCopy(thisR.materials.list{end},target.paint_mirror);
         
@@ -113,23 +114,16 @@ if isfield(target,'paint_base') && isfield(target,'paint_mirror')
 %         piCopyColor(thisR.materials.list.(slotname1), p);
     
 else
-    % The original material is not an array, but rather a struct with many
-    % names.  The new version is an array.  The idx is either a cell that
-    % defines the name of the slot (old version) or a number that defines
-    % the index into the materials list (new version).
-    %
-    if iscell(idx)
-        t = idx{1};
-        thisR.materials.list.(t) = piMaterialCopy(thisR.materials.list.(t),target);
-        thisR.materials.list.(t) = piCopyColor(thisR.materials.list.(t), p);
-    else
-        thisR.materials.list{idx} = ...
-            piMaterialCopy(thisR.materials.list{idx},target);
-        
-        %% Assign color the person sent ins
-        thisR.materials.list{idx} = ...
-            piCopyColor(thisR.materials.list{idx}, p);
-    end
+    % The original material has every possible type of material slot.
+    % We write all of the target slots into the corresponding material
+    % slots
+    thisR.materials.list{idx} = ...
+        piMaterialCopy(thisR.materials.list{idx},target);
+    
+    %% Assign color the person sent ins
+    thisR.materials.list{idx} = ...
+        piCopyColor(thisR.materials.list{idx}, p);
+    
 end
 
 

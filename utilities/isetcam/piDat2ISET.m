@@ -45,6 +45,7 @@ p.addParameter('recipe',[],@(x)(isequal(class(x),'recipe')));
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleilluminance',true,@islogical);
 p.addParameter('wave', 400:10:700, @isnumeric);
+% p.addParameter('wave', 365:5:705, @isnumeric);
 
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;

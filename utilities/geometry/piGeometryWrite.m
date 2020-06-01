@@ -134,6 +134,11 @@ function recursiveWriteGroups(fid, objects)
 % Parse the geometry object tree and for every group object replace the
 % actuall geometry with the 'Include' directive.
 
+%{
+persistent first;
+first = strcat(first, " ");
+%}
+
 if isempty(objects)
     return;
 end
@@ -187,17 +192,22 @@ for n=1:length(objects)
            if ~isempty(currentObject.children(j).mediumInterface)
                fprintf(fid, '%s\n', currentObject.children(j).mediumInterface);
            end
+           %{
            if ~isempty(currentObject.children(j).material)
                fprintf(fid, '%s\n', currentObject.children(j).material);
            end
+           %}
            
            if ~isempty(currentObject.children(j).areaLight)
                fprintf(fid, '%s\n', currentObject.children(j).areaLight);
            end
            
+           %{
            if ~isempty(currentObject.children(j).shape)
                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', currentObject.children(j).name);
            end
+           %}
+           
            %{
            % Not sure if we need this
            if isfield(currentObject.children(j), 'motion') &&...
@@ -222,7 +232,8 @@ for n=1:length(objects)
                end
            end
            %}
-                   
+           fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name);      
+   
        else
            fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name);
        end
