@@ -122,7 +122,7 @@ switch opticsType
         [focalLength, fNumber] = piRecipeFindOpticsParams(thisR);
         
         % Start building the oi
-        ieObject = piOICreate(photons);
+        ieObject = piOICreate(photons,'wavelength',wave);
         
         % Set the parameters the best we can from the lens file.
         if ~isempty(focalLength)

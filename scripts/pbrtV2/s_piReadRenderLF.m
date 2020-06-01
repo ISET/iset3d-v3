@@ -1,5 +1,11 @@
 % s_piReadRenderLF
 %
+% ****** No longer working ********
+%
+%   I think this was based on the original Andy Lin microlens code, not the
+%   newer Michael Mara version.  Should be updated.
+%
+%
 % Implements a light field camera system with an array of microlenses over a
 % sensor.  Converts the OI into a sensor, the sensor into a rendered image, and
 % then uses D. Dansereau's toolbox to produce a small video of the images seen
@@ -22,11 +28,15 @@ if ~piDockerExists, piDockerConfig; end
 
 % We organize the pbrt files with its includes (textures, brdfs, spds, geometry)
 % in a single directory. 
+%{
 fname = fullfile(piRootPath,'data','teapot-area','teapot-area-light.pbrt');
 if ~exist(fname,'file'), error('File not found'); end
 
 % Read the main scene pbrt file.  Return it as a recipe
 thisR = piRead(fname);
+%}
+
+thisR = piRecipeDefault('scene name','teapot');
 
 %% Modify the recipe, thisR, to adjust the rendering
 

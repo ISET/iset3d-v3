@@ -60,7 +60,7 @@ piWrite(recipe);
 
 %%  Show the radiance
 
-ieAddObject(scene); sceneWindow;
+sceneWindow(scene);
 % scene = sceneSet(scene,'gamma',0.5);
 
 %% Show the depth map

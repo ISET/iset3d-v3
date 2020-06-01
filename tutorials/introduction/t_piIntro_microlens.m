@@ -10,6 +10,7 @@
 %    docker pull vistalab/pbrt-v3-spectral
 %
 % ZL, BW SCIEN 2018
+% Last tested by BW, May 31, 2020
 %
 % See also
 %   t_piIntro_*
@@ -81,8 +82,8 @@ fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
 % Set up the microlens array and film size
 % Choose an even number for nMicrolens.  This assures that the sensor and
 % ip data have the right integer relationships.
-pixelsPerMicrolens = 1;
-nMicrolens = [40 40];   % Appears to work for rectangular case, too
+pixelsPerMicrolens = 5;
+nMicrolens = [40 40]*2;   % Appears to work for rectangular case, too
 pixelSize  = microlens.get('lens height')/pixelsPerMicrolens;   % mm
 filmheight = nMicrolens(1)*pixelsPerMicrolens*pixelSize;
 filmwidth  = nMicrolens(2)*pixelsPerMicrolens*pixelSize;
@@ -153,7 +154,7 @@ oiWindow(oi);
 rgb = oiGet(oi,'rgb');
 LF = LFImage2buffer(rgb,nMicrolens(2),nMicrolens(1));
 imgArray = LFbuffer2SubApertureViews(LF);
-ieNewGraphWin; imagesc(imgArray);
+ieNewGraphWin; imagesc(imgArray); axis image
 
 %% Move the OI through the sensor to the IP and visualize
 
@@ -177,8 +178,8 @@ lightfield = ip2lightfield(ip,'pinholes',nMicrolens,'colorspace','srgb');
 
 %% Mouse around 
 
-LFDispMousePan(lightfield.^(1/2.2))
-
+% LFDispMousePan(lightfield.^(1/2.2))
+LFDispVidCirc(lightfield.^(1/2.2))
 %% Focus on a region
 
 %{

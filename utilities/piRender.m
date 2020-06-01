@@ -114,12 +114,19 @@ p.addParameter('meanluminance',[],@inumeric);
 p.addParameter('meanilluminancepermm2',[],@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);
-p.addParameter('wave', 400:10:700, @isnumeric);
 p.addParameter('reflectancerender', false, @islogical);
 
-% If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
-
+% Select this docker image you want to use.  Default would be 'latest'.
+%{
+ thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
+ % p.addParameter('wave', 365:5:705, @isnumeric);
+ p.addParameter('wave', 400:10:705, @isnumeric);
+%}
+% {
 thisDocker = 'vistalab/pbrt-v3-spectral';
+p.addParameter('wave', 400:10:700, @isnumeric);
+%}
+
 fprintf('Docker container %s\n',thisDocker);
 p.addParameter('dockerimagename',thisDocker,@ischar);
 

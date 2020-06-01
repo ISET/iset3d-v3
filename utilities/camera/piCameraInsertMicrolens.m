@@ -115,6 +115,7 @@ if isa(imagingLens,'lensC')
 end
 
 if isa(microLens,'lensC')
+    mlObj = microLens;
     thisName = [microLens.name,'.json'];
     microLens.fileWrite(thisName);
     microLens = fullfile(pwd,thisName);
@@ -128,6 +129,7 @@ else
     combinedLens = p.Results.outputname;
 end
 
+%%
 filmheight = ceil(p.Results.filmheight);
 filmwidth  = ceil(p.Results.filmwidth);
 
@@ -135,8 +137,8 @@ filmwidth  = ceil(p.Results.filmwidth);
 % microlenses so that the film is tiled based on the lens height.
 xdim = p.Results.xdim;
 ydim = p.Results.ydim;
-if isempty(xdim), xdim =  floor((filmheight/microlens.get('lens height'))); end
-if isempty(ydim), ydim =  floor((filmwidth/microlens.get('lens height'))); end
+if isempty(xdim), xdim =  floor((filmheight/mlObj.get('lens height'))); end
+if isempty(ydim), ydim =  floor((filmwidth/mlObj.get('lens height'))); end
 
 microlenstofilm = p.Results.microlenstofilm;
 if isempty(microlenstofilm)
@@ -161,7 +163,7 @@ dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
 dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
 
 % What you want to run
-dockerImageName = 'vistalab/pbrt-v3-spectral';
+dockerImageName = 'vistalab/pbrt-v3-spectral:latest';
 
 %% Copy the imaging and microlens to the output folder
 
@@ -186,8 +188,8 @@ end
 %% Set up the lens tool command to run
 
 % Need to add the other parameters
-lensToolCommand = sprintf('lenstool insertmicrolens -xdim %d -ydim %d -filmheight %f -filmwidth %f -filmtomicrolens %f %s %s %s',...
-    xdim,ydim,filmheight,filmwidth,microlenstofilm,imagingLens,microLens,combinedLens);
+lensToolCommand = sprintf('lenstool insertmicrolens -xdim %d -ydim %d -filmheight %f -filmwidth %f %s %s %s',...
+    xdim,ydim,filmheight,filmwidth,imagingLens,microLens,combinedLens);
 
 cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, lensToolCommand);
 fprintf('Mounting folder %s\n',outputFolder);
@@ -196,5 +198,11 @@ status = system(cmd);
 if status
     error('Docker command problem: %s\n',cmd);
 end
+
+%%  Check the JSON file
+% edit(combinedLens)
+
+% To set the distance between the microlens and the film, you must adjust a
+% parameter in the OMNI camera.  Talk to TL about that!
 
 end

@@ -1,12 +1,12 @@
 %% t_piFWAssets
 %
+% NEEDS MASSIVE UPDATING
+%
 %  In which our heroes explore how to upload and download assets to
 %  Flywheel so we can get LMP and the gang to implement more features
 %  that we want.
 %
-% NEEDS MASSIVE UPDATING
 %
-% 
 
 %%
 st = scitran('stanfordlabs');
