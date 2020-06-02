@@ -1,20 +1,37 @@
-%% Creating a microlens plus imaging lens calculation
+%% Creating a microlens plus imaging lens for PBRT lightfield calculation
 %
-% Uses the isetlens toolbox
+% Dependencies
+%   isetlens toolbox
+%
+% Wandell, 2019
 %
 % See also
-%   piCameraInsertMicrolens, t_piIntro_microlens.m
+%   t_piIntro_microlens, piCameraInsertMicrolens, 
 %
 
 %% Programming questions -
-%  Given that we set the filmwidth and filmheight, should we be able to
-%  read these from the lens file?  Same with filmtomicrolens
+% 
+% * Given that we set the filmwidth and filmheight, should we be able to
+%  read these from the lens file?  
+%
+% * How do we set filmtomicrolens for the omni camera in PBRT?
+%
 
 %% 
 ieInit
 piDockerConfig;
 
+%% Help command for the lenstool insertmicrolens
+%
+% Copy and paste this into a terminal window
+%
+status = system('docker run -ti --rm vistalab/pbrt-v3-spectral lenstool');
+
 %% Shows the lenses
+
+if isempty(which('lensC'))
+    error('The isetlens repository must be on your path'); 
+end
 
 % Microlens with height of 2 um 
 microLensName = fullfile(piRootPath,'data','lens','microlens.json');   
@@ -38,24 +55,14 @@ chdir(fullfile(piRootPath,'local','microlens'));
 % cmd is the terminal command built up in the window
 disp(cmd)
 
+% You can run the cmd this way
+%
+%  system(cmd);
+%
+
 %% Have a look at the output file
 
 thisLens = lensC('filename',combinedLens);
 thisLens.draw;
-
-%% Help command for the lenstool insertmicrolens
-%
-% Copy and paste this into a terminal window
-%
-status = system('docker run -ti --rm vistalab/pbrt-v3-spectral lenstool');
-
-%% The command line docker command for "lenstool insertmicrolens"
-%
-% Copy and paste the command into a terminal window - after putting the
-% relevant files into place ...  This is the command that is built up in
-% piCameraInsertMicrolens
-%
-% docker run -ti --rm vistalab/pbrt-v3-spectral lenstool insertmicrolens -xdim 64 -ydim 64 dgauss.22deg.3.0mm.json microlens.2um.Example.json combined.json
-% system(cmd)
 
 %%

@@ -78,7 +78,7 @@ p.addRequired('param',@ischar);
 
 p.parse(thisR,param);
 
-switch ieParamFormat(param)
+switch ieParamFormat(param)  % lower case, no spaces
     
     % Data management
     case 'inputfile'
@@ -274,16 +274,22 @@ switch ieParamFormat(param)
         
     case {'filmdiagonal','filmdiag'}
         % recipe.get('film diagonal');  in mm
-        val = thisR.film.diagonal.value;
+        if isfield(thisR.film,'diagonal')
+            val = thisR.film.diagonal.value;
+        end
   
     case 'filmsubtype'
         % What are the legitimate options?
-        val = thisR.film.subtype;
+        if isfield(thisR.film,'subtype')
+            val = thisR.film.subtype;
+        end
         
     case {'raysperpixel'}
-        val = thisR.sampler.pixelsamples.value;
+        if isfield(thisR.sampler,'pixelsamples')
+            val = thisR.sampler.pixelsamples.value;
+        end
         
-    case {'cropwindow','crop window'}
+    case {'cropwindow'}
         if(isfield(thisR.film,'cropwindow'))
             val = thisR.film.cropwindow.value;
         else
@@ -292,15 +298,21 @@ switch ieParamFormat(param)
         
         % Rendering related
     case{'maxdepth','bounces','nbounces'}
-        val = thisR.integrator.maxdepth.value;
+        if isfield(thisR.integrator,'maxdepth')
+            val = thisR.integrator.maxdepth.value;
+        end
         
     case{'integrator'}
-        val = thisR.integrator.subtype;
+        if isfield(thisR.integrator,'subtype')
+            val = thisR.integrator.subtype;
+        end
         
-    case{'camerabody','camera body'}
+    case{'camerabody'}
+        % thisR.get('camera body');
         val.camera = thisR.camera;
-        val.film = thisR.film;
+        val.film   = thisR.film;
         val.filter = thisR.filter;
+        
     case{'material'}
         if isfield(thisR.materials, 'list')
             val = thisR.materials.list;
