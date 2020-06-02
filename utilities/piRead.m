@@ -313,6 +313,8 @@ end
 
 thisR.lookAt = struct('from',from,'to',to,'up',up);
 %% Read the light sources and delete them in world
+% piLightRead: includes this and read lights from scene_lights.pbrt;
+% thisR = piLightRead(thisR); ...
 thisR.lights = piLightGetFromWorld(thisR, 'print', false);
 for ii = 1:numel(thisR.lights)
     thisR.lights{ii}.name = 'Default light';

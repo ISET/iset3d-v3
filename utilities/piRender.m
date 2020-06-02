@@ -115,20 +115,8 @@ p.addParameter('meanilluminancepermm2',[],@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);
 p.addParameter('reflectancerender', false, @islogical);
-
-% Select this docker image you want to use.  Default would be 'latest'.
-% {
- thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
- % p.addParameter('wave', 365:5:705, @isnumeric);
- p.addParameter('wave', 400:10:700, @isnumeric);
-%}
-%{
-thisDocker = 'vistalab/pbrt-v3-spectral';
-p.addParameter('wave', 400:10:700, @isnumeric);
-%}
-
-fprintf('Docker container %s\n',thisDocker);
-p.addParameter('dockerimagename',thisDocker,@ischar);
+p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:latest',@ischar);
+p.addParameter('wave', 400:10:700, @isnumeric); % This is the past to piDat2ISET, which is where we do the construction.
 
 p.parse(thisR,varargin{:});
 renderType       = ieParamFormat(p.Results.rendertype);
@@ -136,6 +124,16 @@ version          = p.Results.version;
 dockerImageName  = p.Results.dockerimagename;
 scaleIlluminance = p.Results.scaleIlluminance;
 wave             = p.Results.wave;
+fprintf('Docker container %s\n',dockerImageName);
+
+dockerSplit = split(dockerImageName, ':');
+switch dockerSplit{2}
+    case 'latest'
+        dockerWave = 400:10:700;
+    case 'basisfunction'
+        dockerWave = 365:5:705;
+end
+
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build
     % the PBRT recipe and default the metadata type to a depth map.
@@ -350,30 +348,30 @@ for ii = 1:length(filesToRender)
                 'label','radiance',...
                 'recipe',thisR,...
                 'scaleIlluminance',scaleIlluminance,...
-                'wave',wave);
+                'wave',dockerWave);
         case {'metadata'}
             metadata = piDat2ISET(outFile,...
                 'label','mesh',...
-                'wave',wave);
+                'wave',dockerWave);
             ieObject   = metadata;
         case 'depth'
             depthImage = piDat2ISET(outFile,...
                 'label','depth',...
-                'wave',wave);
+                'wave',dockerWave);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject,'depth map',depthImage);
             end
         case 'coordinates'
             coordMap = piDat2ISET(outFile,...
                 'label','coordinates',...
-                'wave',wave);
+                'wave',dockerWave);
             ieObject = coordMap;
         case {'illuminant'}
             % PBRT rendered data for white matte surfaces
             illuminantPhotons = piDat2ISET(outFile,...
                 'label', 'illuminant',...
                 'scaleIlluminance',scaleIlluminance,...
-                'wave', wave);
+                'wave', dockerWave);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject, 'illuminant photons', illuminantPhotons);
             end            
@@ -381,7 +379,7 @@ for ii = 1:length(filesToRender)
             ieObject = piDat2ISET(outFile,...
                 'label', 'illuminantonly', ...
                 'scaleIlluminance',scaleIlluminance,...
-                'wave', wave);
+                'wave', dockerWave);
     end
 
 end
@@ -392,9 +390,11 @@ if isstruct(ieObject)
         case 'scene'
             names = strsplit(fileparts(thisR.inputFile),'/');
             ieObject = sceneSet(ieObject,'name',names{end});
+            ieObject = sceneSet(ieObject, 'wave', wave);
         case 'opticalimage'
             names = strsplit(fileparts(thisR.inputFile),'/');
             ieObject = oiSet(ieObject,'name',names{end});
+            ieObject = oiSet(ieObject,'wave',wave);
         otherwise
             error('Unknown struct type %s\n',ieObject.type);
     end

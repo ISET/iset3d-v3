@@ -36,11 +36,9 @@ function [imageData, imageSize, lens] = piReadDAT(filename, varargin)
 %%
 parser = inputParser();
 parser.addRequired('filename', @ischar);
-parser.addParameter('maxPlanes', 31, @isnumeric);
 
 parser.parse(filename, varargin{:});
 filename = parser.Results.filename;
-maxPlanes = parser.Results.maxPlanes;
 
 % imageData = [];
 % imageSize = [];
@@ -110,12 +108,6 @@ if(pbrtVer == 2)
 elseif(pbrtVer == 3)
     imageData = reshape(serializedImage, wSize, hSize, nPlanes);
     imageData = permute(imageData,[2 1 3]);
-end
-
-if ~isempty(maxPlanes) && maxPlanes < nPlanes
-    fprintf('  Limiting %d planes to maxPlanes = %d.\n', imageSize(3), maxPlanes);
-    imageSize(3) = maxPlanes;
-    imageData = imageData(:, :, 1:maxPlanes);
 end
 
 % fprintf('OK.\n');
