@@ -119,8 +119,8 @@ p.addParameter('reflectancerender', false, @islogical);
 % Select this docker image you want to use.  Default would be 'latest'.
 % {
  thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
- p.addParameter('wave', 365:5:705, @isnumeric);
- % p.addParameter('wave', 400:10:705, @isnumeric);
+ % p.addParameter('wave', 365:5:705, @isnumeric);
+ p.addParameter('wave', 400:10:700, @isnumeric);
 %}
 %{
 thisDocker = 'vistalab/pbrt-v3-spectral';
