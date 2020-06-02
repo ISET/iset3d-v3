@@ -114,9 +114,13 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceMCCTexture');
         fname = fullfile(FilePath,'flatSurfaceMCCTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
-    case 'flatSurfaceMCCTexture'
-        FilePath = fullfile(piRootPath,'data','V3','flatSurfaceMCCTexture');
-        fname = fullfile(FilePath,'flatSurfaceMCCTexture.pbrt');
+    case 'SimpleSceneLight'
+        FilePath = fullfile(piRootPath,'data','V3','SimpleSceneLight');
+        fname = fullfile(FilePath,'SimpleScene.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
+    case 'MacBethCheckerCusLight'
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['MacBethCheckerCus','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
 
     otherwise
