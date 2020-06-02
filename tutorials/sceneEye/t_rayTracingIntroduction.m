@@ -1,12 +1,15 @@
 %% t_rayTracingIntroduction.m
 %
-% This tutorial is an introduction to modeling the optics of the eye using
-% ray-tracing in ISETBIO. 
+% This tutorial is an introduction to modeling the optics of the human eye
+% using ray-tracing in ISETBIO.
 % 
 % To begin, you must have the Github repo iset3d on your MATLAB path:
-% https://github.com/ISET/iset3d 
+%
+%   https://github.com/ISET/iset3d 
+%
 % as well as the Github repo isetbio on your path:
-% https://github.com/isetbio/isetbio
+%
+%   https://github.com/isetbio/isetbio
 % 
 % You must also have docker installed and running on your machine. You can
 % find general instructions on docker here: https://www.docker.com/
@@ -25,7 +28,8 @@
 % You can find the source code for pbrt-v3-spectral here:
 % https://github.com/scienstanford/pbrt-v3-spectral
 %
-% Depends on: iset3d, isetbio, Docker
+% Depends on: 
+%    iset3d, isetbio, Docker
 %
 % TL ISETBIO Team, 2017
     
@@ -53,8 +57,9 @@ myScene = sceneEye('numbersAtDepth');
 % also be placed in the working directory. This folder will eventually be
 % mounted onto the docker container to be rendered. You can specify a
 % specific working folder as follows: 
-% myScene = sceneEye('scene','numbersAtDepth','workingDirectory',[path to
-% desired directory]);
+%{
+ myScene = sceneEye('scene','numbersAtDepth','workingDirectory',[path to desired directory]);
+%}
 
 % The sceneEye object contains information of the 3D scene as well as the
 % parameters of the eye optics included in the raytracing. You can see a
@@ -89,12 +94,14 @@ oiWindow;
 % Now let's render a series of retinal images at different accommodations.
 
 % With numRays at 128 and resolution at 128, each image takes around 30
-% second to render on a local machine with 8 cores. If you'd like to bump
-% up the image quality slightly, you can turn the resolution up to 256 and
-% numRays to 256, which will bring rendering time to around 2 min per
-% image.  
-% myScene.resoltuion = 256; 
-% myScene.numRays = 256;
+% second to render on a local machine with 8 cores. If you'd like to
+% improve the image quality slightly, you can turn the resolution up to 256
+% and numRays to 256, which will bring rendering time to around 2 min per
+% image.
+%{
+  myScene.resoltuion = 256; 
+  myScene.numRays    = 256;
+%}
 
 accomm = [3 5 10]; % in diopters
 opticalImages = cell(length(accomm),1);
@@ -114,11 +121,9 @@ for ii = 1:length(accomm)
     % directory. In general, you may want to periodically clear your
     % working directory to avoid a build up of files.
     [oi, results] = myScene.render;
-    ieAddObject(oi);
     opticalImages{ii} = oi;
+    oiWindow(oi);
 end
-
-oiWindow;
 
 %% END
 

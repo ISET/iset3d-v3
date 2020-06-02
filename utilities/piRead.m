@@ -185,7 +185,7 @@ if(isempty(cameraStruct))
     warning('Cannot find "camera" in PBRT file.');
     thisR.camera = struct([]); % Return empty.
 else
-    thisR.camera = cameraStruct;
+    thisR.camera = cameraStruct;    
 end
 
 %% Extract sampler block
@@ -203,12 +203,23 @@ if(isempty(filmStruct))
     warning('Cannot find "film" in PBRT file.');
     thisR.film = struct([]); % Return empty.
 else
+    % Patch up the filmStruct to match the recipe requirements
+    if(isfield(filmStruct,'filename'))
+        % Remove the filename since it inteferes with the outfile name.
+        filmStruct = rmfield(filmStruct,'filename');
+    end
+    
     thisR.film = filmStruct;
     
-    if(isfield(thisR.film,'filename'))
-        % Remove the filename since it inteferes with the outfile name.
-        thisR.film = rmfield(thisR.film,'filename');
+    % Some PBRT files do not specify the film diagonal size.  We set it to
+    % 1mm here.
+    try
+        thisR.get('film diagonal');
+    catch
+        disp('Setting film diagonal size to 1 mm');
+        thisR.set('film diagonal',1);
     end
+    
 end
 
 %% Extract surface pixel filter block
