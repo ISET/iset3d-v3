@@ -218,7 +218,7 @@ if inputs.wallXY || inputs.wallXZ || inputs.wallYZ
     newAsset.children.name = 'WallMesh';
     newAsset.children.index  = [];
     newAsset.children.mediumInterface = '';
-    newAsset.children.material = 'NamedMaterial "wallMaterial"';
+    newAsset.children.material = 'NamedMaterial "WallMaterial"';
     newAsset.children.areaLight = [];
     newAsset.children.output = [];
     newAsset.children.light = [];
@@ -231,13 +231,18 @@ if inputs.wallXY || inputs.wallXZ || inputs.wallYZ
     
     underwater.assets.groupobjs = cat(1,underwater.assets.groupobjs,newAsset);
     
-    currentMaterial = piMaterialCreate();
-    currentMaterial.name = 'wallMaterial';
-    currentMaterial.string = 'matte';
-    
     data = [wave(:), zeros(numel(wave),1)]';
-    currentMaterial.spectrumkd = data(:);
-    underwater.materials.list.(currentMaterial.name) = currentMaterial;
+    piMaterialCreate(underwater, 'name', 'WallMaterial',...
+                                 'stringtype', 'matte',....
+                                 'spectrumkd', data);
+    
+    % currentMaterial = piMaterialCreate();
+    % currentMaterial.name = 'wallMaterial';
+    % currentMaterial.string = 'matte';
+    
+    
+    % currentMaterial.spectrumkd = data(:);
+    % underwater.materials.list.(currentMaterial.name) = currentMaterial;
 end
 
 end

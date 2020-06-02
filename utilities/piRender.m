@@ -110,7 +110,7 @@ varargin = ieParamFormat(varargin);
 rTypes = {'radiance','depth','both','all','coordinates','material','mesh', 'illuminant','illuminantonly'};
 p.addParameter('rendertype','both',@(x)(ismember(ieParamFormat(x),rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
-p.addParameter('meanluminance',[],@inumeric);
+p.addParameter('meanluminance',[],@isnumeric);
 p.addParameter('meanilluminancepermm2',[],@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);

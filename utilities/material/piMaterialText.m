@@ -92,10 +92,11 @@ if isfield(materials,'floateta')
 end
 
 if isfield(materials, 'spectrumkd')
-    if(ischar(materials.spectrumkd))
+    if (ischar(materials.spectrumkd))
         val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
     else
-        val_spectrumkd = sprintf(' "spectrum Kd" [ %s ] ',num2str(materials.spectrumkd)); 
+        data_str = sprintf('%f ',materials.spectrumkd);
+        val_spectrumkd = sprintf(' "spectrum Kd" [ %s ] ',data_str); 
     end
     val = strcat(val, val_spectrumkd);
 end
