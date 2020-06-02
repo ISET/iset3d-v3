@@ -413,11 +413,6 @@ end
 
 %% Write out WorldBegin/WorldEnd
 
-
-fprintf(fileID,'WorldBegin\n');
-
-
-
 % Temporarily add light to world so it's easier for us to compose the PBRT
 % file
 % We are planning to change piLightAddToWorld to something like
@@ -445,10 +440,6 @@ if creatematerials
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
         
-        if piContains(currLine, 'WorldBegin')
-            continue;
-        end
-        
         if piContains(currLine, 'materials.pbrt')
             [~,n] = fileparts(renderRecipe.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
@@ -473,10 +464,6 @@ else
     % without any changes.
     for ii = 1:length(renderRecipe.world)
         currLine = renderRecipe.world{ii};
-        
-        if piContains(currLine, 'WorldBegin')
-            continue;
-        end
         
         if overwritegeometry
             if piContains(currLine, 'geometry.pbrt')
