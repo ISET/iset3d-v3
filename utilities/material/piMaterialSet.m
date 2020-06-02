@@ -47,7 +47,41 @@ switch param
         end
     case 'concentration'        
         thisR.materials.list{idx}.floatconcentration = val;
-        
+    case 'delete'
+        % Delete one of the field in this material struct
+        if isfield(thisR.materials.list{idx}, val)
+            thisR.materials.list{idx} = rmfield(thisR.materials.list{idx}, val);
+        end
     otherwise
         thisR.materials.list{idx}.(param) = val;
+        switch param
+            case 'spectrumkd'
+                piMaterialSet(thisR, idx, 'delete', 'rgbkd');
+                piMaterialSet(thisR, idx, 'delete', 'colorkd');
+            case 'rgbkd'
+                piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
+                piMaterialSet(thisR, idx, 'delete', 'colorkd');
+            case 'colorkd'
+                piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
+                piMaterialSet(thisR, idx, 'delete', 'rgbkd');
+            case 'spectrumks'
+                piMaterialSet(thisR, idx, 'delete', 'rgbks');
+                piMaterialSet(thisR, idx, 'delete', 'colorks');               
+            case 'rgbks'
+                piMaterialSet(thisR, idx, 'delete', 'spectrumks');
+                piMaterialSet(thisR, idx, 'delete', 'colorks');                
+            case 'colorks'
+                piMaterialSet(thisR, idx, 'delete', 'spectrumks');
+                piMaterialSet(thisR, idx, 'delete', 'rgbks');                
+            case 'spectrumkr'
+                piMaterialSet(thisR, idx, 'delete', 'rgbkr');
+                piMaterialSet(thisR, idx, 'delete', 'colorkr');                   
+            case 'rgbkr'
+                piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
+                piMaterialSet(thisR, idx, 'delete', 'colorkr');                   
+            case 'colorkr'
+                piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
+                piMaterialSet(thisR, idx, 'delete', 'rgbkr');                    
+        end
+            
 end
