@@ -77,38 +77,38 @@ fromto = p.Results.fromto;
 from = thisR.lights{idx}.from;
 
 if isfield(thisR.lights{idx}, 'to')
-    to = thisR.lights{idx}.to; % The to to - from.
-    to = to/norm(to);
+    direction = thisR.lights{idx}.to - from; % The to to - from.
+    direction = direction/norm(direction);
 
     % The three should follow the 'left hand rule' for the axis
-    lightX = cross([0 1 0],to); lightX = lightX/norm(lightX);
-    lightY = cross(lightX,to); lightY = lightY/norm(lightY);
+    lightX = cross([0 1 0],direction); lightX = lightX/norm(lightX);
+    lightY = cross(lightX,direction); lightY = lightY/norm(lightY);
     % We want cameraY to be pointing in the same to as lookAt.up
     up = thisR.get('up');
     if lightY*up' < 0, lightY = -1*lightY; end
-    lightX = reshape(lightX, size(to)); lightY = reshape(lightY, size(to));
+    lightX = reshape(lightX, size(direction)); lightY = reshape(lightY, size(direction));
     
 else
     warning('This light does not have to. Only translating from.');
     lightX = reshape([1 0 0], size(from)); lightY = reshape([0 1 0], size(from));
-    to = reshape([0 0 1], size(from));
+    direction = reshape([0 0 1], size(from));
 end
 
-shift = xshift*lightX + yshift*lightY + zshift*to;
+shift = xshift*lightX + yshift*lightY + zshift*direction;
 
 switch fromto
     case 'from'
         piLightSet(thisR, idx, 'from', from + shift);
     case 'to'
         if isfield(thisR.lights{idx}, 'to')
-            piLightSet(thisR, idx, 'to', to + shift);
+            piLightSet(thisR, idx, 'to', thisR.lights{idx}.to + shift);
         else
             warning('This light does not have to. It cannot be changed');
         end
     case 'both'
         piLightSet(thisR, idx, 'from', from + shift);
         if isfield(thisR.lights{idx}, 'to')
-            piLightSet(thisR, numel(thisR.lights), 'to', to + shift);
+            piLightSet(thisR, idx, 'to', thisR.lights{idx}.to + shift);
         else
             warning('This light does not have to. It cannot be changed');
         end
