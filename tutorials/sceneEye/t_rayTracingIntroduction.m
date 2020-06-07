@@ -71,14 +71,14 @@ myScene
 myScene.name = 'fastExample';
 
 % Let's change the number of rays to render with. 
-myScene.numRays = 128;
+myScene.numRays = 256;
 
 % And the FOV of the retinal image
 myScene.fov = 30;
 
 % Let's also change the resolution of the render. The retinal image is
 % always square, so there is only one parameter for resolution.
-myScene.resolution = 128;
+myScene.resolution = 256;
 
 % Now let's render. This may take a few seconds, depending on the number of
 % cores on your machine. On a machine with 2 cores it takes ~15 seconds. 
@@ -86,8 +86,7 @@ oi = myScene.render;
 
 % Now we have an optical image that we can use with the rest of ISETBIO. We
 % can take a look at what it looks like right now:
-ieAddObject(oi);
-oiWindow;
+oiWindow(oi);
 
 
 %% Step through accommodation

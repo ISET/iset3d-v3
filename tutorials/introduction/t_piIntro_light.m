@@ -10,11 +10,11 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
-thisR = piRecipeDefault('scene name','checkerboard');
+thisR = piRecipeDefault('scene name','MacBethChecker');
 
 %% The output will be written here
-sceneName = 'checkerboard';
-outFile = fullfile(piRootPath,'local',sceneName,'checkerboard.pbrt');
+sceneName = 'MacBethChecker';
+outFile = fullfile(piRootPath,'local',sceneName,'MacBethChecker.pbrt');
 thisR.set('outputFile',outFile);
 
 %% Check the light list

@@ -27,36 +27,56 @@
 % We start up ISET and check that the user is configured for docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
+
+%{
 if isempty(which('RdtClient'))
     error('You must have the remote data toolbox on your path'); 
 end
+%}
+
+%%
+thisR = piRecipeDefault('scene name','chessSet');
+%
+% We need to copy the materials and geometry files by hand.
+%
 
 %% Read the scene file for the Remote Data site
 
 % sceneName = 'white-room'; sceneFileName = 'scene.pbrt';
-sceneName = 'chessSet'; sceneFileName = 'chessSet.pbrt';
+% sceneName = 'chessSet'; sceneFileName = 'chessSet.pbrt';
+
+%{
+% sceneName = 'white-room'; sceneFileName = 'scene.pbrt';
+sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
 % The output will be written here
 inFolder = fullfile(piRootPath,'local');
 piPBRTFetch(sceneName,'pbrtversion',3,'destinationFolder',inFolder);
 inFile = fullfile(inFolder,sceneName,sceneFileName);
 recipe = piRead(inFile);
-
-outFolder = fullfile(tempdir,sceneName);
-outFile = fullfile(outFolder,[sceneName,'.pbrt']);
-recipe.set('outputFile',outFile);
+%}
 
 %% Change render quality
 
-recipe.set('film resolution',[192 192]);
-recipe.set('pixel samples',96);
-recipe.set('max depth',1); % Number of bounces
+thisR.set('film resolution',[192 192]);
+thisR.set('pixel samples',96);
+thisR.set('max depth',1); % Number of bounces
+thisR.set('film distance',2);   % Two millimeters from the pinhole
+thisR.get('from')
+piCameraTranslate(thisR,'fromto','from','z shift',0.3);
 
 %% Render
-piWrite(recipe);
+%{
+outFolder = fullfile(tempdir,sceneName);
+outFile = fullfile(outFolder,[sceneName,'.pbrt']);
+recipe.set('outputFile',outFile);
+%}
+piWrite(thisR,'overwrite geometry',false,...
+    'overwrite materials',false,...
+    'overwrite json',false);
 
 %%  Create the scene
-[scene, result] = piRender(recipe);
+[scene, result] = piRender(thisR,'render type','radiance');
 
 %%  Show the radiance
 

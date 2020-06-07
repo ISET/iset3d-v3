@@ -199,6 +199,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % 
         % Correct for pinhole, but just an approximation for lens
         % camera.
+        filmDiag      = thisR.get('film diagonal'); 
         if isequal(thisR.get('optics type'),'pinhole')
             if isfield(thisR.camera,'fov')
                 val = thisR.camera.fov.value;
@@ -207,7 +208,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     val = 2*atand(tand(val/2)*filmratio); 
                 end
             else
-                val = atand(thisR.camera.filmdiag.value/2/thisR.camera.filmdistance.value);
+                val = atand(filmDiag/2/thisR.camera.filmdistance.value);
             end
         else
             % Coarse estimate of the diagonal FOV (degrees) for the
@@ -216,7 +217,6 @@ switch ieParamFormat(param)  % lower case, no spaces
             focusDistance = thisR.get('focus distance');    % meters
             lensFile      = thisR.get('lens file');
             filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm
-            filmDiag      = thisR.get('film diagonal');     % mm
             val           = atand(filmDiag/2/filmDistance);
         end
     case 'pupildiameter'

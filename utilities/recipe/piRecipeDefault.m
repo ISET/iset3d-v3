@@ -80,6 +80,15 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
+     
+    case 'chessSet'
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+    case 'chessSetScaled'
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
         
     case 'checkerboard'
         FilePath = fullfile(piRootPath,'data','V3','checkerboard');
@@ -138,6 +147,8 @@ thisR.integrator.subtype = 'path';
 thisR.set('pixelsamples', 16);
 thisR.set('filmresolution', [320, 180]);
 
+% thisR.set('exporterflag',exporter);
+%
 %% Save the recipe for the user
 if write
     piWrite(thisR);

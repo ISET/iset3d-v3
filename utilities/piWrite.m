@@ -1,8 +1,8 @@
-function workingDir = piWrite(renderRecipe,varargin)
+function workingDir = piWrite(thisR,varargin)
 % Write a PBRT scene file based on its renderRecipe
 %
 % Syntax
-%   workingDir = piWrite(recipe,varargin)
+%   workingDir = piWrite(thisR,varargin)
 %
 % The pbrt scene file and all of its resources files are written out
 % in a working directory that will be mounted by the docker container.
@@ -19,8 +19,15 @@ function workingDir = piWrite(renderRecipe,varargin)
 %       directories containing all of the pbrt scene data.
 %
 % Optional parameter/values
-%   overwritepbrtfile  - If scene PBRT file exists,    overwrite (default true)
-%   overwriteresources - If the resources files exist, overwrite (default true) 
+%   overwrite pbrtfile  - If scene PBRT file exists,    overwrite (default true)
+%   overwrite resources - If the resources files exist, overwrite (default true) 
+%   overwrite lensfile    
+%   overwrite materials 
+%   overwrite geometry 
+%   overwrite json
+%   creatematerials   
+%   lightsFlag         
+%   thistrafficflow   
 %
 % Return
 %    workingDir - path to the output directory mounted by the Docker containe
@@ -33,14 +40,14 @@ piWrite(thisR,'overwrite resources',false,'overwrite pbrt file',true);
 piWrite(thisR);
 %}
 %%
+varargin = ieParamFormat(varargin);
 p = inputParser;
 
 % When varargin contains a number, the ieParamFormat() method fails.
 % It takes only a string or cell.  We should look into that.
 % varargin = ieParamFormat(varargin);
 
-
-p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
+p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 
 % % JNM -- Why format variables twice?
 % % Format the parameters by removing spaces and forcing lower case.
@@ -73,11 +80,11 @@ p.addParameter('thistrafficflow',[]);
 % Second rendering for reflectance calculation
 p.addParameter('reflectancerender',false,@islogical);
 
-p.parse(renderRecipe,varargin{:});
+% Store JSON recipe for the traffic scenes
+p.addParameter('overwritejson',true,@islogical);
 
+p.parse(thisR,varargin{:});
 
-
-% workingDir          = p.Results.workingdir;
 overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
@@ -85,7 +92,8 @@ overwritematerials  = p.Results.overwritematerials;
 overwritegeometry   = p.Results.overwritegeometry;
 creatematerials     = p.Results.creatematerials;
 lightsFlag          = p.Results.lightsFlag;
-thistrafficflow         = p.Results.thistrafficflow;
+thistrafficflow     = p.Results.thistrafficflow;
+overwritejson       = p.Results.overwritejson;
 
 %% Check exporter
 % TL: We seem to run into a lot of problems of overwriting the wrong files
@@ -93,7 +101,7 @@ thistrafficflow         = p.Results.thistrafficflow;
 % file). Here we do a pre-check: if the exporter isn't C4D don't touch the
 % materials or geometry at all. Just copy files over to the output
 % directory. Hopefully that will clean things up a bit.
-if(isempty(renderRecipe.exporter))
+if(isempty(thisR.exporter))
     creatematerials = false;
     overwritegeometry = false;
     overwritematerials = false;
@@ -102,14 +110,14 @@ end
 %% Copy the input directory to the Docker working directory
 
 % Input must exist
-inputDir   = fileparts(renderRecipe.inputFile);
+inputDir   = fileparts(thisR.inputFile);
 if ~exist(inputDir,'dir'), warning('Could not find %s\n',inputDir); end
 
 % Make working dir if it does not already exist
-workingDir = fileparts(renderRecipe.outputFile);
+workingDir = fileparts(thisR.outputFile);
 if ~exist(workingDir,'dir'), mkdir(workingDir); end
 
-[pth, ~, ~] = fileparts(renderRecipe.outputFile);
+[pth, ~, ~] = fileparts(thisR.outputFile);
 geometryDir = fullfile(pth,'scene','PBRT','pbrt-geometry');
 if ~exist(geometryDir, 'dir')
     mkdir(geometryDir);
@@ -148,7 +156,7 @@ end
 
 %% Potentially overwrite the scene PBRT file
 
-outFile = renderRecipe.outputFile;
+outFile = thisR.outputFile;
 
 % Check if the outFile exists. If it does, decide what to do.
 if(exist(outFile,'file'))
@@ -165,18 +173,18 @@ end
 
 %% If the optics type is lens, copy the lens file to a lens sub-directory
 
-if isequal(renderRecipe.get('optics type'),'lens')
+if isequal(thisR.get('optics type'),'lens')
     % In version 2 the lens file is stored in the specfile field. We didn't
     % like that, and so we are shifting to lensfile field in version 3.
     % This deals with the compatibility.
     
-    if isfield(renderRecipe.camera,'lensfile')
-        inputLensFile = renderRecipe.camera.lensfile.value;
-    elseif isfield(renderRecipe.camera,'specfile')
-        if (renderRecipe.version == 3)
+    if isfield(thisR.camera,'lensfile')
+        inputLensFile = thisR.camera.lensfile.value;
+    elseif isfield(thisR.camera,'specfile')
+        if (thisR.version == 3)
             warning('Use lensfile, not specfile, for version 3 and higher');
         end
-        inputLensFile = renderRecipe.camera.specfile.value;
+        inputLensFile = thisR.camera.specfile.value;
     end
     
     % Verify that the input lens is a full path
@@ -234,29 +242,29 @@ fileID = fopen(outFile,'w');
 
 %% Write header
 fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
-fprintf(fileID,'# PBRT version = %i \n',renderRecipe.version);
+fprintf(fileID,'# PBRT version = %i \n',thisR.version);
 fprintf(fileID,'\n');
 
 % If a crop window exists, write out a warning
-if(isfield(renderRecipe.film,'cropwindow'))
+if(isfield(thisR.film,'cropwindow'))
     fprintf(fileID,'# Warning: Crop window exists! \n');
 end
 
 %% Write Scale and LookAt commands first
 
 % Optional Scale
-if(~isempty(renderRecipe.scale))   
+if(~isempty(thisR.scale))   
    fprintf(fileID,'Scale %0.2f %0.2f %0.2f \n', ...
-    [renderRecipe.scale(1) renderRecipe.scale(2) renderRecipe.scale(3)]);
+    [thisR.scale(1) thisR.scale(2) thisR.scale(3)]);
     fprintf(fileID,'\n');
 end
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
-if isfield(renderRecipe.camera,'motion') 
+if isfield(thisR.camera,'motion') 
     
-    motionTranslate =renderRecipe.camera.motion.activeTransformStart.pos-renderRecipe.camera.motion.activeTransformEnd.pos;
-    motionStart     =renderRecipe.camera.motion.activeTransformStart.rotate;
-    motionEnd      =  renderRecipe.camera.motion.activeTransformEnd.rotate;
+    motionTranslate =thisR.camera.motion.activeTransformStart.pos-thisR.camera.motion.activeTransformEnd.pos;
+    motionStart     =thisR.camera.motion.activeTransformStart.rotate;
+    motionEnd      =  thisR.camera.motion.activeTransformEnd.rotate;
     fprintf(fileID,'ActiveTransform StartTime \n');
     fprintf(fileID,'Translate 0 0 0 \n');
     fprintf(fileID,'Rotate %f %f %f %f \n',motionStart(:,1)); % Z
@@ -274,19 +282,19 @@ if isfield(renderRecipe.camera,'motion')
 end
 % Required LookAt 
 fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
-    [renderRecipe.lookAt.from(:); renderRecipe.lookAt.to(:); renderRecipe.lookAt.up(:)]);
+    [thisR.lookAt.from(:); thisR.lookAt.to(:); thisR.lookAt.up(:)]);
 fprintf(fileID,'\n');
 
 %% Write all other blocks using a for loop
 
-outerFields = fieldnames(renderRecipe);
+outerFields = fieldnames(thisR);
 
 for ofns = outerFields'
     ofn = ofns{1};
     
     % If empty, we skip this field.
-    if(~isfield(renderRecipe.(ofn),'type') || ...
-            ~isfield(renderRecipe.(ofn),'subtype'))
+    if(~isfield(thisR.(ofn),'type') || ...
+            ~isfield(thisR.(ofn),'subtype'))
         continue;
     end
     
@@ -302,12 +310,12 @@ for ofns = outerFields'
     end
     
     % fprintf('outer field %s\n',ofn);
-    if strcmp(ofn,'camera') && isfield(renderRecipe.(ofn),'medium') 
-       if ~isempty(renderRecipe.(ofn).medium)
+    if strcmp(ofn,'camera') && isfield(thisR.(ofn),'medium') 
+       if ~isempty(thisR.(ofn).medium)
            currentMedium = [];
-           for j=1:length(renderRecipe.media.list)
-                if strcmp(renderRecipe.media.list(j).name,renderRecipe.(ofn).medium)
-                    currentMedium = renderRecipe.media.list;
+           for j=1:length(thisR.media.list)
+                if strcmp(thisR.media.list(j).name,thisR.(ofn).medium)
+                    currentMedium = thisR.media.list;
                 end
            end           
            fprintf(fileID,'MakeNamedMedium "%s" "string type" "water" "string absFile" "spds/%s_abs.spd" "string vsfFile" "spds/%s_vsf.spd"\n',currentMedium.name,...
@@ -320,11 +328,11 @@ for ofns = outerFields'
     fprintf(fileID,'# %s \n',ofn);
     
     % Write main type and subtype
-    fprintf(fileID,'%s "%s" \n',renderRecipe.(ofn).type,...
-        renderRecipe.(ofn).subtype);
+    fprintf(fileID,'%s "%s" \n',thisR.(ofn).type,...
+        thisR.(ofn).subtype);
     
     % Loop through inner field names
-    innerFields = fieldnames(renderRecipe.(ofn));
+    innerFields = fieldnames(thisR.(ofn));
     if(~isempty(innerFields))
         for ifns = innerFields'
             ifn = ifns{1};
@@ -343,8 +351,8 @@ for ofns = outerFields'
                 continue;
             end
             
-            currValue = renderRecipe.(ofn).(ifn).value;
-            currType  = renderRecipe.(ofn).(ifn).type;
+            currValue = thisR.(ofn).(ifn).value;
+            currType  = thisR.(ofn).(ifn).type;
             
             if(strcmp(currType,'string') || ischar(currValue))
                 % We have a string with some value
@@ -426,7 +434,7 @@ for ii = 1:numel(renderRecipe.lights)
 end
 %}
 
-piLightWrite(renderRecipe);
+piLightWrite(thisR);
 
 %{
     % Check if we write all the lights there
@@ -437,23 +445,23 @@ if creatematerials
     % We may have created new materials.
     % We write the material and geometry files based on the recipe,
     % which defines these new materials.
-    for ii = 1:length(renderRecipe.world)
-        currLine = renderRecipe.world{ii};
+    for ii = 1:length(thisR.world)
+        currLine = thisR.world{ii};
         
         if piContains(currLine, 'materials.pbrt')
-            [~,n] = fileparts(renderRecipe.outputFile);
+            [~,n] = fileparts(thisR.outputFile);
             currLine = sprintf('Include "%s_materials.pbrt"',n);
         end
            
         if overwritegeometry
             if piContains(currLine, 'geometry.pbrt')
-                [~,n] = fileparts(renderRecipe.outputFile);
+                [~,n] = fileparts(thisR.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
         end
         
         if piContains(currLine, 'WorldEnd')
-            [~,n] = fileparts(renderRecipe.outputFile);
+            [~,n] = fileparts(thisR.outputFile);
             fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
         end
         fprintf(fileID,'%s \n',currLine);
@@ -462,17 +470,17 @@ if creatematerials
 else
     % No materials were created, so we just write out the world data
     % without any changes.
-    for ii = 1:length(renderRecipe.world)
-        currLine = renderRecipe.world{ii};
+    for ii = 1:length(thisR.world)
+        currLine = thisR.world{ii};
         
         if overwritegeometry
             if piContains(currLine, 'geometry.pbrt')
-                [~,n] = fileparts(renderRecipe.outputFile);
+                [~,n] = fileparts(thisR.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
         end
         if piContains(currLine, 'WorldEnd')
-            [~,n] = fileparts(renderRecipe.outputFile);
+            [~,n] = fileparts(thisR.outputFile);
             fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
         end
         fprintf(fileID,'%s \n',currLine);
@@ -490,40 +498,43 @@ fclose(fileID);
 
 %% Overwrite Materials.pbrt
 % Write both materials and textures in piMaterialWrite function
-if piContains(renderRecipe.exporter, 'C4D')
+exporter = thisR.exporter;
+if piContains(exporter, 'C4D') || piContains(exporter,'Other')
     % If the scene is from Cinema 4D, 
     if ~creatematerials
         % We overwrite from the input directory, but we do not create
         % any new material files beyond what is already in the input
         if overwritematerials
-            [~,n] = fileparts(renderRecipe.inputFile);
+            [~,n] = fileparts(thisR.inputFile);
             fname_materials = sprintf('%s_materials.pbrt',n);
-            renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
-            piMaterialWrite(renderRecipe);
+            thisR.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+            piMaterialWrite(thisR);
         end
     else
         % Create new material files that could come from somewhere
         % other than the input directory.
-        [~,n] = fileparts(renderRecipe.outputFile);
+        [~,n] = fileparts(thisR.outputFile);
         fname_materials = sprintf('%s_materials.pbrt',n);
-        renderRecipe.materials.outputFile_materials = fullfile(workingDir,fname_materials);
-        piMaterialWrite(renderRecipe);
+        thisR.materials.outputFile_materials = fullfile(workingDir,fname_materials);
+        piMaterialWrite(thisR);
     end
 end
 
 
 %% Overwrite geometry.pbrt
 
-if piContains(renderRecipe.exporter, 'C4D')
+if piContains(exporter, 'C4D') || piContains(exporter,'Other')
     if overwritegeometry
-        piGeometryWrite(renderRecipe,'lightsFlag',lightsFlag, ...
+        piGeometryWrite(thisR,'lightsFlag',lightsFlag, ...
             'thistrafficflow',thistrafficflow);
     end
 end
 
 %% Overwrite xxx.json
-[~,scene_fname,~] = fileparts(renderRecipe.outputFile);
-jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
-jsonwrite(jsonFile,renderRecipe);
+if overwritejson
+    [~,scene_fname,~] = fileparts(thisR.outputFile);
+    jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
+    jsonwrite(jsonFile,thisR);
+end
 
 end

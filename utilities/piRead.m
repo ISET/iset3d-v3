@@ -157,7 +157,8 @@ if piContains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
     exporterFlag   = true;
     thisR.exporter = 'C4D';
 else
-    exporterFlag = false;
+    exporterFlag = true;
+    thisR.exporter = 'Other';
 end
 
 %% Material file header check

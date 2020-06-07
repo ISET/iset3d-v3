@@ -253,10 +253,23 @@ tform = reshape(tmp,[4,4]);
 dcm = [tform(1:3); tform(5:7); tform(9:11)];
                     
 [rotz,roty,rotx]= piDCM2angle(dcm);
+if ~isreal(rotz) || ~isreal(roty) || ~isreal(rotx)
+    warning('piDCM2angle returned complex angles');
+    % dcm
+    % txt(posA(1):posB(1))
+end
+
+%{
+rotx = real(rotx*180/pi);
+roty = real(roty*180/pi);
+rotz = real(rotz*180/pi);
+%}
+% {                   
 rotx = rotx*180/pi;
 roty = roty*180/pi;
 rotz = rotz*180/pi;
-                   
+%}
+
 rotation = [rotz, roty, rotx;
                 fliplr(eye(3))];
 
