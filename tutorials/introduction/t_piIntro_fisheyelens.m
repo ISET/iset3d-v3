@@ -28,6 +28,9 @@ if ~piDockerExists, piDockerConfig; end
 if isempty(which('RdtClient'))
     error('You must have the remote data toolbox on your path'); 
 end
+
+%%
+piRecipeDefault('scene name','chessSet');
 %% Read the pbrt files
 
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
