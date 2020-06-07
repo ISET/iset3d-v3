@@ -1,4 +1,4 @@
-function lightSources = piLightGetFromText(thisR, txt, varargin)
+function lightSources = piLightGetFromText(thisR, intext, varargin)
 % Read a light source struct based on the parameters in the recipe
 %
 % This routine only works for light sources that are exported from
@@ -6,7 +6,7 @@ function lightSources = piLightGetFromText(thisR, txt, varargin)
 %
 % Inputs
 %   thisR:  Recipe
-%
+%   intext
 % Optional key/val pairs
 %   print:   Printout the list of lights
 %
@@ -33,17 +33,17 @@ function lightSources = piLightGetFromText(thisR, txt, varargin)
 varargin = ieParamFormat(varargin);
 p  = inputParser;
 p.addRequired('thisR', @(x)(isa(x,'recipe')));
-p.addRequired('txt', @iscell);
+p.addRequired('intext', @iscell);
 p.addParameter('print',true);
 
-p.parse(thisR, txt, varargin{:});
+p.parse(thisR, intext, varargin{:});
 
 %%   Find the indices of the lines the .world slot that are a LightSource
 
-AttBegin  =  find(piContains(txt,'AttributeBegin'));
-AttEnd    =  find(piContains(txt,'AttributeEnd'));
-arealight =  piContains(txt,'AreaLightSource');
-light     =  piContains(txt,'LightSource');
+AttBegin  =  find(piContains(intext,'AttributeBegin'));
+AttEnd    =  find(piContains(intext,'AttributeEnd'));
+arealight =  piContains(intext,'AreaLightSource');
+light     =  piContains(intext,'LightSource');
 lightIdx  =  find(light);   % Find which lines have LightSource on them.
 
 %% Parse the properties of the light in each line in the lightIdx list
@@ -55,17 +55,20 @@ for ii = 1:nLights
     %     % Initialize the light structure
     %     lightSources{ii} = piLightCreate(thisR);
     
-    % Find the attributes sections of the world text
+    % Find the attributes sections of the input text from the World.
+    % 
     if length(AttBegin) >= ii
-        lightSources{ii}.line  = txt(AttBegin(ii):AttEnd(ii));
+        lightSources{ii}.line  = intext(AttBegin(ii):AttEnd(ii));
         lightSources{ii}.range = [AttBegin(ii), AttEnd(ii)];
         lightSources{ii}.pos   = lightIdx(ii) - AttBegin(ii) + 1;
     else
         light(arealight) = 0;
-        lightSources{ii}.line  = txt(lightIdx(ii));
+        lightSources{ii}.line  = intext(lightIdx(ii));
         lightSources{ii}.range = lightIdx(ii);
     end
     
+    % The txt below is derived from the intext stored in the
+    % lightSources.line slot.
     if find(piContains(lightSources{ii}.line, 'AreaLightSource'))
         lightSources{ii}.type = 'area';
         txt = lightSources{ii}.line{piContains(lightSources{ii}.line, 'AreaLightSource')};
@@ -124,7 +127,7 @@ for ii = 1:nLights
         thisLineStr = textscan(txt, '%q');
         thisLineStr = thisLineStr{1};
 
-        
+        % Start checking for key words about the light source
         if ~piContains(lightSources{ii}.type, 'infinite')
             switch compatibility
                 case 'C4D'

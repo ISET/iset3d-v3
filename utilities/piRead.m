@@ -157,7 +157,7 @@ if piContains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
     exporterFlag   = true;
     thisR.exporter = 'C4D';
 else
-    exporterFlag = true;
+    exporterFlag   = false;
     thisR.exporter = 'Other';
 end
 
