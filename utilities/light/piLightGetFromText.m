@@ -52,8 +52,8 @@ nLights = sum(light);
 lightSources = cell(1, nLights);
 
 for ii = 1:nLights
-%     % Initialize the light structure
-%     lightSources{ii} = piLightCreae(thisR);
+    %     % Initialize the light structure
+    %     lightSources{ii} = piLightCreate(thisR);
     
     % Find the attributes sections of the world text
     if length(AttBegin) >= ii
