@@ -31,11 +31,11 @@ end
 
 %% Read the pbrt files
 
-%{
+% {
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
 % sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
+sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 inFolder = fullfile(piRootPath,'local','scenes');
 inFile = fullfile(inFolder,sceneName,sceneFileName);
 if ~exist(inFile,'file')
@@ -45,14 +45,16 @@ if ~exist(inFile,'file')
     dest = piPBRTFetch(sceneName,'pbrtversion',3,...
         'destinationFolder',inFolder,...
         'delete zip',true);
+else
+    fprintf('%s already present in local/scenes\n',sceneFileName);
 end
 
 % This is the PBRT scene file inside the output directory
-
 thisR  = piRead(inFile);
 %}
-
+%{
 thisR = piRecipeDefault;
+%}
 
 %% Set render quality
 
@@ -62,9 +64,8 @@ thisR.set('rays per pixel',64);                      % 128 for high quality
 
 %% Set output file
 
-[~,oiName] = fileparts(thisR.get('inputfile')) ;
-outFile   = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
-outputDir = fileparts(outFile);
+outDir = fullfile(piRootPath,'local','renderings',sceneName);
+outFile = fullfile(outDir,sceneFileName);
 thisR.set('outputFile',outFile);
 
 %% To determine the range of object depths in the scene
@@ -103,6 +104,8 @@ thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
 thisR.integrator.subtype = 'path';  
 thisR.sampler.subtype    = 'sobol';
 
+thisR.set('aperture diameter',2);   % thisR.summarize('all');
+
 % This value determines the number of ray bounces.  If the scene has
 % glass or mirrors, we need to have at least 2 or more.
 % thisR.set('nbounces',4); 
@@ -110,9 +113,9 @@ thisR.sampler.subtype    = 'sobol';
 %% Render and display
 
 % Change this for depth of field effects.
-thisR.set('aperture diameter',2);   % thisR.summarize('all');
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR,'creatematerials',true,'overwritejson',false);
 
+%%
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
 oiWindow(oi);

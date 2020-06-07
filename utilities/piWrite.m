@@ -96,15 +96,21 @@ thistrafficflow     = p.Results.thistrafficflow;
 overwritejson       = p.Results.overwritejson;
 
 %% Check exporter
-% TL: We seem to run into a lot of problems of overwriting the wrong files
-% when the exporter isn't C4D (i.e. when we don't or can't parse the PBRT
-% file). Here we do a pre-check: if the exporter isn't C4D don't touch the
-% materials or geometry at all. Just copy files over to the output
-% directory. Hopefully that will clean things up a bit.
-if(isempty(thisR.exporter))
-    creatematerials = false;
-    overwritegeometry = false;
-    overwritematerials = false;
+
+% What we read and copy depends on how we got the PBRT files in the first
+% place.  The exporter string identifies whether it is a C4D set of files,
+% the most common for us, or another source that we are simply copying
+% ('Copy') or just 'Unknown'.  We impose some constraints on the
+% over-writing flags if the exporter is 'Copy'.
+exporter = thisR.get('exporter');
+switch exporter
+    case 'Copy'
+        creatematerials = false;
+        overwritegeometry = false;
+        overwritematerials = false;
+        overwritejson = false;
+    otherwise
+        % In most cases, we accept whatever the user set.
 end
 
 %% Copy the input directory to the Docker working directory
@@ -124,21 +130,26 @@ if ~exist(geometryDir, 'dir')
 end
 
 % Selectively copy data from the source to the working directory.  In some
-% cases we are looping so we can turn off the repeated copies with this
-% flag.
+% cases we are looping and we turn off the repeated copies by setting
+% overwriteresources to false.
 if overwriteresources && ~isempty(inputDir)
     
     sources = dir(inputDir);
     status = true;
     for i=1:length(sources)
         if startsWith(sources(i).name(1),'.')
+            % Skip dot-files
             continue;
         elseif sources(i).isdir && (strcmpi(sources(i).name,'spds') || strcmpi(sources(i).name,'textures'))
+            % Copy the spds and textures directory files.
             status = status && copyfile(fullfile(sources(i).folder, sources(i).name), fullfile(workingDir,sources(i).name));
         else
+            % Selectively copy the files in the scene root folder
             [~, ~, extension] = fileparts(sources(i).name);
             if ~(contains(extension,'pbrt') || contains(extension,'zip') || contains(extension,'json'))
-                status = status && copyfile(fullfile(sources(i).folder, sources(i).name), fullfile(workingDir,sources(i).name));
+                thisFile = fullfile(sources(i).folder, sources(i).name);
+                fprintf('Copying %s\n',thisFile)
+                status = status && copyfile(thisFile, fullfile(workingDir,sources(i).name));
             end
         end
     end
@@ -146,7 +157,7 @@ if overwriteresources && ~isempty(inputDir)
     if(~status)
         error('Failed to copy input directory to docker working directory.');
     else
-        fprintf('Copied contents from:\n');
+        fprintf('Copied resources from:\n');
         fprintf('%s \n',inputDir);
         fprintf('to \n');
         fprintf('%s \n \n',workingDir);
@@ -232,13 +243,10 @@ end
 renderingDir = fullfile(workingDir,'renderings');
 if ~exist(renderingDir,'dir'), mkdir(renderingDir); end
 
-
-%% OK, we are good to go. Open up the file.
+%% OK, we are good to go. Open up the main PBRT scene file.
 
 % fprintf('Opening %s for output\n',outFile);
 fileID = fopen(outFile,'w');
-
-
 
 %% Write header
 fprintf(fileID,'# PBRT file created with piWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
@@ -285,7 +293,7 @@ fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n'
     [thisR.lookAt.from(:); thisR.lookAt.to(:); thisR.lookAt.up(:)]);
 fprintf(fileID,'\n');
 
-%% Write all other blocks using a for loop
+%% Write all other blocks using a for-loop
 
 outerFields = fieldnames(thisR);
 
@@ -409,8 +417,7 @@ for ofns = outerFields'
             end
             
             fprintf(fileID,lineFormat,...
-                currType,ifn,currValue);
-            
+                currType,ifn,currValue);          
         end
     end
     
@@ -418,8 +425,7 @@ for ofns = outerFields'
     fprintf(fileID,'\n');
 end
 
-
-%% Write out WorldBegin/WorldEnd
+%% Write out WorldBegin/WorldEnd block
 
 % Temporarily add light to world so it's easier for us to compose the PBRT
 % file
@@ -437,14 +443,13 @@ end
 piLightWrite(thisR);
 
 %{
-    % Check if we write all the lights there
-    lightSources = piLightGetFromWorld(renderRecipe);
+ % Check if we write all the lights there
+ lightSources = piLightGetFromWorld(renderRecipe);
 %}
 
 if creatematerials
-    % We may have created new materials.
-    % We write the material and geometry files based on the recipe,
-    % which defines these new materials.
+    % We may have created new materials.  This would mean we created new
+    % materials in Matlab.
     for ii = 1:length(thisR.world)
         currLine = thisR.world{ii};
         
@@ -454,6 +459,8 @@ if creatematerials
         end
            
         if overwritegeometry
+            % We get here if we generated the geometry file from the
+            % recipe.
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(thisR.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
@@ -461,6 +468,9 @@ if creatematerials
         end
         
         if piContains(currLine, 'WorldEnd')
+            % We also insert a *_lights.pbrt include because we also write
+            % out the lights file.  This file might be empty, but it will
+            % also exist.
             [~,n] = fileparts(thisR.outputFile);
             fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
         end
@@ -468,18 +478,24 @@ if creatematerials
     end
     
 else
-    % No materials were created, so we just write out the world data
-    % without any changes.
+    % No materials were created, so we skip the 'Include *_materials.pbrt.
     for ii = 1:length(thisR.world)
         currLine = thisR.world{ii};
         
         if overwritegeometry
+            % We get here if we generated the geometry file from the
+            % recipe, even though we did not make any changes to the
+            % materials.
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(thisR.outputFile);
                 currLine = sprintf('Include "%s_geometry.pbrt"',n);
             end
         end
+        
         if piContains(currLine, 'WorldEnd')
+            % We also insert a *_lights.pbrt include because we also write
+            % out the lights file.  This file might be empty, but it will
+            % also exist.
             [~,n] = fileparts(thisR.outputFile);
             fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
         end
@@ -498,8 +514,12 @@ fclose(fileID);
 
 %% Overwrite Materials.pbrt
 % Write both materials and textures in piMaterialWrite function
-exporter = thisR.exporter;
-if piContains(exporter, 'C4D') || piContains(exporter,'Other')
+
+inDir = thisR.get('input dir');
+outDir = thisR.get('output dir');
+basename = thisR.get('input basename');
+
+if piContains(exporter, 'C4D')
     % If the scene is from Cinema 4D, 
     if ~creatematerials
         % We overwrite from the input directory, but we do not create
@@ -518,16 +538,44 @@ if piContains(exporter, 'C4D') || piContains(exporter,'Other')
         thisR.materials.outputFile_materials = fullfile(workingDir,fname_materials);
         piMaterialWrite(thisR);
     end
+elseif piContains(exporter,'Copy')
+    % Copy the materials and geometry file
+    
+    mFileIn  = fullfile(inDir,sprintf('%s_materials.pbrt',basename));
+    mFileOut = fullfile(outDir,sprintf('%s_materials.pbrt',basename));
+    if exist(mFileIn,'file')
+        copyfile(mFileIn,mFileOut);
+    else
+        % no materials file to copy
+    end
+        
+else
+    % Other case.
+    fprintf('Skip the materials\n');
+
 end
 
 
 %% Overwrite geometry.pbrt
 
-if piContains(exporter, 'C4D') || piContains(exporter,'Other')
+if piContains(exporter, 'C4D')
     if overwritegeometry
         piGeometryWrite(thisR,'lightsFlag',lightsFlag, ...
             'thistrafficflow',thistrafficflow);
     end
+elseif piContains(exporter,'Copy')
+    
+    gFileIn  = fullfile(inDir,sprintf('%s_geometry.pbrt',basename));
+    gFileOut = fullfile(outDir,sprintf('%s_geometry.pbrt',basename));
+    
+    if exist(gFileIn,'file')
+        copyfile(gFileIn,gFileOut);
+    else
+        % no geometry file to copy
+    end
+    
+else
+    fprintf('Skip the geometry\n');
 end
 
 %% Overwrite xxx.json

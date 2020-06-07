@@ -203,7 +203,7 @@ while i <= length(txt)
     elseif piContains(currentLine,'Shape')
         shape = currentLine;
     else
-        warning('Current line skipped: %s', currentLine);
+      %  warning('Current line skipped: %s', currentLine);
     end
 
     i = i+1;
@@ -254,12 +254,13 @@ dcm = [tform(1:3); tform(5:7); tform(9:11)];
                     
 [rotz,roty,rotx]= piDCM2angle(dcm);
 if ~isreal(rotz) || ~isreal(roty) || ~isreal(rotx)
-    warning('piDCM2angle returned complex angles');
+    warning('piDCM2angle returned complex angles.  JSONWRITE will fail.');
     % dcm
     % txt(posA(1):posB(1))
 end
 
 %{
+% Forcing to real is not a good idea.  
 rotx = real(rotx*180/pi);
 roty = real(roty*180/pi);
 rotz = real(rotz*180/pi);

@@ -106,7 +106,11 @@ switch param
         
     case {'inputfile'}
         thisR.inputFile = val;
-        
+    case {'exporter'}
+        % thisR.set('exporter',val);
+        % a string that identifies how the PBRT file was build
+        % We have 'C4D','Copy','Unknown'
+        thisR.exporter = val;
         % Scene parameters
     case 'objectdistance'
         % The 'from' spot, is the camera location.  The 'to' spot is

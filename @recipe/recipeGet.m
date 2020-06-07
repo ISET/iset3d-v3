@@ -83,21 +83,29 @@ switch ieParamFormat(param)  % lower case, no spaces
     % Data management
     case 'inputfile'
         val = thisR.inputFile;
+    case 'inputdir'
+        val = fileparts(thisR.get('input file'));
+    case {'inputbasename'}
+        name = thisR.inputFile;
+        [~,val] = fileparts(name);        
     case 'outputfile'
         % This file location defines the working directory that docker
         % mounts to run.
         val = thisR.outputFile;
+    case 'outputdir'
+        val = fileparts(thisR.get('output file'));
+    case {'outputbasename'}
+        name = thisR.outputFile;
+        [~,val] = fileparts(name);
     case {'workingdirectory','dockerdirectory'}
         % Docker mounts this directory.  Everything is copied into it for
         % the piRender command to run.
         outputFile = thisR.get('output file');
         val = fileparts(outputFile);
-    case {'inputbasename'}
-        name = thisR.inputFile;
-        [~,val] = fileparts(name);
-    case {'outputbasename'}
-        name = thisR.outputFile;
-        [~,val] = fileparts(name);
+    
+        % Graphics related
+    case {'exporter'}
+        val = thisR.exporter;
         
         % Scene and camera direction
     case 'objectdistance'
