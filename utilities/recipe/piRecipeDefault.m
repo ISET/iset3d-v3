@@ -31,7 +31,8 @@ function thisR = piRecipeDefault(varargin)
 %}
 %{
    thisR = piRecipeDefault('scene name','SimpleScene');
-   piWrite(thisR); scene = piRender(thisR);
+   piWrite(thisR); 
+   scene = piRender(thisR);
    sceneWindow(scene);
 %}
 %{
@@ -55,7 +56,7 @@ function thisR = piRecipeDefault(varargin)
 %{
    thisR = piRecipeDefault('scene name','chessSet');
    piWrite(thisR); 
-   scene = piRender(thisR, 'render type', 'radiance');
+   scene = piRender(thisR, 'render type', 'both');
    sceneWindow(scene);
 %}
 
