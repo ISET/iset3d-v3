@@ -60,6 +60,13 @@ function thisR = piRecipeDefault(varargin)
    sceneWindow(scene);
 %}
 
+%{
+   thisR = piRecipeDefault('scene name','teapot');
+   piWrite(thisR); 
+   scene = piRender(thisR);
+   sceneWindow(scene);
+%}
+
 %%  Figure out the scene and whether you want to write it out
 
 varargin = ieParamFormat(varargin);
