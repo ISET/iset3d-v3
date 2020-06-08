@@ -38,10 +38,10 @@ classdef recipe < matlab.mixin.Copyable
         world;       % A cell array with all the WorldBegin/End contents
         lights;       % Light sources
         
-        % INPUTFILE -  Original input file
-        inputFile = '';   
-        
-        outputFile = ''; % Where outputFile = piWrite(recipe);
+        % INPUTFILE -  
+        inputFile = '';    % Original PBRT input file
+        outputFile = '';   % Where outputFile = piWrite(recipe);
+        renderedFile = ''; % Where piRender puts the radiance
         version = 3;     % A PBRTv2 file or a PBRTv3 file
         materials;       % struct containing info about the materials, parsed from *_material.pbrt file
         textures;        % struct containing info about the textures used in the scene

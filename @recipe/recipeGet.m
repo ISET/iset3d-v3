@@ -16,8 +16,12 @@ function val = recipeGet(thisR, param, varargin)
 %   % Data management
 %     'input file'      - full path to original scene pbrt file
 %     'input base name' - just base name of input file
+%     'input dir'       - Directory of the input file
 %     'output file'     - full path to scene pbrt file in working directory
 %     'output base name' - just the base name of the output file
+%     'output dir'       - Directory of the output file
+%     'rendered file'    - dat-file where piRender creates the radiance
+%     'rendered dir'     - directory with rendered data 
 %     'working directory' - directory mounted by docker image
 %
 %   % Camera and scene
@@ -97,6 +101,12 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'outputbasename'}
         name = thisR.outputFile;
         [~,val] = fileparts(name);
+    case 'renderedfile'
+        val = fileparts(thisR.get('rendered file'));
+    case {'rendereddir'}
+        name = thisR.outputFile;
+        [~,val] = fileparts(name);
+        
     case {'workingdirectory','dockerdirectory'}
         % Docker mounts this directory.  Everything is copied into it for
         % the piRender command to run.

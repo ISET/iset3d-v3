@@ -8,8 +8,8 @@
 % TL ISETBIO Team, 2017  
 
 %% Initialize ISETBIO
-if isequal(piCamBio,'isetcam')
-    fprintf('%s: requires ISETBIO, not ISETCam\n',mfilename); 
+if ~isequal(piCamBio,'isetbio')
+    fprintf('%s: requires ISETBIO\n',mfilename); 
     return;
 end
 ieInit;
@@ -20,9 +20,19 @@ ieInit;
 % way that emphasizes the depth of field of the eye. The size of the chess
 % pieces and the board may no longer match the real world.
 
-myScene = sceneEye('chessSetScaled');
-% myScene = sceneEye('snellenAtDepth');
+% {
+myScene = sceneEye('chessSet');
+myScene.name = 'chessSetTest';
+%}
 
+% myScene = sceneEye('snellenAtDepth');
+% myScene = sceneEye('slantedBarTexture'); myScene.name = 'slantedbar';
+%{
+ myScene = sceneEye('colorfulScene');
+ myScene.name = 'colorfulScene';
+ myScene.recipe.set('exporter','Copy')
+%}
+    
 %% Render a quick, LQ image
 % This takes roughly 10 sec to render on an 8 core machine.
 
@@ -38,7 +48,6 @@ myScene.resolution = 256;
 
 %% Set up the name and render
 
-myScene.name = 'chessSetTest';
 [oi,results] = myScene.render;
 
 %% Show

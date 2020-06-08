@@ -81,6 +81,8 @@ switch param
         % If there were files in the previous directory we copy them
         % to the new directory.  Maybe there should be an option to
         % stop the copy.
+        %
+        % I think it is strange that we are doing this in a set. (BW).
         
         currentDir = fileparts(thisR.outputFile);
         newDir     = fileparts(val);
@@ -101,16 +103,23 @@ switch param
                 rmdir(currentDir,'s');
             end
         end
-        
         thisR.outputFile = val;
         
     case {'inputfile'}
+        % thisR.set('input file',filename);
+        val = which(val);
         thisR.inputFile = val;
+        if ~exist(val,'file'), warning('No input file found yet'); end
     case {'exporter'}
         % thisR.set('exporter',val);
         % a string that identifies how the PBRT file was build
         % We have 'C4D','Copy','Unknown'
         thisR.exporter = val;
+    case 'renderedfile'
+        % thisR.set('rendered file',fname);
+        % Set the full path
+        thisR.renderedfile = val;
+
         % Scene parameters
     case 'objectdistance'
         % The 'from' spot, is the camera location.  The 'to' spot is
