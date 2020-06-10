@@ -16,8 +16,10 @@ end
 val = strcat(val, val_format);
 
 % Texture type
-val_type = sprintf(' "%s"', texture.type);
-val = strcat(val, val_type);
+if isfield(texture,'type')
+    val_type = sprintf(' "%s"', texture.type);
+    val = strcat(val, val_type);
+end
 
 % Texture string mapping
 if isfield(texture, 'stringmapping')

@@ -1,4 +1,4 @@
-%% t_piMeshLabel
+%% t_piIntro_meshLabel
 %
 % Under development
 %
@@ -44,15 +44,6 @@ thisR  = piRead(inFile);
 thisR.set('film resolution',round([600 600]*0.25));  % 2 is high res. 0.25 for speed
 thisR.set('rays per pixel',16);                      % 128 for high quality
 
-
-%% Set output file
-
-oiName    = sceneName;
-outFile   = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
-outputDir = fileparts(outFile);
-thisR.set('outputFile',outFile);
-
-
 %% Maybe we should speed this up by only returning radiance.
 piWrite(thisR,'creatematerials',true);
 
@@ -65,3 +56,4 @@ meshMap = piRender(thisR, 'render type', 'mesh');
 ieNewGraphWin; 
 imagesc(meshMap)
 
+%% END

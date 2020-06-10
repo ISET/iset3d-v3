@@ -1,7 +1,7 @@
 %% t_eyeDoF.m
 %
-% This tutorial shows the effect of pupil diameter on the depth of field in
-% the scene.
+% This tutorial uses the sceneEye class and methods to calculate the effect
+% of pupil diameter on the depth of field in the scene.
 % 
 % Depends on: iset3d, isetbio, Docker
 %
@@ -16,18 +16,13 @@ ieInit;
 
 %% Load scene
 
-% The "chessSetScaled" is the chessSet scene but scaled and shifted in a
-% way that emphasizes the depth of field of the eye. The size of the chess
-% pieces and the board may no longer match the real world.
-
-% {
 myScene = sceneEye('chessSet');
 myScene.name = 'chessSetTest';
-%}
 
-% myScene = sceneEye('snellenAtDepth');
-% myScene = sceneEye('slantedBarTexture'); myScene.name = 'slantedbar';
 %{
+% Some other scenes to try
+ myScene = sceneEye('snellenAtDepth');
+ myScene = sceneEye('slantedBarTexture'); myScene.name = 'slantedbar';
  myScene = sceneEye('colorfulScene');
  myScene.name = 'colorfulScene';
  myScene.recipe.set('exporter','Copy')
@@ -38,10 +33,10 @@ myScene.name = 'chessSetTest';
 
 myScene.accommodation = 1/0.28;
 myScene.fov = 30;
-myScene.numCABands = 0;
-myScene.diffractionEnabled = false;
+myScene.numCABands = 8;
+myScene.diffractionEnabled = true;
 myScene.numBounces = 1;
-myScene.pupilDiameter = 4;
+myScene.pupilDiameter = 2;
 
 myScene.numRays    = 128;
 myScene.resolution = 256;
@@ -49,8 +44,6 @@ myScene.resolution = 256;
 %% Set up the name and render
 
 [oi,results] = myScene.render;
-
-%% Show
 oiWindow(oi);
 
 %% Loop through pupil diameters

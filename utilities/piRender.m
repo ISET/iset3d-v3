@@ -126,13 +126,18 @@ scaleIlluminance = p.Results.scaleIlluminance;
 wave             = p.Results.wave;
 fprintf('Docker container %s\n',dockerImageName);
 
+% Different containers expect different wavelength ranges.
+dockerWave = 400:10:700;
 dockerSplit = split(dockerImageName, ':');
-switch dockerSplit{2}
-    case 'latest'
-        dockerWave = 400:10:700;
-    case 'basisfunction'
-        dockerWave = 365:5:705;
+if numel(dockerSplit) == 2
+    switch dockerSplit{2}
+        case 'latest'
+            dockerWave = 400:10:700;
+        case 'basisfunction'
+            dockerWave = 365:5:705;
+    end
 end
+
 
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build

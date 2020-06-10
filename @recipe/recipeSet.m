@@ -397,44 +397,56 @@ switch param
         thisR.filter = val.filter;
     % ZLY added fluorescent 
     case {'eem'}
-        % RecipeSet('eem', {'materialName', 'fluophoresName'});
+        % More comments needed about this.  Looks like it needs to be
+        % re-structured to conform to other calls.  Right now val is a
+        % two-element cell array, which is unusual.  And the first cell is
+        % another field and the second cell is the value
+        %
+        % thisR.set('eem', {'materialName', 'fluophoresName'});
         matName = val{1};
-        if ~isfield(thisR.materials.list, matName)
-            error('Unknown material name %s\n', matName);
+        switch thisR.recipeVer
+            case 2
+                % Not working yet.  We need to re-think.
+                idx = piMaterialFind(thisR,'name',matName);
+            otherwise
+                % This is the original framing, before re-writing the
+                % materials.list organization by Zheng.
+                if ~isfield(thisR.materials.list, matName)
+                    error('Unknown material name %s\n', matName);
+                end
+                if length(val) == 1
+                    error('Donaldson matrix is empty\n');
+                end
+                if length(varargin) > 2
+                    error('Accept only one Donaldson matrix\n');
+                end
+                
+                fluorophoresName = val{2};
+                if isempty(fluorophoresName)
+                    thisR.materials.list.(matName).photolumifluorescence = '';
+                    thisR.materials.list.(matName).floatconcentration = [];
+                else
+                    wave = 365:5:705; % By default it is the wavelength range used in pbrt
+                    fluorophores = fluorophoreRead(fluorophoresName,'wave',wave);
+                    % Here is the excitation emission matrix
+                    eem = fluorophoreGet(fluorophores,'eem');
+                    %{
+                       fluorophorePlot(Porphyrins,'donaldson mesh');
+                    %}
+                    %{
+                       dWave = fluorophoreGet(FAD,'delta wave');
+                       wave = fluorophoreGet(FAD,'wave');
+                       ex = fluorophoreGet(FAD,'excitation');
+                       ieNewGraphWin;
+                       plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
+                    %}
+                    
+                    % The data are converted to a vector like this
+                    flatEEM = eem';
+                    vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
+                    thisR.materials.list.(matName).photolumifluorescence = vec;
+                end
         end
-        if length(val) == 1
-            error('Donaldson matrix is empty\n');
-        end
-        if length(varargin) > 2
-            error('Accept only one Donaldson matrix\n');
-        end
-        
-        fluorophoresName = val{2};
-        if isempty(fluorophoresName)
-            thisR.materials.list.(matName).photolumifluorescence = '';
-            thisR.materials.list.(matName).floatconcentration = [];
-        else
-            wave = 365:5:705; % By default it is the wavelength range used in pbrt
-            fluorophores = fluorophoreRead(fluorophoresName,'wave',wave);
-            % Here is the excitation emission matrix
-            eem = fluorophoreGet(fluorophores,'eem');
-            %{
-                 fluorophorePlot(Porphyrins,'donaldson mesh');
-            %}
-            %{
-                 dWave = fluorophoreGet(FAD,'delta wave');
-                 wave = fluorophoreGet(FAD,'wave');
-                 ex = fluorophoreGet(FAD,'excitation');
-                 ieNewGraphWin; 
-                 plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
-            %}
-
-            % The data are converted to a vector like this
-            flatEEM = eem';
-            vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
-            thisR.materials.list.(matName).photolumifluorescence = vec;
-        end
-        
     case {'concentration'}
         matName = val{1};
         if ~isfield(thisR.materials.list, matName)

@@ -1,5 +1,12 @@
 % t_textureSwitch
-% Switch object textures using MATLAB code
+%
+% Should this be t_piTextureSwitch
+%
+% Change an object texture and render
+%
+%
+% See also
+%  
 
 %% init
 ieInit;
@@ -36,7 +43,7 @@ piTextureCreate(thisR, 'name', 'checks',...
 %% Display material list
 piMaterialList(thisR);
 %% Assign texture on fbm
-piTextureAssignToMaterial(thisR, 'Mat', 'spectrum Kd', 2);
+piTextureAssignToMaterial(thisR, 'Matte', 'spectrum Kd', 2);
 
 %% Write the recipe
 piWrite(thisR, 'overwritematerials', true);

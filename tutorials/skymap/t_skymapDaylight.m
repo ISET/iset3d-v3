@@ -116,6 +116,7 @@ ieNewGraphWin;
 plot(wave,sunSPD,'k-',wave,displaySPD,'b-');
 xlabel('wave'), ylabel('energy'), grid on
 title('Red sky, CCT');
+legend({'sun spd','display spd'})
 
 %% END
 

@@ -1,5 +1,5 @@
 function thisR = piRecipeDefault(varargin)
-% Helper  function to return a simple recipe for testing
+% Returns a recipe to one of our standard scenes.
 %
 % Syntax
 %   thisR = piRecipeDefault(varargin)
@@ -12,6 +12,9 @@ function thisR = piRecipeDefault(varargin)
 %     MacBethChecker (default)
 %     SimpleScene
 %     checkerboard
+%     slantedBar
+%     chessSet
+%     chessSetScaled
 %     teapot
 %
 %   write      -  Call piWrite (default is true).  Writes into iset3d/local
@@ -47,10 +50,10 @@ function thisR = piRecipeDefault(varargin)
    sceneWindow(scene);
 %}
 %{
-   % #ETTB - Zheng should look at and make fix the issue with the light. 
+   % #ETTBSkip - Zheng should look at and make fix the issue with the light. 
    thisR = piRecipeDefault('scene name','slantedBar'); piWrite(thisR);
-   scene = piRender(thisR);
    scene = piRender(thisR,'render type','radiance');
+   scene = sceneSet(scene,'mean luminance',100);
    sceneWindow(scene);
 %}
 %{
@@ -62,6 +65,12 @@ function thisR = piRecipeDefault(varargin)
 
 %{
    thisR = piRecipeDefault('scene name','teapot');
+   piWrite(thisR); 
+   scene = piRender(thisR);
+   sceneWindow(scene);
+%}
+%{
+   thisR = piRecipeDefault('scene name','MacBethCheckerCusLight');
    piWrite(thisR); 
    scene = piRender(thisR);
    sceneWindow(scene);
@@ -141,10 +150,12 @@ switch sceneName
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceWhiteTexture');
         fname = fullfile(FilePath,'flatSurfaceWhiteTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';
     case 'flatSurfaceRandomTexture'
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceRandomTexture');
         fname = fullfile(FilePath,'flatSurfaceRandomTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';
     case 'flatSurfaceMCCTexture'
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceMCCTexture');
         fname = fullfile(FilePath,'flatSurfaceMCCTexture.pbrt');
