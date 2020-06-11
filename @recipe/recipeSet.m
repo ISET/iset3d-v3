@@ -55,6 +55,7 @@ if isequal(param,'help')
     return;
 end
 
+%% Parse
 p = inputParser;
 p.KeepUnmatched = true;
 
@@ -65,8 +66,7 @@ p.addRequired('val');
 
 p.addParameter('lensfile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
 
-p.parse(thisR, param, val, varargin{:});
-
+p.parse(thisR, param, val);
 param = ieParamFormat(p.Results.param);
 
 %% Act
@@ -396,21 +396,35 @@ switch param
         thisR.film   = val.film;
         thisR.filter = val.filter;
     % ZLY added fluorescent 
-    case {'eem'}
-        % More comments needed about this.  Looks like it needs to be
-        % re-structured to conform to other calls.  Right now val is a
-        % two-element cell array, which is unusual.  And the first cell is
-        % another field and the second cell is the value
+    case {'fluorophoreconcentration'}
+        % thisR.set('fluorophore concentration',val,idx)
+    case {'fluorophoreeem'}
+        % thisR.set('fluorophore eem',val,idx)
         %
-        % thisR.set('eem', {'materialName', 'fluophoresName'});
-        matName = val{1};
+        % val - the name of the fluorophore.
+        % idx - a numerical index to the material or it can be a string
+        % which is the name of the mater 
+        if isempty(varargin), error('Material name or index required'); end
+        idx = varargin{1};
+
+        % If the user sent a material name convert it to an index
+        if ischar(idx), idx = piMaterialFind(thisR,'name',idx); end
+
+        matName = val;
         switch thisR.recipeVer
             case 2
-                % Not working yet.  We need to re-think.
-                idx = piMaterialFind(thisR,'name',matName);
+                % A modern recipe. So we set using modern methods.  The
+                % function reads the fluorophore (fluorophoreRead) and
+                % returns the EEM and sets it.  It uses the wavelength
+                % sampling in the recipe to determine the EEM wavelength
+                % sampling.
+                thisR = piMaterialSet(thisR,idx,'fluorophore eem',val);
+                
             otherwise
                 % This is the original framing, before re-writing the
                 % materials.list organization by Zheng.
+                disp('Please update to version 2 of the recipe');
+                disp('This will be deprecated');
                 if ~isfield(thisR.materials.list, matName)
                     error('Unknown material name %s\n', matName);
                 end

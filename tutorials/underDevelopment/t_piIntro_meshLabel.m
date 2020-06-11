@@ -14,15 +14,19 @@
 %%
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-if isempty(which('RdtClient'))
-    error('You must have the remote data toolbox on your path'); 
-end
+
 
 %% Read the pbrt files
 
+% sceneName = 'ChessSet'; sceneFileName = 'SimpleScene.pbrt';
+%{
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
 % sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+% sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+
+if isempty(which('RdtClient'))
+    error('You must have the remote data toolbox on your path'); 
+end
 
 inFolder = fullfile(piRootPath,'local','scenes');
 inFile = fullfile(inFolder,sceneName,sceneFileName);
@@ -37,6 +41,9 @@ end
 
 % This is the PBRT scene file inside the output directory
 thisR  = piRead(inFile);
+%}
+
+thisR = piRecipeDefault('scene name','SimpleScene');
 
 %% Set render quality
 
@@ -49,6 +56,7 @@ piWrite(thisR,'creatematerials',true);
 
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
 
 %% Get the object ?? or material?? label
 

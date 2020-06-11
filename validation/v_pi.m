@@ -22,10 +22,6 @@
 % Donaldson and concentration variables.
 t_piIntro_macbeth_fluorescent;   
 
-% This one needs the right scene with labels, or at least a way to properly
-% label things
-t_piIntro_meshLabel
-
 %  Not sure what to do here.
 piTextureAssignToMaterial % needs fixing by ZLy
 
