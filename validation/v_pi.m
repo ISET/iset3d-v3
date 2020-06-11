@@ -18,10 +18,6 @@
 %% TODO - 
 %{
 
-% Tests fluorescence.  Needs to be fixed for seeing 'eem' values including 
-% Donaldson and concentration variables.
-t_piIntro_macbeth_fluorescent;   
-
 %  Not sure what to do here.
 piTextureAssignToMaterial % needs fixing by ZLy
 
