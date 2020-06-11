@@ -19,6 +19,7 @@
 %{
 
 %  Not sure what to do here.
+t_piTextureSwitch
 piTextureAssignToMaterial % needs fixing by ZLy
 
 %}
