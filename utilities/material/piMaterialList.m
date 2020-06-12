@@ -1,8 +1,8 @@
-function piMaterialList(thisR)
+function list = piMaterialList(thisR)
 % List materials type in this PBRT scene
 %
 % Syntax:
-%   piMaterialList(thisR)
+%   list = piMaterialList(thisR)
 %
 % Brief description
 %   Prints out a list of the materials in this recipe (thisR).  The

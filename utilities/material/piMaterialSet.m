@@ -57,7 +57,7 @@ switch param
             
             % Here is the excitation emission matrix
             eem = fluorophoreGet(fluorophores,'eem');
- 
+            
             % The data are converted to a vector like this
             flatEEM = eem';
             vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
@@ -75,35 +75,54 @@ switch param
         % a valid field from below.
         thisR.materials.list{idx}.(param) = val;
         
-        % Clean up the unnecessary fields
-        switch param
-            case 'spectrumkd'
-                piMaterialSet(thisR, idx, 'delete', 'rgbkd');
-                piMaterialSet(thisR, idx, 'delete', 'colorkd');
-            case 'rgbkd'
-                piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
-                piMaterialSet(thisR, idx, 'delete', 'colorkd');
-            case 'colorkd'
-                piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
-                piMaterialSet(thisR, idx, 'delete', 'rgbkd');
-            case 'spectrumks'
-                piMaterialSet(thisR, idx, 'delete', 'rgbks');
-                piMaterialSet(thisR, idx, 'delete', 'colorks');
-            case 'rgbks'
-                piMaterialSet(thisR, idx, 'delete', 'spectrumks');
-                piMaterialSet(thisR, idx, 'delete', 'colorks');
-            case 'colorks'
-                piMaterialSet(thisR, idx, 'delete', 'spectrumks');
-                piMaterialSet(thisR, idx, 'delete', 'rgbks');
-            case 'spectrumkr'
-                piMaterialSet(thisR, idx, 'delete', 'rgbkr');
-                piMaterialSet(thisR, idx, 'delete', 'colorkr');
-            case 'rgbkr'
-                piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
-                piMaterialSet(thisR, idx, 'delete', 'colorkr');
-            case 'colorkr'
-                piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
-                piMaterialSet(thisR, idx, 'delete', 'rgbkr');
+        % Clean up the unnecessary color fields 
+        if strncmp(param,'texture',7)
+            % if a texture do this
+            switch param(end-2:end)
+                case 'kd'
+                    piMaterialSet(thisR, idx, 'delete', 'rgbkd');
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
+                    piMaterialSet(thisR, idx, 'delete', 'colorkd');
+                case 'ks'
+                    piMaterialSet(thisR, idx, 'delete', 'rgbks');
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumks');
+                    piMaterialSet(thisR, idx, 'delete', 'colorks');
+                case 'kr'
+                    piMaterialSet(thisR, idx, 'delete', 'rgbkr');
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
+                    piMaterialSet(thisR, idx, 'delete', 'colorkr');
+            end
+        else
+            % otherwise not a texture so do this
+            switch param
+                case 'spectrumkd'
+                    piMaterialSet(thisR, idx, 'delete', 'rgbkd');
+                    piMaterialSet(thisR, idx, 'delete', 'colorkd');
+                case 'rgbkd'
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
+                    piMaterialSet(thisR, idx, 'delete', 'colorkd');
+                case 'colorkd'
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
+                    piMaterialSet(thisR, idx, 'delete', 'rgbkd');
+                case 'spectrumks'
+                    piMaterialSet(thisR, idx, 'delete', 'rgbks');
+                    piMaterialSet(thisR, idx, 'delete', 'colorks');
+                case 'rgbks'
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumks');
+                    piMaterialSet(thisR, idx, 'delete', 'colorks');
+                case 'colorks'
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumks');
+                    piMaterialSet(thisR, idx, 'delete', 'rgbks');
+                case 'spectrumkr'
+                    piMaterialSet(thisR, idx, 'delete', 'rgbkr');
+                    piMaterialSet(thisR, idx, 'delete', 'colorkr');
+                case 'rgbkr'
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
+                    piMaterialSet(thisR, idx, 'delete', 'colorkr');
+                case 'colorkr'
+                    piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
+                    piMaterialSet(thisR, idx, 'delete', 'rgbkr');
+            end
         end
 end
 
