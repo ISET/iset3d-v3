@@ -154,10 +154,15 @@ headerCheck_scene = tmp{1};
 fclose(fileID);
 % fprintf('Second read done\n');
 if piContains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
+    % Interprets the information and writes the _geometry.pbrt and
+    % _materials.pbrt files to the rendering folder.
     exporterFlag   = true;
     thisR.exporter = 'C4D';
 else
-    exporterFlag = false;
+    % Copies the original _geometry.pbrt and _materials.pbrt to the
+    % rendering folder.
+    exporterFlag   = false;
+    thisR.exporter = 'Copy';
 end
 
 %% Material file header check
@@ -177,7 +182,7 @@ if exist(inputFile_materials,'file')
     % fprintf('Done with materials read\n');
 end
 
-%% It would be nice to identify every block
+%% It would be nice to identify make sure we interpreted every block
 
 %% Extract camera  block
 cameraStruct = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
@@ -185,7 +190,7 @@ if(isempty(cameraStruct))
     warning('Cannot find "camera" in PBRT file.');
     thisR.camera = struct([]); % Return empty.
 else
-    thisR.camera = cameraStruct;
+    thisR.camera = cameraStruct;    
 end
 
 %% Extract sampler block
@@ -203,12 +208,23 @@ if(isempty(filmStruct))
     warning('Cannot find "film" in PBRT file.');
     thisR.film = struct([]); % Return empty.
 else
+    % Patch up the filmStruct to match the recipe requirements
+    if(isfield(filmStruct,'filename'))
+        % Remove the filename since it inteferes with the outfile name.
+        filmStruct = rmfield(filmStruct,'filename');
+    end
+    
     thisR.film = filmStruct;
     
-    if(isfield(thisR.film,'filename'))
-        % Remove the filename since it inteferes with the outfile name.
-        thisR.film = rmfield(thisR.film,'filename');
+    % Some PBRT files do not specify the film diagonal size.  We set it to
+    % 1mm here.
+    try
+        thisR.get('film diagonal');
+    catch
+        disp('Setting film diagonal size to 1 mm');
+        thisR.set('film diagonal',1);
     end
+    
 end
 
 %% Extract surface pixel filter block
@@ -302,13 +318,13 @@ end
 
 thisR.lookAt = struct('from',from,'to',to,'up',up);
 %% Read the light sources and delete them in world
-thisR.lights = piLightGetFromWorld(thisR, 'print', false);
-for ii = 1:numel(thisR.lights)
-    thisR.lights{ii}.name = 'Default light';
+
+switch thisR.get('exporter')
+    case 'C4D'
+        thisR = piLightRead(thisR);
+    otherwise
 end
 
-% Remove the light from the world as we already stored them in thisR.lights
-thisR = piLightDeleteWorld(thisR, 'all');
 %% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
@@ -330,31 +346,45 @@ if(flip)
 end
 
 %% Read Material.pbrt file if pbrt file is exported by C4D.
-% Is the read materials flag necessary?  Can't we just check if this
-% is an exporterFlag case and see if there is a file?
-if exporterFlag
+
+% Can't we just check if there is a file and read it?  Why do we need to
+% distinguish whether these are C4D or Copy files on the read?
+if isequal(thisR.exporter,'C4D')
     if readmaterials
-        % Check if a materials.pbrt exist
+        % This reads both the materials and the textures
+        
+        % Check if the materials.pbrt exist
         if ~exist(inputFile_materials,'file'), error('File not found'); end
-        [thisR.materials.list,thisR.materials.txtLines] =piMaterialRead(inputFile_materials,'version',3);
+        [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials,'version',3);
         thisR.materials.inputFile_materials = inputFile_materials;
+        
         % Call material lib
         thisR.materials.lib = piMateriallib;
         
         %{
-            % Convert all jpg textures to png format,only *.png & *.exr are supported in pbrt.
+            % Convert all jpg textures to png format
+            % Only *.png & *.exr are supported in pbrt.
             piTextureFileFormat(thisR);
         %}
+        
+        % Now read the textures from the materials file
         [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials, 'version', 3);
         thisR.textures.inputFile_textures = inputFile_materials;
     end
+elseif isequal(thisR.exporter,'Copy')
+    fprintf('Should be copying materials.\n');
+else 
+    fprintf('Skipping materials and texture read.\n');
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
-if exporterFlag 
-    % fprintf('Reading geometry\n');
+if isequal(thisR.exporter,'C4D') 
+    fprintf('Reading C4D geometry information.\n');
     thisR = piGeometryRead(thisR); 
-    % fprintf('Done with geometry read\n');
+elseif isequal(thisR.exporter,'Copy')
+    fprintf('Should be copying geometry.\n');
+else
+    fprintf('Skipping geometry read.\n');
 end
 
 end

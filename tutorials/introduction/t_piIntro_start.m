@@ -1,10 +1,8 @@
 %% The first in a series of scripts introducing iset3d calculations
 %
 % Brief description:
-%
-%  This introduction renders the teapot scene in the data directory of the
-%  ISET3d repository. This introduction sets up a very simple recipe, runs
-%  the docker command, and loads the result into an ISET scene structure.
+%  This script renders the sphere scene in the data directory of the ISET3d
+%  repository.
 % 
 % Dependencies:
 %    ISET3d, (ISETCam or ISETBio), JSONio
@@ -13,10 +11,19 @@
 %
 %    docker pull vistalab/pbrt-v3-spectral
 %
-% TL, BW, ZL SCIEN 2017
+% Description
+%  The scripts uses a very simple recipe for a sphere that is included in
+%  the iset3d repository.  It sets up the recipe properties by adding a
+%  light, setting some resolution parameters, and then calling the render
+%  method.  That method invokes the PBRT docker.  The output of PBRT is
+%  loaded into an ISET scene structure.
+%
+% Authors
+%  TL, BW, ZL, ZLy SCIEN 2017
 %
 % See also
 %   t_piIntro_*
+%
 
 %% Initialize ISET and Docker
 
@@ -26,33 +33,38 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
 
-% The teapot is our test file
-% inFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
-recipe = piRecipeDefault('scene name','teapot');
+thisR = piRecipeDefault('scene name','sphere');
 
-%% The output will be written here
-sceneName = 'teapot';
-outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
-recipe.set('outputFile',outFile);
-
+%% Add a point light
+thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
+%{
+% You could try this light if you like, which is more blue and distant
+%
+ thisR = piLightAdd(thisR, 'type', 'distant', 'light spectrum', [9000 0.001],...
+                        'camera coordinate', true);
+%}
 %% Set up the render quality
 
-% There are many different parameters that can be set.
-recipe.set('film resolution',[192 192]);
-recipe.set('pixel samples',128);
-recipe.set('max depth',1); % Number of bounces
+% There are many different parameters that can be set.  This is the just an
+% introductory script, so we do a minimal number of parameters.  Much of
+% what is described in other scripts expands on this section.
+thisR.set('film resolution',[192 192]);
+thisR.set('rays per pixel',128);
+thisR.set('n bounces',1); % Number of bounces
 
-%% Render
-piWrite(recipe);
+%% Save the recipe information
 
-%%  This is a pinhole case.  So we are rendering a scene.
+piWrite(thisR);
 
-[scene, result] = piRender(recipe);
+%% Render 
 
+% There is no lens, just a pinhole.  In that case, we are rendering a
+% scene.  If we had a lens, we would be rendering an optical image.
+[scene, result] = piRender(thisR);
 sceneWindow(scene);
-scene = sceneSet(scene,'gamma',0.7);
 
 %% Notice that we also computed the depth map
-scenePlot(scene,'depth map');
+
+% scenePlot(scene,'depth map');
 
 %%

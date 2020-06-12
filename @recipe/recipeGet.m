@@ -16,8 +16,12 @@ function val = recipeGet(thisR, param, varargin)
 %   % Data management
 %     'input file'      - full path to original scene pbrt file
 %     'input base name' - just base name of input file
+%     'input dir'       - Directory of the input file
 %     'output file'     - full path to scene pbrt file in working directory
 %     'output base name' - just the base name of the output file
+%     'output dir'       - Directory of the output file
+%     'rendered file'    - dat-file where piRender creates the radiance
+%     'rendered dir'     - directory with rendered data 
 %     'working directory' - directory mounted by docker image
 %
 %   % Camera and scene
@@ -45,6 +49,10 @@ function val = recipeGet(thisR, param, varargin)
 %      'integrator'
 %      'n bounces'
 %
+%    %  Asset information
+%       'assets'      - Not sure I am doing this right
+%       'asset names' - The names in groupobjs.name
+%
 % BW, ISETBIO Team, 2017
 
 % Examples
@@ -70,30 +78,44 @@ p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
-p.addOptional('material', [], @iscell);
+% p.addOptional('material', [], @iscell);
 
-p.parse(thisR,param,varargin{:});
+p.parse(thisR,param);
 
-switch ieParamFormat(param)
+switch ieParamFormat(param)  % lower case, no spaces
     
     % Data management
     case 'inputfile'
         val = thisR.inputFile;
+    case 'inputdir'
+        val = fileparts(thisR.get('input file'));
+    case {'inputbasename'}
+        name = thisR.inputFile;
+        [~,val] = fileparts(name);        
     case 'outputfile'
         % This file location defines the working directory that docker
         % mounts to run.
         val = thisR.outputFile;
+    case 'outputdir'
+        val = fileparts(thisR.get('output file'));
+    case {'outputbasename'}
+        name = thisR.outputFile;
+        [~,val] = fileparts(name);
+    case 'renderedfile'
+        val = fileparts(thisR.get('rendered file'));
+    case {'rendereddir'}
+        name = thisR.outputFile;
+        [~,val] = fileparts(name);
+        
     case {'workingdirectory','dockerdirectory'}
         % Docker mounts this directory.  Everything is copied into it for
         % the piRender command to run.
         outputFile = thisR.get('output file');
         val = fileparts(outputFile);
-    case {'inputbasename'}
-        name = thisR.inputFile;
-        [~,val] = fileparts(name);
-    case {'outputbasename'}
-        name = thisR.outputFile;
-        [~,val] = fileparts(name);
+    
+        % Graphics related
+    case {'exporter'}
+        val = thisR.exporter;
         
         % Scene and camera direction
     case 'objectdistance'
@@ -195,6 +217,7 @@ switch ieParamFormat(param)
         % 
         % Correct for pinhole, but just an approximation for lens
         % camera.
+        filmDiag      = thisR.get('film diagonal'); 
         if isequal(thisR.get('optics type'),'pinhole')
             if isfield(thisR.camera,'fov')
                 val = thisR.camera.fov.value;
@@ -203,7 +226,7 @@ switch ieParamFormat(param)
                     val = 2*atand(tand(val/2)*filmratio); 
                 end
             else
-                val = atand(thisR.camera.filmdiag.value/2/thisR.camera.filmdistance.value);
+                val = atand(filmDiag/2/thisR.camera.filmdistance.value);
             end
         else
             % Coarse estimate of the diagonal FOV (degrees) for the
@@ -212,7 +235,6 @@ switch ieParamFormat(param)
             focusDistance = thisR.get('focus distance');    % meters
             lensFile      = thisR.get('lens file');
             filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm
-            filmDiag      = thisR.get('film diagonal');     % mm
             val           = atand(filmDiag/2/filmDistance);
         end
     case 'pupildiameter'
@@ -270,16 +292,22 @@ switch ieParamFormat(param)
         
     case {'filmdiagonal','filmdiag'}
         % recipe.get('film diagonal');  in mm
-        val = thisR.film.diagonal.value;
+        if isfield(thisR.film,'diagonal')
+            val = thisR.film.diagonal.value;
+        end
   
     case 'filmsubtype'
         % What are the legitimate options?
-        val = thisR.film.subtype;
+        if isfield(thisR.film,'subtype')
+            val = thisR.film.subtype;
+        end
         
     case {'raysperpixel'}
-        val = thisR.sampler.pixelsamples.value;
+        if isfield(thisR.sampler,'pixelsamples')
+            val = thisR.sampler.pixelsamples.value;
+        end
         
-    case {'cropwindow','crop window'}
+    case {'cropwindow'}
         if(isfield(thisR.film,'cropwindow'))
             val = thisR.film.cropwindow.value;
         else
@@ -288,53 +316,98 @@ switch ieParamFormat(param)
         
         % Rendering related
     case{'maxdepth','bounces','nbounces'}
-        val = thisR.integrator.maxdepth.value;
-        
-    case{'integrator'}
-        val = thisR.integrator.subtype;
-        
-    case{'camerabody','camera body'}
-        val.camera = thisR.camera;
-        val.film = thisR.film;
-        val.filter = thisR.filter;
-    case{'eem'}
-        % val = thisR.get('eem', 'material', {'materialName'});
-        if numel(varargin) == 0
-            matNames = fieldnames(thisR.materials.list);
-            val = cell(1, numel(matNames));
-            for ii = 1:numel(matNames)
-                val{ii} = thisR.materials.list.(matNames{ii}).photolumifluorescence;
-            end
-        else
-            matList = varargin{2};
-            val = cell(1, numel(matList));
-            for ii = 1:numel(matList)
-                if ~isfield(thisR.materials.list, matList{ii})
-                    error('Unknown material %s', matList{ii})
-                end
-                val{ii} = thisR.materials.list.(matList{ii}).photolumifluorescence; 
-            end
+        if isfield(thisR.integrator,'maxdepth')
+            val = thisR.integrator.maxdepth.value;
         end
         
+    case{'integrator'}
+        if isfield(thisR.integrator,'subtype')
+            val = thisR.integrator.subtype;
+        end
         
-    case{'concentration'}
-        % val = thisR.get('concentration', 'material', {'materialName'});
-        if numel(varargin) == 0
-            matNames = fieldnames(thisR.materials.list);
-            val = cell(1, numel(matNames));
-            for ii = 1:numel(matNames)
-                val{ii} = thisR.materials.list.(matNames{ii}).floatconcentration;
-            end
+    case{'camerabody'}
+        % thisR.get('camera body');
+        val.camera = thisR.camera;
+        val.film   = thisR.film;
+        val.filter = thisR.filter;
+        
+    case{'material'}
+        if isfield(thisR.materials, 'list')
+            val = thisR.materials.list;
         else
-            matList = varargin{2};
-            val = cell(1, numel(matList));
-            for ii = 1:numel(matList)
-                if ~isfield(thisR.materials.list, matList{ii})
-                    error('Unknown material %s', matList{ii})
-                end
-                val{ii} = thisR.materials.list.(matList{ii}).floatconcentration; 
-            end
-        end        
+            val = {};
+        end
+    case{'texture'}
+        if isfield(thisR.textures, 'list')
+            val = thisR.textures.list;
+        else
+            val = {};
+        end
+    case{'light'}
+        val = thisR.light;
+        
+    % Assets - more work needed here.
+    case {'assetroot'}
+        % The root of all assets
+        val = thisR.assets;
+        
+    case {'groupnames'}
+        % Cell array (2D) of the groupobj names
+        % val{level}{idx}
+        val = piAssetNames(thisR);
+    case {'groupindex'}
+        % thisR.get('groupindex',groupName)
+        % gnames = thisR.get('group names')
+        %
+        % gnames{idx(1)}{dx(2)}
+        if isempty(varargin), error('group name required'); end
+        val = piAssetNames(thisR,'group find',varargin{1});
+    case {'groupobj'}
+        % groupobj = thisR.get('groupobj',idx);
+        % idx from group index
+        %
+        % idx = piAssetNames(thisR,'group find','figure_3m');
+        thisG = thisR.assets;
+        % Work through the levels
+        for level = 1:idx(1)
+            thisG = thisG.groupobjs;
+        end
+        % Select the group
+        val = thisG(idx(2));
+        
+    case {'childrennames'}
+        % cnames = thisR.get('children names')
+        % Cell array (2D) of the children names
+        %
+        [~,val] = piAssetNames(thisR);
+        
+    case {'childrenindex'}
+        % idx = thisR.get('children index',childName)
+        % cnames = thisR.get('children names')
+        %
+        % These are 3-vectors (level, group, idx)
+        %
+        % cnames{idx(1)}{dx(2)}
+        %
+        if isempty(varargin), error('child name required'); end
+        val = piAssetNames(thisR,'children find',varargin{1});
+    case {'child'}
+        % child = thisR.get('child',idx); 
+        %
+        % idx from child index is a 3 vector. There can be multiple
+        % groupobjs at this level and we need to know which one has the
+        % specific child.  So we need
+        %
+        %   [level, groupidx, childidx]
+        %
+        % idx = piAssetNames(thisR,'children find','3_1_Moon Light');
+        thisG = thisR.assets;
+        for level = 1:idx(1)
+            % Work through the levels
+            thisG = thisG.groupobjs;
+        end
+        % Find the group and child
+        val = thisG(idx(2)).children(idx(3));
         
     otherwise
         error('Unknown parameter %s\n',param);

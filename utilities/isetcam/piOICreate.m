@@ -35,7 +35,7 @@ p.addParameter('focalLength',0.004,@isscalar);   % Meters
 p.addParameter('fNumber',4,@isscalar);           % Dimensionless
 p.addParameter('filmDiag',[],@isscalar);         % Meters
 p.addParameter('fov',[],@isscalar)               % Horizontal fov, degrees
-p.addParameter('wavelength',[400:10:700],@isvector); % Spectral samples
+p.addParameter('wavelength',400:10:700,@isvector); % Spectral samples
 
 % Format arguments so that p.parse will run.
 for ii=1:2:length(varargin)

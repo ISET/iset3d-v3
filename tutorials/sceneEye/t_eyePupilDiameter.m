@@ -40,8 +40,15 @@ myScene.diffractionEnabled = true;
 pupilDiameters = [6 4 2];
 
 % Fast test version
+%{
 numRays = [128 128 128];
 myScene.resolution = 128; 
+%}
+% Fast test version
+% {
+numRays = [128 128 128]*4;
+myScene.resolution = 128*4; 
+%}
 
 if(length(numRays) ~= length(pupilDiameters))
     error('numRays and pupilDiameters length need to match!')
@@ -65,8 +72,7 @@ for ii = 1:length(pupilDiameters)
     save(saveFilename,'oi','myScene');
     
     % Show the optical image
-    ieAddObject(oi);
-    oiWindow;
+    oiWindow(oi);
     
 end
 

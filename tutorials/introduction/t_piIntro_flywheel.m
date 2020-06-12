@@ -33,21 +33,24 @@ if ~piDockerExists, piDockerConfig; end
 if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
-sceneName = 'checkerboard_new';
+sceneName = 'checkerboard';
 FilePath = fullfile(piRootPath,'data','V3',sceneName);
 fname = fullfile(FilePath,[sceneName,'.pbrt']);
 if ~exist(fname,'file'), error('File not found'); end
 
 thisR = piRead(fname);
 
+
 %% get a random car and a random person from flywheel
 % take some time, maybe you dont want to run this everytime when you debug
-% assets = piAssetCreate('ncars',1, 'nped',1);
+% assets = piFWAssetCreate('ncars',1, 'nped',1);
 st = scitran('stanfordlabs');
 subject = st.lookup('wandell/Graphics auto/assets');
 session = subject.sessions.findOne('label=car');
 inputs.ncars = 1;
 assetRecipe = piAssetDownload(session,inputs.ncars,'acquisition label','Car_085');
+
+%%
 asset.car   = piAssetAssign(assetRecipe,'label','car');
 
 %% add downloaded asset information to Render recipe.
@@ -58,6 +61,7 @@ thisR = piAssetAddBatch(thisR, asset);
 % This is a low resolution for speed.
 thisR.set('film resolution',[400 300]);
 thisR.set('pixel samples',64);
+
 
 %% Get a sky map from Flywheel, and use it in the scene
 thisTime = '16:30';
@@ -102,7 +106,7 @@ target = thisR.materials.lib.carpaint;  % This is the assignment
 piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
 
 % Assign a nice position.
-thisR.assets(end).position = [3.5 0 -2]';
+thisR.assets.groupobjs(end).position = [3.5 0 -2]';
 
 %% Write out the pbrt scene file, based on thisR.
 

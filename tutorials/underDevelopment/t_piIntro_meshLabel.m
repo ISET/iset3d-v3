@@ -1,4 +1,4 @@
-%% t_piMeshLabel
+%% t_piIntro_meshLabel
 %
 % Under development
 %
@@ -14,15 +14,19 @@
 %%
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-if isempty(which('RdtClient'))
-    error('You must have the remote data toolbox on your path'); 
-end
+
 
 %% Read the pbrt files
 
+% sceneName = 'ChessSet'; sceneFileName = 'SimpleScene.pbrt';
+%{
 % sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
 % sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+% sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+
+if isempty(which('RdtClient'))
+    error('You must have the remote data toolbox on your path'); 
+end
 
 inFolder = fullfile(piRootPath,'local','scenes');
 inFile = fullfile(inFolder,sceneName,sceneFileName);
@@ -37,6 +41,9 @@ end
 
 % This is the PBRT scene file inside the output directory
 thisR  = piRead(inFile);
+%}
+
+thisR = piRecipeDefault('scene name','SimpleScene');
 
 %% Set render quality
 
@@ -44,20 +51,12 @@ thisR  = piRead(inFile);
 thisR.set('film resolution',round([600 600]*0.25));  % 2 is high res. 0.25 for speed
 thisR.set('rays per pixel',16);                      % 128 for high quality
 
-
-%% Set output file
-
-oiName    = sceneName;
-outFile   = fullfile(piRootPath,'local',oiName,sprintf('%s.pbrt',oiName));
-outputDir = fileparts(outFile);
-thisR.set('outputFile',outFile);
-
-
 %% Maybe we should speed this up by only returning radiance.
 piWrite(thisR,'creatematerials',true);
 
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.7);
 
 %% Get the object ?? or material?? label
 
@@ -65,3 +64,4 @@ meshMap = piRender(thisR, 'render type', 'mesh');
 ieNewGraphWin; 
 imagesc(meshMap)
 
+%% END

@@ -16,7 +16,7 @@ if (ver ~= 3)
     error('Only PBRT version 3 Cinema 4D exporter is supported.');
 end
 
-%% Read the text from the fname
+%% Gather texture lines
 
 % Open, read, close
 fileID = fopen(fname);
@@ -24,9 +24,7 @@ tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
 txtLines = tmp{1};
 fclose(fileID);
 
-%% Gather texture lines
-
-textureLines = piTexturesFromMaterialFileText(txtLines);
+textureLines = piTexturesFromText(txtLines);
 if isempty(textureLines), textureList = [];
 else, textureList  = piBlockExtractTexture(thisR, textureLines);end
 end

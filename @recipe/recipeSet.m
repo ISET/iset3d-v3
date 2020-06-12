@@ -55,6 +55,7 @@ if isequal(param,'help')
     return;
 end
 
+%% Parse
 p = inputParser;
 p.KeepUnmatched = true;
 
@@ -65,8 +66,7 @@ p.addRequired('val');
 
 p.addParameter('lensfile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
 
-p.parse(thisR, param, val, varargin{:});
-
+p.parse(thisR, param, val);
 param = ieParamFormat(p.Results.param);
 
 %% Act
@@ -81,13 +81,16 @@ switch param
         % If there were files in the previous directory we copy them
         % to the new directory.  Maybe there should be an option to
         % stop the copy.
+        %
+        % I think it is strange that we are doing this in a set. (BW).
         
         currentDir = fileparts(thisR.outputFile);
         newDir     = fileparts(val);
         if ~exist(newDir,'dir'), mkdir(newDir); end
         
-        % Are we changing the output directory?
-        if isequal(currentDir,newDir)
+        % Are we changing the output directory?  On the MAC, directory case
+        % is not respected, so ...
+        if isequal(lower(currentDir),lower(newDir))
             % Nothing needs to be done
         else
             % We start copying from the current to the new
@@ -100,12 +103,23 @@ switch param
                 rmdir(currentDir,'s');
             end
         end
-        
         thisR.outputFile = val;
         
     case {'inputfile'}
+        % thisR.set('input file',filename);
+        val = which(val);
         thisR.inputFile = val;
-        
+        if ~exist(val,'file'), warning('No input file found yet'); end
+    case {'exporter'}
+        % thisR.set('exporter',val);
+        % a string that identifies how the PBRT file was build
+        % We have 'C4D','Copy','Unknown'
+        thisR.exporter = val;
+    case 'renderedfile'
+        % thisR.set('rendered file',fname);
+        % Set the full path
+        thisR.renderedfile = val;
+
         % Scene parameters
     case 'objectdistance'
         % The 'from' spot, is the camera location.  The 'to' spot is
@@ -382,45 +396,71 @@ switch param
         thisR.film   = val.film;
         thisR.filter = val.filter;
     % ZLY added fluorescent 
-    case {'eem'}
-        % RecipeSet('eem', {'materialName', 'fluophoresName'});
-        matName = val{1};
-        if ~isfield(thisR.materials.list, matName)
-            error('Unknown material name %s\n', matName);
-        end
-        if length(val) == 1
-            error('Donaldson matrix is empty\n');
-        end
-        if length(varargin) > 2
-            error('Accept only one Donaldson matrix\n');
-        end
-        
-        fluorophoresName = val{2};
-        if isempty(fluorophoresName)
-            thisR.materials.list.(matName).photolumifluorescence = '';
-            thisR.materials.list.(matName).floatconcentration = [];
-        else
-            wave = 365:5:705; % By default it is the wavelength range used in pbrt
-            fluorophores = fluorophoreRead(fluorophoresName,'wave',wave);
-            % Here is the excitation emission matrix
-            eem = fluorophoreGet(fluorophores,'eem');
-            %{
-                 fluorophorePlot(Porphyrins,'donaldson mesh');
-            %}
-            %{
-                 dWave = fluorophoreGet(FAD,'delta wave');
-                 wave = fluorophoreGet(FAD,'wave');
-                 ex = fluorophoreGet(FAD,'excitation');
-                 ieNewGraphWin; 
-                 plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
-            %}
+    case {'fluorophoreconcentration'}
+        % thisR.set('fluorophore concentration',val,idx)
+    case {'fluorophoreeem'}
+        % thisR.set('fluorophore eem',val,idx)
+        %
+        % val - the name of the fluorophore.
+        % idx - a numerical index to the material or it can be a string
+        % which is the name of the mater 
+        if isempty(varargin), error('Material name or index required'); end
+        idx = varargin{1};
 
-            % The data are converted to a vector like this
-            flatEEM = eem';
-            vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
-            thisR.materials.list.(matName).photolumifluorescence = vec;
+        % If the user sent a material name convert it to an index
+        if ischar(idx), idx = piMaterialFind(thisR,'name',idx); end
+
+        matName = val;
+        switch thisR.recipeVer
+            case 2
+                % A modern recipe. So we set using modern methods.  The
+                % function reads the fluorophore (fluorophoreRead) and
+                % returns the EEM and sets it.  It uses the wavelength
+                % sampling in the recipe to determine the EEM wavelength
+                % sampling.
+                thisR = piMaterialSet(thisR,idx,'fluorophore eem',val);
+                
+            otherwise
+                % This is the original framing, before re-writing the
+                % materials.list organization by Zheng.
+                disp('Please update to version 2 of the recipe');
+                disp('This will be deprecated');
+                if ~isfield(thisR.materials.list, matName)
+                    error('Unknown material name %s\n', matName);
+                end
+                if length(val) == 1
+                    error('Donaldson matrix is empty\n');
+                end
+                if length(varargin) > 2
+                    error('Accept only one Donaldson matrix\n');
+                end
+                
+                fluorophoresName = val{2};
+                if isempty(fluorophoresName)
+                    thisR.materials.list.(matName).photolumifluorescence = '';
+                    thisR.materials.list.(matName).floatconcentration = [];
+                else
+                    wave = 365:5:705; % By default it is the wavelength range used in pbrt
+                    fluorophores = fluorophoreRead(fluorophoresName,'wave',wave);
+                    % Here is the excitation emission matrix
+                    eem = fluorophoreGet(fluorophores,'eem');
+                    %{
+                       fluorophorePlot(Porphyrins,'donaldson mesh');
+                    %}
+                    %{
+                       dWave = fluorophoreGet(FAD,'delta wave');
+                       wave = fluorophoreGet(FAD,'wave');
+                       ex = fluorophoreGet(FAD,'excitation');
+                       ieNewGraphWin;
+                       plot(wave,sum(eem)/dWave,'k--',wave,ex/max(ex(:)),'r:')
+                    %}
+                    
+                    % The data are converted to a vector like this
+                    flatEEM = eem';
+                    vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
+                    thisR.materials.list.(matName).photolumifluorescence = vec;
+                end
         end
-        
     case {'concentration'}
         matName = val{1};
         if ~isfield(thisR.materials.list, matName)

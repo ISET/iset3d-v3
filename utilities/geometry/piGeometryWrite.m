@@ -11,7 +11,7 @@ function  piGeometryWrite(thisR,varargin)
 %%
 p = inputParser;
 
-varargin =ieParamFormat(varargin);
+% varargin =ieParamFormat(varargin);
 
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 % default is flase, will turn on for night scene
@@ -30,187 +30,222 @@ obj = thisR.assets;
 fname_obj = fullfile(Filepath,sprintf('%s%s',n,e));
 fid_obj = fopen(fname_obj,'w');
 fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%i/%i %i:%i:%f \n  \n',clock);
-for ii = 1: length(obj)
-    % If empty, the obj is a camera, which we do not write out.
-    % Do not write out arealight here, it has been written in scene.pbrt
-    if ~isempty(obj(ii).children) && ~piContains(lower(obj(ii).name), 'arealight')
-        fprintf(fid_obj,'ObjectBegin "%s"\n',obj(ii).name);
-        for dd = 1:length(obj(ii).children)
-            if isfield(obj(ii).children(dd),'mediumInterface')
-                if(~isempty(obj(ii).children(dd).mediumInterface))
-                    fprintf(fid_obj, '%s\n', obj(ii).children(dd).mediumInterface);
-                end
-            end
-            if isfield(obj(ii).children(dd),'material')
-                fprintf(fid_obj, '%s\n', obj(ii).children(dd).material);
-            end
-            [~,output] = fileparts(obj(ii).children(dd).output);
-            fprintf(fid_obj, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
-        end
-        fprintf(fid_obj,'ObjectEnd \n \n');
-        
-        if ~isfield(obj(ii),'motion')||isempty(obj(ii).motion)
-            for kk = 1:length(obj(ii))
-                % if more than one object instance are neeeded, write out all
-                % ot them
-                [m, n]= size(obj(ii).position);
-                if m ==3 && n >= 1
-                    for gg = 1:n
-                        fprintf(fid_obj,'AttributeBegin \n');
-                        if isempty(obj(ii).position(:,gg))
-                            fprintf(fid_obj,'Translate 0 0 0 \n');
-                        else
-                            obj_position = obj(ii).position(:,gg);
-                            fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                                obj_position(2),obj_position(3));
-                        end
-                        if ~isempty(obj(ii).rotate)
-                            obj_rotate = obj(ii).rotate;
-                            % Write out rotation
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Z
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % Y
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % X 
-                        end
-                        % Write out scaling
-                        if isfield(obj(ii),'scale')
-                        if ~isempty(obj(ii).scale)
-                            obj_scale = obj(ii).scale(:,gg);
-                            fprintf(fid_obj,'Scale %f %f %f\n',obj_scale(1),...
-                                obj_scale(2),obj_scale(3)); % Y
-                        end
-                        end
-                        fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
-                        fprintf(fid_obj,'AttributeEnd \n \n');
-                    end
-                else
-                    error('Position should be a 3 by n matrix \n')
-                end
-            end
-            
-        else
-            for kk = 1:length(obj(ii))
-                % if more than one object instance are neeeded, write out all
-                % ot them
-                [m, n]= size(obj(ii).position);
-                if m ==3 && n >= 1
-                    for gg = 1:n
-                        fprintf(fid_obj,'AttributeBegin \n');
-                        % ActiveTranform Start
-                        fprintf(fid_obj,'ActiveTransform StartTime \n');
-                        if isempty(obj(ii).position(:,gg))
-                            fprintf(fid_obj,'Translate 0 0 0 \n');
-                        else
-                            obj_position = obj(ii).position(:,gg);
-                            fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                                obj_position(2),obj_position(3));
-                        end
-                        if ~isempty(obj(ii).rotate)
-                            obj_rotate = obj(ii).rotate;
-                            % Write out rotation
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Z
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % Y
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % X 
-                        end
-                        % Write out scaling
-                        if isfield(obj(ii),'scale')
-                        if ~isempty(obj(ii).scale)
-                            obj_scale = obj(ii).scale(:,gg);
-                            fprintf(fid_obj,'Scale %f %f %f\n',obj_scale(1),...
-                                obj_scale(2),obj_scale(3)); % Y
-                        end
-                        end
-                        % ActiveTranform End
-                        fprintf(fid_obj,'ActiveTransform EndTime \n');
-                        if isempty(obj(ii).motion.position(:,gg))
-                            fprintf(fid_obj,'Translate 0 0 0 \n');
-                        else
-                            obj_position = obj(ii).motion.position(:,gg);
-                            fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                                obj_position(2),obj_position(3));
-                        end
-                        if ~isempty(obj(ii).motion.rotate)
-                            obj_rotate = obj(ii).motion.rotate;
-                            % Write out rotation
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-2)); % Z
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3-1)); % Y
-                            fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(:,gg*3));   % X 
-                        end
-                        fprintf(fid_obj,'ObjectInstance "%s"\n', obj(ii).name);
-                        fprintf(fid_obj,'AttributeEnd \n \n');
-                    end
-                else
-                    error('Position should be a 3 by n matrix \n')
-                end
-            end
-        end
-    end
-    % add a lightsFlag, we dont use lights for day scene.
-    if lightsFlag
-        if piContains(obj(ii).name,'_lightfront')
-            from = obj(ii).position;
-            obj(ii).position = [0 0 0];
-            for gg = 1:n
-                fprintf(fid_obj,'AttributeBegin \n');
-                if isempty(obj(ii).position(:,gg))
-                    fprintf(fid_obj,'Translate 0 0 0 \n');
-                else
-                    obj_position = obj(ii).position(:,gg);
-                    fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                        obj_position(2),obj_position(3));
-                end
-                if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0;0;0;0])
-                    obj_rotate = obj(ii).rotate(:,gg);
-                    fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
-                        obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                end
-                fprintf(fid_obj,'LightSource "point" "color I" [3 3 3] "rgb scale" [1.0 1.0 1.0] "point from" [%f %f %f] \n',...
-                    from(1),from(2),from(3));
-                fprintf(fid_obj,'AttributeEnd \n \n');
-            end
-        end
-        if piContains(obj(ii).name,'_lightback')
-            from = obj(ii).position;
-            obj(ii).position = [0;0;0];
-            for gg = 1:n
-                fprintf(fid_obj,'AttributeBegin \n');
-                if isempty(obj(ii).position(:,gg))
-                    fprintf(fid_obj,'Translate 0 0 0 \n');
-                else
-                    obj_position = obj(ii).position(:,gg);
-                    fprintf(fid_obj,'Translate %f %f %f \n',obj_position(1),...
-                        obj_position(2),obj_position(3));
-                end
-                if ~isempty(obj(ii).rotate)&& ~isequal(obj(ii).rotate,[0;0;0;0])
-                    obj_rotate = obj(ii).rotate(:,gg);
-                    fprintf(fid_obj,'Rotate %f %f %f %f \n',obj_rotate(1),...
-                        obj_rotate(2),obj_rotate(3),obj_rotate(4));
-                end
-                fprintf(fid_obj,'LightSource "point" "color I" [0.5 0.5 0.5] "rgb scale" [0.5 0.5 0.5] "point from" [%f %f %f] \n',...
-                    from(1),from(2),from(3));
-                fprintf(fid_obj,'AttributeEnd \n \n');
-            end
-        end
-    end
-end
-if ~isempty(thistrafficflow)
-    for jj = 1:8
-        for mm = 1: length(obj)
-            if mod(jj,4)~=0
-                num = mod(jj,4);
-            else num = 4;
-            end
-            order = floor((jj+3)/4);
-            if contains(obj(mm).name,sprintf('trafficlight_%03d',num))...
-                    && contains(obj(mm).name,sprintf('_%d_',order)) ...
-                    &&contains(obj(mm).name,thistrafficflow.light(jj).State)...
-                    &&isempty(obj(mm).children) && isfield(thistrafficflow,'light')
-                piTrafficlightAssign(fid_obj,obj(mm));
-            end
-        end
-    end
-end
+
+recursiveWriteObjects(fid_obj, obj, Filepath);
+recursiveWriteGroups(fid_obj, obj);
+
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);
+end
+
+
+function recursiveWriteObjects(fid, objects, rootPath)
+
+% Parse the geometry tree structure and for every geometry object print the
+% corresponding shape into a separate pbrt geometry file.
+
+if isempty(objects)
+    return;
+end
+
+for i=1:length(objects.children)
+    
+    if isempty(objects.children(i).areaLight)
+        % Area lights are not supported with object instances.
+        
+        fprintf(fid, 'ObjectBegin "%s"\n', objects.children(i).name);
+        if ~isempty(objects.children(i).mediumInterface)
+            fprintf(fid, '%s\n', objects.children(i).mediumInterface);
+        end
+        if ~isempty(objects.children(i).material)
+            fprintf(fid, '%s\n', objects.children(i).material);
+        end
+        if ~isempty(objects.children(i).areaLight)
+            fprintf(fid, '%s\n', objects.children(i).areaLight);
+        end
+        if ~isempty(objects.children(i).light)
+            if ~isempty(objects.children(i).light)
+                for ii = 1:numel(objects.children(i).light)
+                    fprintf(fid, '%s\n', objects.children(i).light{ii});
+                end
+            end 
+        end        
+        if ~isempty(objects.children(i).output)
+            [~,output] = fileparts(objects.children(i).output);
+            fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
+        else
+            if ~isempty(objects.children(i).shape)
+                name = objects.children(i).name;
+                geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
+                fprintf(geometryFile,'%s',objects.children(i).shape);
+                fclose(geometryFile);
+                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
+            end
+        end
+        
+        %{
+        % Not sure if we need this
+            if isfield(objects.children(i), 'motion') &&...
+                    ~isempty(objects.children(i).motion)
+                for kk = 1:size(objects.children(i).position, 2)
+                    fprintf(fid, 'ActiveTransform EndTime \n');
+                    if isempty(objects.children(i).motion.position(:,kk))
+                        fprintf(fid,'Translate 0 0 0 \n');
+                    else
+                        pos = objects.children(i).motion.position(:,kk);
+                        fprintf(fid,'Translate %f %f %f \n',pos(1),...
+                            pos(2),pos(3));
+                    end
+
+                    if ~isempty(objects.children(i).motion.rotate)
+                        rot = objects.children(i).motion.rotate;
+                        % Write out rotation
+                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z
+                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-1)); % Y
+                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3));   % X
+                    end
+                end
+            end
+        %}
+        fprintf(fid, 'ObjectEnd\n\n');
+    else
+        
+        if ~isempty(objects.children(i).shape)
+            name = objects.children(i).name;
+            geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
+            fprintf(geometryFile,'%s',objects.children(i).shape);
+            fclose(geometryFile);
+        end
+    end
+end
+
+
+for j=1:length(objects.groupobjs)
+    recursiveWriteObjects(fid,objects.groupobjs(j), rootPath);
+end
+
+
+end
+
+
+
+function recursiveWriteGroups(fid, objects)
+
+% Parse the geometry object tree and for every group object replace the
+% actuall geometry with the 'Include' directive.
+
+%{
+persistent first;
+first = strcat(first, " ");
+%}
+
+if isempty(objects)
+    return;
+end
+
+for n=1:length(objects)
+    
+    currentObject = objects(n);
+    
+    fprintf(fid,'AttributeBegin\n');
+    fprintf(fid,'#ObjectName %s:Vector(%.3f, %.3f, %.3f)\n',currentObject.name, ...
+                                                            currentObject.size.l, ...
+                                                            currentObject.size.w, ...
+                                                            currentObject.size.h);
+    % If a motion exists in the current object, prepare to write it out by
+    % having an additional line below.
+    if isfield(currentObject, 'motion') &&...
+            ~isempty(currentObject.motion)
+        fprintf(fid,'ActiveTransform StartTime \n');
+    end
+    fprintf(fid,'Translate %.3f %.3f %.3f\n',currentObject.position(1), currentObject.position(2), currentObject.position(3));
+    fprintf(fid,'Rotate %.3f %.3f %.3f %.3f \n',currentObject.rotate(:,1)); % Z
+    fprintf(fid,'Rotate %.3f %.3f %.3f %.3f \n',currentObject.rotate(:,2)); % Y
+    fprintf(fid,'Rotate %.3f %.3f %.3f %.3f \n',currentObject.rotate(:,3));   % X 
+    fprintf(fid,'Scale %.3f %.3f %.3f \n',currentObject.scale);
+    
+    % Write out this motion
+    if isfield(currentObject, 'motion') &&...
+            ~isempty(currentObject.motion)
+        for kk = 1:size(currentObject.position, 2)
+            fprintf(fid, 'ActiveTransform EndTime \n');
+            if isempty(currentObject.motion.position(:,kk))
+                fprintf(fid,'Translate 0 0 0 \n');
+            else
+                pos = currentObject.motion.position(:,kk);
+                fprintf(fid,'Translate %f %f %f \n',pos(1),...
+                    pos(2),pos(3));
+            end
+            
+            if isfield(currentObject.motion, 'rotate') && ~isempty(currentObject.motion.rotate)
+                rot = currentObject.motion.rotate;
+                % Write out rotation
+                fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z
+                fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-1)); % Y
+                fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3));   % X
+            end
+        end
+    end
+    
+    for j=1:length(currentObject.children)
+       if isempty(currentObject.children(j).areaLight)
+           if ~isempty(currentObject.children(j).mediumInterface)
+               fprintf(fid, '%s\n', currentObject.children(j).mediumInterface);
+           end
+           %{
+           if ~isempty(currentObject.children(j).material)
+               fprintf(fid, '%s\n', currentObject.children(j).material);
+           end
+           %}
+           
+           if ~isempty(currentObject.children(j).areaLight)
+               fprintf(fid, '%s\n', currentObject.children(j).areaLight);
+           end
+           
+           %{
+           if ~isempty(currentObject.children(j).shape)
+               fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', currentObject.children(j).name);
+           end
+           %}
+           
+           %{
+           % Not sure if we need this
+           if isfield(currentObject.children(j), 'motion') &&...
+                   ~isempty(currentObject.children(j).motion)
+               for kk = 1:size(currentObject.children(j).position, 2)
+                   fprintf(fid, 'ActiveTransform EndTime \n');
+                   if isempty(currentObject.children(j).motion.position(:,kk))
+                       fprintf(fid,'Translate 0 0 0 \n');
+                   else
+                       pos = currentObject.children(j).motion.position(:,kk);
+                       fprintf(fid,'Translate %f %f %f \n',pos(1),...
+                           pos(2),pos(3));
+                   end
+                   
+                   if ~isempty(currentObject.children(j).motion.rotate)
+                       rot = currentObject.children(j).motion.rotate;
+                       % Write out rotation
+                       fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z
+                       fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-1)); % Y
+                       fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3));   % X
+                   end
+               end
+           end
+           %}
+           fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name);      
+   
+       else
+           fprintf(fid,'ObjectInstance "%s"\n',currentObject.children(j).name);
+       end
+    end
+    
+    for j=1:length(currentObject.groupobjs)
+        recursiveWriteGroups(fid,currentObject.groupobjs(j));
+    end
+    fprintf(fid,'AttributeEnd\n');
+end
+fprintf(fid,'\n');
+
 end
 
 

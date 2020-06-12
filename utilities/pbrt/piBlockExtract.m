@@ -14,7 +14,7 @@ function [s, blockLines] = piBlockExtract(txtLines,varargin)
 % Optional parameters
 %   'blockName'    - A string defining the block.
 %   'exporterFlag' - if true, we use piBlockExtractC4D instead since
-%                    the syntax given by the exportr is different.   
+%                    the syntax given by the exporter is different.   
 %
 % Return
 %   s          - a struct containing information from the block of text

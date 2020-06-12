@@ -110,18 +110,13 @@ varargin = ieParamFormat(varargin);
 rTypes = {'radiance','depth','both','all','coordinates','material','mesh', 'illuminant','illuminantonly'};
 p.addParameter('rendertype','both',@(x)(ismember(ieParamFormat(x),rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
-p.addParameter('meanluminance',[],@inumeric);
+p.addParameter('meanluminance',[],@isnumeric);
 p.addParameter('meanilluminancepermm2',[],@isnumeric);
 p.addParameter('scaleIlluminance',true,@islogical);
 p.addParameter('reuse',false,@islogical);
-p.addParameter('wave', 400:10:700, @isnumeric);
 p.addParameter('reflectancerender', false, @islogical);
-
-% If you insist on using V2, then set dockerImageName to 'vistalab/pbrt-v2-spectral';
-
-thisDocker = 'vistalab/pbrt-v3-spectral';
-fprintf('Docker container %s\n',thisDocker);
-p.addParameter('dockerimagename',thisDocker,@ischar);
+p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:latest',@ischar);
+p.addParameter('wave', 400:10:700, @isnumeric); % This is the past to piDat2ISET, which is where we do the construction.
 
 p.parse(thisR,varargin{:});
 renderType       = ieParamFormat(p.Results.rendertype);
@@ -129,6 +124,20 @@ version          = p.Results.version;
 dockerImageName  = p.Results.dockerimagename;
 scaleIlluminance = p.Results.scaleIlluminance;
 wave             = p.Results.wave;
+fprintf('Docker container %s\n',dockerImageName);
+
+% Different containers expect different wavelength ranges.
+dockerWave = 400:10:700;
+dockerSplit = split(dockerImageName, ':');
+if numel(dockerSplit) == 2
+    switch dockerSplit{2}
+        case 'latest'
+            dockerWave = 400:10:700;
+        case 'basisfunction'
+            dockerWave = 365:5:705;
+    end
+end
+
 
 if ischar(thisR)
     % In this case, we only have a string to the pbrt file.  We build
@@ -319,7 +328,7 @@ for ii = 1:length(filesToRender)
         tic
         [status, result] = piRunCommand(cmd);
         elapsedTime = toc;
-
+        % disp(result)
         %% Check the return
 
         if status
@@ -344,30 +353,30 @@ for ii = 1:length(filesToRender)
                 'label','radiance',...
                 'recipe',thisR,...
                 'scaleIlluminance',scaleIlluminance,...
-                'wave',wave);
+                'wave',dockerWave);
         case {'metadata'}
             metadata = piDat2ISET(outFile,...
                 'label','mesh',...
-                'wave',wave);
+                'wave',dockerWave);
             ieObject   = metadata;
         case 'depth'
             depthImage = piDat2ISET(outFile,...
                 'label','depth',...
-                'wave',wave);
+                'wave',dockerWave);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject,'depth map',depthImage);
             end
         case 'coordinates'
             coordMap = piDat2ISET(outFile,...
                 'label','coordinates',...
-                'wave',wave);
+                'wave',dockerWave);
             ieObject = coordMap;
         case {'illuminant'}
             % PBRT rendered data for white matte surfaces
             illuminantPhotons = piDat2ISET(outFile,...
                 'label', 'illuminant',...
                 'scaleIlluminance',scaleIlluminance,...
-                'wave', wave);
+                'wave', dockerWave);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject, 'illuminant photons', illuminantPhotons);
             end            
@@ -375,7 +384,7 @@ for ii = 1:length(filesToRender)
             ieObject = piDat2ISET(outFile,...
                 'label', 'illuminantonly', ...
                 'scaleIlluminance',scaleIlluminance,...
-                'wave', wave);
+                'wave', dockerWave);
     end
 
 end
@@ -386,9 +395,11 @@ if isstruct(ieObject)
         case 'scene'
             names = strsplit(fileparts(thisR.inputFile),'/');
             ieObject = sceneSet(ieObject,'name',names{end});
+            ieObject = sceneSet(ieObject, 'wave', wave);
         case 'opticalimage'
             names = strsplit(fileparts(thisR.inputFile),'/');
             ieObject = oiSet(ieObject,'name',names{end});
+            ieObject = oiSet(ieObject,'wave',wave);
         otherwise
             error('Unknown struct type %s\n',ieObject.type);
     end

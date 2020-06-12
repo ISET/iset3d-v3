@@ -122,7 +122,7 @@ end
 road.vTypes=containers.Map(vTypes,interval);
 
 %% Read out a road render recipe
-thisR = piJson2Recipe(assetRecipe{1}.name);
+thisR = piJson2Recipe(assetRecipe{1}.name, 'update', true);
 % filename = strcat(sceneType,'_',roadtype);
 
 % InputFile is used to create a cloudbucket, so we assign a predefined

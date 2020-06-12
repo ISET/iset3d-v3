@@ -31,7 +31,6 @@ if isempty(varargin)
 else
     for ii=1:2:length(varargin)
         texture.(varargin{ii}) = varargin{ii+1};
-        typeNname = split(varargin{ii});
         piTextureSet(thisR, idx, varargin{ii}, varargin{ii+1});
     end
 end

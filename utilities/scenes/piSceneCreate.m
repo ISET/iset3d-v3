@@ -67,6 +67,9 @@ scene = sceneSet(scene,'fov',p.Results.fov);
 if ~isempty(varargin)
     for ii=1:2:length(varargin) 
         param = varargin{ii}; 
+        if strcmp(param,'meanluminance') || strcmp(param,'fov')
+            continue;
+        end
         val = varargin{ii+1};
         scene = sceneSet(scene,param,val);
     end

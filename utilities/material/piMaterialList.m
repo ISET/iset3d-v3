@@ -1,8 +1,8 @@
-function piMaterialList(thisR)
+function list = piMaterialList(thisR)
 % List materials type in this PBRT scene
 %
 % Syntax:
-%   piMaterialList(thisR)
+%   list = piMaterialList(thisR)
 %
 % Brief description
 %   Prints out a list of the materials in this recipe (thisR).  The
@@ -43,8 +43,8 @@ end
 
 
 %% The user sent in a recipe.  So print the materials in this scene
-fields = fieldnames(thisR.materials.list);
-nMaterials = length(fieldnames(thisR.materials.list));
+
+nMaterials = numel(thisR.materials.list);
 
 [~,sceneName] = fileparts(thisR.inputFile);
 fprintf('\nMaterials in the scene %s\n',sceneName);
@@ -57,8 +57,8 @@ list = cell(1,nMaterials);
 
 for ii =1:nMaterials
     list{ii} = sprintf('%d: %s: \t [ %s ]\n', ii, ...
-        thisR.materials.list.(cell2mat(fields(ii))).name, ...
-        thisR.materials.list.(cell2mat(fields(ii))).string);
+        thisR.materials.list{ii}.name, ...
+        thisR.materials.list{ii}.stringtype);
 end
 for ii =1:nMaterials
     fprintf('%s',list{ii});

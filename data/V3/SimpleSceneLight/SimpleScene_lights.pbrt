@@ -1,0 +1,6 @@
+AttributeBegin 
+Rotate 0 0 1 0 
+Rotate -90 1 0 0 
+Scale 1 1 1 
+LightSource "infinite" "string mapname" "room.exr" 
+AttributeEnd 

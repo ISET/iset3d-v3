@@ -34,7 +34,7 @@ thisR = piRead(fname);
 
 % This is a low resolution for speed.
 thisR.set('film resolution',[200 150]);
-thisR.set('pixel samples',16);
+thisR.set('rays per pixel',128);
 
 %% List material library
 

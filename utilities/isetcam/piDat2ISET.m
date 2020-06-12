@@ -36,21 +36,19 @@ function ieObject = piDat2ISET(inputFile,varargin)
 
 %%
 p = inputParser;
-varargin =ieParamFormat(varargin);
+%varargin =ieParamFormat(varargin);
 p.addRequired('inputFile',@(x)(exist(x,'file')));
 p.addParameter('label','radiance',@(x)ischar(x));
 
 p.addParameter('recipe',[],@(x)(isequal(class(x),'recipe')));
-% p.addParameter('meanluminance',100,@isnumeric);
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleilluminance',true,@islogical);
-p.addParameter('wave', 400:10:700, @isnumeric);
+p.addParameter('wave', [], @isnumeric);
 
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;
 thisR       = p.Results.recipe;
 
-% meanLuminance       = p.Results.meanluminance;
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scaleIlluminance      = p.Results.scaleilluminance;
 wave                  = p.Results.wave;
@@ -62,27 +60,21 @@ if(strcmp(label,'radiance') || strcmp(label, 'illuminant') || strcmp(label, 'ill
     
     % The PBRT output is in energy units.  Scenes and OIs data are
     % represented in photons
-    energy = piReadDAT(inputFile, 'maxPlanes', nWave);
+    energy = piReadDAT(inputFile);
     photons = Energy2Quanta(wave,energy);
     
-    % The scaling factor comes from the display primary units. In
-    % PBRT the display primaries are normalized to 1, the scaling
-    % factor to convert back to real units is then reapplied here.
-    %
-    % OLD:  photons = Energy2Quanta(wave,energy)*0.003664;
-    %
     if strcmp(label, 'illuminant') || strcmp(label, 'illuminantonly')
         ieObject = photons;
         return;
     end
 elseif(strcmp(label,'depth') || strcmp(label,'mesh')||strcmp(label,'material') )
-    tmp = piReadDAT(inputFile, 'maxPlanes', nWave);
+    tmp = piReadDAT(inputFile);
     metadataMap = tmp(:,:,1); clear tmp;
     ieObject = metadataMap;
     return;
 elseif(strcmp(label,'coordinates'))
     % Not sure what this is.  Maybe the 3D coordinates of each point?
-    tmp = piReadDAT(inputFile, 'maxPlanes', nWave);
+    tmp = piReadDAT(inputFile);
     coordMap = tmp(:,:,1:3); clear tmp;
     ieObject = coordMap;
     return;
@@ -122,7 +114,7 @@ switch opticsType
         [focalLength, fNumber] = piRecipeFindOpticsParams(thisR);
         
         % Start building the oi
-        ieObject = piOICreate(photons);
+        ieObject = piOICreate(photons,'wavelength',wave);
         
         % Set the parameters the best we can from the lens file.
         if ~isempty(focalLength)

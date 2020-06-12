@@ -57,12 +57,16 @@ end
 %}
 
 %% Create txtLines for the material struct array
-field =fieldnames(thisR.materials.list);
-materialTxt = cell(1,length(field));
+if isfield(thisR.materials, 'list') && ~isempty(thisR.materials.list)
+    materialNum =numel(thisR.materials.list);
+    materialTxt = cell(1, materialNum);
 
-for ii=1:length(materialTxt)
-    % Converts the material struct to text
-    materialTxt{ii} = piMaterialText(thisR.materials.list.(cell2mat(field(ii))));
+    for ii=1:length(materialTxt)
+        % Converts the material struct to text
+        materialTxt{ii} = piMaterialText(thisR.materials.list{ii});
+    end
+else
+    materialTxt{1} = '';
 end
 
 %% Write to scene_material.pbrt texture-material file
@@ -106,6 +110,16 @@ else
         fprintf(fileID,'%s\n',materialTxt{row});
     end
 end
+
+%% Write media to xxx_materials.pbrt
+
+if ~isempty(thisR.media)
+    for m=1:length(thisR.media.list)
+        fprintf(fileID, piMediumText(thisR.media.list(m), thisR.get('working directory')));
+    end
+end
+
+
 fclose(fileID);
 
 [~,n,e] = fileparts(output);
@@ -113,203 +127,70 @@ fprintf('Material file %s written successfully.\n', [n,e]);
 
 end
 
+
 %% function that converts the struct to text
-function val = piMaterialText(materials)
+function val = piMediumText(medium, workDir)
 % For each type of material, we have a method to write a line in the
 % material file.
 %
 
-val_name = sprintf('MakeNamedMaterial "%s" ',materials.name);
+val_name = sprintf('MakeNamedMedium "%s" ',medium.name);
 val = val_name;
-val_string = sprintf(' "string type" "%s" ',materials.string);
+val_string = sprintf(' "string type" "%s" ',medium.type);
 val = strcat(val, val_string);
 
-if ~isempty(materials.floatindex)
-    val_floatindex = sprintf(' "float index" [%0.5f] ',materials.floatindex);
-    val = strcat(val, val_floatindex);
-end
-
-if ~isempty(materials.texturekd)
-    val_texturekd = sprintf(' "texture Kd" "%s" ',materials.texturekd);
-    val = strcat(val, val_texturekd);
-end
-
-if ~isempty(materials.texturekr)
-    val_texturekr = sprintf(' "texture Kr" "%s" ',materials.texturekr);
-    val = strcat(val, val_texturekr);
-end
-
-if ~isempty(materials.textureks)
-    val_textureks = sprintf(' "texture Ks" "%s" ',materials.textureks);
-    val = strcat(val, val_textureks);
-end
-
-if ~isempty(materials.rgbkr)
-    val_rgbkr = sprintf(' "rgb Kr" [%0.5f %0.5f %0.5f] ',materials.rgbkr);
-    val = strcat(val, val_rgbkr);
-end
-
-if ~isempty(materials.rgbks)
-    val_rgbks = sprintf(' "rgb Ks" [%0.5f %0.5f %0.5f] ',materials.rgbks);
-    val = strcat(val, val_rgbks);
-end
-
-if ~isempty(materials.rgbkt)
-    val_rgbkt = sprintf(' "rgb Kt" [%0.5f %0.5f %0.5f] ',materials.rgbkt);
-    val = strcat(val, val_rgbkt);
-end
-
-if ~isempty(materials.rgbkd)
-    val_rgbkd = sprintf(' "rgb Kd" [%0.5f %0.5f %0.5f] ',materials.rgbkd);
-    val = strcat(val, val_rgbkd);
-end
-
-if ~isempty(materials.colorkd)
-    val_colorkd = sprintf(' "color Kd" [%0.5f %0.5f %0.5f] ',materials.colorkd);
-    val = strcat(val, val_colorkd);
-end
-
-if ~isempty(materials.colorks)
-    val_colorks = sprintf(' "color Ks" [%0.5f %0.5f %0.5f] ',materials.colorks);
-    val = strcat(val, val_colorks);
-end
-if isfield(materials, 'colorreflect')
-    if ~isempty(materials.colorreflect)
-        val_colorreflect = sprintf(' "color reflect" [%0.5f %0.5f %0.5f] ',materials.colorreflect);
-        val = strcat(val, val_colorreflect);
+if ~isempty(medium.absFile) || ~isempty(medium.vsfFile)
+    resDir = fullfile(fullfile(workDir,'spds'));
+    if ~exist(resDir,'dir')
+        mkdir(resDir);
     end
-    if ~isempty(materials.colortransmit)
-        val_colortransmit = sprintf(' "color transmit" [%0.5f %0.5f %0.5f] ',materials.colortransmit);
-        val = strcat(val, val_colortransmit);
+    
+    if ~isempty(medium.absFile)
+        fid = fopen(fullfile(resDir,sprintf('%s_abs.spd',medium.name)),'w');
+        fprintf(fid,'%s',medium.absFile);
+        fclose(fid);
+    
+        val_floatindex = sprintf(' "string absFile" "spds/%s_abs.spd"',medium.name);
+        val = strcat(val, val_floatindex);
     end
-end
-if isfield(materials, 'colormfp')
-    if ~isempty(materials.colormfp)
-        val_colormfp = sprintf(' "color mfp" [%0.5f %0.5f %0.5f] ',materials.colormfp);
-        val = strcat(val, val_colormfp);
+    
+    if ~isempty(medium.vsfFile)
+        fid = fopen(fullfile(resDir,sprintf('%s_vsf.spd',medium.name)),'w');
+        fprintf(fid,'%s',medium.vsfFile);
+        fclose(fid);
+    
+        val_floatindex = sprintf(' "string vsfFile" "spds/%s_vsf.spd"',medium.name);
+        val = strcat(val, val_floatindex);
     end
-end
-if ~isempty(materials.floaturoughness)
-    val_floaturoughness = sprintf(' "float uroughness" [%0.5f] ',materials.floaturoughness);
-    val = strcat(val, val_floaturoughness);
-end
+    
+else
 
-if ~isempty(materials.floatvroughness)
-    val_floatvroughness = sprintf(' "float vroughness" [%0.5f] ',materials.floatvroughness);
-    val = strcat(val, val_floatvroughness);
-end
-
-if ~isempty(materials.floatroughness)
-    val_floatroughness = sprintf(' "float roughness" [%0.5f] ',materials.floatroughness);
-    val = strcat(val, val_floatroughness);
-end
- 
-if isfield(materials,'floateta') && ~isempty(materials.floateta)
-    val_floateta = sprintf(' "float eta" [%0.5f] ',materials.floateta);
-    val = strcat(val, val_floateta);
-end
-
-if ~isempty(materials.spectrumkd)
-    if(ischar(materials.spectrumkd))
-        val_spectrumkd = sprintf(' "spectrum Kd" "%s" ',materials.spectrumkd);
-    else
-        val_spectrumkd = sprintf(' "spectrum Kd" [ %s ] ',num2str(materials.spectrumkd)); 
+    if ~isempty(medium.cPlankton)
+        val_floatindex = sprintf(' "float cPlankton" %f ',medium.cPlankton);
+        val = strcat(val, val_floatindex);
     end
-    val = strcat(val, val_spectrumkd);
-end
 
-if ~isempty(materials.spectrumks)
-    if(ischar(materials.spectrumks))
-        val_spectrumks = sprintf(' "spectrum Ks" "%s" ',materials.spectrumks);
-    else
-        val_spectrumks = sprintf(' "spectrum Ks" [ %s ] ',num2str(materials.spectrumks)); 
+    if ~isempty(medium.aCDOM440)
+        val_texturekd = sprintf(' "float aCDOM440" %f ',medium.aCDOM440);
+        val = strcat(val, val_texturekd);
     end
-    val = strcat(val, val_spectrumks);
-end
 
-if isfield(materials, 'spectrumkr')
-    if ~isempty(materials.spectrumkr)
-        if(isstring(materials.spectrumkr))
-            val_spectrumkr = sprintf(' "spectrum Kr" "%s" ',materials.spectrumkr);
-        else
-            val_spectrumkr = sprintf(' "spectrum Kr" [%0.5f %0.5f %0.5f %0.5f] ',materials.spectrumkr);
-        end
-        val = strcat(val, val_spectrumkr);
-    end
-end
-if isfield(materials, 'spectrumkt')
-    if ~isempty(materials.spectrumkt)
-        if(isstring(materials.spectrumkt))
-            val_spectrumkt = sprintf(' "spectrum Kt" "%s" ',materials.spectrumkt);
-        else
-            val_spectrumkt = sprintf(' "spectrum Kt" [%0.5f %0.5f %0.5f %0.5f] ',materials.spectrumkt);
-        end
-        val = strcat(val, val_spectrumkt);
-    end
-end
-% if ~isempty(materials.spectrumk)
-%     val_spectrumks = sprintf(' "spectrum k" "%s" ',materials.spectrumk);
-%     val = strcat(val, val_spectrumks);
-% end
-
-if ~isempty(materials.spectrumeta)
-    val_spectrumks = sprintf(' "spectrum eta" "%s" ',materials.spectrumeta);
-    val = strcat(val, val_spectrumks);
-end
-
-if ~isempty(materials.stringnamedmaterial1)
-    val_stringnamedmaterial1 = sprintf(' "string namedmaterial1" "%s" ',materials.stringnamedmaterial1);
-    val = strcat(val, val_stringnamedmaterial1);
-end
-
-if isfield(materials, 'bsdffile')
-    if ~isempty(materials.bsdffile)
-        val_bsdfile = sprintf(' "string bsdffile" "%s" ',materials.bsdffile);
-        val = strcat(val, val_bsdfile);
-    end
-end
-if ~isempty(materials.stringnamedmaterial2)
-    val_stringnamedmaterial2 = sprintf(' "string namedmaterial2" "%s" ',materials.stringnamedmaterial2);
-    val = strcat(val, val_stringnamedmaterial2);
-end
-if isfield(materials,'texturebumpmap')
-    if ~isempty(materials.texturebumpmap)
-        val_texturekr = sprintf(' "texture bumpmap" "%s" ',materials.texturebumpmap);
+    if ~isempty(medium.aNAP400)
+        val_texturekr = sprintf(' "float aNAP400" %f ',medium.aNAP400);
         val = strcat(val, val_texturekr);
     end
-end
-if isfield(materials, 'boolremaproughness')
-    if ~isempty(materials.boolremaproughness)
-        val_boolremaproughness = sprintf(' "bool remaproughness" "%s" ',materials.boolremaproughness);
-        val = strcat(val, val_boolremaproughness);
-    end
-end
-if isfield(materials, 'eta')
-    if ~isempty(materials.eta)
-        val_boolremaproughness = sprintf(' "float eta" %0.5f ',materials.eta);
-        val = strcat(val, val_boolremaproughness);
-    end
-end
-if isfield(materials, 'amount')
-    if ~isempty(materials.amount)
-        val_boolremaproughness = sprintf(' "spectrum amount" "%0.5f" ',materials.amount);
-        val = strcat(val, val_boolremaproughness);
-    end
-end
-if isfield(materials, 'photolumifluorescence')
-    if ~isempty(materials.photolumifluorescence)
-        val_photolumifluorescence = [sprintf(' "photolumi fluorescence" '),...
-                                    '[ ', sprintf('%.5f ', materials.photolumifluorescence),' ]'];
-        val = strcat(val, val_photolumifluorescence);
-    end
-end
-if isfield(materials, 'floatconcentration')
-    if ~isempty(materials.floatconcentration)
-        val_floatconcentration = sprintf(' "float concentration" [ %0.5f ] ',...
-                                    materials.floatconcentration);
-        val = strcat(val, val_floatconcentration);
-    end
-end
 
+    if ~isempty(medium.cSmall)
+        val_textureks = sprintf(' "float cSmall" %f ',medium.cSmall);
+        val = strcat(val, val_textureks);
+    end
+
+    if ~isempty(medium.cLarge)
+        val_textureks = sprintf(' "float cLarge" %f ',medium.cLarge);
+        val = strcat(val, val_textureks);
+    end
 
 end
+
+end
+

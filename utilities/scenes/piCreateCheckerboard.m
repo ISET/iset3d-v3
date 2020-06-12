@@ -1,6 +1,7 @@
-function recipe = piCreateCheckerboard(outputfile, varargin)
-
-% recipe = piCreateCheckerboard(outputfile, varargin)
+function thisR = piCreateCheckerboard(varargin)
+% TODO: This is broken, we should fix it.
+%
+% thisR = piCreateCheckerboard(outputfile, varargin)
 %
 % This function creates a simple scene with a black and white checkerboard
 % pattern that can be used for a variety of camera calibration tasks.
@@ -15,35 +16,32 @@ function recipe = piCreateCheckerboard(outputfile, varargin)
 %   (default 0.1)
 %
 % Returns:
-%   recipe - a PBRT scene recipe
+%   thisR - a PBRT scene thisR
 %
 % HB 2019
 
+%%
 p = inputParser;
 p.KeepUnmatched = true;
-p.addRequired('outputfile',@ischar);
 p.addParameter('numX',8,@isnumeric);
 p.addParameter('numY',5,@isnumeric);
 p.addParameter('dimX',0.1,@isnumeric);
 p.addParameter('dimY',0.1,@isnumeric);
-p.parse(outputfile, varargin{:});
+p.parse(varargin{:});
 
-inputs = p.Results;
+%% Read in the base checkerboard file and set metadata
 
-recipe = piRead(fullfile(piRootPath,'data','V3','checkerboard','checkerboard.pbrt'));
-recipe.set('output file',inputs.outputfile);
-piWrite(recipe,'creatematerials',true);
-recipe = piRead(inputs.outputfile);
+thisR = piRecipeDefault('scene name','checkerboard');
 
-recipe.metadata.numX = inputs.numX;
-recipe.metadata.numY = inputs.numY;
-recipe.metadata.dimX = inputs.dimX;
-recipe.metadata.dimY = inputs.dimY;
+thisR.metadata.numX = p.Results.numX;
+thisR.metadata.numY = p.Results.numY;
+thisR.metadata.dimX = p.Results.dimX;
+thisR.metadata.dimY = p.Results.dimY;
 
-totalWidth = inputs.numX * inputs.dimX;
-totalHeight = inputs.numY * inputs.dimY;
+totalWidth  = p.Results.numX * p.Results.dimX;
+totalHeight = p.Results.numY * p.Results.dimY;
 
-cornerX = totalWidth * 0.5;
+cornerX = totalWidth  * 0.5;
 cornerY = totalHeight * 0.5;
 
 % Point coordinates starting from lower left, going counter-clockwise
@@ -52,9 +50,17 @@ P = [-cornerX, -cornerY, 0;
     cornerX, cornerY, 0;
     -cornerX, cornerY, 0]';
 
+%%
+piWrite(thisR,'creatematerials',true);
+
 %% Update geometry
 
-geometryFile = fullfile(recipe.get('working directory'),recipe.assets.children.output);
+% geometryFile = fullfile(thisR.get('working directory'),thisR.assets.groupobjs(1).children.output);
+geometryFile = fullfile(thisR.get('working directory'),'checkerboard_geometry.pbrt');
+
+if ~exist(geometryFile,'file'), error('No geometry file'); end
+
+% This code needs an explanation. (BW).
 fid = fopen(geometryFile,'r');
 geometry = textscan(fid,'%s','delimiter','\n');
 geometry = geometry{1};
@@ -71,20 +77,22 @@ for i=1:length(geometry)
 end
 fclose(fid);
 
-
-
 %% Update texture dimensions
-newTexture = strrep(recipe.materials.txtLines{1},'"float uscale" [8]',sprintf('"float uscale" [%i]',inputs.numX));
-newTexture = strrep(newTexture,'"float vscale" [8]',sprintf('"float vscale" [%i]',inputs.numY));
-recipe.materials.txtLines{1} = newTexture;
 
-fid = fopen(recipe.materials.outputFile_materials,'w');
-for i=1:length(recipe.materials.txtLines)
-    fprintf(fid,'%s\n',recipe.materials.txtLines{i});
+% We specify the number of checks in the material here.  In the original
+% checkerboard PBRT file there is no definition of the uscale and vscale.
+% So we add it here
+piTextureSet(thisR,1,'floatuscale',thisR.metadata.numX);
+piTextureSet(thisR,1,'floatvscale',thisR.metadata.numY);
+
+materialFile = fullfile(thisR.get('working directory'),'checkerboard_materials.pbrt');
+if ~exist(materialFile,'file'), error('No material file'); end
+
+fid = fopen(thisR.materials.outputFile_materials,'w');
+for i=1:length(thisR.materials.txtLines)
+    fprintf(fid,'%s\n',thisR.materials.txtLines{i});
 end
 fclose(fid);
-
-
 
 end
 
