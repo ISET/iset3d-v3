@@ -1,44 +1,62 @@
 function [s, blockLines] = piBlockExtract(txtLines,varargin)
-% Parse a block of scene file text and return it as a structure 
-
+% Parse text in a scene file, returning the info as a structure 
+%
 % Syntax
 %   s = piBlockExtract(txtLines,varargin)
 %
 % Description
-%  Used extensively by piRead to parse important blocks within a PBRT
-%  scene file.
+%  Used extensively by piRead to parse specific types of text blocks within
+%  a PBRT scene file.
 % 
 % Input
-%   txtLines - Cell array of text lines, usually from piRead
+%   txtLines - Cell array of text lines
 % 
 % Optional parameters
-%   'blockName'    - A string defining the block.
-%   'exporterFlag' - if true, we use piBlockExtractC4D instead since
+%   'block name'    - A string defining the block.  In principle this can be
+%                    any string.  In practice, there are several specific
+%                    types of blocks we use a lot (see below).
+%
+%   'exporter flag' - if true, we use piBlockExtractC4D instead since
 %                    the syntax given by the exporter is different.   
 %
 % Return
 %   s          - a struct containing information from the block of text
 %   blockLines - extracted text lines directly (without parsing)
 %
+% Types of blocks we have tried to extract successfully, particularly with
+% PBRT V3
+%
+%    'PixelFilter'
+%    'SurfaceIntegrator'
+%    'Integrator' (ver 2 'SurfaceIntegrator')
+%    'Renderer'
+%    'LookAt'
+%    'Transform'
+%    'ConcatTransform'
+%    'Scale'
+%    'Camera'
+%    'Film'
+%    'Sampler'
+%
 % TL Scienstanford 2017
 %
 % See also
 %   piRead, piWrite, piBlockExtractC4D
 
-% We should say more about the legitimate block names. (BW).
-
 %%  Identify the blockname.  
+
+varargin = ieParamFormat(varargin);
 
 p = inputParser;
 p.addRequired('txtLines',@(x)(iscell(txtLines) && ~isempty(txtLines)));
 
 % We need a valid list of potential block names here.
-addParameter(p,'blockName','Camera',@ischar);
-addParameter(p,'exporterFlag',false,@islogical);
+addParameter(p,'blockname','Camera',@ischar);
+addParameter(p,'exporterflag',false,@islogical);
 p.parse(txtLines,varargin{:});
 
-blockName    = p.Results.blockName;
-exporterFlag = p.Results.exporterFlag;
+blockName    = p.Results.blockname;
+exporterFlag = p.Results.exporterflag;
 
 % Initialize
 s = [];
@@ -161,6 +179,11 @@ for ii = 2:nLines
     % Set this value and type as a field in the structure
     [s.(valueName)] = struct('value',value,'type',valueType);
     
+    if isempty(s)
+        warning('No information found for block %s\n',blockName);
+        s = struct([]);
+    end
+
 end
 
 

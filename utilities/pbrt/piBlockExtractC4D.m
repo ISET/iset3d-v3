@@ -1,11 +1,31 @@
 function [s,blockLines] = piBlockExtractC4D(txtLines,varargin)
+% Block extract function for Cinema4D exporter files
 %
+% Synopsis
+%     [s,blockLines] = piBlockExtractC4D(txtLines,varargin)
+%
+% Inputs
+%
+% Optional/key-value pairs
+%   'block name'
+%
+% Returns
+%   s:          A struct with the information from the block
+%  blockLines:  The text lines with the information
+%
+% See also
+%    piBlockExtractC4D
+%
+
+%% Input parser
+varargin = ieParamFormat(varargin);
+
 p = inputParser;
 p.addRequired('txtLines',@(x)(iscell(txtLines) && ~isempty(txtLines)));
-addParameter(p,'blockName','Camera',@ischar);
+addParameter(p,'blockname','Camera',@ischar);
 p.parse(txtLines,varargin{:});
 
-blockName = p.Results.blockName;
+blockName = p.Results.blockname;
 %%
 nLetters = length(blockName);
 nLines = length(txtLines);
@@ -61,6 +81,11 @@ for ii=1:nLines
         end
         blockLines = thisLine;
     end
+end
+
+if isempty(s)
+    warning('No information found for block %s\n',blockName);
+    s = struct([]);
 end
 
 % fprintf('Read %d materials on %d lines\n',cnt,nLines);

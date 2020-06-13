@@ -128,69 +128,71 @@ txtLines = piReadWorldText(thisR,txtLines);
 exporterFlag = piReadExporter(thisR,header);
 
 %% Extract camera  block
-cameraStruct = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
+thisR.camera = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
+%{
 if(isempty(cameraStruct))
     warning('Cannot find "camera" in PBRT file.');
     thisR.camera = struct([]); % Return empty.
 else
     thisR.camera = cameraStruct;    
 end
-
+%}
 %% Extract sampler block
-samplerStruct = piBlockExtract(txtLines,'blockName','Sampler','exporterFlag',exporterFlag);
+thisR.sampler = piBlockExtract(txtLines,'blockName','Sampler','exporterFlag',exporterFlag);
+%{
 if(isempty(samplerStruct))
     warning('Cannot find "sampler" in PBRT file.');
     thisR.sampler = struct([]); % Return empty.
 else
     thisR.sampler = samplerStruct;
 end
+%}
 
 %% Extract film block
-filmStruct = piBlockExtract(txtLines,'blockName','Film','exporterFlag',exporterFlag);
-if(isempty(filmStruct))
-    warning('Cannot find "film" in PBRT file.');
-    thisR.film = struct([]); % Return empty.
-else
-    % Patch up the filmStruct to match the recipe requirements
-    if(isfield(filmStruct,'filename'))
-        % Remove the filename since it inteferes with the outfile name.
-        filmStruct = rmfield(filmStruct,'filename');
-    end
-    
-    thisR.film = filmStruct;
-    
-    % Some PBRT files do not specify the film diagonal size.  We set it to
-    % 1mm here.
-    try
-        thisR.get('film diagonal');
-    catch
-        disp('Setting film diagonal size to 1 mm');
-        thisR.set('film diagonal',1);
-    end
+thisR.film = piBlockExtract(txtLines,'blockName','Film','exporterFlag',exporterFlag);
+
+% Patch up the filmStruct to match the recipe requirements
+if(isfield(thisR.film,'filename'))
+    % Remove the filename since it inteferes with the outfile name.
+    thisR.film = rmfield(thisR.film,'filename');
+end
+% thisR.film = filmStruct;
+
+% Some PBRT files do not specify the film diagonal size.  We set it to
+% 1mm here.
+try
+    thisR.get('film diagonal');
+catch
+    disp('Setting film diagonal size to 1 mm');
+    thisR.set('film diagonal',1);
 end
 
+
 %% Extract surface pixel filter block
-pfStruct = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
+thisR.filter = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
+%{
 if(isempty(pfStruct))
-    %     warning('Cannot find "filter" in PBRT file.');
     thisR.filter = struct([]); % Return empty.
 else
     thisR.filter = pfStruct;
 end
+%}
 
 %% Extract (surface) integrator block
 if(ver == 2)
-    sfStruct = piBlockExtract(txtLines,'blockName','SurfaceIntegrator','exporterFlag',exporterFlag);
+    thisR.integrator = piBlockExtract(txtLines,'blockName','SurfaceIntegrator','exporterFlag',exporterFlag);
 elseif(ver == 3)
-    sfStruct = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
+    thisR.integrator = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
 end
 
+%{
 if(isempty(sfStruct))
     warning('Cannot find "integrator" in PBRT file. Did you forget to turn on the v3 flag?');
     thisR.integrator = struct([]); % Return empty.
 else
     thisR.integrator = sfStruct;
 end
+%}
 
 %% Extract renderer block
 if(ver == 2)
