@@ -432,12 +432,15 @@ end
 
 %%
 function thisR = piReadGeometry(thisR)
+
+% Call the geometry reading and parsing function
+
 if isequal(thisR.exporter,'C4D')
     fprintf('Reading C4D geometry information.\n');
     thisR = piGeometryRead(thisR);
 elseif isequal(thisR.exporter,'Copy')
-    fprintf('Should be copying geometry.\n');
+    fprintf('Copying geometry.\n');
 else
-    fprintf('Skipping geometry read.\n');
+    fprintf('Skipping geometry.\n');
 end
 end
