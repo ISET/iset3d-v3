@@ -106,7 +106,12 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'rendereddir'}
         name = thisR.outputFile;
         [~,val] = fileparts(name);
-        
+    case {'materialsfile'}        
+        n = thisR.get('input basename');
+        p = thisR.get('input dir');
+        fname_materials = sprintf('%s_materials.pbrt',n);
+        val = fullfile(p,fname_materials);
+               
     case {'workingdirectory','dockerdirectory'}
         % Docker mounts this directory.  Everything is copied into it for
         % the piRender command to run.

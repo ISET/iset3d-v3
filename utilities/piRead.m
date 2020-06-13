@@ -5,9 +5,9 @@ function thisR = piRead(fname,varargin)
 %    thisR = piRead(fname, varargin)
 %
 % Description
-%  PIREAD parses a pbrt scene file and returns critical rendering
-%  information in the various slots of the "recipe" object. The recipe
-%  object contains the information used by PBRT to render the scene.
+%  PIREAD parses a pbrt scene file and returns the full set of rendering
+%  information in the slots of the "recipe" object. The recipe object
+%  contains all the information used by PBRT to render the scene.
 %
 %  We extract blocks with these names from the text prior to WorldBegin
 %
@@ -58,29 +58,40 @@ function thisR = piRead(fname,varargin)
 
 % Examples:
 %{
- fname=fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
- thisR = piRead(fname);
+ thisR = piRecipeDefault('scene name','MacBethChecker');
+ thisR = piRecipeDefault('scene name','SimpleScene');
+ thisR = piRecipeDefault('scene name','teapot');
+
+ piWrite(thisR);
+ scene =  piRender(thisR,'render type','radiance');
+ sceneWindow(scene);
 %}
 
 %%
+varargin =ieParamFormat(varargin);
 p = inputParser;
 
+%{
+% Should delete.
+% We have to protect the varargin in a special way, apparently.  Not sure
+% why yet.  Possible this is no longer necessary.  So we deleted for now
+% and we will see
 if length(varargin) > 1
     for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) | islogical(varargin{i}) ...
-                | isobject(varargin{i}))
+        if ~(isnumeric(varargin{i}) || islogical(varargin{i}) ...
+                || isobject(varargin{i}))
             varargin{i} = ieParamFormat(varargin{i});
         end
     end
 else
     varargin =ieParamFormat(varargin);
 end
+%}
 
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('readmaterials', true,@islogical);
-% We could add - p.addParameter('outputFile') some day and over-ride
-% the code below.
+
 p.parse(fname,varargin{:});
 
 ver = p.Results.version;
@@ -89,7 +100,8 @@ thisR = recipe;
 thisR.inputFile = fname;
 readmaterials   = p.Results.readmaterials;
 
-% Set the output directory default
+%% Set the default output directory
+
 [~,scene_fname]  = fileparts(fname);
 outFilepath      = fullfile(piRootPath,'local',scene_fname);
 outputFile       = fullfile(outFilepath,[scene_fname,'.pbrt']);
@@ -102,87 +114,18 @@ else
     thisR.version = ver;
 end
 
-%% Read PBRT file
+%% Read the text from the PBRT file
 
-% Open, read, close
-% fprintf('Opening %s\n');
-fileID = fopen(fname);
-% fprintf('Open OK\n');
-
-% I don't understand why the spaces or tabs at the beginning of the line are not
-% returned here. (BW).
-% fprintf('Reading\n');
-tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
-txtLines = tmp{1};
-
-% fprintf('Closing\n');
-fclose(fileID);
-% fprintf('Closed\n');
+% The header will determine whether this is a Cinema4D file or not
+[txtLines, header] = piReadText(fname);
 
 %% Split text lines into pre-WorldBegin and WorldBegin sections
-% fprintf('Parsing text\n');
-worldBeginIndex = 0;
-for ii = 1:length(txtLines)
-    currLine = txtLines{ii};
-    if(piContains(currLine,'WorldBegin'))
-        worldBeginIndex = ii;
-        break;
-    end
-end
-% fprintf('Through the loop\n');
-if(worldBeginIndex == 0)
-    warning('Cannot find WorldBegin.');
-    worldBeginIndex = ii;
-end
 
-% Store the text from WorldBegin to the end here
-% fprintf('Storing WorldBegin to end\n');
-thisR.world = txtLines(worldBeginIndex:end);
-
-% Store the text lines from before WorldBegin here
-% fprintf('Storing pre WorldBegin\n');
-txtLines = txtLines(1:(worldBeginIndex-1));
+txtLines = piReadWorldText(thisR,txtLines);
 
 %% Check if header indicates this is an exported Cinema 4D file
-%
-% Unfortunately we have to re-read the text file in order to check the
-% header. 
-% fprintf('Second read\n');
-fileID = fopen(fname);
-tmp = textscan(fileID,'%s','Delimiter','\n');
-headerCheck_scene = tmp{1};
-fclose(fileID);
-% fprintf('Second read done\n');
-if piContains(headerCheck_scene{1}, 'Exported by PBRT exporter for Cinema 4D')
-    % Interprets the information and writes the _geometry.pbrt and
-    % _materials.pbrt files to the rendering folder.
-    exporterFlag   = true;
-    thisR.exporter = 'C4D';
-else
-    % Copies the original _geometry.pbrt and _materials.pbrt to the
-    % rendering folder.
-    exporterFlag   = false;
-    thisR.exporter = 'Copy';
-end
 
-%% Material file header check
-[p,n,~] = fileparts(fname);
-fname_materials = sprintf('%s_materials.pbrt',n);
-inputFile_materials=fullfile(p,fname_materials);
-if exist(inputFile_materials,'file')
-    % fprintf('Reading materials file %s\n',inputFile_materials');
-    fileID = fopen(inputFile_materials);
-    tmp = textscan(fileID,'%s','Delimiter','\n');
-    headerCheck_material = tmp{1};
-    fclose(fileID);
-    if piContains(headerCheck_material{1}, 'Exported by piMaterialWrite')
-        exporterFlag   = true;
-        thisR.exporter = 'C4D';
-    end
-    % fprintf('Done with materials read\n');
-end
-
-%% It would be nice to identify make sure we interpreted every block
+exporterFlag = piReadExporter(thisR,header);
 
 %% Extract camera  block
 cameraStruct = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
@@ -224,7 +167,6 @@ else
         disp('Setting film diagonal size to 1 mm');
         thisR.set('film diagonal',1);
     end
-    
 end
 
 %% Extract surface pixel filter block
@@ -259,18 +201,9 @@ if(ver == 2)
     else
         thisR.renderer = rendererStruct;
     end
-else
-    % Deprecated Nov. 11, 2018.  Delete it if the issue does not comup in a month.
-    % warning('"Renderer" does not exist in the new PBRTv3 format. We leave the field blank .')
 end
-% fprintf('Extracted all the blocks\n');
 
 %% Read LookAt, Transforms, and ConcatTransform, if they exist
-% TODO: In the future we should move all these Transforms into
-% piBlockExtract so that all the parsing is done there. That would make
-% much more sense, organizationally. However, it's more complicated than,
-% since some of the transforms act on each other, so we'll have to be very
-% clever when doing the transforms.
 
 % Parse the camera position.
 
@@ -326,6 +259,7 @@ switch thisR.get('exporter')
 end
 
 %% Read Scale, if it exists
+
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
 % is already in the PBRT file, we want to keep it around.
@@ -345,32 +279,10 @@ if(flip)
     thisR.scale = [-1 1 1];
 end
 
-%% Read Material.pbrt file if pbrt file is exported by C4D.
+%% Read Material.pbrt file
 
-% Can't we just check if there is a file and read it?  Why do we need to
-% distinguish whether these are C4D or Copy files on the read?
-if isequal(thisR.exporter,'C4D')
-    if readmaterials
-        % This reads both the materials and the textures
-        
-        % Check if the materials.pbrt exist
-        if ~exist(inputFile_materials,'file'), error('File not found'); end
-        [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials,'version',3);
-        thisR.materials.inputFile_materials = inputFile_materials;
-        
-        % Call material lib
-        thisR.materials.lib = piMateriallib;
-        
-        %{
-            % Convert all jpg textures to png format
-            % Only *.png & *.exr are supported in pbrt.
-            piTextureFileFormat(thisR);
-        %}
-        
-        % Now read the textures from the materials file
-        [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials, 'version', 3);
-        thisR.textures.inputFile_textures = inputFile_materials;
-    end
+if readmaterials
+    piReadMaterials(thisR); 
 elseif isequal(thisR.exporter,'Copy')
     fprintf('Should be copying materials.\n');
 else 
@@ -378,13 +290,154 @@ else
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
-if isequal(thisR.exporter,'C4D') 
+
+piReadGeometry(thisR);
+
+end
+
+%% Additional functions
+
+%%
+function [txtLines, header] = piReadText(fname)
+% Open, read, close excluding comment lines
+fileID = fopen(fname);
+tmp = textscan(fileID,'%s','Delimiter','\n','CommentStyle',{'#'});
+txtLines = tmp{1};
+fclose(fileID);
+
+% Include comments so we can read only the first line, really
+fileID = fopen(fname);
+tmp = textscan(fileID,'%s','Delimiter','\n');
+header = tmp{1};
+fclose(fileID);
+end
+
+%%
+function txtLines = piReadWorldText(thisR,txtLines)
+% 
+% Finds the text lines from WorldBegin
+% It puts the world section into the thisR.world.
+% Then it removes the world section from the txtLines
+%
+% Why doesn't this go to WorldEnd?  We are hoping that nothing is important
+% after WorldEnd.  But ...
+%
+
+worldBeginIndex = 0;
+for ii = 1:length(txtLines)
+    currLine = txtLines{ii};
+    if(piContains(currLine,'WorldBegin'))
+        worldBeginIndex = ii;
+        break;
+    end
+end
+
+% fprintf('Through the loop\n');
+if(worldBeginIndex == 0)
+    warning('Cannot find WorldBegin.');
+    worldBeginIndex = ii;
+end
+
+% Store the text from WorldBegin to the end here
+thisR.world = txtLines(worldBeginIndex:end);
+
+% Store the text lines from before WorldBegin here
+txtLines = txtLines(1:(worldBeginIndex-1));
+
+end
+
+%%
+function exporterFlag = piReadExporter(thisR,header)
+%
+% Read the first line of the file to see if it is a Cinema 4D file or not
+% Set the recipe accordingly and return a true/false flag
+%
+
+if piContains(header{1}, 'Exported by PBRT exporter for Cinema 4D')
+    % Interprets the information and writes the _geometry.pbrt and
+    % _materials.pbrt files to the rendering folder.
+    exporterFlag   = true;
+    thisR.exporter = 'C4D';
+else
+    % Copies the original _geometry.pbrt and _materials.pbrt to the
+    % rendering folder.
+    exporterFlag   = false;
+    thisR.exporter = 'Copy';
+end
+
+% Check that the materials file export information matches the scene file
+% export 
+
+% Read the materials file if it exists.
+inputFile_materials = thisR.get('materials file');
+
+if exist(inputFile_materials,'file')
+    
+    % Confirm that the material file matches the exporter of the main scene
+    % file.
+    fileID = fopen(inputFile_materials);
+    tmp = textscan(fileID,'%s','Delimiter','\n');
+    headerCheck_material = tmp{1};
+    fclose(fileID);
+    
+    if piContains(headerCheck_material{1}, 'Exported by piMaterialWrite')
+        if isequal(exporterFlag,true) && isequal(thisR.exporter,'C4D')
+            % Everything is fine
+        else
+            warning('The materials file export does not match the main file');
+        end
+    else
+        if isequal(exporterFlag,false)
+            % Everything is fine
+        else
+            warning('Non-standard materials file. Export match not C4D like main file');
+        end
+    end
+else
+    % No material field.  If exporter is Cinema4D, that's not good. Check
+    % that condition here
+    if isequal(thisR.exporter,'C4D')
+        warning('No materials file for a C4D export');
+    end 
+end
+
+end 
+
+%%
+function thisR = piReadMaterials(thisR)
+
+if isequal(thisR.exporter,'C4D')
+    % This reads both the materials and the textures
+    inputFile_materials = thisR.get('materials file');
+    
+    % Check if the materials.pbrt exist
+    if ~exist(inputFile_materials,'file'), error('File not found'); end
+    [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials,'version',3);
+    thisR.materials.inputFile_materials = inputFile_materials;
+    
+    % Call material lib
+    thisR.materials.lib = piMateriallib;
+    
+    %{
+            % Convert all jpg textures to png format
+            % Only *.png & *.exr are supported in pbrt.
+            piTextureFileFormat(thisR);
+    %}
+    
+    % Now read the textures from the materials file
+    [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials, 'version', 3);
+    thisR.textures.inputFile_textures = inputFile_materials;
+end
+end
+
+%%
+function thisR = piReadGeometry(thisR)
+if isequal(thisR.exporter,'C4D')
     fprintf('Reading C4D geometry information.\n');
-    thisR = piGeometryRead(thisR); 
+    thisR = piGeometryRead(thisR);
 elseif isequal(thisR.exporter,'Copy')
     fprintf('Should be copying geometry.\n');
 else
     fprintf('Skipping geometry read.\n');
 end
-
 end
