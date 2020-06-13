@@ -5,7 +5,7 @@ function thisR = piRead(fname,varargin)
 %    thisR = piRead(fname, varargin)
 %
 % Description
-%  PIREAD parses a pbrt scene file and returns the full set of rendering
+%  piREAD parses a pbrt scene file and returns the full set of rendering
 %  information in the slots of the "recipe" object. The recipe object
 %  contains all the information used by PBRT to render the scene.
 %
@@ -104,10 +104,10 @@ end
 %% Split text lines into pre-WorldBegin and WorldBegin sections
 txtLines = piReadWorldText(thisR,txtLines);
 
-%% Check if header indicates this is an exported Cinema 4D file
+%% Set flag indicating whether this is exported Cinema 4D file
 exporterFlag = piReadExporter(thisR,header);
 
-%% Extract camera  block
+%% Extract camera block
 thisR.camera = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
 
 %% Extract sampler block
@@ -135,33 +135,9 @@ end
 thisR.filter = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
 
 %% Extract (surface) integrator block
-%{
-if(ver == 2)
-    % Deprecated
-    thisR.integrator = piBlockExtract(txtLines,'blockName','SurfaceIntegrator','exporterFlag',exporterFlag);
-elseif(ver == 3)
-    thisR.integrator = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
-end
-%}
 thisR.integrator = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
 
-%% Extract renderer block
-%{
-
-% Deprecated
-if(ver == 2)
-    rendererStruct = piBlockExtract(txtLines,'blockName','Renderer','exporterFlag',exporterFlag);
-    if(isempty(rendererStruct))
-        % warning('Cannot find "renderer" in PBRT file. Using default.');
-        thisR.renderer = struct('type','Renderer','subtype','sampler');
-    else
-        thisR.renderer = rendererStruct;
-    end
-end
-%}
-
-%% Set thisR.lookAt using LookAt, Transforms, and ConcatTransform, if they exist
-
+%% Set thisR.lookAt and determine if we need to flip the image
 flip = piReadLookAt(thisR,txtLines,exporterFlag);
 
 % Sometimes the axis flip is "hidden" in the concatTransform matrix. In
@@ -171,7 +147,6 @@ if(flip)
     thisR.scale = [-1 1 1];
 end
 %% Read the light sources and delete them in world
-
 switch thisR.get('exporter')
     case 'C4D'
         thisR = piLightRead(thisR);
@@ -193,22 +168,20 @@ else
 end
 
 %% Read Material.pbrt file
-
 if readmaterials
     piReadMaterials(thisR); 
 elseif isequal(thisR.exporter,'Copy')
-    fprintf('Should be copying materials.\n');
+    fprintf('Copying materials.\n');
 else 
     fprintf('Skipping materials and texture read.\n');
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
-
 piReadGeometry(thisR);
 
 end
 
-%% Additional functions
+%% Helper functions
 
 %%
 function [txtLines, header] = piReadText(fname)
