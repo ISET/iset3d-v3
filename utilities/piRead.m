@@ -71,23 +71,6 @@ function thisR = piRead(fname,varargin)
 varargin =ieParamFormat(varargin);
 p = inputParser;
 
-%{
-% Should delete.
-% We have to protect the varargin in a special way, apparently.  Not sure
-% why yet.  Possible this is no longer necessary.  So we deleted for now
-% and we will see
-if length(varargin) > 1
-    for i = 1:length(varargin)
-        if ~(isnumeric(varargin{i}) || islogical(varargin{i}) ...
-                || isobject(varargin{i}))
-            varargin{i} = ieParamFormat(varargin{i});
-        end
-    end
-else
-    varargin =ieParamFormat(varargin);
-end
-%}
-
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('readmaterials', true,@islogical);
@@ -95,6 +78,7 @@ p.addParameter('readmaterials', true,@islogical);
 p.parse(fname,varargin{:});
 
 ver = p.Results.version;
+if ~isequal(ver,3), error('Only supporting version 3 now.'); end
 
 thisR = recipe;
 thisR.inputFile = fname;
@@ -114,39 +98,20 @@ else
     thisR.version = ver;
 end
 
-%% Read the text from the PBRT file
-
-% The header will determine whether this is a Cinema4D file or not
+%% Read the text and header from the PBRT file
 [txtLines, header] = piReadText(fname);
 
 %% Split text lines into pre-WorldBegin and WorldBegin sections
-
 txtLines = piReadWorldText(thisR,txtLines);
 
 %% Check if header indicates this is an exported Cinema 4D file
-
 exporterFlag = piReadExporter(thisR,header);
 
 %% Extract camera  block
 thisR.camera = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
-%{
-if(isempty(cameraStruct))
-    warning('Cannot find "camera" in PBRT file.');
-    thisR.camera = struct([]); % Return empty.
-else
-    thisR.camera = cameraStruct;    
-end
-%}
+
 %% Extract sampler block
 thisR.sampler = piBlockExtract(txtLines,'blockName','Sampler','exporterFlag',exporterFlag);
-%{
-if(isempty(samplerStruct))
-    warning('Cannot find "sampler" in PBRT file.');
-    thisR.sampler = struct([]); % Return empty.
-else
-    thisR.sampler = samplerStruct;
-end
-%}
 
 %% Extract film block
 thisR.film = piBlockExtract(txtLines,'blockName','Film','exporterFlag',exporterFlag);
@@ -156,7 +121,6 @@ if(isfield(thisR.film,'filename'))
     % Remove the filename since it inteferes with the outfile name.
     thisR.film = rmfield(thisR.film,'filename');
 end
-% thisR.film = filmStruct;
 
 % Some PBRT files do not specify the film diagonal size.  We set it to
 % 1mm here.
@@ -167,34 +131,24 @@ catch
     thisR.set('film diagonal',1);
 end
 
-
 %% Extract surface pixel filter block
 thisR.filter = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
-%{
-if(isempty(pfStruct))
-    thisR.filter = struct([]); % Return empty.
-else
-    thisR.filter = pfStruct;
-end
-%}
 
 %% Extract (surface) integrator block
+%{
 if(ver == 2)
+    % Deprecated
     thisR.integrator = piBlockExtract(txtLines,'blockName','SurfaceIntegrator','exporterFlag',exporterFlag);
 elseif(ver == 3)
     thisR.integrator = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
 end
-
-%{
-if(isempty(sfStruct))
-    warning('Cannot find "integrator" in PBRT file. Did you forget to turn on the v3 flag?');
-    thisR.integrator = struct([]); % Return empty.
-else
-    thisR.integrator = sfStruct;
-end
 %}
+thisR.integrator = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
 
 %% Extract renderer block
+%{
+
+% Deprecated
 if(ver == 2)
     rendererStruct = piBlockExtract(txtLines,'blockName','Renderer','exporterFlag',exporterFlag);
     if(isempty(rendererStruct))
@@ -204,54 +158,18 @@ if(ver == 2)
         thisR.renderer = rendererStruct;
     end
 end
+%}
 
-%% Read LookAt, Transforms, and ConcatTransform, if they exist
+%% Set thisR.lookAt using LookAt, Transforms, and ConcatTransform, if they exist
 
-% Parse the camera position.
+flip = piReadLookAt(thisR,txtLines,exporterFlag);
 
-% A flag for flipping from a RHS to a LHS. 
-flip = 0;
-
-[~, lookAtBlock] = piBlockExtract(txtLines,'blockName','LookAt','exporterFlag',exporterFlag);
-if(isempty(lookAtBlock))
-    % Default camera position.
-    thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
-else
-    values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
-    from = [values{2} values{3} values{4}];
-    to = [values{5} values{6} values{7}];
-    up = [values{8} values{9} values{10}];
+% Sometimes the axis flip is "hidden" in the concatTransform matrix. In
+% this case, the flip flag will be true. When the flip flag is true, we
+% always output Scale -1 1 1.
+if(flip)
+    thisR.scale = [-1 1 1];
 end
-
-% If there's a transform it will overwrite the LookAt.
-[~, transformBlock] = piBlockExtract(txtLines,'blockName','Transform','exporterFlag',exporterFlag);
-if(~isempty(transformBlock))
-    values = textscan(transformBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
-    values = cell2mat(values(2:end));
-    transform = reshape(values,[4 4]);
-    [from,to,up,flip] = piTransform2LookAt(transform);
-end
-
-% Error checking
-if(isempty(transformBlock) && isempty(lookAtBlock))
-    warning('Cannot find "LookAt" or "Transform" in PBRT file. Returning default.');
-end
-
-% If there's a concat transform, we use it to update the current camera
-% position. 
-[~, concatTBlock] = piBlockExtract(txtLines,'blockName','ConcatTransform','exporterFlag',exporterFlag);
-if(~isempty(concatTBlock))
-    values = textscan(concatTBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
-    values = cell2mat(values(2:end));
-    concatTransform = reshape(values,[4 4]);
-    
-    % Apply transform and update lookAt
-    lookAtTransform = piLookat2Transform(from,to,up);
-    [from,to,up,flip] = piTransform2LookAt(lookAtTransform*concatTransform);
-
-end
-
-thisR.lookAt = struct('from',from,'to',to,'up',up);
 %% Read the light sources and delete them in world
 
 switch thisR.get('exporter')
@@ -272,13 +190,6 @@ if(isempty(scaleBlock))
 else
     values = textscan(scaleBlock{1}, '%s %f %f %f');
     thisR.scale = [values{2} values{3} values{4}];
-end
-
-% Sometimes the axis flip is "hidden" in the concatTransform matrix. In
-% this case, the flip flag will be true. When the flip flag is true, we
-% always output Scale -1 1 1.
-if(flip)
-    thisR.scale = [-1 1 1];
 end
 
 %% Read Material.pbrt file
@@ -430,6 +341,60 @@ if isequal(thisR.exporter,'C4D')
     [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials, 'version', 3);
     thisR.textures.inputFile_textures = inputFile_materials;
 end
+end
+
+%%
+
+function [flip,thisR] = piReadLookAt(thisR,txtLines,exporterFlag)
+% Reads the from, to, up field and transform and concatTransform
+%
+% These are a little more complicated w.r.t. formatting.  Special cases
+% here
+
+% A flag for flipping from a RHS to a LHS. 
+flip = 0;
+
+[~, lookAtBlock] = piBlockExtract(txtLines,'blockName','LookAt','exporterFlag',exporterFlag);
+if(isempty(lookAtBlock))
+    % Default camera position.
+    thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
+else
+    values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
+    from = [values{2} values{3} values{4}];
+    to = [values{5} values{6} values{7}];
+    up = [values{8} values{9} values{10}];
+end
+
+% If there's a transform it will overwrite the LookAt.
+[~, transformBlock] = piBlockExtract(txtLines,'blockName','Transform','exporterFlag',exporterFlag);
+if(~isempty(transformBlock))
+    values = textscan(transformBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
+    values = cell2mat(values(2:end));
+    transform = reshape(values,[4 4]);
+    [from,to,up,flip] = piTransform2LookAt(transform);
+end
+
+% Error checking
+if(isempty(transformBlock) && isempty(lookAtBlock))
+    warning('Cannot find "LookAt" or "Transform" in PBRT file. Returning default.');
+end
+
+% If there's a concat transform, we use it to update the current camera
+% position. 
+[~, concatTBlock] = piBlockExtract(txtLines,'blockName','ConcatTransform','exporterFlag',exporterFlag);
+if(~isempty(concatTBlock))
+    values = textscan(concatTBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
+    values = cell2mat(values(2:end));
+    concatTransform = reshape(values,[4 4]);
+    
+    % Apply transform and update lookAt
+    lookAtTransform = piLookat2Transform(from,to,up);
+    [from,to,up,flip] = piTransform2LookAt(lookAtTransform*concatTransform);
+
+end
+
+thisR.lookAt = struct('from',from,'to',to,'up',up);
+
 end
 
 %%
