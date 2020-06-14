@@ -1,20 +1,34 @@
 function [textureList, textureLines] = piTextureRead(thisR, fname, varargin)
+% Read a texture file
 %
+% Synopsis
+%   [textureList, textureLines] = piTextureRead(thisR, fname, varargin)
+%
+% Description
+%   Read the textures.  When they are written out they are placed in the
+%   materials file, so there is no piTextureWrite
+%
+% Inputs
+%
+% Optional key/val pairs
+%   None
+%
+% Returns
+%   textureList  - a cell array with the textures
+%   textureLines - The text lines describing the texture
+%
+% See also
+%  piGeometryRead
+%
+
 %% Parse inputs
 p = inputParser;
-p.addRequired('thiR', @(x)(isa(x, 'recipe')));
+p.addRequired('thisR', @(x)(isa(x, 'recipe')));
 p.addRequired('fname', @(x)(exist(fname, 'file')));
-p.addParameter('version', 3, @isnumeric);
 
 p.parse(thisR, fname, varargin{:});
 
 fname = p.Results.fname;
-ver = p.Results.version;
-
-%% Check version number
-if (ver ~= 3)
-    error('Only PBRT version 3 Cinema 4D exporter is supported.');
-end
 
 %% Gather texture lines
 
@@ -25,8 +39,15 @@ txtLines = tmp{1};
 fclose(fileID);
 
 textureLines = piTexturesFromText(txtLines);
+
 if isempty(textureLines), textureList = [];
-else, textureList  = piBlockExtractTexture(thisR, textureLines);end
+else, textureList  = piBlockExtractTexture(thisR, textureLines);
 end
+
+end
+
+
+
+
 
 

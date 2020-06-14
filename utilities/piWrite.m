@@ -4,21 +4,25 @@ function workingDir = piWrite(thisR,varargin)
 % Syntax
 %   workingDir = piWrite(thisR,varargin)
 %
-% The pbrt scene file and all of its resources files are written out
-% in a working directory that will be mounted by the docker container.
+% The pbrt scene file and all the relevant resource files (geometry,
+% materials, spds, others) are written out in a working directory. These
+% are the files that will be mounted by the docker container and used by
+% PBRT to create the radiance, depth, mesh metadata outputs.
 %
-% In some cases, there are multiple PBRT files that use the same
-% resources files.  If you know the resources files are already there,
-% you can set overwriteresources to false.  Similarly if you do not
-% want to overwrite the pbrt scene file, set overwritepbrtfile to
-% false.
+% There are multiple options as to whether or not to overwrite files that
+% are already present in the output directory.  The logic and conditions
+% about these overwrites is quite complex right now, and we need to
+% simplify.  
+%
+% In some cases, multiple PBRT scenes use the same resources files.  If you
+% know the resources files are already there, you can set
+% overwriteresources to false.  Similarly if you do not want to overwrite
+% the pbrt scene file, set overwritepbrtfile to false.
 %
 % Input
-%   renderRecipe:  a recipe object describing the rendering parameters.  This
-%       includes the inputFile and the outputFile, which are used to find the
-%       directories containing all of the pbrt scene data.
+%   thisR: a recipe object describing the rendering parameters.
 %
-% Optional parameter/values
+% Optional key/value parameters
 %   overwrite pbrtfile  - If scene PBRT file exists,    overwrite (default true)
 %   overwrite resources - If the resources files exist, overwrite (default true) 
 %   overwrite lensfile    
@@ -30,16 +34,22 @@ function workingDir = piWrite(thisR,varargin)
 %   thistrafficflow   
 %
 % Return
-%    workingDir - path to the output directory mounted by the Docker containe
+%    workingDir - path to the output directory mounted by the Docker
+%                 container.  This is not necessary, however, because we
+%                 can find it from thisR.get('output dir')
 %
 % TL Scien Stanford 2017
 % JNM -- Add Windows support 01/25/2019
+%
+% See also
+%   piRead, piRender
 
 %{
 piWrite(thisR,'overwrite resources',false,'overwrite pbrt file',true);
 piWrite(thisR);
 %}
-%%
+
+%% Parse inputs
 varargin = ieParamFormat(varargin);
 p = inputParser;
 

@@ -16,7 +16,7 @@ function [s, blockLines] = piBlockExtract(txtLines,varargin)
 %                    any string.  In practice, there are several specific
 %                    types of blocks we use a lot (see below).
 %
-%   'exporter flag' - if true, we use piBlockExtractC4D instead since
+%   'exporter' - if true, we use piBlockExtractC4D instead since
 %                    the syntax given by the exporter is different.   
 %
 % Return
@@ -52,17 +52,17 @@ p.addRequired('txtLines',@(x)(iscell(txtLines) && ~isempty(txtLines)));
 
 % We need a valid list of potential block names here.
 addParameter(p,'blockname','Camera',@ischar);
-addParameter(p,'exporterflag',false,@islogical);
+addParameter(p,'exporter','C4D',@ischar);
 p.parse(txtLines,varargin{:});
 
-blockName    = p.Results.blockname;
-exporterFlag = p.Results.exporterflag;
+blockName = p.Results.blockname;
+exporter  = p.Results.exporter;
 
 % Initialize
 s = [];
 
 %% If the exporter flag is true, use piBlockExtractC4D instead of this function.
-if(exporterFlag)
+if isequal(exporter,'C4D')
     [s,blockLines] = piBlockExtractC4D(txtLines,'blockName',blockName);
     return;
 end

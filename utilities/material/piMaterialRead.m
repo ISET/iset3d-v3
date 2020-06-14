@@ -25,22 +25,12 @@ function [materialList, materialLines] = piMaterialRead(thisR, fname,varargin)
 materials = piReadMaterial('carandbuilding_materials.pbrt','version',3);
 %}
 
-%%
+%% Parse.  Only PBRT ver3 is supported
 p = inputParser;
 p.addRequired('thiR', @(x)(isa(x, 'recipe')));
 p.addRequired('fname',@(x)(exist(fname,'file')));
-p.addParameter('version',2,@(x)isnumeric(x));
 
 p.parse(thisR, fname,varargin{:});
-
-ver = p.Results.version;
-
-%% Check version number
-if(ver ~= 3)
-    error('Only PBRT version 3 Cinema 4D exporter is supported.');
-end
-
-
 
 %% Extract lines that correspond to specified keyword
 

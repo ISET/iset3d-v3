@@ -15,20 +15,19 @@ function thisR = piRead(fname,varargin)
 %    Integrator in V3), Renderer, LookAt, Transform, ConcatTransform,
 %    Scale
 %
-%  We modify the recipe programmatically to generate multiple
-%  renderings.
-%  
-%  The related routine, piWrite, uses the recipe to write out a PBRT
-%  file locally; piRender executes the PBRT docker image to produce the
-%  rendered output (in an ISET scene or oi format).  Alternatively,
-%  the gCloud object can be used to upload and render the files on the
-%  Google Cloud Platform (see isetcloud).
+%  After creating the recipe from piRead, we modify the recipe
+%  programmatically.  The modified recipe is then used to write out the
+%  PBRT file (piWrite).  These PBRT files are rendered using piRender,
+%  which executes the PBRT docker image and return an ISETCam scene or oi
+%  format).  
+%
+%  We also have routines to execute these functions at scale in Google
+%  Cloud (see isetcloud).
 %
 % Required inputs
 %   fname - a full path to a pbrt scene file
 %
 % Optional parameter/values
-%   'version' - Which version of PBRT, 2 or 3.  Default is Version 3.
 %   'read materials' - When PBRT scene file is exported by cinema4d,
 %        the exporterflag is set and we read the materials file.  If
 %        you do not want to read that file, set this to false.
@@ -37,21 +36,20 @@ function thisR = piRead(fname,varargin)
 %   recipe - A recipe object with the parameters needed to write a new pbrt
 %            scene file
 %
-% Caution:  The reading algorithm assumes that
+% Assumptions:  piRead assumes that
 %
 %     * There is a block of text before WorldBegin and no more text after 
-%     * Comments (indicated by '#' in the first character) and blank lines are
-%     ignored.
-%     * When a block is encountered, the text lines that follow
-%     beginning with a '"' are included in the block.
+%     * Comments (indicated by '#' in the first character) and blank lines
+%        are ignored.
+%     * When a block is encountered, the text lines that follow beginning
+%       with a '"' are included in the block. 
 %    
-%  piRead will not work with PBRT files that do not meet these
-%  criteria.
+%  piRead will not work with PBRT files that do not meet these criteria.
 %
-%  Text starting at WorldBegin to the end of the file (not just
-%  WorldEnd) is stored in recipe.world.
+%  Text starting at WorldBegin to the end of the file (not just WorldEnd)
+%  is stored in recipe.world.
 %
-% TL Scienstanford 2017
+% TL, ZLy, BW Scienstanford 2017-2020
 %
 % See also
 %   piWrite, piRender, piBlockExtract
@@ -59,15 +57,16 @@ function thisR = piRead(fname,varargin)
 % Examples:
 %{
  thisR = piRecipeDefault('scene name','MacBethChecker');
- thisR = piRecipeDefault('scene name','SimpleScene');
- thisR = piRecipeDefault('scene name','teapot');
+ % thisR = piRecipeDefault('scene name','SimpleScene');
+ % thisR = piRecipeDefault('scene name','teapot');
 
  piWrite(thisR);
  scene =  piRender(thisR,'render type','radiance');
  sceneWindow(scene);
 %}
 
-%%
+%% Parse the inputs
+
 varargin =ieParamFormat(varargin);
 p = inputParser;
 
@@ -85,18 +84,10 @@ thisR.inputFile = fname;
 readmaterials   = p.Results.readmaterials;
 
 %% Set the default output directory
-
 [~,scene_fname]  = fileparts(fname);
 outFilepath      = fullfile(piRootPath,'local',scene_fname);
 outputFile       = fullfile(outFilepath,[scene_fname,'.pbrt']);
 thisR.set('outputFile',outputFile);
-
-%% Check version number
-if(ver ~= 2 && ver ~=3)
-    error('PBRT version number incorrect. Possible versions are 2 or 3.');
-else
-    thisR.version = ver;
-end
 
 %% Read the text and header from the PBRT file
 [txtLines, header] = piReadText(fname);
@@ -105,16 +96,17 @@ end
 txtLines = piReadWorldText(thisR,txtLines);
 
 %% Set flag indicating whether this is exported Cinema 4D file
-exporterFlag = piReadExporter(thisR,header);
+% exporterFlag = piReadExporter(thisR,header);
+piReadExporter(thisR,header);
 
 %% Extract camera block
-thisR.camera = piBlockExtract(txtLines,'blockName','Camera','exporterFlag',exporterFlag);
+thisR.camera = piBlockExtract(txtLines,'blockName','Camera','exporter',thisR.exporter);
 
 %% Extract sampler block
-thisR.sampler = piBlockExtract(txtLines,'blockName','Sampler','exporterFlag',exporterFlag);
+thisR.sampler = piBlockExtract(txtLines,'blockName','Sampler','exporter',thisR.exporter);
 
 %% Extract film block
-thisR.film = piBlockExtract(txtLines,'blockName','Film','exporterFlag',exporterFlag);
+thisR.film = piBlockExtract(txtLines,'blockName','Film','exporter',thisR.exporter);
 
 % Patch up the filmStruct to match the recipe requirements
 if(isfield(thisR.film,'filename'))
@@ -132,13 +124,13 @@ catch
 end
 
 %% Extract surface pixel filter block
-thisR.filter = piBlockExtract(txtLines,'blockName','PixelFilter','exporterFlag',exporterFlag);
+thisR.filter = piBlockExtract(txtLines,'blockName','PixelFilter','exporter',thisR.exporter);
 
 %% Extract (surface) integrator block
-thisR.integrator = piBlockExtract(txtLines,'blockName','Integrator','exporterFlag',exporterFlag);
+thisR.integrator = piBlockExtract(txtLines,'blockName','Integrator','exporter',thisR.exporter);
 
 %% Set thisR.lookAt and determine if we need to flip the image
-flip = piReadLookAt(thisR,txtLines,exporterFlag);
+flip = piReadLookAt(thisR,txtLines);
 
 % Sometimes the axis flip is "hidden" in the concatTransform matrix. In
 % this case, the flip flag will be true. When the flip flag is true, we
@@ -159,7 +151,7 @@ end
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
 % is already in the PBRT file, we want to keep it around.
 % fprintf('Reading scale\n');
-[~, scaleBlock] = piBlockExtract(txtLines,'blockName','Scale','exporterFlag',exporterFlag);
+[~, scaleBlock] = piBlockExtract(txtLines,'blockName','Scale','exporter',thisR.exporter);
 if(isempty(scaleBlock))
     thisR.scale = [];
 else
@@ -183,7 +175,7 @@ end
 
 %% Helper functions
 
-%%
+%% Generic text reading, omitting comments and including comments
 function [txtLines, header] = piReadText(fname)
 % Open, read, close excluding comment lines
 fileID = fopen(fname);
@@ -198,7 +190,7 @@ header = tmp{1};
 fclose(fileID);
 end
 
-%%
+%% Find the text in WorldBegin/End section
 function txtLines = piReadWorldText(thisR,txtLines)
 % 
 % Finds the text lines from WorldBegin
@@ -232,10 +224,11 @@ txtLines = txtLines(1:(worldBeginIndex-1));
 
 end
 
-%%
+%% Determine whether this is a Cinema4D export or not
 function exporterFlag = piReadExporter(thisR,header)
 %
-% Read the first line of the file to see if it is a Cinema 4D file or not
+% Read the first line of the scene file to see if it is a Cinema 4D file
+% Also, check the materials file for consistency.
 % Set the recipe accordingly and return a true/false flag
 %
 
@@ -289,7 +282,7 @@ end
 
 end 
 
-%%
+%% Read the materials file
 function thisR = piReadMaterials(thisR)
 
 if isequal(thisR.exporter,'C4D')
@@ -298,7 +291,7 @@ if isequal(thisR.exporter,'C4D')
     
     % Check if the materials.pbrt exist
     if ~exist(inputFile_materials,'file'), error('File not found'); end
-    [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials,'version',3);
+    [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials);
     thisR.materials.inputFile_materials = inputFile_materials;
     
     % Call material lib
@@ -311,35 +304,40 @@ if isequal(thisR.exporter,'C4D')
     %}
     
     % Now read the textures from the materials file
-    [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials, 'version', 3);
+    [thisR.textures.list, thisR.textures.txtLines] = piTextureRead(thisR, inputFile_materials);
     thisR.textures.inputFile_textures = inputFile_materials;
 end
 end
 
-%%
-
-function [flip,thisR] = piReadLookAt(thisR,txtLines,exporterFlag)
-% Reads the from, to, up field and transform and concatTransform
+%% Build the lookAt information
+function [flip,thisR] = piReadLookAt(thisR,txtLines)
+% Reads multiple blocks to create the lookAt field and flip variable
 %
-% These are a little more complicated w.r.t. formatting.  Special cases
-% here
+% The lookAt is built up by reading from, to, up field and transform and
+% concatTransform.
+%
+% Interpreting these variables from the text can be more complicated w.r.t.
+% formatting.
 
 % A flag for flipping from a RHS to a LHS. 
 flip = 0;
 
-[~, lookAtBlock] = piBlockExtract(txtLines,'blockName','LookAt','exporterFlag',exporterFlag);
+% Get the block
+[~, lookAtBlock] = piBlockExtract(txtLines,'blockName','LookAt','exporter',thisR.exporter);
+
 if(isempty(lookAtBlock))
-    % Default camera position.
+    % If it is empty, use the default
     thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
 else
+    % We have values
     values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
     from = [values{2} values{3} values{4}];
     to = [values{5} values{6} values{7}];
     up = [values{8} values{9} values{10}];
 end
 
-% If there's a transform it will overwrite the LookAt.
-[~, transformBlock] = piBlockExtract(txtLines,'blockName','Transform','exporterFlag',exporterFlag);
+% If there's a transform, we transform the LookAt.
+[~, transformBlock] = piBlockExtract(txtLines,'blockName','Transform','exporter',thisR.exporter);
 if(~isempty(transformBlock))
     values = textscan(transformBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
     values = cell2mat(values(2:end));
@@ -347,14 +345,9 @@ if(~isempty(transformBlock))
     [from,to,up,flip] = piTransform2LookAt(transform);
 end
 
-% Error checking
-if(isempty(transformBlock) && isempty(lookAtBlock))
-    warning('Cannot find "LookAt" or "Transform" in PBRT file. Returning default.');
-end
-
 % If there's a concat transform, we use it to update the current camera
 % position. 
-[~, concatTBlock] = piBlockExtract(txtLines,'blockName','ConcatTransform','exporterFlag',exporterFlag);
+[~, concatTBlock] = piBlockExtract(txtLines,'blockName','ConcatTransform','exporter',thisR.exporter);
 if(~isempty(concatTBlock))
     values = textscan(concatTBlock{1}, '%s [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
     values = cell2mat(values(2:end));
@@ -363,14 +356,18 @@ if(~isempty(concatTBlock))
     % Apply transform and update lookAt
     lookAtTransform = piLookat2Transform(from,to,up);
     [from,to,up,flip] = piTransform2LookAt(lookAtTransform*concatTransform);
+end
 
+% Warn the user if nothing was found
+if(isempty(transformBlock) && isempty(lookAtBlock))
+    warning('Cannot find "LookAt" or "Transform" in PBRT file. Returning default.');
 end
 
 thisR.lookAt = struct('from',from,'to',to,'up',up);
 
 end
 
-%%
+%% Read the geometry file
 function thisR = piReadGeometry(thisR)
 
 % Call the geometry reading and parsing function
