@@ -71,13 +71,9 @@ varargin =ieParamFormat(varargin);
 p = inputParser;
 
 p.addRequired('fname',@(x)(exist(fname,'file')));
-p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('readmaterials', true,@islogical);
 
 p.parse(fname,varargin{:});
-
-ver = p.Results.version;
-if ~isequal(ver,3), error('Only supporting version 3 now.'); end
 
 thisR = recipe;
 thisR.inputFile = fname;
