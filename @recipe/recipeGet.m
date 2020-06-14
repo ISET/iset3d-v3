@@ -84,8 +84,9 @@ p.parse(thisR,param);
 
 switch ieParamFormat(param)  % lower case, no spaces
     
-    % Data management
+    % File management
     case 'inputfile'
+        % The place where the PBRT scene files start before being modified
         val = thisR.inputFile;
     case 'inputdir'
         val = fileparts(thisR.get('input file'));
@@ -96,30 +97,36 @@ switch ieParamFormat(param)  % lower case, no spaces
         % This file location defines the working directory that docker
         % mounts to run.
         val = thisR.outputFile;
-    case 'outputdir'
+    case {'outputdir','workingdirectory','dockerdirectory'}
         val = fileparts(thisR.get('output file'));
     case {'outputbasename'}
         name = thisR.outputFile;
         [~,val] = fileparts(name);
     case 'renderedfile'
-        val = fileparts(thisR.get('rendered file'));
+        % We store the renderings in a 'renderings' directory within the
+        % output directory.
+        rdir = thisR.get('rendered dir');
+        outputFile = thisR.get('output basename');
+        val = fullfile(rdir,[outputFile,'.dat']);
     case {'rendereddir'}
-        name = thisR.outputFile;
-        [~,val] = fileparts(name);
-    case {'materialsfile'}        
+        outDir = thisR.get('output dir'); 
+        val = fullfile(outDir,'renderings'); 
+    case {'renderedbasename'}
+        val = thisR.get('output basename');
+    case {'inputmaterialsfile','materialsfile'}
+        % Stored in the root of the input directory
         n = thisR.get('input basename');
         p = thisR.get('input dir');
         fname_materials = sprintf('%s_materials.pbrt',n);
         val = fullfile(p,fname_materials);
-               
-    case {'workingdirectory','dockerdirectory'}
-        % Docker mounts this directory.  Everything is copied into it for
-        % the piRender command to run.
-        outputFile = thisR.get('output file');
-        val = fileparts(outputFile);
+    case {'geometrydir','outputgeometrydir'}
+        % Standard location for the scene geometry output information
+        outputDir = thisR.get('output dir');
+        val = fullfile(outputDir,'scene','PBRT','pbrt-geometry');
     
         % Graphics related
     case {'exporter'}
+        % 'C4D' or 'Unknown' or 'Copy' at present.
         val = thisR.exporter;
         
         % Scene and camera direction
@@ -130,6 +137,14 @@ switch ieParamFormat(param)  % lower case, no spaces
         % A unit vector in the lookAt direction
         val = thisR.lookAt.from - thisR.lookAt.to;
         val = val/norm(val);
+        
+        % Camera fields
+    case {'cameratype'}
+        val = thisR.camera.type;
+    case {'camerasubtype'}
+        if isfield(thisR.camera,'subtype')
+            val = thisR.camera.subtype;
+        end
     case 'lookat'
         val = thisR.lookAt;
     case 'from'
@@ -141,11 +156,26 @@ switch ieParamFormat(param)  % lower case, no spaces
     case 'fromto'
         % Vector between from minus to
         val = thisR.lookAt.from - thisR.lookAt.to;
-      case 'tofrom'
+    case 'tofrom'
         % Vector between from minus to
         val = thisR.lookAt.to - thisR.lookAt.from;
-       
-    case {'cameratype'}
+    case {'scale'}
+        % Change the size (scale) of something.  Almost always 1 1 1
+        val = thisR.scale;
+        
+        % Motion is not always included.
+    case {'cameramotiontranslate'}
+        if isfield(thisR.camera,'motion')
+            val = thisR.camera.motion.activeTransformStart.pos - thisR.camera.motion.activeTransformEnd.pos;
+        end
+    case {'cameramotionstart'}
+        if isfield(thisR.camera,'motion')
+            val = thisR.camera.motion.activeTransformStart.rotate;
+        end
+    case {'cameramotionend'}
+        if isfield(thisR.camera,'motion')
+            val = thisR.camera.motion.activeTransformEnd.rotate;
+        end
     case {'exposuretime','cameraexposure'}
         try
             val = thisR.camera.shutterclose.value - thisR.camera.shutteropen.value;
@@ -164,8 +194,10 @@ switch ieParamFormat(param)  % lower case, no spaces
         elseif ismember(val,{'realisticDiffraction','realisticEye','realistic','omni'})
             val = 'lens';
         end
-    case 'lensfile'
-        % See if there is a lens file and assign it.
+    case {'lensfile','lensfileinput'}
+        % The lens file from the data/lens directory.
+        
+        % There are a few different camera types.  Not all have lens files.
         subType = thisR.camera.subtype;
         switch(lower(subType))
             case 'pinhole'
@@ -173,16 +205,34 @@ switch ieParamFormat(param)  % lower case, no spaces
             case 'perspective'
                 val = 'pinhole (perspective)';
             otherwise
-                % realisticeye and realisticDiffraction both work here.
-                % Need to test 'omni'               
+                % I think this includes realisticeye and omni
                 try
+                    % Make sure the lensfile is in the data/lens directory.
                     [~,name,ext] = fileparts(thisR.camera.lensfile.value);
                     val = [name,ext];
+                    val = fullfile(piRootPath,'data','lens',val);
+                    if ~exist(val,'file')
+                        error('Unknown lens file %s\n',val);
+                    end
                 catch
-                    error('Unknown lens file %s\n',subType);
+                    error('Problem with reading lens for camera type %s\n',subType);
                 end
-                
         end
+    case {'lensdir','lensdirinput'}
+        % 
+        val = fullfile(piRootPath,'data','lens');
+    case 'lensbasename'
+        val = thisR.get('lens file');
+        [~,val,~] = fileparts(val);
+    case 'lensfullbasename'
+        val = thisR.get('lens file');
+        [~,val,ext] = fileparts(val);
+        val = [val,ext];
+    case 'lensfileoutput'
+        outputDir = thisR.get('outputdir');
+        lensfullbasename = thisR.get('lens full basename');
+        val = fullfile(outputDir,'lens',lensfullbasename);
+        
     case {'focusdistance','focaldistance'}
         % recipe.get('focal distance')  (m)
         %
@@ -336,12 +386,16 @@ switch ieParamFormat(param)  % lower case, no spaces
         val.film   = thisR.film;
         val.filter = thisR.filter;
         
-    case{'material'}
+    case{'materials'}
         if isfield(thisR.materials, 'list')
             val = thisR.materials.list;
         else
+            % Should this be just empty, or an empty cell?
             val = {};
         end
+    case {'materialsoutputfile'}
+        val = thisR.materials.outputfile;
+        
     case{'texture'}
         if isfield(thisR.textures, 'list')
             val = thisR.textures.list;

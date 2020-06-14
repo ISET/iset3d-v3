@@ -395,6 +395,13 @@ switch param
         thisR.camera = val.camera;
         thisR.film   = val.film;
         thisR.filter = val.filter;
+
+        % Materials should be built up here.
+    case {'materials'}
+        thisR.materials = val;
+    case {'materialsoutputfile'}
+        thisR.materials.outputfile = val;
+        
     % ZLY added fluorescent 
     case {'fluorophoreconcentration'}
         % thisR.set('fluorophore concentration',val,idx)

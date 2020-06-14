@@ -70,7 +70,7 @@ else
 end
 
 %% Write to scene_material.pbrt texture-material file
-output = thisR.materials.outputFile_materials;
+output = thisR.get('materials output file'); 
 fileID = fopen(output,'w');
 fprintf(fileID,'# Exported by piMaterialWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 
