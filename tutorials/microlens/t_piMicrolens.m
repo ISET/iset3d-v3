@@ -19,11 +19,11 @@
 
 %% 
 ieInit
-piDockerConfig;
+if ~piDockerExists, piDockerConfig; end
+if isempty(which('lensC')), error('Add isetlens to your path'); end
+
 
 %% Help command for the lenstool insertmicrolens
-%
-% Copy and paste this into a terminal window
 %
 status = system('docker run -ti --rm vistalab/pbrt-v3-spectral lenstool');
 

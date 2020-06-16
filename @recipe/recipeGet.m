@@ -205,18 +205,24 @@ switch ieParamFormat(param)  % lower case, no spaces
             case 'perspective'
                 val = 'pinhole (perspective)';
             otherwise
-                % I think this includes realisticeye and omni
-                try
-                    % Make sure the lensfile is in the data/lens directory.
-                    [~,name,ext] = fileparts(thisR.camera.lensfile.value);
-                    val = [name,ext];
-                    val = fullfile(piRootPath,'data','lens',val);
-                    if ~exist(val,'file')
-                        error('Unknown lens file %s\n',val);
+                % I think this is used by omni, particularly for microlens
+                % cases.  We might do something about putting the microlens
+                % examples in the data/lens directory and avoiding this
+                % problem.
+                
+                % Make sure the lensfile is in the data/lens directory.
+                [~,name,ext] = fileparts(thisR.camera.lensfile.value);
+                baseName = [name,ext];
+                val = fullfile(piRootPath,'data','lens',baseName);
+                if ~exist(val,'file')
+                    val = which(baseName);
+                    if isempty(val)
+                        error('Can not find the lens file %s\n',val);
+                    else
+                        fprintf('Using lens file at %s\n',val);
                     end
-                catch
-                    error('Problem with reading lens for camera type %s\n',subType);
                 end
+           
         end
     case {'lensdir','lensdirinput'}
         % 
