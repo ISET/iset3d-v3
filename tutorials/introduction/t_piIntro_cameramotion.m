@@ -24,11 +24,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt files
 
-FilePath = fullfile(piRootPath,'data','V3','SimpleScene');
-fname = fullfile(FilePath,'SimpleScene.pbrt');
-if ~exist(fname,'file'), error('File not found'); end
-
-thisR = piRead(fname);
+thisR = piRecipeDefault('scene name','SimpleScene');
 
 %% Set render quality
 
@@ -43,13 +39,14 @@ thisR.set('rays per pixel',128);
 % bounce, so it will not appear like glass or mirror.
 thisR.set('bounces',2);
 
+thisR.set('fov',45);
+
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on
 % automobile parts. 
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-thisR.set('fov',45);
 
 % We have to check what happens when the sceneName is the same as the
 % original, but we have added materials.  This section here is

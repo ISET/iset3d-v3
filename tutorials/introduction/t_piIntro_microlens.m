@@ -26,40 +26,54 @@ chdir(fullfile(piRootPath,'local'))
 
 % thisR = piRecipeDefault('scene name','living-room');
 % thisR = piRecipeDefault('scene name','kitchen');
-% thisR = piRecipeDefault('scene name','chessSet');
-% thisR = piRecipeDefault('scene name','SimpleScene'); 
+% {
+ thisR = piRecipeDefault('scene name','chessSet'); 
+ % from = [0.0000    0.0700   -0.7000];
+ % to = [ 0.0000    0.0700    0.5000];
+%}
 
-thisR  = piRecipeDefault; 
+%{
+ thisR = piRecipeDefault('scene name','SimpleScene'); 
+ to = [0    0.5000  -14.0000]; 
+ from = [0    0.5000  -15.0000];
+%}
+
+%{
+% Macbeth case
+thisR  = piRecipeDefault; z = -2.7;
+%}
 
 %% Create the microlens
 
-% This microlens is only 2 um high.  So, we scale it
-microlensName = fullfile(piRootPath,'data','lens','microlens.json');
-microlens     = lensC('filename',microlensName);
-currentHeight = microlens.get('lens height');
-desiredHeight = 0.012;   % millimeters
-microlens.scale(desiredHeight/currentHeight);
-microlens.name = sprintf('%s-scaled',microlens.name);
-fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
-    microlens.focalLength,microlens.get('lens height'));
+% Set the microlens size to 12 microns using the
+% microlens.scale method.
+microlens     = lensC('filename','microlens.json');
+desiredHeight = 0.012;                       % mm
+microlens.adjustSize(desiredHeight);
+fprintf('Focal length =  %.3f (mm)\nHeight = %.3f (mm)F-number %.3f\n',...
+    microlens.focalLength,microlens.get('lens height'), microlens.focalLength/microlens.get('lens height'));
 
 %% Choose the imaging lens 
 
 % For the dgauss lenses 22deg is the half width of the field of view
-imagingLensName = fullfile(piRootPath,'data','lens','dgauss.22deg.3.0mm.json');
-imagingLens     = lensC('filename',imagingLensName);
+imagingLens     = lensC('filename','dgauss.22deg.3.0mm.json');
 fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
     imagingLens.focalLength,imagingLens.get('lens height'))
 
 %% Set up the microlens array and film size
 
-% Choose an even number for nMicrolens.  This assures that the sensor and
-% ip data have the right integer relationships.
-pixelsPerMicrolens = 5;
+% Choose an even number for nMicrolens.  
+% This assures that the sensor and ip data have the right integer
+% relationships. 
 nMicrolens = [40 40]*4;   % Appears to work for rectangular case, too
+
+% 
+filmheight = nMicrolens(1)*microlens.get('lens height');
+filmwidth  = nMicrolens(2)*microlens.get('lens height');
+
+% 5x5 array beneath each microlens
+pixelsPerMicrolens = 3;
 pixelSize  = microlens.get('lens height')/pixelsPerMicrolens;   % mm
-filmheight = nMicrolens(1)*pixelsPerMicrolens*pixelSize;
-filmwidth  = nMicrolens(2)*pixelsPerMicrolens*pixelSize;
 filmresolution = [filmheight, filmwidth]/pixelSize;
 
 %% Build the combined lens file using the docker lenstool
@@ -96,18 +110,28 @@ thisR.set('film diagonal',sqrt(filmwidth^2 + filmheight^2));
 % Film resolution -
 thisR.set('film resolution',filmresolution);
 
+%{
+% Chess set case
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
-thisR.set('from',[0 0.14 -0.7]);     % Get higher and back away than default
-thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
+thisR.set('from',from);     % Get higher and back away than default
+thisR.set('to',  to);  % Look down default compared to default
+thisR.set('rays per pixel',32);  % 32 is small
+%}
+%{
+% Simple scene
+thisR.set('from',from);     % Get higher and back away than default
+thisR.set('to',  to);       % Look down default compared to default
 thisR.set('rays per pixel',128);
+%}
 
 % We can use bdpt if you are using the docker with the "test" tag (see
 % header). Otherwise you must use 'path'
 thisR.integrator.subtype = 'path';  
 
-thisR.set('aperture diameter',3);   
+% This is the aperture of the imaging lens of the camera in mm
+thisR.set('aperture diameter',6);   
 
 % thisR.summarize('all');
 
@@ -122,9 +146,12 @@ piWrite(thisR,'creatematerials',true);
 % distance in the scene.
 [lensFilm, infocusDistance] = piRenderResult(result);
 
-%%
-oi = oiSet(oi,'name',sprintf('%s-%d',oiName,thisR.camera.aperturediameter.value));
+%% Name and show the OI
+
+oi = oiSet(oi,'name',...
+    sprintf('%s-%d',thisR.get('input basename'),thisR.get('aperture diameter')));
 oiWindow(oi);
+truesize
 
 %% Lightfield manipulations
 
