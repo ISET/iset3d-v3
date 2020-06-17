@@ -255,7 +255,7 @@ if exist(inputFile_materials,'file')
     headerCheck_material = tmp{1};
     fclose(fileID);
     
-    if piContains(headerCheck_material{1}, 'Exported by piMaterialWrite')
+    if ~piContains(headerCheck_material{1}, 'Exported by piMaterialWrite')
         if isequal(exporterFlag,true) && isequal(thisR.exporter,'C4D')
             % Everything is fine
         else
