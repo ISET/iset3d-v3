@@ -40,6 +40,8 @@ function val = recipeGet(thisR, param, varargin)
 %     'pupil diameter'   - In millimeters
 %     'fov'              - (Field of view) only used if 'optics type' is
 %                          'pinhole' 
+%     'depth range'      - Depth range of the scene elements given the
+%                          camera position
 %
 %    % Light field camera
 %     'n microlens'      - 2-vector, row,col (alias 'n pinholes')
@@ -298,6 +300,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm
             val           = atand(filmDiag/2/filmDistance);
         end
+    case 'depthrange'
+        % dRange = thisR.get('depth range');
+        % Values in meters
+        val = piSceneDepth(thisR);
+        
     case 'pupildiameter'
         % Default is millimeters
         val = 0;  % Pinhole

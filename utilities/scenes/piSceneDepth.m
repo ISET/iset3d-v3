@@ -6,16 +6,25 @@ function [depthrange, depthmap] = piSceneDepth(thisR)
 %
 % Brief description
 %   Calculate the depth image quickly and return the depth range and a
-%   depth map (meters).
+%   depth map histogram (meters).
 %
 % Wandell, 2019
 %
 % See also
 %  t_piIntro_lens
 
+% TODO:  See issue we have with the lens.
+
+%% Make a version of the recipe that matches but with a pinhole
+
+% We think we should not have to do this to correctly get the depth.  The
+% PBRT calculation should be independent of the lens!!!
+pinholeR        = thisR.copy;
+pinholeR.camera = piCameraCreate('pinhole');
+
 %% The render returns the depth map in meters
 
-depthmap   = piRender(thisR, 'render type','depth');
+depthmap   = piRender(pinholeR, 'render type','depth');
 tmp        = depthmap(depthmap > 0);
 depthrange = [min(tmp(:)), max(tmp(:))];
 
@@ -24,7 +33,7 @@ depthrange = [min(tmp(:)), max(tmp(:))];
 if nargout == 0
     ieNewGraphWin;
     histogram(depthmap(:));
-    xlabel('mm'); ylabel('n pixels'); set(gca,'yscale','log');
+    xlabel('m'); ylabel('n pixels'); set(gca,'yscale','log');
     grid on;
 end
 

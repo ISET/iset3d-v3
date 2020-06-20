@@ -70,8 +70,12 @@ thisR.set('outputFile',outFile);
 
 %% To determine the range of object depths in the scene
 
-% [depthRange, depthHist] = piSceneDepth(thisR);
-% histogram(depthHist(:)); xlabel('Depth (m)'); grid on
+% depthRange = thisR.get('depth range');
+%
+% Runs this function
+%   [depthRange, depthHist] = piSceneDepth(thisR);
+%   histogram(depthHist(:)); xlabel('Depth (m)'); grid on
+%
 depthRange = [0.1674, 3.3153];  % Chess set distances in meters
 
 %% Add camera with lens
