@@ -84,6 +84,9 @@ p.addRequired('param',@ischar);
 
 p.parse(thisR,param);
 
+val = [];
+
+%%
 switch ieParamFormat(param)  % lower case, no spaces
     
     % File management
@@ -244,57 +247,150 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'focusdistance','focaldistance'}
         % recipe.get('focal distance')  (m)
         %
-        % Distance in object space to the focal plane. If a lens type,
-        % we check whether the lens can bring this distance into focus
-        % on the film plane.
+        % Distance in object space that is in focus on the film. If the
+        % camera model has a lens, we check whether the lens can bring this
+        % distance into focus on the film plane.
+        %
+        % N.B.  For pinhole this is focal distance.  
+        %       For lens, this   is focus distance.
+        %
         opticsType = thisR.get('optics type');
         switch opticsType
             case {'pinhole','perspective'}
-                % Everything is in focus for a pinhole camera
+                % Everything is in focus for a pinhole camera.  For
+                % pinholes and perspect this is focaldistance.  But not for
+                % realistic or omni.
                 val = thisR.camera.focaldistance.value;
-                warning('Pinhole optics.  No real focal distance');
             case {'environment'}
                 % Everything is in focus for the panorama
                 disp('Panorama rendering. No focal distance');
                 val = NaN;
             case 'lens'
                 % Focal distance given the object distance and the lens file
-                % [p,flname,ext] = fileparts(thisR.camera.lensfile.value);
-                % focalLength = load(fullfile(p,[flname,'.FL.mat']));  % Millimeters
-                val = thisR.camera.focusdistance.value;
-                lensFile = thisR.get('lens file');
+                val      = thisR.camera.focusdistance.value; % Meters
                 
-                % Not required, but aiming to be helpful.  Convert the
-                % distance to the focal plane into millimeters and see
-                % whether the lens can adjust the film distance so
-                % that the plane is in focus.
-                if lensFocus(lensFile,1e+3*val) < 0
-                    warning('%s lens cannot focus at this distance.', lensFile);
-                end
-                
+                % If isetlens is on the path, we convert the distance to
+                % the focal plane into millimeters and warn if there is no
+                % film distance that will bring the object into focus.
+                if exist('lensFocus','file')
+                    % This will run if isetlens is on the path.  Then the
+                    % function lensFocus will be on the path
+                    lensFile     = thisR.get('lens file');
+                    filmdistance = lensFocus(lensFile,val*1e+3); %mm
+                    if filmdistance < 0
+                        warning('%s lens cannot focus an object at this distance.', lensFile);
+                    end
+                end                
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
+    case {'filmdistance'}
+        % thisR.get('film distance'); % Returned in m
+        %
+        % If the camera is a pinhole, we might have a filmdistance.  We
+        % don't understand that.
+        %
+        % When there is a lens, PBRT sets the filmdistance so that an
+        % object at the focaldistance is in focus. This is a means of
+        % calculating roughly where that will be.  It requires having
+        % isetlens on the path, though.
+        %
+        opticsType = thisR.get('optics type');
+        switch opticsType
+            case {'pinhole','perspective'}
+                % Calculate this from the fov, if it is not already stored.
+                if isfield(thisR.camera,'filmdistance')
+                    val = thisR.camera.filmdistance.value;
+                else
+                    % Compute the distance to achieve the diagonal fov.  We
+                    % might have to make this match the smaller size (x or
+                    % y) because of PBRT conventions.  Some day.  For now
+                    % we use the diagonal.
+                    fov = thisR.get('fov');
+                    filmDiag = thisR.get('film diagonal');
+                    val = (filmDiag/2)/atan(fov);
+                end
+            case 'lens'
+                if exist('lensFocus','file')
+                    opticsType = thisR.get('optics type');
+                    if strcmp(opticsType,'lens')
+                        lensFile = thisR.get('lens file');
+                        if exist('lensFocus','file')
+                            % If isetlens is on the path, we convert the
+                            % distance to the focal plane into millimeters
+                            % and see whether there is a film distance so
+                            % that the plane is in focus.
+                            % 
+                            % But we return the value in meters
+                            val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
+                        else
+                            % No lensFocus, so tell the user about isetlens
+                            warning('Add isetlens to your path if you want the film distance estimate')
+                        end
+                        if ~isempty(val) && val < 0
+                            warning('%s lens cannot focus an object at this distance.', lensFile);
+                        end
+                    end
+                end
+            case 'environment'
+                % No idea
+            otherwise
+                error('Unknown opticsType %s\n',opticsType);
+        end
+        
     case {'fov','fieldofview'}
         % recipe.get('fov') - degrees
         % 
-        % Correct for pinhole, but just an approximation for lens
-        % camera.
+        % For the pinhole the film distance and the field of view always
+        % match.  The fov is normally stored which implies a film distance
+        % and film size.
+        %
         filmDiag      = thisR.get('film diagonal'); 
-        if isequal(thisR.get('optics type'),'pinhole')
+        if isequal(thisR.get('optics type'),'pinhole')    
             if isfield(thisR.camera,'fov')
-                val = thisR.camera.fov.value;
+                % The fov was set.
+                val = thisR.camera.fov.value;  % There is an FOV
+                if isfield(thisR.camera,'filmdistance')
+                    % A consistency check.  The field of view should make
+                    % sense for the film distance.
+                    tst = atand(filmDiag/2/thisR.camera.filmdistance.value);
+                    assert(abs((val/tst) - 1) < 0.01);
+                end 
+                %{
+                % fov = tan(filmDiag/2/filmDistance)
+                filmDistance = (filmDiag/2)/atan(fov);
+                thisR.set('film distance',filmDistance)
+                %}
+                %{
+                % Old not sure why it was here.
                 filmratio = thisR.film.xresolution.value/thisR.film.yresolution.value;
                 if filmratio > 1
+                    % x is bigger.  So we correct.
                     val = 2*atand(tand(val/2)*filmratio); 
                 end
+                %}
             else
+                % If there is no FOV, then we have to have a film
+                % distance and size to know the FOV.  This code will break
+                % if we do not have the film distance.
                 val = atand(filmDiag/2/thisR.camera.filmdistance.value);
+                
+                % We don't set the fov this because PBRT does not expect
+                % the diagonal field of view, it expects the minimum of the
+                % height and width fov.  So we aren't sure what to do.
+                %
+                % thisR.set('fov',val);
             end
         else
+            % There is a lens.
+            %
             % Coarse estimate of the diagonal FOV (degrees) for the
             % lens case. Film diagonal size and distance from the film
             % to the back of the lens.
+            if ~exist('lensFocus','file')
+                warning('To calculate FOV you need isetlens on your path');
+                return;
+            end
             focusDistance = thisR.get('focus distance');    % meters
             lensFile      = thisR.get('lens file');
             filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm

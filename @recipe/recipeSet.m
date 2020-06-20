@@ -16,15 +16,15 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %    inputfile
 %
 %  Scene and camera
-%    object distance
 %    camera
+%    object distance (also focus distance)
 %    exposure time
 %
 %  Film/sensor
-%    filmdiagonal
-%    filmdistance
-%    filmresolution
-%    pixelsamples or raysperpixel
+%    film diagonal
+%    film distance
+%    film resolution
+%    rays per pixel
 %
 %  Lens
 %    lensfile - json format for omni case.  dat format for realistic.
@@ -161,12 +161,13 @@ switch param
         % focus.
         %
         % Depending on the camera type, the parameter name is either
-        % focusdistance or focaldistance. Historical annoyance.
+        % focusdistance or focaldistance. Historical annoyance in PBRT.
         if isequal(thisR.camera.subtype,'pinhole')||...
                 isequal(thisR.camera.subtype,'perspective')
             thisR.camera.focaldistance.value = val;
             thisR.camera.focaldistance.type = 'float';
         else
+            % When there is a lens.  Omni.  Realistic.
             thisR.camera.focusdistance.value = val;
             thisR.camera.focusdistance.type = 'float';
         end

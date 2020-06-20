@@ -13,7 +13,10 @@ function [depthrange, depthmap] = piSceneDepth(thisR)
 % See also
 %  t_piIntro_lens
 
-% TODO:  See issue we have with the lens.
+% TODO:  See issue we have with the lens.  Here we remove the camera and
+% replace it with a pinhole.  But really PBRT should also return the same
+% depth map even if there is a lens.  When we are computing the depth map
+% PBRT should use a pinhole.  I think!
 
 %% Make a version of the recipe that matches but with a pinhole
 
