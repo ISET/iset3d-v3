@@ -285,7 +285,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 error('Unknown camera type %s\n',opticsType);
         end
     case {'filmdistance'}
-        % thisR.get('film distance'); % Returned in m
+        % thisR.get('film distance'); % Returned in meters
         %
         % If the camera is a pinhole, we might have a filmdistance.  We
         % don't understand that.
