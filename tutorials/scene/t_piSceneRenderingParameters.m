@@ -2,12 +2,15 @@
 %
 % Maybe t_piSetRenderingParameters
 %
-%    1.  We show to calculate the distance to the scene from the current
-%    camera position
+%   1.  We show to calculate the distance to the scene from the current
+%       camera position
 %
-%    2.  We show how to set the film size correctly given a lense.
+%   2.  We show how to change a lens and set its position.
 %
+%   3.  We show how to set the film size correctly given a lens.
 %
+%   3.  We show how to adjust the focal distance from one object to another
+%   
 
 %% Load a test scene
 
@@ -63,7 +66,7 @@ fprintf('Min %f Max %f Mean %f\n',dRange(1),dRange(2), mean(dRange));
 thisR = piCameraTranslate(thisR,'z shift',2,'fromto','from');
 thisR.get('object distance')
 
-%%  When we change the lens, we check the new film size
+%%  How to adjust the film size
 
 lensfile  = 'dgauss.22deg.3.0mm.json';    % 30 38 18 10
 thisR.camera = piCameraCreate('omni','lensFile',lensfile);
@@ -78,16 +81,23 @@ thisR.set('focal distance',objectDistance);
 fov = 20;
 filmDistance = thisR.get('film distance');  % meters
 
+% The formula for the new film distance is this
+%
 % tan(fov) = filmDiag/filmDistance
 % tand(fov/2) = filmDiag/2/filmDistance
 % filmDiag = tand(fov/2)*filmDistance*2
 %
+% For realistic this would work
+%   filmDiagonal = piCameraFilmSize(thisR,fov);
+%
+% Not sure about pinhole.
+%
 filmDiagonal = filmDistance*tand(fov/2)*2;    % mm
-thisR.set('film diagonal',filmDiagonal*1e3);  % Set in meters
+thisR.set('film diagonal',filmDiagonal*1e3);  % Set in millimeters
 
 %% Show the effect of changing the focal distance
 
-% So the focus is easier to see
+% Add many more rays so the focus sharpness is easier to see
 thisR.set('rays per pixel',256);
 
 piWrite(thisR);

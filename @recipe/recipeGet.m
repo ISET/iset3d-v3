@@ -285,7 +285,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 error('Unknown camera type %s\n',opticsType);
         end
     case {'filmdistance'}
-        % thisR.get('film distance'); % Returned in meters
+        % thisR.get('film distance',unit); % Returned in meters
         %
         % If the camera is a pinhole, we might have a filmdistance.  We
         % don't understand that.
@@ -338,6 +338,11 @@ switch ieParamFormat(param)  % lower case, no spaces
                 error('Unknown opticsType %s\n',opticsType);
         end
         
+        % Adjust spatial units per user's specification
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1});
+        end
+            
     case {'fov','fieldofview'}
         % recipe.get('fov') - degrees
         % 

@@ -364,9 +364,12 @@ switch param
         
         % Film parameters
     case 'filmdiagonal'
+        % thisR.set('film diagonal',val)
+        % Default units are millimeters, Sigh.
         thisR.film.diagonal.type = 'float';
         thisR.film.diagonal.value = val;
     case {'filmdistance'}
+        % Set in meters. Sigh again.
         thisR.camera.filmdistance.type = 'float';
         thisR.camera.filmdistance.value = val;
     case 'filmresolution'
