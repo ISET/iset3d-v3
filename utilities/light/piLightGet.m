@@ -54,8 +54,15 @@ if ~isempty(idx)
     % Just one of the lights
     thisLight = lightSources{idx};
     if ~isempty(param)
-        % A parameter of that light
-        val = thisLight.(param);
+        switch param
+            case 'spd'
+                % spd = piLightGet(thisR,'idx',1,'param','spd');
+                val = ieReadSpectra(thisLight.lightspectrum);
+                val = val*thisLight.spectrumscale;
+            otherwise
+                % A parameter of that light
+                val = thisLight.(param);
+        end        
     else
         val = thisLight;
     end
@@ -73,7 +80,7 @@ if p.Results.print
     for ii = 1:length(lightSources)
         if isfield(lightSources{ii},'spectrum')
             fprintf('%d: name: %s     type: %s     spectrum:  %s\n', ii,...
-                lightSources{ii}.name,lightSources{ii}.type,lightSources{ii}.spectrum);
+                lightSources{ii}.name,lightSources{ii}.type,lightSources{ii}.lightspectrum);
         else
             fprintf('%d: name: %s     type: %s\n', ii,...
                 lightSources{ii}.name,lightSources{ii}.type);

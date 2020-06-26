@@ -33,9 +33,9 @@ function thisR = piLightAdd(thisR, varargin)
 %                         'coneangle', and 'conedeltaangle.'
 %          'distant' - A directional light source "at
 %                         infinity". Takes parameters 'to' and 'from'.
-%          'area'    - convert an object into an area light. (TL: Needs
-%                         more documentation; I'm not sure how it's used at
-%                         the moment.)
+%          'area'    - convert an object into an area light. These can be
+%                      specified only for triangle, sphere, cylinder, and
+%                      disk shapes, but they must have a shape.
 %          'infinite' - an infinitely far away light source that
 %                          potentially casts illumination from all
 %                          directions. Takes no parameters.
