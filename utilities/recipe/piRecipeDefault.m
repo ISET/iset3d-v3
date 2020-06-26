@@ -171,6 +171,11 @@ switch sceneName
         fname = fullfile(FilePath,['MacBethCheckerCus','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
+    case 'cornell_box'
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['cornell_box','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';
     otherwise
         error('Can not identify the scene, %s\n',sceneName);
 end

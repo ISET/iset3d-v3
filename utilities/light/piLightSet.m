@@ -45,6 +45,7 @@ function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
 %  'camera coordinate' - true or false. automatically place the light
 %                            at the camera location.
 %
+% ieExamplesPrint('piLightSet');
 %
 % Zheng,BW, SCIEN, 2020
 %
@@ -52,7 +53,7 @@ function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
 %   piLightCreate, piLightDelete, piLightAdd, piLightGet
 %
 
-% Examples
+% Examples:
 %{
     thisR = piRecipeDefault;
     thisR = piLightDelete(thisR, 'all');
@@ -75,7 +76,6 @@ function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
     [scene, result] = piRender(thisR, 'render type','radiance');
     sceneWindow(scene);
 %}
-
 %{
     % Apply translation and rotation on light
     thisR = piRecipeDefault;

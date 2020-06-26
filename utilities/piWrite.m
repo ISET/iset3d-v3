@@ -27,11 +27,11 @@ function workingDir = piWrite(thisR,varargin)
 %
 %   overwrite pbrtfile  - If scene PBRT file exists,    overwrite (default true)
 %   overwrite resources - If the resources files exist, overwrite (default true) 
-%   overwrite lensfile    
-%   overwrite materials 
-%   overwrite geometry 
-%   overwrite json
-%   creatematerials   
+%   overwrite lensfile  - Logical. Default true  
+%   overwrite materials - Logical. Default true
+%   overwrite geometry  - Logical. Default true
+%   overwrite json      - Logical. Default true
+%   creatematerials     - Logical. Default false
 %   lightsFlag         
 %   thistrafficflow   
 %
