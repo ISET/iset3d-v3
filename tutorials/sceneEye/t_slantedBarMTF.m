@@ -42,11 +42,11 @@ myScene.accommodation = 2;
 myScene.pupilDiameter = 4;
 myScene.fov = 4;
 
-myScene.debugMode = true;
-scene = myScene.render;
+%% Render with debugging on
 
-vcAddObject(scene);
-sceneWindow;
+myScene.debugMode = true;  % We return a scene
+scene = myScene.render;
+sceneWindow(scene);
 
 %% Try moving the slanted bar in and out of focus
 
@@ -66,18 +66,18 @@ for ii = 1:length(planeDistance)
     myScene = sceneEye('slantedBar','planeDistance',planeDistance(ii));
     myScene.name = sprintf('slantedBar_%0.2fm',planeDistance(ii));
     
-    myScene.numRays = 64;
+    myScene.numRays    = 64;
     myScene.resolution = 128;
     myScene.numCABands = 8;
     
-    myScene.accommodation = 1/0.5; 
-    myScene.pupilDiameter = 4;
-    myScene.fov = 3;
+    myScene.accommodation = 1/0.5; % Diopters
+    myScene.pupilDiameter = 4;     % mm
+    myScene.fov = 3;               % deg
 
+    % Not in debug mode, so we have an OI
     oi = myScene.render;
     
-    ieAddObject(oi);
-    oiWindow;
+    oiWindow(oi);
 
 end
 

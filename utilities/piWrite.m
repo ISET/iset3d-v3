@@ -382,6 +382,8 @@ function piWriteBlocks(thisR,fileID)
 % Loop through the thisR fields, writing them out as required
 %
 
+workingDir = thisR.get('output dir');
+
 % These are the main fields in the recipe.  We call them the outer fields.
 % Within each outer field, there will be inner fields.
 outerFields = fieldnames(thisR);

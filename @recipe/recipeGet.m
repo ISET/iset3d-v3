@@ -209,6 +209,9 @@ switch ieParamFormat(param)  % lower case, no spaces
                 val = 'pinhole';
             case 'perspective'
                 val = 'pinhole (perspective)';
+            case 'realisticeye'
+                % Normally empty.  Not sure why we have this here.
+                val = thisR.camera.lensfile.value;
             otherwise
                 % I think this is used by omni, particularly for microlens
                 % cases.  We might do something about putting the microlens
@@ -342,7 +345,66 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isempty(varargin), return;
         else, val = val*ieUnitScaleFactor(varargin{1});
         end
+        
+    % realisticEye parameters
+    case {'retinadistance'}
+        % Default storage in mm.  Hence the scale factor on units
+        if isequal(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.retinaDistance.value;
+        else, error('%s only exists for realisticEye model',param);
+        end
+        % Adjust spatial units per user's specification
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1})*1e3;
+        end
+        
+    case {'retinaradius'}
+        % Default storage in mm.  Hence the scale factor on units
+        if isequal(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.retinaDistance.value;
+        else, error('%s only exists for realisticEye model',param);
+        end
+        % Adjust spatial units per user's specification
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1});
+        end
+        
+    case {'retinasemidiam'}
+        % Curved retina parameter.
+        % Default storage in mm.  Hence the scale factor on units
+        if isequal(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.retinaDistance.value;
+        else, error('%s only exists for realisticEye model',param);
+        end
+        % Adjust spatial units per user's specification
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1})*1e3;
+        end
+        
+    case {'ior1'}
+        % Index of refraction 1
+        if isequal(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.retinaDistance.value;
+        else, error('%s only exists for realisticEye model',param);
+        end
+    case {'ior2'}
+        % Index of refraction 1
+        if isequal(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.retinaDistance.value;
+        else, error('%s only exists for realisticEye model',param);
+        end
+    case {'ior3'}
+        if isequal(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.retinaDistance.value;
+        else, error('%s only exists for realisticEye model',param);
+        end
+    case {'ior4'}
+        if isequal(thisR.camera.subtype,'realisticEye')
+            val = thisR.camera.retinaDistance.value;
+        else, error('%s only exists for realisticEye model',param);
+        end
             
+    % Back to the general case
     case {'fov','fieldofview'}
         % recipe.get('fov') - degrees
         % 
@@ -362,6 +424,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     assert(abs((val/tst) - 1) < 0.01);
                 end 
                 %{
+                % Delete by August 1, 2020.
                 % fov = tan(filmDiag/2/filmDistance)
                 filmDistance = (filmDiag/2)/atan(fov);
                 thisR.set('film distance',filmDistance)
@@ -407,11 +470,16 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = piSceneDepth(thisR);
         
     case 'pupildiameter'
-        % Default is millimeters
-        val = 0;  % Pinhole
-        if strcmp(thisR.camera.subtype,'realisticEye')
-            val = thisR.camera.pupilDiameter.value;
+        % Default units are millimeters
+        switch ieParamFormat(thisR.camera.subtype)
+            case 'pinhole'
+                val = 0;  
+            case 'realisticeye'                
+                val = thisR.camera.pupilDiameter.value;
+            otherwise
+                disp('Need to figure out pupil diameter!!!')
         end
+
     case 'chromaticaberration'
         % thisR.get('chromatic aberration')
         % True or false (on or off)
@@ -485,13 +553,22 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         % Rendering related
     case{'maxdepth','bounces','nbounces'}
+        % Number of bounces.  If not specified, 1.  Otherwise ...
+        val = 1;
         if isfield(thisR.integrator,'maxdepth')
-            val = thisR.integrator.maxdepth.value;
+            val = thisR.integrator.maxdepth.value;            
         end
         
     case{'integrator'}
         if isfield(thisR.integrator,'subtype')
             val = thisR.integrator.subtype;
+        end
+    case {'nwavebands'}
+        % Not sure about this.  Initialized this way because expected this
+        % way in sceneEye.  Could be updated once we understand.
+        val = 0;
+        if(isfield(thisR.renderer, 'nWaveBands'))
+            val = thisR.renderer.nWaveBands.value;
         end
         
     case{'camerabody'}

@@ -13,6 +13,7 @@ if ~isequal(piCamBio,'isetbio')
     return;
 end
 ieInit;
+if ~piDockerExists, piDockerConfig; end
 
 %% Load scene
 
