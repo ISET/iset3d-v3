@@ -1,10 +1,5 @@
 %% Render a Cornell box
 %
-% Status:   Error on line 37.  Adding the light has a problem with the
-% translate parameter.  Error at the end with the iLightDelete().
-%
-% piLightDelete is a problem on line 53.
-%
 % Zhenyi, SCIEN
 
 %%
@@ -15,6 +10,9 @@ if ~piDockerExists, piDockerConfig; end
 
 sceneName = 'cornell_box';
 thisR = piRecipeDefault('scene name',sceneName);
+
+thisR.set('rays per pixel',128);
+thisR.set('nbounces',5);
 
 %%
 piWrite(thisR); scene = piRender(thisR,'render type','radiance');
@@ -33,11 +31,13 @@ thisR = piLightAdd(thisR, 'type', 'spot', ...
     'cameracoordinate', true, ...
     'cone angle',18);
 
-% Default light spectrum is D65
-% Not sure this light shows up at all!
 %{
+% This does not work yet.  We will improve the code get these area lights
+% with different shapes going. 
 thisR = piLightAdd(thisR, 'type', 'area', ...
     'name','Area light 1',...
+    'shape','sphere', ...
+    'radius',0.2,...
     'lightspectrum', 'Tungsten');
 %}
 %{
@@ -58,9 +58,6 @@ thisR.set('fov',fov);
 filmRes = [384 256];
 thisR.set('film resolution',filmRes);
 
-thisR.set('rays per pixel',64);
-thisR.set('nbounces',5);
-
 thisR.integrator.subtype ='directlighting'; 
 
 %% Write and render
@@ -75,9 +72,19 @@ sceneWindow(scene);
 
 %% Add another point light
 
-% The relative intensity is a problem.  Hence the gamma below.  FIgure out
-% how to deal with this.
-thisR = piLightAdd(thisR, 'type', 'point', 'from',[-0.25,-0.25,1.68]);
+% The relative intensity is a problem.
+%
+% function [idx, light] = piLightFind(thisR,'param',val)
+%
+% spd = piLightGet(thisR,'idx',1,'param','spd');
+%
+% thisR = piLightDelete(thisR,2);
+thisR = piLightAdd(thisR, 'type', 'point', ...
+    'from',[-0.25,-0.25,1.68], ...
+    'spectrum scale', 1e-10);
+% spd = piLightGet(thisR,'idx',2,'param','spd');
+% ieNewGraphWin; plot(spd)
+
 piWrite(thisR, 'creatematerials', true);
 [scene, result] = piRender(thisR, 'rendertype', 'radiance');
 
