@@ -22,8 +22,21 @@ function thisR = piRecipeDefault(varargin)
 % Outputs
 %   thisR - the recipe
 %
+% Description:
+%  Mainly this function reads in scenes that are already in the data/V3
+%  repository within ISET3D.  Heavy users sometimes add additional scenes
+%  into that directory.
+%
+%  This is an ISETBio way, based on the RDT, to retrieve scenes into
+%  iset3d/local from the RDT. If you do that, you may wish to store the
+%  retrieved data in your own data/V3.
+%
+%  scenePath = fullfile(piRootPath, 'local', 'scenes', 'snellenAtDepth', 'snellen.pbrt');
+%  sceneUnits = 'm';
+%  pullSceneFromRDT('snellenAtDepth', scenePath);
+%
 % See also
-%  recipe
+%  @recipe
 
 % Examples:
 %{
@@ -70,7 +83,7 @@ function thisR = piRecipeDefault(varargin)
    sceneWindow(scene);
 %}
 %{
-   thisR = piRecipeDefault('scene name','MacBethCheckerCusLight');
+   thisR = piRecipeDefault('scene name','MacBeth Checker CusLight');
    piWrite(thisR); 
    scene = piRender(thisR);
    sceneWindow(scene);
@@ -88,90 +101,118 @@ p.parse(varargin{:});
 sceneName = p.Results.scenename;
 write     = p.Results.write;
 
-%%
-switch sceneName
+%%  To read the file,the upper/lower case must be right
+
+% We check based on all lower case, but get the capitalization right by
+% assignment in the case
+switch ieParamFormat(sceneName)
     
-    case 'MacBethChecker'
+    case 'macbethchecker'
+        sceneName = 'MacBethChecker';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'MacBethCheckerBox'
+    case 'macbethcheckerbox'
+        sceneName = 'MacBethCheckerBox';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'MacBethCheckerCus'
+    case 'macbethcheckercus'
+        sceneName = 'MacBethCheckerCus';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'SimpleScene'
+    case 'simplescene'
+        sceneName = 'SimpleScene';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'chessSet'
+    case 'chessset'
+        sceneName = 'chessSet';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Copy';
-    case 'chessSetScaled'
+    case 'chesssetscaled'
+        sceneName = 'chessSetScaled';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Copy';
     case 'checkerboard'
+        sceneName = 'checkerboard';
         FilePath = fullfile(piRootPath,'data','V3','checkerboard');
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
     case 'teapot'
+        sceneName = 'teapot';
         FilePath = fullfile(piRootPath,'data','V3','teapot');
         fname = fullfile(FilePath,'teapot-area-light.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Unknown';
-    case 'slantedBar'
+    case 'slantedbar'
+        sceneName = 'slantedBar';
         FilePath = fullfile(piRootPath,'data','V3','slantedBar');
         fname = fullfile(FilePath,'slantedBar.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'flatSurface'
+    case 'flatsurface'
+        sceneName = 'flatSurface';
         FilePath = fullfile(piRootPath,'data','V3','flatSurface');
         fname = fullfile(FilePath,'flatSurface.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
     case 'sphere'
+        sceneName = 'sphere';
         FilePath = fullfile(piRootPath,'data','V3','sphere');
         fname = fullfile(FilePath,'sphere.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'flatSurfaceWhiteTexture'
+    case 'flatsurfacewhitetexture'
+        sceneName = 'flatSurfaceWhiteTexture';
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceWhiteTexture');
         fname = fullfile(FilePath,'flatSurfaceWhiteTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'flatSurfaceRandomTexture'
+    case 'flatsurfacerandomtexture'
+        sceneName = 'flatSurfaceRandomTexture';
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceRandomTexture');
         fname = fullfile(FilePath,'flatSurfaceRandomTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'flatSurfaceMCCTexture'
+    case 'flatsurfacemcctexture'
+        sceneName = 'flatSurfaceMCCTexture';
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceMCCTexture');
         fname = fullfile(FilePath,'flatSurfaceMCCTexture.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'SimpleSceneLight'
+    case 'simplescenelight'
+        sceneName = 'SimpleSceneLight';
         FilePath = fullfile(piRootPath,'data','V3','SimpleSceneLight');
         fname = fullfile(FilePath,'SimpleScene.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'MacBethCheckerCusLight'
+    case 'macbethcheckercuslight'
+        sceneName = 'MacBethCheckerCusLight';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['MacBethCheckerCus','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
-    case 'cornell_box'
+    case 'cornellbox'
+        sceneName = 'cornell_box';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['cornell_box','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';
+    case 'snellenatdepth'
+        sceneName = 'snellenAtDepth';
+        % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['cornell_box','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end

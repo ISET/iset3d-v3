@@ -51,9 +51,12 @@ thisR.set('pixel samples',64*quality);   % Number of rays set the quality.
  lensfile = 'wide.40deg.6.0mm.json';
  thislens.plot('focal distance');
 %}
-lensfile = 'fisheye.87deg.6.0mm.json'; 
-thislens = lensC('filename',lensfile);
-thislens.draw;
+lensfile = 'fisheye.87deg.6.0mm.json';
+if exist('lensC','file')
+    % If isetlens is on the path ....
+    thislens = lensC('filename',lensfile);
+    thislens.draw;
+end
 
 thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
