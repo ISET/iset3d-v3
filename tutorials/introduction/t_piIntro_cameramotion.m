@@ -63,8 +63,9 @@ piWrite(thisR,'creatematerials',true);
 % We speed this up by only returning radiance.
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
-sceneSet(scene,'display mode','hdr');
-
+if isequal(piCamBio,'isetcam')
+    sceneSet(scene,'display mode','hdr');
+end
 %% Motion blur from camera
 
 % Specify the initial position and rotation of the camera.  We find

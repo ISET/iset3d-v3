@@ -71,7 +71,9 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
-sceneSet(scene,'display mode','hdr');
+if isequal(piCamBio,'isetcam')
+    sceneSet(scene,'display mode','hdr');
+end
 
 %% Adjust the scene material from uber to mirror
 
