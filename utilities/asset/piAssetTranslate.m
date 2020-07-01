@@ -1,17 +1,42 @@
 function asset = piAssetTranslate(asset, translation,varargin)
 % Translation for assets, also updates a bounding box.
 %
-% When an asset (say a car) comes from the database, the positive x is
-% the heading direction.  The default center of the car is 0 0 0.  If
-% the position slot of the asset is not present, we assume the value
-% is [0,0,0]. 
+% Synopsis
+%
+% Brief description
+%
+% Input
+%   asset
+%   translation
+% 
+% Optional key/value pair
+%   instances num
+%
+% Return
+%   asset - the modified asset
+%
+% Description
+%  When an asset (say a car) comes from the database, the positive x is
+%  the heading direction.  The default center of the car is 0 0 0.  If
+%  the position slot of the asset is not present, we assume the value
+%  is [0,0,0].   (Need better comment here).
 %
 % ZL, Vistasoft Team, 2018
+%
+% See also
+%   piAsset*
+%
+% TODO:  We need piAssetGet, piAssetSet
+%
+
 %% 
+varargin = ieParamFormat(varargin);
+
 p = inputParser;
-p.addParameter('instancesNum',1)
+p.addParameter('instancesnum',1)
 p.parse(varargin{:})
-pos_d = p.Results.instancesNum;
+
+pos_d = p.Results.instancesnum;   % The variable name is confusing (BW)
 %%
 for dd = 1:pos_d
     for ii=1:length(asset)

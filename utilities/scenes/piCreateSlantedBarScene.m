@@ -32,7 +32,7 @@ illumination = parser.Results.illumination;
 %% Read in base scene
 scenePath = fullfile(piRootPath,'data','V3','slantedBar');
 sceneName = 'slantedBar.pbrt';
-recipe = piRead(fullfile(scenePath,sceneName),'version',3);
+recipe = piRead(fullfile(scenePath,sceneName));
 
 %% Make adjustments to the plane
 

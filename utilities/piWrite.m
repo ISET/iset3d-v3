@@ -177,7 +177,11 @@ piWriteCopy(thisR,overwriteresources,overwritepbrtfile)
 %% If the optics type is lens, copy the lens file to a lens sub-directory
 
 if isequal(thisR.get('optics type'),'lens')
-    piWriteLens(thisR,overwritelensfile); 
+    % realisticEye has a lens file slot but it is empty. So we check
+    % whether there is a lens file or not.
+    if ~isempty(thisR.get('lensfile'))
+        piWriteLens(thisR,overwritelensfile);
+    end
 end
 
 %% Open up the main PBRT scene file.
@@ -324,7 +328,8 @@ if ~exist(outputLensDir,'dir'), mkdir(outputLensDir); end
 % is a force overwrite, delete and copy.
 if ~exist(outputLensFile,'file')
     copyfile(inputLensFile,outputLensFile);
-elseif overwritelensfile   % It must exist.  So if we are suppoed overwrite
+elseif overwritelensfile   
+    % It must exist.  So if we are supposed overwrite
     delete(outputLensFile);
     copyfile(inputLensFile,outputLensFile);
 end

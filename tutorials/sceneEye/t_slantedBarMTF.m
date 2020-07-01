@@ -48,6 +48,13 @@ myScene.debugMode = true;  % We return a scene
 scene = myScene.render;
 sceneWindow(scene);
 
+%%
+%{
+myScene.debugMode = false;  % We return a scene
+oi = myScene.render;
+oiWindow(scene);
+%}
+
 %% Try moving the slanted bar in and out of focus
 
 % A note on chromatic aberration:
@@ -60,10 +67,13 @@ sceneWindow(scene);
 % change due to longitudinal chromatic aberration.
 
 planeDistance = [0.3 0.5 0.8]; % meters
-
+% planeDistance = 0.8;  % Meters
 for ii = 1:length(planeDistance)
     
-    myScene = sceneEye('slantedBar','planeDistance',planeDistance(ii));
+    % myScene = sceneEye('slantedBar');
+    
+    myScene = sceneEye('slantedBar','planeDistance',planeDistance(ii)); % Create a slanted bar at 0.5 meter
+
     myScene.name = sprintf('slantedBar_%0.2fm',planeDistance(ii));
     
     myScene.numRays    = 64;

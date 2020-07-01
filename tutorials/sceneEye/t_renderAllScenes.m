@@ -7,8 +7,8 @@
 % set certain parameters for certain scenes (e.g. the distance to a
 % textured plane.)
 %
-% To computation time, we do not render any chromatic aberration in
-% the lens.
+% To shorten computation time, we do not use chromatic aberration in the
+% lens.
 %
 % On an 8-core machine, this script takes around 2-3 minutes to run.
 % (Excluding the time it takes to download new scenes from the remote data
@@ -20,7 +20,7 @@
 % TL ISETBIO Team, 2017
 %
 % See also:
-%  t_piIntro_*
+%  t_eyeDoF, t_piIntro_*
 %
 
 %% Initialize
