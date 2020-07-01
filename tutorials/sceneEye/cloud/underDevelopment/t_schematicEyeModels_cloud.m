@@ -2,7 +2,7 @@
 % Render the same scene using a couple of different eye models.
 
 %% Initialize
-if isequal(piCamBio,'isetcam')
+if piCamBio
     fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
     return;
 end

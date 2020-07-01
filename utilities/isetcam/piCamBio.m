@@ -1,8 +1,8 @@
-function iset = piCamBio()
+function [tf, iset] = piCamBio()
 % Returns a string that indicates ISETCam or ISETBio on the path
 %
 % Synopsis
-%    str= piCamBio;
+%    [tf,str]= piCamBio;
 %
 % Inputs
 %   N/A
@@ -11,10 +11,13 @@ function iset = piCamBio()
 %   N/A
 %
 % Returns
+%   tf:  True if isetcam, false if isetbio, false if neither
 %   String - isetcam, isetbio, or an empty string if neither
 %
-%
 % BW ISET Team, 2018
+%
+% See also
+%
 
 %{
    piCamBio
@@ -22,9 +25,9 @@ function iset = piCamBio()
 rPath = which('isetRootPath');
 
 % Figure it out
-if piContains(rPath,'isetbio'),     iset = 'isetbio';
-elseif piContains(rPath,'isetcam'), iset = 'isetcam';
-else,                               iset = '';
+if piContains(rPath,'isetbio'),     iset = 'isetbio'; tf = false;
+elseif piContains(rPath,'isetcam'), iset = 'isetcam'; tf = true;
+else,                               warning('Neither'); iset = ''; tf = false;
 end
 
 end

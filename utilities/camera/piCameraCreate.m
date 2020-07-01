@@ -154,9 +154,9 @@ switch cameraType
         % Move some default accomodated eye and dispersion curves for the
         % eye into the data folder in pbrt2ISET. Fill them into the missing
         % parameters here.
-        camera.type = 'Camera';
-        camera.subtype = 'realisticEye';
-        camera.lensfile.type = 'string';
+        camera.type           = 'Camera';
+        camera.subtype        = 'realisticEye';
+        camera.lensfile.type  = 'string';
         camera.lensfile.value = ''; % FILL IN
         camera.retinaDistance.type = 'float';
         camera.retinaDistance.value = 16.32;

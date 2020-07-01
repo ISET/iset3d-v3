@@ -9,7 +9,7 @@
 
 
 %% Initialize ISETBIO
-if isequal(piCamBio,'isetcam')
+if piCamBio
     fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
     return;
 end

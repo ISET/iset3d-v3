@@ -18,8 +18,9 @@
 %
 % TL ISETBIO Team, 2017
 
-%% Initialize ISETBIO
-if isequal(piCamBio,'isetcam')
+%% Check ISETBIO and initialize
+
+if piCamBio
     fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
     return;
 end
@@ -33,8 +34,21 @@ if ~piDockerExists, piDockerConfig; end
 % right half is black. By default the plane is placed at [0 0 1] meters,
 % but we can change that by given sceneEye an optional 'planeDistance'
 % input. 
-myScene = sceneEye('slantedBar','planeDistance',0.5); % Create a slanted bar at 0.5 meter
+myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
+
+%{
+thisR = myScene.recipe;                               % This is the slanted bar scene PBRT recipe
+thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to its new position
+%}
+
+thisR = piCreateSlantedBarScene(...
+    'planeDepth', p.Results.planeDistance, ...
+    'eccentricity', p.Results.eccentricity);
+
+% Now set the'planeDistance' to 0.5 meters
+
 myScene.name = 'slantedBarFast';
+
 myScene.numRays = 64;
 myScene.resolution = 128; 
 
