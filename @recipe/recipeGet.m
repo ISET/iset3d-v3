@@ -190,15 +190,31 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         % Lens and optics
     case 'opticstype'
-        % perspective means pinhole.  Maybe we should rename.
-        % realisticDiffraction means lens.  Not sure of all the possibilities
-        % yet.
+        % val = thisR.get('optics type');
+        %
+        % perspective means pinhole.
+        % not sure I understand environment
+        % Others include a lens and so we return the val as 'lens'.
+        % Note that for realisticEye we have different types of human eye
+        % models.  See realistic eye model to figure out how to get the
+        % specific eye model.
+        
         val = thisR.camera.subtype;
         if isequal(val,'perspective'), val = 'pinhole';
         elseif isequal(val,'environment'), val = 'environment';
         elseif ismember(val,{'realisticDiffraction','realisticEye','realistic','omni'})
             val = 'lens';
         end
+    case 'realisticeyemodel'
+        % For the realisticEye we have several models.  Over time we will
+        % figure out how to identify them.  We might insert a slot in the
+        % recipe with the label when we create the model.
+
+        if isequal(thisR.get('camera subtype'),'realisticEye') && ...
+                contains(thisR.get('lensfile'),'navarro')
+            val = 'navarro';
+        end
+        
     case {'lensfile','lensfileinput'}
         % The lens file from the data/lens directory.
         

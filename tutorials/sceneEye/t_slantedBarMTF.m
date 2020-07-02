@@ -41,9 +41,21 @@ thisR = myScene.recipe;                               % This is the slanted bar 
 thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to its new position
 %}
 
-thisR = piCreateSlantedBarScene(...
-    'planeDepth', p.Results.planeDistance, ...
-    'eccentricity', p.Results.eccentricity);
+%{
+thisR = myScene.recipe;
+thisR = piCreateSlantedBarScene(); % ('planeDepth', p.Results.planeDistance, 'eccentricity', p.Results.eccentricity);
+piWrite(thisR);
+
+scene = piRender(thisR);
+sceneWindow(scene);
+
+% We would like this to work
+myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
+thisR = myScene.recipe;
+piWrite(thisR);
+[oi, result] = piRender(thisR,'render type','radiance');
+oiWindow(oi);
+%}
 
 % Now set the'planeDistance' to 0.5 meters
 

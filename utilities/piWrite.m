@@ -315,14 +315,26 @@ end
 function piWriteLens(thisR,overwritelensfile)
 % Write out the lens file.  Handle cases of overwrite or not
 %
+% We also manage different human eye model cases for special types of
+% lenses.  These can require auxiliary files like Index of Refraction files
+% for the Navarro eye and ????
+%
+% See also
+%   navarroLensCreate, setNavarroAccommodation
 
 % Make sure the we have the full path to the input lens file
 inputLensFile = thisR.get('lens file');
 
-outputDir = thisR.get('output dir');
+outputDir      = thisR.get('output dir');
 outputLensFile = thisR.get('lens file output');
-outputLensDir = fullfile(outputDir,'lens');
+outputLensDir  = fullfile(outputDir,'lens');
 if ~exist(outputLensDir,'dir'), mkdir(outputLensDir); end
+
+if isequal(thisR.get('realistic eye model'),'navarro')
+    % Write the ior files.  We will need to make sure these files are included in
+    % the scene PBRT file.
+    piWriteLensNavarro(thisR);
+end
 
 % If the working copy doesn't exist, copy it.  If it exists but there
 % is a force overwrite, delete and copy.
