@@ -313,14 +313,14 @@ end
 
 %% Write lens information
 function piWriteLens(thisR,overwritelensfile)
-% Write out the lens file.  Handle cases of overwrite or not
+% Write out the lens file.  Manage cases of overwrite or not
 %
-% We also manage different human eye model cases for special types of
-% lenses.  These can require auxiliary files like Index of Refraction files
-% for the Navarro eye and ????
+% We also manage special human eye model cases Some of these require
+% auxiliary files like Index of Refraction files that are specified using
+% Include statements in the World block.
 %
 % See also
-%   navarroLensCreate, setNavarroAccommodation
+%   navarroWrite, navarroLensCreate, setNavarroAccommodation
 
 % Make sure the we have the full path to the input lens file
 inputLensFile = thisR.get('lens file');
@@ -331,19 +331,19 @@ outputLensDir  = fullfile(outputDir,'lens');
 if ~exist(outputLensDir,'dir'), mkdir(outputLensDir); end
 
 if isequal(thisR.get('realistic eye model'),'navarro')
-    % Write the ior files.  We will need to make sure these files are included in
-    % the scene PBRT file.
-    piWriteLensNavarro(thisR);
-end
-
-% If the working copy doesn't exist, copy it.  If it exists but there
-% is a force overwrite, delete and copy.
-if ~exist(outputLensFile,'file')
-    copyfile(inputLensFile,outputLensFile);
-elseif overwritelensfile   
-    % It must exist.  So if we are supposed overwrite
-    delete(outputLensFile);
-    copyfile(inputLensFile,outputLensFile);
+    % Write lens file and the ior files into the output directory.
+    navarroWrite(thisR);
+    return;
+else
+    % If the working copy doesn't exist, copy it.  
+    % If it exists but there is a force overwrite, delete and copy.
+    if ~exist(outputLensFile,'file')
+        copyfile(inputLensFile,outputLensFile);
+    elseif overwritelensfile
+        % It must exist.  So if we are supposed overwrite
+        delete(outputLensFile);
+        copyfile(inputLensFile,outputLensFile);
+    end
 end
 
 end
@@ -397,6 +397,10 @@ end
 %%
 function piWriteBlocks(thisR,fileID)
 % Loop through the thisR fields, writing them out as required
+%
+% The blocks that are written out include
+%
+%  Camera and lens
 %
 
 workingDir = thisR.get('output dir');
@@ -453,6 +457,7 @@ for ofns = outerFields'
     if(~isempty(innerFields))
         for ifns = innerFields'
             ifn = ifns{1};
+            
             % Skip these since we've written these out earlier.
             if(strcmp(ifn,'type') || ...
                     strcmp(ifn,'subtype') || ...
@@ -464,6 +469,15 @@ for ofns = outerFields'
                 continue;
             end
             
+            %{
+             Many fields are written out in here.  
+             Some examples are 
+             type, subtype, lensfile retinaDistance 
+             retinaRadius pupilDiameter retinaSemiDiam ior1 ior2 ior3 ior4
+             type subtype pixelsamples type subtype xresolution yresolution
+             type subtype maxdepth
+            %}
+            
             currValue = thisR.(ofn).(ifn).value;
             currType  = thisR.(ofn).(ifn).type;
             
@@ -472,36 +486,42 @@ for ofns = outerFields'
                 lineFormat = '  "%s %s" "%s" \n';
                 
                 % The currValue might be a full path to a file with an
-                % extension. We find the base file name and copy the
-                % file to the working directory. Then, we transform
-                % the string to be printed in the pbrt scene file to
-                % be its new relative path.  There is a minor
-                % exception for the lens file.
-                % Perhaps we should have a better test here, say an
+                % extension. We find the base file name and copy the file
+                % to the working directory. Then, we transform the string
+                % to be printed in the pbrt scene file to be its new
+                % relative path.  There is a minor exception for the lens
+                % file. Perhaps we should have a better test here, say an
                 % exist() test. (BW).
                 [~,name,ext] = fileparts(currValue);
 
                 if(~isempty(ext))
-                    % OK, it has an extension.  So we swing into
-                    % action.  First, copy the file to the working
-                    % directory - unless it is a lens file, in which
-                    % case it is already in place (see above)                    
+                    % This looks like a file with an extension. If it is a
+                    % lens file or an iorX.spd file, indicate that it is in
+                    % the lens/ directory. Otherwise, copy the file to the
+                    % working directory.
+                    
                     fileName = strcat(name,ext);
-                    if ~(strcmp(ifn,'specfile') || strcmp(ifn,'lensfile'))
+                    if strcmp(ifn,'specfile') || strcmp(ifn,'lensfile')
+                        % It is a lens, so just update the name.  It
+                        % was already copied
+                        % This should work.
+                        % currValue = strcat('lens',[filesep, strcat(name,ext)]);
+                        if ispc()
+                            currValue = strcat('lens/',strcat(name,ext));
+                        else
+                            currValue = fullfile('lens',strcat(name,ext));
+                        end
+                    elseif piContains(ifn,'ior')
+                        % The the innerfield name contains the ior string,
+                        % then we change it to this
+                        currValue = strcat('lens',[filesep, strcat(name,ext)]);
+                    else
                         [success,~,id]  = copyfile(currValue,workingDir);
                         if ~success && ~strcmp(id,'MATLAB:COPYFILE:SourceAndDestinationSame')
                             warning('Problem copying %s\n',currValue);
                         end
                         % Update the file for the relative path
                         currValue = fileName;
-                    else
-                        % It is a lens, so just update the name.  It
-                        % was already copied
-                        if ispc()
-                            currValue = strcat('lens/',strcat(name,ext));
-                        else
-                            currValue = fullfile('lens',strcat(name,ext));
-                        end
                     end
                 end
                                 

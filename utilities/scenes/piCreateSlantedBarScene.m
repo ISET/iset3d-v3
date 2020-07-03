@@ -1,4 +1,4 @@
-function recipe = piCreateSlantedBarScene(varargin)
+function thisR = piCreateSlantedBarScene(varargin)
 %CREATESIMPLEPOINT 
 % Create a recipe for a slanted bar scene. 
 
@@ -25,14 +25,15 @@ parser.addParameter('whiteDepth',0, @isnumeric);
 parser.addParameter('blackDepth',0, @isnumeric);
 
 parser.parse(varargin{:});
-planeDepth = parser.Results.planeDepth;
+
+planeDepth   = parser.Results.planeDepth;
 eccentricity = parser.Results.eccentricity;
 illumination = parser.Results.illumination;
 
 %% Read in base scene
 scenePath = fullfile(piRootPath,'data','V3','slantedBar');
 sceneName = 'slantedBar.pbrt';
-recipe = piRead(fullfile(scenePath,sceneName));
+thisR = piRead(fullfile(scenePath,sceneName));
 
 %% Make adjustments to the plane
 
@@ -40,17 +41,17 @@ recipe = piRead(fullfile(scenePath,sceneName));
 % Note: Where should this position be calculated from?
 x = tand(eccentricity)*planeDepth;
 
-for ii = 1:length(recipe.assets)
-    if strcmp(recipe.assets(ii).name,'BlackPlane')
-        recipe.assets(ii).position = ...
-            [recipe.assets(ii).position(1)+x;...
-            recipe.assets(ii).position(2);...
+for ii = 1:length(thisR.assets)
+    if strcmp(thisR.assets(ii).name,'BlackPlane')
+        thisR.assets(ii).position = ...
+            [thisR.assets(ii).position(1)+x;...
+            thisR.assets(ii).position(2);...
             planeDepth];
     end
-    if strcmp(recipe.assets(ii).name,'WhitePlane')
-        recipe.assets(ii).position = ...
-            [recipe.assets(ii).position(1)+x;...
-            recipe.assets(ii).position(2);...
+    if strcmp(thisR.assets(ii).name,'WhitePlane')
+        thisR.assets(ii).position = ...
+            [thisR.assets(ii).position(1)+x;...
+            thisR.assets(ii).position(2);...
             planeDepth];
     end
 end
@@ -65,7 +66,8 @@ if(~exist(fullfile(scenePath,illumName),'file'))
     Warning(['%s SPD file does not exist in the scene folder. You will'...
         'need to copy it manually into your working folder!'],illumName)
 end
-recipe = piWorldFindAndReplace(recipe,'EqualEnergy.spd',illumName);
+
+thisR = piWorldFindAndReplace(thisR,'EqualEnergy.spd',illumName);
 
 
 end

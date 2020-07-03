@@ -157,23 +157,33 @@ switch cameraType
         camera.type           = 'Camera';
         camera.subtype        = 'realisticEye';
         camera.lensfile.type  = 'string';
-        camera.lensfile.value = ''; % FILL IN
+        camera.lensfile.value = lensFile;
         camera.retinaDistance.type = 'float';
         camera.retinaDistance.value = 16.32;
-        camera.retinaRadius.type = 'float';
-        camera.retinaRadius.value = 12;
-        camera.pupilDiameter.type = 'float';
-        camera.pupilDiameter.value = 4;
-        camera.retinaSemiDiam.type = 'float';
+        camera.retinaRadius.type    = 'float';
+        camera.retinaRadius.value   = 12;
+        camera.pupilDiameter.type   = 'float';
+        camera.pupilDiameter.value  = 4;
+        camera.retinaSemiDiam.type  = 'float';
         camera.retinaSemiDiam.value = 6;
+       
+        [~,n,~] = fileparts(lensFile);
+        if isequal(lower(n),'navarro')
+            camera.ior1.value = 'ior1.spd';
+            camera.ior2.value = 'ior2.spd';
+            camera.ior3.value = 'ior3.spd';
+            camera.ior4.value = 'ior4.spd';
+        else
+            camera.ior1.value = '';
+            camera.ior2.value = '';
+            camera.ior3.value = '';
+            camera.ior4.value = '';
+        end
         camera.ior1.type = 'spectrum';
-        camera.ior1.value = ''; % FILL IN
         camera.ior2.type = 'spectrum';
-        camera.ior2.value = ''; % FILL IN
-        camera.ior3.type = 'spectrum';
-        camera.ior3.value = ''; % FILL IN
         camera.ior4.type = 'spectrum';
-        camera.ior4.value = ''; % FILL IN
+        camera.ior3.type = 'spectrum';
+
 
     otherwise
         error('Cannot recognize camera type, %s\n.', cameraType);

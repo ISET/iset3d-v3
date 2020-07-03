@@ -42,19 +42,30 @@ thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to it
 %}
 
 %{
-thisR = myScene.recipe;
-thisR = piCreateSlantedBarScene(); % ('planeDepth', p.Results.planeDistance, 'eccentricity', p.Results.eccentricity);
+% This one works
+thisR = piCreateSlantedBarScene();      % ('planeDepth', p.Results.planeDistance, 'eccentricity', p.Results.eccentricity);
 piWrite(thisR);
-
-scene = piRender(thisR);
+[scene, result] = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
-
+%}
+%{
+% This checks the distance to the plane
+thisR = piCreateSlantedBarScene();      % 
+dRange = thisR.get('depth range');
+%}
+%{
 % We would like this to work
-myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
-thisR = myScene.recipe;
+thisR = piCreateSlantedBarScene();      % 
+thisR.camera = piCameraCreate('humaneye','lensfile','navarro.dat');
 piWrite(thisR);
 [oi, result] = piRender(thisR,'render type','radiance');
 oiWindow(oi);
+%}
+%{
+% How we originally did this.
+myScene = sceneEye('slantedBar');
+% This calls loadPbrtScene with some parameters
+% ('planeDepth', p.Results.planeDistance, 'eccentricity', p.Results.eccentricity);); % Create a slanted bar at 0.5 meter
 %}
 
 % Now set the'planeDistance' to 0.5 meters

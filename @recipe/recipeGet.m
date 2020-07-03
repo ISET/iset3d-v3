@@ -216,6 +216,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isequal(thisR.get('camera subtype'),'realisticEye') && ...
                 contains(thisR.get('lensfile'),'navarro')
             val = 'navarro';
+        else
+            val = [];
         end
         
     case {'lensfile','lensfileinput'}
@@ -369,6 +371,11 @@ switch ieParamFormat(param)  % lower case, no spaces
                 end
             case 'environment'
                 % No idea
+            case 'realisticeye'
+                %
+                warning('Returning retina distance')
+                val = thisR.get('retina distance'); 
+                
             otherwise
                 error('Unknown opticsType %s\n',opticsType);
         end
@@ -377,6 +384,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isempty(varargin), return;
         else, val = val*ieUnitScaleFactor(varargin{1});
         end
+
         
     % realisticEye parameters
     case {'retinadistance'}
@@ -445,56 +453,51 @@ switch ieParamFormat(param)  % lower case, no spaces
         % and film size.
         %
         filmDiag      = thisR.get('film diagonal'); 
-        if isequal(thisR.get('optics type'),'pinhole')    
-            if isfield(thisR.camera,'fov')
-                % The fov was set.
-                val = thisR.camera.fov.value;  % There is an FOV
-                if isfield(thisR.camera,'filmdistance')
-                    % A consistency check.  The field of view should make
-                    % sense for the film distance.
-                    tst = atand(filmDiag/2/thisR.camera.filmdistance.value);
-                    assert(abs((val/tst) - 1) < 0.01);
-                end 
-                %{
-                % Delete by August 1, 2020.
-                % fov = tan(filmDiag/2/filmDistance)
-                filmDistance = (filmDiag/2)/atan(fov);
-                thisR.set('film distance',filmDistance)
-                %}
-                %{
-                % Old not sure why it was here.
-                filmratio = thisR.film.xresolution.value/thisR.film.yresolution.value;
-                if filmratio > 1
-                    % x is bigger.  So we correct.
-                    val = 2*atand(tand(val/2)*filmratio); 
+        switch lower(thisR.get('camera subtype'))
+            case 'pinhole'
+                if isfield(thisR.camera,'fov')
+                    % The fov was set.
+                    val = thisR.camera.fov.value;  % There is an FOV
+                    if isfield(thisR.camera,'filmdistance')
+                        % A consistency check.  The field of view should make
+                        % sense for the film distance.
+                        tst = atand(filmDiag/2/thisR.camera.filmdistance.value);
+                        assert(abs((val/tst) - 1) < 0.01);
+                    end
+                else
+                    % If there is no FOV, then we have to have a film
+                    % distance and size to know the FOV.  This code will break
+                    % if we do not have the film distance.
+                    val = atand(filmDiag/2/thisR.camera.filmdistance.value);
+                    
+                    % We don't set the fov this because PBRT does not expect
+                    % the diagonal field of view, it expects the minimum of the
+                    % height and width fov.  So we aren't sure what to do.
+                    %
+                    % thisR.set('fov',val);
                 end
-                %}
-            else
-                % If there is no FOV, then we have to have a film
-                % distance and size to know the FOV.  This code will break
-                % if we do not have the film distance.
-                val = atand(filmDiag/2/thisR.camera.filmdistance.value);
-                
-                % We don't set the fov this because PBRT does not expect
-                % the diagonal field of view, it expects the minimum of the
-                % height and width fov.  So we aren't sure what to do.
+            case 'realisticeye'
+                % When we are modeling the human eye the distance from the
+                % lens to the retina is stored in (retinaDistance).  All we
+                % need is the size of the film (retinaSemiDiam). Apparently
+                % semidiameter means radius.
+                retinaRadius = thisR.camera.retinaSemiDiam.value;
+                retinaDist = thisR.camera.retinaDistance.value;
+                val = atand(retinaRadius/retinaDist)*2;
+            otherwise
+                % Another lens model (not human)
                 %
-                % thisR.set('fov',val);
-            end
-        else
-            % There is a lens.
-            %
-            % Coarse estimate of the diagonal FOV (degrees) for the
-            % lens case. Film diagonal size and distance from the film
-            % to the back of the lens.
-            if ~exist('lensFocus','file')
-                warning('To calculate FOV you need isetlens on your path');
-                return;
-            end
-            focusDistance = thisR.get('focus distance');    % meters
-            lensFile      = thisR.get('lens file');
-            filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm
-            val           = atand(filmDiag/2/filmDistance);
+                % Coarse estimate of the diagonal FOV (degrees) for the
+                % lens case. Film diagonal size and distance from the film
+                % to the back of the lens.
+                if ~exist('lensFocus','file')
+                    warning('To calculate FOV you need isetlens on your path');
+                    return;
+                end
+                focusDistance = thisR.get('focus distance');    % meters
+                lensFile      = thisR.get('lens file');
+                filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm
+                val           = atand(filmDiag/2/filmDistance);
         end
     case 'depthrange'
         % dRange = thisR.get('depth range');
