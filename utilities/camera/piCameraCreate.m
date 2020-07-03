@@ -145,15 +145,7 @@ switch cameraType
         camera.num_pinholes_h.value = 8;
         
     case {'humaneye'}
-        
-        % TODO:
-        % When we render, we need to make sure pbrt2ISET automatically
-        % copies over all the correct files into a the working folder. This
-        % is taken care of in ISETBIO, but not here.
-        % TODO: 
-        % Move some default accomodated eye and dispersion curves for the
-        % eye into the data folder in pbrt2ISET. Fill them into the missing
-        % parameters here.
+        % Special human eye camera model used with sceneEye calculations.
         camera.type           = 'Camera';
         camera.subtype        = 'realisticEye';
         camera.lensfile.type  = 'string';
@@ -164,9 +156,11 @@ switch cameraType
         camera.retinaRadius.value   = 12;
         camera.pupilDiameter.type   = 'float';
         camera.pupilDiameter.value  = 4;
+        % What is the retinaSemiDiam?  Let's ask TL.
         camera.retinaSemiDiam.type  = 'float';
         camera.retinaSemiDiam.value = 6;
        
+        % These are index of refraction files for the navarro model
         [~,n,~] = fileparts(lensFile);
         if isequal(lower(n),'navarro')
             camera.ior1.value = 'ior1.spd';
@@ -183,7 +177,6 @@ switch cameraType
         camera.ior2.type = 'spectrum';
         camera.ior4.type = 'spectrum';
         camera.ior3.type = 'spectrum';
-
 
     otherwise
         error('Cannot recognize camera type, %s\n.', cameraType);

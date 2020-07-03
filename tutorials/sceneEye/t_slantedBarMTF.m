@@ -29,17 +29,6 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast image of the slanted bar first
 
-% The slanted bar scene consists of a square plane (1x1 m) that is
-% split in half diagonally. The bottom left half is white while the top
-% right half is black. By default the plane is placed at [0 0 1] meters,
-% but we can change that by given sceneEye an optional 'planeDistance'
-% input. 
-myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
-
-%{
-thisR = myScene.recipe;                               % This is the slanted bar scene PBRT recipe
-thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to its new position
-%}
 
 %{
 % This one works
@@ -61,14 +50,45 @@ piWrite(thisR);
 [oi, result] = piRender(thisR,'render type','radiance');
 oiWindow(oi);
 %}
+%{ed
+thisR = piRecipeDefault('scene name','slantedbar');      % 
+piWrite(thisR);
+[scene, result] = piRender(thisR,'render type','radiance');
+sceneWindow(scene);
+%}
+%{
+% We would like this to work
+thisR = piRecipeDefault('scene name','slantedbar');      % 
+thisR.camera = piCameraCreate('humaneye','lensfile','navarro.dat');
+thisR.set('from',[0 0 -9]);
+piWrite(thisR);
+[oi, result] = piRender(thisR,'render type','radiance');
+oiWindow(oi);
+%}
+
+%}
 %{
 % How we originally did this.
 myScene = sceneEye('slantedBar');
+piWrite(myScene.recipe);
+[oi, result] = piRender(myScene.recipe,'render type','radiance');
+oiWindow(oi);
+
 % This calls loadPbrtScene with some parameters
 % ('planeDepth', p.Results.planeDistance, 'eccentricity', p.Results.eccentricity);); % Create a slanted bar at 0.5 meter
 %}
-
+%{
 % Now set the'planeDistance' to 0.5 meters
+thisR = myScene.recipe;                               % This is the slanted bar scene PBRT recipe
+thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to its new position
+%}
+
+% The slanted bar scene consists of a square plane (1x1 m) that is
+% split in half diagonally. The bottom left half is white while the top
+% right half is black. By default the plane is placed at [0 0 1] meters,
+% but we can change that by given sceneEye an optional 'planeDistance'
+% input. 
+myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
 
 myScene.name = 'slantedBarFast';
 

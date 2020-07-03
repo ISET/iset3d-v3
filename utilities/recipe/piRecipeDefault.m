@@ -156,6 +156,9 @@ switch ieParamFormat(sceneName)
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Unknown';
     case 'slantedbar'
+        % In sceneEye cases we were using piCreateSlantedBarScene.  But
+        % going forward we will use the Cinema 4D model so we can use the
+        % other tools for controlling position, texture, and so forth.
         sceneName = 'slantedBar';
         FilePath = fullfile(piRootPath,'data','V3','slantedBar');
         fname = fullfile(FilePath,'slantedBar.pbrt');

@@ -136,8 +136,14 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         % Scene and camera direction
     case 'objectdistance'
+        % thisR.get('object distance',units)
         diff = thisR.lookAt.from - thisR.lookAt.to;
         val = sqrt(sum(diff.^2));
+        % Spatial scale
+        if ~isempty(varargin)
+            val = val*ieUnitScaleFactor(varargin{1});
+        end
+        
     case 'objectdirection'
         % A unit vector in the lookAt direction
         val = thisR.lookAt.from - thisR.lookAt.to;
@@ -448,13 +454,15 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'fov','fieldofview'}
         % recipe.get('fov') - degrees
         % 
-        % For the pinhole the film distance and the field of view always
-        % match.  The fov is normally stored which implies a film distance
-        % and film size.
-        %
+        % We have to deal with fov separately for different types of camera
+        % models.
+        
         filmDiag      = thisR.get('film diagonal'); 
         switch lower(thisR.get('camera subtype'))
-            case 'pinhole'
+            case {'pinhole','perspective'}
+                % For the pinhole the film distance and the field of view always
+                % match.  The fov is normally stored which implies a film distance
+                % and film size.
                 if isfield(thisR.camera,'fov')
                     % The fov was set.
                     val = thisR.camera.fov.value;  % There is an FOV
@@ -469,20 +477,13 @@ switch ieParamFormat(param)  % lower case, no spaces
                     % distance and size to know the FOV.  This code will break
                     % if we do not have the film distance.
                     val = atand(filmDiag/2/thisR.camera.filmdistance.value);
-                    
-                    % We don't set the fov this because PBRT does not expect
-                    % the diagonal field of view, it expects the minimum of the
-                    % height and width fov.  So we aren't sure what to do.
-                    %
-                    % thisR.set('fov',val);
                 end
             case 'realisticeye'
-                % When we are modeling the human eye the distance from the
-                % lens to the retina is stored in (retinaDistance).  All we
-                % need is the size of the film (retinaSemiDiam). Apparently
-                % semidiameter means radius.
-                retinaRadius = thisR.camera.retinaSemiDiam.value;
-                retinaDist = thisR.camera.retinaDistance.value;
+                % When we model the human eye the distance from the lens to
+                % the retina is stored in (retinaDistance). So is the size
+                % of the film (retinaRadius).
+                retinaRadius = thisR.camera.retinaRadius.value;
+                retinaDist   = thisR.camera.retinaDistance.value;
                 val = atand(retinaRadius/retinaDist)*2;
             otherwise
                 % Another lens model (not human)
