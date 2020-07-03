@@ -50,7 +50,7 @@ piWrite(thisR);
 [oi, result] = piRender(thisR,'render type','radiance');
 oiWindow(oi);
 %}
-%{ed
+%{
 thisR = piRecipeDefault('scene name','slantedbar');      % 
 piWrite(thisR);
 [scene, result] = piRender(thisR,'render type','radiance');

@@ -228,6 +228,25 @@ switch param
         else
             warning('Lens radius is set for perspective camera.  Use aperture diameter for omni');
         end
+        
+    % Human eye model related
+    case {'retinadistance'}
+        % Specified in mm
+        thisR.camera.retinaDistance.value = val;
+        thisR.camera.retinaDistance.type = 'float';
+    case {'retinaradius'}
+        % Specified in mm
+        thisR.camera.retinaRadius.value = val;
+        thisR.camera.retinaRadius.type = 'float';
+    case {'retinasemidiam'}
+        % Specified in mm
+        thisR.camera.retinaSemiDiam.value = val;
+        thisR.camera.retinaSemiDiam.type = 'float';
+    case {'pupildiameter'}
+        % Specified in mm
+        thisR.camera.pupilDiameter.value = val;
+        thisR.camera.pupilDiameter.type = 'float';
+        
     case {'ior1','ior2','ior3','ior4'}
         % thisR.set('ior1',fullfilename);
         %
@@ -256,6 +275,8 @@ switch param
                     thisR.camera.ior4.type = 'spectrum';
             end
         end
+     
+    % More general camera parameters
     case {'aperture','aperturediameter'}
         % lens.set('aperture diameter',val (mm))
         %

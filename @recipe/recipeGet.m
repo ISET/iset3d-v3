@@ -378,9 +378,9 @@ switch ieParamFormat(param)  % lower case, no spaces
             case 'environment'
                 % No idea
             case 'realisticeye'
-                %
-                warning('Returning retina distance')
-                val = thisR.get('retina distance'); 
+                % 
+                warning('Returning retina distance in m')
+                val = thisR.get('retina distance','m'); 
                 
             otherwise
                 error('Unknown opticsType %s\n',opticsType);
@@ -401,7 +401,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         % Adjust spatial units per user's specification
         if isempty(varargin), return;
-        else, val = val*ieUnitScaleFactor(varargin{1})*1e3;
+        else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});
         end
         
     case {'retinaradius'}
@@ -412,7 +412,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         % Adjust spatial units per user's specification
         if isempty(varargin), return;
-        else, val = val*ieUnitScaleFactor(varargin{1});
+        else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});
         end
         
     case {'retinasemidiam'}
@@ -424,7 +424,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         % Adjust spatial units per user's specification
         if isempty(varargin), return;
-        else, val = val*ieUnitScaleFactor(varargin{1})*1e3;
+        else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});
         end
         
     case {'ior1'}
@@ -504,6 +504,10 @@ switch ieParamFormat(param)  % lower case, no spaces
         % dRange = thisR.get('depth range');
         % Values in meters
         val = piSceneDepth(thisR);
+        % Adjust spatial units per user's specification
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1});
+        end
         
     case 'pupildiameter'
         % Default units are millimeters
@@ -515,7 +519,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             otherwise
                 disp('Need to figure out pupil diameter!!!')
         end
-
+        % Adjust spatial units per user's specification
+        if isempty(varargin), return;
+        else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});
+        end
+        
     case 'chromaticaberration'
         % thisR.get('chromatic aberration')
         % True or false (on or off)

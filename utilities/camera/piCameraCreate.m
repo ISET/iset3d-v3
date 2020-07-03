@@ -46,7 +46,7 @@ varargin = ieParamFormat(varargin);
 
 p = inputParser;
 validCameraTypes = {'pinhole','perspective','realistic','omni', 'humaneye','lightfield'};
-p.addRequired('cameraType',@(x)(ismember(x,validCameraTypes)));
+p.addRequired('cameraType',@(x)(ismember(ieParamFormat(x),validCameraTypes)));
 
 % This will work for realistic, but not omni.  Perhaps we should make the
 % default depend on the camera type.
@@ -66,7 +66,7 @@ p.parse(cameraType,varargin{:});
 lensFile      = p.Results.lensfile;
 
 %% Initialize the default camera type
-switch cameraType
+switch ieParamFormat(cameraType)
     case {'pinhole','perspective'}
         % A perspective camera with zero aperture is a pinhole camera. 
         camera.type      = 'Camera';
