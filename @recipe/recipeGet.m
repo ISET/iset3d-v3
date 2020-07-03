@@ -145,8 +145,11 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         % Camera fields
     case {'cameratype'}
+        % This is always 'Camera'
         val = thisR.camera.type;
     case {'camerasubtype'}
+        % This is the type of Camera, maybe perspective, pinhole,
+        % realisticEye, omni, realistic, environment???
         if isfield(thisR.camera,'subtype')
             val = thisR.camera.subtype;
         end
@@ -223,10 +226,13 @@ switch ieParamFormat(param)  % lower case, no spaces
         switch(lower(subType))
             case 'pinhole'
                 val = 'pinhole';
+                % There are no lenses for pinhole/perspective
             case 'perspective'
+                % There are no lenses for pinhole/perspective
                 val = 'pinhole (perspective)';
             case 'realisticeye'
-                % Normally empty.  Not sure why we have this here.
+                % This will be navarro.dat or one of the other models,
+                % usually.
                 val = thisR.camera.lensfile.value;
             otherwise
                 % I think this is used by omni, particularly for microlens
@@ -249,16 +255,26 @@ switch ieParamFormat(param)  % lower case, no spaces
            
         end
     case {'lensdir','lensdirinput'}
-        % 
+        % This is the directory where the lens files are kept, not the
+        % directory unique to this recipe. We copy the lens files from this
+        % directory, usually.  There are some complications for navarro and
+        % the realisticEye human models.
         val = fullfile(piRootPath,'data','lens');
+    case 'lensdiroutput'
+        % Directory where we are stsoring the lens file for rendering
+        val = fullfile(thisR.get('outputdir'),'lens');
     case 'lensbasename'
+        % Just the name, like fisheye
         val = thisR.get('lens file');
         [~,val,~] = fileparts(val);
     case 'lensfullbasename'
+        % the name plus the extension fisheye.dat
         val = thisR.get('lens file');
         [~,val,ext] = fileparts(val);
         val = [val,ext];
     case 'lensfileoutput'
+        % The full path to the file in the output area where the lens
+        % file is kept
         outputDir = thisR.get('outputdir');
         lensfullbasename = thisR.get('lens full basename');
         val = fullfile(outputDir,'lens',lensfullbasename);

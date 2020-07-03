@@ -182,6 +182,12 @@ switch param
         thisR.set('film diagonal',35);
         
     case 'cameratype'
+        % This should always be 'Camera'
+        if ~isequal(val,'Camera')
+            error('Check your code');
+        end
+    case {'camerasubtype'}
+        % I don't think the sub is needed.  But there it is.
         thisR.camera.subtype = val;
         
     case {'cameraexposure','exposuretime'}
@@ -201,7 +207,13 @@ switch param
         % Lens related
     case 'lensfile'
         % lens.set('lens file',val)   (string)
-        % Should be the json file defining the camera.
+        % Typically a JSON file defining the camera.  But for realisticEye
+        % we are still using dat files (e.g., navarro.dat).
+        if ~exist(val,'file')
+            % Sometimes we set this without the file being copied yet.
+            % Let's see if this warning does us any good.
+            warning('Lens file in out dir not yet found (%s)\n',val); 
+        end
         thisR.camera.lensfile.value = val;
         thisR.camera.lensfile.type = 'string';
 
@@ -216,7 +228,34 @@ switch param
         else
             warning('Lens radius is set for perspective camera.  Use aperture diameter for omni');
         end
-        
+    case {'ior1','ior2','ior3','ior4'}
+        % thisR.set('ior1',fullfilename);
+        %
+        % For the realisticEye Camera we store spd files that specify the
+        % indices of refraction. for each of the different human optics
+        % components.
+        if ~isequal(thisR.get('camera subtype'),'realisticEye')
+            warning('No ior slot except for realisticEye camera subtype.');
+        else
+            switch param(end)
+                case '1'
+                    % cornea
+                    thisR.camera.ior1.value = val;
+                    thisR.camera.ior1.type = 'spectrum';
+                case '2'
+                    % acqueous
+                    thisR.camera.ior2.value = val;
+                    thisR.camera.ior2.type = 'spectrum';
+                case '3'
+                    % lens
+                    thisR.camera.ior3.value = val;
+                    thisR.camera.ior3.type = 'spectrum';
+                case '4'
+                    % vitreous
+                    thisR.camera.ior4.value = val;
+                    thisR.camera.ior4.type = 'spectrum';
+            end
+        end
     case {'aperture','aperturediameter'}
         % lens.set('aperture diameter',val (mm))
         %
