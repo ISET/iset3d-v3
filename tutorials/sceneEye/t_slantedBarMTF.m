@@ -57,11 +57,14 @@ piWrite(thisR);
 sceneWindow(scene);
 %}
 %{
-% We would like this to work
+% The units of size and distance need some more help.
 thisR = piRecipeDefault('scene name','slantedbar');      % 
 thisR.camera = piCameraCreate('humaneye','lensfile','navarro.dat');
-thisR.set('from',[0 0 -9]);
+
+% Changing the camera position does a lot of good.  What are the units?
+thisR.set('from',[0 0 -200]);
 piWrite(thisR);
+
 [oi, result] = piRender(thisR,'render type','radiance');
 oiWindow(oi);
 %}

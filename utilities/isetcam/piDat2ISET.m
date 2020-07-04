@@ -96,9 +96,9 @@ pbrtFile   = thisR.outputFile;
 ieObjName = sprintf('%s-%s',name,datestr(now,'mmm-dd,HH:MM'));
 
 % If radiance, return a scene or optical image
-opticsType = thisR.get('optics type');
-switch opticsType
-    case 'lens'
+cameraType = thisR.get('camera subtype');
+switch lower(cameraType)
+    case {'lens'}
         % If we used a lens, the ieObject is an optical image (irradiance).
         
         % We specify the mean illuminance of the OI mean illuminance
@@ -158,7 +158,45 @@ switch opticsType
             ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
             ieObject.data.illuminance = oiCalculateIlluminance(ieObject);
         end
+    case {'realisticeye'}
+       % A human eye model, and the ieObject is an optical image (irradiance).
         
+        focalLength = thisR.get('retina distance','m');
+        pupilDiameter = thisR.get('pupil diameter','m');
+        fNumber = focalLength/pupilDiameter;
+        
+        % Start building the oi
+        ieObject = piOICreate(photons,'wavelength',wave);
+        
+        % Set the parameters the best we can from the lens file.
+        ieObject = oiSet(ieObject,'optics focal length',focalLength);
+        ieObject = oiSet(ieObject,'optics fnumber',fNumber);
+        
+        % Calculate and set the oi 'fov'.
+        fov = thisR.get('fov');
+        ieObject    = oiSet(ieObject,'fov',fov);
+        
+        ieObject = oiSet(ieObject,'name',ieObjName);
+
+        ieObject = oiSet(ieObject,'optics model','iset3d');
+        if ~isempty(thisR)
+            eyeModel = thisR.get('realistic eye model');
+            ieObject = oiSet(ieObject,'optics name',eyeModel);
+        else
+            % This should never happen!
+            warning('Render recipe is not specified.');
+        end
+        
+        % We set meanIlluminance per square millimeter of the lens
+        % aperture.
+        if(scaleIlluminance)
+            aperture = oiGet(ieObject,'optics aperture diameter');
+            lensArea = pi*(aperture*1e3/2)^2;
+            meanIlluminance = meanIlluminancepermm2*lensArea;
+            
+            ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
+            ieObject.data.illuminance = oiCalculateIlluminance(ieObject);
+        end 
     case {'pinhole','environment'}
         % A scene radiance, not an oi
         ieObject = piSceneCreate(photons,...
@@ -170,7 +208,7 @@ switch opticsType
         end
         
     otherwise
-        error('Unknown optics type %s\n',opticsType);       
+        error('Unknown optics type %s\n',cameraType);       
 end
 
 end

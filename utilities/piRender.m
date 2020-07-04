@@ -209,7 +209,7 @@ if ((~strcmp(renderType,'radiance')))
             'creatematerials',creatematerials,...
             'overwritegeometry',overwritegeometry);
         
-        metadataFile{ii} = metadataRecipe.outputFile;
+        metadataFile{ii} = metadataRecipe.outputFile; %#ok<AGROW>
     end
 
 end
