@@ -1,13 +1,27 @@
 function  piGeometryWrite(thisR,varargin)
-
-%% Wirte out a new geometry file which matchs the format we used to label object instances
+% Write out a geometry file that matches the format and labeling objects
+%
+% Synopsis
+%   piGeometryWrite(thisR,varargin)
+%
 % Input:
 %       thisR: a render recipe
 %       obj:   Returned by piGeometryRead, contains information about objects.
+%
+% Optional key/value pairs
+%
 % Output:
 %       None for now.
 %
+% Description
+%   We need a better description of objects and groups here.  Definitions
+%   of 'assets'.   
+%
 % Zhenyi, 2018
+%
+% See also
+%   piGeometryRead
+%
 %%
 p = inputParser;
 
@@ -19,15 +33,25 @@ p.addParameter('lightsFlag',false,@islogical);
 p.addParameter('thistrafficflow',[]);
 
 p.parse(thisR,varargin{:});
-lightsFlag  = p.Results.lightsFlag;
-thistrafficflow = p.Results.thistrafficflow;
-%%
+
+% These were used but seem to be no longer used
+%
+% lightsFlag  = p.Results.lightsFlag;
+% thistrafficflow = p.Results.thistrafficflow;
+
+%% Create the default file name
+
 [Filepath,scene_fname] = fileparts(thisR.outputFile);
 fname = fullfile(Filepath,sprintf('%s_geometry.pbrt',scene_fname));[~,n,e]=fileparts(fname);
+
+% Get the assets from the recipe
 obj = thisR.assets;
-%% Make parent obj files which includes all the children obj files
+
+%% Wrote the geometry file.
 
 fname_obj = fullfile(Filepath,sprintf('%s%s',n,e));
+
+% Open and write out the objects
 fid_obj = fopen(fname_obj,'w');
 fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%i/%i %i:%i:%f \n  \n',clock);
 
@@ -36,13 +60,20 @@ recursiveWriteGroups(fid_obj, obj);
 
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);
+
 end
 
-
+%%
 function recursiveWriteObjects(fid, objects, rootPath)
-
-% Parse the geometry tree structure and for every geometry object print the
-% corresponding shape into a separate pbrt geometry file.
+% Print the  shape of each object child into the PBRT geometry file.
+%
+% The nodes and edges of each of the separate objects are stored in their
+% own files within scene/PBRT/pbrt-geometry/ASSETNAME.pbrt.  Here we put
+% some metadata about the asset and we Include the file with the nodes and
+% edges.
+%
+% See also
+%
 
 if isempty(objects)
     return;
@@ -71,45 +102,24 @@ for i=1:length(objects.children)
             end 
         end        
         if ~isempty(objects.children(i).output)
+            % There is an output slot
             [~,output] = fileparts(objects.children(i).output);
             fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
+        elseif ~isempty(objects.children(i).shape)
+            % output is empty but there is a shape slot we also open the
+            % geometry file.
+            name = objects.children(i).name;
+            geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
+            fprintf(geometryFile,'%s',objects.children(i).shape);
+            fclose(geometryFile);
+            fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
         else
-            if ~isempty(objects.children(i).shape)
-                name = objects.children(i).name;
-                geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
-                fprintf(geometryFile,'%s',objects.children(i).shape);
-                fclose(geometryFile);
-                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
-            end
+            % For the camera case we get here.
+            % warning('Could not find an output or shape slot for this child.');
         end
-        
-        %{
-        % Not sure if we need this
-            if isfield(objects.children(i), 'motion') &&...
-                    ~isempty(objects.children(i).motion)
-                for kk = 1:size(objects.children(i).position, 2)
-                    fprintf(fid, 'ActiveTransform EndTime \n');
-                    if isempty(objects.children(i).motion.position(:,kk))
-                        fprintf(fid,'Translate 0 0 0 \n');
-                    else
-                        pos = objects.children(i).motion.position(:,kk);
-                        fprintf(fid,'Translate %f %f %f \n',pos(1),...
-                            pos(2),pos(3));
-                    end
-
-                    if ~isempty(objects.children(i).motion.rotate)
-                        rot = objects.children(i).motion.rotate;
-                        % Write out rotation
-                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-2)); % Z
-                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3-1)); % Y
-                        fprintf(fid,'Rotate %f %f %f %f \n',rot(:,kk*3));   % X
-                    end
-                end
-            end
-        %}
         fprintf(fid, 'ObjectEnd\n\n');
     else
-        
+        % This is an area light case
         if ~isempty(objects.children(i).shape)
             name = objects.children(i).name;
             geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
@@ -119,20 +129,17 @@ for i=1:length(objects.children)
     end
 end
 
-
+%
 for j=1:length(objects.groupobjs)
     recursiveWriteObjects(fid,objects.groupobjs(j), rootPath);
 end
 
-
 end
 
-
-
+%%
 function recursiveWriteGroups(fid, objects)
-
 % Parse the geometry object tree and for every group object replace the
-% actuall geometry with the 'Include' directive.
+% actual geometry with the 'Include' directive.
 
 %{
 persistent first;

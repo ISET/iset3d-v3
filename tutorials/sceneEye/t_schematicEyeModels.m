@@ -54,8 +54,7 @@ oiNavarro = thisScene.render();
 % Show the retinal image
 % Everything is very out of focus since the accommodation is set to
 % infinity. 
-ieAddObject(oiNavarro);
-oiWindow;
+oiWindow(oiNavarro);
 
 % You can see the lens file used and the dispersion curves of the material
 % in the working directory. However, the lens file is not written out until
@@ -68,9 +67,7 @@ oiWindow;
 thisScene.modelName = 'LeGrand';
 thisScene.name = 'LeGrand'; % The name of the optical image
 oiLeGrand = thisScene.render();
-
-ieAddObject(oiLeGrand);
-oiWindow;
+oiWindow(oiLeGrand);
 
 %% Try Arizona eye model
 
@@ -80,6 +77,6 @@ thisScene.accommodation = 0;
 % Render!
 thisScene.name = 'arizona'; % The name of the optical image
 oiArizona = thisScene.render();
+oiWindow(oiArizona);
 
-ieAddObject(oiArizona);
-oiWindow;
+%%

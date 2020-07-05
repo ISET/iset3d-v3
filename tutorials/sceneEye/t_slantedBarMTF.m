@@ -40,7 +40,7 @@ sceneWindow(scene);
 %{
 % This checks the distance to the plane
 thisR = piCreateSlantedBarScene();      % 
-dRange = thisR.get('depth range');
+dRange = thisR.get('depth range','m');
 %}
 %{
 % We would like this to work
@@ -49,6 +49,7 @@ thisR.camera = piCameraCreate('humaneye','lensfile','navarro.dat');
 piWrite(thisR);
 [oi, result] = piRender(thisR,'render type','radiance');
 oiWindow(oi);
+thisR.get('object distance','m')
 %}
 %{
 thisR = piRecipeDefault('scene name','slantedbar');      % 
@@ -67,6 +68,22 @@ piWrite(thisR);
 
 [oi, result] = piRender(thisR,'render type','radiance');
 oiWindow(oi);
+
+% I think there is a problem with the from/to in mm or meters.
+thisR.get('object distance','m')
+
+% How do we check the units on the scene assets?  For example, how do we check
+% the size to make sense of this?  
+%
+% TL had this sceneUnits flag.  Can we make sure that we are always in meters? 
+% It looks to me like the 'nodes'
+% in the scene planes have values like 40, which probably is interpreted as
+% 40 meters.  The intention might have been 40 mm.  Anyway, something like
+% that needs easy checking.  Like
+% 
+%   'thisR.get('asset size',idx)'
+%
+
 %}
 
 %}
@@ -166,10 +183,10 @@ myScene.numCABands = 8;
 myScene.numRays = 256;
 myScene.resolution = 256;
 oi = myScene.render;
-ieAddObject(oi);
-oiWindow;
 
-% If you have isetlens-eye ( https://github.com/ISET/isetlens-eye) on your
+oiWindow(oi);
+
+%% If you have isetlens-eye ( https://github.com/ISET/isetlens-eye) on your
 % path, you can run the following:
 % [freq,mtf] = calculateMTFfromSlantedBar(oi);
 % figure();
@@ -179,7 +196,7 @@ oiWindow;
 % grid on;
 % axis([0 60 0 1])
 
-% Otherwise, you can run this, which is essentially what
+%%  Otherwise, you can run this, which is essentially what
 % calculateMTFfromSlantedBar does.
 
 % Crop the image so we only have the slanted line visible. The ISO12233
@@ -206,3 +223,5 @@ xlabel('Spatial Frequency (cycles/deg)');
 ylabel('Contrast Reduction (SFR)');
 grid on;
 axis([0 60 0 1])
+
+%%

@@ -98,7 +98,7 @@ ieObjName = sprintf('%s-%s',name,datestr(now,'mmm-dd,HH:MM'));
 % If radiance, return a scene or optical image
 cameraType = thisR.get('camera subtype');
 switch lower(cameraType)
-    case {'lens'}
+    case {'realisticdiffraction','realistic','omni'}
         % If we used a lens, the ieObject is an optical image (irradiance).
         
         % We specify the mean illuminance of the OI mean illuminance
@@ -197,7 +197,7 @@ switch lower(cameraType)
             ieObject        = oiAdjustIlluminance(ieObject,meanIlluminance);
             ieObject.data.illuminance = oiCalculateIlluminance(ieObject);
         end 
-    case {'pinhole','environment'}
+    case {'pinhole','environment','perspective'}
         % A scene radiance, not an oi
         ieObject = piSceneCreate(photons,...
                                     'wavelength', wave);
