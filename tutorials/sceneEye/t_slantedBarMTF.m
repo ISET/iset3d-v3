@@ -109,19 +109,18 @@ thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to it
 % but we can change that by given sceneEye an optional 'planeDistance'
 % input. 
 myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
-
-myScene.name = 'slantedBarFast';
-
-myScene.numRays = 64;
-myScene.resolution = 128; 
-
-myScene.accommodation = 2;
-myScene.pupilDiameter = 4;
-myScene.fov = 4;
+myScene.set('model name','navarro');
+myScene.set('name','slanted bar test');
+myScene.set('rays per pixel',32);
+myScene.set('resolution',256); 
+myScene.set('accommodation',2);  % Diopters
+myScene.set('pupil diameter',4); % mm
+myScene.set('fov',4);            % Degrees
 
 %% Render with debugging on
 
-myScene.debugMode = true;  % We return a scene
+myScene.set('debug mode',true);  % We return a scene
+
 scene = myScene.render;
 sceneWindow(scene);
 

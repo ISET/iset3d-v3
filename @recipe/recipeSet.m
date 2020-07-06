@@ -356,6 +356,15 @@ switch param
         % should not have more than 30 wavelength bands
         thisR.integrator.numCABands.value = min(30,val);
         thisR.integrator.numCABands.type = 'integer';
+    case 'integratorsubtype'
+        % Used for chromatic aberration calculation
+        thisR.integrator.type = 'Integrator';
+        thisR.integrator.subtype = 'spectralpath';
+
+    case 'integratornumcabands'
+        thisR.integrator.type = 'Integrator';
+        thisR.integrator.numCABands.value = val;
+        thisR.integrator.numCABands.type = 'integer';
         
     case 'autofocus'
         % Should deprecate this.  Let's run it for a while and see how
