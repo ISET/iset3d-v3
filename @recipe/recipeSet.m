@@ -174,13 +174,22 @@ switch param
         
         % Camera
     case 'camera'
-        % Initialize a camera type with default parameters
-        % To adjust the parameters use recipe.set() calls
+        % val = piCameraCreate('pinhole'); thisR = recipe;
+        % thisR.set('camera',val);
+        %
+        % The whole camera struct
+        thisR.camera = val;
+        %{
+        
+        % This deprecated code is very bizarre for recipeSet. So I replaced
+        % it.  But probably this change will break stuff.  We will have to
+        % fix. 
         thisR.camera = piCameraCreate(val,'lensFile',p.Results.lensfile);
         
-        % For the default camera, the film size is 35 mm
+        % For the default camera, the film size is 35 mm 
         thisR.set('film diagonal',35);
         
+        %}
     case 'cameratype'
         % This should always be 'Camera'
         if ~isequal(val,'Camera')

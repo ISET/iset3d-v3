@@ -25,6 +25,7 @@ function val = recipeGet(thisR, param, varargin)
 %     'working directory' - directory mounted by docker image
 %
 %   % Camera and scene
+%     'camera'           - The whole camera struct
 %     'object distance'  - The magnitude ||(from - to)|| of the difference
 %                          between from and to.  Units are from the scene,
 %                          typically in meters. 
@@ -150,6 +151,9 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = val/norm(val);
         
         % Camera fields
+    case {'camera'}
+        % The whole struct
+        val = thisR.camera;
     case {'cameratype'}
         % This is always 'Camera'
         val = thisR.camera.type;

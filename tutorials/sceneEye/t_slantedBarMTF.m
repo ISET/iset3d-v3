@@ -112,24 +112,23 @@ myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
 myScene.set('model name','navarro');
 myScene.set('name','slanted bar test');
 myScene.set('rays per pixel',32);
-myScene.set('resolution',256); 
+myScene.set('resolution',128); 
 myScene.set('accommodation',2);  % Diopters
 myScene.set('pupil diameter',4); % mm
 myScene.set('fov',4);            % Degrees
 
-%% Render with debugging on
+%% Render with debugging on returns only a scene
 
 myScene.set('debug mode',true);  % We return a scene
-
 scene = myScene.render;
 sceneWindow(scene);
 
-%%
-%{
+%% Now turn off debugging to get the oi
+
 myScene.debugMode = false;  % We return a scene
+myScene.recipe.set('from',[0 0 -300]);
 oi = myScene.render;
-oiWindow(scene);
-%}
+oiWindow(oi);
 
 %% Try moving the slanted bar in and out of focus
 

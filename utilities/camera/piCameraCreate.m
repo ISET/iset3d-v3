@@ -4,9 +4,10 @@ function camera = piCameraCreate(cameraType,varargin)
 %   camera = piCameraCreate(cameraType, lensFile, ..)
 %
 % Input parameters
-%  The type of cameras are
+%  
+% The camera lens type
 %
-%    {'pinhole','perspective]     - Default
+%    {'pinhole','perspective]  - Default is pinhole camera
 %           
 %    'realistic'   - allows chromatic aberration and diffraction and a lens file
 %    'light field' - microlens array in front of the sensor 
@@ -14,6 +15,9 @@ function camera = piCameraCreate(cameraType,varargin)
 %    'omni'        - M. Mara implementation
 %
 % Optional parameter/values
+%
+% Output
+%   camera - Camera structure
 %
 % TL, SCIEN STANFORD 2017 
 
@@ -92,15 +96,14 @@ switch ieParamFormat(cameraType)
             
         end
         
-        camera.type = 'Camera';
-        camera.subtype = 'realistic';
+        camera.type          = 'Camera';
+        camera.subtype       = 'realistic';
         camera.lensfile.type = 'string';
         camera.lensfile.value = which(lensFile);
-        % camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
-        camera.aperturediameter.type = 'float';
+        camera.aperturediameter.type  = 'float';
         camera.aperturediameter.value = 5;    % mm
-        camera.focusdistance.type = 'float';
-        camera.focusdistance.value = 10; % mm
+        camera.focusdistance.type     = 'float';
+        camera.focusdistance.value    = 10; % mm
         
     case {'omni'}
         [~,~,e] = fileparts(lensFile);
@@ -112,7 +115,6 @@ switch ieParamFormat(cameraType)
         camera.subtype = 'omni';
         camera.lensfile.type = 'string';
         camera.lensfile.value = which(lensFile);
-        % camera.lensfile.value = fullfile(piRootPath,'data','lens',lensFile);
         camera.aperturediameter.type = 'float';
         camera.aperturediameter.value = 5;    % mm
         camera.focusdistance.type = 'float';
@@ -124,7 +126,6 @@ switch ieParamFormat(cameraType)
         camera.subtype = 'realisticDiffraction';
         camera.specfile.type = 'string';
         camera.specfile.value = which(lensFile);
-        % camera.specfile.value = fullfile(piRootPath,'data','lens',lensFile);
         camera.filmdistance.type = 'float';
         camera.filmdistance.value = 50;    % mm
         camera.aperture_diameter.type = 'float';
@@ -152,11 +153,17 @@ switch ieParamFormat(cameraType)
         camera.lensfile.value = lensFile;
         camera.retinaDistance.type = 'float';
         camera.retinaDistance.value = 16.32;
+        
+        % What is the retinaSemiDiam?  BW/ZLY think the retina is modeled
+        % on a sphere and the retinaDistance is the radius of the sphere.
+        % The retinaSemiDiam is the distance if you put a plane at the
+        % circle that defines the edge of the retina and measure that
+        % circle's diameter.  The retinaRadius is the distance on the
+        % sphere from the center to the edge of the retina.
         camera.retinaRadius.type    = 'float';
         camera.retinaRadius.value   = 12;
         camera.pupilDiameter.type   = 'float';
         camera.pupilDiameter.value  = 4;
-        % What is the retinaSemiDiam?  Let's ask TL.
         camera.retinaSemiDiam.type  = 'float';
         camera.retinaSemiDiam.value = 6;
        
