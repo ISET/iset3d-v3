@@ -103,6 +103,7 @@ thisR = myScene.recipe;                               % This is the slanted bar 
 thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to its new position
 %}
 
+%%
 % The slanted bar scene consists of a square plane (1x1 m) that is
 % split in half diagonally. The bottom left half is white while the top
 % right half is black. By default the plane is placed at [0 0 1] meters,
@@ -111,11 +112,11 @@ thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to it
 myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
 myScene.set('model name','navarro');
 myScene.set('name','slanted bar test');
-myScene.set('rays per pixel',32);
-myScene.set('resolution',128); 
+myScene.set('rays per pixel',64);
+myScene.set('resolution',512); 
 myScene.set('accommodation',2);  % Diopters
-myScene.set('pupil diameter',4); % mm
-myScene.set('fov',4);            % Degrees
+myScene.set('pupil diameter',3); % mm
+myScene.set('fov',1);            % Degrees
 
 %% Render with debugging on returns only a scene
 
@@ -130,8 +131,11 @@ myScene.recipe.set('from',[0 0 -300]);
 oi = myScene.render;
 oiWindow(oi);
 
-%% Try moving the slanted bar in and out of focus
+%%  How do we determine the distance to the planes?
 
+
+%% Try moving the slanted bar in and out of focus
+%{
 % A note on chromatic aberration:
 % We can render chromatic aberration in the eye by tracing one ray per band
 % of wavelength. The parameter, numCABands determines the number of band we
@@ -165,7 +169,7 @@ for ii = 1:length(planeDistance)
     oiWindow(oi);
 
 end
-
+%}
 %% Calculate the MTF 
 % We can use the ISO12233 standard to calculate the MTF from a slanted bar.
 
@@ -173,6 +177,7 @@ end
 % resolution for less noisy results. With numRays = 256 and resolution =
 % 256, and numCABands = 16, this takes roughly 3 min to render on an 8 core
 % machine.
+
 myScene = sceneEye('slantedBar','planeDistance',1);
 myScene.name = 'slantedBarForMTF';
 myScene.accommodation = 1;

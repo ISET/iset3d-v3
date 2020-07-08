@@ -37,6 +37,7 @@ if ~piDockerExists, piDockerConfig; end
 % A complex, colorful scene with lots of different material types and
 % edges. 
 
+%{
 scene3d = sceneEye('colorfulScene');
                
 scene3d.fov = 30; 
@@ -51,38 +52,63 @@ scene3d.numBounces = 6;
 oi = scene3d.render();
 oi = oiSet(oi,'name','Colorful scene');
 oiWindow(oi);
+%}
 
 %% Chess set
-% A chess set "to scale" (e.g. the pieces match real word sizes). A ruler
-% is placed in the middle of the chess set.
+
+% This one is not "to scale" (e.g. the pieces match real word sizes). A
+% ruler is placed in the middle of the chess set.  There is another one
+% that is scaled correctly.
 
 scene3d = sceneEye('chessSet');
-               
-scene3d.fov = 30; 
-scene3d.resolution = 128;
-scene3d.numRays = 128;
-scene3d.numCABands = 0;
-scene3d.accommodation = 1; 
 
-oi = scene3d.render();
-oi = oiSet(oi,'name','Chess Set');
+scene3d.set('model name','navarro');
+scene3d.set('name','Chess');
+scene3d.set('rays per pixel',16);
+scene3d.set('resolution',[256 256]); 
+scene3d.set('accommodation',2);   % Diopters
+scene3d.set('pupil diameter',3);  % mm
+
+% There is something wrong with the 'fov' calculation.
+% Changing the fov also changes the camera position.  That's weird.
+% Compare fov 20 and 30.
+% scene3d.set('fov',30);            % Degrees
+
+scene3d.debugMode = true;
+scene = scene3d.render;
+sceneWindow(scene);
+
+%% How do we find the distance to the pieces?
+
+dRange = scene3d.recipe.get('depth range','m');
+scene3d.recipe.get('to')
+scene3d.set('to',[0 0 40]);
+
+%%  Use the 
+
+scene3d.debugMode = false;
+scene3d.set('rays per pixel',128);
+scene3d.set('from',[0 0 -20]);
+[oi, result] = scene3d.render('render type','radiance');
 oiWindow(oi);
 
 %% Chess set scaled
 % The same chess set, but it's been distorted in order to emphasize depth
 % of field effects.
 
-scene3d = sceneEye('chessSetScaled');
-               
-scene3d.fov = 30; 
-scene3d.resolution = 128;
-scene3d.numRays = 128;
-scene3d.numCABands = 0;
-scene3d.accommodation = 1/0.3; % Accommodate to the white pawn 
+% scene3d = sceneEye('chessSetScaled');
+scene3d = sceneEye('chesssetscaled');
+
+scene3d.set('model name','navarro');
+scene3d.set('name','Chess');
+scene3d.set('rays per pixel',64);
+scene3d.set('resolution',[512 512]); 
+scene3d.set('accommodation',2);  % Diopters
+scene3d.set('pupil diameter',3); % mm
+scene3d.set('fov',20);            % Degrees
+scene3d.set('accommodation',1/0.3);
 
 oi = scene3d.render();
-oi = oiSet(oi,'name','Chess Set scaled');
-
 oiWindow(oi);
 
 %% Snellen Single
