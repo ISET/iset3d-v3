@@ -60,14 +60,24 @@ oiWindow(oi);
 % ruler is placed in the middle of the chess set.  There is another one
 % that is scaled correctly.
 
-scene3d = sceneEye('chessSet');
+scene3d = sceneEye('chessSetScaled');
+% {
+scene3d.set('model name','gauss');
+% scene3d.set('lensfilename','dgauss.22deg.12.5mm.dat');
+scene3d.set('camera',piCameraCreate('realistic','lens file','dgauss.22deg.12.5mm.dat'));
+scene3d.set('focal distance',12);   % mm is correct
 
-scene3d.set('model name','navarro');
+%}
+
+% scene3d = sceneEye('chessset');
+ 
+% scene3d.set('model name','navarro');
 scene3d.set('name','Chess');
 scene3d.set('rays per pixel',16);
 scene3d.set('resolution',[256 256]); 
-scene3d.set('accommodation',2);   % Diopters
-scene3d.set('pupil diameter',3);  % mm
+scene3d.set('pupil diameter',1);  % mm
+
+% scene3d.set('from',[0 0 -0.10]);
 
 % There is something wrong with the 'fov' calculation.
 % Changing the fov also changes the camera position.  That's weird.
@@ -82,14 +92,14 @@ sceneWindow(scene);
 
 dRange = scene3d.recipe.get('depth range','m');
 scene3d.recipe.get('to')
-scene3d.set('to',[0 0 40]);
+% scene3d.set('to',[0 0 0.5]);
 
 %%  Use the 
 
 scene3d.debugMode = false;
+scene3d.set('accommodation',2);   % Diopters
 scene3d.set('rays per pixel',128);
-scene3d.set('from',[0 0 -20]);
-[oi, result] = scene3d.render('render type','radiance');
+[oi, result] = scene3d.render('render type','both');
 oiWindow(oi);
 
 %% Chess set scaled

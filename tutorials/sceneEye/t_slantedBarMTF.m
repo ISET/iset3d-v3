@@ -127,7 +127,7 @@ sceneWindow(scene);
 %% Now turn off debugging to get the oi
 
 myScene.debugMode = false;  % We return a scene
-myScene.recipe.set('from',[0 0 -300]);
+myScene.recipe.set('from',[0 0 -30]);    % Worry about the units and positions
 oi = myScene.render;
 oiWindow(oi);
 
