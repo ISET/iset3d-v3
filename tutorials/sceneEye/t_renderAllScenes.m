@@ -61,12 +61,20 @@ oiWindow(oi);
 % that is scaled correctly.
 
 scene3d = sceneEye('chessSetScaled');
-% {
+scene3d = sceneEye('chessSet');
+scene3d.set('resolution',256);
+scene3d.set('rays per pixel',64);
+
+scene3d.set('mm units',false);
+oi= scene3d.render('render type','radiance');
+oiWindow(oi);
+
+scene3d.get('lens file')
+%{
 scene3d.set('model name','gauss');
 % scene3d.set('lensfilename','dgauss.22deg.12.5mm.dat');
 scene3d.set('camera',piCameraCreate('realistic','lens file','dgauss.22deg.12.5mm.dat'));
 scene3d.set('focal distance',12);   % mm is correct
-
 %}
 
 % scene3d = sceneEye('chessset');

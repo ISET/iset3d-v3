@@ -190,6 +190,19 @@ switch param
         thisR.set('film diagonal',35);
         
         %}
+    case 'mmunits'
+        % thisR.set('mm units',true/false)
+        %
+        % Indicate whether we are in millimeter units or not
+        thisR.camera.mmUnits.type = 'bool';
+        if val
+            % val is true, so we are in millimeter units
+            thisR.camera.mmUnits.value = 'true';
+        else
+            % We are probably in units of meters, not millimeters
+            thisR.camera.mmUnits.value = 'false';
+        end
+        
     case 'cameratype'
         % This should always be 'Camera'
         if ~isequal(val,'Camera')

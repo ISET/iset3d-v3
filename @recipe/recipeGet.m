@@ -411,7 +411,7 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'retinaradius'}
         % Default storage in mm.  Hence the scale factor on units
         if isequal(thisR.camera.subtype,'realisticEye')
-            val = thisR.camera.retinaDistance.value;
+            val = thisR.camera.retinaRadius.value;
         else, error('%s only exists for realisticEye model',param);
         end
         % Adjust spatial units per user's specification
@@ -423,7 +423,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Curved retina parameter.
         % Default storage in mm.  Hence the scale factor on units
         if isequal(thisR.camera.subtype,'realisticEye')
-            val = thisR.camera.retinaDistance.value;
+            val = thisR.camera.retinaSemiDiam.value;
         else, error('%s only exists for realisticEye model',param);
         end
         % Adjust spatial units per user's specification
@@ -434,23 +434,23 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'ior1'}
         % Index of refraction 1
         if isequal(thisR.camera.subtype,'realisticEye')
-            val = thisR.camera.retinaDistance.value;
+            val = thisR.camera.ior1.value;
         else, error('%s only exists for realisticEye model',param);
         end
     case {'ior2'}
         % Index of refraction 1
         if isequal(thisR.camera.subtype,'realisticEye')
-            val = thisR.camera.retinaDistance.value;
+            val = thisR.camera.ior2.value;
         else, error('%s only exists for realisticEye model',param);
         end
     case {'ior3'}
         if isequal(thisR.camera.subtype,'realisticEye')
-            val = thisR.camera.retinaDistance.value;
+            val = thisR.camera.ior3.value;
         else, error('%s only exists for realisticEye model',param);
         end
     case {'ior4'}
         if isequal(thisR.camera.subtype,'realisticEye')
-            val = thisR.camera.retinaDistance.value;
+            val = thisR.camera.ior4.value;
         else, error('%s only exists for realisticEye model',param);
         end
             
@@ -461,7 +461,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % We have to deal with fov separately for different types of camera
         % models.
         
-        filmDiag      = thisR.get('film diagonal'); 
+        filmDiag = thisR.get('film diagonal'); 
         switch lower(thisR.get('camera subtype'))
             case {'pinhole','perspective'}
                 % For the pinhole the film distance and the field of view always

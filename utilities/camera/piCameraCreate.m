@@ -166,7 +166,13 @@ switch ieParamFormat(cameraType)
         camera.pupilDiameter.value  = 4;
         camera.retinaSemiDiam.type  = 'float';
         camera.retinaSemiDiam.value = 6;
-       
+        
+        % Default distance to the focal plane in object space.  This
+        % differs from the 'object distance' which is the difference
+        % between the 'from' and 'to' coordinates.
+        camera.focusdistance.value = 0.2;   % Meters.  Accommodation is 5 diopters
+        camera.focusdistance.type  = 'float';
+        
         % These are index of refraction files for the navarro model
         [~,n,~] = fileparts(lensFile);
         if isequal(lower(n),'navarro')

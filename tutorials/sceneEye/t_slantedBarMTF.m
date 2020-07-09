@@ -110,25 +110,31 @@ thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to it
 % but we can change that by given sceneEye an optional 'planeDistance'
 % input. 
 myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
+myScene.set('mm units',false);
 myScene.set('model name','navarro');
 myScene.set('name','slanted bar test');
 myScene.set('rays per pixel',64);
 myScene.set('resolution',512); 
 myScene.set('accommodation',2);  % Diopters
 myScene.set('pupil diameter',3); % mm
-myScene.set('fov',1);            % Degrees
+myScene.set('retina semidiam',1);  % mm
+myScene.set('retina radius',12);  % mm
+% myScene.get('retina radius','m');  % mm
+% myScene.get('retina semidiam','mm');  % mm
 
 %% Render with debugging on returns only a scene
 
-myScene.set('debug mode',true);  % We return a scene
+%{
+myScene.set('debug mode',true);    % We return a scene
+myScene.set('fov',0.3);            % Degrees
 scene = myScene.render;
 sceneWindow(scene);
+%}
 
 %% Now turn off debugging to get the oi
 
 myScene.debugMode = false;  % We return a scene
-myScene.recipe.set('from',[0 0 -30]);    % Worry about the units and positions
-oi = myScene.render;
+oi = myScene.render('render type','radiance');
 oiWindow(oi);
 
 %%  How do we determine the distance to the planes?
