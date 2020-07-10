@@ -46,20 +46,20 @@ thisR = piRead(fullfile(scenePath,sceneName));
 % Note: Where should this position be calculated from?
 x = tand(eccentricity)*planeDepth;
 
-for ii = 1:length(thisR.assets)
-    if strcmp(thisR.assets(ii).name,'BlackPlane')
-        thisR.assets(ii).position = ...
-            [thisR.assets(ii).position(1)+x;...
-            thisR.assets(ii).position(2);...
-            planeDepth];
-    end
-    if strcmp(thisR.assets(ii).name,'WhitePlane')
-        thisR.assets(ii).position = ...
-            [thisR.assets(ii).position(1)+x;...
-            thisR.assets(ii).position(2);...
-            planeDepth];
-    end
-end
+%% Set the two planes to the specified distance
+
+T = [x,0,planeDepth];
+
+thisGroup= piAssetNames(thisR,'group find','WhitePlane');
+thisR.assets(thisGroup(1)).groupobjs(thisGroup(2)).position(3) = T(3);
+
+thisGroup= piAssetNames(thisR,'group find','BlackPlane');
+thisR.assets(thisGroup(1)).groupobjs(thisGroup(2)).position(3) = T(3);
+
+%{
+[gnames,cnames] = piAssetNames(thisR);
+gnames{thisGroup(1)}{thisGroup(2)}
+%}
 
 %% Make adjustments to the light
 

@@ -29,14 +29,18 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast image of the slanted bar first
 
+% Create an empty sceneEye object
 thisEye = sceneEye();
 
-% Needs to be fixed for the new assets format
-thisR = piCreateSlantedBarScene('planeDepth',0.5);
-%
+% Create a simple scene.  It is possible to use any scene recipe.
+% thisR = piRecipeDefault('scene name','Simple scene');
+
+% We are
+thisR = piCreateSlantedBarScene('planeDepth',0.2);
 
 thisEye.set('recipe',thisR);
 thisEye.set('camera',piCameraCreate('humaneye','lens file','navarro.dat'));
+thisEye.set('film resolution',320);
 thisEye.set('mm units',false);
 
 thisEye.usePinhole = true;
@@ -44,9 +48,12 @@ scene = thisEye.render;
 sceneWindow(scene);
 
 thisEye.usePinhole = false;
+thisEye.set('retina semidiam',3);
+thisEye.set('accommodation',0.4);
 oi = thisEye.render;
 oiWindow(oi);
-%}
+
+
 
 %{
 % This checks the distance to the plane
