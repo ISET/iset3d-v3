@@ -16,6 +16,11 @@ function thisR = piCreateSlantedBarScene(varargin)
 % RETURN
 %   recipe - recipe for this created scene
 
+% Examples:
+%{
+  thisR = piCreateSlantedBarScene('planeDepth',0.5);
+%}
+
 %% Parse inputs
 parser = inputParser();
 parser.addParameter('planeDepth',1, @isnumeric);

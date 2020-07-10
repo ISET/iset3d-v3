@@ -62,7 +62,7 @@ oiWindow(oi);
 
 scene3d = sceneEye('chessSetScaled');
 scene3d = sceneEye('chessSet');
-scene3d.set('resolution',256);
+scene3d.set('film resolution',256);
 scene3d.set('rays per pixel',64);
 
 scene3d.set('mm units',false);

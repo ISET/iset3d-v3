@@ -36,6 +36,10 @@ c = piCameraCreate('lightfield');
 lensname = 'dgauss.22deg.12.5mm.json';
 c = piCameraCreate('omni','lens file',lensname);
 %}
+%{
+lensname = 'navarro.dat';
+c = piCameraCreate('humaneye','lens file',lensname);
+%}
 
 % PROGRAMMING
 %   TODO: Perhaps this should be a function of the recipe class?

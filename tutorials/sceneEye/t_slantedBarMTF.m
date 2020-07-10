@@ -29,14 +29,22 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast image of the slanted bar first
 
+thisEye = sceneEye();
 
-%{
-% This one works
-thisR = piCreateSlantedBarScene();      % ('planeDepth', p.Results.planeDistance, 'eccentricity', p.Results.eccentricity);
-piWrite(thisR);
-[scene, result] = piRender(thisR,'render type','radiance');
+thisR = piCreateSlantedBarScene('planeDepth',0.5);
+thisEye.set('recipe',thisR);
+thisEye.set('camera',piCameraCreate('humaneye','lens file','navarro.dat'));
+thisEye.set('mm units',false);
+
+thisEye.debugMode = true;
+scene = thisEye.render;
 sceneWindow(scene);
+
+thisEye.debugMode = false;
+oi = thisEye.render;
+oiWindow(oi);
 %}
+
 %{
 % This checks the distance to the plane
 thisR = piCreateSlantedBarScene();      % 
@@ -111,14 +119,13 @@ thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to it
 % input. 
 myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
 myScene.set('mm units',false);
-myScene.set('model name','navarro');
-myScene.set('name','slanted bar test');
 myScene.set('rays per pixel',64);
-myScene.set('resolution',512); 
+myScene.set('film resolution',[256 256]); 
 myScene.set('accommodation',2);  % Diopters
 myScene.set('pupil diameter',3); % mm
-myScene.set('retina semidiam',1);  % mm
-myScene.set('retina radius',12);  % mm
+
+% myScene.set('retina semidiam',1);  % mm
+% myScene.set('retina radius',12);  % mm
 % myScene.get('retina radius','m');  % mm
 % myScene.get('retina semidiam','mm');  % mm
 
@@ -126,7 +133,7 @@ myScene.set('retina radius',12);  % mm
 
 %{
 myScene.set('debug mode',true);    % We return a scene
-myScene.set('fov',0.3);            % Degrees
+myScene.set('fov',3);            % Degrees
 scene = myScene.render;
 sceneWindow(scene);
 %}

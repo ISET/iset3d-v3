@@ -144,6 +144,11 @@ switch param
         % (camera) position, but not the object position in the scene.
         thisR.lookAt.from = thisR.lookAt.to + objDirection*val;
         % warning('Object distance may not be important');
+       
+    case {'accommodation'}
+        % Special case where we allow setting accommodation or focal
+        % distance.  My optometrist friends insist.
+        thisR.set('focal distance',1/val);
         
     case {'focusdistance','focaldistance'}
         % lens.set('focus distance',m)
