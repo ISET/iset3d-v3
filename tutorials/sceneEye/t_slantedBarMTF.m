@@ -31,16 +31,19 @@ if ~piDockerExists, piDockerConfig; end
 
 thisEye = sceneEye();
 
+% Needs to be fixed for the new assets format
 thisR = piCreateSlantedBarScene('planeDepth',0.5);
+%
+
 thisEye.set('recipe',thisR);
 thisEye.set('camera',piCameraCreate('humaneye','lens file','navarro.dat'));
 thisEye.set('mm units',false);
 
-thisEye.debugMode = true;
+thisEye.usePinhole = true;
 scene = thisEye.render;
 sceneWindow(scene);
 
-thisEye.debugMode = false;
+thisEye.usePinhole = false;
 oi = thisEye.render;
 oiWindow(oi);
 %}

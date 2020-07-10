@@ -150,32 +150,42 @@ switch ieParamFormat(cameraType)
         camera.num_pinholes_h.value = 8;
         
     case {'humaneye'}
-        % Special human eye camera model used with sceneEye calculations.
+        % Yuman eye camera model used with sceneEye calculations in
+        % ISETBio. 
         camera.type           = 'Camera';
         camera.subtype        = 'realisticEye';
         camera.lensfile.type  = 'string';
         camera.lensfile.value = lensFile;
+        
+        % This is the length of the chord that defines the field of view.
+        % There is a PowerPoint in the wiki (iset3d) images that explains
+        % the parameters and the eye ball geometry.
+        
+        % The distance from the back of the lens to the retina is the
+        % retinaDistance.
         camera.retinaDistance.type = 'float';
         camera.retinaDistance.value = 16.32;
-        
-        % What is the retinaSemiDiam?  BW/ZLY think the retina is modeled
-        % on a sphere and the retinaDistance is the radius of the sphere.
-        % The retinaSemiDiam is the distance if you put a plane at the
-        % circle that defines the edge of the retina and measure that
-        % circle's diameter.  The retinaRadius is the distance on the
-        % sphere from the center to the edge of the retina.
+        % The radius of the whole eyeball is retinaRadius.
         camera.retinaRadius.type    = 'float';
-        camera.retinaRadius.value   = 12;
-        camera.pupilDiameter.type   = 'float';
-        camera.pupilDiameter.value  = 4;
+        camera.retinaRadius.value   = 12;  %mm
+        % The chord length used to define the effect 'width','height' and
+        % field of view of the eyeball model.  See the PowerPoint (above).
         camera.retinaSemiDiam.type  = 'float';
-        camera.retinaSemiDiam.value = 6;
+        camera.retinaSemiDiam.value = 6;  %mm
+        
+        camera.pupilDiameter.type   = 'float';
+        camera.pupilDiameter.value  = 4;  % mm
         
         % Default distance to the focal plane in object space.  This
         % differs from the 'object distance' which is the difference
         % between the 'from' and 'to' coordinates.
         camera.focusdistance.value = 0.2;   % Meters.  Accommodation is 5 diopters
         camera.focusdistance.type  = 'float';
+        
+        % Default is units of meters.  If you have something in
+        % millimeters, you should use this flag
+        camera.mmUnits.value = 'false';
+        camera.mmUnits.type  = 'bool';
         
         % These are index of refraction files for the navarro model
         [~,n,~] = fileparts(lensFile);
