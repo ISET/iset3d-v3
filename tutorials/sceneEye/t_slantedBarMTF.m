@@ -1,18 +1,14 @@
 %% t_slantedBarMTF.m
 %
-% This tutorial shows how you can render a retinal image of "slanted bar."
-% We can then use this slanted bar to estimate the modulation transfer
-% function of the optical system.
-%
-% We also show how the color fringing along the edge of the bar due to
-% chromatic aberration. 
-%
 % We recommend you go through t_rayTracingIntroduction.m before running
 % this tutorial.
 %
-% 01/05/19 dhb  This broken because it calls a function
-%               calculateMTFFromSlantedBar that does not
-%               exist in iset3d or isetbio.
+% This tutorial renders a retinal image of "slanted bar." We can then use
+% this slanted bar to estimate the modulation transfer function of the
+% optical system.
+%
+% We also show how the color fringing along the edge of the bar due to
+% chromatic aberration. 
 %
 % Depends on: pbrt2ISET, ISETBIO, Docker, ISET
 %
@@ -30,15 +26,13 @@ if ~piDockerExists, piDockerConfig; end
 %% Render a fast image of the slanted bar first
 
 % Create an empty sceneEye object
-thisEye = sceneEye();
+thisEye = sceneEye('slantedbar');
 
 % Create a simple scene.  It is possible to use any scene recipe.
 % thisR = piRecipeDefault('scene name','Simple scene');
+% thisR = piCreateSlantedBarScene('planeDepth',0.2);
+% thisEye.set('recipe',thisR);
 
-% We are
-thisR = piCreateSlantedBarScene('planeDepth',0.2);
-
-thisEye.set('recipe',thisR);
 thisEye.set('camera',piCameraCreate('humaneye','lens file','navarro.dat'));
 thisEye.set('film resolution',320);
 thisEye.set('mm units',false);
@@ -47,52 +41,14 @@ thisEye.usePinhole = true;
 scene = thisEye.render;
 sceneWindow(scene);
 
+%% Now an OI
+
+% We still need to deal with some of the units, I think.
 thisEye.usePinhole = false;
-thisEye.set('retina semidiam',3);
-thisEye.set('accommodation',0.4);
 oi = thisEye.render;
 oiWindow(oi);
 
-
-
-%{
-% This checks the distance to the plane
-thisR = piCreateSlantedBarScene();      % 
-dRange = thisR.get('depth range','m');
-%}
-%{
-% We would like this to work
-thisR = piCreateSlantedBarScene();      % 
-thisR.camera = piCameraCreate('humaneye','lensfile','navarro.dat');
-piWrite(thisR);
-[oi, result] = piRender(thisR,'render type','radiance');
-oiWindow(oi);
-thisR.get('object distance','m')
-%}
-%{
-thisR = piRecipeDefault('scene name','slantedbar');      % 
-piWrite(thisR);
-[scene, result] = piRender(thisR,'render type','radiance');
-sceneWindow(scene);
-%}
-%{
-% The units of size and distance need some more help.
-thisR = piRecipeDefault('scene name','slantedbar');      % 
-thisR.camera = piCameraCreate('humaneye','lensfile','navarro.dat');
-
-% Changing the camera position does a lot of good.  What are the units?
-thisR.set('from',[0 0 -200]);
-piWrite(thisR);
-
-[oi, result] = piRender(thisR,'render type','radiance');
-oiWindow(oi);
-
-% I think there is a problem with the from/to in mm or meters.
-thisR.get('object distance','m')
-
-% How do we check the units on the scene assets?  For example, how do we check
-% the size to make sense of this?  
-%
+%%
 % TL had this sceneUnits flag.  Can we make sure that we are always in meters? 
 % It looks to me like the 'nodes'
 % in the scene planes have values like 40, which probably is interpreted as
@@ -126,35 +82,20 @@ thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to it
 % split in half diagonally. The bottom left half is white while the top
 % right half is black. By default the plane is placed at [0 0 1] meters,
 % but we can change that by given sceneEye an optional 'planeDistance'
-% input. 
+% input.
+%{
 myScene = sceneEye('slantedBar'); % Create a slanted bar at 0.5 meter
 myScene.set('mm units',false);
 myScene.set('rays per pixel',64);
 myScene.set('film resolution',[256 256]); 
 myScene.set('accommodation',2);  % Diopters
 myScene.set('pupil diameter',3); % mm
+%}
 
 % myScene.set('retina semidiam',1);  % mm
 % myScene.set('retina radius',12);  % mm
 % myScene.get('retina radius','m');  % mm
 % myScene.get('retina semidiam','mm');  % mm
-
-%% Render with debugging on returns only a scene
-
-%{
-myScene.set('debug mode',true);    % We return a scene
-myScene.set('fov',3);            % Degrees
-scene = myScene.render;
-sceneWindow(scene);
-%}
-
-%% Now turn off debugging to get the oi
-
-myScene.debugMode = false;  % We return a scene
-oi = myScene.render('render type','radiance');
-oiWindow(oi);
-
-%%  How do we determine the distance to the planes?
 
 
 %% Try moving the slanted bar in and out of focus
@@ -201,6 +142,7 @@ end
 % 256, and numCABands = 16, this takes roughly 3 min to render on an 8 core
 % machine.
 
+%{
 myScene = sceneEye('slantedBar','planeDistance',1);
 myScene.name = 'slantedBarForMTF';
 myScene.accommodation = 1;
@@ -211,6 +153,7 @@ myScene.resolution = 256;
 oi = myScene.render;
 
 oiWindow(oi);
+%}
 
 %% If you have isetlens-eye ( https://github.com/ISET/isetlens-eye) on your
 % path, you can run the following:
@@ -225,6 +168,7 @@ oiWindow(oi);
 %%  Otherwise, you can run this, which is essentially what
 % calculateMTFfromSlantedBar does.
 
+%{
 % Crop the image so we only have the slanted line visible. The ISO12233
 % routine will be confused by the edges of the retinal image if we don't
 % first crop it.
@@ -249,5 +193,6 @@ xlabel('Spatial Frequency (cycles/deg)');
 ylabel('Contrast Reduction (SFR)');
 grid on;
 axis([0 60 0 1])
+%}
 
 %%

@@ -55,11 +55,9 @@ myScene = sceneEye('numbersAtDepth');
 % needed to render a specific scene will be copied to the working folder
 % upon creation of the scene. All new data generated within ISETBIO will
 % also be placed in the working directory. This folder will eventually be
-% mounted onto the docker container to be rendered. You can specify a
-% specific working folder as follows: 
-%{
- myScene = sceneEye('scene','numbersAtDepth','workingDirectory',[path to desired directory]);
-%}
+% mounted onto the docker container to be rendered.
+%
+% The rendering software 
 
 % The sceneEye object contains information of the 3D scene as well as the
 % parameters of the eye optics included in the raytracing. You can see a

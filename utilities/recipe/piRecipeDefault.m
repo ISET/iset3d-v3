@@ -16,6 +16,7 @@ function thisR = piRecipeDefault(varargin)
 %     chessSet
 %     chessSetScaled
 %     teapot
+%     numbers at depth
 %
 %   write      -  Call piWrite (default is true).  Writes into iset3d/local
 %
@@ -220,6 +221,13 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,['cornell_box','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
+    case 'numbersatdepth'
+        sceneName = 'NumbersAtDepth';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['numbersAtDepth','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';
     otherwise
         error('Can not identify the scene, %s\n',sceneName);
 end
@@ -234,13 +242,13 @@ thisR.set('outputfile',outFile);
 
 % Set defaults for very low resolution, for testing
 thisR.integrator.subtype = 'path';
-thisR.set('pixelsamples', 16);
-thisR.set('filmresolution', [320, 180]);
+thisR.set('pixelsamples', 32);
+thisR.set('filmresolution', [320, 320]);
 
 %% Save the recipe for the user
 if write
     piWrite(thisR);
-    fprintf('Recipe is written in iset3d/local.\n');
+    fprintf('%s: Using piWrite to save %s in iset3d/local.\n',mfilename, sceneName);
 end
 
 end
