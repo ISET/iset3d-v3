@@ -55,9 +55,7 @@ thisEye.usePinhole = false;
 oi = thisEye.render;
 oiWindow(oi);
 
-%% Increase the resolution
-
-% Takes 30 sec
+%% Increase the spatial resolution and the number of rays
 
 thisEye.set('spatial resolution',512);
 thisEye.set('rays per pixel',128);
