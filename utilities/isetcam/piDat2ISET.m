@@ -41,9 +41,14 @@ p.addRequired('inputFile',@(x)(exist(x,'file')));
 p.addParameter('label','radiance',@(x)ischar(x));
 
 p.addParameter('recipe',[],@(x)(isequal(class(x),'recipe')));
+p.addParameter('wave', [], @isnumeric);
+
+% For the OI case
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
 p.addParameter('scaleilluminance',true,@islogical);
-p.addParameter('wave', [], @isnumeric);
+
+% For the pinhole case
+p.addParameter('meanluminance',100,@isnumeric);
 
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;
@@ -51,6 +56,7 @@ thisR       = p.Results.recipe;
 
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scaleIlluminance      = p.Results.scaleilluminance;
+meanLuminance         = p.Results.meanluminance;
 wave                  = p.Results.wave;
 
 %% Depending on label, assign the output data properly to ieObject
@@ -207,6 +213,13 @@ switch lower(cameraType)
             ieObject = sceneSet(ieObject,'fov',thisR.get('fov'));
         end
         
+        if(scaleIlluminance)
+            % In this case we cannot scale by the area because the aperture
+            % is a pinhole.  The ieObject is a scene.  So we use the mean
+            % luminance parameter (default is 100 cd/m2).
+            ieObject = sceneAdjustLuminance(ieObject,meanLuminance);
+            ieObject = sceneSet(ieObject,'luminance',sceneCalculateLuminance(ieObject));
+        end
     otherwise
         error('Unknown optics type %s\n',cameraType);       
 end
