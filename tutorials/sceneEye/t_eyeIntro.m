@@ -35,9 +35,11 @@ thisR = piRecipeDefault('scene name','chesssetscaled');
 % physiological optics (from Navarro) as the camera model for rendering.
 thisR.set('camera',piCameraCreate('humaneye','lens file','navarro.dat'));
 
-%% Create the 
+%% Create the basic sceneEye object 
 
 thisEye = sceneEye;
+
+% Add the recipe to the sceneEye
 thisEye.set('recipe',thisR);
 
 %% Check the basic scene.

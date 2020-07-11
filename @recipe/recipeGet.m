@@ -21,14 +21,14 @@ function val = recipeGet(thisR, param, varargin)
 %     'output base name' - just the base name of the output file
 %     'output dir'       - Directory of the output file
 %     'rendered file'    - dat-file where piRender creates the radiance
-%     'rendered dir'     - directory with rendered data 
+%     'rendered dir'     - directory with rendered data
 %     'working directory' - directory mounted by docker image
 %
 %   % Camera and scene
 %     'camera'           - The whole camera struct
 %     'object distance'  - The magnitude ||(from - to)|| of the difference
 %                          between from and to.  Units are from the scene,
-%                          typically in meters. 
+%                          typically in meters.
 %     'object direction' - Unit length vector of from and to
 %     'look at'          - Struct with four components
 %        'from'           - Camera location
@@ -39,8 +39,8 @@ function val = recipeGet(thisR, param, varargin)
 %     'lens file'        - Name of lens file in data/lens
 %     'focal distance'   - See autofocus calculation (mm)
 %     'pupil diameter'   - In millimeters
-%     'fov'              - (Field of view) only used if 'optics type' is
-%                          'pinhole' 
+%     'fov'              - (Field of view) Used if 'optics type' is
+%                          'pinhole' or 'realisticEye' or ..???
 %     'depth range'      - Depth range of the scene elements given the
 %                          camera position
 %
@@ -98,7 +98,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = fileparts(thisR.get('input file'));
     case {'inputbasename'}
         name = thisR.inputFile;
-        [~,val] = fileparts(name);        
+        [~,val] = fileparts(name);
     case 'outputfile'
         % This file location defines the working directory that docker
         % mounts to run.
@@ -115,8 +115,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         outputFile = thisR.get('output basename');
         val = fullfile(rdir,[outputFile,'.dat']);
     case {'rendereddir'}
-        outDir = thisR.get('output dir'); 
-        val = fullfile(outDir,'renderings'); 
+        outDir = thisR.get('output dir');
+        val = fullfile(outDir,'renderings');
     case {'renderedbasename'}
         val = thisR.get('output basename');
     case {'inputmaterialsfile','materialsfile'}
@@ -129,7 +129,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Standard location for the scene geometry output information
         outputDir = thisR.get('output dir');
         val = fullfile(outputDir,'scene','PBRT','pbrt-geometry');
-    
+        
         % Graphics related
     case {'exporter'}
         % 'C4D' or 'Unknown' or 'Copy' at present.
@@ -224,7 +224,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % For the realisticEye we have several models.  Over time we will
         % figure out how to identify them.  We might insert a slot in the
         % recipe with the label when we create the model.
-
+        
         if isequal(thisR.get('camera subtype'),'realisticEye') && ...
                 contains(thisR.get('lensfile'),'navarro')
             val = 'navarro';
@@ -266,7 +266,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                         fprintf('Using lens file at %s\n',val);
                     end
                 end
-           
+                
         end
     case {'lensdir','lensdirinput'}
         % This is the directory where the lens files are kept, not the
@@ -300,8 +300,9 @@ switch ieParamFormat(param)  % lower case, no spaces
         % camera model has a lens, we check whether the lens can bring this
         % distance into focus on the film plane.
         %
-        % N.B.  For pinhole this is focal distance.  
+        % N.B.  For pinhole this is focal distance.
         %       For lens, this   is focus distance.
+        %       (in PBRT parlance)
         %
         opticsType = thisR.get('optics type');
         switch opticsType
@@ -329,7 +330,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     if filmdistance < 0
                         warning('%s lens cannot focus an object at this distance.', lensFile);
                     end
-                end                
+                end
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
@@ -369,7 +370,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                             % distance to the focal plane into millimeters
                             % and see whether there is a film distance so
                             % that the plane is in focus.
-                            % 
+                            %
                             % But we return the value in meters
                             val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
                         else
@@ -384,9 +385,10 @@ switch ieParamFormat(param)  % lower case, no spaces
             case 'environment'
                 % No idea
             case 'realisticeye'
-                % 
+                % The back of the lens to the retina is returned for the
+                % realisticEye case
                 warning('Returning retina distance in m')
-                val = thisR.get('retina distance','m'); 
+                val = thisR.get('retina distance','m');
                 
             otherwise
                 error('Unknown opticsType %s\n',opticsType);
@@ -396,9 +398,9 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isempty(varargin), return;
         else, val = val*ieUnitScaleFactor(varargin{1});
         end
-
         
-    % realisticEye parameters
+        
+        % realisticEye parameters
     case {'retinadistance'}
         % Default storage in mm.  Hence the scale factor on units
         if isequal(thisR.camera.subtype,'realisticEye')
@@ -410,8 +412,12 @@ switch ieParamFormat(param)  % lower case, no spaces
         else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});
         end
         
-    case {'retinaradius'}
-        % Default storage in mm.  Hence the scale factor on units
+    case {'eyeradius','retinaradius'}
+        % thisR.get('eye radius','m');
+        % Default storage in mm.  
+        %
+        % Originally called retina radius, but it really is the
+        % radius of the eye ball, not the retina.
         if isequal(thisR.camera.subtype,'realisticEye')
             val = thisR.camera.retinaRadius.value;
         else, error('%s only exists for realisticEye model',param);
@@ -432,6 +438,75 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isempty(varargin), return;
         else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});
         end
+        
+    case 'center2chord'
+        % Distance from the center of the eyeball to the chord that defines
+        % the field of view.  We know the radius of the eyeball and the
+        % size of the chord.
+        %
+        %  val^2 + semiDiam^2 = radius^2
+        %
+        % See the PPT about the eyeball geometry, defining the retina
+        % radius, distance, and semidiam
+        
+        eyeRadius = thisR.get('retina radius','mm');
+        semiDiam  = thisR.get('retina semidiam','mm');
+        if(eyeRadius < semiDiam)
+            % The distance to the retina from the back of the lens should
+            % always be bigger than the eye ball radius.  Otherwise the
+            % lens is on the wrong side of the center of the eye.
+            error('semiDiam is larger than eye ball radius. Not good.')
+        end
+        val = sqrt(eyeRadius^2 - semiDiam^2);
+        
+        %{
+        % This is the old approach from TL.  I think we simplified it
+        % correctly.
+        
+        eyeRadius     = thisR.get('retina radius','mm');
+        focalDistance = thisR.get('retina distance','mm');
+        
+        % Not entirely accurate but lets treat the origin point for the FOV
+        % calculate as the back of the lens
+        if(eyeRadius > focalDistance)
+            % The distance to the retina from the back of the lens should
+            % always be bigger than the eye ball radius.  Otherwise the
+            % lens is on the wrong side of the center of the eye.
+            error('Eye radius is larger than retina distance.')
+        end
+        
+        % The field of view depends on the three eye ball geometry
+        % parameters, distance, radius, semidiam.  When we set the 'fov',
+        % we should really be setting the semidiam.  From the distance,
+        % radius, and semidiam, we should get the fov.
+        % the fov
+        d = focalDistance - eyeRadius;
+        
+        % We are solving a function to get the value of the distance, val.
+        myfun = @(a, k, d, r) sqrt(r^2-a.^2)./(d+a) - k;  % parameterized function
+       
+        k = tand(thisR.get('fov')/2);
+        
+        fun = @(a) myfun(a, k, d, eyeRadius);    % function of x alone
+        val = fzero(fun, [d eyeRadius]);
+        
+        if(isnan(val))
+            error('Search for a image width to match FOV failed. Initial guess is probably not close...')
+        end
+        %}
+    case {'lens2chord','distance2chord'}
+        %  Distance from the back of the lens to the chord that defines
+        %  the field of view.
+        %
+        % See the PPT about the eyeball geometry, defining the retina
+        % radius, distance, and semidiam
+       
+        eyeRadius     = thisR.get('retina radius','mm');
+        focalDistance = thisR.get('retina distance','mm');
+        d = focalDistance - eyeRadius;
+        
+        a = thisR.get('center 2 chord');
+        val = a+d;
         
     case {'ior1'}
         % Index of refraction 1
@@ -455,15 +530,15 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.camera.ior4.value;
         else, error('%s only exists for realisticEye model',param);
         end
-            
-    % Back to the general case
+        
+        % Back to the general case
     case {'fov','fieldofview'}
         % recipe.get('fov') - degrees
-        % 
+        %
         % We have to deal with fov separately for different types of camera
         % models.
         
-        filmDiag = thisR.get('film diagonal'); 
+        filmDiag = thisR.get('film diagonal');
         switch lower(thisR.get('camera subtype'))
             case {'pinhole','perspective'}
                 % For the pinhole the film distance and the field of view always
@@ -485,12 +560,19 @@ switch ieParamFormat(param)  % lower case, no spaces
                     val = atand(filmDiag/2/thisR.camera.filmdistance.value);
                 end
             case 'realisticeye'
-                % When we model the human eye the distance from the lens to
-                % the retina is stored in (retinaDistance). So is the size
-                % of the film (retinaRadius).
-                retinaRadius = thisR.camera.retinaRadius.value;
-                retinaDist   = thisR.camera.retinaDistance.value;
-                val = atand(retinaRadius/retinaDist)*2;
+                % thisR.get('fov') - realisticEye case
+                %
+                % The retinal geometry parameters are retinaDistance,
+                % retinaSemidiam and retinaRadius.
+                %
+                % The field of view depends on the size of a chord placed
+                % at the 'back' of the sphere where the image is formed.
+                % The length of half of this chord is called the semidiam.
+                % The distance from the lens to this chord can be
+                % calculated from the
+                rd = thisR.get('lens 2 chord','mm');
+                rs = thisR.get('retina semidiam','mm');
+                val = atand(rs/rd)*2;
             otherwise
                 % Another lens model (not human)
                 %
@@ -506,6 +588,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 filmDistance  = lensFocus(lensFile,1e+3*focusDistance); % mm
                 val           = atand(filmDiag/2/filmDistance);
         end
+        
     case 'depthrange'
         % dRange = thisR.get('depth range');
         % Values in meters
@@ -519,8 +602,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Default units are millimeters
         switch ieParamFormat(thisR.camera.subtype)
             case 'pinhole'
-                val = 0;  
-            case 'realisticeye'                
+                val = 0;
+            case 'realisticeye'
                 val = thisR.camera.pupilDiameter.value;
             otherwise
                 disp('Need to figure out pupil diameter!!!')
@@ -542,7 +625,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         catch
             val = 0;
         end
-
+        
         % Light field camera parameters
     case {'nmicrolens','npinholes'}
         % How many microlens (pinholes)
@@ -574,8 +657,8 @@ switch ieParamFormat(param)  % lower case, no spaces
     case 'aperturediameter'
         % Needs to be checked.
         if isfield(thisR.camera, 'aperturediameter') ||...
-            isfield(thisR.camera, 'aperture_diameter')
-                val = thisR.camera.aperturediameter.value;
+                isfield(thisR.camera, 'aperture_diameter')
+            val = thisR.camera.aperturediameter.value;
         else
             val = nan;
         end
@@ -585,7 +668,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isfield(thisR.film,'diagonal')
             val = thisR.film.diagonal.value;
         end
-  
+        
     case 'filmsubtype'
         % What are the legitimate options?
         if isfield(thisR.film,'subtype')
@@ -609,7 +692,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Number of bounces.  If not specified, 1.  Otherwise ...
         val = 1;
         if isfield(thisR.integrator,'maxdepth')
-            val = thisR.integrator.maxdepth.value;            
+            val = thisR.integrator.maxdepth.value;
         end
         
     case{'integrator'}
@@ -649,7 +732,7 @@ switch ieParamFormat(param)  % lower case, no spaces
     case{'light'}
         val = thisR.light;
         
-    % Assets - more work needed here.
+        % Assets - more work needed here.
     case {'assetroot'}
         % The root of all assets
         val = thisR.assets;
@@ -695,7 +778,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isempty(varargin), error('child name required'); end
         val = piAssetNames(thisR,'children find',varargin{1});
     case {'child'}
-        % child = thisR.get('child',idx); 
+        % child = thisR.get('child',idx);
         %
         % idx from child index is a 3 vector. There can be multiple
         % groupobjs at this level and we need to know which one has the
