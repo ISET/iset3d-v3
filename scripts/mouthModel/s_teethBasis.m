@@ -16,7 +16,8 @@ ylim([-0.8 0.6])
 teethRefl = ieReadSpectra('TeethReflectanceMeasurements_8subjects',...
                 wave, extrapVal);
 
-%% Calculate weights            
+%% Calculate weights
+% The first 8 samples are meaningful
 wgtsPred = zeros(size(teethRefl, 2)/2, 3);
 
 for ii=1:size(teethRefl, 2)/2

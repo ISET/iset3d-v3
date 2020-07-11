@@ -409,6 +409,32 @@ switch param
     % ZLY added fluorescent 
     case {'fluorophoreconcentration'}
         % thisR.set('fluorophore concentration',val,idx)
+        if isempty(varargin), error('Material name or index required'); end
+        idx = varargin{1};
+
+        % If the user sent a material name convert it to an index
+        if ischar(idx), idx = piMaterialFind(thisR,'name',idx); end
+
+        matName = val;
+        switch thisR.recipeVer
+            case 2
+                % A modern recipe. So we set using modern methods.  The
+                % function reads the fluorophore (fluorophoreRead) and
+                % returns the EEM and sets it.  It uses the wavelength
+                % sampling in the recipe to determine the EEM wavelength
+                % sampling.
+                thisR = piMaterialSet(thisR,idx,'fluorophore concentration',val);
+                
+            otherwise
+                % This is the original framing, before re-writing the
+                % materials.list organization by Zheng.
+                disp('Please update to version 2 of the recipe');
+                disp('This will be deprecated');
+                if ~isfield(thisR.materials.list, matName)
+                    error('Unknown material name %s\n', matName);
+                end
+                thisR.materials.list.(matName).floatconcentration = val;
+        end
     case {'fluorophoreeem'}
         % thisR.set('fluorophore eem',val,idx)
         %
