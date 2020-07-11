@@ -157,9 +157,11 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'cameratype'}
         % This is always 'Camera'
         val = thisR.camera.type;
-    case {'camerasubtype'}
-        % This is the type of Camera, maybe perspective, pinhole,
-        % realisticEye, omni, realistic, environment???
+    case {'cameramodel','camerasubtype'}
+        % thisR.get('camera model')
+        % This is Camera model, stored in the subtype slot.
+        % It may be perspective, pinhole, realisticEye, omni, realistic,
+        % environment.
         if isfield(thisR.camera,'subtype')
             val = thisR.camera.subtype;
         end
@@ -552,7 +554,10 @@ switch ieParamFormat(param)  % lower case, no spaces
         val(1) = thisR.camera.subpixels_h;
         
         % Film
-    case 'filmresolution'
+    case {'filmresolution','spatialresolution'}
+        % thisR.get('spatial resolution');
+        % When using ISETBio, we usually call it spatial resolution.  For
+        % ISETCam, it is usually film resolution.
         try
             val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
         catch

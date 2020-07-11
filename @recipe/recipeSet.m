@@ -468,8 +468,11 @@ switch param
         % Set in meters. Sigh again.
         thisR.camera.filmdistance.type = 'float';
         thisR.camera.filmdistance.value = val;
-    case 'filmresolution'
-        % This is printed out in the pbrt scene file
+    case {'filmresolution','spatialresolution'}
+        % thisR.set('spatial resolution',256);
+        % Number of spatial samples on the film (or retinal) surface. The
+        % number of samples may be spread over larger or smaller field of
+        % view.
         if length(val) == 1, val(2) = val(1); end
         thisR.film.xresolution.value = val(1);
         thisR.film.yresolution.value = val(2);

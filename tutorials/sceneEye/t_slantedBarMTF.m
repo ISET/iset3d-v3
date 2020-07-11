@@ -27,19 +27,16 @@ if ~piDockerExists, piDockerConfig; end
 
 % Create an empty sceneEye object
 thisEye = sceneEye('slantedbar');
+oi = thisEye.render;
+oiWindow(oi);
 
-% Create a simple scene.  It is possible to use any scene recipe.
-% thisR = piRecipeDefault('scene name','Simple scene');
-% thisR = piCreateSlantedBarScene('planeDepth',0.2);
-% thisEye.set('recipe',thisR);
 
-thisEye.set('camera',piCameraCreate('humaneye','lens file','navarro.dat'));
-thisEye.set('film resolution',320);
-thisEye.set('mm units',false);
+%% Increase the spatial resolution and number of ray samples
+thisEye.set('spatial resolution',512);
+thisEye.set('rays per pixel',128);
+oi = thisEye.render;
+oiWindow(oi);
 
-thisEye.usePinhole = true;
-scene = thisEye.render;
-sceneWindow(scene);
 
 %% Now an OI
 
