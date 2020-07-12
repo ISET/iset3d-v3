@@ -350,7 +350,15 @@ switch param
             warning('fov not set for camera models');
         end
     case 'diffraction'
-        thisR.camera.diffractionEnabled.value = val;
+        % thisR.set('diffraction');
+        %
+        % Turn on diffraction rendering.  Works with realistic eye and
+        % omni.  Probably realisticEye, but we should ask TL.
+        if val
+            thisR.camera.diffractionEnabled.value = 'true';
+        else 
+            thisR.camera.diffractionEnabled.value = 'false'; 
+        end
         thisR.camera.diffractionEnabled.type = 'bool';
         
     case 'chromaticaberration'

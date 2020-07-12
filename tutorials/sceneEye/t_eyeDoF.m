@@ -17,55 +17,52 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Load scene
 
-myScene = sceneEye('chessSet');
-myScene.name = 'chessSetTest';
+% This version of the chess set is scaled to the right dimensions
+thisEye = sceneEye('chessSetScaled');
+fprintf('Pupil diameter:  %0.1f mm\n',thisEye.get('pupil diameter','mm'));
 
-%{
-% Some other scenes to try
- myScene = sceneEye('snellenAtDepth');
- myScene = sceneEye('slantedBarTexture'); myScene.name = 'slantedbar';
- myScene = sceneEye('colorfulScene');
- myScene.name = 'colorfulScene';
- myScene.recipe.set('exporter','Copy')
-%}
-    
-%% Render a quick, LQ image
-% This takes roughly 10 sec to render on an 8 core machine.
+%% Render a quick, low quality scene
 
-myScene.accommodation = 1/0.28;
-myScene.fov = 30;
-myScene.numCABands = 8;
-myScene.diffractionEnabled = true;
-myScene.numBounces = 1;
-myScene.pupilDiameter = 2;
+% Through a pinhole you get a large depth of field
+thisEye.set('fov',20);             % deg
+thisEye.set('use pinhole',true);
+scene = thisEye.render('render type','radiance');
+sceneWindow(scene);
 
-myScene.numRays    = 128;
-myScene.resolution = 256;
+thisEye.summary;
 
-%% Set up the name and render
+%% This takes roughly 30 sec to render on an 8 core machine.
 
-[oi,results] = myScene.render;
+% Set up for optical image with lens
+thisEye.set('use pinhole',false);
+
+% Upgrade the quality
+thisEye.set('rays per pixel',256);
+thisEye.set('spatial samples',384);
+
+oi = thisEye.render('render type','both');    % Radiance and depth
 oiWindow(oi);
 
-%% Loop through pupil diameters
+% Print a summary
+thisEye.summary;
 
-% Increase the quality
-myScene.numCABands = 8;
-myScene.numBounces = 3;
-myScene.numRays    = 1024;
-myScene.resolution = 512;
+%% Adjust the focus plane to the back piece
 
-pupilDiameter = [2 4 6];
-for pd = pupilDiameter
-    
-    myScene.pupilDiameter = pd;
-    
-    myScene.name = sprintf('DoF%0.2fmm',pd);
-    [oi,results] = myScene.render;
-    
-    oiWindow(oi);
-end
+thisEye.set('accommodation',1);
+oi = thisEye.render('render type','radiance');
+oiWindow(oi);
 
+% Print a summary
+thisEye.summary;
+
+%% Reducing the pupil sharpens up the nearer pieces
+
+thisEye.set('pupil diameter',2);   % Shrink the pupil
+thisEye.set('rays per pixel',512); % Use more rays 
+oi = thisEye.render('render type','radiance');    % Radiance and depth
+oiWindow(oi);
+
+thisEye.summary;
 
 %%
 

@@ -463,41 +463,6 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         val = sqrt(eyeRadius^2 - semiDiam^2);
         
-        %{
-        % This is the old approach from TL.  I think we simplified it
-        % correctly.
-        
-        eyeRadius     = thisR.get('retina radius','mm');
-        focalDistance = thisR.get('retina distance','mm');
-        
-        % Not entirely accurate but lets treat the origin point for the FOV
-        % calculate as the back of the lens
-        if(eyeRadius > focalDistance)
-            % The distance to the retina from the back of the lens should
-            % always be bigger than the eye ball radius.  Otherwise the
-            % lens is on the wrong side of the center of the eye.
-            error('Eye radius is larger than retina distance.')
-        end
-        
-        % The field of view depends on the three eye ball geometry
-        % parameters, distance, radius, semidiam.  When we set the 'fov',
-        % we should really be setting the semidiam.  From the distance,
-        % radius, and semidiam, we should get the fov.
-        % the fov
-        d = focalDistance - eyeRadius;
-        
-        % We are solving a function to get the value of the distance, val.
-        myfun = @(a, k, d, r) sqrt(r^2-a.^2)./(d+a) - k;  % parameterized function
-       
-        k = tand(thisR.get('fov')/2);
-        
-        fun = @(a) myfun(a, k, d, eyeRadius);    % function of x alone
-        val = fzero(fun, [d eyeRadius]);
-        
-        if(isnan(val))
-            error('Search for a image width to match FOV failed. Initial guess is probably not close...')
-        end
-        %}
     case {'lens2chord','distance2chord'}
         %  Distance from the back of the lens to the chord that defines
         %  the field of view.
@@ -617,10 +582,25 @@ switch ieParamFormat(param)  % lower case, no spaces
         else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});
         end
         
+    case 'diffraction'
+        % thisR.get('diffraction');
+        %
+        % Status of diffraction during rendering.  Works with realistic eye
+        % and omni.  Probably realisticEye, but we should ask TL.  It isn't
+        % quite running in the new version, July 11.
+        val = 'false';
+        if isfield(thisR.camera,'diffractionEnabled')
+            val = thisR.camera.diffractionEnabled.value;
+        end
+        if isequal(val,'true'), val = true; else, val = false; end
+
     case 'chromaticaberration'
         % thisR.get('chromatic aberration')
         % True or false (on or off)
-        val = thisR.camera.chromaticAberrationEnabled.value;
+        val = 'false';
+        if isfield(thisR.camera,'chromaticAberrationEnabled')
+            val = thisR.camera.chromaticAberrationEnabled.value;
+        end
         if isequal(val,'true'), val = true; else, val = false; end
         
     case 'numcabands'
