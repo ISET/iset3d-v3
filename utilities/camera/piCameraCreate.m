@@ -168,6 +168,7 @@ switch ieParamFormat(cameraType)
         % The radius of the whole eyeball is retinaRadius.
         camera.retinaRadius.type    = 'float';
         camera.retinaRadius.value   = 12;  %mm
+        
         % The chord length used to define the effect 'width','height' and
         % field of view of the eyeball model.  See the PowerPoint (above).
         camera.retinaSemiDiam.type  = 'float';
@@ -186,6 +187,11 @@ switch ieParamFormat(cameraType)
         % millimeters, you should use this flag
         camera.mmUnits.value = 'false';
         camera.mmUnits.type  = 'bool';
+        
+        % Status of the chromatic aberration during rendering.  This slows
+        % the calculation, so we start with it off.
+        camera.chromaticAberrationEnabled.value = 'false';
+        camera.chromaticAberrationEnabled.type  = 'bool';
         
         % These are index of refraction files for the navarro model
         [~,n,~] = fileparts(lensFile);

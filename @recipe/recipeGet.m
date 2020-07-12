@@ -618,6 +618,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % True or false (on or off)
         val = thisR.camera.chromaticAberrationEnabled.value;
         if isequal(val,'true'), val = true; else, val = false; end
+        
     case 'numcabands'
         % thisR.get('num ca bands')
         try

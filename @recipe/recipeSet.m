@@ -363,26 +363,31 @@ switch param
         % Enable or disable
         thisR.camera.chromaticAberrationEnabled.type = 'bool';
         
+        % User turned off chromatic abberations
         if isequal(val,false)
+            % Use path, not spectralpath, integrator and set nunCABand to
+            % 1.
             thisR.camera.chromaticAberrationEnabled.value = 'false';
+            thisR.integrator.subtype = 'path';
+            thisR.integrator.numCABands.value = 1;
+            thisR.integrator.numCABands.type = 'integer';
             return;
-        elseif isequal(val,true)
-            thisR.camera.chromaticAberrationEnabled.value = 'true';
-            val = 8;
-        elseif isnumeric(val)
-            thisR.camera.chromaticAberrationEnabled.value = 'true';
-        else
-            error('Unexpected type for val.  %s\n',class(val));
         end
         
-        % Enabled, so set proper integrator
-        thisR.integrator.subtype = 'spectralpath';
+        % User sent in true or an integer number of bands which implies
+        % true.
+        thisR.camera.chromaticAberrationEnabled.value = 'true';
         
-        % Set the bands.  These are divided evenly into bands between
-        % 400 and 700 nm. There are  31 wavelength samples, so we
+        % This is the integrator that manages chromatic aberration.
+        thisR.integrator.subtype = 'spectralpath';
+
+        % Set the number of bands.  These are divided evenly into bands
+        % between 400 and 700 nm. There are  31 wavelength samples, so we
         % should not have more than 30 wavelength bands
+        if islogical(val), val = 8;  end % Default number of bands
         thisR.integrator.numCABands.value = min(30,val);
         thisR.integrator.numCABands.type = 'integer';
+        
     case 'integratorsubtype'
         % Used for chromatic aberration calculation
         thisR.integrator.type = 'Integrator';
