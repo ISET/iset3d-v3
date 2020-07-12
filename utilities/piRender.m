@@ -389,17 +389,27 @@ for ii = 1:length(filesToRender)
 
 end
 
-%% If the return is a scene or an oi, and the user set a mean luminance or mean illuminance value, do it.
+%% We used to name here, but apparently not needed any more
+
+% Why are we updating the wave?  Is that ever needed?
 if isstruct(ieObject)
     switch ieObject.type
         case 'scene'
-            names = strsplit(fileparts(thisR.inputFile),'/');
-            ieObject = sceneSet(ieObject,'name',names{end});
-            ieObject = sceneSet(ieObject, 'wave', wave);
+            % names = strsplit(fileparts(thisR.inputFile),'/');
+            % ieObject = sceneSet(ieObject,'name',names{end});
+            curWave = sceneGet(ieObject,'wave');
+            if ~isequal(curWave(:),wave(:))
+                ieObject = sceneSet(ieObject, 'wave', wave);
+            end
+            
         case 'opticalimage'
-            names = strsplit(fileparts(thisR.inputFile),'/');
-            ieObject = oiSet(ieObject,'name',names{end});
-            ieObject = oiSet(ieObject,'wave',wave);
+            % names = strsplit(fileparts(thisR.inputFile),'/');
+            % ieObject = oiSet(ieObject,'name',names{end});
+            curWave = oiGet(ieObject,'wave');
+            if ~isequal(curWave(:),wave(:)) 
+                ieObject = oiSet(ieObject,'wave',wave);
+            end
+                        
         otherwise
             error('Unknown struct type %s\n',ieObject.type);
     end

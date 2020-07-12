@@ -61,7 +61,7 @@ wave                  = p.Results.wave;
 
 %% Depending on label, assign the output data properly to ieObject
 
-nWave = length(wave);
+% nWave = length(wave);
 if(strcmp(label,'radiance') || strcmp(label, 'illuminant') || strcmp(label, 'illuminantonly'))
     
     % The PBRT output is in energy units.  Scenes and OIs data are
@@ -97,9 +97,8 @@ if(isempty(thisR))
 end
 
 % Create a name for the ISET object
-pbrtFile   = thisR.outputFile;
-[~,name,~] = fileparts(pbrtFile);
-ieObjName = sprintf('%s-%s',name,datestr(now,'mmm-dd,HH:MM'));
+pbrtFile   = thisR.get('output basename');
+ieObjName = sprintf('%s-%s',pbrtFile,datestr(now,'mmm-dd,HH:MM'));
 
 % If radiance, return a scene or optical image
 cameraType = thisR.get('camera subtype');

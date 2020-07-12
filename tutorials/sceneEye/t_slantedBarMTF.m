@@ -25,54 +25,43 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast image of the slanted bar first
 
-% Create an empty sceneEye object
 thisEye = sceneEye('slantedbar');
+thisEye.set('fov',3);                % About 3 deg on a side
+thisEye.set('spatial samples',512);  % Number of OI sample points
 oi = thisEye.render;
 oiWindow(oi);
 
+%% Increase the  number of ray samples to get rid of graphics noise
 
-%% Increase the spatial resolution and number of ray samples
-thisEye.set('spatial resolution',512);
 thisEye.set('rays per pixel',128);
 oi = thisEye.render;
 oiWindow(oi);
 
+thisEye.set('chromatic aberration',false);
+oi = thisEye.render;
 
-%% Now an OI
+%% Turn on chromatic aberration
 
-% We still need to deal with some of the units, I think.
-thisEye.usePinhole = false;
+% This is a lot slower.  8 bands or 4 bands is faster to just have a look.
+nSpectralBands = 4;
+thisEye.set('chromatic aberration',nSpectralBands);
 oi = thisEye.render;
 oiWindow(oi);
 
-%%
-% TL had this sceneUnits flag.  Can we make sure that we are always in meters? 
-% It looks to me like the 'nodes'
-% in the scene planes have values like 40, which probably is interpreted as
-% 40 meters.  The intention might have been 40 mm.  Anyway, something like
-% that needs easy checking.  Like
-% 
-%   'thisR.get('asset size',idx)'
-%
-
-%}
-
-%}
-%{
-% How we originally did this.
-myScene = sceneEye('slantedBar');
-piWrite(myScene.recipe);
-[oi, result] = piRender(myScene.recipe,'render type','radiance');
+mean(thisEye.get('depth range'))   % Where is the plane?
+thisEye.set('focal distance',0.5); % Set the focus off the plane
+oi = thisEye.render;               % Render
 oiWindow(oi);
 
-% This calls loadPbrtScene with some parameters
-% ('planeDepth', p.Results.planeDistance, 'eccentricity', p.Results.eccentricity);); % Create a slanted bar at 0.5 meter
-%}
-%{
-% Now set the'planeDistance' to 0.5 meters
-thisR = myScene.recipe;                               % This is the slanted bar scene PBRT recipe
-thisR = piAssetTranslate(thisR,assetIDX,newPosition); % Set the back plane to its new position
-%}
+mean(thisEye.get('depth range'))   % Where is the plane?
+thisEye.set('focal distance',2); % Set the focus off the plane
+oi = thisEye.render;               % Render
+oiWindow(oi);
+
+mean(thisEye.get('depth range'))   % Where is the plane?
+thisEye.set('focal distance',5); % Set the focus off the plane
+oi = thisEye.render;               % Render
+oiWindow(oi);
 
 %%
 % The slanted bar scene consists of a square plane (1x1 m) that is

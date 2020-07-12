@@ -29,6 +29,8 @@ thisEye.summary;
 thisEye = sceneEye('chesssetscaled');
 thisEye.summary;
 
+thisR = piRecipeDefault('scene name','sanmiguel');
+
 %%
 oi = thisEye.render;
 oiWindow(oi);

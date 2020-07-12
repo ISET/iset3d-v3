@@ -228,6 +228,35 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,['numbersAtDepth','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
+    case 'kitchen'
+        sceneName = 'kitchen';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
+    case 'livingroom'
+        sceneName = 'livingroom';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
+    case 'yeahright'
+        sceneName = 'yeahright';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['yeahright','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
+    case 'sanmiguel'
+        warning('sanmiguel:  Not rendering correctly yet.')
+        sceneName = 'sanmiguel';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['sanmiguel','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
     otherwise
         error('Can not identify the scene, %s\n',sceneName);
 end
