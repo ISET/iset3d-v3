@@ -8,8 +8,8 @@
 % TL ISETBIO Team, 2017  
 
 %% Initialize ISETBIO
-if ~isequal(piCamBio,'isetbio')
-    fprintf('%s: requires ISETBIO\n',mfilename); 
+if piCamBio
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
     return;
 end
 ieInit;
