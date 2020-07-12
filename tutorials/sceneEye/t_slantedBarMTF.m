@@ -48,17 +48,14 @@ thisEye.set('chromatic aberration',nSpectralBands);
 oi = thisEye.render;
 oiWindow(oi);
 
+%% Focus infront of and behind the plane, which is at 1m
+
 mean(thisEye.get('depth range'))   % Where is the plane?
+
 thisEye.set('focal distance',0.5); % Set the focus off the plane
 oi = thisEye.render;               % Render
 oiWindow(oi);
 
-mean(thisEye.get('depth range'))   % Where is the plane?
-thisEye.set('focal distance',2); % Set the focus off the plane
-oi = thisEye.render;               % Render
-oiWindow(oi);
-
-mean(thisEye.get('depth range'))   % Where is the plane?
 thisEye.set('focal distance',5); % Set the focus off the plane
 oi = thisEye.render;               % Render
 oiWindow(oi);

@@ -5,7 +5,9 @@ function [out, namelist] = summarize(thisR,str)
 %   [out, namelist] = recipe.summarize(str)
 %
 % Description
-%   Prints a summary of the recipe parameters to the console. 
+%   Prints a summary of the PBRT recipe parameters to the console. This
+%   routine has a lot of options.  We might simplify them or at least make
+%   the default more useful.  Have a look at sceneEye.summary().
 %
 % Inputs
 %   str:  'all','file','render','camera','film',lookat','assets',
@@ -26,7 +28,7 @@ function [out, namelist] = summarize(thisR,str)
 % Wandell
 %
 % See also
-%  recipe, recipeGet
+%  sceneEye.summary, recipe, recipeGet
 %
 
 % Examples:

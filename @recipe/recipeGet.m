@@ -334,6 +334,10 @@ switch ieParamFormat(param)  % lower case, no spaces
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
+    case {'accommodation'}
+        % thisR.get('accommodation');   % Diopters
+        val = 1 / thisR.get('focal distance','m');
+        
     case {'filmdistance'}
         % thisR.get('film distance',unit); % Returned in meters
         %
