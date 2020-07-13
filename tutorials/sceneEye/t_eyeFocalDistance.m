@@ -4,10 +4,9 @@
 % this tutorial.
 %
 % This tutorial renders a retinal image of "slanted bar" to illustrate
-%    * Quick scene rendering
-%    * Setting the FOV
-%    * turning on chromatic aberration
-%    * adjusting the focal distance closer and further than the plane
+%    * Quick scene rendering with a pinhole, no lens
+%    * Set the lens and turn on chromatic aberration (in focus)
+%    * Adjust the focal distance closer and further than the plane
 %
 % Depends on: 
 %    ISETBio, ISET3d, Docker
@@ -29,6 +28,8 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Show the slanted bar scene
 
+% This is rendered using a pinhole so the rendering is fast and has
+% infinite depth of field (no focal distance).
 thisEye = sceneEye('slantedbar');
 thisEye.set('use pinhole',true);
 thisEye.set('fov',2);                % About 3 deg on a side
@@ -37,45 +38,50 @@ sceneWindow(scene);
 
 thisEye.summary;
 
-%% Render a fast image of the slanted bar first
+%% Suppose you look at the edge of the plane in the image
 
+% Turn off the pinhole and use the Navarro model.
 thisEye.set('use pinhole',false);
-thisEye.set('rays per pixel',128);              % Reduce render noise
-thisEye.set('spatial samples',384);             % Number of OI sample points
-oi = thisEye.render('render type','radiance');  % Do not bother with depth
-oiWindow(oi);
 
-thisEye.summary;
-
-
-%% Turn on chromatic aberration
-
-% This is slower because it includes (about 8x)
+% Turn on chromatic aberration.  
 nSpectralBands = 8;
 thisEye.set('chromatic aberration',nSpectralBands);
-oi = thisEye.render('render type','radiance');  % Do not bother with depth
-oiWindow(oi);
 
-thisEye.summary;
-
-
-%% Distance to the plane
-
+% This is the distance to the plane.  We will match the focal plane.
 sprintf('Mean depth %f\n',mean(thisEye.get('depth range')))   
 
-%% Nearer than the plane
-thisEye.set('focal distance',0.5); % Set the focus closer than the plane
+thisEye.set('focal distance',1);
+
+% Reduce the rendering noise
+thisEye.set('rays per pixel',128);              % Reduce render noise
+thisEye.set('spatial samples',384);             % Number of OI sample points
+
+% Show the user what will be rendered
+thisEye.summary;
+
+% This takes longer than the pinhole rendering.
 oi = thisEye.render('render type','radiance');  % Do not bother with depth
 oiWindow(oi);
 
+%% Suppose the plane is there, but you look at something closer.
+
+thisEye.set('focal distance',0.3); 
+
+% Show the user what will be rendered
 thisEye.summary;
+
+oi = thisEye.render('render type','radiance');  
+oiWindow(oi);
 
 %%  Further than the plane
 
-thisEye.set('focal distance',5);                % Set the focus further than the plane
-oi = thisEye.render('render type','radiance');  % Do not bother with depth
-oiWindow(oi);
+% Now look at something beyond the plane
+thisEye.set('focal distance',5);      
 
+% Show the user what will be rendered
 thisEye.summary;
+
+oi = thisEye.render('render type','radiance');  
+oiWindow(oi);
 
 %% END
