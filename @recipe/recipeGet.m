@@ -345,6 +345,12 @@ switch ieParamFormat(param)  % lower case, no spaces
             otherwise
                 error('Unknown camera type %s\n',opticsType);
         end
+        
+        % Adjust spatial units per user's specification
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1});
+        end
+        
     case {'accommodation'}
         % thisR.get('accommodation');   % Diopters
         val = 1 / thisR.get('focal distance','m');
@@ -422,6 +428,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.camera.retinaDistance.value;
         else, error('%s only exists for realisticEye model',param);
         end
+        
         % Adjust spatial units per user's specification
         if isempty(varargin), return;
         else, val = (val*1e-3)*ieUnitScaleFactor(varargin{1});

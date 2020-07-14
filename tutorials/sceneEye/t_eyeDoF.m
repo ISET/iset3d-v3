@@ -26,46 +26,43 @@ fprintf('Pupil diameter:  %0.1f mm\n',thisEye.get('pupil diameter','mm'));
 % Through a pinhole you get a large depth of field
 thisEye.set('fov',20);             % deg
 thisEye.set('use pinhole',true);
+
+thisEye.summary;
 scene = thisEye.render('render type','radiance');
 sceneWindow(scene);
 
-thisEye.summary;
-
-%% This takes roughly 30 sec to render on an 8 core machine.
+%% Big pupil case.
 
 % Set up for optical image with lens
-thisEye.set('use pinhole',false);
+thisEye.set('use optics',true);
+
+% Focus on the rook at the back
+thisEye.set('accommodation',1);
 
 % Upgrade the quality
+thisEye.set('pupil diameter',5);     % Big pupil
 thisEye.set('rays per pixel',256);
 thisEye.set('spatial samples',384);
+
+% Print a summary
+thisEye.summary;
 
 oi = thisEye.render('render type','both');    % Radiance and depth
 oiWindow(oi);
 
-% Print a summary
-thisEye.summary;
-
-%% Adjust the focus plane to the back piece
-
-thisEye.set('accommodation',1);
-oi = thisEye.render('render type','radiance');
-oiWindow(oi);
-
-% Print a summary
-thisEye.summary;
 
 %% Reducing the pupil sharpens up the nearer pieces
 
-thisEye.set('pupil diameter',2);   % Shrink the pupil
+% Shrink the pupil
+thisEye.set('pupil diameter',2);   
+
+% We add some more rays because shrinking the pupil adds some rendering
+% noise.
 thisEye.set('rays per pixel',512); % Use more rays 
+thisEye.summary;
+
 oi = thisEye.render('render type','radiance');    % Radiance and depth
 oiWindow(oi);
 
-thisEye.summary;
 
-%%
-
-
-
-
+%% END

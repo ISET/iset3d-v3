@@ -48,7 +48,7 @@ nSpectralBands = 8;
 thisEye.set('chromatic aberration',nSpectralBands);
 
 % This is the distance to the plane.  We will match the focal plane.
-sprintf('Mean depth %f\n',mean(thisEye.get('depth range')))   
+sprintf('Mean depth %f (m)\n',mean(thisEye.get('depth range')))   
 
 thisEye.set('focal distance',1);
 

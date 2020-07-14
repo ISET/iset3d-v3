@@ -1,7 +1,9 @@
 %% t_rayTracingIntroduction.m
 %
-% This tutorial is an introduction to modeling the optics of the human eye
-% using ray-tracing in ISETBio.
+% This tutorial is a brief, mainly textual, introduction to modeling the
+% optics of the human eye using ray-tracing in ISETBio.  Read the words
+% here to get some ideas.  Then try the other tutorials (t_eye*) for more
+% examples of parameters (with fewer words).
 % 
 % To begin, you must have the Github repo iset3d on your MATLAB path:
 %
@@ -107,74 +109,54 @@ disp(theScene)
 % microlens arrays.
 disp(theScene.get('recipe'))
 
-%%
+%%  Show the scene.
+
+% Setting the pinhole to true means we have no optics.  The result is a
+% scene, rather than a spectral irradiance at the retina.
 theScene.set('use pinhole',true);
+theScene.set('fov',33);
+
 scene = theScene.render;
 sceneWindow(scene);
 
 %% Rendering the PBRT scene
 
-% Once you have loaded a scene, you render it using a method that is part
-% of the sceneEye class.
-theScene.set('use pinhole',false);
-retinalImage = theScene.render;
+% Now tell PBRT to use the lens
+theScene.set('use optics',true);
 
-% In ISETBio we represent the retinalImage 
-oiWindow(retinalImage);
+% Focus on the numbers at 200 mm
+theScene.set('accommodation',1/0.2);   % Diopters
 
-% Let's change the number of rays to render with. 
-theScene.numRays = 256;
+% The lens rendering benefits from adding a few more rays per pixel
+theScene.set('rays per pixel',192);
 
-% And the FOV of the retinal image
-theScene.fov = 30;
+% Summarizing is always nice
+theScene.summary;
 
-% Let's also change the resolution of the render. The retinal image is
-% always square, so there is only one parameter for resolution.
-theScene.resolution = 256;
-
-% Now let's render. This may take a few seconds, depending on the number of
-% cores on your machine. On a machine with 2 cores it takes ~15 seconds. 
+% Render and show.  We use 'oi' to refer to optical image, the spectral
+% irradiance at the retina (also retinal irradiance).
 oi = theScene.render;
-
-% Now we have an optical image that we can use with the rest of ISETBIO. We
-% can take a look at what it looks like right now:
 oiWindow(oi);
 
+%% Set the accomodation to the 100 mm target
 
-%% Step through accommodation
-% Now let's render a series of retinal images at different accommodations.
+% Change the focal distance.  You can set this in diopters or 'focal
+% distance'.  Your choice.
+theScene.set('accommodation',1/0.1);   % Diopters
+theScene.summary;
 
-% With numRays at 128 and resolution at 128, each image takes around 30
-% second to render on a local machine with 8 cores. If you'd like to
-% improve the image quality slightly, you can turn the resolution up to 256
-% and numRays to 256, which will bring rendering time to around 2 min per
-% image.
-%{
-  myScene.resoltuion = 256; 
-  myScene.numRays    = 256;
-%}
+oi = theScene.render;
+oiWindow(oi);
 
-accomm = [3 5 10]; % in diopters
-opticalImages = cell(length(accomm),1);
-for ii = 1:length(accomm)
-    
-    theScene.accommodation = accomm(ii);
-    theScene.name = sprintf('accom_%0.2fdpt',theScene.accommodation);
-    
-    % This produces the characteristic LCA of the eye. The higher the
-    % number, the longer the rendering time but the finer the sampling
-    % across the visible spectrum.
-    theScene.numCABands = 6; 
-    
-    % When we change accommodation the lens geometry and dispersion curves
-    % of the eye will change. ISETBIO automatically generates these new
-    % files at rendering time and will output them in your working
-    % directory. In general, you may want to periodically clear your
-    % working directory to avoid a build up of files.
-    [oi, results] = theScene.render;
-    opticalImages{ii} = oi;
-    oiWindow(oi);
-end
+%% Adjust the lens pigment density
+
+% The lens density is managed in the sceneEye.setOI method after the PBRT
+% rendering.
+theScene.set('lens density',0);
+theScene.summary;
+
+oi = theScene.render;
+oiWindow(oi);
 
 %% END
 
