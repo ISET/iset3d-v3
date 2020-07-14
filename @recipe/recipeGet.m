@@ -134,7 +134,18 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'exporter'}
         % 'C4D' or 'Unknown' or 'Copy' at present.
         val = thisR.exporter;
-        
+    case 'mmunits'
+        % thisR.get('mm units',true/false)
+        %
+        % Indicates whether the PBRT scene representation is in millimeter
+        % units.  Typically, it is not - it is in 'meters'.  The value is
+        % stored as a string because PBRT reads it that way.  We might
+        % choose to return true/false some day.
+        val = 'false';
+        if isfield(thisR.camera,'mmUnits')
+            % val is true, so we are in millimeter units
+            val = thisR.camera.mmUnits.value;
+        end
         % Scene and camera direction
     case 'objectdistance'
         % thisR.get('object distance',units)

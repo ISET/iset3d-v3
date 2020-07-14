@@ -258,8 +258,10 @@ if exist(inputFile_materials,'file')
     if ~piContains(headerCheck_material{1}, 'Exported by piMaterialWrite')
         if isequal(exporterFlag,true) && isequal(thisR.exporter,'C4D')
             % Everything is fine
+        elseif isequal(thisR.exporter,'Copy')
+            % Everything is still fine
         else
-            warning('The materials file export does not match the main file');
+            warning('Puzzled about the materials file.');
         end
     else
         if isequal(exporterFlag,false)
@@ -372,8 +374,9 @@ if isequal(thisR.exporter,'C4D')
     fprintf('Reading C4D geometry information.\n');
     thisR = piGeometryRead(thisR);
 elseif isequal(thisR.exporter,'Copy')
-    fprintf('Copying geometry.\n');
+    fprintf('Geometry file will be copied by piWriteCopy.\n');
 else
     fprintf('Skipping geometry.\n');
 end
+
 end

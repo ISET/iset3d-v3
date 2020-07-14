@@ -218,9 +218,9 @@ switch ieParamFormat(sceneName)
         sceneName = 'snellenAtDepth';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
-        fname = fullfile(FilePath,['cornell_box','.pbrt']);
+        fname = fullfile(FilePath,['snellen','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
-        exporter = 'C4D';
+        exporter = 'Copy';
     case 'numbersatdepth'
         sceneName = 'NumbersAtDepth';
         % Local
@@ -266,7 +266,9 @@ end
 thisR = piRead(fname);
 thisR.set('exporter',exporter);
 
-outFile = fullfile(piRootPath,'local',sceneName,[sceneName,'.pbrt']);
+% outFile = fullfile(piRootPath,'local',sceneName,[sceneName,'.pbrt']);
+[~,n,e] = fileparts(fname);
+outFile = fullfile(piRootPath,'local',sceneName,[n,e]);
 thisR.set('outputfile',outFile);
 
 % Set defaults for very low resolution, for testing

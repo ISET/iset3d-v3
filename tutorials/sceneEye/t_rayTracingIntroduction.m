@@ -1,7 +1,7 @@
 %% t_rayTracingIntroduction.m
 %
 % This tutorial is an introduction to modeling the optics of the human eye
-% using ray-tracing in ISETBIO.
+% using ray-tracing in ISETBio.
 % 
 % To begin, you must have the Github repo iset3d on your MATLAB path:
 %
@@ -11,28 +11,64 @@
 %
 %   https://github.com/isetbio/isetbio
 % 
-% You must also have docker installed and running on your machine. You can
-% find general instructions on docker here: https://www.docker.com/
+% You must have Docker installed and running on your machine. You can find
+% general instructions on docker here: 
 %
-% In ISETBIO we can load up a virtual, 3D scene and render a retinal image
-% by tracing the light passing from the scene through the optics of the
-% human eye onto the retina. We use a modified version of PBRT (Physically
-% Based Ray Tracer) to do this calculation. Our version of PBRT, which we
-% call pbrt-v3-spectral, has the ability to render through the optics of
-% the human eye and to trace rays spectrally. Pbrt-v3-spectral has also
-% been dockerized so you do not need to compile or install the source code
-% in order to render images. Instead, you must have docker installed and
-% running on your computer and the scenes should automatically render
-% through the docker container.
-% 
+%   https://www.docker.com/
+%
 % You can find the source code for pbrt-v3-spectral here:
-% https://github.com/scienstanford/pbrt-v3-spectral
+% 
+%   https://github.com/scienstanford/pbrt-v3-spectral
 %
 % Depends on: 
-%    iset3d, isetbio, Docker
+%    ISET3d, ISETBio, Docker
 %
-% TL ISETBIO Team, 2017
-    
+% See also:
+%   YouTube videos:
+%
+  
+%% The basic idea
+%
+% ISETBIO includes a set of tools for calculating the retinal image (also
+% called the spectral irradiance at the retina). 
+%
+% Many of the tools were developed for relatively simple scenes, like the
+% image on the central few degrees on a computer screen.  For such scenes
+% the spectral point spread functions are enough for the central fovea.  
+%
+% If the image spans a larger field of view, then the spectral point spread
+% functions across different field heights are necessary.
+%
+% For the much larger world of 3D natural images, we need additional tools.
+% In part this is because distance from the eye's accommodative plane has
+% an impact on the blur, and in part this is because 3D occlusion has an
+% additional impact.
+%
+% To assist with calculating for 3D natural image models we use ray tracing
+% methods. Specifically, we modified PBRT (Physically Based Ray Tracer) to
+% enable us to calculate how a 3D scene would become a retinal image
+% given that we had a model of the physiological optics.  PBRT is a widely
+% used and admired ray tracer that has been validated, it is open-source,
+% and it is very well-documented.
+%
+% PBRT is not Matlab, and thus we needed to develop a method for using it
+% smoothly with ISETBio (and ISETCam).
+%
+% What we have done is place the PBRT code inside of a Docker container
+% that can be called from within Matlab.  We have written a large number of
+% Matlab tools that permit us to set up the PBRT scenes and the parameters
+% of the physiological optics that transform the 3D scene into the retinal
+% image.
+%
+% With this approach, you do not need to compile or install the source code
+% in order to render images. You must only have docker installed and
+% running on your computer. 
+%
+% The next few lines show the basic philosoph we take to running the 3D ray
+% tracing code. There are many more tutorial scripts that go into detail,
+% and we hope you find those useful.  This one just gets you going.
+% Slightly.
+%
 
 %% Initialize ISETBIO
 if piCamBio
@@ -49,7 +85,7 @@ if ~piDockerExists, piDockerConfig; end
 % wiki page (https://github.com/isetbio/isetbio/wiki/3D-rendering).
 
 % You can select a scene as follows:
-myScene = sceneEye('numbersAtDepth');
+theScene = sceneEye('Numbers at depth');
 
 % ISETBIO requires a "working directory." If one is not specified when
 % creating a scene, the default is in isetbioRootPath/local. All data
@@ -60,28 +96,45 @@ myScene = sceneEye('numbersAtDepth');
 %
 % The rendering software 
 
-% The sceneEye object contains information of the 3D scene as well as the
-% parameters of the eye optics included in the raytracing. You can see a
-% list of the parameters available in the object structure:
-myScene
+% The sceneEye object class is quite simple, containing only a few
+% parameters that are special to its function.
+disp(theScene)
 
-% Let's render a quick, low quality retinal image first. Let's name this
-% render fastExample.
-myScene.name = 'fastExample';
+% Almost all of the rendering properties are specified within the 'recipe'.
+% The 'recipe' class is used by ISET3d for all scenes, whether they are
+% physiological optics models or not. The rendering software can handle
+% many types of lenses and much more complex optical models, say with
+% microlens arrays.
+disp(theScene.get('recipe'))
+
+%%
+theScene.set('use pinhole',true);
+scene = theScene.render;
+sceneWindow(scene);
+
+%% Rendering the PBRT scene
+
+% Once you have loaded a scene, you render it using a method that is part
+% of the sceneEye class.
+theScene.set('use pinhole',false);
+retinalImage = theScene.render;
+
+% In ISETBio we represent the retinalImage 
+oiWindow(retinalImage);
 
 % Let's change the number of rays to render with. 
-myScene.numRays = 256;
+theScene.numRays = 256;
 
 % And the FOV of the retinal image
-myScene.fov = 30;
+theScene.fov = 30;
 
 % Let's also change the resolution of the render. The retinal image is
 % always square, so there is only one parameter for resolution.
-myScene.resolution = 256;
+theScene.resolution = 256;
 
 % Now let's render. This may take a few seconds, depending on the number of
 % cores on your machine. On a machine with 2 cores it takes ~15 seconds. 
-oi = myScene.render;
+oi = theScene.render;
 
 % Now we have an optical image that we can use with the rest of ISETBIO. We
 % can take a look at what it looks like right now:
@@ -105,20 +158,20 @@ accomm = [3 5 10]; % in diopters
 opticalImages = cell(length(accomm),1);
 for ii = 1:length(accomm)
     
-    myScene.accommodation = accomm(ii);
-    myScene.name = sprintf('accom_%0.2fdpt',myScene.accommodation);
+    theScene.accommodation = accomm(ii);
+    theScene.name = sprintf('accom_%0.2fdpt',theScene.accommodation);
     
     % This produces the characteristic LCA of the eye. The higher the
     % number, the longer the rendering time but the finer the sampling
     % across the visible spectrum.
-    myScene.numCABands = 6; 
+    theScene.numCABands = 6; 
     
     % When we change accommodation the lens geometry and dispersion curves
     % of the eye will change. ISETBIO automatically generates these new
     % files at rendering time and will output them in your working
     % directory. In general, you may want to periodically clear your
     % working directory to avoid a build up of files.
-    [oi, results] = myScene.render;
+    [oi, results] = theScene.render;
     opticalImages{ii} = oi;
     oiWindow(oi);
 end

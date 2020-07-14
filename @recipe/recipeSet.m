@@ -84,24 +84,10 @@ switch param
         %
         % I think it is strange that we are doing this in a set. (BW).
         
-        currentDir = fileparts(thisR.outputFile);
         newDir     = fileparts(val);
-        if ~exist(newDir,'dir'), mkdir(newDir); end
-        
-        % Are we changing the output directory?  On the MAC, directory case
-        % is not respected, so ...
-        if isequal(lower(currentDir),lower(newDir))
-            % Nothing needs to be done
-        else
-            % We start copying from the current to the new
-            if ~exist(currentDir,'dir')
-                % No files to be copied
-            else
-                fprintf('Output directory changed. Copying files from %s to %s \n',...
-                    currentDir,newDir);
-                copyfile(currentDir,newDir);
-                rmdir(currentDir,'s');
-            end
+        if ~exist(newDir,'dir')
+            fprintf('Creating output folder %s\n',newDir);
+            mkdir(newDir); 
         end
         thisR.outputFile = val;
         
