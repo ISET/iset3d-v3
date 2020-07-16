@@ -235,6 +235,13 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,['bathroom','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Copy';
+    case 'classroom'
+        sceneName = 'classroom';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
     case 'kitchen'
         sceneName = 'kitchen';
         % Local
@@ -277,20 +284,32 @@ end
 
 %% Got the file, create the recipe
 
+% Parse the file contents into the ISET3d recipe and identify the type of
+% parser.  C4D has special status.  In other cases, such as the scenes from
+% the PBRT and Benedikt sites, we just copy the files into ISET3d/local.
 thisR = piRead(fname);
 thisR.set('exporter',exporter);
 
+% By default, do the rendering and mounting from ISET3d/local.  That
+% directory is not part of the git upload area.
 % outFile = fullfile(piRootPath,'local',sceneName,[sceneName,'.pbrt']);
 [~,n,e] = fileparts(fname);
 outFile = fullfile(piRootPath,'local',sceneName,[n,e]);
 thisR.set('outputfile',outFile);
 
-% Set defaults for very low resolution, for testing
+% Set defaults for very low resolution (for testing)
 thisR.integrator.subtype = 'path';
 thisR.set('pixelsamples', 32);
 thisR.set('filmresolution', [320, 320]);
 
-%% Save the recipe for the user
+% If no camera was included, add a pinhole by default.
+if isempty(thisR.get('camera'))
+    thisR.set('camera',piCameraCreate('pinhole'));
+end
+
+%% If requested, write the files now
+
+% Usually, however, we edit the recipe before writing and rendering.
 if write
     piWrite(thisR);
     fprintf('%s: Using piWrite to save %s in iset3d/local.\n',mfilename, sceneName);

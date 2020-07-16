@@ -11,9 +11,13 @@
 % Read a rendering recipe
 % thisR = piRecipeDefault('scene name','living room');
 % thisR = piRecipeDefault('scene name','kitchen');  % Very high dynamic range
-thisR = piRecipeDefault('scene name','yeahright');
+% thisR = piRecipeDefault('scene name','yeahright');
 % thisR = piRecipeDefault('scene name','plants dusk');  % Doesn't work
-thisR = piRecipeDefault('scene name','bathroom');
+% thisR = piRecipeDefault('scene name','bathroom');
+%{
+thisR = piRecipeDefault('scene name','classroom'); c = piCameraCreate('pinhole');
+thisR.set('camera',c);
+%}
 
 % Adjust the rendering and related parameters
 thisR.set('rays per pixel',128);

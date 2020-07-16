@@ -522,9 +522,13 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'fov','fieldofview'}
         % recipe.get('fov') - degrees
         %
-        % We have to deal with fov separately for different types of camera
-        % models.
+        if isfield(thisR.camera,'fov')
+            val = thisR.camera.fov.value;
+            return;
+        end
         
+        % Try to figure out.  But we have to deal with fov separately for
+        % different types of camera models.
         filmDiag = thisR.get('film diagonal');
         if isempty(filmDiag)
             thisR.set('film diagonal',10);
