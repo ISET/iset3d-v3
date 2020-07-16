@@ -526,6 +526,10 @@ switch ieParamFormat(param)  % lower case, no spaces
         % models.
         
         filmDiag = thisR.get('film diagonal');
+        if isempty(filmDiag)
+            thisR.set('film diagonal',10);
+            warning('Set film diagonal to 10 mm, arbitrarily');
+        end
         switch lower(thisR.get('camera subtype'))
             case {'pinhole','perspective'}
                 % For the pinhole the film distance and the field of view always
@@ -533,7 +537,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 % and film size.
                 if isfield(thisR.camera,'fov')
                     % The fov was set.
-                    val = thisR.camera.fov.value;  % There is an FOV
+                    val = thisR.get('fov');  % There is an FOV
                     if isfield(thisR.camera,'filmdistance')
                         % A consistency check.  The field of view should make
                         % sense for the film distance.
@@ -541,10 +545,15 @@ switch ieParamFormat(param)  % lower case, no spaces
                         assert(abs((val/tst) - 1) < 0.01);
                     end
                 else
-                    % If there is no FOV, then we have to have a film
-                    % distance and size to know the FOV.  This code will break
-                    % if we do not have the film distance.
-                    val = atand(filmDiag/2/thisR.camera.filmdistance.value);
+                    % There is no FOV. We hneed a film distance and size to
+                    % know the FOV.  With no film distance, we are in
+                    % trouble.  So, we set an arbitrary distance and tell
+                    % the user to fix it. 
+                    filmDistance = 3*filmDiag;  % Just made that up.
+                    thisR.set('film distance',filmDistance);
+                    warning('Set film distance  to %f (arbitrarily)',filmDistance);
+                    % filmDistance = thisR.set('film distance');
+                    val = atand(filmDiag/2/filmDistance);
                 end
             case 'realisticeye'
                 % thisR.get('fov') - realisticEye case
@@ -567,7 +576,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 % lens case. Film diagonal size and distance from the film
                 % to the back of the lens.
                 if ~exist('lensFocus','file')
-                    warning('To calculate FOV you need isetlens on your path');
+                    warning('To calculate FOV with a lens, you need isetlens on your path');
                     return;
                 end
                 focusDistance = thisR.get('focus distance');    % meters
@@ -640,10 +649,11 @@ switch ieParamFormat(param)  % lower case, no spaces
         val(1) = thisR.camera.subpixels_h;
         
         % Film
-    case {'filmresolution','spatialresolution'}
-        % thisR.get('spatial resolution');
-        % When using ISETBio, we usually call it spatial resolution.  For
-        % ISETCam, it is usually film resolution.
+    case {'spatialsamples','filmresolution','spatialresolution'}
+        % thisR.get('spatial samples');
+        %
+        % When using ISETBio, we usually call it spatial samples or spatial
+        % resolution.  For ISETCam, it is usually film resolution.
         try
             val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
         catch
@@ -698,7 +708,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.integrator.maxdepth.value;
         end
         
-    case{'integrator'}
+    case{'integrator','integratorsubtype'}
         if isfield(thisR.integrator,'subtype')
             val = thisR.integrator.subtype;
         end

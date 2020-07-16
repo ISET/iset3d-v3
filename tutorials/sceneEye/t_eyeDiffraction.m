@@ -1,6 +1,6 @@
 %% t_eyeDiffraction.m
 %
-% We recommend you go through t_rayTracingIntroduction.m before running
+% We recommend you go through t_eyeIntro.m before running
 % this tutorial.
 %
 % This tutorial renders a retinal image of "slanted bar." We can then use

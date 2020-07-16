@@ -7,19 +7,23 @@ function camera = piCameraCreate(cameraType,varargin)
 %  
 % The camera lens type
 %
-%    {'pinhole','perspective]  - Default is pinhole camera
+%    {'pinhole']   - Default is pinhole camera, also called 'perspective'
 %           
-%    'realistic'   - allows chromatic aberration and diffraction and a lens file
+%    'realistic'   - allows chromatic aberration, diffraction and a lens file
 %    'light field' - microlens array in front of the sensor 
 %    'human eye'   - T. Lian human eye model parameters
-%    'omni'        - M. Mara implementation
+%    'omni'        - M. Mara implementation that subsumes the others.
+%                    This may become our only form once we test enough.
 %
 % Optional parameter/values
 %
 % Output
-%   camera - Camera structure
+%   camera - Camera structure for placement in a recipe
 %
-% TL, SCIEN STANFORD 2017 
+% TL, BW SCIEN STANFORD 2017 
+%
+% See also
+%    recipe
 
 % Examples:
 %{
@@ -38,13 +42,13 @@ c = piCameraCreate('omni','lens file',lensname);
 %}
 %{
 lensname = 'navarro.dat';
-c = piCameraCreate('humaneye','lens file',lensname);
+c = piCameraCreate('human eye','lens file',lensname);
 %}
 
 % PROGRAMMING
-%   TODO: Perhaps this should be a function of the recipe class?
+%   TODO: Perhaps this should be a method in the recipe class?
 %
-%   TODO: Implement things like this for the camera type values
+%   TODO: Implement things key/val options for the camera type values
 %
 %           piCameraCreate('pinhole','fov',val);
 %
@@ -150,8 +154,7 @@ switch ieParamFormat(cameraType)
         camera.num_pinholes_h.value = 8;
         
     case {'humaneye'}
-        % Yuman eye camera model used with sceneEye calculations in
-        % ISETBio. 
+        % Human eye model used with sceneEye calculations in ISETBio. 
         camera.type           = 'Camera';
         camera.subtype        = 'realisticEye';
         camera.lensfile.type  = 'string';

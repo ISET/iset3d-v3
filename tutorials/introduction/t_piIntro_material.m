@@ -1,4 +1,4 @@
-%% Illustrates setting special scene materials
+%% Illustrates setting scene materials
 %
 % This example scene includes glass and other materials.  The script
 % sets up the glass material and number of bounces to make the glass
@@ -11,16 +11,10 @@
 %
 %    ISET3d, (ISETCam or ISETBio), JSONio
 %
-%  Check that you have the updated docker image by running
-%
-%    docker pull vistalab/pbrt-v3-spectral
-%    docker pull vistalab/pbrt-v3-spectral:test
-%
 % ZL, BW SCIEN 2018
 %
 % See also
 %   t_piIntro_*
-
 
 %% Initialize ISET and Docker
 
@@ -28,19 +22,13 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt files
-sceneName = 'SimpleScene';
-FilePath = fullfile(piRootPath,'data','V3',sceneName);
-fname = fullfile(FilePath,[sceneName,'.pbrt']);
-if ~exist(fname,'file'), error('File not found'); end
-
-% This scene contains some glass and a mirror
-thisR = piRead(fname);
+thisR = piRecipeDefault('scene name','simple scene');
 
 %% Set render quality
 
 % This is a low resolution for speed.
 thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',64);
+thisR.set('rays per pixel',64);
 
 %% List material library
 
@@ -55,15 +43,11 @@ piMaterialList(thisR);
 %% Write out the pbrt scene file, based on thisR.
 
 thisR.set('fov',45);
-thisR.film.diagonal.value = 10;
-thisR.film.diagonal.type  = 'float';
-thisR.integrator.subtype = 'bdpt';  
-thisR.sampler.subtype = 'sobol';
+thisR.set('film diagonal',10);
+thisR.set('integrator subtype','bdpt');
+thisR.set('sampler subtype','sobol');
 
 %% Changing the name!!!!  Important to comment and explain!!! ZL, BW
-outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
-thisR.set('outputFile',outFile);
-
 piWrite(thisR,'creatematerials',true);
 
 %% Render
@@ -71,9 +55,6 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
-if isequal(piCamBio,'isetcam')
-    sceneSet(scene,'display mode','hdr');
-end
 
 %% Adjust the scene material from uber to mirror
 

@@ -317,16 +317,25 @@ switch param
                 thisR.camera.fov.value = val;
                 thisR.camera.fov.type = 'float';
             else
+                % camera types:  omni, realisticeye, 
+                
                 % if two fov is given [hor, ver], we should resize film
-                % acoordingly
-                filmRes = thisR.get('film resolution');
+                % acoordingly.  This is the current number of spatial
+                % samples for the two dimensions
+                filmRes = thisR.get('spatial samples');
+                
+                % Set the field of view to the minimum of the two values
                 fov = min(val);
+                
                 % horizontal resolution/ vertical resolution
                 resRatio = tand(val(1)/2)/tand(val(2)/2);
+                
+                % Depending on which is the governing dimension, adjust the
+                % number of spatial samples, using the resolution ratio.
                 if fov == val(1)
-                    thisR.set('film resolution',[max(filmRes)*resRatio, max(filmRes)]);
+                    thisR.set('spatial samples',[max(filmRes)*resRatio, max(filmRes)]);
                 else
-                    thisR.set('film resolution',[max(filmRes), max(filmRes)/resRatio]);
+                    thisR.set('spatial samples',[max(filmRes), max(filmRes)/resRatio]);
                 end
                 thisR.camera.fov.value = fov;
                 thisR.camera.fov.type = 'float';
@@ -373,24 +382,37 @@ switch param
         thisR.camera.chromaticAberrationEnabled.value = 'true';
         
         % This is the integrator that manages chromatic aberration.
-        thisR.integrator.subtype = 'spectralpath';
+        thisR.set('integrator subtype','spectralpath');
 
         % Set the number of bands.  These are divided evenly into bands
         % between 400 and 700 nm. There are  31 wavelength samples, so we
         % should not have more than 30 wavelength bands
         if islogical(val), val = 8;  end % Default number of bands
-        thisR.integrator.numCABands.value = min(30,val);
-        thisR.integrator.numCABands.type = 'integer';
+        thisR.set('num ca bands',val);
         
     case 'integratorsubtype'
         % Used for chromatic aberration calculation
         thisR.integrator.type = 'Integrator';
-        thisR.integrator.subtype = 'spectralpath';
+        thisR.integrator.subtype = val;
 
     case 'integratornumcabands'
         thisR.integrator.type = 'Integrator';
         thisR.integrator.numCABands.value = val;
         thisR.integrator.numCABands.type = 'integer';
+        
+    case{'maxdepth','bounces','nbounces'}
+        % thisR.set('n bounces',val);
+        % Number of surfaces a ray can bounce from
+
+        if(~strcmp(thisR.integrator.subtype,'path')) &&...
+                (~strcmp(thisR.integrator.subtype,'bdpt'))
+            disp('Changing integrator sub type to "bdpt"');
+            
+            % When multiple bounces are needed, use this integrator
+            thisR.integrator.subtype = 'bdpt';
+        end
+        thisR.integrator.maxdepth.value = val;
+        thisR.integrator.maxdepth.type = 'integer';
         
     case 'autofocus'
         % Should deprecate this.  Let's run it for a while and see how
@@ -420,18 +442,7 @@ switch param
     case 'up'
         thisR.lookAt.up = val;
         
-        % Rendering related
-    case{'maxdepth','bounces','nbounces'}
-        % Eliminated warning Nov. 11, 2018.
-        if(~strcmp(thisR.integrator.subtype,'path')) &&...
-                (~strcmp(thisR.integrator.subtype,'bdpt'))
-            disp('Changing integrator sub type to "bdpt"');
-            
-            % When multiple bounces are needed, use this integrator
-            thisR.integrator.subtype = 'bdpt';
-        end
-        thisR.integrator.maxdepth.value = val;
-        thisR.integrator.maxdepth.type = 'integer';
+
         
         % Microlens
     case 'microlens'
@@ -478,10 +489,19 @@ switch param
         thisR.film.yresolution.value = val(2);
         thisR.film.xresolution.type = 'integer';
         thisR.film.yresolution.type = 'integer';
-    case {'pixelsamples','raysperpixel'}
+    
         % Sampler
+    case 'samplersubtype'
+        % thisR.set('sampler subtype','halton')
+        %
+        thisR.sampler.type = 'Sampler';
+        thisR.sampler.subtype = val;
+    case {'raysperpixel','pixelsamples'}
+        % thisR.set('rays per pixel')
+        % How many rays from each pixel 
         thisR.sampler.pixelsamples.value = val;
         thisR.sampler.pixelsamples.type = 'integer';
+        
     case{'cropwindow','crop window'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
@@ -492,12 +512,17 @@ switch param
     case {'traffictimestamp'}
         thisR.metadata.sumo.timestamp = val;
         
-        % Getting read for camera level recipe information.
-        % Not really used get.
+    case 'filter'
+        warning('Not sure how to set filter yet');
+        
+        % Getting ready for camera level recipe information.
+        % Not really used yet and may never get used.
     case {'camerabody'}
-        thisR.camera = val.camera;
-        thisR.film   = val.film;
-        thisR.filter = val.filter;
+        % Notice that val is rather special in this case. Which we are not
+        % yet using.
+        thisR.set('camera',val.camera);
+        thisR.set('film',val.film);
+        thisR.filter = thisR.set('filter',val.filter);
 
         % Materials should be built up here.
     case {'materials'}
