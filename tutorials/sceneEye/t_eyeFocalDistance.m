@@ -76,7 +76,8 @@ thisEye.summary;
 oi = thisEye.render('render type','radiance');
 oiWindow(oi);
 
-% You can see the spread of the short wavelength light.
+% You can see the spread of the short wavelength light.  The low sampling
+% density of the S-cones makes so much sense for this purpose.
 
 %% Adjust the accommodation nearer than the plane
 
