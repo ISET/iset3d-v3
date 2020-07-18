@@ -228,6 +228,13 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,['numbersAtDepth','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
+    case 'lettersatdepth'
+        sceneName = 'lettersAtDepth';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['lettersAtDepth','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';
     case 'bathroom'
         sceneName = 'bathroom';
         % Local
