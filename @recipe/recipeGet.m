@@ -9,23 +9,60 @@ function val = recipeGet(thisR, param, varargin)
 %     param - a parameter (string)
 %
 % Returns
-%     val - derived parameter
+%     val - Stored or derived parameter from the recipe
 %
 % Parameters
 %
 %   % Data management
-%     'input file'      - full path to original scene pbrt file
-%     'input base name' - just base name of input file
-%     'input dir'       - Directory of the input file
-%     'output file'     - full path to scene pbrt file in working directory
-%     'output base name' - just the base name of the output file
-%     'output dir'       - Directory of the output file
-%     'rendered file'    - dat-file where piRender creates the radiance
-%     'rendered dir'     - directory with rendered data
-%     'working directory' - directory mounted by docker image
+%    % The input files are the original PBRT files
+%     'input file'        - full path to original scene pbrt file
+%     'input basename'    - just base name of input file
+%     'input dir'         - Directory of the input file
 %
-%   % Camera and scene
+%    % The output files are the modified PBRT files after modifications to the
+%    % parameters in ISET3d
+%     'output file'       - full path to scene pbrt file in working directory
+%     'output basename'   - base name of the output file
+%     'output dir'        - Directory of the output file
+%
+%    % The rendered files are the output of PBRT, which starts with the
+%    % output files
+%     'rendered file'     - dat-file where piRender creates the radiance
+%     'rendered dir'      - directory with rendered data
+%     'rendered basename' - basename of rendered dat-file
+%
+%    % Scene properties 
+%     'exporter'  - Where the scene came from
+%     'mm units'  - Some scenes were given to us in mm, rathern m, units
+%     'depth range'      - Depth range of the scene elements given the
+%                          camera position (m)
+%
+%   % Camera, scene and film
+%    % There are several types of cameras: pinhole, realistic,
+%    % realisticDiffraction, realisticEye, and omni.  The camera parameters
+%    % are stored in the 'camera' and 'film' slots.  There are also some
+%    % parameters that define the camera location, what it is pointed at in
+%    % the World and motion
 %     'camera'           - The whole camera struct
+%     'camera type'      - Always 'camera'
+%     'camera subtype'   - 
+%     'camera body'
+%     'optics type'      - Translates camera sub type into one of
+%                          'pinhole', 'envronment', or 'lens'
+%     'lens file'        - Name of lens file in data/lens
+%     'focal distance'   - See autofocus calculation (mm)
+%     'pupil diameter'   - In millimeters
+%     'fov'              - (Field of view) Used if 'optics type' is
+%                          'pinhole' or 'realisticEye' or ..???
+%    % PBRT allows us to specify camera translations.  Here are the
+%    % parameters
+%     'camera motion start' - Start position in the World
+%     'camera motion end'   - End position in the World
+%     'camera exposure'     - Time (sec)
+%     'camera motion translate' - Difference in position (Start - End)
+%
+%    % The relationship between the camera and objects in the World are
+%    % specified by these parameters
 %     'object distance'  - The magnitude ||(from - to)|| of the difference
 %                          between from and to.  Units are from the scene,
 %                          typically in meters.
@@ -35,26 +72,82 @@ function val = recipeGet(thisR, param, varargin)
 %        'to'             - Camera points at
 %        'up'             - Direction that is 'up'
 %        'from to'        - vector difference (from - to)
-%     'optics type'      -
-%     'lens file'        - Name of lens file in data/lens
-%     'focal distance'   - See autofocus calculation (mm)
-%     'pupil diameter'   - In millimeters
-%     'fov'              - (Field of view) Used if 'optics type' is
-%                          'pinhole' or 'realisticEye' or ..???
-%     'depth range'      - Depth range of the scene elements given the
-%                          camera position
+%        'to from'        - vector difference (to - from)
 %
-%    % Light field camera
+%    % Lens
+%      'lens file'
+%      'lens dir input'
+%      'lens dir output'
+%      'lens basename'      - No extension
+%      'lens full basename' - With extension
+%      'focus distance'     - Distance to in-focus plane  (m)
+%      'focal distance'     - Used with pinhole, which has infinite depth
+%                             of field, to specify the distance from the
+%                             pinhole and film 
+%      'accommodation'      - Inverse of focus distance (diopters)
+%      'fov'                - Field of view (deg)
+%      'aperture diameter'   - For most cameras, but not human eye
+%      'pupil diameter'      - For realisticEye.  Zero for pinhole
+%      'diffraction'         - Enabled or not
+%      'chromatic aberraton' - Enabled or not
+%      'num ca bands'        - Number of chromatic aberration spectral bands
+%
+%    % Film and retina
+%      'film subtype' 
+%      'film distance'      - PBRT adjusts the film distance so that an
+%                             object at the focus distance is in focus.
+%                             This is that distance. If a pinhole, it might
+%                             just exist as a parameter.  If it doesn't
+%                             exist, then we use the film size to and FOV
+%                             to figure out what it must be.
+%      'spatial samples'    - Sampling resolution
+%      'film x resolution'  - Number of x dimension samples
+%      'film y resolution'  - Number of y-dimension samples
+%      'film diagonarl'     - Size in mm
+%      
+%   
+%      % Special retinal properties for human eye models
+%      'retina distance'
+%      'eye radius'
+%      'retina semidiam'
+%      'center 2 chord'
+%      'lens 2 chord'
+%      'ior1','ior2','ior3','ior4' - Index of refraction slots for Navarro
+%                                    eye model
+%
+%    % Light field camera parameters
 %     'n microlens'      - 2-vector, row,col (alias 'n pinholes')
 %     'n subpixels'      - 2 vector, row,col
 %
-%    % Rendering
+%    % Properties of how PBRT does the rendering
 %      'integrator'
+%      'rays per pixe'
 %      'n bounces'
+%      'crop window'
+%      'integrator subtype'
+%      'nwavebands'
 %
-%    %  Asset information
-%       'assets'      - Not sure I am doing this right
+%    % Asset information
+%       'assets'      - This struct includes the objects and their
+%                       properties in the World
 %       'asset names' - The names in groupobjs.name
+%       'group names'
+%       'group index'
+%       'group obj'
+%       'child'
+%       'children names'
+%       'children index'
+%
+%    % Material information
+%      'materials'
+%      'materials output file'
+%
+%    % Textures
+%      'texture'
+%      
+%    % Lighting information
+%      'light'
+%
 %
 % BW, ISETBIO Team, 2017
 
@@ -68,7 +161,8 @@ function val = recipeGet(thisR, param, varargin)
 %}
 
 % Programming todo
-%
+%   * Lots of gets needed for the assets, materials, lighting, ...
+%  
 
 %% Parameters
 

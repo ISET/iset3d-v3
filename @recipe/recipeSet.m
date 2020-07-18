@@ -12,25 +12,81 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % Parameter list (in progress, many more to be added)
 %
 %   Data management
-%    outputfile
-%    inputfile
+%    'input file'
+%    'output file
+%    'rendered file'
 %
-%  Scene and camera
-%    camera
-%    object distance (also focus distance)
-%    exposure time
+%  %Scene
+%    'mm units'   - Logical (true/false)
+%    'exporter'   - Information about where the PBRT file came from
+%    'lookat'
+%    'from'
+%    'to'
+%    'up'
+%
+%  % Camera
+%    'camera'
+%    'camera subtype'
+%    'camera exposure'
+%    'camera body'      - Do not use
+%
+%    'object distance'
+%    'accommodation'
+%    'exposure time'
+%    'focus distance'
+%    'focal distance'
+%    'n microlens'
+%    'light field film resolution'
+%    'n subpixels'
+%
+%   % Lens
+%     'lens file'    - JSON file for omni.  Older models (realistic) use dat-file
+%     'lens radius'  - Only for perspective camera.  Use aperture diameter
+%                      for omni
+%     'aperture diameter'
+%     'fov'
+%     'diffraction'
+%     'chromatic aberration'
+%
+%   % Film
+%     'film diagonal'
+%     'film distance'
+%     'spatial samples'
+%  
+%   % RealisticEye (human optics)
+%     'retina distance' - mm
+%     'eye radius'      - mm
+%     'retina semdiam'  - mm
+%     'pupil diameter'  - mm
+%     'ior1','ior2','ior3','ior4' - Index of refraction data for Navarro eye
+%                          model
 %
 %  Film/sensor
-%    film diagonal
-%    film distance
-%    film resolution
-%    rays per pixel
-%
-%  Lens
-%    lensfile - json format for omni case.  dat format for realistic.
+%    'film diagonal'
+%    'film distance'
+%    'film resolution'
+%    'rays per pixel'
 %
 %  Rendering
-%    nbounces
+%    'integrator num ca bands'
+%    'integrator subtype'
+%    'sampler'
+%    'filter'
+%    'rays per pixel'
+%    'crop window'
+%    'nbounces'
+%    'autofocus'
+%
+%  Materials
+%    'materials'
+%    'materials output file'
+%    'fluorophore concentration'
+%    'fluorophore eem'
+%    'concentration'
+%    
+%  ISETAuto special:
+%    'traffic flow density'%
+%    'traffic time stamp'
 %
 % BW ISETBIO Team, 2017
 %
@@ -42,7 +98,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % https://www.pbrt.org/fileformat-v3.html#cameras
 %
 % See also
-%    recipeGet
+%    @recipe, recipeGet
 
 % Examples:
 %{
@@ -247,7 +303,7 @@ switch param
         % Specified in mm
         thisR.camera.retinaDistance.value = val;
         thisR.camera.retinaDistance.type = 'float';
-    case {'retinaradius'}
+    case {'eyeradius','retinaradius'}
         % Specified in mm
         thisR.camera.retinaRadius.value = val;
         thisR.camera.retinaRadius.type = 'float';
@@ -463,7 +519,9 @@ switch param
         thisR.set('film resolution', nMicrolens .* nSubpixels);
     case 'nsubpixels'
         % How many pixels behind each microlens/pinhole
-        % The type is not included because this is not passed to pbrt.
+        % The type is not included because this is not passed to pbrt.  It
+        % is specified in the lens file made by the Docker container.  See
+        % instructions about modeling light field cameras.
         thisR.camera.subpixels_h = val(1);
         thisR.camera.subpixels_w = val(2);
         
@@ -501,7 +559,7 @@ switch param
         thisR.sampler.pixelsamples.value = val;
         thisR.sampler.pixelsamples.type = 'integer';
         
-    case{'cropwindow','crop window'}
+    case{'cropwindow'}
         thisR.film.cropwindow.value = [val(1) val(2) val(3) val(4)];
         thisR.film.cropwindow.type = 'float';
         
