@@ -20,7 +20,7 @@ thisR.set('camera',c);
 %}
 
 % Adjust the rendering and related parameters
-thisR.set('rays per pixel',128);
+thisR.set('rays per pixel',1024);
 thisR.set('spatial samples',[512 512]);
 piWrite(thisR);
 

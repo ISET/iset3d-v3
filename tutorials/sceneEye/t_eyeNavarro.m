@@ -75,7 +75,7 @@ thisEye.set('use pinhole',false);
 % bands for speed and to get a rought sense. You can use up to 31.  It is
 % slow, but that's what we do here because we are only rendering once. When
 % the GPU work is completed, this will be fast!
-nSpectralBands = 31;
+nSpectralBands = 16;
 thisEye.set('chromatic aberration',nSpectralBands);
 
 % Find the distance to the object
@@ -88,7 +88,7 @@ thisEye.set('focal distance',oDist);
 thisEye.set('rays per pixel',512);      
 
 % Increase the spatial resolution by adding more spatial samples.
-thisEye.set('spatial samples',784);     
+thisEye.set('spatial samples',512);     
 
 % Summarize
 thisEye.summary;
