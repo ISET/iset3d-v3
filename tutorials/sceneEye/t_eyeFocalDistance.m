@@ -1,9 +1,10 @@
 %% t_eyeFocalDistance.m
 %
-% We recommend you go through t_rayTracingIntroduction.m before running
+% We recommend you go through t_eyeIntro.m before running
 % this tutorial.
 %
 % This tutorial renders a retinal image of "slanted bar" to illustrate
+%
 %    * Quick scene rendering with a pinhole, no lens
 %    * Set the lens and turn on chromatic aberration (in focus)
 %    * Adjust the focal distance closer and further than the plane
@@ -28,42 +29,58 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Show the slanted bar scene
 
-% This is rendered using a pinhole so the rendering is fast and has
+% This is rendered using a pinhole so the rendering is fast.  It has
 % infinite depth of field (no focal distance).
+
 thisEye = sceneEye('slantedbar');
+
+% This is the distance to the edge in the scene.  We will match the focal
+% plane.
+sprintf('Mean depth %f (m)\n',mean(thisEye.get('depth range')))  
+
 thisEye.set('use pinhole',true);
-thisEye.set('fov',2);                % About 3 deg on a side
+thisEye.set('fov',2);             % Degrees
+
+% The scene has a little imperfection.  We will fix it some day.
 scene = thisEye.render;
-sceneWindow(scene);
+sceneWindow(scene);   
 
 thisEye.summary;
 
-%% Suppose you look at the edge of the plane in the image
+%% Now use the optics model.
 
-% Turn off the pinhole and use the Navarro model.
+% Turn off the pinhole.  The model eye (by default) is the Navarro model.
 thisEye.set('use pinhole',false);
 
-% Turn on chromatic aberration.  
+% Suppose you are in focus at the proper distance to the edge. And we turn
+% on chromatic aberration.  That will slow down the calculation, but makes
+% it more accurate and interesting.  We only use 8 spectral bands for
+% speed.  You can use up to 31.
 nSpectralBands = 8;
 thisEye.set('chromatic aberration',nSpectralBands);
 
-% This is the distance to the plane.  We will match the focal plane.
-sprintf('Mean depth %f (m)\n',mean(thisEye.get('depth range')))   
+% This is the distance we calculate above
+thisEye.set('focal distance',1);  
 
-thisEye.set('focal distance',1);
+% Reduce the rendering noise by using more rays. 
+thisEye.set('rays per pixel',128);      
 
-% Reduce the rendering noise
-thisEye.set('rays per pixel',128);              % Reduce render noise
-thisEye.set('spatial samples',384);             % Number of OI sample points
+% Increase the spatial resolution by adding more spatial samples.
+thisEye.set('spatial samples',384);     
 
-% Show the user what will be rendered
+% Summarize
 thisEye.summary;
 
-% This takes longer than the pinhole rendering.
-oi = thisEye.render('render type','radiance');  % Do not bother with depth
+% This takes longer than the pinhole rendering, so we do not bother with
+% the depth.
+oi = thisEye.render('render type','radiance');
 oiWindow(oi);
 
-%% Suppose the plane is there, but you look at something closer.
+% You can see the spread of the short wavelength light.
+
+%% Adjust the accommodation nearer than the plane
+
+% Suppose the plane is there, but you look at something closer.
 
 thisEye.set('focal distance',0.3); 
 
@@ -73,7 +90,10 @@ thisEye.summary;
 oi = thisEye.render('render type','radiance');  
 oiWindow(oi);
 
-%%  Further than the plane
+% When you are focused closer than the blur is larger and the spread of the
+% short wavelength light increases.
+
+%% Beyond the plane
 
 % Now look at something beyond the plane
 thisEye.set('focal distance',5);      
@@ -83,5 +103,10 @@ thisEye.summary;
 
 oi = thisEye.render('render type','radiance');  
 oiWindow(oi);
+
+% When you are focused beyond the edge the blur changes substantially.  In
+% this case the color fringe is very different.  This change in color
+% fringe provides a wonderful single to direct the direction of
+% accommodation. 
 
 %% END

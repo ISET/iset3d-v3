@@ -1,5 +1,7 @@
 %% t_eyePupilDiameter.m
 %
+% Deprecated
+%
 % Render the slanted bar scene at different pupil diameters. The rendered
 % images can be used to calculate the MTF of the eye at a specific pupil
 % size. 

@@ -37,7 +37,7 @@ function thisR = piRecipeDefault(varargin)
 %  pullSceneFromRDT('snellenAtDepth', scenePath);
 %
 % See also
-%  @recipe
+%  @recipe, recipe.list
 
 % Examples:
 %{

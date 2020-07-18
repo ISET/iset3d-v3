@@ -74,7 +74,7 @@ switch str
         fprintf('Input:  %s\n',thisR.get('input file'));
         fprintf('Output: %s\n',thisR.get('output file'));
         if isfield(thisR,'exporter'), fprintf('Exported by %s\n',thisR.exporter); end
-        fprintf('\n');
+        % fprintf('\n');
         
     case 'render'
         fprintf('\nRenderer information\n-----------\n');
@@ -85,7 +85,7 @@ switch str
         fprintf('renderer\n');
         fprintf('filter\n');
         namelist = thisR.world;  % Abusive.  Change variable name.
-        fprintf('\n');
+        % fprintf('\n');
         
     case 'camera'
         fprintf('\nCamera parameters\n-----------\n');
@@ -98,7 +98,7 @@ switch str
         fprintf('Focal distance (m):\t%0.2f\n',thisR.get('focal distance'));
         fprintf('Exposure time (s):\t%f\n',thisR.get('exposure time'));
         fprintf('Field of view (deg):\t%f\n',thisR.get('fov'));
-        fprintf('\n');
+        % fprintf('\n');
         
     case 'film'
         out = thisR.film;
@@ -111,7 +111,7 @@ switch str
         else
             fprintf('diagonal:   %d (mm)\n',thisR.get('film diagonal'));
         end
-        fprintf('\n');
+        % fprintf('\n');
         
     case 'lookat'
         fprintf('\nLookat parameters\n-----------\n');
@@ -120,8 +120,8 @@ switch str
         fprintf('from:\t%.3f %.3f %.3f\n',thisR.get('from'));
         fprintf('to:\t%.3f %.3f %.3f\n',thisR.get('to'));
         fprintf('up:\t%.3f %.3f %.3f\n',thisR.get('up'));
-        fprintf('object distance: %.3f (m)',thisR.get('object distance'));
-        fprintf('\n');
+        fprintf('object distance: %.3f (m)\n',thisR.get('object distance'));
+        % fprintf('\n');
         
     case 'assets'
         fprintf('\nAssets\n-----------\n');
@@ -144,7 +144,7 @@ switch str
             namelist{ii} = thisR.assets(ii).name;
         end
         namelist = sort(unique(namelist));
-        fprintf('\n');
+        % fprintf('\n');
         
     case 'materials'
         fprintf('\nMaterials\n-----------\n');
@@ -154,7 +154,7 @@ switch str
         fprintf('Number:\t%d\n',numel(thisR.materials.list));
         [~,filename,ext] = fileparts(thisR.materials.inputFile_materials);
         fprintf('File:\t%s\n',[filename,ext])
-        fprintf('\n');
+        % fprintf('\n');
         
     case 'metadata'
 
@@ -167,7 +167,7 @@ switch str
         for ii=1:numel(namelist)
             fprintf('%d\t%s\n',ii,namelist{ii});
         end
-        fprintf('\n');
+        % fprintf('\n');
         
     otherwise
         error('Unknown parameter %s\n',str);

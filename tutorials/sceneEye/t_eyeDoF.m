@@ -1,11 +1,22 @@
 %% t_eyeDoF.m
 %
-% This tutorial uses the sceneEye class and methods to calculate the effect
-% of pupil diameter on the depth of field in the scene.
-% 
-% Depends on: iset3d, isetbio, Docker
+% We suggest reading the t_eyeIntro tutorial before running this tutorial.
 %
-% TL ISETBIO Team, 2017  
+% This tutorial renders a retinal image of the chess set to illustrate
+%
+%    * Quick scene rendering with a pinhole, no lens
+%    * Set the lens and turn on chromatic aberration (in focus)
+%    * Adjust the focal distance closer and further than the plane
+%
+% The Chess Set scene is not part of the GitHub repository.  To download
+% the PBRT scene please visit
+%
+%     INSTRUCTIONS WILL BE PLACED HERE.  In the mean time, ask me.
+% 
+% Depends on: ISET3d, ISETBio, Docker
+%
+% See also
+%   t_eyeIntro, t_eyeFocalDistance, 
 
 %% Initialize ISETBIO
 if piCamBio

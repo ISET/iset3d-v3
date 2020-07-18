@@ -1,11 +1,15 @@
 %% t_eyeIntro.m
 %
-% This tutorial is a brief, mainly textual, introduction to modeling the
-% optics of the human eye using ray-tracing in ISETBio.  Read the words
-% here to get some ideas.  Then try the other tutorials (t_eye*) for more
-% examples of parameters (with fewer words).
+% This brief tutorial is a (mainly) textual, introduction to modeling the
+% optics of the human eye using ray-tracing in ISETBio and ISET3d.  
+%
+% The words and brief code in here describe the basic ideas.  Other
+% tutorials (t_eye*) for more examples of parameters (with fewer words) to
+% illustrate the ISETBio sceneEye usage.  Look through the ISET3d tutorials
+% (t_piIntro*) to see more about general modeling with many other types of
+% optical models.
 % 
-% To begin, you must have the Github repo iset3d on your MATLAB path:
+% To begin, you must have the Github repo ISET3d on your MATLAB path:
 %
 %   https://github.com/ISET/iset3d 
 %
@@ -73,50 +77,72 @@
 %
 
 %% Initialize ISETBIO
+
+% We switch between ISETBio and ISETCam often. We use this little header to
+% make sure the user is on the ISETBio path needed for sceneEye.
 if piCamBio
     fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
     return;
 end
+
+% General ISET initialization
 ieInit;
+
+% Checks that you have docker installed and configured.
 if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast, low quality retinal image
 
-% We have several scenes that have been tailored specifically for isetbio
-% and iset3d. You can find a description of these scenes (and more) on the
-% wiki page (https://github.com/isetbio/isetbio/wiki/3D-rendering).
+% We have several scenes that have been created specifically for ISETBio
+% and ISET3d. 
 
-% You can select a scene as follows:
+% You can select and read the data from a PBRT scene by initializing a
+% sceneEye object with the directory name of the PBRT files.  A collection
+% of files is part of the ISET3d repository (iset3d/data/V3).
 theScene = sceneEye('Numbers at depth');
 
-% ISETBIO requires a "working directory." If one is not specified when
-% creating a scene, the default is in isetbioRootPath/local. All data
-% needed to render a specific scene will be copied to the working folder
-% upon creation of the scene. All new data generated within ISETBIO will
-% also be placed in the working directory. This folder will eventually be
-% mounted onto the docker container to be rendered.
+% theScene is a sceneEye object that has been initialized by reading the
+% PBRT files in the relevant directory.
 %
-% The rendering software 
+% To see all of PBRT files available for loading use the @recipe 'list'
+% method:
+theScene.recipe.list;
 
-% The sceneEye object class is quite simple, containing only a few
-% parameters that are special to its function.
+% The first level of the sceneEye object class is quite simple, containing
+% only a few parameters that are special to its function.
 disp(theScene)
 
-% Almost all of the rendering properties are specified within the 'recipe'.
-% The 'recipe' class is used by ISET3d for all scenes, whether they are
+% Almost all of the rendering parameters and the complexity of the scene
+% are specified within the 'recipe'. That object (@recipe in ISET3d) is not
+% simple.
+%
+% The @recipe class is used by ISET3d for all scenes, whether they are
 % physiological optics models or not. The rendering software can handle
 % many types of lenses and much more complex optical models, say with
-% microlens arrays.
+% microlens arrays.  This is the top level of that class.  Notice that we
+% retrieve the recipe from theScene using the 'get' method.
 disp(theScene.get('recipe'))
 
-%%  Show the scene.
+%%  Seeing the scene.
 
-% Setting the pinhole to true means we have no optics.  The result is a
+% It is often useful to have a quick look at the scene you have loaded. Ray
+% tracing through a pinhole is much faster than through the optics. We take
+% a quick look by setting the 'use pinhole' to true and then rendering.
+% Because there are no optics, the result of the rendering is an ISETBio
 % scene, rather than a spectral irradiance at the retina.
+
+% Notice the use of 'set'
 theScene.set('use pinhole',true);
+
+% We can tell PBRT the field of view of the scene.
 theScene.set('fov',33);
 
+% Render it this way.   By default, the depth map is calculated, too.
+% Notice that the rendering calls docker (twice).  The radiance and depth
+% maps are calculated and read into the ISETBio scene structure.
 scene = theScene.render;
+
+% Show the scene
 sceneWindow(scene);
 
 %% Rendering the PBRT scene
@@ -124,10 +150,10 @@ sceneWindow(scene);
 % Now tell PBRT to use the lens
 theScene.set('use optics',true);
 
-% Focus on the numbers at 200 mm
+% Set the scene to focus on the numbers at 200 mm
 theScene.set('accommodation',1/0.2);   % Diopters
 
-% The lens rendering benefits from adding a few more rays per pixel
+% The lens rendering benefits from adding a more rays per pixel
 theScene.set('rays per pixel',192);
 
 % Summarizing is always nice
@@ -138,25 +164,59 @@ theScene.summary;
 oi = theScene.render;
 oiWindow(oi);
 
+% The number at 200 is in good focus, while the others are not.
+
 %% Set the accomodation to the 100 mm target
 
-% Change the focal distance.  You can set this in diopters or 'focal
-% distance'.  Your choice.
+% Set the focal distance to 100 mm (0.1 m).  We will set 'accommodation'
+% again, but you could set the 'focal distance' parameter if you prefer.
 theScene.set('accommodation',1/0.1);   % Diopters
+
+% Summarize
 theScene.summary;
 
+% Now we 
 oi = theScene.render;
 oiWindow(oi);
+
+% Now the number at 100 mm is in good focus, not 200 or 300.
 
 %% Adjust the lens pigment density
 
-% The lens density is managed in the sceneEye.setOI method after the PBRT
-% rendering.
+% Other parameters, such as lens density are managed in the same way.  For
+% example you can change the lens density to 0 this way.
 theScene.set('lens density',0);
+
 theScene.summary;
 
 oi = theScene.render;
+
 oiWindow(oi);
+
+% The image is no longer yellow.
+
+%% More on the parameters
+
+% There are many parameters of the rendering and eye model that can be
+% changed. We always address this parameters through the 'get' and 'set'
+% methods of the sceneEye class.  This is important because if we ever have
+% to make a change to the parameters or calculations, that change can be
+% implemented in the 'set' or 'get' function, rather than having to track
+% down all the places that made explicit reference to the parameter.  All
+% programmers know this - but we have observed that the idea is not alway
+% implemented in practice.
+%
+
+% The parameters include values that control the rendering, control the
+% eye, control objects in the scene.  At this point nearly all of the work
+% we are doing on ISET3d - and it is a work in progress - involves better
+% understanding and controlling the parameters needed to do scientific and
+% engineering work.  We are not done - but we are better now than we were a
+% year ago, so there is hope.
+
+% We suggest that a next tutorial to try might be t_eyeFocalDistance, which
+% illustrates chromatic aberration and focal distance for the Navarro
+% physiological optics model.
 
 %% END
 

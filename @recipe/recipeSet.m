@@ -371,9 +371,8 @@ switch param
             % Use path, not spectralpath, integrator and set nunCABand to
             % 1.
             thisR.camera.chromaticAberrationEnabled.value = 'false';
-            thisR.integrator.subtype = 'path';
-            thisR.integrator.numCABands.value = 1;
-            thisR.integrator.numCABands.type = 'integer';
+            thisR.set('integrator subtype','path');
+            thisR('integrator numCABands',1);
             return;
         end
         
@@ -388,7 +387,7 @@ switch param
         % between 400 and 700 nm. There are  31 wavelength samples, so we
         % should not have more than 30 wavelength bands
         if islogical(val), val = 8;  end % Default number of bands
-        thisR.set('num ca bands',val);
+        thisR.set('integrator num cabands',val);
         
     case 'integratorsubtype'
         % Used for chromatic aberration calculation
