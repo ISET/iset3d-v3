@@ -5,11 +5,10 @@
 %
 % This tutorial renders a retinal image of the chess set to illustrate
 %
-%    * Quick scene rendering with a pinhole, no lens.  Infinite depth of
-%    field
-%    * Set the physiological optics and a focal distance at the rook.  The
-%    nearby pieces are blurred
-%    * Adjust the focal distance closer, the rook becomes blurred.
+%    * Rendering with a pinhole, no lens.  Infinite depth of field
+%    * Set the physiological optics and a focal distance on the rook.
+%    * For a big pupil, the nearby pieces are very blurred
+%    * Reduce the pupil diameter and the nearby pieces are less blurred.
 %
 % For speed, we do this calculation without chromatic aberration.
 %
