@@ -43,6 +43,11 @@ if ~piDockerExists, piDockerConfig; end
 % The MCC image is the default recipe.  We do not write it out yet because
 % we are going to change the parameters
 thisR = piRecipeDefault;
+%{
+piWrite(thisR); 
+scene = piRender(thisR);
+sceneWindow(scene);
+%}
 
 %% Change the light
 
@@ -51,7 +56,7 @@ thisR = piLightDelete(thisR, 'all');
 
 % Add an equal energy distant light for uniform lighting
 spectrumScale = 1;
-lightSpectrum = 'EqualEnergy';
+lightSpectrum = 'equalEnergy';
 thisR = piLightAdd(thisR,...
     'type','distant',...
     'light spectrum',lightSpectrum,...
@@ -60,15 +65,9 @@ thisR = piLightAdd(thisR,...
 
 %% Set an output file
 
-% All output needed to render this recipe will be written into this
-% directory. 
-sceneName = 'macbeth';
-outFile = fullfile(piRootPath,'local',sceneName,'macbeth.pbrt');
-thisR.set('outputfile',outFile);
-
 % This is pretty high resolution given the nature of the target.
-thisR.integrator.subtype = 'path';
-thisR.set('pixelsamples', 16);
+thisR.set('integrator subtype','path');
+thisR.set('rays per pixel', 16);
 thisR.set('filmresolution', [640, 360]);
 
 %% Write 
@@ -77,14 +76,10 @@ thisR.set('filmresolution', [640, 360]);
 % material file.
 piWrite(thisR, 'overwritematerials', true);
 
-%% Render the scene and the illuminant
+%% Render and display
 
-% This case uses the default docker image, that does not incorporate
-% fluorescence rendering.  'all' means the illuminant, depth, and
-% radiance.
-thisDocker = 'vistalab/pbrt-v3-spectral';
-wave = 400:10:700;
-[scene, result] = piRender(thisR, 'wave', wave, 'dockerimage name', thisDocker, 'render type','illuminant');
+clear scene
+[scene, result] = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
 
 %%

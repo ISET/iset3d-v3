@@ -11,7 +11,7 @@ ieInit
 
 thisSE = sceneEye('chess set scaled','human eye','arizona');
 
-thisSE.set('rays per pixel',256);  % Pretty quick, but not high quality
+thisSE.set('rays per pixel',128);  % Pretty quick, but not high quality
 
 oi = thisSE.render('render type','radiance');  % Render and show
 
