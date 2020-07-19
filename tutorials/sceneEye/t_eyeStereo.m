@@ -5,14 +5,13 @@
 % Create a stereo pair of retinal irradiance images.
 %
 % See also
+%   t_eyeCrop2Cones
 %
 
-%%
-ieInit
 
 %% Make an oi of the chess set scene using the LeGrand eye model
 
-thisSE = sceneEye('chess set scaled','human eye','legrand');
+thisSE = sceneEye('chess set scaled','human eye','navarro');
 
 thisSE.set('lens density',0);   % Just because I can
 

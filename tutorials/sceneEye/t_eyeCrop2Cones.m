@@ -9,11 +9,17 @@
 % TODO:
 %   Copy some of the ROI utilities from ISETCam over to ISETBio
 
-%%
-ieInit
+%% Check ISETBIO and initialize
+if piCamBio
+    fprintf('%s: requires ISETBio, not ISETCam\n',mfilename); 
+    return;
+end
+ieInit;
+if ~piDockerExists, piDockerConfig; end
 
 %%
 thisSE = sceneEye('bathroom');
+
 fromOrig = thisSE.get('from');
 
 %{
