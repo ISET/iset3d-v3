@@ -35,6 +35,16 @@ p.addParameter('type','point',@ischar);
 p.parse(varargin{:});
 
 lightSpectrum = p.Results.lightspectrum;
+if ischar(lightSpectrum)
+    % User sent a char, so this must be a file on the path.  In fact, it
+    % has to be a mat-file.  Usually we keep files in isetcam/data/lights
+    % (or in isetbio same place).
+    [thisP,n,~] = fileparts(lightSpectrum);
+    lightSpectrum = fullfile(thisP,[n,'.mat']);
+    if ~exist(lightSpectrum,'file')
+        warning('Could not find an exact match to %s on the path\n',lightSpectrum);
+    end
+end
 type = p.Results.type;
 
 %% Construct a lightsource structure
