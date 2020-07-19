@@ -333,8 +333,13 @@ if ~exist(outputLensDir,'dir'), mkdir(outputLensDir); end
 if isequal(thisR.get('realistic eye model'),'navarro')
     % Write lens file and the ior files into the output directory.
     navarroWrite(thisR);
-    return;
 elseif isequal(thisR.get('realistic eye model'),'legrand')
+    % Write lens file and the ior files into the output directory.
+    legrandWrite(thisR);
+elseif isequal(thisR.get('realistic eye model'),'arizona')
+    % Write lens file into the output directory.
+    % Still tracking down why no IOR files are associated with this model.
+    arizonaWrite(thisR);
 else
     % If the working copy doesn't exist, copy it.  
     % If it exists but there is a force overwrite, delete and copy.

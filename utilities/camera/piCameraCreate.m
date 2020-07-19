@@ -82,6 +82,9 @@ p.parse(cameraType,varargin{:});
 
 lensFile      = p.Results.lensfile;
 if ~exist(lensFile,'file')
+    % This warning could be eliminated after some time.  It arises when we
+    % first create one of the human eye models but the output lens
+    % directory has not yet had the file written out.
     warning('Lens file not found %s\n',lensFile); 
 end
 
@@ -206,12 +209,15 @@ switch ieParamFormat(cameraType)
         
         % These are index of refraction files for the navarro model
         [~,n,~] = fileparts(lensFile);
-        if isequal(lower(n),'navarro')
+        if isequal(lower(n),'navarro') || ...
+                isequal(lower(n),'legrand')
             camera.ior1.value = 'ior1.spd';
             camera.ior2.value = 'ior2.spd';
             camera.ior3.value = 'ior3.spd';
             camera.ior4.value = 'ior4.spd';
         else
+            % Arizona does not have any entries here.  How can that be?
+            % Asking TL.
             camera.ior1.value = '';
             camera.ior2.value = '';
             camera.ior3.value = '';

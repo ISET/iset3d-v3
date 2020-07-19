@@ -299,6 +299,13 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Copy';
+    case 'bedroom'
+        sceneName = 'bedroom';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
     case 'livingroom3'
         % Not running
         sceneName = 'living-room-3';
