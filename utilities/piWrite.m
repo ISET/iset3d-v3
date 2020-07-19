@@ -334,6 +334,7 @@ if isequal(thisR.get('realistic eye model'),'navarro')
     % Write lens file and the ior files into the output directory.
     navarroWrite(thisR);
     return;
+elseif isequal(thisR.get('realistic eye model'),'legrand')
 else
     % If the working copy doesn't exist, copy it.  
     % If it exists but there is a force overwrite, delete and copy.

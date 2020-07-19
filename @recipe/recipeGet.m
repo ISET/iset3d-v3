@@ -329,10 +329,15 @@ switch ieParamFormat(param)  % lower case, no spaces
         % For the realisticEye we have several models.  Over time we will
         % figure out how to identify them.  We might insert a slot in the
         % recipe with the label when we create the model.
-        
         if isequal(thisR.get('camera subtype'),'realisticEye') && ...
                 contains(thisR.get('lensfile'),'navarro')
             val = 'navarro';
+        elseif isequal(thisR.get('camera subtype'),'realisticEye')  && ...
+                contains(thisR.get('lensfile'),'legrand')
+            val = 'legrand';
+        elseif isequal(thisR.get('camera subtype'),'realisticEye')  && ...
+                contains(thisR.get('lensfile'),'arizona')
+            val = 'arizona';
         else
             val = [];
         end
