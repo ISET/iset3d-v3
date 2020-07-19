@@ -33,22 +33,23 @@ if ~piDockerExists, piDockerConfig; end
 %% Load scene
 
 % This version of the chess set is scaled to the right physical dimensions
-thisEye = sceneEye('chessSetScaled');
+thisSE = sceneEye('chessSetScaled');
 
-fprintf('Pupil diameter:  %0.1f mm\n',thisEye.get('pupil diameter','mm'));
+fprintf('Pupil diameter:  %0.1f mm\n',thisSE.get('pupil diameter','mm'));
 
 %% Render a quick, low quality scene
 
 % Through a pinhole you get a large depth of field
-thisEye.set('fov',20);             % deg
+thisSE.set('fov',20);             % deg
 
-thisEye.set('use pinhole',true);
+thisSE.set('use pinhole',true);
 
-thisEye.summary;
-
-scene = thisEye.render;
-
+% Create the scene
+scene = thisSE.render;
 sceneWindow(scene);
+
+% Summarize what we did
+thisSE.summary;
 
 % For fun, have a look at the depth map (units are meters).
 scenePlot(scene,'depth map');  colorbar;
@@ -56,37 +57,37 @@ scenePlot(scene,'depth map');  colorbar;
 %% Big pupil case.
 
 % Set up for optical image with lens
-thisEye.set('use optics',true);
+thisSE.set('use optics',true);
 
 % Focus on the rook at the back (1 diopter)
-thisEye.set('accommodation',1);
+thisSE.set('accommodation',1);
 
-% Upgrade the quality.  For a big pupil, we need some extra rays.
-thisEye.set('pupil diameter',5);     
-thisEye.set('rays per pixel',256);
+% Upgrade the rendering quality.  
+thisSE.set('pupil diameter',5);     
+thisSE.set('rays per pixel',256);
 
 % Print a summary
-thisEye.summary;
+thisSE.summary;
 
 % Radiance only for speed
-oi = thisEye.render('render type','radiance');    
+oi = thisSE.render('render type','radiance');    
 oiWindow(oi);
 
-% Yellow because of the lens.  Blurry for the chess pieces that are close.
+% Yellow because of the lens.  Blurry image of the close chess pieces.
 
 %% Reducing the pupil sharpens up the nearer pieces
 
 % Shrink the pupil.  That will increse the depth of field.
-thisEye.set('pupil diameter',2);   
+thisSE.set('pupil diameter',2);   
 
-% We add even more rays because shrinking the pupil adds more rendering
-% noise.
-thisEye.set('rays per pixel',512); % Use more rays 
+% Shrinking the pupil adds more rendering noise.  So we increase the number
+% of rays.
+thisSE.set('rays per pixel',512);
 
-thisEye.summary;
-
-oi = thisEye.render('render type','radiance');    % Radiance and depth
+oi = thisSE.render('render type','radiance');    % Radiance and depth
 oiWindow(oi);
+
+thisSE.summary;
 
 % Less blurry for the chess pieces that are close. 
 %

@@ -29,14 +29,14 @@ end
 
 %% Load scene
 planeDistance = 5; % 5 meters away
-myScene = sceneEye('slantedBar','planeDistance',planeDistance); 
+thisEye = sceneEye('slantedBar','planeDistance',planeDistance); 
 
 %% Set fixed parameters
-myScene.accommodation = 1/planeDistance; % Accomodate to plane
-myScene.fov = 4;
+thisEye.accommodation = 1/planeDistance; % Accomodate to plane
+thisEye.fov = 4;
 
-myScene.numCABands = 6;
-myScene.diffractionEnabled = true;
+thisEye.numCABands = 6;
+thisEye.diffractionEnabled = true;
 
 %% Loop through pupil diameters
 pupilDiameters = [6 4 2];
@@ -49,7 +49,7 @@ myScene.resolution = 128;
 % Fast test version
 % {
 numRays = [128 128 128]*4;
-myScene.resolution = 128*4; 
+thisEye.resolution = 128*4; 
 %}
 
 if(length(numRays) ~= length(pupilDiameters))
@@ -61,16 +61,16 @@ for ii = 1:length(pupilDiameters)
     currPupilDiam = pupilDiameters(ii);
     currNumRays = numRays(ii);
     
-    myScene.pupilDiameter = currPupilDiam;
-    myScene.numRays = currNumRays;
+    thisEye.pupilDiameter = currPupilDiam;
+    thisEye.numRays = currNumRays;
     
-    myScene.name = sprintf('pupilDiam_%0.2fmm',currPupilDiam);
+    thisEye.name = sprintf('pupilDiam_%0.2fmm',currPupilDiam);
     
-    oi = myScene.render;
+    oi = thisEye.render;
     
     % Save the oi and the corresponding myScene object into the save
     % directory.
-    saveFilename = fullfile(saveDir,[myScene.name '.mat']);
+    saveFilename = fullfile(saveDir,[thisEye.name '.mat']);
     save(saveFilename,'oi','myScene');
     
     % Show the optical image

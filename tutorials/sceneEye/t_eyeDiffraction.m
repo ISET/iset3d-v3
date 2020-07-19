@@ -25,37 +25,37 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Set up the slanted bar scene
 
-thisEye = sceneEye('slantedbar');
+thisSE = sceneEye('slantedbar');
 
-thisEye.set('rays per pixel',32);
+thisSE.set('rays per pixel',32);
 from = [0 0 -500];
-thisEye.set('from',from);
-thisEye.set('use pinhole',true);
-scene = thisEye.render;
+thisSE.set('from',from);
+thisSE.set('use pinhole',true);
+scene = thisSE.render;
 sceneWindow(scene);
 
 
 %%
-thisEye.set('use optics',true);
+thisSE.set('use optics',true);
 
-thisEye.set('fov',1);                % About 3 deg on a side
-thisEye.set('spatial samples',256);  % Number of OI sample points
-thisEye.set('rays per pixel',256);
-thisEye.set('focal distance',thisEye.get('object distance','m'));
-thisEye.set('lens density',0);       % Yellow is harder to see.
+thisSE.set('fov',1);                % About 3 deg on a side
+thisSE.set('spatial samples',256);  % Number of OI sample points
+thisSE.set('rays per pixel',256);
+thisSE.set('focal distance',thisSE.get('object distance','m'));
+thisSE.set('lens density',0);       % Yellow is harder to see.
 
-thisEye.set('diffraction',true);
-thisEye.set('pupil diameter',4);
+thisSE.set('diffraction',true);
+thisSE.set('pupil diameter',4);
 
-oi = thisEye.render('render type','radiance');
+oi = thisSE.render('render type','radiance');
 oi = oiSet(oi,'name','4mm-diffractionOn');
 oiWindow(oi);
 oiPlot(oi,'illuminance hline',[128 128]);
 set(gca,'xlim',[-30 30],'xtick',(-30:10:30));
 
 %% Diffraction should not matter
-thisEye.set('diffraction',false);
-oi = thisEye.render('render type','radiance');
+thisSE.set('diffraction',false);
+oi = thisSE.render('render type','radiance');
 oi = oiSet(oi,'name','4mm-diffractionOff');
 oiWindow(oi);
 
@@ -66,11 +66,11 @@ title('4 mm off')
 
 %% Diffraction should matter
 
-thisEye.set('rays per pixel',1024);
-thisEye.set('pupil diameter',1);
+thisSE.set('rays per pixel',1024);
+thisSE.set('pupil diameter',1);
 
-thisEye.set('diffraction',true);
-oi = thisEye.render('render type','radiance');
+thisSE.set('diffraction',true);
+oi = thisSE.render('render type','radiance');
 oi = oiSet(oi,'name','1mm-diffractionOn');
 oiWindow(oi);
 
@@ -80,22 +80,22 @@ title('1 mm on')
 %% Diffraction should matter.
 
 % Make a direct comparison
-thisEye.set('diffraction',false);
-oi = thisEye.render('render type','radiance');
+thisSE.set('diffraction',false);
+oi = thisSE.render('render type','radiance');
 oi = oiSet(oi,'name','1mm-diffractionOff');
 oiWindow(oi);
-thisEye.summary;
+thisSE.summary;
 
 oiPlot(oi,'illuminance hline',[128 128]);
 set(gca,'xlim',[-30 30],'xtick',(-30:10:30));
 title('1 mm off')
 %%  Maybe we should be smoothing the curve at the edge?
 
-thisEye.set('rays per pixel',4096);
-thisEye.set('pupil diameter',0.5);
+thisSE.set('rays per pixel',4096);
+thisSE.set('pupil diameter',0.5);
 
-thisEye.set('diffraction',true);
-oi = thisEye.render('render type','radiance');
+thisSE.set('diffraction',true);
+oi = thisSE.render('render type','radiance');
 oi = oiSet(oi,'name','Halfmm-diffractionOn');
 oiWindow(oi);
 
@@ -104,8 +104,8 @@ set(gca,'xlim',[-30 30],'xtick',(-30:10:30));
 title('Half mm on')
 %%
 
-thisEye.set('diffraction',false);
-oi = thisEye.render('render type','radiance');
+thisSE.set('diffraction',false);
+oi = thisSE.render('render type','radiance');
 oi = oiSet(oi,'name','Halfmm-diffractionOff');
 oiWindow(oi);
 

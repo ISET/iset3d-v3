@@ -285,6 +285,28 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,['sanmiguel','.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Copy';
+    case 'teapotfull'
+        sceneName = 'teapot-full';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
+    case 'whiteroom'
+        sceneName = 'white-room';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
+    case 'livingroom3'
+        % Not running
+        sceneName = 'living-room-3';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'Copy';
     otherwise
         error('Can not identify the scene, %s\n',sceneName);
 end

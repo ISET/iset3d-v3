@@ -25,39 +25,39 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Render a fast image of the slanted bar first
 
-thisEye = sceneEye('slantedbar');
-thisEye.set('fov',3);                % About 3 deg on a side
-thisEye.set('spatial samples',512);  % Number of OI sample points
-oi = thisEye.render;
+thisSE = sceneEye('slantedbar');
+thisSE.set('fov',3);                % About 3 deg on a side
+thisSE.set('spatial samples',512);  % Number of OI sample points
+oi = thisSE.render;
 oiWindow(oi);
 
 %% Increase the  number of ray samples to get rid of graphics noise
 
-thisEye.set('rays per pixel',128);
-oi = thisEye.render;
+thisSE.set('rays per pixel',128);
+oi = thisSE.render;
 oiWindow(oi);
 
-thisEye.set('chromatic aberration',false);
-oi = thisEye.render;
+thisSE.set('chromatic aberration',false);
+oi = thisSE.render;
 
 %% Turn on chromatic aberration
 
 % This is a lot slower.  8 bands or 4 bands is faster to just have a look.
 nSpectralBands = 4;
-thisEye.set('chromatic aberration',nSpectralBands);
-oi = thisEye.render;
+thisSE.set('chromatic aberration',nSpectralBands);
+oi = thisSE.render;
 oiWindow(oi);
 
 %% Focus infront of and behind the plane, which is at 1m
 
-mean(thisEye.get('depth range'))   % Where is the plane?
+mean(thisSE.get('depth range'))   % Where is the plane?
 
-thisEye.set('focal distance',0.5); % Set the focus off the plane
-oi = thisEye.render;               % Render
+thisSE.set('focal distance',0.5); % Set the focus off the plane
+oi = thisSE.render;               % Render
 oiWindow(oi);
 
-thisEye.set('focal distance',5); % Set the focus off the plane
-oi = thisEye.render;               % Render
+thisSE.set('focal distance',5); % Set the focus off the plane
+oi = thisSE.render;               % Render
 oiWindow(oi);
 
 %%

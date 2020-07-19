@@ -99,18 +99,18 @@ if ~piDockerExists, piDockerConfig; end
 % You can select and read the data from a PBRT scene by initializing a
 % sceneEye object with the directory name of the PBRT files.  A collection
 % of files is part of the ISET3d repository (iset3d/data/V3).
-theScene = sceneEye('Numbers at depth');
+thisSE = sceneEye('Numbers at depth');
 
 % theScene is a sceneEye object that has been initialized by reading the
 % PBRT files in the relevant directory.
 %
 % To see all of PBRT files available for loading use the @recipe 'list'
 % method:
-theScene.recipe.list;
+thisSE.recipe.list;
 
 % The first level of the sceneEye object class is quite simple, containing
 % only a few parameters that are special to its function.
-disp(theScene)
+disp(thisSE)
 
 % Almost all of the rendering parameters and the complexity of the scene
 % are specified within the 'recipe'. That object (@recipe in ISET3d) is not
@@ -121,7 +121,7 @@ disp(theScene)
 % many types of lenses and much more complex optical models, say with
 % microlens arrays.  This is the top level of that class.  Notice that we
 % retrieve the recipe from theScene using the 'get' method.
-disp(theScene.get('recipe'))
+disp(thisSE.get('recipe'))
 
 %%  Seeing the scene.
 
@@ -132,15 +132,15 @@ disp(theScene.get('recipe'))
 % scene, rather than a spectral irradiance at the retina.
 
 % Notice the use of 'set'
-theScene.set('use pinhole',true);
+thisSE.set('use pinhole',true);
 
 % We can tell PBRT the field of view of the scene.
-theScene.set('fov',33);
+thisSE.set('fov',33);
 
 % Render it this way.   By default, the depth map is calculated, too.
 % Notice that the rendering calls docker (twice).  The radiance and depth
 % maps are calculated and read into the ISETBio scene structure.
-scene = theScene.render;
+scene = thisSE.render;
 
 % Show the scene
 sceneWindow(scene);
@@ -148,20 +148,20 @@ sceneWindow(scene);
 %% Rendering the PBRT scene
 
 % Now tell PBRT to use the lens
-theScene.set('use optics',true);
+thisSE.set('use optics',true);
 
 % Set the scene to focus on the numbers at 200 mm
-theScene.set('accommodation',1/0.2);   % Diopters
+thisSE.set('accommodation',1/0.2);   % Diopters
 
 % The lens rendering benefits from adding a more rays per pixel
-theScene.set('rays per pixel',192);
+thisSE.set('rays per pixel',192);
 
 % Summarizing is always nice
-theScene.summary;
+thisSE.summary;
 
 % Render and show.  We use 'oi' to refer to optical image, the spectral
 % irradiance at the retina (also retinal irradiance).
-oi = theScene.render;
+oi = thisSE.render;
 oiWindow(oi);
 
 % The number at 200 is in good focus, while the others are not.
@@ -170,13 +170,13 @@ oiWindow(oi);
 
 % Set the focal distance to 100 mm (0.1 m).  We will set 'accommodation'
 % again, but you could set the 'focal distance' parameter if you prefer.
-theScene.set('accommodation',1/0.1);   % Diopters
+thisSE.set('accommodation',1/0.1);   % Diopters
 
 % Summarize
-theScene.summary;
+thisSE.summary;
 
 % Now we 
-oi = theScene.render;
+oi = thisSE.render;
 oiWindow(oi);
 
 % Now the number at 100 mm is in good focus, not 200 or 300.
@@ -185,11 +185,11 @@ oiWindow(oi);
 
 % Other parameters, such as lens density are managed in the same way.  For
 % example you can change the lens density to 0 this way.
-theScene.set('lens density',0);
+thisSE.set('lens density',0);
 
-theScene.summary;
+thisSE.summary;
 
-oi = theScene.render;
+oi = thisSE.render;
 
 oiWindow(oi);
 

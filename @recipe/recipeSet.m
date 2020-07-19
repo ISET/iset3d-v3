@@ -446,7 +446,12 @@ switch param
         thisR.set('integrator num cabands',val);
         
     case 'integratorsubtype'
-        % Used for chromatic aberration calculation
+        % thisR.set('integrator subtype',val)
+        %
+        % Different integrators are needed depending on the materials in
+        % the scene, and also for chromatic aberration calculations.  For
+        % example spectralpath is needed for CA.  bdpt is needed when there
+        % are scattering media.
         thisR.integrator.type = 'Integrator';
         thisR.integrator.subtype = val;
 

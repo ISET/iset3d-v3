@@ -44,6 +44,10 @@ c = piCameraCreate('omni','lens file',lensname);
 lensname = 'navarro.dat';
 c = piCameraCreate('human eye','lens file',lensname);
 %}
+%{
+lensname = 'legrand.dat';
+c = piCameraCreate('human eye','lens file',lensname);
+%}
 
 % PROGRAMMING
 %   TODO: Perhaps this should be a method in the recipe class?
@@ -71,11 +75,15 @@ switch cameraType
     otherwise
         lensDefault = '';
 end
-p.addParameter('lensfile',lensDefault,@(x)(exist(x,'file')));
+
+p.addParameter('lensfile',lensDefault, @ischar);
 
 p.parse(cameraType,varargin{:});
 
 lensFile      = p.Results.lensfile;
+if ~exist(lensFile,'file')
+    warning('Lens file not found %s\n',lensFile); 
+end
 
 %% Initialize the default camera type
 switch ieParamFormat(cameraType)

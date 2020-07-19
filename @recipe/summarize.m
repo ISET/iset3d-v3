@@ -78,12 +78,8 @@ switch str
         
     case 'render'
         fprintf('\nRenderer information\n-----------\n');
-        if isempty(thisR.renderer), return; end
-        out = thisR.renderer;
-        fprintf('Sampler\n');
-        fprintf('Integration\n');
-        fprintf('renderer\n');
-        fprintf('filter\n');
+        fprintf('Rays per pixel %d\n',thisR.get('rays per pixel'));
+        fprintf('Bounces %d\n',thisR.get('n bounces'));
         namelist = thisR.world;  % Abusive.  Change variable name.
         % fprintf('\n');
         

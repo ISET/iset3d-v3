@@ -415,7 +415,9 @@ switch ieParamFormat(param)  % lower case, no spaces
                 % Everything is in focus for a pinhole camera.  For
                 % pinholes and perspect this is focaldistance.  But not for
                 % realistic or omni.
-                val = thisR.camera.focaldistance.value;
+                if isfield(thisR.camera,'focaldistance')
+                    val = thisR.camera.focaldistance.value;
+                end
             case {'environment'}
                 % Everything is in focus for the panorama
                 disp('Panorama rendering. No focal distance');

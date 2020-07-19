@@ -39,28 +39,28 @@ toC = [ 0.1458     0.0100     1.6667];
 
 % This is rendered using a pinhole so the rendering is fast.  It has
 % infinite depth of field (no focal distance).
-thisEye = sceneEye('snellen at depth');
+thisSE = sceneEye('letters at depth');
 
 % Position the eye off to the side so we can see the 3D easily
 from = [0.25,0.3,-1.3];
-thisEye.set('from',from);
+thisSE.set('from',from);
 
 % Look at the position with the 'B'.  The values for each of the letters
 % are included above.
-thisEye.set('to',toB);
+thisSE.set('to',toB);
 
 % Have a quick check with the pinhole
-thisEye.set('use pinhole',true);
+thisSE.set('use pinhole',true);
 
 % Given the distance from the scene, this FOV captures everything we want
-thisEye.set('fov',15);             % Degrees
+thisSE.set('fov',15);             % Degrees
 
 % Render the scene
-scene = thisEye.render;
+scene = thisSE.render;
 
 sceneWindow(scene);   
 
-thisEye.summary;
+thisSE.summary;
 
 % You can see the depth map if you like
 %   scenePlot(scene,'depth map');
@@ -68,7 +68,7 @@ thisEye.summary;
 %% Now use the optics model with chromatic aberration
 
 % Turn off the pinhole.  The model eye (by default) is the Navarro model.
-thisEye.set('use pinhole',false);
+thisSE.set('use pinhole',false);
 
 % We turn on chromatic aberration.  That slows down the calculation, but
 % makes it more accurate and interesting.  We often use only 8 spectral
@@ -76,28 +76,28 @@ thisEye.set('use pinhole',false);
 % slow, but that's what we do here because we are only rendering once. When
 % the GPU work is completed, this will be fast!
 nSpectralBands = 16;
-thisEye.set('chromatic aberration',nSpectralBands);
+thisSE.set('chromatic aberration',nSpectralBands);
 
 % Find the distance to the object
-oDist = thisEye.get('object distance');
+oDist = thisSE.get('object distance');
 
 % This is the distance to the B and we set our accommodation to that.
-thisEye.set('focal distance',oDist);  
+thisSE.set('focal distance',oDist);  
 
 % Reduce the rendering noise by using more rays. 
-thisEye.set('rays per pixel',512);      
+thisSE.set('rays per pixel',512);      
 
 % Increase the spatial resolution by adding more spatial samples.
-thisEye.set('spatial samples',512);     
-
-% Summarize
-thisEye.summary;
+thisSE.set('spatial samples',512);     
 
 % This takes longer than the pinhole rendering, so we do not bother with
 % the depth.
-oi = thisEye.render('render type','radiance');
+oi = thisSE.render('render type','radiance');
 
 % Have a look.  Lots of things you can plot in this window.
 oiWindow(oi);
+
+% Summarize
+thisSE.summary;
 
 %% END
