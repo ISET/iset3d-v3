@@ -48,14 +48,6 @@ piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
 
-% We have to check what happens when the sceneName is the same as the
-% original, but we have added materials.  This section here is
-% important to clarify for us.
-sceneName = 'SimpleScene';
-outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
-thisR.set('outputFile',outFile);
-
-% The first time, we create the materials folder.
 piWrite(thisR,'creatematerials',true);
 
 %% Render the original scene with no camera motion
@@ -65,21 +57,30 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 if isequal(piCamBio,'isetcam')
     sceneSet(scene,'display mode','hdr');
+else
+    sceneSet(scene,'gamma',0.5);
 end
 %% Motion blur from camera
 
 % Specify the initial position and rotation of the camera.  We find
-% the current camera position 
-thisR.camera.motion.activeTransformStart.pos    = thisR.lookAt.from(:);
-thisR.camera.motion.activeTransformStart.rotate = piRotationMatrix;
+% the current camera position
+
+from = thisR.get('from');
+thisR.set('camera motion translate start',from(:));
+thisR.set('camera motion rotate start',piRotationMatrix);
+
+% thisR.camera.motion.activeTransformStart.pos    = thisR.lookAt.from(:);
+% thisR.camera.motion.activeTransformStart.rotate = piRotationMatrix;
 
 % Move in the direction you are looking, but just a small amount.
 fromto = thisR.get('from to');
 endPos = -0.5*fromto(:) + thisR.lookAt.from(:);
-thisR.camera.motion.activeTransformEnd.pos      = endPos;
 
-% No rotation
-thisR.camera.motion.activeTransformEnd.rotate   = piRotationMatrix;
+thisR.set('camera motion translate end',endPos);
+thisR.set('camera motion rotate end',piRotationMatrix);
+
+% thisR.camera.motion.activeTransformEnd.pos      = endPos;
+% thisR.camera.motion.activeTransformEnd.rotate   = piRotationMatrix;
 
 piWrite(thisR,'creatematerials',true);
 

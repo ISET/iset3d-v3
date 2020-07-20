@@ -370,8 +370,8 @@ end
 if isfield(thisR.camera,'motion') 
        
     motionTranslate = thisR.get('camera motion translate'); 
-    motionStart     = thisR.get('camera motion start'); 
-    motionEnd       = thisR.get('camera motion end'); 
+    motionStart     = thisR.get('camera motion rotation start'); 
+    motionEnd       = thisR.get('camera motion rotation end'); 
     
     fprintf(fileID,'ActiveTransform StartTime \n');
     fprintf(fileID,'Translate 0 0 0 \n');

@@ -43,11 +43,6 @@ if ~piDockerExists, piDockerConfig; end
 % The MCC image is the default recipe.  We do not write it out yet because
 % we are going to change the parameters
 thisR = piRecipeDefault;
-%{
-piWrite(thisR); 
-scene = piRender(thisR);
-sceneWindow(scene);
-%}
 
 %% Change the light
 
@@ -78,7 +73,6 @@ piWrite(thisR, 'overwritematerials', true);
 
 %% Render and display
 
-clear scene
 [scene, result] = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
 

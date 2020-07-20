@@ -12,11 +12,6 @@ if ~piDockerExists, piDockerConfig; end
 %% Read the file
 thisR = piRecipeDefault('scene name','MacBethChecker');
 
-%% The output will be written here
-sceneName = 'MacBethChecker';
-outFile = fullfile(piRootPath,'local',sceneName,'MacBethChecker.pbrt');
-thisR.set('outputFile',outFile);
-
 %% Check the light list
 piLightGet(thisR);
 

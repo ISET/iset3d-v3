@@ -91,26 +91,3 @@ oiSet(oi,'gamma',0.6);
 
 %% END
 
-%%  Scratch
-
-%{
-% ISETBIO integration
-  cm = coneMosaic;
-  cm.setSizeToFOV(4);
-  cm.compute(oi);
-  cm.window; truesize;
-%}
-
-%{
- outDir = thisR.get('output dir')
- dir(fullfile(outDir,'renderings'))
-%}
-
-%{
-% You might adjust the focus for different scenes.  Use piRender with
-% the 'depth map' option to see how far away the scene objects are.
-% There appears to be some difference between the depth map and the
-% true focus.
-  dMap = piRender(thisR,'render type','depth');
-  ieNewGraphWin; imagesc(dMap); colormap(flipud(gray)); colorbar;
-%}

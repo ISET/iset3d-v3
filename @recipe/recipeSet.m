@@ -19,25 +19,27 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %  %Scene
 %    'mm units'   - Logical (true/false)
 %    'exporter'   - Information about where the PBRT file came from
-%    'lookat'
-%    'from'
-%    'to'
-%    'up'
+%    'lookat'     - includes the 'from','to', and 'up vectors
+%    'from'       - Position of the camera
+%    'to'         - A position the camera is pointed up
+%    'up'         - The direction that is up, not always the y-direction
 %
 %  % Camera
-%    'camera'
-%    'camera subtype'
+%    'camera'     - Struct with camera information
+%    'camera subtype' - The valid camera subtypes are
+%                       {'pinhole','realistic','realisticEye','omni'} 
 %    'camera exposure'
 %    'camera body'      - Do not use
 %
-%    'object distance'
-%    'accommodation'
-%    'exposure time'
-%    'focus distance'
-%    'focal distance'
-%    'n microlens'
-%    'light field film resolution'
-%    'n subpixels'
+%    'object distance' - Distance between from and to
+%    'accommodation'   - Inverse of the focus distance
+%    'exposure time'   - ????
+%    'focus distance'  - Distance to where the camera is in best focus
+%    'focal distance'  - Used with pinhole to define image plane distance
+%                        from the pinhole
+%    'n microlens'     - Number of microlenses in front of the sensor
+%    'n subpixels'     - Number of pixels behind each microlens
+%    'light field film resolution' - ????
 %
 %   % Lens
 %     'lens file'    - JSON file for omni.  Older models (realistic) use dat-file
@@ -259,19 +261,32 @@ switch param
         % I don't think the sub is needed.  But there it is.
         thisR.camera.subtype = val;
         
-    case {'cameraexposure','exposuretime'}
-        % Normally, openShutter is at time zero
-        thisR.camera.shutteropen.type  = 'float';
-        thisR.camera.shutterclose.type = 'float';
-        try
-            openShutter = thisR.camera.shutteropen.value;
-        catch
-            openShutter = 0;
-            thisR.camera.shutteropen.value = 0;
-        end
+        % Camera motion
+    case {'cameramotiontranslatestart'}
+        % thisR.set('camera motion translate start',vector)
+        thisR.camera.motion.activeTransformStart.pos = val;
         
+    case {'cameramotiontranslateend'}
+        % thisR.set('camera motion translate end',vector)
+        thisR.camera.motion.activeTransformEnd.pos = val;
+        
+    case {'cameramotionrotatestart'}
+        % thisR.set('camera motion rotate start',rotMatrix)
+        thisR.camera.motion.activeTransformStart.rotate = val;
+        
+    case {'cameramotionrotateend'}
+        % thisR.set('camera motion rotate end',rotMatrix)
+        thisR.camera.motion.activeTransformEnd.rotate = val;
+        
+        % Camera exposure
+    case {'cameraexposure','exposuretime'}
         % Shutter duration in sec
-        thisR.camera.shutterclose.value = val + openShutter;
+        % Shutter open is always at time zero
+        thisR.camera.shutteropen.type  = 'float';
+        thisR.camera.shutteropen.value = 0;
+        
+        thisR.camera.shutterclose.type = 'float';
+        thisR.camera.shutterclose.value = val;
         
         % Lens related
     case 'lensfile'

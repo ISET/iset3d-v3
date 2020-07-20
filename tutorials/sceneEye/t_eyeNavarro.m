@@ -3,12 +3,12 @@
 % We recommend you go through t_eyeIntro.m before running
 % this tutorial.
 %
-% This tutorial renders the PBRT SCENE "letters at depth" using the
-% Navarro eye model.  The purpose of the script is to illustrate how to
+% This tutorial renders the PBRT SCENE "letters at depth" using the Navarro
+% eye model.  The script illustrates how to
 %
 %   * set up a sceneEye with the Navarro model
-%   * position the camera and look at a particular scene object
-%   * render with chromatic aberration
+%   * position the camera to center on a specific scene object
+%   * render with chromatic aberration (slow)
 %
 % Depends on: 
 %    ISETBio, ISET3d, Docker
@@ -16,7 +16,7 @@
 % Wandell, 2020
 %
 % See also
-%   t_eye*
+%   t_eyeArizona, t_eyeLeGrand
 %
 
 %% Check ISETBIO and initialize

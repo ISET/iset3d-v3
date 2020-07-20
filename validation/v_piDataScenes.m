@@ -11,18 +11,8 @@
 %    docker pull vistalab/pbrt-v3-spectral
 %
 % See also
-%
-%
-% Notes
-%
-%    sceneName,          sceneFileName
-%   ------------------------
-%    coloredCube,        coloredCube
-%    slantedBar,         slantedBar
-%    slantedBarTexture,  slantedBarTexture
-%    cylinderTexture,    cylinderTexture
-%    teapot,             teapot-area-light
-%    checkerboard,       checkerboard
+%   thisR.list produces a list of the files on your system.
+
 
 %% Initialize ISET and Docker
 
@@ -33,30 +23,18 @@ if ~piDockerExists, piDockerConfig; end
 %% Read the white-room file for the Remote Data site
 
 % This is the INPUT file name
-sceneName = 'coloredCube'; sceneFileName = 'coloredCube.pbrt';
-
-% The output will be written here
-inFolder = fullfile(piRootPath,'data','V3');
-inFile = fullfile(inFolder,sceneName,sceneFileName);
-
-%%
-recipe = piRead(inFile);
-
-% This is out the putput scene name
-outFolder = fullfile(tempdir,sceneName);
-outFile = fullfile(outFolder,[sceneName,'.pbrt']);
-recipe.set('outputFile',outFile);
+thisR = piRecipeDefault('scene name','coloredCube');
 
 %% Change render quality
-recipe.set('film resolution',[192 192]);
-recipe.set('pixel samples',96);
-recipe.set('max depth',1); % Number of bounces
+thisR.set('film resolution',[192 192]);
+thisR.set('rays per pixel',96);
+thisR.set('n bounces',1); % Number of bounces
 
 %% Render
-piWrite(recipe);
+piWrite(thisR);
 
 %%  Create the scene
-[scene, result] = piRender(recipe);
+[scene, result] = piRender(thisR);
 
 %%  Show it and the depth map
 sceneWindow(scene);

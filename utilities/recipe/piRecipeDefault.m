@@ -150,6 +150,12 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
+    case 'coloredcube'
+        sceneName = 'coloredCube';
+        FilePath = fullfile(piRootPath,'data','V3','coloredCube');
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';
     case 'teapot'
         sceneName = 'teapot';
         FilePath = fullfile(piRootPath,'data','V3','teapot');

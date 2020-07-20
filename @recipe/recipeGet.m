@@ -45,7 +45,7 @@ function val = recipeGet(thisR, param, varargin)
 %    % the World and motion
 %     'camera'           - The whole camera struct
 %     'camera type'      - Always 'camera'
-%     'camera subtype'   - 
+%     'camera subtype'   - Valid camera subtypes are {'omni','pinhole', ...}
 %     'camera body'
 %     'optics type'      - Translates camera sub type into one of
 %                          'pinhole', 'envronment', or 'lens'
@@ -288,16 +288,30 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Change the size (scale) of something.  Almost always 1 1 1
         val = thisR.scale;
         
-        % Motion is not always included.
+        % Motion is not always included.  When it is, there is a start and
+        % end position, and a start and end rotation.
     case {'cameramotiontranslate'}
+        % This is the difference between start and end
         if isfield(thisR.camera,'motion')
             val = thisR.camera.motion.activeTransformStart.pos - thisR.camera.motion.activeTransformEnd.pos;
         end
-    case {'cameramotionstart'}
+    case {'cameramotiontranslatestart'}
+        % Start position
+        if isfield(thisR.camera,'motion')
+            val = thisR.camera.motion.activeTransformStart.pos ;
+        end
+    case {'cameramotiontranslateend'}
+        % End position
+        if isfield(thisR.camera,'motion')
+            val =  thisR.camera.motion.activeTransformEnd.pos;
+        end
+    case {'cameramotionrotationstart'}
+        % Start rotation
         if isfield(thisR.camera,'motion')
             val = thisR.camera.motion.activeTransformStart.rotate;
         end
-    case {'cameramotionend'}
+    case {'cameramotionrotationend'}
+        % End rotation
         if isfield(thisR.camera,'motion')
             val = thisR.camera.motion.activeTransformEnd.rotate;
         end

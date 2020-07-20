@@ -15,7 +15,7 @@ function thisR = piLightAdd(thisR, varargin)
 %  Many key/value pairs to define the light are acceptable in the varargin.
 %  This routine calls piLightCreate with the variables in varargin, and that
 %  function in turn calls  piLightSet to set all the key/value pairs here.
-%  
+%
 %  The list of settable light parameters is determined by the light
 %  parameters in PBRT. Those parameters are defined on this web-page in the
 %  PBRT web site.
@@ -79,9 +79,9 @@ p.KeepUnmatched = true;
 p.addRequired('recipe', @(x)(isa(x,'recipe')));
 
 % update an exist light, zero means to add a new one
-p.addParameter('update',0); 
+p.addParameter('update',0);
 % Directly assign update a light source with one
-p.addParameter('newlightsource', [], @isstruct); 
+p.addParameter('newlightsource', [], @isstruct);
 
 p.parse(thisR, varargin{:});
 
@@ -119,7 +119,7 @@ else
     % We create the light with parameters sent in by varargin. We call
     % piLightCreate.  The new light is attached to the recipe upon return.
     piLightCreate(thisR, newVarargin{:});
-
+    
 end
 
 %% Tell the user the status.  We might turn this off some day.

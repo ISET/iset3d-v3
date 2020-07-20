@@ -52,21 +52,14 @@ thisR = piLightAdd(thisR,...
     'spectrumscale', spectrumScale,...
     'cameracoordinate', true);
 
-%% Set an output file
+%% Set rendering parameters 
 
-% All output needed to render this recipe will be written into this
-% directory. 
-sceneName = 'macbeth';
-outFile = fullfile(piRootPath,'local',sceneName,'macbeth.pbrt');
-thisR.set('outputfile',outFile);
-thisR.integrator.subtype = 'path';
-
+thisR.set('integrator subtype','path');
 thisR.set('pixelsamples', 16);
-
 thisR.set('filmresolution', [640, 360]);
 
 %% Write 
-% Write modified recipe out
+
 piWrite(thisR, 'overwritematerials', true);
 
 %% Render the scene and the illuminant
@@ -86,7 +79,6 @@ sceneWindow(scene);
 
 scenePlot(scene,'depth map');
 title('Z Map');
-
 
 %%
 
