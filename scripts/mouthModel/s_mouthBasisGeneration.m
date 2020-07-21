@@ -18,7 +18,8 @@ nSamples = size(mouthRefl, 2);
 [mouthBasis, wgts] = basisAnalysis(mouthRefl, wave, 'vis', true);
 
 %% Generate a matrix tranasformation for wgts to lrgb conversion
-[~, mWgts2lrgb] = wgts2lrgb(wgts, mouthBasis, wave);
+mWgts2lrgb = wgts2lrgb(mouthBasis, wave, 'disp name', 'LCD-Apple',...
+                                         'light source', 'D65');
 
 %% Save basis functions, wgts, and wgts2lrgb matrix
 comment = 'Mouth reflection basis functions';

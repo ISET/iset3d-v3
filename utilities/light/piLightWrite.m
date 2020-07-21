@@ -45,17 +45,7 @@ for ii = 1:numel(thisR.lights)
     if isfield(thisLightSource, 'type'), type = thisLightSource.type;
     else, type = 'point'; end
     
-    if isfield(thisLightSource, 'lightspectrum')
-        if isnumeric(thisLightSource.lightspectrum)
-            lightSpectrum = ['[ ' num2str(thisLightSource.lightspectrum), ']'];
-        else
-            lightSpectrum = sprintf('"spds/lights/%s.spd"', thisLightSource.lightspectrum);
-        end
-    else
-        % There is no specified light spectrum.  So we assign D65.
-        lightSpectrum = sprintf('"spds/lights/%s.spd"', 'D65');
-        thisLightSource.lightspectrum = 'D65';
-    end
+
     
     if isfield(thisLightSource, 'from'), from = thisLightSource.from;
     else, from = [0 0 0]; end
@@ -71,6 +61,18 @@ for ii = 1:numel(thisR.lights)
     
     if isfield(thisLightSource, 'spectrumscale'), spectrumScale = thisLightSource.spectrumscale;
     else, spectrumScale = 1; end
+    
+    if isfield(thisLightSource, 'lightspectrum')
+        if isnumeric(thisLightSource.lightspectrum)
+            lightSpectrum = ['[ ' num2str(thisLightSource.lightspectrum), ']'];
+        else
+            lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', thisLightSource.lightspectrum, spectrumScale);
+        end
+    else
+        % There is no specified light spectrum.  So we assign D65.
+        lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', 'D65', spectrumScale);
+        thisLightSource.lightspectrum = 'D65';
+    end
     
     if isfield(thisLightSource, 'mapname'), mapname = thisLightSource.mapname;
     else, mapname = ''; end
@@ -111,7 +113,7 @@ for ii = 1:numel(thisR.lights)
             outputDir = fileparts(thisR.outputFile);
             lightSpdDir = fullfile(outputDir, 'spds', 'lights');
             thisLightfile = fullfile(lightSpdDir,...
-                sprintf('%s.spd', thisLightSource.lightspectrum));
+                sprintf('%s_%f.spd', thisLightSource.lightspectrum, spectrumScale));
             if ~exist(lightSpdDir, 'dir'), mkdir(lightSpdDir); end
             fid = fopen(thisLightfile, 'w');
             for jj = 1: length(data)
