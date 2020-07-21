@@ -17,20 +17,20 @@ thisSE.set('lens density',0);   % Just because I can
 
 thisSE.set('rays per pixel',512);  % Pretty quick, but not high quality
 
-oiLeft = thisSE.render;  % Render and show
+oiLeft = thisSE.render;  % Render radiance and depth, and then show
 oiWindow(oiLeft);
 
 %% Shift the eye position
 
 % Change the eye position (from) but stay focused on the same object (to).
 % I shifted the eye position by a lot (12 mm) so the image difference is be
-% easy to see.  The inter-pupil difference is really only 6-8 mm 
+% easy to see.  The inter-pupil difference is really only 6-8 cm 
 
-from = thisSE.get('from');   % Current camera location
+fromLeft = thisSE.get('from');         % Current camera location
+fromRight = fromLeft + [6,0,0]*1e-2;   % Shift it 6 cm
+thisSE.set('from',fromRight);  
 
-thisSE.set('from',from + [0.012,0,0]);  % Shift it 12 mm
-
-oiRight = thisSE.render;
+oiRight = thisSE.render('render type','radiance');
 oiWindow(oiRight);
 
 %% END

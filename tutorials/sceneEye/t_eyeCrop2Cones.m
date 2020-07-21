@@ -28,53 +28,73 @@ end
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%%  Render a scene with a pinhole for speed and to pick the region
+%%  Render an indoor scene with a pinhole for speed 
 
-% A natural scene
+% The rendering is rough, just to get the general overview
 thisSE = sceneEye('white room');
+thisSE.set('use pinhole',true);
+thisSE.set('rays per pixel',256);   % Speed, not quality
 
-% For speed, I didn't turn on chromatic aberration
-%
+scene = thisSE.render;
+sceneWindow(scene); 
+sceneSet(scene,'gamma',0.3);
+scenePlot(scene,'depth map');
+
+%% Let's do a bit better by calculating the retinal irradiance
+tic
+
+% This calculation takes about three minutes on my Mac
+thisSE.set('use optics',true);
 thisSE.set('spatial samples',[640 640]);
-thisSE.set('rays per pixel',32);   % Speed, not quality
-thisSE.set('accommodation',1/5);   % Back of the further chair
+thisSE.set('rays per pixel',256);   % Speed, not quality
+thisSE.set('accommodation',1/5);    % Back of the further chair
+thisSE.set('to',[2 1.2 5.2]);       % Gets us near the pillow
+thisSE.set('chromatic aberration',true);
+thisSE.set('fov',20);
 
 % Render the oi and show it
 oi = thisSE.render('render type','both');
-oi = oiSet(oi,'fov',20);
+
+% Show the retinal irradiance
 oiWindow(oi); oiSet(oi,'gamma',0.3);
 
 oiPlot(oi,'depth map');
 
+toc
 %% This is how I picked a region of the OI to put on the cone mosaic
 
 % [~,rect] = vcROISelect(oi);
 
 %%  Now calculate the cone response
 
-% rect = [169   280   122   128];
-rect = [213   306    48    76];
+rect = [  411   143   117   182];
 oiSmall = oiCrop(oi,rect);
+
 oiWindow(oiSmall);
 fov = oiGet(oiSmall,'fov');
 
-%%
+%%  Image the irradiance on the fovea
+
 conesF = coneMosaic('center',[0 0]);
 conesF.setSizeToFOV(fov*1.2);
 conesF.emGenSequence(50);
 conesF.compute(oiSmall);
 conesF.window;
 
-%%
-conesNP = coneMosaic('center',[2 0]*1e-3);  % 1 mm off to the side
+%%  Image the irradiance on the near periphery
+
+conesNP = coneMosaic('center',[2 0]*1e-3);  % 1 mm to the side
 conesNP.setSizeToFOV(fov*1.2);
 conesNP.emGenSequence(50);
 conesNP.compute(oiSmall);
 conesNP.window;
 
+%% END
+
 %%  Scratch
 
 %{
+% toOrig = [1.8159    1.2751    5.2786];  % white room
  % This is how I looked around and chose a from position
  % 
  thisSE.set('use pinhole',true);

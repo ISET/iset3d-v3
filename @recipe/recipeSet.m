@@ -443,7 +443,7 @@ switch param
             % 1.
             thisR.camera.chromaticAberrationEnabled.value = 'false';
             thisR.set('integrator subtype','path');
-            thisR('integrator numCABands',1);
+            thisR.set('integrator num ca bands',1);
             return;
         end
         
