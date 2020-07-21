@@ -36,7 +36,7 @@ disp('t_piIntro_macbeth_zmap')
 t_piIntro_macbeth_zmap;          % Get the zmap
 
 %%  Check that the scenes in the data directory still run
-s
+
 disp('v_piDataScenes')
 v_piDataScenes;                  % Checks the local data scenes
 
