@@ -39,6 +39,7 @@ oiWindow(oi);
 
 thisSE.set('chromatic aberration',false);
 oi = thisSE.render;
+oiWindow(oi);
 
 %% Turn on chromatic aberration
 

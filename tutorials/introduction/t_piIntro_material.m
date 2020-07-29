@@ -22,7 +22,8 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt files
-thisR = piRecipeDefault('scene name','simple scene');
+sceneName = 'simple scene';
+thisR = piRecipeDefault('scene name',sceneName);
 
 %% Set render quality
 
