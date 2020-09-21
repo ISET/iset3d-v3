@@ -63,7 +63,7 @@ end
 
 % If we get here, we try to extract from the file name. Not preferred.
 try
-    warning('Decoding lens parameters from lens file name %s',lensName);
+    fprintf('Decoding lens parameters from lens file name %s',lensName);
     % Guess focal length (effective) from lens name
     focalLength = str2double(extractBetween(lensName,'deg.','mm'));
     focalLength = focalLength*10^-3; % meters
@@ -75,11 +75,9 @@ try
         apertureDiameter = recipe.get('aperturediameter');
     else
         
-        % ----------------------
-        % The below lines are directly from fileRead.m in isetlens. However
+        % These lines are directly from fileRead.m in isetlens. However
         % they are have been simplified so that we don't have to use a lens
         % class and don't require the user to have isetlens.
-        % ----------------------
         
         % Read the lens file
         fid = fopen(recipe.camera.lensfile.value);
@@ -142,7 +140,7 @@ try
     %}
     
 catch
-    warning('Could not determine optics parameters from recipe. Leaving OI parameter values as default.')
+    warning('Could not determine optics parameters from recipe. Using OI default parameters.')
 end
 
 end
