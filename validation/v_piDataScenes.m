@@ -23,7 +23,9 @@ if ~piDockerExists, piDockerConfig; end
 %% Read the white-room file for the Remote Data site
 
 % This is the INPUT file name
-thisR = piRecipeDefault('scene name','coloredCube');
+% thisR = piRecipeDefault('scene name','cornellbox');
+% thisR = piRecipeDefault('scene name','coloredCube');
+thisR = piRecipeDefault('scene name','chessSet');
 
 %% Change render quality
 thisR.set('film resolution',[192 192]);

@@ -84,7 +84,7 @@ for ii=1:nLines
 end
 
 if isempty(s)
-    warning('No information found for block %s\n',blockName);
+    % warning('No information found for block %s\n',blockName);
     s = struct([]);
 end
 

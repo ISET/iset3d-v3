@@ -79,6 +79,8 @@ thisR = recipe;
 thisR.inputFile = fname;
 readmaterials   = p.Results.readmaterials;
 
+% summary = sprintf('Read summary %s\n',fname);
+
 %% Set the default output directory
 [~,scene_fname]  = fileparts(fname);
 outFilepath      = fullfile(piRootPath,'local',scene_fname);
@@ -166,6 +168,9 @@ end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
 piReadGeometry(thisR);
+
+% I was thinking about summarizing what was read. 
+% disp(summary)
 
 end
 

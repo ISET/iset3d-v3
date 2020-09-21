@@ -1,8 +1,8 @@
-function [s, blockLines] = piBlockExtract(txtLines,varargin)
+function [s, blockLines ] = piBlockExtract(txtLines,varargin)
 % Parse text in a scene file, returning the info as a structure 
 %
 % Syntax
-%   s = piBlockExtract(txtLines,varargin)
+%   [s, blockLines] = piBlockExtract(txtLines,varargin)
 %
 % Description
 %  Used extensively by piRead to parse specific types of text blocks within
@@ -20,8 +20,9 @@ function [s, blockLines] = piBlockExtract(txtLines,varargin)
 %                    the syntax given by the exporter is different.   
 %
 % Return
-%   s          - a struct containing information from the block of text
-%   blockLines - extracted text lines directly (without parsing)
+%   s           - a struct containing information from the block of text
+%   blockLines  - extracted text lines directly (without parsing)
+%   readSummary - Any warnings about unread sections returned here.
 %
 % Types of blocks we have tried to extract successfully, particularly with
 % PBRT V3
