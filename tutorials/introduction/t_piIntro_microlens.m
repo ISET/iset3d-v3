@@ -1,4 +1,4 @@
-%% Render using a lens plus a microlens
+%% Render using a lens plus a microlens - a lightfield camera
 %
 % Set up to work with the Chess Set scene.
 %
@@ -10,24 +10,25 @@
 %    docker pull vistalab/pbrt-v3-spectral
 %
 % ZL, BW SCIEN 2018
-% Last tested by BW, May 31, 2020
 %
 % See also
 %   t_piIntro_*
-%   isetLens repository
+%   requires the isetlens repository
 
 %% Initialize ISET and Docker
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
+if isempty(which('lensC')), error('You must add the isetlens repository to your path'); end
+
+% Run this from the local directorys
 chdir(fullfile(piRootPath,'local'))
 
 %% Read the pbrt files
 
-% thisR = piRecipeDefault('scene name','living-room');
-% thisR = piRecipeDefault('scene name','kitchen');
+testScenes = {'chessSet','livingroom','kitchen'};
 % {
- thisR = piRecipeDefault('scene name','chessSet'); 
+ thisR = piRecipeDefault('scene name',testScenes{1}); 
  % from = [0.0000    0.0700   -0.7000];
  % to = [ 0.0000    0.0700    0.5000];
 %}
@@ -43,11 +44,12 @@ chdir(fullfile(piRootPath,'local'))
 thisR  = piRecipeDefault; z = -2.7;
 %}
 
-%% Create the microlens
+%% Read in the microlens and set its size
+
+microlens     = lensC('filename','microlens.json');
 
 % Set the microlens size to 12 microns using the
 % microlens.scale method.
-microlens     = lensC('filename','microlens.json');
 desiredHeight = 0.012;                       % mm
 microlens.adjustSize(desiredHeight);
 fprintf('Focal length =  %.3f (mm)\nHeight = %.3f (mm)F-number %.3f\n',...
@@ -62,27 +64,32 @@ fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
 
 %% Set up the microlens array and film size
 
-% Choose an even number for nMicrolens.  
-% This assures that the sensor and ip data have the right integer
-% relationships. 
-nMicrolens = [40 40]*4;   % Appears to work for rectangular case, too
+% The nMicrolens is the number of image samples in the reconstructed
+% images. 
 
-% 
+% Always choose an even number for nMicrolens.  This assures that the
+% sensor and ip data have the right integer relationships. 
+nMicrolens = [40 40]*8;   % Appears to work for rectangular case, too
+
+% The sensor size (film size) should be big enough to support all of the
+% microlenses
 filmheight = nMicrolens(1)*microlens.get('lens height');
 filmwidth  = nMicrolens(2)*microlens.get('lens height');
 
-% 5x5 array beneath each microlens
-pixelsPerMicrolens = 3;
+% Set the number of pixels behind each microlens.  This determines the size
+% of the pixel.
+pixelsPerMicrolens = 5;  % The 2D array of pixels is this number squared
 pixelSize  = microlens.get('lens height')/pixelsPerMicrolens;   % mm
 filmresolution = [filmheight, filmwidth]/pixelSize;
 
-%% Build the combined lens file using the docker lenstool
+%% Build the lens file using the docker lenstool
 
+% The combined lens includes the imaging lens and the microlens array.
 [combinedlens,cmd] = piCameraInsertMicrolens(microlens,imagingLens, ...
     'xdim',nMicrolens(1),  'ydim',nMicrolens(2),...
     'film width',filmwidth,'film height',filmheight);
 
-%% Set up the lens+microlens
+%% Create the camera with the lens+microlens
 
 thisLens = combinedlens;
 fprintf('Using lens: %s\n',thisLens);
@@ -98,7 +105,9 @@ thisR.camera = piCameraCreate('omni','lensFile',thisLens);
 %}
 
 % PBRT estimates the distance.  It is not perfectly aligned to the depth
-% map, but it is close.
+% map, but it is close.  For the Chess Set we use about 0.6 meters as the
+% plane that will be in focus for this imaging lens.  With the lightfield
+% camera we can reset the focus, of course.s
 thisR.set('focus distance',0.6);
 
 % The FOV is not used for the 'realistic' camera.
@@ -115,15 +124,15 @@ thisR.set('film resolution',filmresolution);
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
 % middle.  The in focus is about the pawn or rook.
-thisR.set('from',from);     % Get higher and back away than default
-thisR.set('to',  to);  % Look down default compared to default
-thisR.set('rays per pixel',32);  % 32 is small
+ thisR.set('from',from);          % Get higher and back away than default
+ thisR.set('to',  to);            % Look down default compared to default
+ thisR.set('rays per pixel',32);  % 32 is small
 %}
 %{
 % Simple scene
-thisR.set('from',from);     % Get higher and back away than default
-thisR.set('to',  to);       % Look down default compared to default
-thisR.set('rays per pixel',128);
+ thisR.set('from',from);     % Get higher and back away than default
+ thisR.set('to',  to);       % Look down default compared to default
+ thisR.set('rays per pixel',128);
 %}
 
 % We can use bdpt if you are using the docker with the "test" tag (see
@@ -131,9 +140,9 @@ thisR.set('rays per pixel',128);
 thisR.integrator.subtype = 'path';  
 
 % This is the aperture of the imaging lens of the camera in mm
-thisR.set('aperture diameter',6);   
+thisR.set('aperture diameter',6);   % In millimeters
 
-% thisR.summarize('all');
+thisR.summarize('all');
 
 %% Render and display
 
@@ -143,37 +152,56 @@ piWrite(thisR,'creatematerials',true);
 [oi, result] = piRender(thisR,'render type','radiance');
 
 % Parse the result for the lens to film distance and the in-focus
-% distance in the scene.
-[lensFilm, infocusDistance] = piRenderResult(result);
+% distance in the scene.  The lensFilm is the separation between the film
+% and the microlens, which is the effective back of this lens (imaging lens
+% plus microlens).  The infocusDistance is the distance in the scene that
+% is rendered in good focus by the optics.
+%
+%  [lensFilm, infocusDistance] = piRenderResult(result);
+%
 
-%% Name and show the OI
+% Name and show the OI
 
-oi = oiSet(oi,'name',...
-    sprintf('%s-%d',thisR.get('input basename'),thisR.get('aperture diameter')));
+oiName = sprintf('%s-%d',thisR.get('input basename'),thisR.get('aperture diameter'));
+oi = oiSet(oi,'name',oiName);
 oiWindow(oi);
-truesize
 
 %% Lightfield manipulations
 
+% Pull out the oi samples
 rgb = oiGet(oi,'rgb');
+
+% Convert these to the lightfield format used by the LF library.
 LF = LFImage2buffer(rgb,nMicrolens(2),nMicrolens(1));
+
+% Pull out the corresponding samples from the samples behind the pixel and
+% show them as separate images
 imgArray = LFbuffer2SubApertureViews(LF);
-ieNewGraphWin; imagesc(imgArray); axis image
 
-%% Move the OI through the sensor to the IP and visualize
+% Notice how the pixelsPerMicrolens x pixelsPerMicrolens images are looking
+% through the imaging lens from slightly different points of view.  Also,
+% notice how we lose photons at the corner samples.
+ieNewGraphWin; imagesc(imgArray); axis image;  
 
+%% Convert the OI through a matched sensor 
+
+% We create a sensor that has each pixel equal to one sample in the OI 
 sensor = sensorCreate('light field',oi);
 sensor = sensorCompute(sensor,oi);
-ieAddObject(sensor); sensorWindow;
+sensorWindow(sensor);
 
 %% Image process ... should really use the whiteScene here
 
 ip = ipCreate;
 ip = ipCompute(ip,sensor);
-ieAddObject(ip); ipWindow;
+ipWindow(ip);
 
-%%  Show the different views
+%%  Convert the image processed data into a light field representation
 
+% The lightfield variable has the dimensions
+%
+%  pixelsPerMicrolens x pixelsPerMicrolens x nMicrolens x nMicrolens x 3
+%
 lightfield = ip2lightfield(ip,'pinholes',nMicrolens,'colorspace','srgb');
 
 % Click on window and press Escape to close
@@ -182,7 +210,13 @@ lightfield = ip2lightfield(ip,'pinholes',nMicrolens,'colorspace','srgb');
 
 %% Mouse around 
 
-% LFDispMousePan(lightfield.^(1/2.2))
+% You can use your mouse to visualize this way
+%  LFDispMousePan(lightfield.^(1/2.2))
+
+% This shows up as a movie that cycles through the different images
+%
+% Click on window to select and then press Escape to close the window
+%
 LFDispVidCirc(lightfield.^(1/2.2))
 %% Focus on a region
 
@@ -190,14 +224,6 @@ LFDispVidCirc(lightfield.^(1/2.2))
 outputImage = LFAutofocus(lightfield);
 ieNewGraphWin;
 imagescRGB(outputImage);
-%}
-
-%% The depth is not right any more
-
-%{
- depth = piRender(thisR,'render type','depth');
- ieNewGraphWin;
- imagesc(depth);
 %}
 
 

@@ -387,7 +387,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     if isempty(val)
                         error('Can not find the lens file %s\n',val);
                     else
-                        fprintf('Using lens file at %s\n',val);
+                        % fprintf('Using lens file at %s\n',val);
                     end
                 end
                 

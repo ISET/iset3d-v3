@@ -100,7 +100,7 @@ switch str
         out = thisR.film;
         fprintf('\nFilm parameters\n-----------\n');
         fprintf('subtype: %s\n',out.subtype);
-        fprintf('x,y resolution: %d %d (samples)\n',thisR.get('film resolution'));
+        fprintf('x,y resolution: %d %d (samples)\n',round(thisR.get('film resolution')));
         lensFile = thisR.get('lens file');
         if isequal(lensFile,'pinhole (perspective)')
             % We should do something smart here.  This is not smart.
