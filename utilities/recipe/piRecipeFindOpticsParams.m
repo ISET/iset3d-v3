@@ -63,7 +63,7 @@ end
 
 % If we get here, we try to extract from the file name. Not preferred.
 try
-    fprintf('Decoding lens parameters from lens file name %s',lensName);
+    fprintf('Decoding lens parameters from lens file name %s\n',lensName);
     % Guess focal length (effective) from lens name
     focalLength = str2double(extractBetween(lensName,'deg.','mm'));
     focalLength = focalLength*10^-3; % meters
