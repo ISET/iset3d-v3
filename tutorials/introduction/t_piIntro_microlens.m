@@ -27,29 +27,17 @@ chdir(fullfile(piRootPath,'local'))
 %% Read the pbrt files
 
 testScenes = {'chessSet','livingroom','kitchen'};
-% {
- thisR = piRecipeDefault('scene name',testScenes{1}); 
- % from = [0.0000    0.0700   -0.7000];
- % to = [ 0.0000    0.0700    0.5000];
-%}
 
-%{
- thisR = piRecipeDefault('scene name','SimpleScene'); 
- to = [0    0.5000  -14.0000]; 
- from = [0    0.5000  -15.0000];
-%}
+thisR = piRecipeDefault('scene name',testScenes{1}); 
 
-%{
-% Macbeth case
-thisR  = piRecipeDefault; z = -2.7;
-%}
 
 %% Read in the microlens and set its size
 
+% This is a simple microlens file.
 microlens     = lensC('filename','microlens.json');
 
-% Set the microlens size to 12 microns using the
-% microlens.scale method.
+% Adjust its size to 12 microns using the adjustSize method of the lensC
+% class.
 desiredHeight = 0.012;                       % mm
 microlens.adjustSize(desiredHeight);
 fprintf('Focal length =  %.3f (mm)\nHeight = %.3f (mm)F-number %.3f\n',...
@@ -57,8 +45,10 @@ fprintf('Focal length =  %.3f (mm)\nHeight = %.3f (mm)F-number %.3f\n',...
 
 %% Choose the imaging lens 
 
-% For the dgauss lenses 22deg is the half width of the field of view
-imagingLens     = lensC('filename','dgauss.22deg.3.0mm.json');
+% For the double gauss lenses 22deg is the half width of the field of view.
+% This focal length produces a decent part of the central scene.
+imagingLens     = lensC('filename','dgauss.22deg.12.5mm.json');
+
 fprintf('Focal length =  %.3f (mm)\nHeight = %.3f\n',...
     imagingLens.focalLength,imagingLens.get('lens height'))
 
@@ -176,8 +166,16 @@ LF = LFImage2buffer(rgb,nMicrolens(2),nMicrolens(1));
 
 % Pull out the corresponding samples from the samples behind the pixel and
 % show them as separate images
-imgArray = LFbuffer2SubApertureViews(LF);
+[imgArray, imgCorners] = LFbuffer2SubApertureViews(LF);
 
+%{
+imSize = size(LF,[1 2]);
+thisCorner = imgCorners(3,3,:);
+r = thisCorner(1):(thisCorner(1)+imSize(1));
+c = thisCorner(2):(thisCorner(2)+imSize(2));
+thisImg = imgArray(r,c,:);
+ieNewGraphWin; imagesc(thisImg); axis image;
+%}
 % Notice how the pixelsPerMicrolens x pixelsPerMicrolens images are looking
 % through the imaging lens from slightly different points of view.  Also,
 % notice how we lose photons at the corner samples.
