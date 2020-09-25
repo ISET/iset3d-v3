@@ -68,7 +68,7 @@ filmwidth  = nMicrolens(2)*microlens.get('lens height');
 
 % Set the number of pixels behind each microlens.  This determines the size
 % of the pixel.
-pixelsPerMicrolens = 5;  % The 2D array of pixels is this number squared
+pixelsPerMicrolens = 7;  % The 2D array of pixels is this number squared
 pixelSize  = microlens.get('lens height')/pixelsPerMicrolens;   % mm
 filmresolution = [filmheight, filmwidth]/pixelSize;
 
