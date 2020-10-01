@@ -119,41 +119,51 @@ fprintf(fid_rtGeo, '\n');
 
 objInsList = find(contains(rtTxtLines, strcat("ObjectInstance ", '"', childGeoName)));
 objInsIndex = objInsList(end);
-
-% Get the attribute section above
-if contains(rtTxtLines{objInsIndex-1}, "ObjectInstance")    
-    for ii = objBegIndex+1 : objInsIndex
-        fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
-    end
-    
-    attText = strcat("ObjectInstance ", ' ','"', newObjectName, '"');
-    fprintf(fid_rtGeo, '%s\n', attText);
-    
-    % Write the remaining text
-    for ii = objInsIndex+1:numel(rtTxtLines)
-        fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
-    end
-
-else
-    % There are other information 
-    attText = rtTxtLines(objInsIndex-7:objInsIndex+1);
-    
-    for ii = objBegIndex+1 : objInsIndex+1
-        fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
-    end
-    
-    % Write this section again wtih the new instance
-    attText{end-1} = strcat("ObjectInstance ", ' ','"', newObjectName, '"');
-    
-    for ii = 1:numel(attText)
-        fprintf(fid_rtGeo, '%s\n', attText{ii});
-    end
-    
-    % Write the remaining text
-    for ii = objInsIndex+2:numel(rtTxtLines)
-        fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
-    end
+for ii = objBegIndex+1 : objInsIndex
+    fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
 end
+
+attText = strcat("ObjectInstance ", ' ','"', newObjectName, '"');
+fprintf(fid_rtGeo, '%s\n', attText);
+
+for ii = objInsIndex+1:numel(rtTxtLines)
+    fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
+end
+
+% % Get the attribute section above
+% if contains(rtTxtLines{objInsIndex-1}, "ObjectInstance")    
+%     for ii = objBegIndex+1 : objInsIndex
+%         fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
+%     end
+%     
+%     attText = strcat("ObjectInstance ", ' ','"', newObjectName, '"');
+%     fprintf(fid_rtGeo, '%s\n', attText);
+%     
+%     % Write the remaining text
+%     for ii = objInsIndex+1:numel(rtTxtLines)
+%         fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
+%     end
+% 
+% else
+%     % There are other information 
+%     attText = rtTxtLines(objInsIndex-7:objInsIndex+1);
+%     
+%     for ii = objBegIndex+1 : objInsIndex+1
+%         fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
+%     end
+%     
+%     % Write this section again wtih the new instance
+%     attText{end-1} = strcat("ObjectInstance ", ' ','"', newObjectName, '"');
+%     
+%     for ii = 1:numel(attText)
+%         fprintf(fid_rtGeo, '%s\n', attText{ii});
+%     end
+%     
+%     % Write the remaining text
+%     for ii = objInsIndex+2:numel(rtTxtLines)
+%         fprintf(fid_rtGeo, '%s\n', rtTxtLines{ii});
+%     end
+% end
 
 %% Minus one so the numbers of vertice agree with the rule in PBRT
 
