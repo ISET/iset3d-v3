@@ -130,19 +130,28 @@ switch ieParamFormat(sceneName)
         sceneName = 'SimpleScene';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'chessset'
         sceneName = 'chessSet';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'chesssetscaled'
         sceneName = 'chessSetScaled';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'checkerboard'
         sceneName = 'checkerboard';
@@ -169,7 +178,10 @@ switch ieParamFormat(sceneName)
         sceneName = 'slantedBar';
         FilePath = fullfile(piRootPath,'data','V3','slantedBar');
         fname = fullfile(FilePath,'slantedBar.pbrt');
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'flatsurface'
         sceneName = 'flatSurface';
@@ -246,7 +258,10 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['bathroom','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'classroom'
         sceneName = 'classroom';
@@ -260,7 +275,10 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'plantsdusk'
         sceneName = 'plantsDusk';
@@ -270,18 +288,24 @@ switch ieParamFormat(sceneName)
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'Copy';
     case 'livingroom'
-        sceneName = 'livingroom';
+        sceneName = 'living-room';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'yeahright'
         sceneName = 'yeahright';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['yeahright','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'sanmiguel'
         warning('sanmiguel:  Not rendering correctly yet.')
@@ -289,7 +313,10 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['sanmiguel','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'teapotfull'
         sceneName = 'teapot-full';
@@ -303,14 +330,20 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'bedroom'
         sceneName = 'bedroom';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'livingroom3'
         % Not running
@@ -318,7 +351,10 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     otherwise
         error('Can not identify the scene, %s\n',sceneName);
