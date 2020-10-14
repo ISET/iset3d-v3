@@ -112,19 +112,28 @@ switch ieParamFormat(sceneName)
         sceneName = 'MacBethChecker';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'macbethcheckerbox'
         sceneName = 'MacBethCheckerBox';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'macbethcheckercus'
         sceneName = 'MacBethCheckerCus';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'simplescene'
         sceneName = 'SimpleScene';
@@ -163,7 +172,10 @@ switch ieParamFormat(sceneName)
         sceneName = 'coloredCube';
         FilePath = fullfile(piRootPath,'data','V3','coloredCube');
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'teapot'
         sceneName = 'teapot';
@@ -187,7 +199,10 @@ switch ieParamFormat(sceneName)
         sceneName = 'flatSurface';
         FilePath = fullfile(piRootPath,'data','V3','flatSurface');
         fname = fullfile(FilePath,'flatSurface.pbrt');
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'sphere'
         sceneName = 'sphere';
@@ -199,59 +214,86 @@ switch ieParamFormat(sceneName)
         sceneName = 'flatSurfaceWhiteTexture';
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceWhiteTexture');
         fname = fullfile(FilePath,'flatSurfaceWhiteTexture.pbrt');
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'flatsurfacerandomtexture'
         sceneName = 'flatSurfaceRandomTexture';
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceRandomTexture');
         fname = fullfile(FilePath,'flatSurfaceRandomTexture.pbrt');
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'flatsurfacemcctexture'
         sceneName = 'flatSurfaceMCCTexture';
         FilePath = fullfile(piRootPath,'data','V3','flatSurfaceMCCTexture');
         fname = fullfile(FilePath,'flatSurfaceMCCTexture.pbrt');
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'simplescenelight'
         sceneName = 'SimpleSceneLight';
         FilePath = fullfile(piRootPath,'data','V3','SimpleSceneLight');
         fname = fullfile(FilePath,'SimpleScene.pbrt');
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'macbethcheckercuslight'
         sceneName = 'MacBethCheckerCusLight';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['MacBethCheckerCus','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'cornellbox'
         sceneName = 'cornell_box';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['cornell_box','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'snellenatdepth'
         sceneName = 'snellenAtDepth';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['snellen','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'numbersatdepth'
         sceneName = 'NumbersAtDepth';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['numbersAtDepth','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'lettersatdepth'
         sceneName = 'lettersAtDepth';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['lettersAtDepth','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';
     case 'bathroom'
         sceneName = 'bathroom';
@@ -285,7 +327,10 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['plantsDusk','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'Copy';
     case 'livingroom'
         sceneName = 'living-room';
