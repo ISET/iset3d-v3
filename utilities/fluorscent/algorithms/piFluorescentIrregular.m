@@ -1,5 +1,6 @@
 function piFluorescentIrregular(thisR, TR, childGeometryPath, txtLines, base,...
                             location,varargin)
+%% In progress
 
 %% Create pattern
 m = 100;

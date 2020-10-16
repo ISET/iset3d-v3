@@ -1,5 +1,5 @@
-function verticesOne = piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
-                                    txtLines, base, location, type, varargin)
+function verticesOne = piFluorescentCoreSpread(thisR, TR, childGeometryPath,...
+                                    txtLines, matIdx, varargin)
 %% Generate a pattern from single triangle
 %
 %   piFluorescentUniformSpread
@@ -21,21 +21,72 @@ function verticesOne = piFluorescentUniformSpread(thisR, TR, childGeometryPath,.
 % Ouputs:
 %   None
 %
+
+% Examples:
+%{
+ieInit;
+if ~piDockerExists, piDockerConfig; end
+thisR = piRecipeDefault('scene name', 'sphere');
+piMaterialList(thisR);
+piLightDelete(thisR, 'all');
+thisR = piLightAdd(thisR,...
+    'type','distant',...
+    'light spectrum','OralEye_385',...
+    'spectrumscale', 1,...
+    'cameracoordinate', true); 
+piWrite(thisR);
+%{
+scene = piRender(thisR);
+sceneWindow(scene);
+%}
+thisIdx = 1;
+piFluorescentPattern(thisR, thisIdx, 'algorithm', 'core spread',...
+                    'fluoName','protoporphyrin','sz', 10,...
+                    'concentration', 1);
+wave = 365:5:705;
+thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
+[scene, result] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'radiance');
+sceneWindow(scene)
+%}
 %% Parse the input
 p = inputParser;
+p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
+p.addRequired('TR');
+p.addRequired('childGeometryPath', @ischar);
+p.addRequired('txtLines', @iscell);
+p.addRequired('matIdx', @(x)(ischar(x) || isnumeric(x)));
 
-p.addParameter('depth', 40, @isscalar)
-p.addParameter('sTriangleIndex', -1, @isscalar)
-p.parse(varargin{:});
+p.addParameter('type', 'add',@ischar);
+p.addParameter('concentration', -1, @isnumeric);
+p.addParameter('fluoName', 'protoporphyrin', @ischar);
 
-depth = p.Results.depth;
-sTriangleIndex = p.Results.sTriangleIndex;
-%% Initialize the algorithm structure
+p.addParameter('sz', -1, @isscalar)
+p.addParameter('coreTRIndex', -1, @isscalar)
+p.parse(thisR, TR, childGeometryPath, txtLines,...
+        matIdx, varargin{:});
+
+thisR = p.Results.thisR;
+TR    = p.Results.TR;
+childGeometryPath = p.Results.childGeometryPath;
+txtLines = p.Results.txtLines;
+matIdx = p.Results.matIdx;
+type = p.Results.type;
+fluoName = p.Results.fluoName;
+concentration = p.Results.concentration;
+
+sz = p.Results.sz;
+coreTRIndex = p.Results.coreTRIndex;
+%% Parameter initialize
+
+if concentration == -1, concentration = rand(1); end
+
+if sz == -1, sz = randi([1, uint64((max(TR.Points(:))))]); end
 
 edgesNum = size(TR.ConnectivityList, 1);
-
 % Randomly pick one triangle as start if sTriangleIndex is not defined (-1)
-if sTriangleIndex == -1, sTriangleIndex = randi(edgesNum); end
+if coreTRIndex == -1, coreTRIndex = randi(edgesNum); end
+
+%% Initialize the algorithm structure
 
 nCollection = neighbors(TR);
 %{
@@ -45,10 +96,10 @@ nCollection = neighbors(TR);
 
 %}
 
-indexList = [sTriangleIndex];
-qTriangleIndex = [sTriangleIndex];
+indexList = [coreTRIndex];
+qTriangleIndex = [coreTRIndex];
 qDepthList = [0];
-verticesTwo = [TR.ConnectivityList(sTriangleIndex, :)];
+verticesTwo = [TR.ConnectivityList(coreTRIndex, :)];
 
 visited = zeros(1, edgesNum);
 %% 
@@ -57,7 +108,7 @@ while(~isempty(qTriangleIndex))
     thisDepth = qDepthList(1);
     
     curDepth = thisDepth + 1;
-    if curDepth <= depth
+    if curDepth <= sz
         % Find the neighbor triangles, push them in queue
         thisNeighbors = nCollection(thisIndex, :);
         for ii = 1:numel(thisNeighbors)
@@ -84,9 +135,9 @@ while(~isempty(qTriangleIndex))
             
             if ~isempty(newIndex)
                 if visited(newIndex) == 0
-                    qTriangleIndex = [qTriangleIndex newIndex];
-                    qDepthList = [qDepthList curDepth];
-                    indexList = [indexList newIndex];
+                    qTriangleIndex = [qTriangleIndex newIndex'];
+                    qDepthList = [qDepthList curDepth * ones(1, numel(newIndex))];
+                    indexList = [indexList newIndex'];
                     verticesTwo = [verticesTwo; TR.ConnectivityList(newIndex, :)];
                     visited(newIndex) = 1;
                 end
@@ -101,7 +152,7 @@ while(~isempty(qTriangleIndex))
 end
 
 %{
-    verticesPlot(verticeTwo, TR);
+    verticesPlot(verticesTwo, TR);
     verticesReset(TR);
 %}
 
@@ -115,7 +166,8 @@ end
 
 %% Go edit PBRT files
 piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
-                                base, location, verticesOne, verticesTwo, type);
+                                matIdx, verticesOne, verticesTwo, type,...
+                                fluoName, concentration);
 
 
 end
