@@ -15,6 +15,55 @@ function obj = piAssetCreate(varargin)
 %  assembled them into an asset structure.  That has been renamed to
 %  piFWAssetCreate();
 %
+% Longer description
+%
+%    The graphics objects are described using a logic that aligns with the
+%    PBRT logic.  The graphics objects can have several groups of nodes
+%    that each form a tree.  We might create a 'virtual' root node and hang
+%    all the trees off it.  Or we might just have assets be a cell array so
+%    that assets{1} is one tree, assets{2} is a second tree.
+%
+%    Each tree has 'nodes' and 'leafs'.  The 'nodes' define the position,
+%    size, rotation of the nodes and leafs beneath it.  The 'leafs' can be
+%    either objects (person, sphere, whatever) or a light (???).  The
+%    reason for having a light here is because the light might be attached
+%    to a surface (e.g., a ceiling light, or a light source that is part of
+%    a camera). (We might remove the lights but put a link from the light
+%    to a node in the graphics object so that its position tracks that
+%    node).
+%
+%    The leafs (terminal nodes) define the material properties of a
+%    specific part of the graphics object or the properties of a light. For
+%    example, the terminal nodes define the shape of an object, or if it is
+%    a light the type of light (e.g., area light).
+%
+%    We should have different types of nodes.
+%
+%    node.type = {'node','object','light'}
+%
+%    piAssetCreate('node')
+%    piAssetCreate('object')
+%    piAssetCreate('light')
+%
+%    All the nodes have node.name, node.parent. We should look for a
+%    graphics 'tree' management package in Matlab.
+%
+%    if node.type = 'node'
+%        node.size, node.scale, node.position, node.rotate, node.nodes{}
+%
+%    if node.type = 'object'
+%        node.material, node.shape
+%
+%    if node.type = 'light'
+%        node.light, node.arealight, node.output
+%
+%    How easy will it be to create 
+%      * If this architecture is good, piWrite should be very easy for
+%        creating PBRT files
+%      * piAssetGet and piAssetSet functions should be clear if we have this
+%        architecture
+%
+%
 % ZLY, BW
 %
 % See also
