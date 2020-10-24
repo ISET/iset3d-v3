@@ -45,3 +45,12 @@ disp(t.tostring)
 
 %% 
 nodeID = piAssetFind(t, 'name', 'light');
+
+%%
+t1 = tree('root');
+t2 = tree();
+t2 = t2.addnode(1, 'rr');
+t2 = t2.addnode(1, 'cc');
+t2 = t2.removenode(1);
+t1 = t1.graft(1, t2);
+disp(t1.tostring)

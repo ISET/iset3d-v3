@@ -15,7 +15,7 @@ t = tree('root');
 disp(t.tostring)
 
 thisID = piAssetFind(t, 'name', 'object');
-nodeObject = 
+nodeObject = t.get(thisID);
 %}
 %%
 nodeList = [0]; % 0 is always the index for root node
