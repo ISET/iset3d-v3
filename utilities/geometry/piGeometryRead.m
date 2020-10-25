@@ -107,6 +107,7 @@ function [trees, parsedUntil] = parseGeometryText(txt, name)
 %
 %   The geometry text comes from C4D export. We parse the lines of text in 
 %   'txt' cell array and recrursively create a tree structure of geometric objects.
+%   TODO: comment on the logic
 
 % res = [];
 % groupobjs = [];
