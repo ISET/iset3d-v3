@@ -195,7 +195,10 @@ while i <= length(txt)
         % children). This can be confusing but is somewhat similar to
         % previous representation.
         
-        if exist('rot','var') || exist('position','var')
+        if exist('rot','var') || exist('position','var') &&...
+                        ~exist('arealight', 'var')
+           % This is a 'node' node.
+           
             % resCurrent = createGroupObject();
             resCurrent = piAssetCreate('type', 'node');
             
@@ -240,9 +243,24 @@ while i <= length(txt)
             if exist('lght','var')
                 % Wrap the light text into attribute section
                 lghtWrap = [{'AttributeBegin'}, lght(:)', {'AttributeEnd'}];
-                resLight.light = piLightGetFromText(thisR, lghtWrap); 
+                resLight.light = piLightGetFromText(thisR, lghtWrap, 'print', false); 
             end
-            if exist('areaLight','var'), resLight.areaLight = areaLight; end
+            if exist('areaLight','var')
+                resLight.areaLight = piLightGetFromText(areaLight); 
+                
+                if exist('shape', 'var')
+                    resLight.areaLight.shape = shape;
+                end
+                
+                if exist('rot', 'var')
+                    resLight.areaLight.rotate = rot;
+                end
+                
+                if exist('position', 'var')
+                    resLight.areaLight.position = position;
+                end
+                
+            end
             
             if exist('name', 'var'), resLight.name = name; end
             

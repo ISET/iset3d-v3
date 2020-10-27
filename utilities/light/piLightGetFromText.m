@@ -93,6 +93,21 @@ for ii = 1:nLights
             end
         end
         
+        % Parse ConcatTransform
+        concatTrans = find(piContains(lightSources{ii}.line, 'ConcatTransform'));
+        if concatTrans
+            [rot, position] = piParseConcatTransform(lightSources{ii}.line{concatTrans});
+            lightSources{ii}.rotate = rot;
+            lightSources{ii}.position = position;
+        end
+        
+        % Parse shape
+        shp = find(piContains(lightSources{ii}.line, 'ConcatTransform'));
+        if shp
+            lightSources{ii}.shape = piParseShape(lightSources{ii}.line{shp});
+        end
+        
+        
     else
         % Assign type
         lightType = lightSources{ii}.line{piContains(lightSources{ii}.line,'LightSource')};
