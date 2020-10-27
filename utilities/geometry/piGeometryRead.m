@@ -64,7 +64,7 @@ end
 
 if ~convertedflag
     % It was not converted, so we go to work.
-    renderRecipe.assets = parseGeometryText(txtLines,'');
+    renderRecipe.assets = parseGeometryText(renderRecipe, txtLines,'');
 
     % jsonwrite(AssetInfo,renderRecipe);
     % fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
@@ -91,7 +91,7 @@ end
 
 %%
 %
-function [trees, parsedUntil] = parseGeometryText(txt, name)
+function [trees, parsedUntil] = parseGeometryText(thisR, txt, name)
 %
 % Inputs:
 %
@@ -107,7 +107,25 @@ function [trees, parsedUntil] = parseGeometryText(txt, name)
 %
 %   The geometry text comes from C4D export. We parse the lines of text in 
 %   'txt' cell array and recrursively create a tree structure of geometric objects.
-%   TODO: comment on the logic
+%   
+%   Logic explanation:
+%   parseGeometryText will recursively parse the geometry text line by
+%   line. If current text is:
+%       a) 'AttributeBegin': this is the beginning of a section. We will
+%       keep looking for node/object/light information until we reach the 
+%       'AttributeEnd'.
+%       b) Node/object/light information: this could contain rotation,
+%       position, scaling, shape, material properties, light spectrum
+%       information. Upon seeing the information, parameters will be
+%       created to store the value.
+%       c) 'AttributeEnd': this is the end of a section. Depending on
+%       parameters in this section, we will create different nodes and make
+%       them as trees. Noted the 'node' node will have children for sure,
+%       so we assumed that before reaching the end of 'node' seciton, we
+%       already have some children, so we need to attach them under the
+%       'node'. 'Ojbect' and 'Light', on the other hand will have no child
+%       as they will be children leaves. So we simply create leave nodes
+%       for them and return.
 
 % res = [];
 % groupobjs = [];
@@ -120,7 +138,57 @@ while i <= length(txt)
     currentLine = txt{i};
     
     % Return if we've reached the end of current attribute
-    if strcmp(currentLine,'AttributeEnd')
+    
+    if strcmp(currentLine,'AttributeBegin')
+        % This is an Attribute inside an Attribute
+        [subnodes, retLine] = parseGeometryText(thisR, txt(i+1:end), name);
+        subtrees = cat(1, subtrees, subnodes);
+        %{
+        groupobjs = cat(1, groupobjs, subnodes);
+        
+        
+        % Give an index to the subchildren to make it different from its
+        % parents and brothers (we are not sure if it works for more than
+        % two levels). We name the subchildren based on the line number and
+        % how many subchildren there are already.
+        if ~isempty(subchildren)
+            subchildren.name = sprintf('%d_%d_%s', i, numel(children)+1, subchildren.name);
+        end
+        children = cat(1, children, subchildren);
+        %}
+%         assets = cat(1, assets, subassets);
+        i =  i + retLine;
+        
+    elseif piContains(currentLine,'#ObjectName')
+        [name, sz] = piParseObjectName(currentLine);
+        
+    elseif piContains(currentLine,'ConcatTransform')
+        [rot, position] = piParseConcatTransform(currentLine);
+        
+    elseif piContains(currentLine,'MediumInterface')
+        % MediumInterface could be water or other scattering media.
+        medium = currentLine;
+        
+    elseif piContains(currentLine,'NamedMaterial')
+        mat = piParseGeometryMaterial(currentLine);
+        
+    elseif piContains(currentLine,'AreaLightSource')
+        areaLight = currentLine;
+        
+    elseif piContains(currentLine,'LightSource') ||...
+            piContains(currentLine, 'Rotate') ||...
+            piContains(currentLine, 'Scale')
+        % Usually light source contains only one line. Exception is the
+        % infinite light
+        if ~exist('lght','var')
+            lght{1} = currentLine;
+        else
+            lght{end+1} = currentLine;
+        end
+        
+    elseif piContains(currentLine,'Shape')
+        shape = piParseShape(currentLine);
+    elseif strcmp(currentLine,'AttributeEnd')
         
         % Assemble all the read attributes into either a groub object, or a
         % geometry object. Only group objects can have subnodes (not
@@ -157,7 +225,7 @@ while i <= length(txt)
             
             if exist('mat','var')
                 resObject.material = mat; 
-                resObject.name = strcat(resObject.name, '_', mat);
+                resObject.name = strcat(resObject.name, '_', mat.namedmaterial);
             end
             if exist('medium','var')
                 resObject.medium = medium; 
@@ -169,7 +237,11 @@ while i <= length(txt)
             
         elseif exist('areaLight','var') || exist('lght','var')
             resLight = piAssetCreate('type', 'light');
-            if exist('lght','var'), resLight.light = lght; end
+            if exist('lght','var')
+                % Wrap the light text into attribute section
+                lghtWrap = [{'AttributeBegin'}, lght(:)', {'AttributeEnd'}];
+                resLight.light = piLightGetFromText(thisR, lghtWrap); 
+            end
             if exist('areaLight','var'), resLight.areaLight = areaLight; end
             
             if exist('name', 'var'), resLight.name = name; end
@@ -197,53 +269,6 @@ while i <= length(txt)
         parsedUntil = i;
         return;
         
-    elseif strcmp(currentLine,'AttributeBegin')
-        % This is an Attribute inside an Attribute
-        [subnodes, retLine] = parseGeometryText(txt(i+1:end), name);
-        subtrees = cat(1, subtrees, subnodes);
-        %{
-        groupobjs = cat(1, groupobjs, subnodes);
-        
-        
-        % Give an index to the subchildren to make it different from its
-        % parents and brothers (we are not sure if it works for more than
-        % two levels). We name the subchildren based on the line number and
-        % how many subchildren there are already.
-        if ~isempty(subchildren)
-            subchildren.name = sprintf('%d_%d_%s', i, numel(children)+1, subchildren.name);
-        end
-        children = cat(1, children, subchildren);
-        %}
-%         assets = cat(1, assets, subassets);
-        i =  i + retLine;
-        
-    elseif piContains(currentLine,'#ObjectName')
-        [name, sz] = parseObjectName(currentLine);
-        
-    elseif piContains(currentLine,'ConcatTransform')
-        [rot, position] = parseConcatTransform(currentLine);
-        
-    elseif piContains(currentLine,'MediumInterface')
-        % MediumInterface could be water or other scattering media.
-        medium = currentLine;
-        
-    elseif piContains(currentLine,'NamedMaterial')
-        mat = currentLine;
-        
-    elseif piContains(currentLine,'AreaLightSource')
-        areaLight = currentLine;
-        
-    elseif piContains(currentLine,'LightSource') ||...
-            piContains(currentLine, 'Rotate') ||...
-            piContains(currentLine, 'Scale')
-        if ~exist('lght','var')
-            lght{1} = currentLine;
-        else
-            lght{end+1} = currentLine;
-        end
-        
-    elseif piContains(currentLine,'Shape')
-        shape = currentLine;
     else
       %  warning('Current line skipped: %s', currentLine);
     end
@@ -265,134 +290,8 @@ parsedUntil = i;
 
 end
 %}
-%%
-function [name, sz] = parseObjectName(txt)
-% Parse an ObjectName string in 'txt' to extract the object name and size.
-%
-% Cinema4D produces a line with #ObjectName in it. The format of the
-% #ObjectName line appears to be something like this:
-%
-%   #ObjectName Plane:Vector(5000, 0, 5000)
-%
-% The only cases we have seen are NAME:Vector(X,Z,Y).  Someone seems to
-% know the meaning of these three values which are read into 'res' below.
-% The length is 2*X, width is 2*Y and height is 2*Z.
-% 
-% Perhaps these numbers should always be treated as in meters or maybe
-% centimeters?  We need to figure this out.  For the slantedBar scene we
-% had the example above, and we think the scene might be about 100 meters,
-% so this would make sense.
-%
-% We do not have a routine to fill in these values for non-Cinema4D
-% objects.
 
 
-% Find the location of #ObjectName in the string
-pattern = '#ObjectName';
-loc = strfind(txt,pattern);
-
-% Look for a colon
-pos = strfind(txt,':');
-name = txt(loc(1)+length(pattern) + 1:max(pos(1)-1, 1));
-
-posA = strfind(txt,'(');
-posB = strfind(txt,')');
-res = sscanf(txt(posA(1)+1:posB(1)-1),'%f, %f, %f');
-
-% Position minimima and maxima for lower left (X,Y), upper right.
-sz.pmin = [-res(1) -res(3)];
-sz.pmax = [res(1) res(3)];
-
-% We are not really sure what these coordinates represent with respect to
-% the scene or the camera direction.  For one case we analyzed (a plane)
-% this is what the values meant.
-sz.l = 2*res(1);   % length (X)
-sz.w = 2*res(2);   % depth (Z)
-sz.h = 2*res(3);   % height (Y)
-
-end
-
-%%
-function [rotation, translation] = parseConcatTransform(txt)
-% Given a string 'txt' extract the information about transform.
-
-posA = strfind(txt,'[');
-posB = strfind(txt,']');
-
-tmp  = sscanf(txt(posA(1):posB(1)), '[%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f]');
-tform = reshape(tmp,[4,4]);
-dcm = [tform(1:3); tform(5:7); tform(9:11)];
-                    
-[rotz,roty,rotx]= piDCM2angle(dcm);
-if ~isreal(rotz) || ~isreal(roty) || ~isreal(rotx)
-    warning('piDCM2angle returned complex angles.  JSONWRITE will fail.');
-    % dcm
-    % txt(posA(1):posB(1))
-end
-
-%{
-% Forcing to real is not a good idea.  
-rotx = real(rotx*180/pi);
-roty = real(roty*180/pi);
-rotz = real(rotz*180/pi);
-%}
-% {                   
-rotx = rotx*180/pi;
-roty = roty*180/pi;
-rotz = rotz*180/pi;
-%}
-
-% Comment needed
-rotation = [rotz, roty, rotx;
-                fliplr(eye(3))];
-
-translation = reshape(tform(13:15),[3,1]);
-end
-
-%%
-function obj = createGroupObject()
-% Initialize a structure representing a group object.
-%
-% What makes something a group object rather than a child?
-% What if we want to read the nodes and edges of an object, can we do it?
-
-obj.name = [];      % String
-obj.size.l = 0;     % Length
-obj.size.w = 0;     % Width
-obj.size.h = 0;     % Height
-obj.size.pmin = [0 0];    % No idea
-obj.size.pmax = [0 0];    % No idea
-
-obj.scale = [1 1 1];
-obj.position = [0 0 0];   % Maybe the middle of the object?
-
-obj.rotate = [0 0 0;
-              0 0 1;
-              0 1 0;
-              1 0 0];
-
-obj.children = [];
-obj.groupobjs = [];
-          
-
-end
-
-%%
-function obj = createGeometryObject()
-
-% This function creates a geometry object and initializes all fields to
-% empty values.
-
-obj.name = [];
-obj.index = [];
-obj.mediumInterface = [];
-obj.material = [];
-obj.light = [];
-obj.areaLight = [];
-obj.shape = [];
-obj.output = [];
-
-end
 
 %%
 %%
@@ -525,6 +424,52 @@ res.groupobjs = groupobjs;
 res.children = children;
 
 parsedUntil = i;
+
+end
+
+
+%%
+function obj = createGroupObject()
+% Initialize a structure representing a group object.
+%
+% What makes something a group object rather than a child?
+% What if we want to read the nodes and edges of an object, can we do it?
+
+obj.name = [];      % String
+obj.size.l = 0;     % Length
+obj.size.w = 0;     % Width
+obj.size.h = 0;     % Height
+obj.size.pmin = [0 0];    % No idea
+obj.size.pmax = [0 0];    % No idea
+
+obj.scale = [1 1 1];
+obj.position = [0 0 0];   % Maybe the middle of the object?
+
+obj.rotate = [0 0 0;
+              0 0 1;
+              0 1 0;
+              1 0 0];
+
+obj.children = [];
+obj.groupobjs = [];
+          
+
+end
+
+%%
+function obj = createGeometryObject()
+
+% This function creates a geometry object and initializes all fields to
+% empty values.
+
+obj.name = [];
+obj.index = [];
+obj.mediumInterface = [];
+obj.material = [];
+obj.light = [];
+obj.areaLight = [];
+obj.shape = [];
+obj.output = [];
 
 end
 %}
