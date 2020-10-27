@@ -1,4 +1,4 @@
-function id = piAssetFind(tree, param, val)
+function id = piAssetFind(thisR, param, val)
 %%
 
 % See also:
@@ -16,14 +16,16 @@ thisID = piAssetFind(t, 'name', 'object');
 nodeObject = t.get(thisID);
 %}
 %%
+thisTree = thisR.assets;
+%%
 nodeList = [0]; % 0 is always the index for root node
 
 curIdx = 1; %
  
 while curIdx <= numel(nodeList)
-    IDs = tree.getchildren(nodeList(curIdx));
+    IDs = thisTree.getchildren(nodeList(curIdx));
     for ii = 1:numel(IDs)
-        if isequal(val, piAssetGet(tree, IDs(ii), param))
+        if isequal(val, piAssetGet(thisR, IDs(ii), param))
             id = IDs(ii);
             return;
         end

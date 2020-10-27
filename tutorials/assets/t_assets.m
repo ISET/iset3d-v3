@@ -12,4 +12,6 @@ disp(thisRSS.assets.tostring)
 thisRCB = piRead(which('cornell_box_formal.pbrt'));
 disp(thisRCB.assets.tostring);
 
-%%
+% Check if piAssetFind works
+ids = piAssetFind(thisRCB, {'name', 'type'}, {'Area Light', 'object'});
+piAssetGet(thisRCB, ids)

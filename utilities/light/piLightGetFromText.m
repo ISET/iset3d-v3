@@ -34,7 +34,7 @@ varargin = ieParamFormat(varargin);
 p  = inputParser;
 p.addRequired('thisR', @(x)(isa(x,'recipe')));
 p.addRequired('intext', @iscell);
-p.addParameter('print',true);
+p.addParameter('printinfo',true);
 
 p.parse(thisR, intext, varargin{:});
 
@@ -253,7 +253,7 @@ for ii = 1:numel(lightSources)
     end
 end
 
-if p.Results.print
+if p.Results.printinfo
     disp('---------------------')
     disp('*****Light Type******')
     for ii = 1:length(lightSources)

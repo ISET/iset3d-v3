@@ -29,7 +29,7 @@ p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
 p.parse(thisR)
 
 %% Get light from world
-thisR.lights = piLightGetFromText(thisR, thisR.world,'print', false);
+thisR.lights = piLightGetFromText(thisR, thisR.world,'printinfo', false);
 
 % Remove the light from the world as we already stored them in thisR.lights
 thisR = piLightDeleteWorld(thisR, 'all');
