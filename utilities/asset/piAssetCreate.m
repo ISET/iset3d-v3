@@ -38,7 +38,6 @@ switch type
     case 'light'
         obj.name = 'light';
         obj.light = [];
-        obj.areaLight = [];
 end
 
 

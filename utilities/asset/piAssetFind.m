@@ -1,7 +1,5 @@
 function id = piAssetFind(tree, param, val)
 %%
-% TODO: implement a tree traverse algorithm (e.g. BFS) to find a node with
-% a parameter having val
 
 % See also:
 %   piAssetGet, piAssetSet;

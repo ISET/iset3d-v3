@@ -48,9 +48,6 @@ if exist(inputFile_lights,'file')
         warning('%s exists but no light found. \n', inputFile_lights);
     end
 end
-%% Give default name to all lights
-for ii = 1:numel(thisR.lights)
-    thisR.lights{ii}.name = 'Default light';
-end
+
 
 end

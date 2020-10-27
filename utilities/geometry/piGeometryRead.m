@@ -178,8 +178,8 @@ while i <= length(txt)
     elseif piContains(currentLine,'LightSource') ||...
             piContains(currentLine, 'Rotate') ||...
             piContains(currentLine, 'Scale')
-        % Usually light source contains only one line. Exception is the
-        % infinite light
+        % Usually light source contains only one line. Exception is there
+        % are rotations or scalings
         if ~exist('lght','var')
             lght{1} = currentLine;
         else
@@ -195,15 +195,52 @@ while i <= length(txt)
         % children). This can be confusing but is somewhat similar to
         % previous representation.
         
-        if exist('rot','var') || exist('position','var') &&...
-                        ~exist('arealight', 'var')
-           % This is a 'node' node.
+        % More to explain this long if-elseif-else condition:
+        %   First check if this is a light/arealight node. If so, parse the
+        %   parameters.
+        %   If it is not a light node, then we consider if it is a node
+        %   node which records some common translation and rotation.
+        %   Else, it must be an object node which contains material info
+        %   and other things.
+        
+        if exist('areaLight','var') || exist('lght','var')
+            % This is a 'light' node
+            resLight = piAssetCreate('type', 'light');
+            if exist('lght','var')
+                % Wrap the light text into attribute section
+                lghtWrap = [{'AttributeBegin'}, lght(:)', {'AttributeEnd'}];
+                resLight.light = piLightGetFromText(thisR, lghtWrap, 'print', false); 
+            end
+            if exist('areaLight','var')
+                resLight.light = piLightGetFromText(thisR, {areaLight}, 'print', false); 
+                
+                if exist('shape', 'var')
+                    resLight.light{1}.shape = shape;
+                end
+                
+                if exist('rot', 'var')
+                    resLight.light{1}.rotate = rot;
+                end
+                
+                if exist('position', 'var')
+                    resLight.light{1}.position = position;
+                end
+                
+            end
+            
+            if exist('name', 'var'), resLight.name = sprintf('%s', name); end
+            
+            subtrees = cat(1, subtrees, tree(resLight));
+            trees = subtrees;
+
+        elseif exist('rot','var') || exist('position','var')
+           % This is a 'node' node
            
             % resCurrent = createGroupObject();
             resCurrent = piAssetCreate('type', 'node');
             
             % If present populate fields.
-            if exist('name','var'), resCurrent.name = name; end
+            if exist('name','var'), resCurrent.name = sprintf('%s', name); end
             if exist('sz','var'), resCurrent.size = sz; end
             if exist('rot','var'), resCurrent.rotate = rot; end
             if exist('position','var'), resCurrent.position = position; end
@@ -222,55 +259,26 @@ while i <= length(txt)
         elseif exist('shape','var') || exist('mediumInterface','var') || exist('mat','var')
             % resChildren = createGeometryObject();
             resObject = piAssetCreate('type', 'object');
-            if exist('name','var'), resObject.name = name; end
+            if exist('name','var'), resObject.name = sprintf('%s', name); end
             
             if exist('shape','var'), resObject.shape = shape; end
             
             if exist('mat','var')
                 resObject.material = mat; 
-                resObject.name = strcat(resObject.name, '_', mat.namedmaterial);
+                resObject.name = sprintf('%s_material_%s', resObject.name, mat.namedmaterial);
             end
             if exist('medium','var')
                 resObject.medium = medium; 
-                resObject.name = strcat(resObject.name, '_', medium);
+                resObject.name = sprintf('%s_medium_%s', resObject.name, medium);
             end
             
             subtrees = cat(1, subtrees, tree(resObject));
             trees = subtrees;
-            
-        elseif exist('areaLight','var') || exist('lght','var')
-            resLight = piAssetCreate('type', 'light');
-            if exist('lght','var')
-                % Wrap the light text into attribute section
-                lghtWrap = [{'AttributeBegin'}, lght(:)', {'AttributeEnd'}];
-                resLight.light = piLightGetFromText(thisR, lghtWrap, 'print', false); 
-            end
-            if exist('areaLight','var')
-                resLight.areaLight = piLightGetFromText(areaLight); 
-                
-                if exist('shape', 'var')
-                    resLight.areaLight.shape = shape;
-                end
-                
-                if exist('rot', 'var')
-                    resLight.areaLight.rotate = rot;
-                end
-                
-                if exist('position', 'var')
-                    resLight.areaLight.position = position;
-                end
-                
-            end
-            
-            if exist('name', 'var'), resLight.name = name; end
-            
-            subtrees = cat(1, subtrees, tree(resLight));
-            trees = subtrees;
-            
+           
         elseif exist('name','var')
             % resCurrent = createGroupObject();
             resCurrent = piAssetCreate('type', 'node');
-            if exist('name','var'), resCurrent.name = name; end
+            if exist('name','var'), resCurrent.name = sprintf('%s', name); end
             
             %{
             resCurrent.groupobjs = groupobjs;

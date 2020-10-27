@@ -102,7 +102,7 @@ for ii = 1:nLights
         end
         
         % Parse shape
-        shp = find(piContains(lightSources{ii}.line, 'ConcatTransform'));
+        shp = find(piContains(lightSources{ii}.line, 'Shape'));
         if shp
             lightSources{ii}.shape = piParseShape(lightSources{ii}.line{shp});
         end
@@ -233,14 +233,23 @@ for ii = 1:nLights
         [~, lightSources{ii}.rotate] = piParseVector(lightSources{ii}.line(rot));
     end
     
+    % Look up translation
+    trans = find(piContains(lightSources{ii}.line, 'Translate'));
+    if trans
+        [~, lightSources{ii}.position] = piParseVector(lightSources{ii}.line(trans));
+    end
+    
     % Look up scale
     scl = find(piContains(lightSources{ii}.line, 'Scale'));
     if scl
         [~, lightSources{ii}.scale] = piParseVector(lightSources{ii}.line(scl));
     end
-    
+end
+
+%% Give to light
+for ii = 1:numel(lightSources)
     if ~isfield(lightSources{ii}, 'name')
-        lightSources{ii}.name = strcat(num2str(numel(lightSources{ii})), ' type: ', lightSources{ii}.type);
+        lightSources{ii}.name = sprintf('#%d_Light_type:%s', ii, lightSources{ii}.type);
     end
 end
 
