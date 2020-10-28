@@ -18,7 +18,7 @@
 % TL,ZL,BW SCIEN 2017
 %
 % See also
-%   t_piIntro_start
+%   t_piIntro_*
 %
 
 % History:
@@ -26,6 +26,8 @@
 %                  RDT, and then get rid of a copy of some non-existent
 %                  files.  Had to make variable names 'recipe' and 'thisR'
 %                  consistent (went with 'thisR').
+%   10/28/20  dhb  Since ChessSet is now part of ISET3d, change to kitchen
+%                  scene to illustrate getting something we don't already have.
 
 %% Initialize ISET and Docker
 %
@@ -40,8 +42,13 @@ end
 
 %% Read the scene file for the remote data site
 %
-% Specify name of scene and where we want the output
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
+% Specify name of scene and where we want the output.  The iset3d/local
+% directory is ignored by git and is a place we can stash files we are
+% working with, without clogging up the github repository.
+%
+% We happen to know there is a 'kitchen' scene stored on the server, with
+% the scene name being 'scene.pbrt'.  We'll pull that down and render it.
+sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
 inFolder = fullfile(piRootPath,'local');
 piPBRTFetch(sceneName,'pbrtversion',3,'destinationFolder',inFolder);
 inFile = fullfile(inFolder,sceneName,sceneFileName);
@@ -64,15 +71,11 @@ piWrite(thisR,'overwrite geometry',false,...
     'overwrite materials',false,...
     'overwrite json',false);
 
-%% Render!
+%% Render!  
+%
+% Specifying 'render type','radiance' skips computing the depth map.
 [scene, result] = piRender(thisR,'render type','radiance');
 
-%%  Show the rendered radiance
+%  Show the rendered radiance.
 sceneWindow(scene);
-
-%% Show the depth map.
-%
-% This doesn't look right. The depth map has
-% all pixels set to 1.  Not sure what is going
-% on there.
-scenePlot(scene,'depth map');
+sceneSet(scene,'gamma',0.5);
