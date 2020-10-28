@@ -1,18 +1,8 @@
-%% t_piIntro_macbeth
+%% Render MacBeth color checker
 %
-% Brief description:
-%   Render a MacBeth color checker. We render both an illuminant image and
-%   a depth image.  The illuminant is spatio-spectral.
-%
-% The depth map is the distance from the camera position to the point
-% in the image.  So even though the MCC is flat, the distance from the
-% camera to the points on the surface increases as we measure off
-% axis.
-%
-% See t_piIntro_macbeth_zmap to calculate the zmap rather than the
-% depth map.
+% Description:
+%   Render a MacBeth color checker.
 % 
-%  
 % Index numbers for MacBeth color checker:
 %          ---- ---- ---- ---- ---- ----
 %         | 01 | 05 | 09 | 13 | 17 | 21 |
@@ -32,7 +22,13 @@
 %   ZLY, BW, 2020
 %
 % See also
-%   t_piIntro_cameraposition, piLightSet(examples)
+%   t_piIntro_*
+
+% History:
+%   10/28/20  dhb  The comments said this rendered a depth map and an
+%                  illuminant image, but it doesn't do either.  Removed
+%                  those comments. It might be nice to have this do those
+%                  two things, but I don't know how.
 
 %% init
 ieInit;
@@ -45,7 +41,7 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault;
 
 %% Change the light
-
+%
 % There is a default point light.  We delete that.
 thisR = piLightDelete(thisR, 'all');
 
@@ -59,21 +55,19 @@ thisR = piLightAdd(thisR,...
     'cameracoordinate', true);
 
 %% Set an output file
-
+%
 % This is pretty high resolution given the nature of the target.
 thisR.set('integrator subtype','path');
 thisR.set('rays per pixel', 16);
 thisR.set('filmresolution', [640, 360]);
 
 %% Write 
-
+%
 % Write modified recipe out.  We changed the materials, so we overwrite the
 % material file.
 piWrite(thisR, 'overwritematerials', true);
 
 %% Render and display
-
 [scene, result] = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
 
-%%
