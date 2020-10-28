@@ -184,6 +184,8 @@ ieNewGraphWin; imagesc(imgArray); axis image;
 %% Convert the OI through a matched sensor 
 
 % We create a sensor that has each pixel equal to one sample in the OI 
+%
+% THIS BREAKS HERE.
 sensor = sensorCreate('light field',oi);
 sensor = sensorCompute(sensor,oi);
 sensorWindow(sensor);
