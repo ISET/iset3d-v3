@@ -31,7 +31,7 @@
 %% Initialize ISET and Docker
 %
 % We start up ISET and check that the user is configured for docker
-ieInit;
+clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the file

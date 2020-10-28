@@ -1,4 +1,4 @@
-%% ISET3D Render using a fisheye lens
+%% Render using a fisheye lens
 %
 % We read in the PBRT file and render it through a pinhole.  Then we render
 % the same data through a fisheye lens.
@@ -21,13 +21,12 @@
 %  10/28/20  dhb  Comment tuning.
 
 %% Initialize ISET and Docker
-
-ieInit;
+clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the PBRT input scene
-
-% We input the scene and store its parameters in a recipe
+%
+% Input the scene and store its parameters in a recipe
 thisR = piRecipeDefault('scene name','chessSet');
 
 % This is a quick rendering of the PBRT scene through a pinhole optics
