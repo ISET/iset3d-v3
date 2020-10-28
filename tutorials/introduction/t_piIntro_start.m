@@ -61,7 +61,7 @@ piWrite(thisR);
 %% Render 
 %
 % There is no lens, just a pinhole.  In that case, we are rendering a
-% scene.  If we had a lens, we would be rendering an optical image.
+% scene. If we had a lens, we would be rendering an optical image.
 [scene, result] = piRender(thisR);
 sceneWindow(scene);
 
