@@ -10,6 +10,8 @@
 % t_piIntro_macbeth_zmap        - Render a MacBeth Color Checker Chart with zmap.
 % t_piIntro_fisheyelens         - Render through a lens.
 % t_piIntro_light               - Manipulate scene lighting.
+%
 % t_piIntro_cameramotion        - Render with camera motion blur.
+% t_piIntro_assetmotion         - Render with motion blur of one object.
 %
 % t_piIntro_rdt                 - Use RemoteDataToolbox to download and render a scene.
