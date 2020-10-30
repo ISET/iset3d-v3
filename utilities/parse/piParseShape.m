@@ -34,7 +34,7 @@ end
 
 function s = shapeCreate
     s.meshshape = '';
-    s.ingeterindices = '';
+    s.integerindices = '';
     s.pointp = '';
     s.floatuv = '';
     s.normaln = '';

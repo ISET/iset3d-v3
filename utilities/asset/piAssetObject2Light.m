@@ -21,4 +21,5 @@ lightNode.light = light;
 lightNode.name = objectName;
 lightNode.light.shape = shape;
 
+thisR.assets = thisR.assets.set(index, lightNode);
 end
