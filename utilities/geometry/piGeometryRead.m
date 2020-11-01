@@ -209,21 +209,21 @@ while i <= length(txt)
             if exist('lght','var')
                 % Wrap the light text into attribute section
                 lghtWrap = [{'AttributeBegin'}, lght(:)', {'AttributeEnd'}];
-                resLight.light = piLightGetFromText(thisR, lghtWrap, 'print', false); 
+                resLight.lght = piLightGetFromText(thisR, lghtWrap, 'print', false); 
             end
             if exist('areaLight','var')
-                resLight.light = piLightGetFromText(thisR, {areaLight}, 'print', false); 
+                resLight.lght = piLightGetFromText(thisR, {areaLight}, 'print', false); 
                 
                 if exist('shape', 'var')
-                    resLight.light{1}.shape = shape;
+                    resLight.lght{1}.shape = shape;
                 end
                 
                 if exist('rot', 'var')
-                    resLight.light{1}.rotate = rot;
+                    resLight.lght{1}.rotate = rot;
                 end
                 
                 if exist('position', 'var')
-                    resLight.light{1}.position = position;
+                    resLight.lght{1}.position = position;
                 end
                 
             end
@@ -259,8 +259,10 @@ while i <= length(txt)
         elseif exist('shape','var') || exist('mediumInterface','var') || exist('mat','var')
             % resChildren = createGeometryObject();
             resObject = piAssetCreate('type', 'object');
-            if exist('name','var'), resObject.name = sprintf('%s', name); end
-            
+            if exist('name','var')
+                resObject.name = sprintf('%d_%d_%s',i, numel(subtrees)+1, name); 
+            end
+
             if exist('shape','var'), resObject.shape = shape; end
             
             if exist('mat','var')

@@ -29,6 +29,7 @@ switch type
               0 0 1;
               0 1 0;
               1 0 0];
+        obj.motion = [];
     case 'object'
         obj.name = 'object';
         obj.mediumInterface = [];
