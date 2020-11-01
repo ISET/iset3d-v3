@@ -11,24 +11,25 @@
 % History:
 %  11/01/2020  dhb  Fix up read so scene is actually read.
 %              dhb  The only asset in the scene is called 'root', not
-%                   'Cube'.
+%                   'Cube'.  Turns out we should be looking in the
+%                   groupobjs field, not the root field.
 
 %% Initialize 
 clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read in the base scene
-recipe = piRecipeDefault('scene name','coloredCube');
+thisR = piRecipeDefault('scene name','coloredCube');
 
 %% Render the original scene first
 %
 % Set a working/output folder
-recipe = recipeSet(recipe,'outputfile',...
+thisR = recipeSet(thisR,'outputfile',...
     fullfile(piRootPath,'local','coloredCube','coloredCube.pbrt'));
 
 % Write out file and render
-piWrite(recipe);
-[scene, ~] = piRender(recipe,'version',3);
+piWrite(thisR);
+[scene, ~] = piRender(thisR,'version',3);
 ieAddObject(scene);
 sceneWindow;
 
@@ -37,53 +38,48 @@ sceneWindow;
 
 % Loop through all assets. There is only one in this scene and it is called
 % 'root'.  We rotate that one.
-for ii = 1:length(recipe.assets)
-    if strcmp(recipe.assets(ii).name,'root')
+for ii = 1:length(thisR.assets.groupobjs)
+    if strcmp(thisR.assets.groupobjs(ii).name,'Cube')
         % The rotation is stored in angle-axis format, along the columns.  
-        recipe.assets(ii).rotate(1,2) = ...
-            recipe.assets(ii).rotate(1,2) + 10;
+        thisR.assets.groupobjs(ii).rotate(1,2) = ...
+            thisR.assets.groupobjs(ii).rotate(1,2) + 10;
     end
 end
 
 % Write and render
-piWrite(recipe);
-[scene, ~] = piRender(recipe,'version',3);
+piWrite(thisR);
+[scene, ~] = piRender(thisR,'version',3);
 ieAddObject(scene);
 sceneWindow;
 
-%% Rotate the cube again
-%
-% Another 10 degrees
-
-% Loop through all assets and rotate the one called "Cube"
-for ii = 1:length(recipe.assets)
-    if strcmp(recipe.assets(ii).name,'root')
+%% Rotate the cube again by another 10 degrees
+for ii = 1:length(thisR.assets.groupobjs)
+    if strcmp(thisR.assets.groupobjs(ii).name,'Cube')
         % The rotation is stored in angle-axis format, along the columns.  
-        recipe.assets(ii).rotate(1,2) = ...
-            recipe.assets(ii).rotate(1,2) + 10;
+        thisR.assets.groupobjs(ii).rotate(1,2) = ...
+            thisR.assets.groupobjs(ii).rotate(1,2) + 10;
     end
 end
 
-% Write out file
-piWrite(recipe);%
-[scene, ~] = piRender(recipe,'version',3);
+% Write and render
+piWrite(thisR);%
+[scene, ~] = piRender(thisR,'version',3);
 ieAddObject(scene);
 sceneWindow;
 
-%% Now try translating
+%% Now translate
 %
 % Move 15 cm along positive x-axis
-
-% Loop through all assets and rotate the one called "Cube"
-for ii = 1:length(recipe.assets)
-    if strcmp(recipe.assets(ii).name,'root')  
-        recipe.assets(ii).position(1) = ...
-            recipe.assets(ii).position(1) + 0.15;
+for ii = 1:length(thisR.assets.groupobjs)
+    if strcmp(thisR.assets.groupobjs(ii).name,'Cube')
+        % The rotation is stored in angle-axis format, along the columns.
+        thisR.assets.groupobjs(ii).position(1) = ...
+            thisR.assets.groupobjs(ii).position(1) + 0.15;
     end
 end
 
 % Write and render
-piWrite(recipe);
-[scene, result] = piRender(recipe,'version',3);
+piWrite(thisR);
+[scene, result] = piRender(thisR,'version',3);
 ieAddObject(scene);
 sceneWindow;
