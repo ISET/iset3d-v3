@@ -1,4 +1,4 @@
-%% Illustrate object rotation and translation
+%% Illustrate object rotation, translation, and scaling
 %
 % Description:
 %    This tutorial shows how you can rotate and translate an object using
@@ -34,10 +34,10 @@ ieAddObject(scene);
 sceneWindow;
 
 %% Rotate the cube
+%
 % Rotate 10 degrees clockwise around cube's y-axis
 
-% Loop through all assets. There is only one in this scene and it is called
-% 'root'.  We rotate that one.
+% Loop through all assets and act on the cube.
 for ii = 1:length(thisR.assets.groupobjs)
     if strcmp(thisR.assets.groupobjs(ii).name,'Cube')
         % The rotation is stored in angle-axis format, along the columns.  
@@ -69,12 +69,27 @@ sceneWindow;
 
 %% Now translate
 %
-% Move 15 cm along positive x-axis
+% Move cube 15 cm along positive x-axis
 for ii = 1:length(thisR.assets.groupobjs)
     if strcmp(thisR.assets.groupobjs(ii).name,'Cube')
         % The rotation is stored in angle-axis format, along the columns.
         thisR.assets.groupobjs(ii).position(1) = ...
             thisR.assets.groupobjs(ii).position(1) + 0.15;
+    end
+end
+
+% Write and render
+piWrite(thisR);
+[scene, result] = piRender(thisR,'version',3);
+ieAddObject(scene);
+sceneWindow;
+
+%% Scale along x-axis
+for ii = 1:length(thisR.assets.groupobjs)
+    if strcmp(thisR.assets.groupobjs(ii).name,'Cube')
+        % The rotation is stored in angle-axis format, along the columns.
+        thisR.assets.groupobjs(ii).scale(1) = ...
+            thisR.assets.groupobjs(ii).scale(1)*2;
     end
 end
 
