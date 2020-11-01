@@ -21,4 +21,4 @@ piAssetGet(thisRCB, ids)
 newLight = piLightCreate('type', 'area');
 thisRCB = piAssetObject2Light(thisRCB, ids, newLight);
 
-piWrite(thisRCB, 'overwrite geometry', false);
+piWrite(thisRCB);

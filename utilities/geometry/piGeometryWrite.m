@@ -55,14 +55,58 @@ fname_obj = fullfile(Filepath,sprintf('%s%s',n,e));
 fid_obj = fopen(fname_obj,'w');
 fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%i/%i %i:%i:%f \n  \n',clock);
 
-recursiveWriteObjects(fid_obj, obj, Filepath);
-recursiveWriteGroups(fid_obj, obj);
+% Traverse the tree from root
+rootID = 1;
+recursiveWriteObjects(fid_obj, obj.assets, rootID, Filepath);
+recursiveWriteGroups(fid_obj, obj.assets);
 
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);
 
 end
 
+function recursiveWriteObjects(fid, obj, nodeID, rootPath)
+% Define each object in geometry.pbrt file. This section writes out 
+% (1) Material for every object
+% (2) path to each children geometry files which store the shape and other 
+%     geometry info.
+% 
+% The process will be:
+%   (1) Get the children of this node
+%   (2) For each child, check if it is an 'object' node. If so, write it out.
+%   (3) If the child is a 'node' node, put it in a list which will be
+%   recursively checked in next level.
+
+%% Get children of thisNode
+children = obj.getchildren(nodeID);
+
+%% Loop through all children at this level
+% If 'object' node, write out. If 'node' node, put in the list
+
+% Create a list for next level recursion
+nodeList = [];
+
+for ii = 1:numel(children)
+    thisNode = obj.get(children(ii));
+    % If node, put id in the nodeList
+    if isequal(thisNode.type, 'node')
+        nodeList = [nodeList children(ii)];
+    end
+    
+    % 
+    if isequal(thisNode.type, 'object')
+        
+    end
+end
+
+for ii = 1:numel(nodeList)
+    recursiveWrite(fod, obj, nodeList(ii), rootPath);
+end
+
+
+end
+
+%{
 %%
 function recursiveWriteObjects(fid, objects, rootPath)
 % Print the  shape of each object child into the PBRT geometry file.
@@ -136,6 +180,10 @@ end
 
 end
 
+%}
+
+
+%{
 %%
 function recursiveWriteGroups(fid, objects)
 % Parse the geometry object tree and for every group object replace the
@@ -254,5 +302,6 @@ end
 fprintf(fid,'\n');
 
 end
+%}
 
 
