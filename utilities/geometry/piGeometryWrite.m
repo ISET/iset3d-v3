@@ -185,12 +185,13 @@ end
 % indent spacing
 indentSpacing = "    ";
 
-nodeList = [];
+
 
 for ii = 1:numel(children)
     thisNode = obj.get(children(ii));
     fprintf(fid, strcat(spacing, 'AttributeBegin\n'));
-
+    
+    nodeList = [];
     if isequal(thisNode.type, 'node')
         % Put node in nodeList
         nodeList = [nodeList children(ii)];
@@ -254,6 +255,9 @@ for ii = 1:numel(children)
                 end
             end
         end
+        for jj = 1:numel(nodeList)
+            recursiveWriteAttributes(fid, obj, nodeList(jj), lvl + 1);
+        end
             
     elseif isequal(thisNode.type, 'object') || isequal(thisNode.type, 'light')
         fprintf(fid, strcat(spacing, indentSpacing, ...
@@ -262,9 +266,7 @@ for ii = 1:numel(children)
         % Hopefully we will never get here.
     end
     
-    for jj = 1:numel(nodeList)
-        recursiveWriteAttributes(fid, obj, nodeList(jj), lvl + 1);  
-    end
+
     fprintf(fid, strcat(spacing, 'AttributeEnd\n'));
 end
 
