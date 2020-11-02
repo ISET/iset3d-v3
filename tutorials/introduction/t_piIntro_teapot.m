@@ -20,15 +20,14 @@
 %   t_piIntro_*
 
 %% Initialize ISET and Docker
-
+%
 % We start up ISET and check that the user is configured for docker
-ieInit;
+clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read the file
-
-% The teapot is our test file
-% inFile = fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt');
+%% Read the scene recipe file
+%
+% This is the teapot scene
 thisR = piRecipeDefault('scene name','teapot');
 
 %% The output will be written here
@@ -37,7 +36,7 @@ outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
 thisR.set('outputFile',outFile);
 
 %% Set up the render quality
-
+%
 % There are many different parameters that can be set.
 thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
@@ -47,9 +46,9 @@ thisR.set('max depth',1); % Number of bounces
 piWrite(thisR);
 
 %% This is a pinhole case. So we are rendering a scene.
-
+%
+% Render and show it
 [scene, result] = piRender(thisR);
-
 sceneWindow(scene);
 scene = sceneSet(scene,'gamma',0.7);
 

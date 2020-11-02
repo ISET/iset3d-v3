@@ -167,11 +167,11 @@ if isfield(materials, 'amount')
 end
 if isfield(materials, 'photolumifluorescence')
     val_photolumifluorescence = [sprintf(' "photolumi fluorescence" '),...
-                                '[ ', sprintf('%.5f ', materials.photolumifluorescence),' ]'];
+                                '[ ', sprintf('%.10f ', materials.photolumifluorescence),' ]'];
     val = strcat(val, val_photolumifluorescence);
 end
 if isfield(materials, 'floatconcentration')
-    val_floatconcentration = sprintf(' "float concentration" [ %0.5f ] ',...
+    val_floatconcentration = sprintf(' "float concentration" [ %0.10f ] ',...
                                 materials.floatconcentration);
     val = strcat(val, val_floatconcentration);
 end

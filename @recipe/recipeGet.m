@@ -121,7 +121,7 @@ function val = recipeGet(thisR, param, varargin)
 %
 %    % Properties of how PBRT does the rendering
 %      'integrator'
-%      'rays per pixe'
+%      'rays per pixel'
 %      'n bounces'
 %      'crop window'
 %      'integrator subtype'

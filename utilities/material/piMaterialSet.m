@@ -24,7 +24,6 @@ function thisR = piMaterialSet(thisR, materialIdx, param, val, varargin)
 
 %% Parse inputs
 param = ieParamFormat(param);
-varargin = ieParamFormat(varargin);
 
 p = inputParser;
 p.addRequired('recipe', @(x)(isa(x, 'recipe')));
@@ -32,7 +31,8 @@ p.addRequired('materialIdx');
 p.addRequired('param', @ischar);
 p.addRequired('val');
 
-p.parse(thisR, materialIdx, param, val, varargin{:});
+% varargin is not parsed. Due to multiple fluorophores. See below
+p.parse(thisR, materialIdx, param, val); 
 idx = p.Results.materialIdx;
 
 %% Conditions where we need to convert spectrum from numeric to char
@@ -53,11 +53,15 @@ switch param
             thisR.materials.list{idx}.floatconcentration = [];
         else
             wave = 365:5:705; % By default it is the wavelength range used in pbrt
-            fluorophores = fluorophoreRead(fluorophoresName,'wave',wave);
-            
-            % Here is the excitation emission matrix
-            eem = fluorophoreGet(fluorophores,'eem');
-            
+
+            if ~strcmp(val, 'custom')
+                fluorophores = fluorophoreRead(fluorophoresName,'wave',wave);
+
+                % Here is the excitation emission matrix
+                eem = fluorophoreGet(fluorophores,'eem');
+            else
+                eem = varargin{1};
+            end
             % The data are converted to a vector like this
             flatEEM = eem';
             vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];

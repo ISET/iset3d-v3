@@ -1,13 +1,11 @@
-%% t_piIntro_macbeth_zmap
+%% Render a MacBeth color checker and show how to get a zmap image.
 %
-% Render a MacBeth color checker. We render both an illuminant image
-% and a zmap image.  The illuminant is spatio-spectral.  
+% Description:
+%   The zmap differs from the depth map.  It is the z-coordinate, not
+%   the distance from the camera to the point.
 %
-% The zmap differs from the depth map.  It is the z-coordinate, not
-% the distance from the camera to the point.
-%
-% See t_piIntro_macbeth to calculate the depth map rather than the
-% zmap.
+%   See t_piIntro_macbeth to calculate the depth map rather than the
+%   zmap, and how to compute an illumination map.
 % 
 %  
 % Index numbers for MacBeth color checker:
@@ -27,6 +25,11 @@
 %
 % Author:
 %   ZLY, BW, 2020
+
+% History:
+%   10/28/20  dhb  Comments said this rendered an illuminant image, but it
+%                  doesn't.  Removed those comments, and point to
+%                  p_piIntro_macbeth for illumination map.
 
 %% init
 ieInit;
@@ -58,27 +61,32 @@ thisR.set('integrator subtype','path');
 thisR.set('pixelsamples', 16);
 thisR.set('filmresolution', [640, 360]);
 
-%% Write 
-
+%% Write and render
 piWrite(thisR, 'overwritematerials', true);
-
-%% Render the scene and the illuminant
 
 % This case uses the default docker image, that does not incorporate
 % fluorescence rendering.  'all' means the illuminant, depth, and
-% radiance.
+% radiance. Here we just render the radiance image.
 [scene,  result] = piRender(thisR, 'render type','radiance'); %#ok<ASGLU>
-[coords, result] = piRender(thisR, 'render type','coordinates');
-
-cameraCoord = thisR.lookAt.from;
-zmap = coords(:,:,3) - cameraCoord(3);
-scene = sceneSet(scene,'depthmap',zmap);
 sceneWindow(scene);
 
-%%  The z-map is flat.  The depth map is curved
+% Compute the zmap.
+%
+% Start by doing a rendering that returns the XYZ 3D coordinates of the visible
+% surfaces.
+[coords, result] = piRender(thisR, 'render type','coordinates');
 
+% Get where camera is looking from
+cameraCoord = thisR.lookAt.from;
+
+% Compute the zmap
+zmap = coords(:,:,3) - cameraCoord(3);
+
+%% Call this the 'depth map' and plot.
+%
+%  The z-map is flat.  The depth map is curved
+scene = sceneSet(scene,'depthmap',zmap);
 scenePlot(scene,'depth map');
 title('Z Map');
 
-%%
 

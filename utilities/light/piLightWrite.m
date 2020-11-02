@@ -157,7 +157,8 @@ for ii = 1:numel(thisR.lights)
                 lightSourceText{ii}.line{3,:} = sprintf('LightSource "point" "%s I" %s', spectrumType, lightSpectrum);
                 lightSourceText{ii}.line{end+1} = 'AttributeEnd';
             else
-                lightSourceText{ii}.line{1,:} = sprintf('LightSource "point" "%s I" %s "point from" [%.4f %.4f %.4f]',...
+                lightSourceText{ii}.line = line;
+                lightSourceText{ii}.line{pos} = sprintf('LightSource "point" "%s I" %s "point from" [%.4f %.4f %.4f]',...
                     spectrumType, lightSpectrum, from(1), from(2), from(3));
             end
             
@@ -174,7 +175,8 @@ for ii = 1:numel(thisR.lights)
                     spectrumType, lightSpectrum, thisConeAngle, thisConeDelta);
                 lightSourceText{ii}.line{end+1} = 'AttributeEnd';
             else
-                lightSourceText{ii}.line{1,:} = sprintf('LightSource "spot" "%s I" %s "point from" [%.4f %.4f %.4f] "point to" [%.4f %.4f %.4f] %s %s',...
+                lightSourceText{ii}.line = line;
+                lightSourceText{ii}.line{pos} = sprintf('LightSource "spot" "%s I" %s "point from" [%.4f %.4f %.4f] "point to" [%.4f %.4f %.4f] %s %s',...
                     spectrumType, lightSpectrum, from(1), from(2), from(3), to(1), to(2), to(3), thisConeAngle, thisConeDelta);
             end
             
@@ -185,6 +187,7 @@ for ii = 1:numel(thisR.lights)
             thisConeDelta = sprintf('float conedelataangle [%d]', coneDeltaAngle);
             lightSourceText{ii}.line{1,:} = [lightSourceText{end+1}.line{2}, thisConeAngle, thisConeDelta];
         case 'distant'
+            
             if thisLightSource.cameracoordinate
                 lightSourceText{ii}.line{1} = 'AttributeBegin';
                 lightSourceText{ii}.line{2} = 'CoordSysTransform "camera"';
@@ -192,7 +195,8 @@ for ii = 1:numel(thisR.lights)
                 lightSourceText{ii}.line{3} = sprintf('LightSource "distant" "%s L" %s', spectrumType, lightSpectrum);
                 lightSourceText{ii}.line{end+1} = 'AttributeEnd';
             else
-                lightSourceText{ii}.line{1,:} = sprintf('LightSource "distant" "%s L" %s "point from" [%.4f %.4f %.4f] "point to" [%.4f %.4f %.4f]',...
+                lightSourceText{ii}.line = line;
+                lightSourceText{ii}.line{pos} = sprintf('LightSource "distant" "%s L" %s "point from" [%.4f %.4f %.4f] "point to" [%.4f %.4f %.4f]',...
                     spectrumType, lightSpectrum, from, to);
             end
             

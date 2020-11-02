@@ -1,4 +1,4 @@
-function piFluorescentPattern(thisR, varargin)
+function thisR = piFluorescentPattern(thisR, varargin)
 %% Apply pattern generation algorithms and change pbrt files for the pattern
 % 
 %   piFluorescentPattern
@@ -27,7 +27,24 @@ function piFluorescentPattern(thisR, varargin)
 %
 % See also:
 %   t_piFluorescentPattern
+%
+% TODO: In the future, we want to assign the pattern within recipe. This
+% will be done when assets get updated.
+%
+% Algorithm input:
+%   Half split:
+%   
 
+% Examples
+%{
+thisR = piRecipeDefault('scene name', 'slantedbar');
+piMaterialList(thisR);
+piWrite(thisR);
+scene = piRender(thisR);
+sceneWindow(scene);
+thisIdx = 2;
+piFluorescentPattern(thisR, thisIdx, 'algorithm', 'half split');
+%}
 %% Parse parameters
 
 p = inputParser;
@@ -35,25 +52,101 @@ p = inputParser;
 p.KeepUnmatched = true;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
-p.addParameter('location','',@ischar);
-p.addParameter('base','',@ischar);
-p.addParameter('algorithm','half split',@ischar);
-p.addParameter('type', 'darker', @ischar);
-
+p.addRequired('matIdx', @(x)(ischar(x) || isnumeric(x)));
+p.addParameter('algorithm','halfsplit',@ischar);
+p.addParameter('type', 'add', @ischar);
+p.addParameter('fluoName', 'protoporphyrin', @ischar);
 p.parse(thisR, varargin{:});
 
 thisR  = p.Results.thisR;
-location = p.Results.location;
-base   = p.Results.base;
+matIdx = p.Results.matIdx;
 type = p.Results.type;
-
+fluoName = p.Results.fluoName;
 algorithm = ieParamFormat(p.Results.algorithm);
 
-if isempty(location), error('Location must be specified.\n'); end
-if isempty(base), base = location; end 
+%% Address unmatched parameters
 
-%% TODO: make a copy of all the current files to the current folder?
+switch algorithm
+    case 'halfsplit'
+        if isfield(p.Unmatched, 'concentration')
+            concentration = p.Unmatched.concentration;
+        else
+            concentration = 1;
+        end
+    case 'corespread'
+        % Concentration
+        if isfield(p.Unmatched, 'concentration')
+            concentration = p.Unmatched.concentration;
+        else
+            concentration = -1;
+        end
+        
+        % coreTRIndex
+        if isfield(p.Unmatched, 'coreTRIndex')
+            coreTRIndex = p.Unmatched.coreTRIndex;
+        else
+            coreTRIndex = -1;
+        end
+        
+        % sz
+        if isfield(p.Unmatched, 'sz')
+            sz = p.Unmatched.sz;
+        else
+            sz = -1;
+        end
+        
+    case 'multicore'
+        % Note: different from corespread where only one pattern will be
+        % created:
+        %   maxConcentration: the max difference that
+        %   will be applied on the base pattern.
+        %   maxSz: the max size of the pattern
+        
+        % max concentration
+        if isfield(p.Unmatched, 'maxConcentration')
+            maxConcentration = p.Unmatched.maxConcentration;
+        else
+            maxConcentration = -1;
+        end
+        
+        % min concentration
+        if isfield(p.Unmatched, 'minConcentration')
+            minConcentration = p.Unmatched.minConcentration;
+        else
+            minConcentration = 0;
+        end
+        
+        % max size
+        if isfield(p.Unmatched, 'maxSz')
+            maxSz = p.Unmatched.maxSz;
+        else
+            maxSz = -1;
+        end
+        
+        % min size
+        if isfield(p.Unmatched, 'minSz')
+            minSz = p.Unmatched.minSz;
+        else
+            minSz = 0;
+        end
+        
+        if isfield(p.Unmatched, 'coreNum')
+            coreNum = p.Unmatched.coreNum;
+        else
+            coreNum = -1;
+        end
+        
+        
+end
 
+
+%% Convert baseMaterial and targetMaterial into index if not
+if ischar(matIdx)
+    matIdx = piMaterialFind(thisR, 'name', matIdx);
+end
+
+%% Get material name
+matName = piMaterialGet(thisR, 'idx', matIdx, 'param','name');
 
 %% Read child geometry files from the written pbrt files
 
@@ -66,7 +159,9 @@ tmp = textscan(fid_rtGeo,'%s','Delimiter','\n');
 rtGeomTxtLines = tmp{1};
 
 % We change the last object if selected material is used more than once.
-index = find(contains(rtGeomTxtLines, location),1,'last') + 1; % Need to see next line
+% With NamedMaterial line, we can make sure the line below is the child
+% geometry path.
+index = find(contains(rtGeomTxtLines, strcat("NamedMaterial ", '"', matName)),1,'last') + 1; % Need to see next line
 
 tmp = strsplit(rtGeomTxtLines{index}, '"');
 
@@ -79,20 +174,14 @@ fid_obj = fopen(childGeometryPath,'r');
 tmp = textscan(fid_obj,'%s','Delimiter','\n');
 
 txtLines = tmp{1};
-
-indicesLine = txtLines{3};
-pointPosLine = txtLines{4};
-
-% Process the indices (edges)
-indicesSplit = strsplit(indicesLine, {'[',']'}); 
-indicesStr = indicesSplit{2};
+txtLines = strsplit(txtLines{1}, {'[',']'});
+indicesStr = txtLines{2};
+pointsStr = txtLines{4};
 
 vertices = threeDCreate(indicesStr);
 vertices = vertices + 1;
 
 % Process the points (seems won't be used)
-pointsSplit = strsplit(pointPosLine, {'[', ']'});
-pointsStr = pointsSplit{2};
 points = threeDCreate(pointsStr);
 
 %% Create triangulation object using MATLAB Computational Geometry toolbox
@@ -107,9 +196,18 @@ TR = triangulation(vertices, points);
 switch algorithm
     case 'halfsplit'
         piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
-                                  txtLines, base, location, type);
-    case 'uniformspread'
-
+                                  txtLines, matIdx,... 
+                                  'fluoName', fluoName,...
+                                  'concentration', concentration,...
+                                  'type', type);
+    case 'corespread'
+        piFluorescentCoreSpread(thisR, TR, childGeometryPath, txtLines, matIdx,...
+                            'type', type,...
+                            'concentration', concentration,...
+                            'fluoName', fluoName,...
+                            'sz', sz,...
+                            'coreTRIndex', coreTRIndex);
+        %{
         if isfield(p.Unmatched, 'depth')
             if isfield(p.Unmatched, 'sTriangleIndex')
                 piFluorescentUniformSpread(thisR, TR, childGeometryPath,...
@@ -131,8 +229,18 @@ switch algorithm
                                            txtLines, base, location, type);                 
             end
         end
+        %}
         
-    case 'multiuniform'
+    case 'multicore'
+        piFluorescentMultiCore(thisR, TR, childGeometryPath, txtLines, matIdx,...
+                               'type', type,...
+                               'fluoName', fluoName,...
+                               'maxConcentration', maxConcentration,...
+                               'minConcentration', minConcentration,...
+                               'maxSz', maxSz,...
+                               'minSz', minSz,...
+                               'coreNum', coreNum);
+        %{
         if isfield(p.Unmatched, 'maxDepth')
             if isfield(p.Unmatched, 'coreNumber')
                 piFluorescentMultiUniform(thisR, TR, childGeometryPath,...
@@ -154,6 +262,7 @@ switch algorithm
                            txtLines, base, location, type);
             end
         end
+        %}
     case 'irregular'
         piFluorescentIrregular(thisR, TR, childGeometryPath, txtLines, base,...
                             location, type);

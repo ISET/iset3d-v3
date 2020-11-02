@@ -1,1 +1,1 @@
-MakeNamedMaterial "PBR" "string type" "matte" "spectrum Kd" "spds/totalreflect.spd"
+MakeNamedMaterial "white" "string type" "matte" "spectrum Kd" "spds/totalreflect.spd"
