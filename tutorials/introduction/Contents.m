@@ -13,6 +13,7 @@
 % t_piIntro_simpletransforms    - Show how to rotate and translate an object.
 % t_piIntro_material            - Show how to change object material
 % t_piIntro_material_color      - Show how to change object color.
+% t_piIntro_scenefromweb        - Render PBRT scenes from https://benedikt-bitterli.me/resources/.
 %
 % t_piIntro_cameramotion        - Render with camera motion blur.
 % t_piIntro_assetmotion         - Render with motion blur of one object.
