@@ -59,18 +59,18 @@ fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%
 rootID = 1;
 % Write object and light definition in main geoemtry and children geometry
 % file
-recursiveWriteNode(fid_obj, obj, rootID, Filepath);
+recursiveWriteNode(fid_obj, obj, rootID, Filepath, thisR.outputFile);
 
 % Write tree structure in main geometry file
 lvl = 0;
-recursiveWriteAttributes(fid_obj, obj, rootID, lvl);
+recursiveWriteAttributes(fid_obj, obj, rootID, lvl, thisR.outputFile);
 
 fclose(fid_obj);
 fprintf('%s is written out \n', fname_obj);
 
 end
 
-function recursiveWriteNode(fid, obj, nodeID, rootPath)
+function recursiveWriteNode(fid, obj, nodeID, rootPath, outFilePath)
 % Define each object in geometry.pbrt file. This section writes out 
 % (1) Material for every object
 % (2) path to each children geometry files which store the shape and other 
@@ -142,6 +142,7 @@ for ii = 1:numel(children)
         
         % Create a tmp recipe
         tmpR = recipe;
+        tmpR.outputFile = outFilePath;
         tmpR.lights = thisNode.lght;
         lightText = piLightWrite(tmpR, 'writefile', false);
         
@@ -161,12 +162,12 @@ for ii = 1:numel(children)
 end
 
 for ii = 1:numel(nodeList)
-    recursiveWriteNode(fid, obj, nodeList(ii), rootPath);
+    recursiveWriteNode(fid, obj, nodeList(ii), rootPath, outFilePath);
 end
 
 end
 
-function recursiveWriteAttributes(fid, obj, thisNode, lvl)
+function recursiveWriteAttributes(fid, obj, thisNode, lvl, outFilePath)
 % Write attribute sections. The logic is:
 %   1) Get the children of the current node
 %   2) For each child, write out information accordingly
@@ -191,11 +192,7 @@ for ii = 1:numel(children)
     thisNode = obj.get(children(ii));
     fprintf(fid, strcat(spacing, 'AttributeBegin\n'));
     
-    nodeList = [];
-    if isequal(thisNode.type, 'node')
-        % Put node in nodeList
-        nodeList = [nodeList children(ii)];
-        
+    if isequal(thisNode.type, 'node')        
         % Write info
         fprintf(fid, strcat(spacing, indentSpacing,...
             sprintf('#ObjectName %s:Vector(%.3f, %.3f, %.3f)',thisNode.name,...
@@ -255,13 +252,25 @@ for ii = 1:numel(children)
                 end
             end
         end
-        for jj = 1:numel(nodeList)
-            recursiveWriteAttributes(fid, obj, nodeList(jj), lvl + 1);
-        end
+        
+        recursiveWriteAttributes(fid, obj, children(ii), lvl + 1, outFilePath);
             
-    elseif isequal(thisNode.type, 'object') || isequal(thisNode.type, 'light')
+    elseif isequal(thisNode.type, 'object')
         fprintf(fid, strcat(spacing, indentSpacing, ...
                          sprintf('ObjectInstance "%s"', thisNode.name), '\n'));
+    elseif isequal(thisNode.type, 'light')
+        % Create a tmp recipe
+        tmpR = recipe;
+        tmpR.outputFile = outFilePath;
+        tmpR.lights = thisNode.lght;
+        lightText = piLightWrite(tmpR, 'writefile', false);
+        
+        for jj = 1:numel(lightText)
+            for kk = 1:numel(lightText{jj}.line)
+                fprintf(fid,strcat(spacing, indentSpacing,... 
+                        sprintf('%s\n',lightText{jj}.line{kk})));
+            end
+        end
     else
         % Hopefully we will never get here.
     end

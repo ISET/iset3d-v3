@@ -38,7 +38,7 @@ switch type
         obj.output = [];
     case 'light'
         obj.name = 'light';
-        obj.light = [];
+        obj.lght = [];
 end
 
 

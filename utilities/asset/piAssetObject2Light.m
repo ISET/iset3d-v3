@@ -1,4 +1,4 @@
-function thisR = piAssetObject2Light(thisR, index, light)
+function thisR = piAssetObject2Light(thisR, index, lght)
 % Change an object node to light. This is especially for the area light
 % Inputs:
 %   thisR - recipe
@@ -17,9 +17,9 @@ shape = objectNode.shape;
 
 %% Create a new node to replace the object node
 lightNode = piAssetCreate('type', 'light');
-lightNode.light = light;
+lightNode.lght = {lght}; % Convert the light to cell
 lightNode.name = objectName;
-lightNode.light.shape = shape;
+lightNode.lght{1}.shape = shape;
 
 thisR.assets = thisR.assets.set(index, lightNode);
 end

@@ -40,8 +40,8 @@ if ischar(lightSpectrum)
     % has to be a mat-file.  Usually we keep files in isetcam/data/lights
     % (or in isetbio same place).
     [thisP,n,~] = fileparts(lightSpectrum);
-    lightSpectrum = fullfile(thisP,[n,'.mat']);
-    if ~exist(lightSpectrum,'file')
+    lightSpectrum = fullfile(thisP, n);
+    if ~exist([lightSpectrum, '.mat'],'file')
         warning('Could not find an exact match to %s on the path\n',lightSpectrum);
     end
 end
