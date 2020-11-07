@@ -56,6 +56,7 @@ function thisR = piLightAdd(thisR, varargin)
 %           reference.
 %
 % Zhenyi, TL, SCIEN, 2019
+% Zheng L, SCIEN, 2020
 %
 % See also:
 %   piLightSet, piLightCreate
