@@ -27,6 +27,8 @@ else
                     % This is a 'node'
                     val = thisNode.(param);
                 end
+            case 'parent'
+                val = thisTree.getparent(id);
             otherwise
                 if ~isfield(thisNode, param)
                     if ischar(thisNode) % In the case of a string
@@ -34,13 +36,14 @@ else
                     else
                         name = thisNode.name;
                     end
-                    if printinfo
-                        warning('Node %s does not have field: %s. Empty return', name, param)
-                    end
+
                     val = [];
                 else
                     val = thisNode.(param);
                 end
+        end
+        if printinfo && isempty(val)
+            warning('Node %s does not have field: %s. Empty return', name, param)
         end
     elseif iscell(param)
         val = cell(1, numel(param));
@@ -49,4 +52,6 @@ else
         end
     end
 end
+
+
 end
