@@ -17,18 +17,30 @@ if ~exist('param', 'var')
     val = thisNode;
 else
     if ischar(param)
-        if ~isfield(thisNode, param)
-            if ischar(thisNode) % In the case of a string
-                name = thisNode;
-            else
-                name = thisNode.name;
-            end
-            if printinfo
-                warning('Node %s does not have field: %s. Empty return', name, param)
-            end
-            val = [];
-        else
-            val = thisNode.(param);
+        switch param
+            case 'position'
+                % if node is 'light' or 'object', check it's parents.
+                if isequal(thisNode.type, 'object') ||...
+                   isequal(thisNode.type, 'light')
+                    val = piAssetGet(thisR, thisR.assets.getparent(id), param);
+                else
+                    % This is a 'node'
+                    val = thisNode.(param);
+                end
+            otherwise
+                if ~isfield(thisNode, param)
+                    if ischar(thisNode) % In the case of a string
+                        name = thisNode;
+                    else
+                        name = thisNode.name;
+                    end
+                    if printinfo
+                        warning('Node %s does not have field: %s. Empty return', name, param)
+                    end
+                    val = [];
+                else
+                    val = thisNode.(param);
+                end
         end
     elseif iscell(param)
         val = cell(1, numel(param));
