@@ -12,5 +12,5 @@ The general approach is the following
 
 To see some examples, have a look at the tutorial directory.  If you want to read more, please look through the [wiki pages](https://github.com/ISET/iset3d/wiki)
 
-(Formerly pbrt2iset, and before that we relied on RenderToolbox4). 
+(Formerly pbrt2iset, and before that we relied on RenderToolbox4).
 
