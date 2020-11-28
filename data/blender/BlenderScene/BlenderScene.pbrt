@@ -1,0 +1,80 @@
+Film "image" "integer xresolution" [1366] "integer yresolution" [768] "string filename" "output00001.exr"
+PixelFilter "box" "float xwidth" [0.5] "float ywidth" [0.5] 
+Accelerator "bvh" 
+"string splitmethod" "sah"
+"integer maxnodeprims" [4]
+Sampler "halton"
+"integer pixelsamples" [100]
+"bool samplepixelcenter" "false"
+Integrator "path"
+"integer maxdepth" [10]
+Scale -1 1 1 #avoid the 'flipped image' bug..
+LookAt	7.358891487121582 -6.925790786743164 4.958309173583984
+	6.707333087921143 -6.311620235443115 4.51303768157959
+	-0.32401347160339355 0.305420845746994 0.8953956365585327
+
+Camera "perspective"
+"float fov" [22.89519204617112]
+WorldBegin
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.4279036521911621 0.6284238696098328 0.8000000715255737]		
+		"color Kt" [ 0.4286903440952301 0.6307572722434998 0.7991030216217041]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/Cube_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [5.004478 0.000000 0.000000 0.000000 0.000000 -4.658173 1.829268 0.000000 0.000000 -1.829268 -4.658173 0.000000 0.183087 1.309729 3.536817 1.000000 ]
+		AreaLightSource "diffuse" "blackbody L" [5500 		10]		
+		Shape "trianglemesh"
+		"point P" [
+		-1.0 -1.0 0.0 1.0 -1.0 0.0 1.0 1.0 0.0 -1.0 -1.0 0.0 1.0 1.0 0.0 -1.0 1.0 0.0		
+		]
+		"normal N" [
+		0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0		
+		]
+		"float st" [
+		0.0 0.0 
+		1.0 0.0 
+		1.0 1.0 
+		0.0 0.0 
+		1.0 1.0 
+		0.0 1.0 
+		]
+		"integer indices" [
+		0 1 2 3 4 5 
+		]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.480773 0.408475 -0.019025 0.000000 -0.359680 0.408456 -0.319609 0.000000 -0.194535 0.254299 0.543916 0.000000 1.921835 -0.888381 0.210804 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.23707586526870728 0.2733142673969269 0.8349812626838684]		
+		"color Kt" [ 0.23839768767356873 0.2746772766113281 0.838799238204956]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/Suzanne.001_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.591483 0.000000 0.000000 0.000000 0.000000 0.591483 0.000000 0.000000 0.000000 0.000000 0.591483 0.000000 1.498791 -2.403944 0.413048 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.6804354190826416 0.17170684039592743 0.2866702675819397]		
+		"color Kt" [ 0.679542601108551 0.17144107818603516 0.2874409258365631]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/Icosphere.001_mat0.ply"]
+	AttributeEnd
+	
+
+WorldEnd
