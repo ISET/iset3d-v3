@@ -1,0 +1,5 @@
+# PBRT file created in C4D exporter format on 2020/11/29 12:40:4.92 
+
+MakeNamedMaterial "Cube_mat0_material" "string type" "glass" "rgb Kr" [0.4279036521911621 0.6284238696098328 0.8000000715255737] "rgb Kt" [0.4286903440952301 0.6307572722434998 0.7991030216217041] "float uroughness" [0.0] "float vroughness" [0.0] "float index" [1.3329999446868896]
+MakeNamedMaterial "Suzanne.001_mat0_material" "string type" "glass" "rgb Kr" [0.23707586526870728 0.2733142673969269 0.8349812626838684] "rgb Kt" [0.23839768767356873 0.2746772766113281 0.838799238204956] "float uroughness" [0.0] "float vroughness" [0.0] "float index" [1.3329999446868896]
+MakeNamedMaterial "Icosphere.001_mat0_material" "string type" "glass" "rgb Kr" [0.6804354190826416 0.17170684039592743 0.2866702675819397] "rgb Kt" [0.679542601108551 0.17144107818603516 0.2874409258365631] "float uroughness" [0.0] "float vroughness" [0.0] "float index" [1.3329999446868896]
