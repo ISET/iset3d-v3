@@ -281,8 +281,9 @@ for ii = 1:length(filesToRender)
             dockerCommand = sprintf('%s -w %s', dockerCommand, shortOut);
         end
 
-        linuxOut = strcat('/c', strrep(erase(outputFolder, 'C:'), '\', '/'));
-
+        % I don't know when this worked, but it doesn't seem to any more!
+        % linuxOut = strcat('/c', strrep(erase(outputFolder, 'C:'), '\', '/'));
+        linuxOut = outputFolder; % try without replacing any separators
         dockerCommand = sprintf('%s -v %s:%s', dockerCommand, linuxOut, shortOut);
 
         cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
