@@ -180,6 +180,13 @@ if isequal(thisR.exporter,'Blender')
     piWriteC4Dformat_ply(thisR);
     
     % NOTE: this is a new helper function
+    % that converts a right-handed coordinate system into the left-handed
+    % pbrt system
+    % NOTE: this function should always be called once for Blender exports
+    % because Blender uses a right-handed coordinate system
+    piWriteC4Dformat_handedness(thisR);
+    
+    % NOTE: this is a new helper function
     % that calculate 'Vector' information in the geometry file
     % NOTE: this function should always be called for Blender exports 
     % because the Blender exporter does not include vector information 
@@ -309,6 +316,19 @@ thisR = piLightAdd(thisR,'type','infinite','light spectrum','D65');
 % as above
 
 [~, scaleBlock] = piBlockExtract_Blender(txtLines,'blockName','Scale','exporter',thisR.exporter);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTE: below added
+% The Blender exporter automatically sets the Scale at [-1 1 1] because
+% Blender is right-handed and pbrt is left-handed. But, this function
+% converts the handedness of the scene to be left-handed, so this scaling
+% is no longer needed.
+if isequal(thisR.exporter,'Blender')
+    scaleBlock = [];
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if(isempty(scaleBlock))
@@ -535,6 +555,20 @@ else
     from = [values{2} values{3} values{4}];
     to = [values{5} values{6} values{7}];
     up = [values{8} values{9} values{10}];
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % NOTE: below added
+    % to convert the right-handed coordinate system of the Blender export
+    % into the left-handed pbrt system
+  
+    if isequal(thisR.exporter,'Blender')
+        from = from([1 3 2]);
+        to   =   to([1 3 2]);
+        up   =   up([1 3 2]); 
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
 
 % If there's a transform, we transform the LookAt.
@@ -991,6 +1025,141 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% Convert a right-handed coordinate system to the left-handed pbrt system
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTE: helper function added
+% that converts a right-handed coordinate system into the left-handed pbrt 
+% system
+% (this function should always be called once for Blender exports, because 
+% Blender uses a right-handed coordinate system)
+
+function piWriteC4Dformat_handedness(thisR)
+
+% Get geometry file name
+[inFilepath,scene_fname] = fileparts(thisR.inputFile);
+inputFile_geometry = fullfile(inFilepath,sprintf('%s_geometry.pbrt',scene_fname));
+
+% If the geometry file doesn't exist, give warning and exit this function
+if ~exist(inputFile_geometry,'file')
+    warning('Geometry file does not exist.');
+    return
+end
+
+% Get text from geometry file
+fileID = fopen(inputFile_geometry,'r');
+tmp = textscan(fileID,'%s','Delimiter','\n');
+txtLines = tmp{1};
+fclose(fileID);
+
+% If this conversion to a left-handed coordinate system has already
+% occurred, exit this function (must only do this conversion once)
+checkflg = piContains(txtLines,'Converted to a left-handed coordinate system');
+if any(checkflg)
+    return
+end
+    
+% Switch y and z coordinates per vertex for vertex positions ('point P') 
+% and per-vertex normals ('normal N') in the 'Shape' line for each object
+pLines = find(piContains(txtLines,'"point P"'));
+numsLines = numel(pLines);
+for ii = 1:numsLines
+    Pline = txtLines{pLines(ii)};
+    
+    % Get 'point P' vector
+    pidx = strfind(Pline,'"point P"');
+    pPline = Pline(pidx:end);
+    openidx  = strfind(pPline,'[');
+    closeidx = strfind(pPline,']');
+    pointP = pPline(openidx(1)+1:closeidx(1)-1);
+    pointP = str2num(pointP);
+    
+    % Reshape points into three columns (three axes)
+    numvertices = numel(pointP)/3;
+    pointP = reshape(pointP,[3,numvertices]);
+    pointP = pointP';
+    
+    % Switch y and z coordinates
+    pointP = pointP(:,[1 3 2]);
+    
+    % Reshape points into vector
+    pointP = reshape(pointP.',1,[]);
+    
+    % Convert to string
+    pointP = mat2str(pointP);
+    
+    % Replace converted 'point P' in the 'Shape' line
+    Pline = append(Pline(1:pidx+9),pointP,Pline(pidx+closeidx(1):end));
+    
+    % If the 'normal N' vector exists, switch y and z coordinates as above
+    nidx = strfind(Pline,'"normal N"');
+    if ~isempty(nidx)
+        nPline = Pline(nidx:end);
+        openidx  = strfind(nPline,'[');
+        closeidx = strfind(nPline,']');
+        normalN = nPline(openidx(1)+1:closeidx(1)-1);
+        normalN = str2num(normalN);
+        normalN = reshape(normalN,[3,numvertices]);
+        normalN = normalN';
+        normalN = normalN(:,[1 3 2]);
+        normalN = reshape(normalN.',1,[]);
+        normalN = mat2str(normalN);
+        Pline = append(Pline(1:nidx+10),normalN,Pline(nidx+closeidx(1):end));
+    end
+    
+    % Replace old 'Shape' text line with new text line
+    txtLines{pLines(ii)} = Pline;
+end    
+
+% Convert 'ConcatTransform' matrices into left-handed matrices for each object
+cLines = find(piContains(txtLines,'ConcatTransform'));
+numsLines = numel(cLines);
+for ii = 1:numsLines
+    Cline = txtLines{cLines(ii)};
+    
+    % Get 'ConcatTransform' vector
+    openidx  = strfind(Cline,'[');
+    closeidx = strfind(Cline,']');
+    ConcatTransform = Cline(openidx(1)+1:closeidx-1);
+    ConcatTransform = str2num(ConcatTransform);
+    
+    % Convert the right-handed matrix into a left-handed matrix
+    c = reshape(ConcatTransform,[4,4]);
+    ConcatTransform = [c(1) c(9)  c(5) c(13); ...
+                       c(3) c(11) c(7) c(15); ...
+                       c(2) c(10) c(6) c(14); ...   
+                       c(4) c(12) c(8) c(16)];
+    
+    % Reshape matrix into vector
+    ConcatTransform = reshape(ConcatTransform,[1 16]);
+    
+    % Convert to string
+    ConcatTransform = mat2str(ConcatTransform);
+    
+    % Replace converted 'ConcatTransform' vector
+    Cline = append('ConcatTransform ',ConcatTransform);
+    
+    % Replace old 'ConcatTransform' text line with new text line
+    txtLines{cLines(ii)} = Cline;
+end 
+
+% Update geometry file text
+fileID = fopen(inputFile_geometry,'w');
+fprintf(fileID,'%s\n',txtLines{1});
+% Write in a comment describing when the handedness was converted
+% (this helper function will watch out for this comment in the future
+% because you must only do this conversion once)
+fprintf(fileID,'# Converted to a left-handed coordinate system on %i/%i/%i %i:%i:%0.2f \n',clock);
+txtLines = txtLines(2:end);
+txtLines = txtLines';
+fprintf(fileID,'%s\n',txtLines{:});
+fclose(fileID);
+fprintf('Coordinate system was converted to left-handed pbrt system in the geometry file.\n');
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 %% Calculate vector information
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1040,7 +1209,7 @@ for ii = 1:numsLines
     if ~any(lineidx)
         thisLine = append(thisLine,':Vector(0, 0, 0)');
     else
-        % get 'point P' vector
+        % Get 'point P' vector
         Pline = thistxt{lineidx};
         pidx = strfind(Pline,'"point P"');
         Pline = Pline(pidx:end);

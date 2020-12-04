@@ -132,7 +132,7 @@ sceneWindow(scene);
 
 %% Translate an object
 %
-% Move the sphere along its negative x-axis.  
+% Move the sphere 70 cm along its negative x-axis.  
 % Again, you need to know that the name of the object contains 'sphere'.
 for ii = 1:length(thisR.assets.groupobjs)
     if piContains(thisR.assets.groupobjs(ii).name,'sphere')
@@ -150,11 +150,11 @@ sceneWindow(scene);
 
 %% Scale an object
 %
-% Scale the 'Cube' along its z-axis.
+% Scale the 'Cube' along its y-axis.
 for ii = 1:length(thisR.assets.groupobjs)
     if piContains(thisR.assets.groupobjs(ii).name,'Cube')
-        thisR.assets.groupobjs(ii).scale(3) = ...
-            thisR.assets.groupobjs(ii).scale(3)*1.5;
+        thisR.assets.groupobjs(ii).scale(2) = ...
+            thisR.assets.groupobjs(ii).scale(2)*1.5;
     end
 end
 
