@@ -725,31 +725,20 @@ for ii = 1:numbeginLines
     % (The 'Vector' parameter will be set later)
     nameline = append('#ObjectName ',objectname);
     geometryobj{find(cellfun(@isempty,geometryobj),1)} = nameline;
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % NOTE: THIS NEEDS EDITING
-    % iset3d expects 'ConcatTransform', but Blender export provides
-    % 'Transform'
-    % the hack below replaces 'Transform' with 'ConcatTransform' for now
-    % and gives a warning that the transform to create the objects was
-    % incorrect
-    
+
+    % iset3d expects 'ConcatTransform' and the Blender export provides
+    % 'Transform', but this should be fine as the current transform should
+    % reset to identity at WorldBegin
     Tlineidx  = piContains(objectLines,'Transform');
     if any(Tlineidx)
         Tline    = objectLines{Tlineidx};
-        if isequal(Tline(1:9),'Transform')
-            warning('Transform used to create objects was incorrect.');
-        end
         openidx  = strfind(Tline,'[');
         closeidx = strfind(Tline,']');
         Tvalue   = Tline(openidx(1)+1:closeidx(1)-1);
         Transformline = append('ConcatTransform [',Tvalue,']');
         geometryobj{find(cellfun(@isempty,geometryobj),1)} = Transformline;
     end
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+
     % Add an 'AttributeBegin' line
     geometryobj{find(cellfun(@isempty,geometryobj),1)} = 'AttributeBegin';
     
