@@ -68,7 +68,6 @@ end
 exporter = 'Blender';
 thisR = piRead_Blender(fname,'exporter',exporter);
 
-
 %% Save the recipe information
 %
 % piWrite_Blender.m is an edited version of piWrite.m
@@ -88,9 +87,8 @@ sceneWindow(scene);
 %% How to perform basic functions with images exported from Blender
 %
 % The rest of this tutorial is adapted from intro tutorials
-% (t_piIntro_simpletransforms.m, t_piIntro_material.m, and
-% t_piIntro_material_color.m) to demonstrate how to perform some basic 
-% functions with images exported from Blender
+% (t_piIntro_simpletransforms.m, t_piIntro_material.m) to demonstrate how 
+% to perform some basic functions with images exported from Blender
 % (see iset3d/tutorials/introduction for all of the intro tutorials).
 
 %% Change render quality
@@ -226,40 +224,23 @@ scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Change cube material to matte');
 sceneWindow(scene);
 
-%% Change the color and material of an object
+%% Change the color of an object
 % 
-% Change the material of the sphere to green plastic.
+% Change the color of the cube to green.
+% This section depends on variables defined in the section above.
 
-% Get the full name of the sphere's material as above.
-objectName = 'sphere';
-objectidx  = piContains(materialList,objectName);
-objectLine = materialList{objectidx};
-closeidx = strfind(objectLine,':');
-objectMaterialName = objectLine(4:closeidx(2)-1);
-
-% Get the 'plastic' material from the library as above.
-desiredMaterial = 'plastic';
-theMaterials = fieldnames(thisR.materials.lib);
-targetMaterial = [];
-for ii = 1:length('theMaterials')
-    if (strcmp(theMaterials{ii},desiredMaterial))
-        eval(['targetMaterial = thisR.materials.lib.' desiredMaterial ';']);
-        break;
-    end
-end
-
-% Select the color green for the diffuse component of the 'plastic' material.
+% Add a green diffuse component to the 'targetMaterial' defined above 
+% (the 'matte' material).
 targetMaterial.rgbkd = [0 1 0];
 
-% Assign the sphere the 'plastic' material.
-fprintf('Changing material to %s\n',desiredMaterial);
+% Assign the cube the revised material.
 piMaterialAssign(thisR,objectMaterialName,targetMaterial);
 
 % Because we changed the material assignment, we need to set the
 % 'creatematerials' argument to true.
 piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Change sphere material to green plastic');
+scene = sceneSet(scene,'name','Change cube color to green');
 sceneWindow(scene);
 
 %% End
