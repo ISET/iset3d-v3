@@ -2,8 +2,8 @@ function renderRecipe = piGeometryRead_Blender(renderRecipe)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % NOTE: below added
-% Adapted from piGeometryRead.m to handle the exporter being set to 'Blender'
-% and to extract the scale parameter for each object
+% Adapted from piGeometryRead.m
+% to extract scale and rotation information separately per object
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -205,9 +205,11 @@ while i <= length(txt)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % NOTE: below added
-    % to handle the exporter being Blender by calling a new helper function
-    % (the Blender exporter uses 'Transform' instead of 'ConcatTransform')
-    % and to extract object scale
+    % to extract scale and rotation information separately per object
+    % (the Blender exporter uses 'Transform' instead of 'ConcatTransform'
+    % per object, which is why the statement below looks for the 'Transform'
+    % line, but the new 'parseTransform' helper function below could be 
+    % used for 'ConcatTransform' lines from the C4D exporter as well)
     
     elseif piContains(currentLine,'Transform')
         [position, rot, scale] = parseTransform(currentLine);
@@ -339,9 +341,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % NOTE: helper function added
-% to handle the 'Transform' line used by the Blender exporter
-% by extracting translation, rotation, and scale parameters from the
+% to extract translation, rotation, and scale parameters from the 
 % transformation matrix
+% (this helper function is currently only called for Blender exports 
+% because the Blender export uses 'Transform' understead of 
+% 'ConcatTransform', but this helper function could be called for
+% 'ConcatTransform' lines from the C4D exporter as well)
 
 function [translation, rotation, scale] = parseTransform(txt)
 

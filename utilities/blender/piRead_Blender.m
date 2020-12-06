@@ -634,10 +634,7 @@ if isequal(thisR.exporter,'C4D') || isequal(thisR.exporter,'Blender')
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % NOTE: below changed
     % to call an edited version of piGeometryRead.m
-    % that handles the exporter being Blender
-    % and extracts the scale parameter for each object
-    % NOTE: this function should always be called for a Blender export
-    % but should be useful for any scaled objects
+    % that extracts scale and rotation information separately per object
 
     thisR = piGeometryRead_Blender(thisR);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1230,7 +1227,10 @@ for ii = 1:numsLines
         maxpointP  = max(pointP);
         diffpointP = abs(minpointP)+abs(maxpointP);
         v = diffpointP/2;
-        thisLine = append(thisLine,':Vector(',num2str(v(1)),', ',num2str(v(2)),', ',num2str(v(3)),')');
+        
+        % Add vector to object name line in pbrt format, which is
+        % NAME:Vector(X, Z, Y)
+        thisLine = append(thisLine,':Vector(',num2str(v(1)),', ',num2str(v(3)),', ',num2str(v(2)),')');
     end
     
     % Replace old object text line with new text line
