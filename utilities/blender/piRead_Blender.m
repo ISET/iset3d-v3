@@ -630,7 +630,18 @@ if isequal(thisR.exporter,'C4D') || isequal(thisR.exporter,'Blender')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     fprintf('Reading C4D geometry information.\n');
-    thisR = piGeometryRead(thisR);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % NOTE: below changed
+    % to call an edited version of piGeometryRead.m
+    % that handles the exporter being Blender
+    % and extracts the scale parameter for each object
+    % NOTE: this function should always be called for a Blender export
+    % but should be useful for any scaled objects
+
+    thisR = piGeometryRead_Blender(thisR);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 elseif isequal(thisR.exporter,'Copy')
     fprintf('Geometry file will be copied by piWriteCopy.\n');
 else
@@ -759,18 +770,11 @@ for ii = 1:numbeginLines
     % (The 'Vector' parameter will be set later)
     nameline = append('#ObjectName ',objectname);
     geometryobj{find(cellfun(@isempty,geometryobj),1)} = nameline;
-
-    % iset3d expects 'ConcatTransform' and the Blender export provides
-    % 'Transform', but this should be fine as the current transform should
-    % reset to identity at WorldBegin
+   
+    %Add the transform line
     Tlineidx  = piContains(objectLines,'Transform');
     if any(Tlineidx)
-        Tline    = objectLines{Tlineidx};
-        openidx  = strfind(Tline,'[');
-        closeidx = strfind(Tline,']');
-        Tvalue   = Tline(openidx(1)+1:closeidx(1)-1);
-        Transformline = append('ConcatTransform [',Tvalue,']');
-        geometryobj{find(cellfun(@isempty,geometryobj),1)} = Transformline;
+        geometryobj{find(cellfun(@isempty,geometryobj),1)} = objectLines{Tlineidx};
     end
 
     % Add an 'AttributeBegin' line
@@ -1112,36 +1116,34 @@ for ii = 1:numsLines
     txtLines{pLines(ii)} = Pline;
 end    
 
-% Convert 'ConcatTransform' matrices into left-handed matrices for each object
-cLines = find(piContains(txtLines,'ConcatTransform'));
-numsLines = numel(cLines);
+% Convert 'Transform' matrices into left-handed matrices for each object
+tLines = find(piContains(txtLines,'Transform'));
+numsLines = numel(tLines);
 for ii = 1:numsLines
-    Cline = txtLines{cLines(ii)};
+    Tline = txtLines{tLines(ii)};
     
-    % Get 'ConcatTransform' vector
-    openidx  = strfind(Cline,'[');
-    closeidx = strfind(Cline,']');
-    ConcatTransform = Cline(openidx(1)+1:closeidx-1);
-    ConcatTransform = str2num(ConcatTransform);
+    % Get 'Transform' vector
+    openidx  = strfind(Tline,'[');
+    closeidx = strfind(Tline,']');
+    Transform = Tline(openidx(1)+1:closeidx-1);
+    Transform = str2num(Transform);
     
     % Convert the right-handed matrix into a left-handed matrix
-    c = reshape(ConcatTransform,[4,4]);
-    ConcatTransform = [c(1) c(9)  c(5) c(13); ...
-                       c(3) c(11) c(7) c(15); ...
-                       c(2) c(10) c(6) c(14); ...   
-                       c(4) c(12) c(8) c(16)];
+    Transform = reshape(Transform,[4,4]);
+    Transform(:,[2 3]) = Transform(:,[3 2]);
+    Transform([2 3],:) = Transform([3 2],:);
     
     % Reshape matrix into vector
-    ConcatTransform = reshape(ConcatTransform,[1 16]);
+    Transform = reshape(Transform,[1 16]);
     
     % Convert to string
-    ConcatTransform = mat2str(ConcatTransform);
+    Transform = mat2str(Transform);
     
-    % Replace converted 'ConcatTransform' vector
-    Cline = append('ConcatTransform ',ConcatTransform);
+    % Replace converted 'Transform' vector
+    Tline = append('Transform ',Transform);
     
-    % Replace old 'ConcatTransform' text line with new text line
-    txtLines{cLines(ii)} = Cline;
+    % Replace old 'Transform' text line with new text line
+    txtLines{tLines(ii)} = Tline;
 end 
 
 % Update geometry file text
