@@ -119,7 +119,7 @@ else
     
     % We create the light with parameters sent in by varargin. We call
     % piLightCreate.  The new light is attached to the recipe upon return.
-    newLight = piLightCreate(thisR, newVarargin{:});
+    newLight = piLightCreate(newVarargin{:});
     %% Add the light to the recipe
 
     val = numel(piLightGet(thisR,'print',false));

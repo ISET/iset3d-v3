@@ -171,6 +171,12 @@ switch ieParamFormat(sceneName)
         fname = fullfile(FilePath,'slantedBar.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
         exporter = 'C4D';
+    case 'slantedbarc4d'
+        sceneName = 'slantedBarC4D';
+        FilePath = fullfile(piRootPath,'data','V3','slantedBarC4D');
+        fname = fullfile(FilePath,'slantedBarC4D.pbrt');
+        if ~exist(fname,'file'), error('File not found'); end
+        exporter = 'C4D';    
     case 'flatsurface'
         sceneName = 'flatSurface';
         FilePath = fullfile(piRootPath,'data','V3','flatSurface');
