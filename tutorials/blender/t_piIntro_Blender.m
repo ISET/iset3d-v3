@@ -32,6 +32,7 @@
 % History:
 %   11/27/20  amn  Wrote it.
 %   12/03/20  amn  Added color change section.
+%   12/07/20  amn  Updated the Blender scene.
 
 %% Initialize ISET and Docker
 %
@@ -68,6 +69,14 @@ end
 exporter = 'Blender';
 thisR = piRead_Blender(fname,'exporter',exporter);
 
+%% Change render quality
+%
+% Decrease the resolution to decrease rendering time.
+raysperpixel = thisR.get('rays per pixel');
+filmresolution = thisR.get('film resolution');
+thisR.set('rays per pixel', raysperpixel/2);
+thisR.set('film resolution',filmresolution/2);
+
 %% Save the recipe information
 %
 % piWrite_Blender.m is an edited version of piWrite.m
@@ -91,107 +100,107 @@ sceneWindow(scene);
 % to perform some basic functions with images exported from Blender
 % (see iset3d/tutorials/introduction for all of the intro tutorials).
 
-%% Change render quality
-%
-% This is a low resolution for speed.
-thisR.set('rays per pixel',64);
-thisR.set('film resolution',[400 300]);
-
 %% List the names of the objects in this recipe
 %
-% The object names were assigned above by piRead_Blender.m to be as
-% descriptive as possible based on the information available in the Blender 
-% export. You will need to know the names of the objects in your scene to 
-% work with them below.
+% You will need to know the names of the objects in your scene to work with
+% them below. See the tutorial referenced in the header (on how to use the
+% Blender-to-pbrt exporter) for notes on naming your objects in Blender.
 fprintf('\nThis recipe contains objects:\n');
 for ii = 1:length(thisR.assets.groupobjs)
     fprintf('%s\n',thisR.assets.groupobjs(ii).name);
 end
 fprintf('\n');
   
-%% Rotate an object
-%
-% Rotate the monkey head 30 degrees along its x-axis.
-% As noted above, you will need to know that this object's name contains
-% the string 'Suzanne' (as assigned by piRead_Blender.m above based on the
-% object's Blender name). 
-% Loop through all assets and act on Suzanne:
-for ii = 1:length(thisR.assets.groupobjs)
-    if piContains(thisR.assets.groupobjs(ii).name,'Suzanne')
-        % The rotation is stored in angle-axis format, along the columns.
-        thisR.assets.groupobjs(ii).rotate(1,1) = ...
-            thisR.assets.groupobjs(ii).rotate(1,1) + 30;
-    end
-end
-
-% Write and render.
-piWrite_Blender(thisR);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Rotate Suzanne');
-sceneWindow(scene);
-
 %% Translate an object
 %
-% Move the sphere 70 cm along its negative x-axis.  
-% Again, you need to know that the name of the object contains 'sphere'.
+% Move the robot 70 cm along the y-axis.
+% Note that this will move the robot in world coordinates. In the Blender
+% scene included in this tutorial, the camera was aligned to the world
+% coordinates. See the tutorial referenced in the header (on how to use the
+% Blender-to-pbrt exporter) for how to set up your camera in Blender.
 for ii = 1:length(thisR.assets.groupobjs)
-    if piContains(thisR.assets.groupobjs(ii).name,'sphere')
-        % Do this by adjusting position
-        thisR.assets.groupobjs(ii).position(1) = ...
-            thisR.assets.groupobjs(ii).position(1) - .7;
+    
+    % As you can see in the object name list displayed above, all of the
+    % objects that make up the robot contain the string 'Robot'
+    % so translate all of the objects that contain that string.
+    if piContains(thisR.assets.groupobjs(ii).name,'Robot')
+        
+        % Translate along the y-axis by adjusting the 2nd position
+        % parameter.
+        thisR.assets.groupobjs(ii).position(2) = ...
+        thisR.assets.groupobjs(ii).position(2) + .7;
     end
 end
 
 % Write and render.
 piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Translate sphere');
+scene = sceneSet(scene,'name','Translated robot');
+sceneWindow(scene);
+
+%% Rotate an object
+%
+% Rotate the mirror 20 degrees along its y-axis.
+for ii = 1:length(thisR.assets.groupobjs)
+    if piContains(thisR.assets.groupobjs(ii).name,'Mirror')
+        % The rotation is stored in angle-axis format, along the columns.
+        thisR.assets.groupobjs(ii).rotate(1,2) = ...
+        thisR.assets.groupobjs(ii).rotate(1,2) - 20;
+    end
+end
+
+% Write and render.
+piWrite_Blender(thisR);
+scene = piRender_Blender(thisR,'render type','radiance');
+scene = sceneSet(scene,'name','Rotated mirror');
 sceneWindow(scene);
 
 %% Scale an object
 %
-% Scale the 'Cube' along its y-axis.
+% Scale the monkey head along its x-axis.
 for ii = 1:length(thisR.assets.groupobjs)
-    if piContains(thisR.assets.groupobjs(ii).name,'Cube')
-        thisR.assets.groupobjs(ii).scale(2) = ...
-            thisR.assets.groupobjs(ii).scale(2)*1.5;
+    if strcmp(thisR.assets.groupobjs(ii).name,'Monkey')
+        thisR.assets.groupobjs(ii).scale(1) = ...
+        thisR.assets.groupobjs(ii).scale(1)*2;
     end
 end
 
 % Write and render.
 piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Scale cube');
+scene = sceneSet(scene,'name','Scaled monkey');
 sceneWindow(scene);
 
-%% Move the camera farther away
+%% Translate, rotate, and scale an object
 %
-% This works if we set object distance, but not if we set camera position 
-% directly.
-distance = thisR.get('object distance');
-thisR.set('object distance',distance*3);
+% Just for fun: move, rotate, and scale the robot's arm
+for ii = 1:length(thisR.assets.groupobjs)
+    if strcmp(thisR.assets.groupobjs(ii).name,'RobotArmLeft')
+        % Translate along the y-axis.
+        thisR.assets.groupobjs(ii).position(2) = ...
+        thisR.assets.groupobjs(ii).position(2) + .2;
+        % Rotate along its x-axis.
+        thisR.assets.groupobjs(ii).rotate(1,1) = ...
+        thisR.assets.groupobjs(ii).rotate(1,1) + 50;
+        % Scale along its y-axis.
+        thisR.assets.groupobjs(ii).scale(2) = ...
+        thisR.assets.groupobjs(ii).scale(2)*1.5;
+    end
+end
 
-% Write and render
+% Write and render.
 piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Move camera farther away');
+scene = sceneSet(scene,'name','Modified robot''s arm');
 sceneWindow(scene);
 
 %% Change the material of an object
 %
-% Change the material of the cube to 'matte'.
+% Change the material of the top sphere to 'matte'.
 
-% Get the material list
+% Get the material list and select the material of the chosen object.
 materialList = piMaterialList(thisR);
-
-% If you know part of the object's name, find the name of the object's material.
-% Or, see the 'materialList' that was just displayed above for all of the
-% object material names.
-objectName = 'Cube';
-objectidx  = piContains(materialList,objectName);
-objectLine = materialList{objectidx};
-closeidx = strfind(objectLine,':');
-objectMaterialName = objectLine(4:closeidx(2)-1);
+objectMaterialName = 'SphereTop_material';
 
 % Get the 'matte' material from the library.
 %
@@ -221,12 +230,12 @@ end
 % 'creatematerials' argument to true.
 piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Change cube material to matte');
+scene = sceneSet(scene,'name','Changed top sphere material to matte');
 sceneWindow(scene);
 
 %% Change the color of an object
 % 
-% Change the color of the cube to green.
+% Change the color of the top sphere to green.
 % This section depends on variables defined in the section above.
 
 % Add a green diffuse component to the 'targetMaterial' defined above 
@@ -240,7 +249,7 @@ piMaterialAssign(thisR,objectMaterialName,targetMaterial);
 % 'creatematerials' argument to true.
 piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Change cube color to green');
+scene = sceneSet(scene,'name','Changed top sphere color to green');
 sceneWindow(scene);
 
 %% End

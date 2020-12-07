@@ -299,7 +299,7 @@ end
 % Because a light is not automatically added by the Blender exporter, a 
 % light is added here
 
-% Add an infinite light
+% Add an infinite light corresponding to mid-day sunlight
 thisR = piLightAdd(thisR,'type','infinite','light spectrum','D65');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -759,6 +759,8 @@ for ii = 1:numbeginLines
     if any(plylineidx)
         plyline = objectLines{plylineidx};
         [~,objectname] = fileparts(plyline);
+        % Remove the '_mat0' that the Blender exporter adds automatically
+        objectname = objectname(1:end-5);
         % If there is no .ply file, give the object a generic name
     else
         objectname = (['object' num2str(ii)]);
