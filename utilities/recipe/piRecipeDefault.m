@@ -145,7 +145,7 @@ switch ieParamFormat(sceneName)
         end
         exporter = 'C4D';
     case 'chessset'
-        sceneName = 'chessSet';
+        sceneName = 'ChessSet';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,[sceneName,'.pbrt']);
         if ~exist(fname,'file')
