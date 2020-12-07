@@ -38,8 +38,19 @@ fprintf('Docker command\n\t%s\n', command);
 % Capture the status and results
 try
     if ispc
-        [status, result] = system(strcat(command,' &'));
-        pause(20);
+        % There is a much better way to invoke docker+pbrt on Windows
+        % We can use '-echo' to get Stdout to the Matlab Command Window
+        % and therefore don't need either the TTY or the Pause command
+        % It doesn't seem to have any downside, but the old code is also
+        % below.
+        % Ideally we'd have a single point where the docker command is
+        % created, and fix it there, but it is created in multiple places
+        % so we remove the TTY flag here:
+        %        [status, result] = system(strcat(command,' &'));
+        %        pause(20);
+        command = strrep(command,"-ti","-i");
+        command = strrep(command,"-it", "-i");
+        [status, result] = system(command,'-echo');
     else
         [status, result] = system(command);
     end
