@@ -137,6 +137,8 @@ for ii = 1:numel(children)
         fprintf(fid, 'ObjectEnd\n\n');
         
     elseif isequal(thisNode.type, 'light')
+        % Seems this is the source of warning.
+        %{
         fprintf(fid, 'ObjectBegin "%s"\n', thisNode.name);
         name = thisNode.name;
         
@@ -156,6 +158,7 @@ for ii = 1:numel(children)
         fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
         
         fprintf(fid, 'ObjectEnd\n\n');        
+        %}
     else
         % Something must be wrong if we get here.
     end
