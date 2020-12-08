@@ -267,8 +267,7 @@ targetMaterial.rgbkd = [0 1 1];
 % Assign the top sphere the revised material.
 piMaterialAssign(thisR,objectMaterialName,targetMaterial);
 
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
+% Set the 'creatematerials' argument to true.
 piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Changed top sphere color to cyan');
@@ -281,12 +280,49 @@ sceneSet(scene,'gamma',0.5);
 % exported from Blender, because the Blender exporter does not export 
 % textures.
 
-%% Add a checkerboard texture to the floor
+%% Add a 3D pbrt texture
 % 
-% The 'checkerboard' texture is included in pbrt. 
+% Add the 'wrinkled' texture, which is included in pbrt, to the table
+% (other 3D pbrt textures to try below instead of 'wrinkled' are 'fbm', 
+% 'marble', and 'windy', among others).
 
 % You will be creating a new texture. Select a name for this texture.
-texturename = 'FloorChecks';
+texturename = 'Wrinkled';
+
+% Assign this new texture to the material of each table object (the table
+% top and the table legs).
+for ii = 1:length(thisR.materials.list)
+    if piContains(thisR.assets.groupobjs(ii).name,'Table')
+        thisR.materials.list{ii}.stringtype = 'matte';
+        thisR.materials.list{ii}.texturekd = texturename;
+    end
+end
+
+% Set up this new texture in the recipe.
+tidx = length(thisR.textures.list);
+tidx = tidx + 1;
+thisR.textures.list{tidx,1}.name = texturename;
+thisR.textures.list{tidx,1}.linenumber = tidx;
+thisR.textures.list{tidx,1}.format = 'spectrum';
+
+% The 'wrinkled' texture is included in pbrt (substitute in other 3D pbrt
+% textures below).
+thisR.textures.list{tidx,1}.type = 'wrinkled';
+
+% Set the 'creatematerials' argument to true.
+piWrite_Blender(thisR,'creatematerials',true);
+scene = piRender_Blender(thisR,'render type','radiance');
+scene = sceneSet(scene,'name','Changed table texture');
+sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
+
+%% Add a 2D pbrt texture
+% 
+% Add the 'checkerboard' texture, which is included in pbrt, to the floor
+% (another 2D pbrt texture to try below instead of 'checkerboard' is 'uv').
+
+% You will be creating a new texture. Select a name for this texture.
+texturename = 'Checks';
 
 % Assign this new texture to the material of the floor.
 for ii = 1:length(thisR.materials.list)
@@ -299,109 +335,22 @@ end
 % Set up this new texture in the recipe.
 tidx = length(thisR.textures.list);
 tidx = tidx + 1;
-thisR.textures.list{tidx}.name = texturename;
-thisR.textures.list{tidx}.linenumber = tidx;
-thisR.textures.list{tidx}.format = 'spectrum';
-% The 'checkerboard' texture is included in pbrt.
-thisR.textures.list{tidx}.type = 'checkerboard';
-% You can select the scaling factors for the u and v texture coordinates.
-thisR.textures.list{tidx}.floatuscale = 25;
-thisR.textures.list{tidx}.floatvscale = 25;
+thisR.textures.list{tidx,1}.name = texturename;
+thisR.textures.list{tidx,1}.linenumber = tidx;
+thisR.textures.list{tidx,1}.format = 'spectrum';
 
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
+% The 'checkerboard' texture is included in pbrt (substitute in other 2D
+% pbrt textures below).
+thisR.textures.list{tidx,1}.type = 'checkerboard';
+
+% You can specify the texture scaling factors for 2D textures.
+thisR.textures.list{tidx,1}.floatuscale = 35;
+thisR.textures.list{tidx,1}.floatvscale = 35;
+
+% Set the 'creatematerials' argument to true.
 piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Changed floor texture');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Modify the checkerboard texture of the floor
-% 
-% In the above section, you assigned your new 'FloorChecks' texture to the 
-% material of the floor, and you set up this new texture in the recipe.
-% Now, you can modify that existing texture.
-
-% Modify the 'FloorChecks' texture.
-for ii = 1:length(thisR.textures.list)
-    if strcmp(thisR.textures.list{ii}.name,'FloorChecks')
-        % Selecting large scaling factors for the texture coordinates
-        % creates a fuzzy appearance.
-        thisR.textures.list{ii}.floatuscale = 500;
-        thisR.textures.list{ii}.floatvscale = 500;
-    end
-end
-
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Gave floor a fuzzy texture');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Add a wrinkled texture to the table
-% 
-% The 'wrinkled' texture is included in pbrt. 
-
-% You will be creating a new texture. Select a name for this texture.
-texturename = 'Wrinkled';
-
-% Assign this new texture to the material of each table object (the table
-% top and the table legs)
-for ii = 1:length(thisR.materials.list)
-    if piContains(thisR.assets.groupobjs(ii).name,'Table')
-        thisR.materials.list{ii}.stringtype = 'matte';
-        thisR.materials.list{ii}.texturekd = texturename;
-    end
-end
-
-% Set up this new texture in the recipe.
-tidx = length(thisR.textures.list);
-tidx = tidx + 1;
-thisR.textures.list{tidx}.name = texturename;
-thisR.textures.list{tidx}.linenumber = tidx;
-thisR.textures.list{tidx}.format = 'spectrum';
-% The 'wrinkled' texture is included in pbrt.
-thisR.textures.list{tidx}.type = 'wrinkled';
-
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed table texture');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Add a marble texture to the walls
-%
-% The 'marble' texture is included in pbrt.
-
-% You will be creating a new texture. Select a name for this texture.
-texturename = 'Marble';
-
-% Assign this new texture to the material of each wall.
-for ii = 1:length(thisR.materials.list)
-    if piContains(thisR.assets.groupobjs(ii).name,'Wall')
-        thisR.materials.list{ii}.stringtype = 'matte';
-        thisR.materials.list{ii}.texturekd = texturename;
-    end
-end
-
-% Set up this new texture in the recipe.
-tidx = length(thisR.textures.list);
-tidx = tidx + 1;
-thisR.textures.list{tidx}.name = texturename;
-thisR.textures.list{tidx}.linenumber = tidx;
-thisR.textures.list{tidx}.format = 'spectrum';
-% The 'marble' texture is included in pbrt.
-thisR.textures.list{tidx}.type = 'marble';
-
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed texture of walls');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
 
