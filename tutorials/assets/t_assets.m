@@ -1,60 +1,63 @@
+% t_assets
+% Introduction to the new assets tree structure. We parse objects in the
+% scene as assets with a tree structure.
+
 %%
 ieInit;
 
-%% Test the simplest case for mcc
-thisR = piRecipeDefault('scene name', 'MacBethChecker');
-piWrite(thisR)
+%% Use simple scene as an example
+thisR = piRecipeDefault('scene name', 'SimpleScene');
+
+% Use a smaller rays per pixel for faster rendering 
+thisR.set('raysperpixel', 8);
+
+% Display the assets structure
+disp(thisR.assets.tostring)
+
+piWrite(thisR);
+
 [scene, results] = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 
-%% Test simple scene
-thisRSS = piRecipeDefault('scene name', 'SimpleScene');
-disp(thisRSS.assets.tostring)
+%% Now let's get material information from asset and make some changes
 
-piWrite(thisRSS);
+% Get a 'node' node, which has rotation and position info
+assetId = piAssetFind(thisR, 'name', 'figure_6m');
 
-[scene, results] = piRender(thisRSS, 'render type', 'radiance');
+% Get its child 'object' node id, which has surface geometry and material
+thisAssetID = piAssetGet(thisR, assetId, 'children');
+
+% Check the material of this asset
+mat = piAssetGet(thisR, thisAssetID, 'material');
+
+% Get the material name
+matName = mat.namedmaterial;
+
+% Find this material.
+matIdx = piMaterialFind(thisR, 'name', matName);
+
+% Set the material with another property
+piMaterialSet(thisR, matIdx, 'rgbkd', [0, 1, 0]);
+
+piWrite(thisR);
+
+[scene, results] = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 
-%% Now check the cornell box
-thisRCB = piRead(which('cornell_box_formal.pbrt'));
-thisRCB.set('film resolution',[512 512]);
-thisRCB.set('rays per pixel',32);
-thisRCB.set('n bounces',5); % Number of bounces
+%% Let's make another object an area light
+assetTwoID = piAssetGet(thisR, piAssetFind(thisR, 'name', 'figure_3m'), 'children');
 
-disp(thisRCB.assets.tostring);
-
-%% Delete all light
-piLightDelete(thisRCB, 'all');
-
-%%
-% Check if piAssetFind works
-ids = piAssetFind(thisRCB, {'name', 'type'}, {'3_1_Area Light', 'object'});
-piAssetGet(thisRCB, ids)
-
-
-% Change an object node to light
+% Create a new area light with D65
 newLight = piLightCreate('type', 'area');
-newLight = piLightSet(newLight, [], 'lightspectrum', 'BoxLampSPD');
-% newLight = piLightSet(newLight, [], 'spectrumscale', 1e-10);
+lightName = 'D65';
+newLight = piLightSet(newLight, [], 'lightspectrum', lightName);
+newLight= piLightSet(newLight, [], 'spectrum scale', 3e-3);
 
-thisRCB = piAssetObject2Light(thisRCB, ids, newLight);
+thisR = piAssetObject2Light(thisR, assetTwoID, newLight);
 
-%% Reflectance
-wave = 400:10:700;
-refWhite = ieReadSpectra('CBWhiteSurface', wave);
-%%
-leftWallIdx = piMaterialFind(thisRCB, 'name', 'Left Wall');
-rightWallIdx = piMaterialFind(thisRCB, 'name', 'Right Wall');
-whiteWallIdx = piMaterialFind(thisRCB, 'name', 'Other Walls');
+piWrite(thisR);
 
-piMaterialSet(thisRCB, leftWallIdx, 'spectrumkd', refWhite);
-piMaterialSet(thisRCB, rightWallIdx, 'spectrumkd', refWhite);
-piMaterialSet(thisRCB, whiteWallIdx, 'spectrumkd', refWhite);
-
-piWrite(thisRCB);
-[scene, results] = piRender(thisRCB, 'render type', 'radiance');
+[scene, results] = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
+scene = sceneSet(scene, 'render flag', 'hdr');
 
-%%
-sensor = sensorCreate('Monochrome');

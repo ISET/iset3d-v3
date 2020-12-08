@@ -29,6 +29,8 @@ else
                 end
             case 'parent'
                 val = thisTree.getparent(id);
+            case 'children'
+                val = thisTree.getchildren(id);
             otherwise
                 if ~isfield(thisNode, param)
                     if ischar(thisNode) % In the case of a string
