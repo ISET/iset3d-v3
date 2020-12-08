@@ -92,6 +92,7 @@ scene = piRender_Blender(thisR,'render type','radiance');
 % Name this render and display it.
 scene = sceneSet(scene,'name','Blender export');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% How to perform basic functions with images exported from Blender
 %
@@ -137,6 +138,7 @@ piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Translated robot');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% Rotate an object
 %
@@ -154,6 +156,7 @@ piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Rotated mirror');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% Scale an object
 %
@@ -170,6 +173,7 @@ piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Scaled monkey');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% Translate, rotate, and scale an object
 %
@@ -193,6 +197,7 @@ piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Modified robot''s arm');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% Change the material of an object
 %
@@ -232,6 +237,7 @@ piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Changed top sphere material to matte');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% Change the color of an object
 % 
@@ -251,5 +257,6 @@ piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Changed top sphere color to green');
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% End

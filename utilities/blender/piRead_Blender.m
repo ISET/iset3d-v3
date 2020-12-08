@@ -981,38 +981,49 @@ for ii = 1:numsLines
     plyLine = plyLine{plylineidx};
     [~,objectname] = fileparts(plyLine);
     
-    % Read .ply file
-    ptCloud = pcread([objectname '.ply']);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % NOTE: new function below
+    % The function below is a modified version of pcread.m
+    % that reads out the per-vertex texture coordinates (in addition to the 
+    % per-vertex locations and normals read out by pcread.m)from the .ply file
+    
+    [ptCloud,plyTexture] = pcread_Blender([objectname '.ply']);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    % Set up .ply file output in pbrt format
     plyLocation = ptCloud.Location;
     plyNormal   = ptCloud.Normal;
     %pcshow(ptCloud); %uncomment this line to plot points
-    
-    % Set up .ply file output in pbrt format
     % NOTE: for now, assumes all exported objects are triangle mesh
     Shape = 'trianglemesh';
-    % Put vertices with their corresponding normals
-    plyBoth = [plyLocation plyNormal];
-    % Get the unique vertices
-    uvertices = unique(plyBoth,'rows');
-    % Separate out the unique vertices from their corresponding normals
+    % Align vertices with their corresponding normals and texture coordinates
+    plyAll = [plyLocation plyNormal plyTexture];
+    % Get the unique vertices/normals/texture coordinates
+    uvertices = unique(plyAll,'rows');
+    % Separate out the three parameters
     pointP  = uvertices(:,1:size(plyLocation,2));
-    normalN = uvertices(:,size(plyLocation,2)+1:end);
-    % Define the shapes based on their vertices
-    [~,integerindices] = ismember(plyLocation,pointP,'rows');
+    normalN = uvertices(:,size(plyLocation,2)+1:size(plyLocation,2)+size(plyNormal,2));
+    floatuv = uvertices(:,size(plyLocation,2)+size(plyNormal,2)+1:end);
+    % Calculate the integer indices 
+    [~,integerindices] = ismember(plyAll,uvertices,'rows');
     % Integers currently start at 1 but need to start at 0
     integerindices = integerindices - 1;
     % Reshape into pbrt format
     integerindices = integerindices';
     pointP  = reshape(pointP.',1,[]);
     normalN = reshape(normalN.',1,[]);
+    floatuv = reshape(floatuv.',1,[]);
     % Convert to strings
     integerindices = mat2str(integerindices);
-    pointP = mat2str(pointP);
+    pointP  = mat2str(pointP);
     normalN = mat2str(normalN);
+    floatuv = mat2str(floatuv);
     
     % Rewrite 'Shape' line in pbrt format
     newLine = append('Shape "',Shape,'" "integer indices" ',integerindices, ...
-        ' "point P" ',pointP,' "normal N" ',normalN);
+        ' "point P" ',pointP,' "normal N" ',normalN,' "float uv" ',floatuv);
     
     % Replace the old 'Shape' line with the rewritten line
     txtLines{sLines(ii)} = newLine;
