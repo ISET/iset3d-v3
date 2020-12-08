@@ -96,7 +96,7 @@ sceneSet(scene,'gamma',0.5);
 
 %% How to perform basic functions with images exported from Blender
 %
-% The rest of this tutorial is adapted from intro tutorials
+% The next part of this tutorial is adapted from intro tutorials
 % (t_piIntro_simpletransforms.m, t_piIntro_material.m) to demonstrate how 
 % to perform some basic functions with images exported from Blender
 % (see iset3d/tutorials/introduction for all of the intro tutorials).
@@ -114,88 +114,104 @@ fprintf('\n');
   
 %% Translate an object
 %
-% Move the robot 70 cm along the y-axis.
-% Note that this will move the robot in world coordinates. In the Blender
+% Move the mirror 50 cm along the negative x-axis.
+% Note that this will move the mirror in world coordinates. In the Blender
 % scene included in this tutorial, the camera was aligned to the world
 % coordinates. See the tutorial referenced in the header (on how to use the
 % Blender-to-pbrt exporter) for how to set up your camera in Blender.
 for ii = 1:length(thisR.assets.groupobjs)
     
     % As you can see in the object name list displayed above, all of the
-    % objects that make up the robot contain the string 'Robot'
-    % so translate all of the objects that contain that string.
-    if piContains(thisR.assets.groupobjs(ii).name,'Robot')
+    % objects that make up the mirror contain the string 'Mirror'
+    % so you can translate all of the objects that contain that string.
+    if piContains(thisR.assets.groupobjs(ii).name,'Mirror')
         
-        % Translate along the y-axis by adjusting the 2nd position
+        % Translate along the x-axis by adjusting the 1st position
         % parameter.
-        thisR.assets.groupobjs(ii).position(2) = ...
-        thisR.assets.groupobjs(ii).position(2) + .7;
+        thisR.assets.groupobjs(ii).position(1) = ...
+        thisR.assets.groupobjs(ii).position(1) - .5;
     end
 end
 
 % Write and render.
 piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Translated robot');
+scene = sceneSet(scene,'name','Translated mirror');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
 
 %% Rotate an object
 %
-% Rotate the mirror 20 degrees along its y-axis.
+% Rotate the monkey head 45 degrees along its y-axis.
 for ii = 1:length(thisR.assets.groupobjs)
-    if piContains(thisR.assets.groupobjs(ii).name,'Mirror')
+    if strcmp(thisR.assets.groupobjs(ii).name,'Monkey')
         % The rotation is stored in angle-axis format, along the columns.
         thisR.assets.groupobjs(ii).rotate(1,2) = ...
-        thisR.assets.groupobjs(ii).rotate(1,2) - 20;
+        thisR.assets.groupobjs(ii).rotate(1,2) - 45;
     end
 end
 
 % Write and render.
 piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Rotated mirror');
+scene = sceneSet(scene,'name','Rotated monkey');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
 
 %% Scale an object
 %
-% Scale the monkey head along its x-axis.
+% Scale the table top along its x-axis.
 for ii = 1:length(thisR.assets.groupobjs)
-    if strcmp(thisR.assets.groupobjs(ii).name,'Monkey')
+    % Only the table top (and not the table legs, which are separate 
+    % objects) will be scaled
+    if strcmp(thisR.assets.groupobjs(ii).name,'Table')
         thisR.assets.groupobjs(ii).scale(1) = ...
-        thisR.assets.groupobjs(ii).scale(1)*2;
+        thisR.assets.groupobjs(ii).scale(1) * 1.5;
     end
 end
 
 % Write and render.
 piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Scaled monkey');
+scene = sceneSet(scene,'name','Scaled table top');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
 
-%% Translate, rotate, and scale an object
+%% Just for fun, put it all together
 %
-% Just for fun: move, rotate, and scale the robot's arm
+% Make a happy robot.
 for ii = 1:length(thisR.assets.groupobjs)
-    if strcmp(thisR.assets.groupobjs(ii).name,'RobotArmLeft')
-        % Translate along the y-axis.
+    % Move all robot-related objects 70 cm up, along the y-axis.
+    if piContains(thisR.assets.groupobjs(ii).name,'Robot')
         thisR.assets.groupobjs(ii).position(2) = ...
-        thisR.assets.groupobjs(ii).position(2) + .2;
-        % Rotate along its x-axis.
-        thisR.assets.groupobjs(ii).rotate(1,1) = ...
-        thisR.assets.groupobjs(ii).rotate(1,1) + 50;
-        % Scale along its y-axis.
-        thisR.assets.groupobjs(ii).scale(2) = ...
-        thisR.assets.groupobjs(ii).scale(2)*1.5;
-    end
+        thisR.assets.groupobjs(ii).position(2) + .7;
+    
+        % Translate, rotate, and scale one of the robot's arms.
+        if strcmp(thisR.assets.groupobjs(ii).name,'RobotArmLeft')
+            % Translate along the y-axis.
+            thisR.assets.groupobjs(ii).position(2) = ...
+            thisR.assets.groupobjs(ii).position(2) + .2;
+            % Rotate along its x-axis.
+            thisR.assets.groupobjs(ii).rotate(1,1) = ...
+            thisR.assets.groupobjs(ii).rotate(1,1) + 50;
+            % Scale along its y-axis.
+            thisR.assets.groupobjs(ii).scale(2) = ...
+            thisR.assets.groupobjs(ii).scale(2) * 1.5;
+        
+        % Scale the robot's eyes and mouth.
+        elseif piContains(thisR.assets.groupobjs(ii).name,'RobotEye') || ...
+                   strcmp(thisR.assets.groupobjs(ii).name,'RobotMouth')
+            % Scale along the object's y-axis.
+            thisR.assets.groupobjs(ii).scale(2) = ...
+            thisR.assets.groupobjs(ii).scale(2) * 2;
+        end
+    end 
 end
 
 % Write and render.
 piWrite_Blender(thisR);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Modified robot''s arm');
+scene = sceneSet(scene,'name','Made a happy robot');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
 
@@ -224,7 +240,7 @@ for ii = 1:length('theMaterials')
     end
 end
 if (~isempty(targetMaterial))
-    % Assign the cube the 'matte' material.
+    % Assign the top sphere the 'matte' material.
     fprintf('Changing material to %s\n',desiredMaterial);
     piMaterialAssign(thisR,objectMaterialName,targetMaterial);
 else
@@ -241,21 +257,21 @@ sceneSet(scene,'gamma',0.5);
 
 %% Change the color of an object
 % 
-% Change the color of the top sphere to green.
+% Change the color of the top sphere to cyan.
 % This section depends on variables defined in the section above.
 
-% Add a green diffuse component to the 'targetMaterial' defined above 
+% Add a cyan diffuse component to the 'targetMaterial' defined above 
 % (the 'matte' material).
-targetMaterial.rgbkd = [0 1 0];
+targetMaterial.rgbkd = [0 1 1];
 
-% Assign the cube the revised material.
+% Assign the top sphere the revised material.
 piMaterialAssign(thisR,objectMaterialName,targetMaterial);
 
 % Because we changed the material assignment, we need to set the
 % 'creatematerials' argument to true.
 piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed top sphere color to green');
+scene = sceneSet(scene,'name','Changed top sphere color to cyan');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
 
