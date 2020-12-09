@@ -125,3 +125,5 @@ piWrite(thisR);
 [scene, result] = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
+
+%% END
