@@ -61,3 +61,14 @@ piWrite(thisR);
 sceneWindow(scene);
 scene = sceneSet(scene, 'render flag', 'hdr');
 
+%%
+id = piAssetFind(thisR, 'name', 'Null');
+
+nullNode = piAssetGet(thisR, id);
+
+childrenID = piAssetGet(thisR, id, 'children');
+
+for ii=1:numel(childrenID)
+    thisNode = piAssetGet(thisR, childrenID(ii));
+    thisNode.name
+end

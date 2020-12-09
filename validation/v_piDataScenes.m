@@ -25,7 +25,7 @@ if ~piDockerExists, piDockerConfig; end
 % This is the INPUT file name
 % thisR = piRecipeDefault('scene name','cornellbox');
 % thisR = piRecipeDefault('scene name','coloredCube');
-thisR = piRecipeDefault('scene name','chessSet');
+thisR = piRecipeDefault('scene name','ChessSet');
 
 %% Change render quality
 thisR.set('film resolution',[192 192]);
