@@ -1,0 +1,20 @@
+AttributeBegin
+	#ObjectName Camera:Vector(0, 0, 0)
+	ConcatTransform [6.12323399574e-17 -0.0 1.0 0  0.0 1.0 0.0 0  -1.0 0.0 6.12323399574e-17 0  60.0 0.0 -1.5306526287e-14 1]
+AttributeEnd
+AttributeBegin
+	#ObjectName BlackSurface:Vector(200, 0, 125)
+	ConcatTransform [6.12323399574e-17 -1.0 0.0 0  1.0 6.12323399574e-17 0.0 0  -0.0 0.0 1.0 0  0.0 0.0 0.0 1]
+	AttributeBegin
+		NamedMaterial "BlackMat"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-200.0 0.0 -200.0 -200.0 1.21878970995e-14 -50.0 200.0 6.59091105812e-17 50.0 200.0 0.0 -200.0 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [2.53090665313e-17 1.0 -4.07581434696e-17 2.53090665313e-17 1.0 -4.07581434696e-17 2.53090665313e-17 1.0 -4.07581434696e-17 2.53090665313e-17 1.0 -4.07581434696e-17 ]
+	AttributeEnd
+AttributeEnd
+AttributeBegin
+	#ObjectName WhiteSurface:Vector(200, 0, 125)
+	ConcatTransform [6.12323399574e-17 -1.0 0.0 0  1.0 6.12323399574e-17 0.0 0  -0.0 0.0 1.0 0  0.0 0.0 0.0 1]
+	AttributeBegin
+		NamedMaterial "WhiteMat"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-200.0 0.0 -50.0 -200.0 0.0 200.0 200.0 0.0 200.0 200.0 -1.04805227734e-14 50.0 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [2.18344232307e-17 1.0 -3.49350765074e-17 2.18344232307e-17 1.0 -3.49350765074e-17 2.18344232307e-17 1.0 -3.49350765074e-17 2.18344232307e-17 1.0 -3.49350765074e-17 ]
+	AttributeEnd
+AttributeEnd
