@@ -20,7 +20,7 @@ lrgb = mWgts2lrgb * wgts;
 %% Generate texture map with 2D texture map
 
 % Read in the image
-mouthFolder = fullfile(piRootPath, 'local', 'mouth_model');
+mouthFolder = fullfile(piRootPath, 'local', 'pose_realistic');
 colorImgPath = fullfile(mouthFolder, 'Mouth color map.png');
 mouthImg = im2double(imread(colorImgPath));
 mouthImg = imresize(mouthImg, [256, 256]);
@@ -59,11 +59,11 @@ xlabel('wavelength (nm)'); ylabel('Reflectance')
 %}
 
 %% Write out mouthImgBinary (texture map) as exr image
-textureImgPathWgts = fullfile(mouthFolder, 'Mouth_color_map_wgts.exr');
+textureImgPathWgts = fullfile(mouthFolder, 'Mouth_color_map_wgts_uniform.exr');
 exrwrite(mouthTextureWgts, textureImgPathWgts);
 
 % For visualization
-textureImgPathLrgb = fullfile(mouthFolder, 'Mouth_color_map_lrgb.exr');
+textureImgPathLrgb = fullfile(mouthFolder, 'Mouth_color_map_lrgb_uniform.exr');
 exrwrite(mouthTextureLrgb, textureImgPathLrgb);
 %% Check image
 %{
@@ -102,7 +102,7 @@ piTextureList(thisR);
 textureIdx = 3;
 piTextureSet(thisR, textureIdx, 'bool gamma', 'false');
 piTextureSet(thisR, textureIdx, 'stringwrap', 'absolute');
-piTextureSet(thisR, textureIdx, 'stringfilename', 'Mouth_color_map_wgts.exr');
+piTextureSet(thisR, textureIdx, 'stringfilename', 'Mouth_color_map_wgts_uniform.exr');
 
 %%
 basisFunctionsFileName = 'mouthReflectance.mat';

@@ -25,26 +25,29 @@
 %   t_piIntro_*
 %
 
-%% Initialize ISET and Docker
+% History:
+%   10/18/20  dhb  Cleaned up comments a bit.
 
+%% Initialize ISET and Docker
+%
 % We start up ISET and check that the user is configured for docker
-ieInit;
+clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
-
 thisR = piRecipeDefault('scene name','sphere');
 
 %% Add a point light
 thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
-%{
-% You could try this light if you like, which is more blue and distant
-%
- thisR = piLightAdd(thisR, 'type', 'distant', 'light spectrum', [9000 0.001],...
-                        'camera coordinate', true);
-%}
-%% Set up the render quality
 
+% You can also try this light if you like, which is more blue and distant
+% 
+% Just comment the line above and uncomment this one
+% thisR = piLightAdd(thisR, 'type', 'distant', 'light spectrum', [9000 0.001],...
+%                         'camera coordinate', true);
+
+%% Set up the render quality
+%
 % There are many different parameters that can be set.  This is the just an
 % introductory script, so we do a minimal number of parameters.  Much of
 % what is described in other scripts expands on this section.
@@ -53,18 +56,17 @@ thisR.set('rays per pixel',128);
 thisR.set('n bounces',1); % Number of bounces
 
 %% Save the recipe information
-
 piWrite(thisR);
 
 %% Render 
-
+%
 % There is no lens, just a pinhole.  In that case, we are rendering a
-% scene.  If we had a lens, we would be rendering an optical image.
+% scene. If we had a lens, we would be rendering an optical image.
 [scene, result] = piRender(thisR);
 sceneWindow(scene);
 
-%% Notice that we also computed the depth map
-
+%% Note that we also computed the depth map
+%
+% Show it by uncommenting the line below.
 % scenePlot(scene,'depth map');
 
-%%

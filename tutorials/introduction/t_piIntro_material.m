@@ -17,8 +17,7 @@
 %   t_piIntro_*
 
 %% Initialize ISET and Docker
-
-ieInit;
+clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt files
@@ -26,39 +25,36 @@ sceneName = 'simple scene';
 thisR = piRecipeDefault('scene name',sceneName);
 
 %% Set render quality
-
+%
 % This is a low resolution for speed.
 thisR.set('film resolution',[400 300]);
 thisR.set('rays per pixel',64);
 
 %% List material library
-
+%
 % These all the possible materials. 
 mType = piMateriallib;
 disp(mType);
-   thisR.materials.lib
+thisR.materials.lib
 
 % These are the materials in this particular scene.
 piMaterialList(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-
 thisR.set('fov',45);
 thisR.set('film diagonal',10);
 thisR.set('integrator subtype','bdpt');
 thisR.set('sampler subtype','sobol');
-
-%% Changing the name!!!!  Important to comment and explain!!! ZL, BW
 piWrite(thisR,'creatematerials',true);
 
 %% Render
-
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
 
 %% Adjust the scene material from uber to mirror
-
+%
 % The SimpleScene has a part named 'mirror' (slot 5), but the
 % material type is set to uber.  We want to change that.
 partName = 'mirror';
@@ -68,24 +64,18 @@ partName = 'mirror';
 target = thisR.materials.lib.mirror; 
 piMaterialAssign(thisR, partName, target);
 
-%% Set the render to account for glass and mirror requiring multiple bounces
-
+% Set the render to account for glass and mirror requiring multiple bounces
+%
 % This value determines the number of ray bounces.  If a scene has
 % glass we need to have at least 2 bounces.
 thisR.set('nbounces',10);
 
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
+% Write and render
 piWrite(thisR,'creatematerials',true);
-% In fact, this whole library is always stored as part of any recipe
-% 
-
-%% Render
-
-scene = piRender(thisR);
-scene = sceneSet(scene,'name',sprintf('Mirror %s',sceneName));
+[scene, result] = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('Glass %s',sceneName));
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.8);
+sceneSet(scene,'gamma',0.5);
 
 %% Adjust the scene material from mirror to glass (the person, too)
 
@@ -98,14 +88,9 @@ piMaterialAssign(thisR, 'GLASS', target);
 personName = 'uber_blue';
 piMaterialAssign(thisR, personName, target);
 
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
+% Write and render
 piWrite(thisR,'creatematerials',true);
-
-%% Render
-
 [scene, result] = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Glass %s',sceneName));
 sceneWindow(scene);
-
-%% END
+sceneSet(scene,'gamma',0.5);
