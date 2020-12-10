@@ -146,10 +146,11 @@ piReadExporter(thisR,header);
 
 %% If this is an exported Blender file: 
 % 1) rewrite 'txtLines' in C4D format
-% 2) rewrite 'thisR.world' in C4D format
-% 3) create materials and geometry files in C4D format
+% 2) create materials and geometry files in C4D format
+% 3) rewrite 'thisR.world' in C4D format
 % 4) extract geometry information from .ply functions in the geometry file
-% 5) calculate 'Vector' information in the geometry file
+% 5) convert the coordinate system from right-handed to left-handed
+% 6) calculate 'Vector' information in the geometry file
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

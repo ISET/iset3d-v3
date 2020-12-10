@@ -8,7 +8,7 @@
 %    A detailed tutorial for users new to Blender 
 %    on how to use the Blender-to-pbrt exporter to export Blender images
 %    either created by the user or downloaded from the web
-%    can be found here: <<<<<INSERT LINK TO GITHUB WIKI HERE>>>>>
+%    can be found here: https://github.com/ISET/iset3d/wiki/Blender
 
 %    The current tutorial uses an image that has already been exported from
 %    Blender with the method above and which is included in the iset3d
@@ -33,7 +33,8 @@
 %   11/27/20  amn  Wrote it.
 %   11/29/20  dhb  Edited it.
 %   12/03/20  amn  Added color change section.
-%   12/07/20  amn  Updated the Blender scene.
+%   12/07/20  amn  Updated the Blender scene, added texture sections.
+%   12/10/20  amn  Added a new texture section, added wiki link.
 
 %% Initialize ISET and Docker
 %
@@ -345,13 +346,35 @@ thisR.textures.list{tidx,1}.format = 'spectrum';
 thisR.textures.list{tidx,1}.type = 'checkerboard';
 
 % You can specify the texture scaling factors for 2D textures.
-thisR.textures.list{tidx,1}.floatuscale = 35;
-thisR.textures.list{tidx,1}.floatvscale = 35;
+thisR.textures.list{tidx,1}.floatuscale = 8;
+thisR.textures.list{tidx,1}.floatvscale = 8;
 
 % Set the 'creatematerials' argument to true.
 piWrite_Blender(thisR,'creatematerials',true);
 scene = piRender_Blender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name','Changed floor texture');
+sceneWindow(scene);
+sceneSet(scene,'gamma',0.5);
+
+%% Modify a texture that is already in the recipe
+%
+% In the above section, you added a texture to the recipe. You also
+% assigned this texture to the material of the floor. Now, you can modify
+% that existing texture.
+
+% Modify the 'Checks' texture.
+for ii = 1:length(thisR.textures.list)
+    if strcmp(thisR.textures.list{ii}.name,'Checks')
+        % Specify larger texture scaling factors.
+        thisR.textures.list{ii}.floatuscale = 35.1;
+        thisR.textures.list{ii}.floatvscale = 35.1;
+    end
+end
+
+% Set the 'creatematerials' argument to true.
+piWrite_Blender(thisR,'creatematerials',true);
+scene = piRender_Blender(thisR,'render type','radiance');
+scene = sceneSet(scene,'name','Changed existing floor texture');
 sceneWindow(scene);
 sceneSet(scene,'gamma',0.5);
 
