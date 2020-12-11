@@ -13,10 +13,9 @@ type = p.Results.type;
 
 %% Initialize the asset
 obj.type = type;
-obj.index = 0;
 
 switch type
-    case 'node'
+    case 'branch'
         obj.name = 'node';
         obj.size.l = 0;
         obj.size.w = 0;

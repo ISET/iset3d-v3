@@ -31,7 +31,7 @@ function val = recipeGet(thisR, param, varargin)
 %     'rendered dir'      - directory with rendered data
 %     'rendered basename' - basename of rendered dat-file
 %
-%    % Scene properties 
+%    % Scene properties
 %     'exporter'  - Where the scene came from
 %     'mm units'  - Some scenes were given to us in mm, rathern m, units
 %     'depth range'      - Depth range of the scene elements given the
@@ -83,7 +83,7 @@ function val = recipeGet(thisR, param, varargin)
 %      'focus distance'     - Distance to in-focus plane  (m)
 %      'focal distance'     - Used with pinhole, which has infinite depth
 %                             of field, to specify the distance from the
-%                             pinhole and film 
+%                             pinhole and film
 %      'accommodation'      - Inverse of focus distance (diopters)
 %      'fov'                - Field of view (deg)
 %      'aperture diameter'   - For most cameras, but not human eye
@@ -93,7 +93,7 @@ function val = recipeGet(thisR, param, varargin)
 %      'num ca bands'        - Number of chromatic aberration spectral bands
 %
 %    % Film and retina
-%      'film subtype' 
+%      'film subtype'
 %      'film distance'      - PBRT adjusts the film distance so that an
 %                             object at the focus distance is in focus.
 %                             This is that distance. If a pinhole, it might
@@ -104,8 +104,8 @@ function val = recipeGet(thisR, param, varargin)
 %      'film x resolution'  - Number of x dimension samples
 %      'film y resolution'  - Number of y-dimension samples
 %      'film diagonarl'     - Size in mm
-%      
-%   
+%
+%
 %      % Special retinal properties for human eye models
 %      'retina distance'
 %      'eye radius'
@@ -144,7 +144,7 @@ function val = recipeGet(thisR, param, varargin)
 %
 %    % Textures
 %      'texture'
-%      
+%
 %    % Lighting information
 %      'light'
 %
@@ -162,7 +162,7 @@ function val = recipeGet(thisR, param, varargin)
 
 % Programming todo
 %   * Lots of gets needed for the assets, materials, lighting, ...
-%  
+%
 
 %% Parameters
 
@@ -182,8 +182,9 @@ p.parse(thisR,param);
 val = [];
 
 %%
+
 switch ieParamFormat(param)  % lower case, no spaces
-    
+   
     % File management
     case 'inputfile'
         % The place where the PBRT scene files start before being modified
@@ -551,7 +552,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         
     case {'eyeradius','retinaradius'}
         % thisR.get('eye radius','m');
-        % Default storage in mm.  
+        % Default storage in mm.
         %
         % Originally called retina radius, but it really is the
         % radius of the eye ball, not the retina.
@@ -602,7 +603,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         %
         % See the PPT about the eyeball geometry, defining the retina
         % radius, distance, and semidiam
-       
+        
         eyeRadius     = thisR.get('retina radius','mm');
         focalDistance = thisR.get('retina distance','mm');
         d = focalDistance - eyeRadius;
@@ -667,7 +668,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     % There is no FOV. We hneed a film distance and size to
                     % know the FOV.  With no film distance, we are in
                     % trouble.  So, we set an arbitrary distance and tell
-                    % the user to fix it. 
+                    % the user to fix it.
                     filmDistance = 3*filmDiag;  % Just made that up.
                     thisR.set('film distance',filmDistance);
                     warning('Set film distance  to %f (arbitrarily)',filmDistance);
@@ -739,7 +740,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.camera.diffractionEnabled.value;
         end
         if isequal(val,'true'), val = true; else, val = false; end
-
+        
     case 'chromaticaberration'
         % thisR.get('chromatic aberration')
         % True or false (on or off)
@@ -864,11 +865,18 @@ switch ieParamFormat(param)  % lower case, no spaces
     case{'light'}
         val = thisR.light;
         
-        % Assets - more work needed here.
+    % Assets - more work needed here.
+    case {'asset', 'assets'}
+        if numel(varargin) == 1
+            val = piAssetGet(thisR, varargin{1});
+        elseif numel(varargin) == 2
+            val = piAssetGet(thisR, varargin{1}, varargin{2});
+        else
+            error('Wrong parameter number. One at a time')
+        end
     case {'assetroot'}
         % The root of all assets
         val = thisR.assets;
-        
     case {'groupnames'}
         % Cell array (2D) of the groupobj names
         % val{level}{idx}

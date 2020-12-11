@@ -1,12 +1,127 @@
-function thisR = piAssetSet(thisR, id, param, val)
+function thisR = piAssetSet(thisR, assetInfo, param, val, varargin)
+%%
+%
+% Synopsis:
+%   thisR = piAssetSet(thisR, assetInfo, param, val, varargin);
+%
+% Brief description:
+%   Set the value of a parameter of a node, or replace a node.
+%
+% Inputs:
+%   thisR     - recipe.
+%   assetInfo - information of asset. Either an id or a name.
+%   param     - parameter name to be changed
+%   val       - new parameter value
+%
+% Returns:
+%   thisR     - modified recipe.
+%
+%
+
+% Examples:
+%{
+thisR = piRecipeDefault;
+thisName = 'colorChecker_material_Patch13Material';
+newName = 'newName';
+thisR = thisR.set('asset', thisName, 'name', newName);
+disp(thisR.assets.tostring)
+nodeName = thisR.get('asset', newName, 'name');
+thisNode = thisR.get('asset', newName);
+%}
+%{
+thisR = piRecipeDefault;
+thisName = 'colorChecker_material_Patch13Material';
+
+thisMat = thisR.get('asset', thisName, 'material');
+
+% Change material property
+% Get the material name
+matName = thisMat.namedmaterial;
+
+% Find this material.
+matIdx = piMaterialFind(thisR, 'name', matName);
+
+% Set the material with another property
+piMaterialSet(thisR, matIdx, 'rgbkd', [0, 1, 0]);
+
+%}
+
+% TODO: Write a routine to enforce unique names
+
+%% Parse input
+p = inputParser;
+p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
+p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
+p.addRequired('param', @ischar);
+p.parse(thisR, assetInfo, param, varargin{:});
 
 %%
-thisNode = thisR.assets.get(id);
-
-if ~isfield(thisNode, param)
-    warning('Node %s does not have parameter: %s. Ignoring setting', thisNode.name, param);
-else
-    thisNode.(param) = val;
-    thisR.assets = thisR.assets.set(id, thisNode);
+% If assetInfo is a node name, find the id
+if ischar(assetInfo)
+    assetName = assetInfo;
+    assetInfo = piAssetFind(thisR, 'name', assetInfo);
+    if isempty(assetInfo)
+        warning('Couldn not find an asset with name %s:', assetName);
+        return;
+    end
 end
+
+thisNode = thisR.assets.get(assetInfo);
+
+% If replace the node with a new one
+if isequal(param, 'node')
+    thisR.assets = thisR.assets.set(assetInfo, val);
+    return;
+end
+
+switch thisNode.type
+    case 'object'
+        switch param
+            case {'name'}
+                thisNode.name = val;
+            case {'mediumInterface'}
+                thisNode.mediumInterface = val;
+            case {'material'}
+                thisNode.material = val;
+            case {'shape'}
+                thisNode.shape = val;
+            case {'output'}
+                thisNode.output = val;
+            case {'position'}
+                thisNode.position = val;
+            otherwise
+                warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
+                return;
+        end
+    case 'light'
+        switch param
+            case {'name'}
+                thisNode.name = val;
+            case {'lght', 'light'}
+                thisNode.lght = val;
+            case {'rotate'}
+                thisNode.rotate = val;
+            case {'motion'}
+                thisNode.motion = val;
+            otherwise
+                warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
+                return;
+        end
+    case 'branch'
+        switch param
+            case {'name'}
+                thisNode.name = val;
+            case {'size'}
+                thisNode.size = val;
+            case {'scale'}
+                thisNode.scale = val;
+            case {'position'}
+                thisNode.position = val;
+            otherwise
+                warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
+                return;
+        end                
+end
+
+thisR.assets = thisR.assets.set(assetInfo, thisNode);
 end

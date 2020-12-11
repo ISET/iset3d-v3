@@ -120,10 +120,10 @@ function [trees, parsedUntil] = parseGeometryText(thisR, txt, name)
 %       created to store the value.
 %       c) 'AttributeEnd': this is the end of a section. Depending on
 %       parameters in this section, we will create different nodes and make
-%       them as trees. Noted the 'node' node will have children for sure,
-%       so we assumed that before reaching the end of 'node' seciton, we
+%       them as trees. Noted the 'branch' node will have children for sure,
+%       so we assumed that before reaching the end of 'branch' seciton, we
 %       already have some children, so we need to attach them under the
-%       'node'. 'Ojbect' and 'Light', on the other hand will have no child
+%       'branch'. 'Ojbect' and 'Light', on the other hand will have no child
 %       as they will be children leaves. So we simply create leave nodes
 %       for them and return.
 
@@ -234,10 +234,10 @@ while i <= length(txt)
             trees = subtrees;
 
         elseif exist('rot','var') || exist('position','var')
-           % This is a 'node' node
+           % This is a 'branch' node
            
             % resCurrent = createGroupObject();
-            resCurrent = piAssetCreate('type', 'node');
+            resCurrent = piAssetCreate('type', 'branch');
             
             % If present populate fields.
             if exist('name','var'), resCurrent.name = sprintf('%s', name); end
@@ -260,7 +260,8 @@ while i <= length(txt)
             % resChildren = createGeometryObject();
             resObject = piAssetCreate('type', 'object');
             if exist('name','var')
-                resObject.name = sprintf('%d_%d_%s',i, numel(subtrees)+1, name); 
+                % resObject.name = sprintf('%d_%d_%s',i, numel(subtrees)+1, name); 
+                resObject.name = name;
             end
 
             if exist('shape','var'), resObject.shape = shape; end
@@ -279,7 +280,7 @@ while i <= length(txt)
            
         elseif exist('name','var')
             % resCurrent = createGroupObject();
-            resCurrent = piAssetCreate('type', 'node');
+            resCurrent = piAssetCreate('type', 'branch');
             if exist('name','var'), resCurrent.name = sprintf('%s', name); end
             
             %{

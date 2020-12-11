@@ -128,6 +128,7 @@ p.parse(thisR, param, val);
 param = ieParamFormat(p.Results.param);
 
 %% Act
+
 switch param
     
     % Rendering and Docker related
@@ -606,7 +607,8 @@ switch param
         thisR.materials = val;
     case {'materialsoutputfile'}
         thisR.materials.outputfile = val;
-        
+    case {'asset', 'assets'}
+        thisR = piAssetSet(thisR, val, varargin{1}, varargin{2});
     % ZLY added fluorescent 
     case {'fluorophoreconcentration'}
         % thisR.set('fluorophore concentration',val,idx)

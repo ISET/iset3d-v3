@@ -25,7 +25,7 @@ curIdx = 1; %
 while curIdx <= numel(nodeList)
     IDs = thisTree.getchildren(nodeList(curIdx));
     for ii = 1:numel(IDs)
-        if isequal(val, piAssetGet(thisR, IDs(ii), param))
+        if isequal(val, piAssetGet(thisR, uint16(IDs(ii)), param))
             id = IDs(ii);
             return;
         end
