@@ -272,6 +272,16 @@ switch ieParamFormat(sceneName)
             if ~exist(fname, 'file'), error('File not found'); end
         end
         exporter = 'C4D';
+    case {'cornellboxbunnychart'}
+        sceneName = 'Cornell_BoxBunnyChart';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['Cornell_Box_Multiple_Cameras_Bunny_charts','.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'C4D';        
     case 'snellenatdepth'
         sceneName = 'snellenAtDepth';
         % Local

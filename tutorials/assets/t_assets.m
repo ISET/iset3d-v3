@@ -21,7 +21,7 @@ sceneWindow(scene);
 
 %% Now let's get material information from asset and make some changes
 
-% Get a 'node' node, which has rotation and position info
+% Get a 'branch' node, which has rotation and position info
 assetId = piAssetFind(thisR, 'name', 'figure_6m');
 
 % Get its child 'object' node id, which has surface geometry and material

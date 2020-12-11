@@ -4,8 +4,8 @@ ieInit;
 %% 
 t = tree('root');
 
-%% Create a 'node' asset node
-node = piAssetCreate('type', 'node');
+%% Create a 'branch' asset node
+node = piAssetCreate('type', 'branch');
 
 %% Create an 'object' asset node
 object = piAssetCreate('type', 'object');

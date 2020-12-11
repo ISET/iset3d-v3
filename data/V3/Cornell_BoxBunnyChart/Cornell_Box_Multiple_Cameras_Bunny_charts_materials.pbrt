@@ -1,0 +1,14 @@
+Texture "macbeth_color" "spectrum" "imagemap" "string filename" "macbeth.png"
+MakeNamedMaterial "MCC" "string type" "uber" "float index" [1.333] "texture Kd" "macbeth_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+Texture "USAF1951-300dpi_color" "spectrum" "imagemap" "string filename" "USAF1951-300dpi.png"
+MakeNamedMaterial "USAF" "string type" "uber" "float index" [1.333] "texture Kd" "USAF1951-300dpi_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+Texture "EIA1956-300dpi_color" "spectrum" "imagemap" "string filename" "EIA1956-300dpi.png"
+MakeNamedMaterial "EIA" "string type" "uber" "float index" [1.333] "texture Kd" "EIA1956-300dpi_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Cube_Small" "string type" "uber" "float index" [1.333] "rgb Kd" [0.603827338855 0.603827338855 0.603827338855] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Cube_Large" "string type" "uber" "float index" [1.333] "rgb Kd" [0.603827338855 0.603827338855 0.603827338855] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "White Wall" "string type" "uber" "float index" [1.333] "rgb Kd" [0.603827338855 0.603827338855 0.603827338855] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Back Wall" "string type" "uber" "float index" [1.333] "rgb Kd" [0.603827338855 0.603827338855 0.603827338855] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Bottom Wall" "string type" "uber" "float index" [1.333] "rgb Kd" [0.603827338855 0.603827338855 0.603827338855] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Right Wall" "string type" "uber" "float index" [1.333] "rgb Kd" [0.088593736676 0.767768760555 0.116680962281] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Left Wall" "string type" "uber" "float index" [1.333] "rgb Kd" [0.890005406994 0.0 0.0] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "Default" "string type" "uber" "float index" [1.333] "rgb Kd" [1.0 1.0 1.0] "rgb Ks" [0.0331047665709 0.0331047665709 0.0331047665709] "rgb Kr" [0.0508760881716 0.0508760881716 0.0508760881716] "float roughness" [0.5]

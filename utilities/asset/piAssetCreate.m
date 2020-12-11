@@ -1,12 +1,12 @@
 function obj = piAssetCreate(varargin)
 
 %{
-n = piAssetCreate('type', 'node');
+n = piAssetCreate('type', 'branch');
 
 %}
 %%
 p = inputParser;
-p.addParameter('type', 'node', @ischar);
+p.addParameter('type', 'branch', @ischar);
 p.parse(varargin{:});
 
 type = p.Results.type;
@@ -16,7 +16,7 @@ obj.type = type;
 
 switch type
     case 'branch'
-        obj.name = 'node';
+        obj.name = 'branch';
         obj.size.l = 0;
         obj.size.w = 0;
         obj.size.h = 0;

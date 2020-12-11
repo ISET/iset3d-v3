@@ -93,7 +93,11 @@ function str = tostring(obj, sorted)
         % VISTALAB: adding the name of the node
         data = obj.get(ID);
         if isstruct(data)
-            contentStr = sprintf('%s',data.name);
+            if numel(data.name) <= 12
+                contentStr = sprintf('%s',data.name);
+            else
+                contentStr = sprintf('%s..%s',data.name(1:5), data.name(end-5:end));
+            end
         else 
             contentStr = data;
         end

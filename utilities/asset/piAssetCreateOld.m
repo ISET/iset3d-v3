@@ -39,16 +39,16 @@ function obj = piAssetCreate(varargin)
 %
 %    We should have different types of nodes.
 %
-%    node.type = {'node','object','light'}
+%    node.type = {'branch','object','light'}
 %
-%    piAssetCreate('node')
+%    piAssetCreate('branch')
 %    piAssetCreate('object')
 %    piAssetCreate('light')
 %
 %    All the nodes have node.name, node.parent. We should look for a
 %    graphics 'tree' management package in Matlab.
 %
-%    if node.type = 'node'
+%    if node.type = 'branch'
 %        node.size, node.scale, node.position, node.rotate, node.nodes{}
 %
 %    if node.type = 'object'
