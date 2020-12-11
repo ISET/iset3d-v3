@@ -25,6 +25,9 @@
 % See also
 %   t_piIntroduction01, t_piIntroduction02
 
+%% Problem (11/01/20, DHB): This won't run without a flywheel key,
+%                           which most people don't have.
+
 
 %% Initialize ISET and Docker
 

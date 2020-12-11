@@ -84,7 +84,7 @@ class LogPipe(threading.Thread):
             if len(line) > 0:
                 # check if this message comes from the publish subprocess (LEVEL: msg..)
                 tokens = line.split(':')
-                if tokens > 0 and tokens[0] in g_levelMap:
+                if tokens > 0 and g_levelMap.has_key(tokens[0]):
                     level = tokens[0]
                     msg = line[len(tokens[0])+1:].strip()
                     # log this message with the correct level
@@ -210,7 +210,7 @@ class ErrorItem(object):
         return self.is_selected
 
     def Format(self, i=0):
-        print((i * '    ' + '<ROOT>'))
+        print i * '    ' + '<ROOT>'
         for child in self.children:
             child.format(i + 1)
 
@@ -250,7 +250,7 @@ class RootItem(ErrorItem):
         try:
             return self.children[-1]
         except IndexError:
-            print("Ahaaaaa fu")
+            print "Ahaaaaa fu"
             return None
 
 class ErrorHandler(logging.Handler):
@@ -313,7 +313,7 @@ class ErrorList(c4d.gui.TreeViewFunctions):
 
         # multiply text color with red or yellow depending on warning level (LAUBWERKCINEMA-524)
         textColor = area.GetColorRGB(c4d.COLOR_TEXT)
-        textColor = dict((k, v / 255.0) for k, v in list(textColor.items()))
+        textColor = dict((k, v / 255.0) for k, v in textColor.items())
         if obj.level == 'WARNING':
             # yellow
             textColor['b'] =  textColor['b'] * 0.0
@@ -768,7 +768,7 @@ def ExportPolygonObject(pbrtGeometry, pbrtMaterials, exportedMaterials, obj, ind
 
         # for each original vertex index store a list of target vertices. With these vertices we store the new index, the uv texture coordinate and the normal
         vertexMap = dict()
-        for iPolygon, polygon in zip(list(range(obj.GetPolygonCount())), obj.GetAllPolygons()):
+        for iPolygon, polygon in zip(range(obj.GetPolygonCount()), obj.GetAllPolygons()):
             if (currentSelection and not currentSelection.IsSelected(iPolygon)) or touchedPolygons.IsSelected(iPolygon):
                 continue
 
@@ -790,7 +790,7 @@ def ExportPolygonObject(pbrtGeometry, pbrtMaterials, exportedMaterials, obj, ind
             # texture coordinates or normals into multiple points.
             def checkVertex(index, uvw, normal):
                 newIndex = len(points)
-                if index in vertexMap:
+                if vertexMap.has_key(index):
                     for entry in vertexMap[index]:
                         if (not uvw or (math.fabs(entry[0].x - uvw.x)    < EPSILON and math.fabs(entry[0].y - uvw.y)    < EPSILON and math.fabs(entry[0].z - uvw.z)    < EPSILON)) and \
                            (not normal or (math.fabs(entry[1].x - normal.x) < EPSILON and math.fabs(entry[1].y - normal.y) < EPSILON and math.fabs(entry[1].z - normal.z) < EPSILON)):

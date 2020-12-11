@@ -20,6 +20,23 @@
 %  t_piIntro_*
 %
 
+%% Problems (11/1/2020, DHB):
+%  1) piCreateCheckerboard is broken.  This is because there is no
+%  materials.outputFile_materials field, but the routine refers to i.
+%  There is a materials.inputFile_materials.  I tried changing to that and
+%  things got further, but it looks like this will continually add lines to
+%  the checkerboard_materials.pbrt file and doesn't seem good as a real
+%  fix.  I reverted.
+%
+%  2) This tries to set 'camera type' to 'realistic' but that is not
+%  supported.  Changed to 'Camera' which is the only allowable variable and
+%  that go further, but other problems prevented success and I reverted.
+%
+%  3) Writing the recipe dies at piTextureText, because what is passed to
+%  it doesn't have some required fields.  This is beyond me to reverse
+%  engineer in finite time, and at this point I gave up and added these
+%  comments.
+
 %% Initialize ISET and Docker
 
 % We start up ISET and check that the user is configured for docker

@@ -1,7 +1,7 @@
-%% Add camera motion blur
+%% Show how to render with camera motion blur
 %
 % This script shows how to add camera motion blur while keeping the
-% whole scene still.
+% scene itself stationary.
 %
 % Dependencies:
 %
@@ -17,28 +17,30 @@
 % See also
 %   t_piIntro_*
 
-%% Initialize ISET and Docker
+% History:
+%   10/28/20  dhb  Comments, simplify some aspects of code, remove stray
+%                  commented out lines that had no explanation.
 
+%% Initialize ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read pbrt files
-
+%% Read in a scene recipe
 thisR = piRecipeDefault('scene name','SimpleScene');
 
 %% Set render quality
-
+%
 % This is a low resolution for speed.
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',128);
 
-%% List material library
-
+%% Rendering properites
+%
 % This value determines the number of ray bounces.  The scene has
-% glass we need to have at least 2 or more.  We start with only 1
-% bounce, so it will not appear like glass or mirror.
+% glass so we need to have at least 2 or more.
 thisR.set('bounces',2);
 
+% Field of view
 thisR.set('fov',45);
 
 % This is a convenient routine we use when there are many parts and
@@ -47,12 +49,11 @@ thisR.set('fov',45);
 piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-
 piWrite(thisR,'creatematerials',true);
 
-%% Render the original scene with no camera motion
-
-% We speed this up by only returning radiance.
+%% Render the scene with no camera motion
+%
+% Speed up by only returning radiance, and display
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 if isequal(piCamBio,'isetcam')
@@ -60,46 +61,46 @@ if isequal(piCamBio,'isetcam')
 else
     sceneSet(scene,'gamma',0.5);
 end
+
 %% Motion blur from camera
-
-% Specify the initial position and rotation of the camera.  We find
-% the current camera position
-
+%
+% Specify the initial position and pose (rotation), translate,
+% and then set camera motion end position.
+%
+% Findthe current camera position and rotation
 from = thisR.get('from');
 thisR.set('camera motion translate start',from(:));
 thisR.set('camera motion rotate start',piRotationMatrix);
 
-% thisR.camera.motion.activeTransformStart.pos    = thisR.lookAt.from(:);
-% thisR.camera.motion.activeTransformStart.rotate = piRotationMatrix;
-
-% Move in the direction you are looking, but just a small amount.
+% Move in the direction camera is looking, but just a small amount.
 fromto = thisR.get('from to');
 endPos = -0.5*fromto(:) + thisR.lookAt.from(:);
 
+% Set camera motion end parameters, no change in rotation yet.
 thisR.set('camera motion translate end',endPos);
 thisR.set('camera motion rotate end',piRotationMatrix);
 
-% thisR.camera.motion.activeTransformEnd.pos      = endPos;
-% thisR.camera.motion.activeTransformEnd.rotate   = piRotationMatrix;
-
+% Write and render
 piWrite(thisR,'creatematerials',true);
-
-%%
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: Translation');
 sceneWindow(scene);
 
 %%  Now, rotate the camera
+%
+% No translation, end position is where camera is now.
+endPos = thisR.lookAt.from(:);
 
-% No translation
-thisR.camera.motion.activeTransformEnd.pos = thisR.lookAt.from(:);
+% The angle specification is piRotationMatrix.  Here the angle is changed
+% by 5 degrees around the z-axis.
+endRotation = piRotationMatrix('zrot',5);
 
-% The angle specification is piRotationMatrix.  To change the angle,
-% say by rotation around the z-axis by 5 deg we set
-thisR.camera.motion.activeTransformEnd.rotate = piRotationMatrix('zrot',5);
+% Set camera motion end parameters.
+thisR.set('camera motion translate end',endPos);
+thisR.set('camera motion rotate end',endRotation);
+
+%% Write an render
 piWrite(thisR,'creatematerials',true);
-
-%%
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: rotation');
 sceneWindow(scene);

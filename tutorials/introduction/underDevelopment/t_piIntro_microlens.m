@@ -3,7 +3,7 @@
 % Set up to work with the Chess Set scene.
 %
 % Dependencies:
-%    ISET3d, ISETCam, JSONio
+%    ISET3d, ISETCam, JSONio, isetlens
 %
 % Check that you have the updated docker image by running
 %
@@ -13,7 +13,14 @@
 %
 % See also
 %   t_piIntro_*
-%   requires the isetlens repository
+
+%% Problem (11/01/20, DHB): This won't run if isetbio is on the path before
+%                           isetcam, because RGB.mat isn't available and
+%                           the sensorCreate needs it.  I could fix that,
+%                           and indeed did temporarily, but it still broke
+%                           because some call to sensorSet from
+%                           sensorLightfield tried to set an unknown
+%                           parameter.
 
 %% Initialize ISET and Docker
 
@@ -25,14 +32,11 @@ if isempty(which('lensC')), error('You must add the isetlens repository to your 
 chdir(fullfile(piRootPath,'local'))
 
 %% Read the pbrt files
-
 testScenes = {'chessSet','livingroom','kitchen'};
-
 thisR = piRecipeDefault('scene name',testScenes{1}); 
 
-
 %% Read in the microlens and set its size
-
+%
 % This is a simple microlens file.
 microlens     = lensC('filename','microlens.json');
 
