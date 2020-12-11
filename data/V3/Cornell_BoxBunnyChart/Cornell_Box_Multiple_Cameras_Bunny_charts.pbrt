@@ -1,0 +1,12 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [7.27366154732e-16 0.0 1.0 0  -0.0 1.0 0.0 0  -1.0 -0.0 7.27366154732e-16 0  4.36419692839e-14 -15.0 60.0 1]
+Camera "perspective" "float fov" [31.332533537] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["Cornell_Box_Multiple_Cameras_Bunny_charts.exr"] "integer xresolution" [1280] "integer yresolution" [720]
+Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.318546778125 0.318546778125 0.318546778125] "float index" [1.333]
+	Include "Cornell_Box_Multiple_Cameras_Bunny_charts_materials.pbrt"
+	Include "Cornell_Box_Multiple_Cameras_Bunny_charts_geometry.pbrt"
+WorldEnd
