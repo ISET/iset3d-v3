@@ -608,7 +608,24 @@ switch param
     case {'materialsoutputfile'}
         thisR.materials.outputfile = val;
     case {'asset', 'assets'}
-        thisR = piAssetSet(thisR, val, varargin{1}, varargin{2});
+        switch varargin{1}
+            case 'add'
+                thisR = piAssetAdd(thisR, val, varargin{2});
+            case {'delete', 'remove'}
+                thisR = piAssetDelete(thisR, val);
+            case {'insert'}
+                thisR = piAssetInsert(thisR, val, varargin{2});
+            case {'translate', 'translation'}
+                thisR = piAssetTranslate(thisR, val, varargin{2});
+            case {'rotate', 'rotation'}
+                thisR = piAssetRotate(thisR, val, varargin{2});
+            case {'motion'}
+                thisR = piAssetMotionAdd(thisR, val, varargin{2:end});
+            case {'obj2light'}
+                thisR = piAssetObject2Light(thisR, val, varargin{2});
+            otherwise
+                thisR = piAssetSet(thisR, val, varargin{1}, varargin{2});
+        end
     % ZLY added fluorescent 
     case {'fluorophoreconcentration'}
         % thisR.set('fluorophore concentration',val,idx)

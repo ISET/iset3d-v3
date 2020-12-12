@@ -1,4 +1,4 @@
-function asset = piAssetAssign(assetRecipe,varargin)
+function asset = piAssetAssignOld(assetRecipe,varargin)
 %% Assign properties from an assetRecipe on Flywheel to an asset struct
 %
 % Syntax:

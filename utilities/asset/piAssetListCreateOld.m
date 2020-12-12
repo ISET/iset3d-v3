@@ -1,4 +1,4 @@
-function assetlist = piAssetListCreate(varargin)
+function assetlist = piAssetListCreateOld(varargin)
 % Create an assetList for street elements on flywheel
 %
 % Syntax:

@@ -1,55 +1,74 @@
-function asset = piAssetMotionAdd(asset, varargin)
+function thisR = piAssetMotionAdd(thisR, assetInfo, varargin)
+%%
+%
+%
+
+% Example:
+%{
+thisR = piRecipeDefault;
+disp(thisR.assets.tostring)
+
+nodeName = 'colorChecker_material_Patch13Material';
+thisR = thisR.set('asset', nodeName, 'motion', 'rotation', [0 0 45],...
+                    'translation', [0.5 0 0]);
+disp(thisR.assets.tostring)
+piWrite(thisR);
+[scene, result] = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+%}
 %%
 p = inputParser;
-p.addParameter('translation',[],@iscell)
-p.addParameter('Y',[],@iscell);
-p.addParameter('Z',[],@iscell);
-p.addParameter('instancesNum',1)
-p.parse(varargin{:})
+p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
+p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
+p.addParameter('translation', [0 0 0], @isvector);
+p.addParameter('rotation', [0 0 0], @isvector);
+p.parse(thisR, assetInfo, varargin{:});
+
+thisR = p.Results.thisR;
+assetInfo = p.Results.assetInfo;
 translation = p.Results.translation;
-pos_d = p.Results.instancesNum;
-Y     = p.Results.Y;
-Z     = p.Results.Z;
+rotation = p.Results.rotation;
+
 %%
-for dd = 1:pos_d
-    for ii=1:length(asset)
-        % Add the translation
-        if ~isempty(translation{dd})
-            translation{dd} = reshape(translation{dd},3,1);
-        else
-            translation{dd} = [0;0;0];
-        end
-        asset(ii).motion.position(:,dd) = translation{dd};
-        % Update the position of the x-z 2d box of the asset that we use
-        % for machine learning identification.
-        %     asset(ii).size.pmin = asset(ii).size.pmin + [translation(1) translation(3)];
-        %     asset(ii).size.pmax = asset(ii).size.pmax + [translation(1) translation(3)];
-        if isfield(asset(ii),'children')
-            if length(asset(ii).children) >= 1
-                if isempty(asset(ii).rotate)
-                    asset(ii).rotate(:,1) = [0;0;1;0];
-                    asset(ii).rotate(:,2) = [0;0;0;1];
-                    asset(ii).rotate(:,3) = [0;1;0;0];
-                end
-                if ~isempty(Y)
-                    asset(ii).motion.rotate(:,dd*3-2) = [Y{dd};0;1;0];
-                else
-                    asset(ii).motion.rotate(:,dd*3-2) = [0;0;1;0];
-                end %Y
-                if ~isempty(Z)
-                    asset(ii).motion.rotate(:,dd*3)   = [Z{dd};0;0;1];
-                else
-                    asset(ii).motion.rotate(:,dd*3)   = [0;0;0;1];
-                end %Z
-                asset(ii).motion.rotate(:,dd*3-1) = [0;1;0;0];  % X
-                % find car position
-                %         object_position = [object(ii).position(1) object(ii).position(3)];
-                % rotate object's pmin and pmax for bounding box checking
-                %         object(ii).size.pmin = piPointRotate(object(ii).size.pmin,object_position,-degree);
-                %         object(ii).size.pmax = piPointRotate(object(ii).size.pmax,object_position,-degree);
-            end
-        end
+% If assetInfo is a node name, find the id
+if ischar(assetInfo)
+    assetName = assetInfo;
+    assetInfo = piAssetFind(thisR, 'name', assetInfo);
+    if isempty(assetInfo)
+        warning('Couldn not find an asset with name %s:', assetName);
+        return;
     end
 end
 
+%%
+thisNode = thisR.assets.get(assetInfo);
+
+if isempty(thisNode)
+    warning('Couldn not find an asset with name %d:', assetInfo);
+    return;
+end
+
+rotMatrix = [rotation(3), rotation(2), rotation(1);
+             fliplr(eye(3))];
+
+if isequal(thisNode.type, 'branch')
+    % If the node is branch
+    % Get current position and rotation
+    curPos = thisR.get('asset', assetInfo, 'position');
+    curRot = thisR.get('asset', assetInfo, 'rotation');
+    % Form motion struct by adding together
+    motion.position = curPos + reshape(translation, 1, 3);
+    motion.rotate = curRot + rotMatrix;
+    thisR = thisR.set('asset', assetInfo, 'motion', motion);
+else
+    % Node is object or light
+    % Form motion struct by only having the translation and rotation
+    motion.position = reshape(translation, 1, 3);
+    motion.rotate = rotMatrix;
+    
+    newBranch = piAssetCreate('type', 'branch');
+    newBranch.name = strcat('new_motion', '_', thisNode.name);
+    newBranch.motion = motion;
+    thisR = thisR.set('asset', assetInfo, 'insert', newBranch);
+end
 end

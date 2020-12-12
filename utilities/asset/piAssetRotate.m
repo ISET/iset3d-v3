@@ -1,54 +1,81 @@
-function object=piAssetRotate(object,varargin)
-% only rotate around y axis is allowed
+function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %%
+%
+% Synopsis:
+%   thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
+%
+% Brief description:
+%   Rotate an asset. Function reweitten by Zheng Lyu.
+% 
+% Inputs:
+%   thisR       - recipe.
+%   assetInfo   - asset node name or id.
+%   rotation    - rotation vector 
+% 
+% Returns:
+%   thisR       - modified recipe.
+%
+% Description:
+%   Rotate an asset. If the asset is a branch node, move it.
+%   If the asset is an object or light, insert a branch node representing
+%   rotation between the node and its parent.
+%   
+% ZL, Vistasoft Team, 2018
+% ZLY, Vistasoft Team, 2020
+%
+% See also
+%   piAsset*
+%
+
+% Example:
+%{
+thisR = piRecipeDefault('scene name', 'Simple scene');
+disp(thisR.assets.tostring)
+
+thisR = thisR.set('asset', 'Sky1', 'rotation', [45, 0, 0]);
+disp(thisR.assets.tostring)
+%}
+%% Parse input
 p = inputParser;
-p.addParameter('instancesNum',1);
-p.addParameter('Y',[],@iscell);
-p.addParameter('Z',[],@iscell);
-p.parse(varargin{:})
-pos_d = p.Results.instancesNum;
-Y     = p.Results.Y;
-Z     = p.Results.Z;
+p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
+p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
+p.addRequired('rotation', @isvector);
+p.parse(thisR, assetInfo, rotation, varargin{:});
+
 %%
-for dd = 1:pos_d
-    for ii=1:length(object)
-        % rotate car
-        if isfield(object(ii),'children')
-            if length(object(ii).children) >= 1
-                if isempty(object(ii).rotate)
-                    object(ii).rotate(:,1) = [0;0;1;0];
-                    object(ii).rotate(:,2) = [0;0;0;1];
-                    object(ii).rotate(:,3) = [0;1;0;0];
-                end
-                if ~isempty(Y)
-                object(ii).rotate(:,dd*3-2) = [Y{dd};0;1;0];
-                else
-                    object(ii).rotate(:,dd*3-2) = [0;0;1;0];
-                end%Y
-                if ~isempty(Z)
-                object(ii).rotate(:,dd*3)   = [Z{dd};0;0;1];
-                else
-                    object(ii).rotate(:,dd*3)   = [0;0;0;1];
-                end%Z
-                object(ii).rotate(:,dd*3-1) = [0;1;0;0];  % X
-                % find car position
-                %         object_position = [object(ii).position(1) object(ii).position(3)];
-                % rotate object's pmin and pmax for bounding box checking
-                %         object(ii).size.pmin = piPointRotate(object(ii).size.pmin,object_position,-degree);
-                %         object(ii).size.pmax = piPointRotate(object(ii).size.pmax,object_position,-degree);
-            end
-        end
+% If assetInfo is a node name, find the id
+if ischar(assetInfo)
+    assetName = assetInfo;
+    assetInfo = piAssetFind(thisR, 'name', assetInfo);
+    if isempty(assetInfo)
+        warning('Couldn not find an asset with name %s:', assetName);
+        return;
     end
-    % rotate lights
-    %     for jj=1:length(object)
-    %         if piContains(object(jj).name,'light')
-    %             light = [object(jj).position(1) object(jj).position(3)];
-    %             %         plot([object_position(1) light(1)],[object_position(2) light(2)]);hold on
-    %             %         axis([-15 15 -15 15]);
-    %             position = piPointRotate(light,object_position,-degree);
-    %             %         plot([object_position(1) position(1)],[object_position(2) position(2)]);
-    %             object(jj).position = [position(1);object(jj).position(2);position(2)];
-    %         end
-    %     end
 end
+
+%%
+thisNode = thisR.assets.get(assetInfo);
+
+if isempty(thisNode)
+    warning('Couldn not find an asset with name %d:', assetInfo);
+    return;
+end
+
+% Form rotation matrix
+rotMatrix = [rotation(3), rotation(2), rotation(1);
+             fliplr(eye(3))];
+
+if isequal(thisNode.type, 'branch')
+    % If the node is branch
+    curRot = thisR.get('asset', assetInfo, 'rotation');
+    curRot = curRot + rotMatrix;
+    thisR = thisR.set('asset', assetInfo, 'rotation', curRot);
+else
+    % Node is object or light
+    newBranch = piAssetCreate('type', 'branch');
+    newBranch.rotation = rotMatrix;
+    newBranch.name = strcat('new_rotation', '_', thisNode.name);
+    thisR = thisR.set('asset', assetInfo, 'insert', newBranch);
+end
+
 end

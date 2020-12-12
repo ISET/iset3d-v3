@@ -228,14 +228,14 @@ for ii = 1:numel(children)
             
         % Write out motion
         if ~isempty(thisNode.motion)
-            for jj = 1:size(thisNode.position, 2)
+            for jj = 1:size(thisNode.position, 1)
                 fprintf(fid, strcat(spacing, indentSpacing,...
                                 'ActiveTransform EndTime \n'));
-                if isempty(thisNode.motion.position(:,jj))
+                if isempty(thisNode.motion.position(jj, :))
                     fprintf(fid, strcat(spacing, indentSpacing,...
                                 'Translate 0 0 0\n'));
                 else
-                    pos = thisNode.motion.position(:, jj);
+                    pos = thisNode.motion.position(jj,:);
                     fprintf(fid, strcat(spacing, indentSpacing,...
                              sprintf('Translate %f %f %f', pos(1),...
                                                               pos(2),...

@@ -1,4 +1,4 @@
-function assetRecipe = piAssetDownload(session,nassets,varargin)
+function assetRecipe = piAssetDownloadOld(session,nassets,varargin)
 % Download assets from a flywheel database
 %
 % Syntax

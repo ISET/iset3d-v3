@@ -28,23 +28,6 @@ disp(thisR.assets.tostring)
 nodeName = thisR.get('asset', newName, 'name');
 thisNode = thisR.get('asset', newName);
 %}
-%{
-thisR = piRecipeDefault;
-thisName = 'colorChecker_material_Patch13Material';
-
-thisMat = thisR.get('asset', thisName, 'material');
-
-% Change material property
-% Get the material name
-matName = thisMat.namedmaterial;
-
-% Find this material.
-matIdx = piMaterialFind(thisR, 'name', matName);
-
-% Set the material with another property
-piMaterialSet(thisR, matIdx, 'rgbkd', [0, 1, 0]);
-
-%}
 
 % TODO: Write a routine to enforce unique names
 
