@@ -21,7 +21,7 @@ function thisR = piAssetSet(thisR, assetInfo, param, val, varargin)
 % Examples:
 %{
 thisR = piRecipeDefault;
-thisName = 'colorChecker_material_Patch13Material';
+thisName = '013ID_colorChecker_material_Patch09Material';
 newName = 'newName';
 thisR = thisR.set('asset', thisName, 'name', newName);
 disp(thisR.assets.tostring)

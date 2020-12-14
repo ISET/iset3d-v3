@@ -881,10 +881,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         
     % Assets - more work needed here.
     case {'asset', 'assets'}
-        if numel(varargin) == 1
-            val = piAssetGet(thisR, varargin{1});
-        elseif numel(varargin) == 2
-            val = piAssetGet(thisR, varargin{1}, varargin{2});
+        if numel(varargin) == 1 || numel(varargin) == 2
+            val = piAssetGet(thisR, varargin{:});
         else
             error('Wrong parameter number. One at a time')
         end

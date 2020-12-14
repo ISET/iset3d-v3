@@ -24,7 +24,7 @@ function val = piAssetGet(thisR, assetInfo, param, varargin)
 %{
 thisR = piRecipeDefault;
 disp(thisR.assets.tostring)
-thisName = 'colorChecker_material_Patch13Material';
+thisName = '013ID_colorChecker_material_Patch09Material';
 node = thisR.get('asset', thisName);
 shape = thisR.get('asset', thisName, 'shape');
 scale = thisR.get('asset', 'colorChecker', 'scale');
