@@ -861,12 +861,17 @@ switch ieParamFormat(param)  % lower case, no spaces
         val.filter = thisR.filter;
         
     case{'materials'}
-        if isfield(thisR.materials, 'list')
-            val = thisR.materials.list;
-        else
-            % Should this be just empty, or an empty cell?
-            val = {};
+        if isempty(varargin)
+            if isfield(thisR.materials, 'list')
+                val = thisR.materials.list;
+            else
+                % Should this be just empty, or an empty cell?
+                val = {};
+            end
+            return;
         end
+        
+        
     case {'materialsoutputfile'}
         val = thisR.materials.outputfile;
         
