@@ -54,3 +54,14 @@ t2 = t2.addnode(1, 'cc');
 t2 = t2.removenode(1);
 t1 = t1.graft(1, t2);
 disp(t1.tostring)
+
+%%
+
+thisR = piRecipeDefault('scene name', 'Simple Scene');
+disp(thisR.assets.tostring)
+
+thisR.assets = thisR.assets.setparent(10, 12);
+disp(thisR.assets.tostring)
+
+
+

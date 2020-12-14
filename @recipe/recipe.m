@@ -37,6 +37,7 @@ classdef recipe < matlab.mixin.Copyable
         scale;       % Optional scale factor to flip handedness
         world;       % A cell array with all the WorldBegin/End contents
         lights;       % Light sources
+        transformTimes; % Transform start and end time
         
         % INPUTFILE -  
         inputFile = '';    % Original PBRT input file

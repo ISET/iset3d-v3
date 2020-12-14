@@ -252,7 +252,18 @@ switch param
             % We are probably in units of meters, not millimeters
             thisR.camera.mmUnits.value = 'false';
         end
-        
+    case {'transformtimesstart'}
+        thisR.transformTimes.start = val;
+        if ~isfield(thisR.transformTimes, 'end')
+            warning('Adding transform end time: %.4f', val + 1);
+            thisR.transformTimes.end = val + 1;
+        end
+    case {'transformtimesend'}
+        if ~isfield(thisR.transformTimes, 'start')
+            warning('Adding transform start time: %.4f', 0);
+            thisR.transformTimes.start = 0;
+        end
+        thisR.transformTimes.end = val;
     case 'cameratype'
         % This should always be 'Camera'
         if ~isequal(val,'Camera')
@@ -615,11 +626,13 @@ switch param
                 thisR = piAssetDelete(thisR, val);
             case {'insert'}
                 thisR = piAssetInsert(thisR, val, varargin{2});
+            case {'parent'}
+                thisR = piAssetSetParent(thisR, val, varargin{2});
             case {'translate', 'translation'}
                 thisR = piAssetTranslate(thisR, val, varargin{2});
             case {'rotate', 'rotation'}
                 thisR = piAssetRotate(thisR, val, varargin{2});
-            case {'motion'}
+            case {'move', 'motion'}
                 thisR = piAssetMotionAdd(thisR, val, varargin{2:end});
             case {'obj2light'}
                 thisR = piAssetObject2Light(thisR, val, varargin{2});

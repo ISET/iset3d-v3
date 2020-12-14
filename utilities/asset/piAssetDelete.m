@@ -18,7 +18,7 @@ function thisR = piAssetDelete(thisR, assetInfo, varargin)
 %{
 thisR = piRecipeDefault('scene name', 'Simple scene');
 disp(thisR.assets.tostring)
-thisR = thisR.set('asset', 'Sky1', 'delete');
+thisR = thisR.set('asset', '004ID_Sky1', 'delete');
 disp(thisR.assets.tostring)
 %}
 %% Parse
@@ -43,6 +43,8 @@ end
 %% Remove node 
 if ~isempty(thisR.assets.get(assetInfo))
     thisR.assets = thisR.assets.removenode(assetInfo);
+    warning('Removing node might change remaining node ids.')
+    [thisR.assets, ~] = thisR.assets.uniqueNames;
 else
     warning('Node: %d is not in the tree, returning.', assetInfo);
 end

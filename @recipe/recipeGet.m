@@ -242,6 +242,20 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.camera.mmUnits.value;
         end
         % Scene and camera direction
+    case {'transformtimes'}
+        val = thisR.transformTimes;
+    case {'transformtimesstart'}
+        if isfield(thisR.transformTimes, 'strat')
+            val = thisR.transformTimes.start;
+        else
+            val = [];
+        end
+    case {'transformtimesend'}
+        if isfield(thisR.transformTimes, 'end')
+            val = thisR.transformTimes.end;
+        else
+            val = [];
+        end        
     case 'objectdistance'
         % thisR.get('object distance',units)
         diff = thisR.lookAt.from - thisR.lookAt.to;

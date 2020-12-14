@@ -170,6 +170,10 @@ classdef tree
             ID = obj.Parent(ID);
         end
         
+        function obj = setparent(obj, childID, newParentID)
+            obj.Parent(childID) = newParentID;
+        end
+        
         function IDs = getsiblings(obj, ID)
             %% GETSIBLINGS  Return the list of ID of the sliblings of the 
             % given node ID, including itself.
@@ -193,7 +197,120 @@ classdef tree
             n = numel(obj.Parent);
         end
         
+        function n = names(obj)
+            n = cell(1, numel(obj.Node));
+            for ii=1:numel(obj.Node)
+                if isstruct(obj.Node{ii})
+                    n{ii} = obj.Node{ii}.name;
+                else
+                    n{ii} = obj.Node{ii};
+                end
+            end
+        end
         
+        function newNames = stripID(obj, id)
+            if notDefined('id')
+                newNames = cell(1, obj.nnodes);
+                for ii=1:obj.nnodes
+                    if ~obj.isRoot(ii)
+                        if obj.hasID(ii)
+                            newNames{ii} = obj.Node{ii}.name(7:end);
+                        else
+                            newNames{ii} = obj.Node{ii}.name;
+                        end
+                    else
+                        if obj.hasID(ii)
+                            newNames{ii} = obj.Node{ii}(7:end);
+                        else
+                            newNames{ii} = obj.Node{ii};
+                        end
+                    end
+                end
+                return;
+            end
+            
+            if ~obj.isRoot(id)
+                if obj.hasID(id)
+                    newNames = obj.Node{id}.name(7:end);
+                else
+                    newNames = obj.Node{id}.name;
+                end
+            else
+                if obj.hasID(id)
+                    newNames = obj.Node{id}(7:end);
+                else
+                    newNames = obj.Node{id};
+                end
+            end
+        end
+                
+        function val = hasID(obj, id)
+            if notDefined('id')
+                for ii=1:numel(obj.nnodes)
+                    if ~obj.hasID(ii)
+                        val = false;
+                        return;
+                    end
+                end
+                
+                val = true;
+                return;
+            end
+            
+            if isstruct(obj.Node{id})
+                if numel(obj.Node{id}.name) >= 5 &&...
+                   isequal(obj.Node{id}.name(1:5), sprintf('%03dID', id))
+                    val = true;
+                else
+                    val = false;
+                end
+            else
+                if numel(obj.Node{id}) >= 5 && ...
+                   isequal(obj.Node{id}(1:5), sprintf('%03dID', id))
+                    val = true;
+                else
+                    val = false;
+                end
+            end
+        end
+        
+        function [obj, names] = uniqueNames(obj, id)
+            
+            % Update all nodes
+            if notDefined('id')
+                stripNames = obj.stripID;
+                names = cell(1, numel(stripNames));
+                for ii=1:numel(obj.Node)
+                    if isstruct(obj.Node{ii})
+                        obj.Node{ii}.name = sprintf('%03dID_%s', ii, stripNames{ii});
+                        names{ii} = obj.Node{ii}.name;
+                    else
+                        obj.Node{ii} = sprintf('%03dID_%s', ii, stripNames{ii});
+                        names{ii} = obj.Node{ii};
+                    end
+                end
+                return;
+            end
+            
+            if ~obj.hasID(id)
+                if isstruct(obj.Node{id})
+                    obj.Node{id}.name = sprintf('%03dID_%s', id, obj.Node{id}.name);
+                    names = obj.Node{id}.name;
+                else
+                    obj.Node{id} = sprintf('%03dID_%s', id, obj.Node{id});
+                    names = obj.Node{id};
+                end
+            end
+        
+        end
+        
+        function val = isRoot(obj, id)
+            if id == 1
+                val = true;
+            else
+                val = false;
+            end
+        end
     end
     
     % STATIC METHODS

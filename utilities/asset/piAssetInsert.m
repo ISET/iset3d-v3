@@ -63,8 +63,11 @@ parentNode = thisR.get('asset', assetInfo, 'parent');
 newNode.type = 'branch'; % Enforce it is branch node
 thisR = thisR.set('asset', parentNode.name, 'add', newNode);
 
-% Remove node and attach it under the new node. 
-thisR = thisR.set('asset', curNode.name, 'delete');
-thisR = thisR.set('asset', newNode.name, 'add', curNode);
+% Change the parent of curNode to the new node
+% NOTE: name of newNode will be changed when adding in the tree. The new
+% node will be the last node in the node cell array, so checking the last
+% element.
+thisR = thisR.set('asset', curNode.name, 'parent',...
+            thisR.get('asset', thisR.assets.nnodes, 'name'));
 
 end

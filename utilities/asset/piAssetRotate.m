@@ -16,7 +16,8 @@ function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %   thisR       - modified recipe.
 %
 % Description:
-%   Rotate an asset. If the asset is a branch node, move it.
+%   Rotate an asset. If the asset is a branch node, insert a new node with 
+%   motion as the new parent of its all children.
 %   If the asset is an object or light, insert a branch node representing
 %   rotation between the node and its parent.
 %   
@@ -32,7 +33,7 @@ function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
 thisR = piRecipeDefault('scene name', 'Simple scene');
 disp(thisR.assets.tostring)
 
-thisR = thisR.set('asset', 'Sky1', 'rotation', [45, 0, 0]);
+thisR = thisR.set('asset', '004ID_Sky1', 'rotation', [45, 0, 0]);
 disp(thisR.assets.tostring)
 %}
 %% Parse input
@@ -64,18 +65,26 @@ end
 % Form rotation matrix
 rotMatrix = [rotation(3), rotation(2), rotation(1);
              fliplr(eye(3))];
-
+newBranch = piAssetCreate('type', 'branch');
+newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'rotate');
+newBranch.rotate = rotMatrix;
+         
 if isequal(thisNode.type, 'branch')
     % If the node is branch
-    curRot = thisR.get('asset', assetInfo, 'rotation');
-    curRot = curRot + rotMatrix;
-    thisR = thisR.set('asset', assetInfo, 'rotation', curRot);
+    % Get the children id of thisNode
+    childID = thisR.assets.getchildren(assetInfo);
+    
+    % Add the new node as child of thisNode
+    thisR = thisR.set('asset', thisNode.name, 'add', newBranch);
+    
+    % Set the parent of children of thisNode be the newBranch
+    for ii=1:numel(childID)
+        thisR.set('asset', childID(ii), 'parent',...
+                thisR.get('asset', thisR.assets.nnodes, 'name'));
+    end
 else
     % Node is object or light
-    newBranch = piAssetCreate('type', 'branch');
-    newBranch.rotation = rotMatrix;
-    newBranch.name = strcat('new_rotation', '_', thisNode.name);
+    % Insert the newBranch node under its parent
     thisR = thisR.set('asset', assetInfo, 'insert', newBranch);
 end
-
 end

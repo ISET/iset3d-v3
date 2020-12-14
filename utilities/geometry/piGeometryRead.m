@@ -1,4 +1,4 @@
-function renderRecipe = piGeometryRead(renderRecipe)
+function thisR = piGeometryRead(thisR)
 % Read a C4d geometry file and extract object information into a recipe
 %
 % Syntax:
@@ -25,10 +25,10 @@ function renderRecipe = piGeometryRead(renderRecipe)
 
 %%
 p = inputParser;
-p.addRequired('renderRecipe',@(x)isequal(class(x),'recipe'));
+p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 
 %% Check version number
-if(renderRecipe.version ~= 3)
+if(thisR.version ~= 3)
     error('Only PBRT version 3 Cinema 4D exporter is supported.');
 end
 
@@ -36,12 +36,12 @@ end
 
 % Best practice is to initalize the ouputFile.  Sometimes people
 % don't.  So we do this as the default behavior.
-[inFilepath, scene_fname] = fileparts(renderRecipe.inputFile);
+[inFilepath, scene_fname] = fileparts(thisR.inputFile);
 inputFile = fullfile(inFilepath,sprintf('%s_geometry.pbrt',scene_fname));
 
 % Save the JSON file at AssetInfo
 % outputFile  = renderRecipe.outputFile;
-outFilepath = fileparts(renderRecipe.outputFile);
+outFilepath = fileparts(thisR.outputFile);
 AssetInfo   = fullfile(outFilepath,sprintf('%s.json',scene_fname));
 
 %% Open the geometry file
@@ -64,7 +64,7 @@ end
 
 if ~convertedflag
     % It was not converted, so we go to work.
-    renderRecipe.assets = parseGeometryText(renderRecipe, txtLines,'');
+    thisR.assets = parseGeometryText(thisR, txtLines,'');
 
     % jsonwrite(AssetInfo,renderRecipe);
     % fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
@@ -78,15 +78,18 @@ else
     % There may be a utility that accomplishes this.  We should find
     % it and use it here.
     fds = fieldnames(renderRecipe_tmp);
-    renderRecipe = recipe;
+    thisR = recipe;
     
     % Assign the each field in the struct to a recipe class
     for dd = 1:length(fds)
-        renderRecipe.(fds{dd})= renderRecipe_tmp.(fds{dd});
+        thisR.(fds{dd})= renderRecipe_tmp.(fds{dd});
     end
     
 end
 
+
+%% Make the node name unique
+[thisR.assets, ~] = thisR.assets.uniqueNames;
 end
 
 %%

@@ -1,9 +1,10 @@
-function str = tostring(obj, sorted)
+function [str, names] = tostring(obj, sorted)
 %% TOSTRING  Return a char matrix reprensenting the tree.
 % The symbol 'ø' is used for nodes that have no or empty content.
 %
 % obj.tostring(sorted) sort the nodes in the generated string if 'sorted'
-% is true. It is false by defualt.
+% is true. It is false by default.
+
 
     if nargin < 2
         sorted = false;
@@ -63,6 +64,9 @@ function str = tostring(obj, sorted)
     % this in the second iteration.
     columnTree = tree(obj);
     
+    % A full names of nodes
+    names = cell(1, numel(obj.Node));
+    
     for i = 1 : numel(iterator)
         
         ID = iterator(i);
@@ -92,15 +96,19 @@ function str = tostring(obj, sorted)
         
         % VISTALAB: adding the name of the node
         data = obj.get(ID);
+        
         if isstruct(data)
+            names{i} = data.name;
             if numel(data.name) <= 12
                 contentStr = sprintf('%s',data.name);
             else
-                contentStr = sprintf('%s..%s',data.name(1:5), data.name(end-5:end));
+                contentStr = sprintf('%s..%s',data.name(1:8), data.name(end-4:end));
             end
-        else 
+        else
+            names{i} = data;
             contentStr = data;
         end
+        
         
         contentWidth = numel(contentStr);
         dc = floor(contentWidth / 2);

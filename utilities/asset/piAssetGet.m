@@ -38,19 +38,31 @@ p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
 p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
 p.addRequired('param', @ischar);
 p.parse(thisR, assetInfo, param, varargin{:});
+        
 %%
+
+val = [];
 % If assetInfo is a node name, find the id
 if ischar(assetInfo)
     assetName = assetInfo;
     assetInfo = piAssetFind(thisR, 'name', assetInfo);
     if isempty(assetInfo)
         warning('Couldn not find an asset with name %s:', assetName);
+
         return;
     end
 end
 
 thisTree = thisR.assets;
 thisNode = thisTree.get(assetInfo);
+
+% Special case for the root node.
+if thisTree.isRoot(assetInfo) 
+    if isequal(param, 'name')
+        val = thisNode;
+        return;
+    end
+end
 
 if isempty(param)
     val = thisNode;
@@ -78,7 +90,7 @@ else
             end
         end
         return;
-    elseif isequal(thisNode, 'root')
+    elseif thisTree.isRoot(assetInfo)
         val = [];
         return;
     end

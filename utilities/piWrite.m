@@ -195,6 +195,9 @@ piWriteHeader(thisR,fileID)
 %% Write Scale and LookAt commands first
 piWriteLookAtScale(thisR,fileID);
 
+%% Write transform start and end time
+piWriteTransformTimes(thisR, fileID);
+
 %% Write all other blocks that we have field names for
 piWriteBlocks(thisR,fileID);
 
@@ -398,6 +401,18 @@ fprintf(fileID,'LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n'
 
 fprintf(fileID,'\n');
 
+end
+
+%% Transform times
+function piWriteTransformTimes(thisR, fileID)
+% Get transform times
+startTime = thisR.get('transform times start');
+endTime = thisR.get('transform times end');
+
+if ~isempty(startTime) && ~isempty(endTime)
+    fprintf(fileID,'TransformTimes %0.6f %0.6f \n', ...
+        startTime, endTime);    
+end
 end
 
 %%

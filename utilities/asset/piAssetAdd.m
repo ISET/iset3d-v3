@@ -43,7 +43,7 @@ if ischar(parentInfo)
     parentName = parentInfo;
     parentInfo = piAssetFind(thisR, 'name', parentInfo);
     if isempty(parentInfo)
-        warning('Couldn not find a parent with name %s:', parentName);
+        warning('Could not find a parent with name %s:', parentName);
         return;
     end
 end
@@ -51,6 +51,8 @@ end
 %% Check if the parent node exists
 if ~isempty(thisR.assets.get(parentInfo))
     [thisR.assets, id] = thisR.assets.addnode(parentInfo, node);
+    % Format the new node name.
+    [thisR.assets, ~] = thisR.assets.uniqueNames(thisR.assets.nnodes);
 else
     warning('Parent node: %d does not exist, returning.', parentInfo);
 end
