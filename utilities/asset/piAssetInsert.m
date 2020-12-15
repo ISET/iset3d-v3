@@ -23,7 +23,7 @@ thisR = piRecipeDefault('scene name', 'Simple scene');
 disp(thisR.assets.tostring)
 newNode = piAssetCreate('type', 'branch');
 newNode.name = 'New node';
-thisR = thisR.set('asset', 'Sky1', 'insert', newNode);
+thisR = thisR.set('asset', '004ID_Sky1', 'insert', newNode);
 disp(thisR.assets.tostring)
 %}
 %% Parse input

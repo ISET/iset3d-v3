@@ -209,6 +209,7 @@ classdef tree
         end
         
         function newNames = stripID(obj, id)
+            %
             if notDefined('id')
                 newNames = cell(1, obj.nnodes);
                 for ii=1:obj.nnodes
@@ -242,10 +243,26 @@ classdef tree
                     newNames = obj.Node{id};
                 end
             end
+            
+        end
+        
+        function print(obj, id)
+            if notDefined('id')
+                disp(obj.tostring)
+            else
+                thisNode = obj.Node{id};
+                disp(thisNode)
+            end
         end
                 
         function val = hasID(obj, id)
+            % We check that the node name conforms to the syntax.
+            % XXXID, where XXX is the integer index for that node.
+            
+            % If id is not passed, we check if all node start with XXXID.
+            % If id is passed, we check if that node starts with idID.
             if notDefined('id')
+                % Checking all the nodes.
                 for ii=1:numel(obj.nnodes)
                     if ~obj.hasID(ii)
                         val = false;
@@ -258,6 +275,7 @@ classdef tree
             end
             
             if isstruct(obj.Node{id})
+                % It is real node.
                 if numel(obj.Node{id}.name) >= 5 &&...
                    isequal(obj.Node{id}.name(1:5), sprintf('%03dID', id))
                     val = true;
@@ -265,6 +283,7 @@ classdef tree
                     val = false;
                 end
             else
+                % It is root node.
                 if numel(obj.Node{id}) >= 5 && ...
                    isequal(obj.Node{id}(1:5), sprintf('%03dID', id))
                     val = true;
@@ -275,12 +294,19 @@ classdef tree
         end
         
         function [obj, names] = uniqueNames(obj, id)
+            % Assign unique names to nodes or a particular node. If id is
+            % provided, the function assign unique names to that node.
+            % Otherwise to all nodes in the tree.
             
             % Update all nodes
             if notDefined('id')
                 stripNames = obj.stripID;
                 names = cell(1, numel(stripNames));
-                for ii=1:numel(obj.Node)
+                if obj.nnodes > 999
+                    warning('Number of nodes: %d exceeds 999', obj.nnodes);
+                end
+                
+                for ii=1:obj.nnodes
                     if isstruct(obj.Node{ii})
                         obj.Node{ii}.name = sprintf('%03dID_%s', ii, stripNames{ii});
                         names{ii} = obj.Node{ii}.name;
@@ -304,7 +330,8 @@ classdef tree
         
         end
         
-        function val = isRoot(obj, id)
+        function val = isRoot(~, id)
+            % Check if it is root node. Yes if id is 1.
             if id == 1
                 val = true;
             else
