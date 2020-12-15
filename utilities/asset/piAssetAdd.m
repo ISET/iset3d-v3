@@ -21,9 +21,9 @@ function [thisR, id] = piAssetAdd(thisR, parentInfo, node, varargin)
 %{
 thisR = piRecipeDefault('scene name', 'Simple scene');
 disp(thisR.assets.tostring)
-thisNode = thisR.get('asset', 'Sky1');
+thisNode = thisR.get('asset', '004ID_Sky1');
 thisNode.name = 'Sky1_copy';
-thisR = thisR.set('asset', 'Sky1', 'add', thisNode);
+thisR = thisR.set('asset', '004ID_Sky1', 'add', thisNode);
 disp(thisR.assets.tostring)
 %}
 %% Parse input
@@ -52,7 +52,7 @@ end
 if ~isempty(thisR.assets.get(parentInfo))
     [thisR.assets, id] = thisR.assets.addnode(parentInfo, node);
     % Format the new node name.
-    [thisR.assets, ~] = thisR.assets.uniqueNames(thisR.assets.nnodes);
+    [thisR.assets, ~] = thisR.assets.uniqueNames(id);
 else
     warning('Parent node: %d does not exist, returning.', parentInfo);
 end

@@ -30,7 +30,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt files for a simple scene
 thisR = piRecipeDefault('scene name','SimpleScene');
-disp(thisR.assets.tostring)
+thisR.assets.print
 %% Set render quality
 %
 % This is a low resolution for speed.
@@ -72,7 +72,7 @@ sceneSet(scene,'gamma',0.7);
 [~, names] = thisR.assets.tostring;
 
 % Move this asset
-thisAssetName = '015ID_figure_3m_material_uber_blue';
+thisAssetName = 'figure_3m_material_uber_blue';
 
 assetPos = thisR.get('asset', thisAssetName, 'position');
 % The motion blur is assigned to a particular asset.  In this example,
@@ -98,7 +98,7 @@ thisR.set('cameraexposure', 0.5);
 thisR.set('asset', thisAssetName, 'motion', 'translation', [0.1, 0, 0]);
 thisR.set('asset', thisAssetName, 'motion', 'translation', [0, 0.1, 0]);
 
-disp(thisR.assets.tostring)
+thisR.assets.print;
 
 %% Render the motion blur
 piWrite(thisR,'creatematerials',true);
@@ -110,7 +110,7 @@ sceneSet(scene,'gamma',0.7);
 %% Add some rotation to the motion
 
 thisR.set('asset', thisAssetName, 'motion', 'rotation', [0, 0, 30]);
-disp(thisR.assets.tostring)
+thisR.assets.print
 %% Write and render the motion blur
 piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
