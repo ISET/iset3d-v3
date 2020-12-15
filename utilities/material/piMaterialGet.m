@@ -120,6 +120,48 @@ else
             val = thisMat.floatspeculartint;
         case 'texturespeculartint'
             val = thisMat.texturespeculartint;
+        % Disney BSDF
+        case 'boolthin'
+            val = thisMat.boolthin;
+        case 'spectrumdifftrans'
+            val = thisMat.spectrumdifftrans;
+        case 'texturedifftrans'
+            val = thisMat.texturedifftrans;
+        case 'spectrumflatness'
+            val = thisMat.spectrumflatness;
+        case 'textureflatness'
+            val = thisMat.textureflatness;
+        % Fourier
+        case 'stringbsdffile'
+            val = thisMat.stringbsdffile;
+        % Glass
+        case 'spectrumkr'
+            val = thisMat.spectrumkr;
+        case 'texturekr'
+            val = thisMat.texturekr;
+        case 'spectrumkt'
+            val = thisMat.spectrumkt;
+        case 'texturekt'
+            val = thisMat.texturekt;
+        case 'floaturoughness'
+            val = thisMat.floaturoughness;
+        case 'textureuroughness'
+            val = thisMat.textureuroughness;
+        case 'floatvroughness'
+            val = thisMat.floatvroughness;
+        case 'texturevroughness'
+            val = thisMat.texturevroughness;
+        case 'boolremaproughness'
+            val = thisMat.boolremaproughness;
+        % Hair
+        case 'spectrumsigmaa'
+            val = thisMat.spectrumsigmaa;
+        case 'texturesigmaa'
+            val = thisMat.texturesigmaa;
+        case 'floateumelanin'
+            val = thisMat.
+            
+            
         otherwise
             warning('Unknown parameter: %s', param)
             val = thisMat.(param);
