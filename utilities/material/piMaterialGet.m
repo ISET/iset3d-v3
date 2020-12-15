@@ -1,4 +1,4 @@
-function val = piMaterialGet(thisR, varargin)
+function val = piMaterialGet(thisR, matInfo, param, varargin)
 % Read a material struct in the recipe
 %
 % Inputs
@@ -23,24 +23,109 @@ function val = piMaterialGet(thisR, varargin)
 % Examples:
 %{
     thisR = piRecipeDefault;
-    materials = piMaterialGet(thisR);
+    materials = thisR.get('materials');
+    matName = 'Patch01Material';
+    thisMaterial = thisR.get('materials', matName);
 %}
+
+%%
+if notDefined('param'), param = ''; end
 %% Parse inputs
 
 varargin = ieParamFormat(varargin);
+param = ieParamFormat(param);
+
 p = inputParser;
 p.addRequired('recipe', @(x)(isa(x, 'recipe')));
-p.addParameter('idx', [], @isnumeric);
-p.addParameter('param', '', @ischar);
+p.addRequired('matInfo', @(x)(ischar(x) || isscalar(x)));
+p.addRequired('param', @ischar);
 p.addParameter('print', false);
 
-p.parse(thisR, varargin{:});
-idx = p.Results.idx;
-param = p.Results.param;
+p.parse(thisR, matInfo, param, varargin{:});
 
-%% Check if any material exist
-if ~isfield(thisR.textures, 'list'), materialNames = {}; end
+%%
+val = [];
+% If assetInfo is a node name, find the id
+if ischar(matInfo)
+    matName = matInfo;
+    matInfo = piMaterialFind(thisR, 'name', matInfo);
+    if isempty(matInfo)
+        warning('Could not find an asset with name: %s', matName);
+        return;
+    end
+end
 
+if isempty(matInfo) || matInfo > numel(thisR.materials.list)
+    warning('Could not find material.')
+    return;
+end
+
+if isempty(param)
+    val = thisR.materials.list{matInfo};
+else
+    thisMat = thisR.get('materials', matInfo);
+    if ~isfield(thisMat, param)
+        warning('Mat: %s does not have field: %s', thisMat.name, param);
+        return;
+    end
+    
+    % If the parameter exists.
+    switch param
+        % Disney material
+        case 'spectrumcolor'
+            val = thisMat.spectrumcolor;
+        case 'texturecolor'
+            val = thisMat.texturecolor;
+        case 'floatanisotropic'
+            val = thisMat.floatanisotropic;
+        case 'textureanisotropic'
+            val = thisMat.textureanosotropic;
+        case 'floatclearcoat'
+            val = thisMat.floatclearcoat;
+        case 'textureclearcoat'
+            val = thisMat.floatclearcoat;
+        case 'floatclearcoatgloss'
+            val = thisMat.floatclearcoatgloss;
+        case 'textureclearcoatgloss'
+            val = thisMat.textureclearcoatgloss;
+        case 'floateta'
+            val = thisMat.floateta;
+        case 'textureeta'
+            val = thisMat.textureeta;
+        case 'floatmetallic'
+            val = thisMat.floatmetallic;
+        case 'texturemetallic'
+            val = thisMat.texturemetallic;
+        case 'floatroughness'
+            val = thisMat.floatroughness;
+        case 'textureroughness'
+            val = thisMat.textureroughness;
+        case 'spectrumscatterdistance'
+            val = thisMat.spectrumscatterdistance;
+        case 'texturescatterdistance'
+            val = thisMat.texturescatterdistance;
+        case 'floatsheen'
+            val = thisMat.floatsheen;
+        case 'texturesheen'
+            val = thisMat.texturesheen;
+        case 'floatsheentint'
+            val = thisMat.floatsheentint;
+        case 'texturesheentint'
+            val = thisMat.texturesheentint;
+        case 'floatspectrans'
+            val = thisMat.floatspectrans;
+        case 'texturespectrans'
+            val = thisMat.texturespectrans;
+        case 'floatspeculartint'
+            val = thisMat.floatspeculartint;
+        case 'texturespeculartint'
+            val = thisMat.texturespeculartint;
+        otherwise
+            warning('Unknown parameter: %s', param)
+            val = thisMat.(param);
+    end
+end
+%{
 %% Return different values depending on inputs
 
 if ~isempty(idx)
@@ -61,7 +146,7 @@ else
     end
 end
 
-%% Print all textures
+%% Print all materials
 
 if p.Results.print
     disp('--------------------')
@@ -74,4 +159,5 @@ if p.Results.print
     disp('********************')
     disp('--------------------')    
 end
+%}
 end

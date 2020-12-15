@@ -860,17 +860,24 @@ switch ieParamFormat(param)  % lower case, no spaces
         val.film   = thisR.film;
         val.filter = thisR.filter;
         
-    case{'materials'}
+    case{'materials', 'material'}
         if isempty(varargin)
             if isfield(thisR.materials, 'list')
                 val = thisR.materials.list;
             else
                 % Should this be just empty, or an empty cell?
+                warning('No material in this recipe')
                 val = {};
             end
             return;
         end
         
+        % Get a certain material value
+        if numel(varargin) == 1 || numel(varargin) == 2
+            val = piMaterialGet(thisR, varargin{:});
+        else
+            error('Wrong parameter number. One at a time');
+        end
         
     case {'materialsoutputfile'}
         val = thisR.materials.outputfile;
