@@ -1,5 +1,5 @@
 function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
-%%
+%% Rotate an asset
 %
 % Synopsis:
 %   thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
@@ -9,15 +9,18 @@ function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
 % 
 % Inputs:
 %   thisR       - recipe.
-%   assetInfo   - asset node name or id.
-%   rotation    - rotation vector 
+%   assetInfo   - asset name or id
+%   rotation    - rotation vector [x-axis, y-axis, z-axis] (deg)
 % 
 % Returns:
 %   thisR       - modified recipe.
 %
 % Description:
-%   Rotate an asset. If the asset is a branch node, insert a new node with 
-%   motion as the new parent of its all children.
+%   Rotate an asset. 
+%
+%   If the asset is a branch node, insert a new branch node with rotation
+%   below.
+%
 %   If the asset is an object or light, insert a branch node representing
 %   rotation between the node and its parent.
 %   
