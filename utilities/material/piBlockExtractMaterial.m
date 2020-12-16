@@ -38,6 +38,10 @@ function materialList = piBlockExtractMaterial(thisR, txtLines, varargin)
 % covered the ones in our current Cinema 4D export.  But ...
 %
 
+% Examples
+%{
+thisR = piRecipeDefault;
+%}
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
@@ -51,14 +55,42 @@ for ii=1:numel(txtLines)
 
     thisLine = textscan(thisLine,'%q');
     thisLine = thisLine{1};
-    nStrings = size(thisLine);
-    
-    
-    % ZLY: 
-    piMaterialCreate(thisR, 'name', thisLine{2}, 'linenumber', ii);
+       
+    % Create a new material 
+    matName = thisLine{2}; % Material name
+    matType = thisLine{4}; % Material type
+    newMat = piMaterialCreate(matName, 'type', matType);
 
     % For strings 3 to the end, parse
-    for ss=3:nStrings
+    for ss = 5:2:numel(thisLine)
+        % Get parameter type and name
+        keyTypeName = strsplit(thisLine{ss}, ' ');
+        keyType = ieParamFormat(keyTypeName{1});
+        keyName = ieParamFormat(keyTypeName{2});
+        
+        switch keyType
+            case 'string'
+                thisVal = thisLine{ss + 1};
+            case 'float'
+                % Parse a float number from string
+                thisVal = piParseNumericString(thisLine{ss + 1});
+            case 'spectrum'
+                % Parse a spectrum from string
+                thisVal = piParseSpectrumString(thisLine{ss + 1});
+            case {'rgb', 'color'}
+                % Parse rgb from string
+                thisVal = piParseRGBString(thisLine{ss + 1});
+            case 'bool'
+                thisVal = piParseBoolString(thisLine{ss + 1});
+            case 'photolumi'
+                thisVal = piParseSpectrumString(thisLine{ss + 1});
+            otherwise
+                warning('Could not resolve the parameter type: %s', keyType);
+                continue;
+        end
+        
+        
+        %{
         switch thisLine{ss}
             case 'string type'
                 thisR.materials.list{ii}.stringtype = thisLine{ss+1};
@@ -114,11 +146,12 @@ for ii=1:numel(txtLines)
             case 'photolumi fluorescence'
                 thisR.materials.list{ii}.photolumifluorescence = thisLine{ss+1};
         end
+        %}
     end
 end
 
 thisR.materials.list = thisR.materials.list';
 materialList = thisR.materials.list;
-fprintf('Read %d materials\n', nLines);
+fprintf('Read %d materials\n', numel(materialList));
 
 end
