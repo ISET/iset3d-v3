@@ -862,6 +862,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         
     case{'materials', 'material'}
         if isempty(varargin)
+            % Return the whole material list
             if isfield(thisR.materials, 'list')
                 val = thisR.materials.list;
             else
@@ -872,9 +873,26 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
+        
+        if ischar(varargin{1})
+            % If searching by name, find the index
+            matIdx = piMaterialFind(thisR, 'name', varargin{1});
+        elseif isnumeric(varargin{1})
+            matIdx = varargin{1};
+        end
+        
+        thisMat = [];
+        if ~isempty(matIdx) && matIdx <= numel(thisR.materials.list)
+            thisMat = thisR.materials.list{matIdx};
+        else
+            warning('Could not find node');
+        end
         % Get a certain material value
-        if numel(varargin) == 1 || numel(varargin) == 2
-            val = piMaterialGet(thisR, varargin{:});
+        if numel(varargin) == 1
+            % Getting the material
+            val = thisMat;
+        elseif numel(varargin) == 2
+            val = piMaterialGet(thisMat, varargin{1}, varargin{2});
         else
             error('Wrong parameter number. One at a time');
         end

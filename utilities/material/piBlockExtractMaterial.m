@@ -1,4 +1,4 @@
-function materialList = piBlockExtractMaterial(thisR, txtLines)
+function materialList = piBlockExtractMaterial(thisR, txtLines, varargin)
 % Extract parameters of a material from a block of text
 %
 % Syntax:
@@ -38,114 +38,23 @@ function materialList = piBlockExtractMaterial(thisR, txtLines)
 % covered the ones in our current Cinema 4D export.  But ...
 %
 
-%%
-nLines = numel(txtLines);
+%% Parse input
+p = inputParser;
+p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
+p.addRequired('txtLines', @iscell);
 
-%{
-%% Parse the string on the material line
-cnt = 0;
-for ii=1:nLines
-    thisLine = txtLines{ii};
-    if strncmp(thisLine,'MakeNamedMaterial',nLetters)
-        cnt = cnt+1;
-
-        thisLine = textscan(thisLine,'%q');
-        thisLine = thisLine{1};
-        nStrings = size(thisLine);
-
-        % It does, so this is the start
-        materials(cnt) = piMaterialCreate;
-        materials(cnt).linenumber = ii;
-        materials(cnt).name = thisLine{2};
-        
-        % For strings 3 to the end, parse
-        for ss=3:nStrings
-            
-            switch thisLine{ss}
-                case 'string type'
-                    materials(cnt).string = thisLine{ss+1};
-
-                case 'float index'
-                    materials(cnt).floatindex = piParseNumericString(thisLine{ss+1});
-                    
-                case 'texture Kd'
-                    materials(cnt).texturekd = thisLine{ss+1};
-                    
-                case 'texture Ks'
-                    materials(cnt).textureks = thisLine{ss+1};
-                    
-                case 'texture Kr'
-                    materials(cnt).texturekr = thisLine{ss+1};
-                    
-                case 'rgb Kr'
-                    materials(cnt).rgbkr = piParseRGB(thisLine,ss);
-
-                case 'rgb Ks'
-                    materials(cnt).rgbks = piParseRGB(thisLine,ss); 
-
-                case 'rgb Kd'
-                    materials(cnt).rgbkd = piParseRGB(thisLine,ss);
-
-                case 'rgb Kt'
-                    materials(cnt).rgbkt = piParseRGB(thisLine,ss);
-
-                case 'color Kd'
-                    materials(cnt).colorkd = piParseRGB(thisLine,ss);
-
-                case 'color Ks'
-                    materials(cnt).colorks = piParseRGB(thisLine,ss);
-
-                case 'float uroughness'
-                    materials(cnt).floaturoughness = piParseNumericString(thisLine{ss+1});
-                case 'float vroughness'
-                    materials(cnt).floatvroughness = piParseNumericString(thisLine{ss+1});
-                case 'float roughness'
-                    materials(cnt).floatroughness = piParseNumericString(thisLine{ss+1});
-                case 'spectrum Kd'
-                    materials(cnt).spectrumkd = thisLine{ss+1};
-                case 'spectrum Ks'
-                    materials(cnt).spectrumks = thisLine{ss+1};
-                case 'spectrum k'
-                    materials(cnt).spectrumk = thisLine{ss+1};
-                case 'spectrum Kr'
-                    % How do we check if it's going to be a string or numeric values?  
-                    materials(cnt).spectrumkr = piParseNumericSpectrum(thisLine,ss); 
-                case 'spectrum Kt'
-                    materials(cnt).spectrumkt = piParseNumericSpectrum(thisLine,ss); 
-                case 'spectrum eta'
-                    materials(cnt).spectrumeta = thisLine{ss+1};
-                case 'string namedmaterial1'
-                    materials(cnt).stringnamedmaterial1 = thisLine{ss+1};
-                case 'string namedmaterial2'
-                    materials(cnt).stringnamedmaterial2 = thisLine{ss+1};
-                case 'texture bumpmap'
-                    materials(cnt).texturebumpmap = thisLine{ss+1};
-                case 'bool remaproughness'
-                    materials(cnt).boolremaproughness = thisLine{ss+1};
-                case 'string bsdffile'   
-                    materials(cnt).bsdffile = thisLine{ss+1};
-                case 'photolumi fluorescence'
-                    materials(cnt).photolumifluorescence = thisLine{ss+1};
-                otherwise
-                    % fprintf('Unknown case %s\n',thisLine{ss});
-            end
-        end
-    end
-end
-for jj = 1:cnt
-materiallist.(materials(jj).name)= materials(jj);
-end
-fprintf('Read %d materials on %d lines\n',cnt,nLines);
-%}
+p.parse(thisR, txtLines, varargin{:});
 
 %% Parse the string on the material line
-for ii=1:nLines
+for ii=1:numel(txtLines)
     thisLine = txtLines{ii};
 
     thisLine = textscan(thisLine,'%q');
     thisLine = thisLine{1};
     nStrings = size(thisLine);
-
+    
+    
+    % ZLY: 
     piMaterialCreate(thisR, 'name', thisLine{2}, 'linenumber', ii);
 
     % For strings 3 to the end, parse
