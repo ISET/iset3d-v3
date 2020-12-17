@@ -256,7 +256,30 @@ classdef tree
                 disp(thisNode)
             end
         end
-                
+        
+        % Print the tree or a node of the tree
+        function T = show(obj)
+            % Bring up a window with the tree.  Returns the text object
+            % that you can use to reset the 
+            %
+            % Maybe this should rely on tree.plot, which has an example
+            % that I don't yet understand.
+            %{
+              [ lineage duration ] = tree.example; % 1st one is made of strings only, 2nd one of integers
+              slin = lineage.subtree(19); % Work on a subset
+              sdur = duration.subtree(19);
+              [vlh hlh tlh] = slin.plot(sdur, 'YLabel', {'Division time' '(min)'});
+              rcolor = [ 0.6 0.2 0.2 ];
+              aboveTreshold = sdur > 10; % true if longer than 10 minutes
+            %}
+            
+            % Better to strip the IDs before plotting.
+            str = obj.tostring;
+            ieNewGraphWin([],'wide');
+            T = text(0.1,0.5,str);
+            axis off
+        end
+        
         % Check that a node has its ID embedded in its name.
         function val = hasID(obj, id)
             % The name format is usually XXXID_<>, where XXX is the integer

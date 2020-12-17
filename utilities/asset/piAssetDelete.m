@@ -43,8 +43,8 @@ end
 %% Remove node 
 if ~isempty(thisR.assets.get(assetInfo))
     thisR.assets = thisR.assets.removenode(assetInfo);
-    warning('Removing node might change remaining node ids.')
-    [thisR.assets, ~] = thisR.assets.uniqueNames;
+    % warning('Removing node might change remaining node ids.')
+    % [thisR.assets, ~] = thisR.assets.uniqueNames;
 else
     warning('Node: %d is not in the tree, returning.', assetInfo);
 end

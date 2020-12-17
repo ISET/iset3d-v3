@@ -33,14 +33,14 @@ id = piAssetFind(thisR, 'name', 'Camera');
 idtwo = piAssetFind(thisR, 'name', '002ID_Camera');
 %}
 %%
-thisTree = thisR.assets;
+assets = thisR.assets;
 %%
-nodeList = [0]; % 0 is always the index for root node
+nodeList = 0; % 0 is always the index for root node
 
 curIdx = 1; %
  
 while curIdx <= numel(nodeList)
-    IDs = thisTree.getchildren(nodeList(curIdx));
+    IDs = assets.getchildren(nodeList(curIdx));
     for ii = 1:numel(IDs)
         if isequal(param, 'name')
             % Users are allowed to look for node with its ID or just the

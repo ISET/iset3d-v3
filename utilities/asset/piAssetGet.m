@@ -47,17 +47,16 @@ if ischar(assetInfo)
     assetName = assetInfo;
     assetInfo = piAssetFind(thisR, 'name', assetInfo);
     if isempty(assetInfo)
-        warning('Couldn not find an asset with name %s:', assetName);
-
+        warning('Could not find an asset with name %s:', assetName);
         return;
     end
 end
 
-thisTree = thisR.assets;
-thisNode = thisTree.get(assetInfo);
+assets = thisR.assets;
+thisNode = assets.get(assetInfo);
 
 % Special case for the root node.
-if thisTree.isRoot(assetInfo) 
+if assets.isRoot(assetInfo) 
     if isequal(param, 'name')
         val = thisNode;
         return;
@@ -68,7 +67,7 @@ if isempty(param)
     val = thisNode;
 else
     if isequal(param, 'parent')
-        parent = thisTree.getparent(assetInfo);
+        parent = assets.getparent(assetInfo);
         if isempty(parent)
             val = [];
         else
@@ -77,7 +76,7 @@ else
         return;
         
     elseif isequal(param, 'children')
-        childrenList = thisTree.getchildren(assetInfo);
+        childrenList = assets.getchildren(assetInfo);
         
         if isempty(childrenList)
             val = [];
@@ -90,7 +89,7 @@ else
             end
         end
         return;
-    elseif thisTree.isRoot(assetInfo)
+    elseif assets.isRoot(assetInfo)
         val = [];
         return;
     end

@@ -889,6 +889,10 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'assetroot'}
         % The root of all assets
         val = thisR.assets;
+    case {'assetnames'}
+        val = thisR.assets.stripID;
+        
+        %{
     case {'groupnames'}
         % Cell array (2D) of the groupobj names
         % val{level}{idx}
@@ -946,7 +950,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         % Find the group and child
         val = thisG(idx(2)).children(idx(3));
-        
+        %}
+
     otherwise
         error('Unknown parameter %s\n',param);
 end

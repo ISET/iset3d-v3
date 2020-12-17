@@ -38,7 +38,8 @@ str = thisR.assets.print;
 
 % TODO:  Create an option to print the str in a window, not the command
 % line.
-
+% T = thisR.assets.show;
+%
 %% Here is an example retrieving one of the assets
 
 % You do not need to include the prepended XXXID_ part of the object.
@@ -46,6 +47,9 @@ thisR.get('asset','sky')
 
 % But you can
 thisR.get('asset','002ID_sky')
+
+% Or just the node number
+thisR.get('asset',2)
 
 % You can also retrieve the properties of an object
 thisR.get('asset','sky','position')
@@ -108,6 +112,49 @@ scene = sceneSet(scene, 'name', 'Translation');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
+%% Add a copy of an existing object
+
+% We want a copy asset with new name function
+thisAsset = 'figure_3m_material_uber_blue'; 
+
+newAsset = thisR.get('asset',thisAsset);
+newAsset.name = 'blueGuy2';
+
+% Add the asset, but notice we need the parent
+parent = thisR.get('asset',thisAsset,'parent');
+thisR.set('asset',parent.name,'add',newAsset);
+
+thisR.assets.print;
+
+thisR.set('asset',newAsset.name,'rotate',[0 0 -45]);
+thisR.set('asset',newAsset.name,'translate',[1 0 0]);
+thisR.assets.print;
+
+%%
+piWrite(thisR);
+
+scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name', 'blueguy2');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+
+%% Delete an existing object
+
+thisAsset = 'figure_3m_material_uber_blue'; 
+
+thisR.set('asset',thisAsset,'delete');
+
+thisR.assets.print;
+
+%%
+piWrite(thisR);
+
+[scene, results] = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name', 'blueguy2');
+sceneWindow(scene);
+scene = sceneSet(scene, 'render flag', 'hdr');
+
 %% Let's make one of the assets glow:  we turn it into an area light
 
 % Create a new area light with D65 spectral power distsribution
@@ -117,7 +164,7 @@ areaLight = piLightSet(areaLight, [], 'lightspectrum', lightName);
 areaLight = piLightSet(areaLight, [], 'spectrum scale', 3e-1);
 
 % This is the red sphere at the back
-thisAsset = thisR.get('asset',19,'name');
+thisAsset = thisR.get('asset',18,'name');
 
 % This converts the sphere asset into a glowing D65 ball.  Notice that it
 % did not add any new nodes.  It simply changed the properties of the
@@ -125,6 +172,8 @@ thisAsset = thisR.get('asset',19,'name');
 thisR = thisR.set('asset', thisAsset, 'obj2light', areaLight);
 
 thisR.assets.print;
+% T = thisR.assets.show;
+
 
 %% Write and render
 piWrite(thisR);
@@ -134,7 +183,6 @@ scene = sceneSet(scene, 'name', 'Obj2Arealight');
 sceneWindow(scene);
 scene = sceneSet(scene, 'render flag', 'hdr');
 
-%%
 
 %% Now let's get material information from asset and make some changes
 % We are ignoring this now until the material sets/gets are finished.
