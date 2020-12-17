@@ -1,13 +1,13 @@
-function mList = piMaterialFind(thisR, field, val)
-%% Find materials in the list such that the field equals a value
+function [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
+%% Find materials in the list such that the parameter matches a value
 %
 % Synopsis
-%   mList = piMaterialFind(thisR, field, val)
+%   [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
 %
 % Inputs
-%   thisR
-%   field  - Name of the field
-%   val    - Value of the field
+%   mList   - material list cell array
+%   param   - parameter name
+%   val     - value to match
 %
 % Return
 %   mList  - List of materials that have a field with a specific name and
@@ -27,45 +27,43 @@ function mList = piMaterialFind(thisR, field, val)
 % See also
 %  piMaterial*
 
+% Examples
+%{
+    thisR = piRecipeDefault;
+    mlist = piMaterialFind(thisR.materials.list, 'name', 'Mat');
+%}
+
+%% parse input
+p = inputParser;
+p.addRequired('mList', @iscell);
+p.addRequired('param', @ischar)
+p.parse(mList, param, varargin{:});
 
 %% Format 
-field = ieParamFormat(field);
+param = ieParamFormat(param);
 
 %%
-if isstruct(thisR.materials.list)
-    % The returned material list is a cell array of field names
-    mList = {};
-    fNames = fieldnames(thisR.materials.list);
-    for ii = 1:numel(fNames)
-        if ischar(val)
-            if strcmp(thisR.materials.list.(fNames{ii}).(field), val)
-                mList{end+1} = fNames{ii};
-            end
-        elseif isnumeric(val)
-            if isequal(thisR.materials.list{ii}.(field), val)
-                mList{end+1} = fNames{ii};
-            end
+
+mIdx = [];
+mCollection = {};
+cnt = 0;
+for ii = 1:numel(mList)
+    if isfield(mList{ii}, param)
+        if isequal(param, 'name') || isequal(param, 'type')
+            curVal = mList{ii}.(param);
+        else
+            curVal = mList{ii}.(param).value;
         end
         
-    end
-elseif iscell(thisR.materials.list)
-    % The return material list is a vector
-    mList = [];
-    for ii = 1:numel(thisR.materials.list)
-        if isfield(thisR.materials.list{ii}, field)
-            if ischar(val)
-                if strcmp(thisR.materials.list{ii}.(field), val)
-                    mList(end+1) = ii;
-                end
-            elseif isnumeric(val)
-                if isequal(thisR.materials.list{ii}.(field), val)
-                    mList(end+1) = ii;
-                end
-            end
+        if isequal(curVal, val)
+            cnt = cnt + 1;
+            mIdx(cnt) = ii;
+            mCollection{cnt} = mList{ii};
         end
     end
-else
-    error('Bad recipe materials list.');
 end
 
+if cnt == 1
+    mCollection = mCollection{1};
+end
 end

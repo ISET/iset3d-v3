@@ -1,4 +1,4 @@
-function res = piMaterialGet(material, param, varargin)
+function val = piMaterialGet(material, param, varargin)
 % Read a material struct in the recipe
 %
 % Inputs
@@ -22,31 +22,44 @@ function res = piMaterialGet(material, param, varargin)
 
 % Examples:
 %{
-    thisR = piRecipeDefault;
-    materials = thisR.get('materials');
-    matName = 'Patch01Material';
-    thisMaterial = thisR.get('materials', matName);
+    mat = piMaterialCreate('new material');
+    kdType = piMaterialGet(mat, 'kd type');
 %}
 
 %% Parse inputs
 
-param = ieParamFormat(param);
+% check the parameter name and type/val flag
+nameTypeVal = strsplit(param, ' ');
+pName    = nameTypeVal{1};
+if numel(nameTypeVal) > 1
+    pTypeVal = nameTypeVal{2};
+else
+    pTypeVal = '';
+end
 
 p = inputParser;
-p.addRequired(material, @isstruct);
+p.addRequired('material', @isstruct);
 p.addRequired('param', @ischar);
-p.addParameter('type', '', @ischar);
-p.addParameter('val', '', @ischar);
 
 p.parse(material, param, varargin{:});
 
 %%
-res = [];
+val = [];
 
-if isfield(material, param)
+if isfield(material, pName)
+    % If asking name or type, get the param and return.
+    if isequal(pName, 'name') || isequal(pName, 'type')
+        val = material.(pName);
+        return;
+    end
+    
     % If type and val are both empty, return the parameter struct
-    if  ~isempty(type) && ~isempty(res)
-
+    if isempty(pTypeVal)
+        val = material.(pName);
+    elseif isequal(pTypeVal, 'type')
+        val = material.(pName).type;
+    elseif isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
+        val = material.(pName).value;
     end    
 else
     warning('Parameter: %s does not exist in material type: %s',...
@@ -78,15 +91,7 @@ end
 %% Print all materials
 
 if p.Results.print
-    disp('--------------------')
-    disp('****Material Type****')
-    for ii = 1:length(materialNames)
-        fprintf('%d: name: %s     format: %s    type: %s\n', ii,...
-                thisR.materials.list{ii}.name,...
-                thisR.materials.list{ii}.type);
-    end
-    disp('********************')
-    disp('--------------------')    
+   
 end
 %}
 end

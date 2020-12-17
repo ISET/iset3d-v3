@@ -860,7 +860,14 @@ switch ieParamFormat(param)  % lower case, no spaces
         val.film   = thisR.film;
         val.filter = thisR.filter;
         
-    case{'materials', 'material'}
+    case {'materials', 'material'}
+        %{
+            thisMat = thisR.get('material', matName);
+            nameCheck = thisR.get('material', matName, 'name');
+            kd = thisR.get('material', matName, 'kd');
+            kdType = thisR.get('material', matName, 'kd type');
+            kdVal = thisR.get('material', matName, 'kd value');
+        %}
         if isempty(varargin)
             % Return the whole material list
             if isfield(thisR.materials, 'list')
@@ -873,20 +880,23 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
-        
+        % Get index in material list
         if ischar(varargin{1})
-            % If searching by name, find the index
-            matIdx = piMaterialFind(thisR, 'name', varargin{1});
-        elseif isnumeric(varargin{1})
+            % Search by name, find the index
+            [~, thisMat] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+            if isempty(thisMat)
+                warning('Could not find material. Return.')
+                return;
+            end
+        elseif isnumeric(varargin{1}) &&...
+                varargin{1} <= numel(thisR.materials.list)
             matIdx = varargin{1};
-        end
-        
-        thisMat = [];
-        if ~isempty(matIdx) && matIdx <= numel(thisR.materials.list)
             thisMat = thisR.materials.list{matIdx};
         else
-            warning('Could not find node');
+            warning('Could not find material. Return');
+            return;
         end
+        
         % Get a certain material value
         if numel(varargin) == 1
             % Getting the material
@@ -896,7 +906,30 @@ switch ieParamFormat(param)  % lower case, no spaces
         else
             error('Wrong parameter number. One at a time');
         end
+    case {'nmaterial', 'nmaterials', 'materialnumber', 'materialsnumber'}
+        if isfield(thisR.materials, 'list')
+            val = numel(thisR.materials.list);
+        else
+            val = 0;
+        end        
+    case {'printmaterials', 'materialsprint'}
+        nMaterials = thisR.get('n material');
         
+        [~,sceneName] = fileparts(thisR.inputFile);
+        fprintf('\nMaterials in the scene %s\n',sceneName);
+        fprintf('-------------------------------\n');
+        
+        fprintf('  Name  \t [Type]\n');
+        fprintf('-------------------------------\n');
+                
+        for ii =1:nMaterials
+            fprintf('%d: %s: \t [ %s ]\n', ii, ...
+                thisR.materials.list{ii}.name, ...
+                thisR.materials.list{ii}.type);
+        end
+        
+        fprintf('-------------------------------\n');
+        val = [];
     case {'materialsoutputfile'}
         val = thisR.materials.outputfile;
         

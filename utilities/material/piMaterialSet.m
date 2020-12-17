@@ -1,4 +1,4 @@
-function material = piMaterialSet(material, param, varargin)
+function material = piMaterialSet(material, param, val, varargin)
 %% 
 %
 % Synopsis
@@ -21,61 +21,83 @@ function material = piMaterialSet(material, param, varargin)
 % See also
 %   piMaterialGet, piMaterial*
 
+% Examples:
+%{
+    mat = piMaterialCreate('new material', 'kd', [400 1 800 1]);
+    mat = piMaterialSet(mat, 'kd val', [1 1 1]);
+%}
 
 %% Parse inputs
+
+% check the parameter name and type/val flag
+nameTypeVal = strsplit(param, ' ');
+pName    = nameTypeVal{1};
+
+% Whether it is specified to set a type or a value.
+if numel(nameTypeVal) > 1
+    pTypeVal = nameTypeVal{2};
+else
+    % Set a whole struct
+    pTypeVal = '';
+end
 
 p = inputParser;
 p.addRequired('material', @(x)(isstruct(x)));
 p.addRequired('param', @ischar);
-p.addParameter('type', '', @ischar);
-p.addParameter('val', [], @(x)(ischar(x) || isnumeric(x)));
+p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || isbool));
 
-% varargin is not parsed. Due to multiple fluorophores. See below
-p.parse(material, param, varargin{:});
-type = p.Results.type;
-val = p.Results.val;
+p.parse(material, param, val, varargin{:});
 
 %% if obj is a material struct
 % materialInfo has no meaning
 
-if ~isfield(material, param)
-    warning('Parameter: %s does not exist in %s, returning.',...
-                param, material.name)
-    return;
-end
+if isfield(material, pName)
+    % Set name or type
+    if isequal(pName, 'name') || isequal(pName, 'type')
+        material.(pName) = val;
+        return;
+    end
+    
+    % Set a whole struct
+    if isempty(pTypeVal)
+        material.(pName) = val;
+        return;
+    end
+    
+    % Set parameter type
+    if isequal(pTypeVal, 'type')
+        material.(pName).type = type;
+        return;
+    end
+    
+    % Set parameter value
+    if isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
+        material.(pName).value = val;
 
-if isequal(param, 'type')
-    % If setting material type, get the value and return.
-    material.(param) = val;
-    return;
-end
-
-if ~isempty(type)
-    material.(param).type = type;
-end
-
-if ~isempty(val)
-    material.(param).value = val;
-
-    % Changing property type if the user doesn't specify it.
-    if isnumeric(val)
-        if numel(val) == 3
-            material.(param).type = 'rgb';
-        elseif numel(val) > 3
-            material.(param).type = 'spectrum';
-        end
-    elseif ischar(val)
-        % It is a file name, so the type has to be spectrum or texture,
-        % depending on the extension
-        [~, ~, e] = fileparts(val); % Check extension
-        if isempty(e) || isequal(e, '.spd')
-            material.(param).type = 'spectrum';
-        else
-            material.(param).type = 'texture';
+        % Changing property type if the user doesn't specify it.
+        if isnumeric(val)
+            if numel(val) == 3
+                material.(pName).type = 'rgb';
+            elseif numel(val) > 3
+                material.(pName).type = 'spectrum';
+            end
+        elseif ischar(val)
+            % It is a file name, so the type has to be spectrum or texture,
+            % depending on the extension
+            [~, ~, e] = fileparts(val); % Check extension
+            if isempty(e) || isequal(e, '.spd')
+                material.(pName).type = 'spectrum';
+            else
+                material.(pName).type = 'texture';
+            end
+        elseif isbool(val)
+            material.(pName).type = 'bool';
         end
     end
+else
+    warning('Parameter: %s does not exist in material type: %s',...
+                pName, material.type);
 end
-return;
 
 %%
 %{

@@ -38,9 +38,9 @@ function material = piMaterialCreate(name, varargin)
 % Examples
 %{
     material = piMaterialCreate('new material', 'type', 'kdsubsurface',...
-                                'rgb kd',[1, 1, 1]);
+                                'kd rgb',[1, 1, 1]);
     material = piMaterialCreate('new material',...
-                                'rgb kd',[1, 1, 1]);
+                                'kd rgb',[1, 1, 1]);
 %}
 %%
 % Replace the space in potential parameters. For example, 'rgb kd' won't
@@ -375,16 +375,20 @@ for ii=1:2:numel(varargin)
         continue;
     end
     
-    % Assume format of 'TYPE_TYPENAME'
     keyTypeName = strsplit(thisKey, '_');
-    keyType = ieParamFormat(keyTypeName{1});
-    keyName = ieParamFormat(keyTypeName{2});
+    
+    % keyName is the property name. if it follows 'TYPE_NAME', we need
+    % later, otherwise we need the first one.
+    if piMaterialIsParamType(keyTypeName{1})
+        keyName = ieParamFormat(keyTypeName{2});
+    else
+        keyName = ieParamFormat(keyTypeName{1});
+    end
+    
     
     if isfield(material, keyName)
-        material = piMaterialSet(material,...
-                                keyName,...
-                                'type', keyType,...
-                                'val', thisVal);
+        material = piMaterialSet(material, sprintf('%s value', keyName),...
+                                thisVal);
     else
         warning('Parameter %s does not exist in material %s',...
                     keyName, material.type)

@@ -16,8 +16,23 @@ thisR.get('material', MATNAME, 'kd value')
 thisR.set('material', MATNAME, key -'kd spectrum', val - [400 1 800 1]);
 %}
 
+%% Create recipe
 thisR = piRecipeDefault;
 matName = 'Mat';
 
+%% Get function
 thisMat = thisR.get('material', matName);
 nameCheck = thisR.get('material', matName, 'name');
+kd = thisR.get('material', matName, 'kd');
+kdType = thisR.get('material', matName, 'kd type');
+kdVal = thisR.get('material', matName, 'kd value');
+
+%% Set function
+thisR.set('material', matName, 'kd value', [400 1 800 1]);
+mat = piMaterialCreate('new material');
+thisR.set('material', 'add', mat);
+thisR.set('material', mat.name, 'kd value', [1 1 1]);
+thisR.set('material', 2, mat);
+thisR.set('material', 'delete', mat.name)
+
+thisR.get('materials print');

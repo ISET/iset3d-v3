@@ -85,9 +85,9 @@ for ii=1:numel(txtLines)
                 % str2num can convert string to vector. str2double can't.
                 thisVal = str2num(thisLine{ss + 1});
             case 'bool'
-                if isequal(thisLine{ss + 1}, '"true"')
+                if isequal(thisLine{ss + 1}, 'true')
                     thisVal = true;
-                elseif isequal(thisLine{ss + 1}, '"false"')
+                elseif isequal(thisLine{ss + 1}, 'false')
                     thisVal = false;
                 end
             otherwise
@@ -95,8 +95,8 @@ for ii=1:numel(txtLines)
                 continue;
         end
         
-        newMat = piMaterialSet(newMat, keyName,...
-                    'type', keyType, 'val', thisVal);
+        newMat = piMaterialSet(newMat, sprintf('%s value', keyName),...
+                                thisVal);
         %{
         switch thisLine{ss}
             case 'string type'

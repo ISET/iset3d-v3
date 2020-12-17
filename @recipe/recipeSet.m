@@ -27,7 +27,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %  % Camera
 %    'camera'     - Struct with camera information
 %    'camera subtype' - The valid camera subtypes are
-%                       {'pinhole','realistic','realisticEye','omni'} 
+%                       {'pinhole','realistic','realisticEye','omni'}
 %    'camera exposure'
 %    'camera body'      - Do not use
 %
@@ -54,7 +54,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %     'film diagonal'
 %     'film distance'
 %     'spatial samples'
-%  
+%
 %   % RealisticEye (human optics)
 %     'retina distance' - mm
 %     'eye radius'      - mm
@@ -85,7 +85,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %    'fluorophore concentration'
 %    'fluorophore eem'
 %    'concentration'
-%    
+%
 %  ISETAuto special:
 %    'traffic flow density'%
 %    'traffic time stamp'
@@ -96,7 +96,7 @@ function thisR = recipeSet(thisR, param, val, varargin)
 % Generally
 % https://www.pbrt.org/fileformat-v3.html#overview
 %
-% Specifically 
+% Specifically
 % https://www.pbrt.org/fileformat-v3.html#cameras
 %
 % See also
@@ -146,7 +146,7 @@ switch param
         newDir     = fileparts(val);
         if ~exist(newDir,'dir')
             fprintf('Creating output folder %s\n',newDir);
-            mkdir(newDir); 
+            mkdir(newDir);
         end
         thisR.outputFile = val;
         
@@ -164,7 +164,7 @@ switch param
         % thisR.set('rendered file',fname);
         % Set the full path
         thisR.renderedfile = val;
-
+        
         % Scene parameters
     case 'objectdistance'
         % The 'from' spot, is the camera location.  The 'to' spot is
@@ -189,7 +189,7 @@ switch param
         % (camera) position, but not the object position in the scene.
         thisR.lookAt.from = thisR.lookAt.to + objDirection*val;
         % warning('Object distance may not be important');
-       
+        
     case {'accommodation'}
         % Special case where we allow setting accommodation or focal
         % distance.  My optometrist friends insist.
@@ -233,10 +233,10 @@ switch param
         
         % This deprecated code is very bizarre for recipeSet. So I replaced
         % it.  But probably this change will break stuff.  We will have to
-        % fix. 
+        % fix.
         thisR.camera = piCameraCreate(val,'lensFile',p.Results.lensfile);
         
-        % For the default camera, the film size is 35 mm 
+        % For the default camera, the film size is 35 mm
         thisR.set('film diagonal',35);
         
         %}
@@ -308,11 +308,11 @@ switch param
         if ~exist(val,'file')
             % Sometimes we set this without the file being copied yet.
             % Let's see if this warning does us any good.
-            warning('Lens file in out dir not yet found (%s)\n',val); 
+            warning('Lens file in out dir not yet found (%s)\n',val);
         end
         thisR.camera.lensfile.value = val;
         thisR.camera.lensfile.type = 'string';
-
+        
     case {'lensradius'}
         % lens.set('lens radius',val (mm))
         %
@@ -325,7 +325,7 @@ switch param
             warning('Lens radius is set for perspective camera.  Use aperture diameter for omni');
         end
         
-    % Human eye model related
+        % Human eye model related
     case {'retinadistance'}
         % Specified in mm
         thisR.camera.retinaDistance.value = val;
@@ -371,8 +371,8 @@ switch param
                     thisR.camera.ior4.type = 'spectrum';
             end
         end
-     
-    % More general camera parameters
+        
+        % More general camera parameters
     case {'aperture','aperturediameter'}
         % lens.set('aperture diameter',val (mm))
         %
@@ -400,7 +400,7 @@ switch param
                 thisR.camera.fov.value = val;
                 thisR.camera.fov.type = 'float';
             else
-                % camera types:  omni, realisticeye, 
+                % camera types:  omni, realisticeye,
                 
                 % if two fov is given [hor, ver], we should resize film
                 % acoordingly.  This is the current number of spatial
@@ -434,8 +434,8 @@ switch param
         % omni.  Probably realisticEye, but we should ask TL.
         if val
             thisR.camera.diffractionEnabled.value = 'true';
-        else 
-            thisR.camera.diffractionEnabled.value = 'false'; 
+        else
+            thisR.camera.diffractionEnabled.value = 'false';
         end
         thisR.camera.diffractionEnabled.type = 'bool';
         
@@ -465,7 +465,7 @@ switch param
         
         % This is the integrator that manages chromatic aberration.
         thisR.set('integrator subtype','spectralpath');
-
+        
         % Set the number of bands.  These are divided evenly into bands
         % between 400 and 700 nm. There are  31 wavelength samples, so we
         % should not have more than 30 wavelength bands
@@ -481,7 +481,7 @@ switch param
         % are scattering media.
         thisR.integrator.type = 'Integrator';
         thisR.integrator.subtype = val;
-
+        
     case 'integratornumcabands'
         thisR.integrator.type = 'Integrator';
         thisR.integrator.numCABands.value = val;
@@ -490,7 +490,7 @@ switch param
     case{'maxdepth','bounces','nbounces'}
         % thisR.set('n bounces',val);
         % Number of surfaces a ray can bounce from
-
+        
         if(~strcmp(thisR.integrator.subtype,'path')) &&...
                 (~strcmp(thisR.integrator.subtype,'bdpt'))
             disp('Changing integrator sub type to "bdpt"');
@@ -529,7 +529,7 @@ switch param
     case 'up'
         thisR.lookAt.up = val;
         
-
+        
         
         % Microlens
     case 'microlens'
@@ -568,7 +568,7 @@ switch param
         thisR.camera.filmdistance.type = 'float';
         thisR.camera.filmdistance.value = val;
     case {'spatialsamples','filmresolution','spatialresolution'}
-        % thisR.set('spatial samples',256); 
+        % thisR.set('spatial samples',256);
         %
         % Number of spatial samples on the film (or retinal) surface. The
         % number of samples may be spread over larger or smaller field of
@@ -578,7 +578,7 @@ switch param
         thisR.film.yresolution.value = val(2);
         thisR.film.xresolution.type = 'integer';
         thisR.film.yresolution.type = 'integer';
-    
+        
         % Sampler
     case 'samplersubtype'
         % thisR.set('sampler subtype','halton')
@@ -587,7 +587,7 @@ switch param
         thisR.sampler.subtype = val;
     case {'raysperpixel','pixelsamples'}
         % thisR.set('rays per pixel')
-        % How many rays from each pixel 
+        % How many rays from each pixel
         thisR.sampler.pixelsamples.value = val;
         thisR.sampler.pixelsamples.type = 'integer';
         
@@ -612,10 +612,67 @@ switch param
         thisR.set('camera',val.camera);
         thisR.set('film',val.film);
         thisR.filter = thisR.set('filter',val.filter);
-
+        
         % Materials should be built up here.
-    case {'materials'}
-        thisR.materials = val;
+    case {'materials', 'material'}
+        %{
+            thisR.set('material', materialList);
+            thisR.set('material', matName, newMaterial);
+            thisR.set('material', 'add', newMaterial);
+            thisR.set('material', 'delete', matName);
+            thisR.set('material', matName, 'PARAM TYPE', VAL);
+        %}
+        % Set a new list of materials
+        if isempty(varargin)
+            if iscell(val)
+                thisR.materials.list = val;
+            else
+                warning('Please provide a list of materials in cell array')
+            end
+            return;
+        end
+        
+        % Add/delete a material        
+        switch val
+            case {'add'}
+                nMaterial = thisR.get('n material');
+                thisR.materials.list{nMaterial + 1} = varargin{1};
+                return;
+            case {'delete', 'remove'}
+                if isnumeric(varargin{1})
+                    thisR.materials.list{varargin{1}} = {};
+                else
+                    [matIdx, ~] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                    thisR.materials.list(matIdx) = [];
+                end
+                return;
+                
+        end
+        
+        % Get index in material list
+        if ischar(val)
+            % Search by name, find the index
+            [matIdx, thisMat] = piMaterialFind(thisR.materials.list, 'name', val);
+            if isempty(thisMat)
+                warning('Could not find material. Return.')
+                return;
+            end
+        elseif isnumeric(val) &&...
+                val <= numel(thisR.materials.list)
+            matIdx = val;
+            thisMat = thisR.materials.list{val};
+        else
+            warning('Could not find material');
+            return;
+        end
+        
+        if numel(varargin{1}) == 1
+            thisR.materials.list{matIdx} = varargin{1};
+        else
+            thisMat = piMaterialSet(thisMat, varargin{1}, varargin{2});
+            thisR.set('materials', matIdx, thisMat);
+        end
+
     case {'materialsoutputfile'}
         thisR.materials.outputfile = val;
     case {'asset', 'assets'}
@@ -639,15 +696,15 @@ switch param
             otherwise
                 thisR = piAssetSet(thisR, val, varargin{1}, varargin{2});
         end
-    % ZLY added fluorescent 
+        % ZLY added fluorescent
     case {'fluorophoreconcentration'}
         % thisR.set('fluorophore concentration',val,idx)
         if isempty(varargin), error('Material name or index required'); end
         idx = varargin{1};
-
+        
         % If the user sent a material name convert it to an index
         if ischar(idx), idx = piMaterialFind(thisR,'name',idx); end
-
+        
         matName = val;
         switch thisR.recipeVer
             case 2
@@ -673,13 +730,13 @@ switch param
         %
         % val - the name of the fluorophore.
         % idx - a numerical index to the material or it can be a string
-        % which is the name of the mater 
+        % which is the name of the mater
         if isempty(varargin), error('Material name or index required'); end
         idx = varargin{1};
-
+        
         % If the user sent a material name convert it to an index
         if ischar(idx), idx = piMaterialFind(thisR,'name',idx); end
-
+        
         matName = val;
         switch thisR.recipeVer
             case 2
