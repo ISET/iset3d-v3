@@ -19,6 +19,9 @@ thisR.set('material', MATNAME, key -'kd spectrum', val - [400 1 800 1]);
 %% Create recipe
 thisR = piRecipeDefault;
 matName = 'Mat';
+piWrite(thisR);
+[scene, res] = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene)
 
 %% Get function
 thisMat = thisR.get('material', matName);
@@ -30,9 +33,11 @@ thisR.get('materials print');
 
 %% Set function
 thisR.set('material', matName, 'kd value', [400 1 800 1]);
-mat = piMaterialCreate('new material');
-thisR.set('material', 'add', mat);
 thisR.set('material', mat.name, 'kd value', [1 1 1]);
 thisR.set('material', 2, mat);
+
+%% Add and delete
+mat = piMaterialCreate('new material');
+thisR.set('material', 'add', mat);
 thisR.set('material', 'delete', mat.name)
 

@@ -80,10 +80,19 @@ for ii=1:numel(txtLines)
         switch keyType
             case {'string', 'texture'}
                 thisVal = thisLine{ss + 1};
-            case {'float', 'spectrum', 'rgb', 'color', 'photolumi'}
+            case {'float', 'rgb', 'color', 'photolumi'}
                 % Parse a float number from string
                 % str2num can convert string to vector. str2double can't.
                 thisVal = str2num(thisLine{ss + 1});
+            case {'spectrum'}
+                [~, ~, e] = fileparts(thisLine{ss + 1});
+                if isequal(e, '.spd')
+                    % Is a file
+                    thisVal = thisLine{ss + 1};
+                else
+                    % Is vector
+                    thisVal = str2num(thisLine{ss + 1});
+                end
             case 'bool'
                 if isequal(thisLine{ss + 1}, 'true')
                     thisVal = true;

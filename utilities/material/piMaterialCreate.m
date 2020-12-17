@@ -1,13 +1,4 @@
 function material = piMaterialCreate(name, varargin)
-% OLD comment.
-% Template for the material structure.
-% We have noticed these as possible additions
-%    spectrum Kd
-%    xyz Kd
-%
-% V2 had a specifier 'texture bumpmap' that we don't think is V3.
-%
-
 %%
 % 
 % Synopsis:
@@ -29,18 +20,25 @@ function material = piMaterialCreate(name, varargin)
 %   The material properties should be given in key/val pairs. For keys. it
 %   should follow the format of 'TYPE KEYNAME'. It's easier for us to
 %   extract type and parameter name using space.
-%   
+%   Syntax is: 
+%       material = piMaterialCreate(NAME, 'type', [MATERIAL TYPE],...
+%                                   [PROPERTYTYPE PROPERTYNAME], [VALUE]); 
+%       material = piMaterialCreate(NAME, 'type', [MATERIAL TYPE],...
+%                                   [PROPERTYNAME PROPERTYTYPE], [VALUE]);
+%
 % Returns:
 %   material                  - created material
-%
 %
 
 % Examples
 %{
+    %   
     material = piMaterialCreate('new material', 'type', 'kdsubsurface',...
                                 'kd rgb',[1, 1, 1]);
     material = piMaterialCreate('new material',...
                                 'kd rgb',[1, 1, 1]);
+    material = piMaterialCreate('new material', 'type', 'uber',...
+                                'spectrum kd', [400 1 800 1]);
 %}
 %%
 % Replace the space in potential parameters. For example, 'rgb kd' won't
@@ -60,6 +58,14 @@ p.parse(name, varargin{:});
 type = ieParamFormat(p.Results.type);
 %% Construct material struct
 material.name = name;
+
+% Fluorescence EEM and concentration
+material.fluorescence.type = 'photolumi';
+material.fluorescence.value = [];
+
+material.concentration.type = 'float';
+material.concentration.value = [];
+
 switch type
     % Different materials have different properties
     case 'disney'
@@ -229,8 +235,8 @@ switch type
         
         material.kr.type = 'spectrum';
         material.kr.value = [];
-    case 'mixture'
-        material.type = 'mixture';
+    case 'mix'
+        material.type = 'mix';
         
         material.amount.type = 'spectrum';
         material.amount.value = [];

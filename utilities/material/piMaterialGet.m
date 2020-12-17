@@ -1,19 +1,19 @@
 function val = piMaterialGet(material, param, varargin)
-% Read a material struct in the recipe
+%%
+%
+% Synopsis:
+%   val = piMaterialGet(material, param, varargin)
+%
+% Brief description:
+%   Get a material property.
 %
 % Inputs
-%   thisR:  Recipe
+%   material    - material struct.
+%   param       - property name.
 %
-% Optional key/val pairs
-%   idx:    Index of the material to address
-%   param:  Parameter of the indexed material to return
-%   print:  Print out the list of textures
 %
 % Returns:
-%   val: Depending on the input arguments
-%       - Cell array of material structures (idx and param both empty)
-%       - One of materials (param empty)
-%       - A parameter of one of the materials (idx and param both set)
+%   val         - property value.
 %
 % ZLY, SCIEN, 2020
 %
@@ -24,6 +24,7 @@ function val = piMaterialGet(material, param, varargin)
 %{
     mat = piMaterialCreate('new material');
     kdType = piMaterialGet(mat, 'kd type');
+    kdVal = piMaterialGet(mat, 'kd value');
 %}
 
 %% Parse inputs

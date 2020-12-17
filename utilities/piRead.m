@@ -298,7 +298,7 @@ if isequal(thisR.exporter,'C4D')
     
     % Check if the materials.pbrt exist
     if ~exist(inputFile_materials,'file'), error('File not found'); end
-    [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials);
+    thisR.materials.list = piMaterialRead(thisR, inputFile_materials);
     thisR.materials.inputFile_materials = inputFile_materials;
     
     % Call material lib

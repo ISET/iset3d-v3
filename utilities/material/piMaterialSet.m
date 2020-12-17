@@ -2,21 +2,22 @@ function material = piMaterialSet(material, param, val, varargin)
 %% 
 %
 % Synopsis
-%    thisR = piMaterialSet(material, materialIdx, param, val, varargin)
+%    material = piMaterialSet(material, param, val, varargin)
 %
 % Brief description
 %   Set one of the material properties.
 %
 % Inputs:
-%   material
-%   materialInfo
+%   material    - material struct.
+%   param       - material property
+%   val         - property value
 %
 % Optional key/value pairs
-%   type    - property type
-%   val     - property val
+%   type        - property type
+%   val         - property val
 %
 % Returns
-%   obj     -  modified recipe or material struct
+%   material    -  modified material struct
 %
 % See also
 %   piMaterialGet, piMaterial*
@@ -79,7 +80,11 @@ if isfield(material, pName)
             if numel(val) == 3
                 material.(pName).type = 'rgb';
             elseif numel(val) > 3
-                material.(pName).type = 'spectrum';
+                if piMaterialISEEM(val)
+                    material.(pName).type = 'photolumi';
+                else
+                    material.(pName).type = 'spectrum';
+                end
             end
         elseif ischar(val)
             % It is a file name, so the type has to be spectrum or texture,
@@ -100,6 +105,7 @@ else
 end
 
 %%
+% NOTE: keep it longer for a while
 %{
 %% Conditions where we need to convert spectrum from numeric to char
 if piContains(param, ['spectrum', 'rgb', 'color']) && isnumeric(val)

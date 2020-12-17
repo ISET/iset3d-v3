@@ -912,7 +912,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         else
             val = 0;
         end        
-    case {'printmaterials', 'materialsprint'}
+    case {'printmaterials', 'materialsprint', 'materialprint', 'printmaterial'}
         nMaterials = thisR.get('n material');
         
         [~,sceneName] = fileparts(thisR.inputFile);
