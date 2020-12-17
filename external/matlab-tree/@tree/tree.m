@@ -220,14 +220,14 @@ classdef tree
             
             if ~obj.isRoot(id)
                 newNames = obj.Node{id}.name;
-                while obj.hasID(id)
-                    newNames = obj.Node{id}.name(7:end);
-                end
+
             else
                 newNames = obj.Node{id};
-                while obj.hasID(id)
-                    newNames = obj.Node{id}(7:end);
-                end
+            end
+            
+            while numel(newNames) >= 7 &&...
+                    isequal(newNames(4:5), 'ID')
+                newNames = newNames(7:end);
             end
             
         end
@@ -288,7 +288,7 @@ classdef tree
             % If id is passed, we check if that node starts with XXXID.
             if isstruct(obj.Node{id})
                 % It is real node.
-                if numel(obj.Node{id}.name) >= 5 &&...
+                if numel(obj.Node{id}.name) >= 7 &&...
                    isequal(obj.Node{id}.name(1:5), sprintf('%03dID', id))
                     val = true;
                 else
@@ -296,7 +296,7 @@ classdef tree
                 end
             else
                 % The root node is special.
-                if numel(obj.Node{id}) >= 5 && ...
+                if numel(obj.Node{id}) >= 7 && ...
                    isequal(obj.Node{id}(1:5), sprintf('%03dID', id))
                     val = true;
                 else
