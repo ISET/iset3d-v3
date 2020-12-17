@@ -1,5 +1,8 @@
 %% init
+% Deprecated
+
 ieInit;
+
 
 %% 
 t = tree('root');

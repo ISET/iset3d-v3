@@ -1,11 +1,11 @@
 function thisR = piAssetDelete(thisR, assetInfo, varargin)
-%%
+% Delete a node of the asset tree
 %
 % Synopsis:
 %   thisR = piAssetDelete(thisR, assetInfo)
 %
 % Brief description:
-%   Remove a node from assets tree
+%   assetInfo:  The node name or the id
 %
 % Inputs:
 %   thisR     - recipe.
@@ -34,7 +34,7 @@ assetInfo = p.Results.assetInfo;
 % If assetInfo is a node name, find the id
 if ischar(assetInfo)
     assetName = assetInfo;
-    assetInfo = piAssetFind(thisR, 'name', assetInfo);
+    assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
     if isempty(assetInfo)
         warning('Couldn not find a parent with name %s:', assetName);
         return;

@@ -197,13 +197,18 @@ classdef tree
             n = numel(obj.Parent);
         end
         
-        function n = names(obj)
-            n = cell(1, numel(obj.Node));
-            for ii=1:numel(obj.Node)
-                if isstruct(obj.Node{ii})
-                    n{ii} = obj.Node{ii}.name;
-                else
-                    n{ii} = obj.Node{ii};
+        % Return all the asset names or just the name of asset number id
+        function n = names(obj,id)
+            if notDefined('id')
+                n = cell(1, numel(obj.Node));
+                for ii=1:numel(obj.Node)
+                    if isstruct(obj.Node{ii}), n{ii} = obj.Node{ii}.name;
+                    else,                      n{ii} = obj.Node{ii};
+                    end
+                end
+            else
+                if isstruct(obj.Node{id}), n = obj.Node{id}.name;
+                else,                      n = obj.Node{id};
                 end
             end
         end

@@ -47,47 +47,49 @@ p.addRequired('rotation', @isvector);
 p.parse(thisR, assetInfo, rotation, varargin{:});
 
 %%
-% If assetInfo is a node name, find the id
+% If assetInfo is a name, find the id
 if ischar(assetInfo)
-    assetName = assetInfo;
-    assetInfo = piAssetFind(thisR, 'name', assetInfo);
+    assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
     if isempty(assetInfo)
-        warning('Couldn not find an asset with name %s:', assetName);
+        warning('Could not find an asset with name %s:', assetInfo);
         return;
     end
 end
 
-%%
 thisNode = thisR.assets.get(assetInfo);
 
+%% 
 if isempty(thisNode)
-    warning('Couldn not find an asset with name %d:', assetInfo);
+    warning('Could not find an asset with name %d:', assetInfo);
     return;
 end
 
-% Form rotation matrix
+% Create the rotation matrix
 rotMatrix = [rotation(3), rotation(2), rotation(1);
              fliplr(eye(3))];
 newBranch = piAssetCreate('type', 'branch');
-newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'rotate');
+newBranch.name   = strcat(thisR.assets.stripID(assetInfo), '_', 'rotate');
 newBranch.rotate = rotMatrix;
          
 if isequal(thisNode.type, 'branch')
-    % If the node is branch
-    % Get the children id of thisNode
+    % The node sent in is a branch node.  Get a list of the ids of its
+    % children 
     childID = thisR.assets.getchildren(assetInfo);
     
-    % Add the new node as child of thisNode
+    % Add the new node, which is also a branch, as child of the input branch
+    % node.
     thisR = thisR.set('asset', thisNode.name, 'add', newBranch);
     
-    % Set the parent of children of thisNode be the newBranch
+    % Set the children of the original branch node will now be children of
+    % this new branch node
     for ii=1:numel(childID)
         thisR.set('asset', childID(ii), 'parent',...
                 thisR.get('asset', thisR.assets.nnodes, 'name'));
     end
 else
-    % Node is object or light
-    % Insert the newBranch node under its parent
+    % The node sent in is an object or light.  We create a new node between
+    % thisNode and its parent.    
     thisR = thisR.set('asset', assetInfo, 'insert', newBranch);
 end
+
 end

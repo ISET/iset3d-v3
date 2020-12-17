@@ -1,21 +1,29 @@
 %% t_assets
 %
-% Introduction to the assets organization.
+% Introduction to the assets and their methods.
 %
-% The assets are now stored in ISET3d using a tree structure. Each node in
-% the tree has a unique name.  This tutorial illustrates how to get
-% information about the nodes and to set their properties.
-%
-% Assets can be objects or lights.  The reason we include lights in the
-% assets is because lights can be part of an object, such as the head lamp
-% of a car, or a candle on a Menorah. 
+% The assets are stored in ISET3d using a tree structure. Each node in the
+% tree has a unique name and a link to its parent node.  
 %
 % The asset tree includes information about (a) position and orientation,
-% (b) material, and (c) shape of the asset.  The position and orientation
-% information is stored in the branches of the tree, and these values are
-% inherited by everything below that branch.  The shape information and
-% material properties are stored at the leaf of the tree.
+% (b) material, and (c) shape of the asset.  This information is stored in
+% different types of nodes.
 %
+% Position, scale and orientation information is stored in the branches of
+% the tree. These values are inherited by everything below that branch.
+% Shape and material properties are stored at the leafs of the tree.
+%
+% This tutorial illustrates how to find nodes and their parents, and how to
+% adjust the position, rotation, and scale of the objects. A separate
+% tutorial will illustrate how to adjust material properties.
+%
+% Note: Assets can be objects or lights.  We include lights as assets
+% because lights can be part of an object, such as the head lamp of a car,
+% or a candle on a Menorah.
+%
+% ISET3d Methods tested here:
+%
+%   print, translate, rotate, scale, add, delete, obj2light
 %
 % See also
 %   t_assetsMotion.m
@@ -33,25 +41,27 @@ thisR = piRecipeDefault('scene name', 'SimpleScene');
 thisR.assets
 
 % You can display the assets tree structure in the command window.
-
 str = thisR.assets.print;
 
-% TODO:  Create an option to print the str in a window, not the command
-% line.
-% T = thisR.assets.show;
-%
+% thisR.assets.findleaves
+% thisR.assets.names
+% t = thisR.assets.stripID
+% str = thisR.assets.tostring
+
 %% Here is an example retrieving one of the assets
 
 % You do not need to include the prepended XXXID_ part of the object.
+
+% Ask for just the asset and you get the struct
 thisR.get('asset','sky')
 
-% But you can
-thisR.get('asset','002ID_sky')
+% You can request just the id and prepend the ID.  Goofy, but there it is
+thisR.get('asset id','002ID_sky')
 
-% Or just the node number
-thisR.get('asset',2)
+% To use the node number and get the struct, work directly with the assets
+thisR.assets.get(2)
 
-% You can also retrieve the properties of an object
+% You can retrieve a particuly asset propert this way
 thisR.get('asset','sky','position')
 
 %% Here is a low resolution rendering of the scene as baseline
@@ -78,12 +88,13 @@ thisAsset = 'figure_3m_material_uber_blue';
 % This places a new branch node representating a rotation just above the
 % named leaf asset.  The rotation is (x,y,z) in degrees.  We are rotating
 % around the z-axis in this case.
-thisR = thisR.set('asset', thisAsset, 'rotate', [0, 0, 45]);
+thisR.set('asset', thisAsset, 'rotate', [0, 0, 45]);
 
 % Notice that there is a new node just above the 015ID_ asset.
 thisR.assets.print;
 
 %% Write and render
+
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Rotation');
@@ -92,16 +103,18 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %% Translate
 
-% Here is another one of the figures.  This time, we select asset 16, which
-% is a branch that defines the position and rotation of the yellow guy at
-% the  back of the scene.
-thisAsset = thisR.get('asset',16,'name');
+% This is the object representing the yellow man
+assetName = 'figure_6m_material_uber';
 
-% We add a translation, moving him 2 meters in the z direction.
-thisR = thisR.set('asset', thisAsset, 'translate', [0, 0, -2]);
+% In this example, we find the branch node that is just above the yellow
+% man, representing its position, rotation and such.
+thisAsset = thisR.get('asset parent id',assetName);
 
-% This time the new branch is below the branch we selected, but above the
-% leaf (017ID_...uber) representing the asset shape.
+% We add a translation, moving yellow man 2 meters in the z direction.
+thisR.set('asset', thisAsset, 'translate', [0, 0, -2]);
+
+% This time the new branch is below the branch, but above the object (leaf)
+% that contains the object shape.
 thisR.assets.print;
 
 %% Write and render
@@ -112,17 +125,41 @@ scene = sceneSet(scene, 'name', 'Translation');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
+%% Scale
+
+% This is the object representing the yellow man
+assetName = 'figure_6m_material_uber';
+
+% We scale the size of the yellow man
+thisR.set('asset', assetName, 'scale', 1.2);
+
+% This time the new branch is below the branch, but above the object (leaf)
+% that contains the object shape.
+thisR.assets.print;
+
+%% Write and render
+piWrite(thisR);
+
+scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name', 'Translation');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+
 %% Add a copy of an existing object
 
-% We want a copy asset with new name function
+% The blue man.
 thisAsset = 'figure_3m_material_uber_blue'; 
 
+% Get the blue man that we will modify into a new asset.
 newAsset = thisR.get('asset',thisAsset);
 newAsset.name = 'blueGuy2';
 
-% Add the asset, but notice we need the parent
-parent = thisR.get('asset',thisAsset,'parent');
-thisR.set('asset',parent.name,'add',newAsset);
+% We add the asset below the parent of the current blue man. 
+parent = thisR.get('asset parent',thisAsset);     % The parent
+
+% Calls the function to insert an asset below a parent.
+thisR.set('asset',parent.name,'add',newAsset);    
 
 thisR.assets.print;
 
@@ -130,30 +167,27 @@ thisR.set('asset',newAsset.name,'rotate',[0 0 -45]);
 thisR.set('asset',newAsset.name,'translate',[1 0 0]);
 thisR.assets.print;
 
-%%
-piWrite(thisR);
+%%  Show the 2nd blue guy
 
+piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'blueguy2');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
-
 %% Delete an existing object
 
 thisAsset = 'figure_3m_material_uber_blue'; 
-
 thisR.set('asset',thisAsset,'delete');
-
 thisR.assets.print;
 
-%%
-piWrite(thisR);
+%% And the rotated blue guy is deleted
 
+piWrite(thisR);
 [scene, results] = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'blueguy2');
 sceneWindow(scene);
-scene = sceneSet(scene, 'render flag', 'hdr');
+sceneSet(scene, 'render flag', 'hdr');
 
 %% Let's make one of the assets glow:  we turn it into an area light
 
@@ -164,27 +198,28 @@ areaLight = piLightSet(areaLight, [], 'lightspectrum', lightName);
 areaLight = piLightSet(areaLight, [], 'spectrum scale', 3e-1);
 
 % This is the red sphere at the back
-thisAsset = thisR.get('asset',18,'name');
+assetName = '019ID_Sphere_material_BODY'; 
 
 % This converts the sphere asset into a glowing D65 ball.  Notice that it
 % did not add any new nodes.  It simply changed the properties of the
 % sphere.
-thisR = thisR.set('asset', thisAsset, 'obj2light', areaLight);
+thisR.set('asset', assetName, 'obj2light', areaLight);
 
 thisR.assets.print;
-% T = thisR.assets.show;
-
 
 %% Write and render
+
 piWrite(thisR);
 
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Obj2Arealight');
 sceneWindow(scene);
-scene = sceneSet(scene, 'render flag', 'hdr');
+sceneSet(scene, 'render flag', 'hdr');
 
+%% END
 
 %% Now let's get material information from asset and make some changes
+
 % We are ignoring this now until the material sets/gets are finished.
 %
 %{
