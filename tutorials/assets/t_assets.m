@@ -189,6 +189,8 @@ scene = sceneSet(scene, 'name', 'blueguy2');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
+%% Illustrate deleting the translate node.
+
 %% Let's make one of the assets glow:  we turn it into an area light
 
 % Create a new area light with D65 spectral power distsribution
