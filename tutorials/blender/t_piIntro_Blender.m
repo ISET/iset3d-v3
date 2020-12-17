@@ -5,27 +5,24 @@
 %    using the Blender-to-pbrt exporter:
 %    https://github.com/stig-atle/io_scene_pbrt
 
-%    A detailed tutorial for users new to Blender 
-%    on how to use the Blender-to-pbrt exporter to export Blender images
-%    either created by the user or downloaded from the web
-%    can be found here: https://github.com/ISET/iset3d/wiki/Blender
+%    A tutorial on how to use the Blender exporter can be found here: 
+%    https://github.com/ISET/iset3d/wiki/Blender
 
-%    The current tutorial uses an image that has already been exported from
-%    Blender with the method above and which is included in the iset3d
-%    repository.
+%    The current tutorial uses an image that was exported from Blender and 
+%    which is included in the iset3d repository.
+
+%    To use your own output from the Blender-to-pbrt exporter:
+%    Put the output (a pbrt file and a 'meshes' folder) into a new folder 
+%    within the local directory of your iset3d installation: 
+%    ~/iset3d/local/scenes/[your new folder]. This folder will be ignored 
+%    by github, so it won't be synced up with the repository. You will be 
+%    able to point to your new folder and your pbrt file below. 
 %
 %    This tutorial works very similarly to tutorials that operate on scenes
 %    exported from Cinema 4D, but to parse and work with the Blender
 %    exported pbrt files you need to call functions with _Blender as part
 %    of their name.  These functions were written to understand the dialect
 %    of pbrt created by the Blender exporter.
-%
-%    To use your own output from the Blender-to-pbrt exporter:
-%    Put the output (a pbrt file and a 'meshes' folder) into a new folder 
-%    within the local/scenes directory of your iset3d installation. This 
-%    folder will be ignored by github, so it won't be synced up with the 
-%    repository. You will be able to point to your new folder and your pbrt 
-%    file below. 
 %
 %    This tutorial is adapted from t_piIntro_scenefromweb.m
 
