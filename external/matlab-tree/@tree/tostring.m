@@ -103,6 +103,13 @@ function [str, names] = tostring(obj, sorted)
                 contentStr = sprintf('%s',data.name);
             else
                 contentStr = sprintf('%s..%s',data.name(1:8), data.name(end-4:end));
+                %{
+                thisName = split(data.name,'_');
+                contentStr = '';
+                for ss = 1:numel(thisName)
+                    contentStr = sprintf('%s\n%s',contentStr,thisName{ss});
+                end
+                %}
             end
         else
             names{i} = data;

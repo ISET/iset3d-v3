@@ -1,70 +1,75 @@
-function id = piAssetFind(thisR, param, val)
-%%
-% Find an asset with parameters matches vale.
+function [id, thisAsset] = piAssetFind(assets, param, val)
+% Find the id of an asset such that the parameter matches the val
 %
 % Synopsis:
-%   id = piAssetFind(thisR, param, val)
+%   [id, theAsset] = piAssetFind(assets, param, val)
 %
 % Inputs:
-%   thisR   - recipe
+%   assets  - recipe
 %   param   - parameter
 %   val     - value to match
 %
 % Returns:
-%   id      - 
+%   id       - id of the matching node
+%   theAsset - the asset struct
+%
 % See also:
 %   piAssetGet, piAssetSet;
 
-% Example
+% Examples:
 %{
-t = tree('root');
-[t, nID] = t.addnode(1, node);
-[t, oID] = t.addnode(nID, object);
-[t, lID] = t.addnode(nID, light);
-disp(t.tostring)
+ thisR = piRecipeDefault;
+ id = piAssetFind(thisR.assets, 'name', 'Camera');
+ [id, theAsset]  = piAssetFind(thisR, 'name', '002ID_Camera');
+ id = piAssetFind(thisR.assets, 'scale', [1 1 1]);
+%}
 
-thisID = piAssetFind(t, 'name', 'object');
-nodeObject = t.get(thisID);
-%}
-%{
-thisR = piRecipeDefault;
-names = thisR.assets.names;
-id = piAssetFind(thisR, 'name', 'Camera');
-idtwo = piAssetFind(thisR, 'name', '002ID_Camera');
-%}
+%%  In the past, we allowed a recipe
+
+% So now we check if it is a recipe and then we get the assets.
+if isa(assets,'recipe')
+    assets = assets.assets;
+end
+if ~isa(assets,'tree'), error('Assets must be a tree.'); end
+
+% If the input is a node id (number), replace val with the name.
+if isnumeric(val), val = assets.get(val).name; end
 %%
-thisTree = thisR.assets;
-%%
-nodeList = [0]; % 0 is always the index for root node
+nodeList = 0; % 0 is always the index for root node
 
 curIdx = 1; %
  
 while curIdx <= numel(nodeList)
-    IDs = thisTree.getchildren(nodeList(curIdx));
+    IDs = assets.getchildren(nodeList(curIdx));
     for ii = 1:numel(IDs)
         if isequal(param, 'name')
-            % Users are allowed to look for node with its ID or just the
-            % name contain.
-            % piAssetFind(thisR, 'name', 'XXXID_NAME') or 
-            % piAssetFind(thisR, 'name', 'NAME') 
-            if isequal(val, thisR.assets.stripID(IDs(ii))) || ...
-                    isequal(val, piAssetGet(thisR, IDs(ii), param))
+            % Users are allowed to look for node with the ID prepended or
+            % just the base asset name.  That is why 'name' is a special
+            % case. 
+            if isequal(val, assets.stripID(IDs(ii))) || ...
+                    isequal(val, assets.names(IDs(ii)))
                 id = IDs(ii);
+                if nargout > 1, thisAsset = assets.get(IDs(ii)); end
                 return;
             end
         else
-            % All other parameters must match.
-            if isequal(val, piAssetGet(thisR, IDs(ii), param))
-                id = IDs(ii);
-                return;
+            % Another parameter must match.  Returns the first instance of
+            % the match.  Maybe it should return all the instances?
+            if IDs(ii) > 1
+                thisAsset = assets.get(IDs(ii));
+                if isequal(val, piAssetGet(thisAsset, param))
+                    id = IDs(ii);
+                    return;
+                end
             end
         end
-        nodeList = [nodeList IDs(ii)];
+        nodeList = [nodeList IDs(ii)]; %#ok<AGROW>
     end
     
     curIdx = curIdx + 1;
 end
 
 id = [];
+thisAsset = [];
 
 end

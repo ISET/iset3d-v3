@@ -42,7 +42,7 @@ rotation = p.Results.rotation;
 % If assetInfo is a node name, find the id
 if ischar(assetInfo)
     assetName = assetInfo;
-    assetInfo = piAssetFind(thisR, 'name', assetInfo);
+    assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
     if isempty(assetInfo)
         warning('Couldn not find an asset with name %s:', assetName);
         return;

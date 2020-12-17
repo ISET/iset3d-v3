@@ -34,19 +34,17 @@ p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
 p.addRequired('lght', @isstruct);
 p.parse(thisR, assetInfo, lght, varargin{:});
 
-%%
-% If assetInfo is a node name, find the id
+%% If assetInfo is a node name, find the assetID
 if ischar(assetInfo)
-    assetName = assetInfo;
-    assetInfo = piAssetFind(thisR, 'name', assetInfo);
-    if isempty(assetInfo)
-        warning('Couldn not find an asset with name %s:', assetName);
+    assetID = piAssetFind(thisR.assets, 'name', assetInfo);
+    if isempty(assetID)
+        warning('Could not find an asset named %s:', assetInfo);
         return;
     end
 end
 
 %% Extract the information from object node
-objectNode = thisR.assets.get(assetInfo);
+objectNode = thisR.assets.get(assetID);
 objectName = objectNode.name;
 shape = objectNode.shape;
 
@@ -58,5 +56,5 @@ if isequal(lght.type, 'area')
     lightNode.lght{1}.shape = shape;
 end
 
-thisR.assets = thisR.assets.set(assetInfo, lightNode);
+thisR.assets = thisR.assets.set(assetID, lightNode);
 end

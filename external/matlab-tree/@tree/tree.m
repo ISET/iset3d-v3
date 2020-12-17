@@ -197,13 +197,18 @@ classdef tree
             n = numel(obj.Parent);
         end
         
-        function n = names(obj)
-            n = cell(1, numel(obj.Node));
-            for ii=1:numel(obj.Node)
-                if isstruct(obj.Node{ii})
-                    n{ii} = obj.Node{ii}.name;
-                else
-                    n{ii} = obj.Node{ii};
+        % Return all the asset names or just the name of asset number id
+        function n = names(obj,id)
+            if notDefined('id')
+                n = cell(1, numel(obj.Node));
+                for ii=1:numel(obj.Node)
+                    if isstruct(obj.Node{ii}), n{ii} = obj.Node{ii}.name;
+                    else,                      n{ii} = obj.Node{ii};
+                    end
+                end
+            else
+                if isstruct(obj.Node{id}), n = obj.Node{id}.name;
+                else,                      n = obj.Node{id};
                 end
             end
         end
@@ -213,54 +218,65 @@ classdef tree
             if notDefined('id')
                 newNames = cell(1, obj.nnodes);
                 for ii=1:obj.nnodes
-                    if ~obj.isRoot(ii)
-                        if obj.hasID(ii)
-                            newNames{ii} = obj.Node{ii}.name(7:end);
-                        else
-                            newNames{ii} = obj.Node{ii}.name;
-                        end
-                    else
-                        if obj.hasID(ii)
-                            newNames{ii} = obj.Node{ii}(7:end);
-                        else
-                            newNames{ii} = obj.Node{ii};
-                        end
-                    end
+                    newNames{ii} = obj.stripID(ii);
                 end
                 return;
             end
             
             if ~obj.isRoot(id)
-                if obj.hasID(id)
-                    newNames = obj.Node{id}.name(7:end);
-                else
-                    newNames = obj.Node{id}.name;
-                end
+                newNames = obj.Node{id}.name;
+
             else
-                if obj.hasID(id)
-                    newNames = obj.Node{id}(7:end);
-                else
-                    newNames = obj.Node{id};
-                end
+                newNames = obj.Node{id};
+            end
+            
+            while numel(newNames) >= 7 &&...
+                    isequal(newNames(4:5), 'ID')
+                newNames = newNames(7:end);
             end
             
         end
         
-        function print(obj, id)
+        % Print the tree or a node of the tree
+        function str = print(obj, id)
             if notDefined('id')
-                disp(obj.tostring)
+                str = obj.tostring;
+                disp(str)
             else
                 thisNode = obj.Node{id};
                 disp(thisNode)
             end
         end
-                
-        function val = hasID(obj, id)
-            % We check that the node name conforms to the syntax.
-            % XXXID, where XXX is the integer index for that node.
+        
+        % Print the tree or a node of the tree
+        function T = show(obj)
+            % Bring up a window with the tree.  Returns the text object
+            % that you can use to reset the 
+            %
+            % Maybe this should rely on tree.plot, which has an example
+            % that I don't yet understand.
+            %{
+              [ lineage duration ] = tree.example; % 1st one is made of strings only, 2nd one of integers
+              slin = lineage.subtree(19); % Work on a subset
+              sdur = duration.subtree(19);
+              [vlh hlh tlh] = slin.plot(sdur, 'YLabel', {'Division time' '(min)'});
+              rcolor = [ 0.6 0.2 0.2 ];
+              aboveTreshold = sdur > 10; % true if longer than 10 minutes
+            %}
             
-            % If id is not passed, we check if all node start with XXXID.
-            % If id is passed, we check if that node starts with idID.
+            % Better to strip the IDs before plotting.
+            str = obj.tostring;
+            ieNewGraphWin([],'wide');
+            T = text(0.1,0.5,str);
+            axis off
+        end
+        
+        % Check that a node has its ID embedded in its name.
+        function val = hasID(obj, id)
+            % The name format is usually XXXID_<>, where XXX is the integer
+            % index for that node. 
+            
+            % If id is not passed, we check all nodes
             if notDefined('id')
                 % Checking all the nodes.
                 for ii=1:numel(obj.nnodes)
@@ -274,17 +290,18 @@ classdef tree
                 return;
             end
             
+            % If id is passed, we check if that node starts with XXXID.
             if isstruct(obj.Node{id})
                 % It is real node.
-                if numel(obj.Node{id}.name) >= 5 &&...
+                if numel(obj.Node{id}.name) >= 7 &&...
                    isequal(obj.Node{id}.name(1:5), sprintf('%03dID', id))
                     val = true;
                 else
                     val = false;
                 end
             else
-                % It is root node.
-                if numel(obj.Node{id}) >= 5 && ...
+                % The root node is special.
+                if numel(obj.Node{id}) >= 7 && ...
                    isequal(obj.Node{id}(1:5), sprintf('%03dID', id))
                     val = true;
                 else
@@ -293,19 +310,32 @@ classdef tree
             end
         end
         
+        % Assign unique names to a node or all nodes
         function [obj, names] = uniqueNames(obj, id)
-            % Assign unique names to nodes or a particular node. If id is
-            % provided, the function assign unique names to that node.
-            % Otherwise to all nodes in the tree.
+            % Names are made unique by creating them as
+            %
+            %   XXXID_STRING
+            %
+            % where XXX is the node id (an integer).  We are considering if
+            % we need XXXXID to allow for more nodes.
+            %
+            % If id is provided, the function assign unique names to that
+            % node. Otherwise unique names are assigned to all nodes in the
+            % tree. 
             
             % Update all nodes
             if notDefined('id')
+                % Some nodes may already have an ID.  So we strip the ID
+                % from all the nodes.
                 stripNames = obj.stripID;
                 names = cell(1, numel(stripNames));
                 if obj.nnodes > 999
                     warning('Number of nodes: %d exceeds 999', obj.nnodes);
                 end
                 
+                % Then we do the renaming.  We are considering if we need
+                % to use %04ID to allow 10,000 nodes for the driving
+                % scenes.
                 for ii=1:obj.nnodes
                     if isstruct(obj.Node{ii})
                         obj.Node{ii}.name = sprintf('%03dID_%s', ii, stripNames{ii});
@@ -330,6 +360,7 @@ classdef tree
         
         end
         
+        % Test if this is the root node.  Should be a static method.
         function val = isRoot(~, id)
             % Check if it is root node. Yes if id is 1.
             if id == 1

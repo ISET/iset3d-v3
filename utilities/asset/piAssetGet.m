@@ -1,16 +1,16 @@
-function val = piAssetGet(thisR, assetInfo, param, varargin)
-%%
+function val = piAssetGet(thisAsset, param, varargin)
+% Return a parameter value for a specific node in an asset tree
 %
 % Synopsis:
-%   val = piAssetGet(thisR, assetInfo, param)
+%   val = piAssetGet(thisAsset, param)
 %
 % Brief description:
-%   Get the value of a node parameter in the asset tree or the node 
-%   itself.
+%   The asset is a node in a tree.  This routine returns the value of one
+%   of the node parameters.  To return the parent or children of a node,
+%   you must call the tree functions.
 %
 % Inputs:
-%   thisR     - recipe
-%   assetInfo - information of asset. Either an id or a name.
+%   thisAsset - A Node from the tree of assets.
 %
 % Optional:
 %   param     - the parameter to look for, or empty to return the node.
@@ -19,132 +19,81 @@ function val = piAssetGet(thisR, assetInfo, param, varargin)
 %   val       - the parameter value or the node (if param is empty or
 %               omitted).
 %
+% See also
+%    assets.getparent(nodeID)  (assets is a tree).
 
 % Examples:
 %{
-thisR = piRecipeDefault;
-disp(thisR.assets.tostring)
-thisName = 'colorChecker_material_Patch09Material';
-node = thisR.get('asset', thisName);
-shape = thisR.get('asset', thisName, 'shape');
-scale = thisR.get('asset', 'colorChecker', 'scale');
+  thisR = piRecipeDefault;
+  disp(thisR.assets.tostring)
+  thisName = 'colorChecker_material_Patch09Material';
+  [~, thisAsset] = piAssetFind(thisR.assets, 'name',thisName);
+  thisAsset
+  shape = piAssetGet(thisAsset, 'shape');
+  scale = thisR.get('asset', 'colorChecker', 'scale');
 %}
 %%
-if notDefined('param'), param = ''; end
+% if notDefined('param'), param = ''; end
 
 %% Parse input
 p = inputParser;
-p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
-p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
+p.addRequired('thisAsset', @isstruct);
 p.addRequired('param', @ischar);
-p.parse(thisR, assetInfo, param, varargin{:});
-        
+p.parse(thisAsset,param, varargin{:});
+
 %%
 
 val = [];
-% If assetInfo is a node name, find the id
-if ischar(assetInfo)
-    assetName = assetInfo;
-    assetInfo = piAssetFind(thisR, 'name', assetInfo);
-    if isempty(assetInfo)
-        warning('Could not find an asset with name %s:', assetName);
 
-        return;
-    end
-end
-
-thisTree = thisR.assets;
-thisNode = thisTree.get(assetInfo);
-
-% Special case for the root node.
-if thisTree.isRoot(assetInfo) 
-    if isequal(param, 'name')
-        val = thisNode;
-        return;
-    end
-end
-
-if isempty(param)
-    val = thisNode;
-else
-    if isequal(param, 'parent')
-        parent = thisTree.getparent(assetInfo);
-        if isempty(parent)
-            val = [];
-        else
-            val = piAssetGet(thisR, parent);
+switch thisAsset.type
+    case 'object'
+        switch param
+            case {'name'}
+                val = thisAsset.name;
+            case {'mediumInterface'}
+                val = thisAsset.mediumInterface;
+            case {'material'}
+                val = thisAsset.material;
+            case {'shape'}
+                val = thisAsset.shape;
+            case {'output'}
+                val = thisAsset.output;
+            case {'position'}
+                val = piAssetGet(thisR, thisR.assets.getparent(assetInfo), param);
+            otherwise
+                warning('Node %s does not have field: %s. Empty return', thisAsset.name, param)
+                return;
         end
-        return;
-        
-    elseif isequal(param, 'children')
-        childrenList = thisTree.getchildren(assetInfo);
-        
-        if isempty(childrenList)
-            val = [];
-        elseif numel(childrenList) == 1
-            val = piAssetGet(thisR, childrenList);
-        else
-            val = cell(1, numel(childrenList));
-            for ii=1:numel(childrenList)
-                val{ii} = piAssetGet(thisR, childrenList(ii));
-            end
+    case 'light'
+        switch param
+            case {'name'}
+                val = thisAsset.name;
+            case {'lght'}
+                val = thisAsset.lght;
+            case {'position'}
+                val = piAssetGet(thisR, thisR.assets.getparent(assetInfo), param);
+            otherwise
+                warning('Node %s does not have field: %s. Empty return', thisAsset.name, param)
+                return;
         end
-        return;
-    elseif thisTree.isRoot(assetInfo)
-        val = [];
-        return;
-    end
-    
-    switch thisNode.type
-        case 'object'
-            switch param
-                case {'name'}
-                    val = thisNode.name;
-                case {'mediumInterface'}
-                    val = thisNode.mediumInterface;
-                case {'material'}
-                    val = thisNode.material;
-                case {'shape'}
-                    val = thisNode.shape;
-                case {'output'}
-                    val = thisNode.output;
-                case {'position'}
-                    val = piAssetGet(thisR, thisR.assets.getparent(assetInfo), param);
-                otherwise
-                    warning('Node %s does not have field: %s. Empty return', thisNode.name, param)
-                    return;
-            end
-        case 'light'
-            switch param
-                case {'name'}
-                    val = thisNode.name;
-                case {'lght'}
-                    val = thisNode.lght;
-                case {'position'}
-                    val = piAssetGet(thisR, thisR.assets.getparent(assetInfo), param);
-                otherwise
-                    warning('Node %s does not have field: %s. Empty return', thisNode.name, param)
-                    return;
-            end
-        case 'branch'
-            switch param
-                case {'name'}
-                    val = thisNode.name;
-                case {'size'}
-                    val = thisNode.size;
-                case {'scale'}
-                    val = thisNode.scale;
-                case {'position'}
-                    val = thisNode.position;
-                case {'rotate'}
-                    val = thisNode.rotate;
-                case {'motion'}
-                    val = thisNode.motion;
-                otherwise
-                    warning('Node %s does not have field: %s. Empty return', thisNode.name, param)
-                    return;
-            end
-    end
-    
+    case 'branch'
+        switch param
+            case {'name'}
+                val = thisAsset.name;
+            case {'size'}
+                val = thisAsset.size;
+            case {'scale'}
+                val = thisAsset.scale;
+            case {'position'}
+                val = thisAsset.position;
+            case {'rotate'}
+                val = thisAsset.rotate;
+            case {'motion'}
+                val = thisAsset.motion;
+            otherwise
+                warning('Node %s does not have field: %s. Empty return', thisAsset.name, param)
+                return;
+        end
 end
+
 end

@@ -1,28 +1,26 @@
-function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
-%% Rotate an asset
+function thisR = piAssetScale(thisR, assetInfo, scaleFactor, varargin)
+%% Scale the size of an asset
 %
 % Synopsis:
-%   thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
+%   thisR = piAssetScale(thisR, assetInfo, scaleFactor, varargin)
 %
 % Brief description:
-%   Rotate an asset. Function reweitten by Zheng Lyu.
+%   Scale an asset size.
 % 
 % Inputs:
 %   thisR       - recipe.
 %   assetInfo   - asset name or id
-%   rotation    - rotation vector [x-axis, y-axis, z-axis] (deg)
+%   rotation    - scaling vector [x-axis, y-axis, z-axis] (deg)
 % 
 % Returns:
 %   thisR       - modified recipe.
 %
 % Description:
-%   Rotate an asset. 
-%
-%   If the asset is a branch node, insert a new branch node with rotation
-%   below.
+%   If the asset is a branch node, insert a new branch node with the
+%   scaling below.
 %
 %   If the asset is an object or light, insert a branch node representing
-%   rotation between the node and its parent.
+%   the scaling between the node and its parent.
 %   
 % ZL, Vistasoft Team, 2018
 % ZLY, Vistasoft Team, 2020
@@ -43,20 +41,20 @@ disp(thisR.assets.tostring)
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
 p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
-p.addRequired('rotation', @isvector);
-p.parse(thisR, assetInfo, rotation, varargin{:});
+p.addRequired('scaleFactor', @isvector);
+p.parse(thisR, assetInfo, scaleFactor, varargin{:});
 
 %%
 % If assetInfo is a name, find the id
 if ischar(assetInfo)
-    assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
-    if isempty(assetInfo)
+    assetID = piAssetFind(thisR.assets, 'name', assetInfo);
+    if isempty(assetID)
         warning('Could not find an asset with name %s:', assetInfo);
         return;
     end
 end
 
-thisNode = thisR.assets.get(assetInfo);
+thisNode = thisR.assets.get(assetID);
 
 %% 
 if isempty(thisNode)
@@ -64,17 +62,18 @@ if isempty(thisNode)
     return;
 end
 
-% Create the rotation matrix
-rotMatrix = [rotation(3), rotation(2), rotation(1);
-             fliplr(eye(3))];
+% If a scalar, turn into a 3 vector
+if numel(scaleFactor) == 1
+    scaleFactor = repmat(scaleFactor,1,3); 
+end
 newBranch = piAssetCreate('type', 'branch');
-newBranch.name   = strcat(thisR.assets.stripID(assetInfo), '_', 'rotate');
-newBranch.rotate = rotMatrix;
+newBranch.name   = strcat(thisR.assets.stripID(assetID), '_', 'scale');
+newBranch.scale = scaleFactor;
          
 if isequal(thisNode.type, 'branch')
     % The node sent in is a branch node.  Get a list of the ids of its
     % children 
-    childID = thisR.assets.getchildren(assetInfo);
+    childID = thisR.assets.getchildren(assetID);
     
     % Add the new node, which is also a branch, as child of the input branch
     % node.
@@ -89,7 +88,7 @@ if isequal(thisNode.type, 'branch')
 else
     % The node sent in is an object or light.  We create a new node between
     % thisNode and its parent.    
-    thisR = thisR.set('asset', assetInfo, 'insert', newBranch);
+    thisR = thisR.set('asset', assetID, 'insert', newBranch);
 end
 
 end

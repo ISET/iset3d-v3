@@ -676,25 +676,36 @@ switch param
     case {'materialsoutputfile'}
         thisR.materials.outputfile = val;
     case {'asset', 'assets'}
-        switch varargin{1}
+        % Typical:    thisR.set(param,val) 
+        % This case:  thisR.set('asset',assetName, param, val);
+        %
+        % All of these operations need the whole tree, so we send in the
+        % recipe with thisR.assets.  We could send in just assets, but ..
+        assetName = val;        
+        param = varargin{1};
+        if numel(varargin) == 2, val   = varargin{2}; end
+        switch param
             case 'add'
-                thisR = piAssetAdd(thisR, val, varargin{2});
+                thisR = piAssetAdd(thisR, assetName, val);
             case {'delete', 'remove'}
-                thisR = piAssetDelete(thisR, val);
+                thisR = piAssetDelete(thisR, assetName);
             case {'insert'}
-                thisR = piAssetInsert(thisR, val, varargin{2});
+                thisR = piAssetInsert(thisR, assetName, val);
             case {'parent'}
-                thisR = piAssetSetParent(thisR, val, varargin{2});
+                thisR = piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
-                thisR = piAssetTranslate(thisR, val, varargin{2});
+                thisR = piAssetTranslate(thisR, assetName, val);
             case {'rotate', 'rotation'}
-                thisR = piAssetRotate(thisR, val, varargin{2});
+                thisR = piAssetRotate(thisR, assetName, val);
+            case {'scale'}
+                thisR = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}
-                thisR = piAssetMotionAdd(thisR, val, varargin{2:end});
+                thisR = piAssetMotionAdd(thisR, assetName, val);
             case {'obj2light'}
-                thisR = piAssetObject2Light(thisR, val, varargin{2});
+                thisR = piAssetObject2Light(thisR, assetName, val);
             otherwise
-                thisR = piAssetSet(thisR, val, varargin{1}, varargin{2});
+                % What does this do?
+                thisR = piAssetSet(thisR, assetName, varargin{1},val);
         end
         % ZLY added fluorescent
     case {'fluorophoreconcentration'}

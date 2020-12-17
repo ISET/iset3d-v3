@@ -943,15 +943,43 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = thisR.light;
         
     % Assets - more work needed here.
-    case {'asset', 'assets'}
-        if numel(varargin) == 1 || numel(varargin) == 2
-            val = piAssetGet(thisR, varargin{:});
-        else
-            error('Wrong parameter number. One at a time')
+    case {'asset'}
+        % thisR.get('asset',assetName or ID);  % Returns the asset
+        % thisR.get('asset',assetName,param);  % Returns the param val
+        [~,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
+        if length(varargin) == 1
+            val = thisAsset;
+            return;
+        else 
+            val = piAssetGet(thisAsset,varargin{2});
         end
+    case {'assetid'}
+        % thisR.get('asset id',assetName);  % ID from name
+        val = piAssetFind(thisR.assets,'name',varargin{1});
     case {'assetroot'}
-        % The root of all assets
-        val = thisR.assets;
+        % The root of all assets just has a name, not properties.
+        val = thisR.assets.get(1);
+    case {'assetnames'}
+        % The names without the XXXID_ prepended
+        val = thisR.assets.stripID;
+    case {'assetparentid'}
+        % thisR.get('asset parent id',assetName or ID);
+        %
+        % Returns the id of the parent node
+        thisNode = varargin{1};
+        if ischar(thisNode)
+            % It is a name, get the ID
+            thisNodeID = piAssetFind(thisR.assets,'name',thisNode);
+        end
+        val = thisR.assets.getparent(thisNodeID);
+    case {'assetparent'}
+        % thisR.get('asset parent',assetName)
+        %
+        thisNode = varargin{1};
+        parentNode = thisR.get('asset parent id',thisNode);
+        val = thisR.assets.Node{parentNode};   
+
+        %{
     case {'groupnames'}
         % Cell array (2D) of the groupobj names
         % val{level}{idx}
@@ -1009,7 +1037,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         % Find the group and child
         val = thisG(idx(2)).children(idx(3));
-        
+        %}
+
     otherwise
         error('Unknown parameter %s\n',param);
 end
