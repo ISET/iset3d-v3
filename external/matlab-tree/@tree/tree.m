@@ -213,34 +213,20 @@ classdef tree
             if notDefined('id')
                 newNames = cell(1, obj.nnodes);
                 for ii=1:obj.nnodes
-                    if ~obj.isRoot(ii)
-                        if obj.hasID(ii)
-                            newNames{ii} = obj.Node{ii}.name(7:end);
-                        else
-                            newNames{ii} = obj.Node{ii}.name;
-                        end
-                    else
-                        if obj.hasID(ii)
-                            newNames{ii} = obj.Node{ii}(7:end);
-                        else
-                            newNames{ii} = obj.Node{ii};
-                        end
-                    end
+                    newNames{ii} = obj.stripID(ii);
                 end
                 return;
             end
             
             if ~obj.isRoot(id)
-                if obj.hasID(id)
+                newNames = obj.Node{id}.name;
+                while obj.hasID(id)
                     newNames = obj.Node{id}.name(7:end);
-                else
-                    newNames = obj.Node{id}.name;
                 end
             else
-                if obj.hasID(id)
+                newNames = obj.Node{id};
+                while obj.hasID(id)
                     newNames = obj.Node{id}(7:end);
-                else
-                    newNames = obj.Node{id};
                 end
             end
             
