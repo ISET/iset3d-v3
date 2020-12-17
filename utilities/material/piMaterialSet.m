@@ -61,7 +61,7 @@ if ~isempty(val)
     if isnumeric(val)
         if numel(val) == 3
             material.(param).type = 'rgb';
-        elseif numel(value) > 3
+        elseif numel(val) > 3
             material.(param).type = 'spectrum';
         end
     elseif ischar(val)

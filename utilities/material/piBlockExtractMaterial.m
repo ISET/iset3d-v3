@@ -50,12 +50,14 @@ p.addRequired('txtLines', @iscell);
 p.parse(thisR, txtLines, varargin{:});
 
 %% Parse the string on the material line
+thisR.materials.list = cell(1, numel(txtLines));
 for ii=1:numel(txtLines)
     thisLine = txtLines{ii};
 
-    thisLine = textscan(thisLine,'%q');
-    thisLine = thisLine{1};
-       
+    % Split the text line with ' "', '" ' and '"' to get key/val pair
+    thisLine = strsplit(thisLine, {' "', '" ', '"'});
+    thisLine = thisLine(~cellfun('isempty',thisLine));
+    
     % Create a new material 
     matName = thisLine{2}; % Material name
     matType = thisLine{4}; % Material type
@@ -68,28 +70,33 @@ for ii=1:numel(txtLines)
         keyType = ieParamFormat(keyTypeName{1});
         keyName = ieParamFormat(keyTypeName{2});
         
+        % Some corner cases
+        % "index" should be replaced with "eta"
+        switch keyName
+            case 'index'
+                keyName = 'eta';
+        end
+        
         switch keyType
-            case 'string'
+            case {'string', 'texture'}
                 thisVal = thisLine{ss + 1};
-            case 'float'
+            case {'float', 'spectrum', 'rgb', 'color', 'photolumi'}
                 % Parse a float number from string
-                thisVal = piParseNumericString(thisLine{ss + 1});
-            case 'spectrum'
-                % Parse a spectrum from string
-                thisVal = piParseSpectrumString(thisLine{ss + 1});
-            case {'rgb', 'color'}
-                % Parse rgb from string
-                thisVal = piParseRGBString(thisLine{ss + 1});
+                % str2num can convert string to vector. str2double can't.
+                thisVal = str2num(thisLine{ss + 1});
             case 'bool'
-                thisVal = piParseBoolString(thisLine{ss + 1});
-            case 'photolumi'
-                thisVal = piParseSpectrumString(thisLine{ss + 1});
+                if isequal(thisLine{ss + 1}, '"true"')
+                    thisVal = true;
+                elseif isequal(thisLine{ss + 1}, '"false"')
+                    thisVal = false;
+                end
             otherwise
                 warning('Could not resolve the parameter type: %s', keyType);
                 continue;
         end
         
-        
+        newMat = piMaterialSet(newMat, keyName,...
+                    'type', keyType, 'val', thisVal);
         %{
         switch thisLine{ss}
             case 'string type'
@@ -148,9 +155,9 @@ for ii=1:numel(txtLines)
         end
         %}
     end
+    thisR.materials.list{ii} = newMat;
 end
 
-thisR.materials.list = thisR.materials.list';
 materialList = thisR.materials.list;
 fprintf('Read %d materials\n', numel(materialList));
 

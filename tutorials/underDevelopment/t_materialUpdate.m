@@ -1,5 +1,6 @@
 %% Create a new material
 
+%{
 mat.name
 mat.type
 mat.kd.type
@@ -13,4 +14,10 @@ thisR.get('material', MATNAME, 'kd type')
 thisR.get('material', MATNAME, 'kd value')
 
 thisR.set('material', MATNAME, key -'kd spectrum', val - [400 1 800 1]);
+%}
 
+thisR = piRecipeDefault;
+matName = 'Mat';
+
+thisMat = thisR.get('material', matName);
+nameCheck = thisR.get('material', matName, 'name');

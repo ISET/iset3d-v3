@@ -892,7 +892,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             % Getting the material
             val = thisMat;
         elseif numel(varargin) == 2
-            val = piMaterialGet(thisMat, varargin{1}, varargin{2});
+            val = piMaterialGet(thisMat, varargin{2});
         else
             error('Wrong parameter number. One at a time');
         end
