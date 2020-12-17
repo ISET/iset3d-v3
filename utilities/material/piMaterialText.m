@@ -37,10 +37,10 @@ for ii=1:numel(matParams)
              if isequal(thisType, 'photolumi')
                  % Fluorescence EEM needs more precision
                  thisText = sprintf(' "%s %s" [%s] ',...
-                     thisType, matParams{ii}, num2str(thisVal), '%.10f');
+                     thisType, matParams{ii}, num2str(thisVal, '%.10f '));
              else
                 thisText = sprintf(' "%s %s" [%s] ',...
-                     thisType, matParams{ii}, num2str(thisVal), '%.4f');
+                     thisType, matParams{ii}, num2str(thisVal, '%.4f '));
              end
          end
 
