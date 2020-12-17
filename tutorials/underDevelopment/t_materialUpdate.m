@@ -37,8 +37,9 @@ thisR.set('material', matName, 'kd value', [0 1 0]);
 piWrite(thisR);
 [scene, res] = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene)
+
 %% Add and delete
 mat = piMaterialCreate('new material');
 thisR.set('material', 'add', mat);
-thisR.set('material', 'delete', mat.name)
+thisR.set('material', 'delete', mat.name);
 
