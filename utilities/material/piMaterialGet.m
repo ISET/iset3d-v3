@@ -1,4 +1,4 @@
-function val = piMaterialGet(material, param, varargin)
+function res = piMaterialGet(material, param, varargin)
 % Read a material struct in the recipe
 %
 % Inputs
@@ -41,10 +41,19 @@ p.addParameter('val', '', @ischar);
 p.parse(material, param, varargin{:});
 
 %%
-val = [];
+res = [];
 
+if isfield(material, param)
+    % If type and val are both empty, return the parameter struct
+    if  ~isempty(type) && ~isempty(res)
 
+    end    
+else
+    warning('Parameter: %s does not exist in material type: %s',...
+            param, material.type);
 end
+
+
 %{
 %% Return different values depending on inputs
 
