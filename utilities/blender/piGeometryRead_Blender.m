@@ -381,7 +381,7 @@ end
 % Calculate rotation angles about the X, Y, and Z axes from the transform matrix
 % (citation: Slabaugh, Gregory G., "Computing Euler angles from a rotation matrix", 
 % https://www.gregslabaugh.net/publications/euler.pdf, December 5, 2020)
-if abs(R(3,1))~=1
+if abs(round(R(3,1),4))~=1
     roty = -asin(R(3,1));
     cosy = cos(roty);
     rotx = atan2(R(3,2)/cosy, R(3,3)/cosy);
