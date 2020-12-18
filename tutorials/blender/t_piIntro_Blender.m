@@ -13,7 +13,7 @@
 
 %    To use your own output from the Blender-to-pbrt exporter:
 %    Put the output (a pbrt file and a 'meshes' folder) into a new folder 
-%    within the local directory of your iset3d installation: 
+%    within your iset3d installation: 
 %    ~/iset3d/local/scenes/[your new folder]. This folder will be ignored 
 %    by github, so it won't be synced up with the repository. You will be 
 %    able to point to your new folder and your pbrt file below. 
