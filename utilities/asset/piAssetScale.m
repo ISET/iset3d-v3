@@ -1,8 +1,8 @@
-function thisR = piAssetScale(thisR, assetInfo, scaleFactor, varargin)
+function newBranch = piAssetScale(thisR, assetInfo, scaleFactor, varargin)
 %% Scale the size of an asset
 %
 % Synopsis:
-%   thisR = piAssetScale(thisR, assetInfo, scaleFactor, varargin)
+%   piAssetScale(thisR, assetInfo, scaleFactor, varargin)
 %
 % Brief description:
 %   Scale an asset size.
@@ -13,7 +13,7 @@ function thisR = piAssetScale(thisR, assetInfo, scaleFactor, varargin)
 %   rotation    - scaling vector [x-axis, y-axis, z-axis] (deg)
 % 
 % Returns:
-%   thisR       - modified recipe.
+%   newBranch       - modified recipe.
 %
 % Description:
 %   If the asset is a branch node, insert a new branch node with the
@@ -67,7 +67,7 @@ if numel(scaleFactor) == 1
     scaleFactor = repmat(scaleFactor,1,3); 
 end
 newBranch = piAssetCreate('type', 'branch');
-newBranch.name   = strcat(thisR.assets.stripID(assetID), '_', 'scale');
+newBranch.name   = strcat(thisR.assets.stripID(assetID), '_', 'S');
 newBranch.scale = scaleFactor;
          
 if isequal(thisNode.type, 'branch')
@@ -77,7 +77,7 @@ if isequal(thisNode.type, 'branch')
     
     % Add the new node, which is also a branch, as child of the input branch
     % node.
-    thisR = thisR.set('asset', thisNode.name, 'add', newBranch);
+    thisR.set('asset', thisNode.name, 'add', newBranch);
     
     % Set the children of the original branch node will now be children of
     % this new branch node
@@ -88,7 +88,7 @@ if isequal(thisNode.type, 'branch')
 else
     % The node sent in is an object or light.  We create a new node between
     % thisNode and its parent.    
-    thisR = thisR.set('asset', assetID, 'insert', newBranch);
+    thisR.set('asset', assetID, 'insert', newBranch);
 end
 
 end

@@ -1,8 +1,8 @@
-function thisR = piAssetTranslate(thisR, assetInfo, translation,varargin)
+function newBranch = piAssetTranslate(thisR, assetInfo, translation,varargin)
 %%
 %
 % Synopsis:
-%   thisR = piAssetTranslate(thisR, assetInfo, translation, varargin)
+%   newBranch = piAssetTranslate(thisR, assetInfo, translation, varargin)
 %
 % Brief description:
 %   Translate the position of an asset. Function rewritten by Zheng Lyu.
@@ -13,7 +13,7 @@ function thisR = piAssetTranslate(thisR, assetInfo, translation,varargin)
 %   translation - translation vector
 %
 % Return
-%   thisR       - the modified recipe
+%   newBranch   - the newly inserted branch
 %
 % Description
 %   Translate an asset. If the asset is a branch node, move it.
@@ -64,7 +64,7 @@ end
 
 % New branch node
 newBranch = piAssetCreate('type', 'branch');
-newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'translate');
+newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'T');
 newBranch.position = reshape(translation, 1, 3);
 
 if isequal(thisNode.type, 'branch')
@@ -73,7 +73,7 @@ if isequal(thisNode.type, 'branch')
     childID = thisR.assets.getchildren(assetInfo);
     
     % Add the new node as child of thisNode
-    thisR = thisR.set('asset', thisNode.name, 'add', newBranch);
+    thisR.set('asset', thisNode.name, 'add', newBranch);
     
     % Set the parent of children of thisNode be the newBranch
     for ii=1:numel(childID)
@@ -83,7 +83,7 @@ if isequal(thisNode.type, 'branch')
 else
     % Node is object or light
     % Insert the newBranch node under its parent
-    thisR = thisR.set('asset', assetInfo, 'insert', newBranch);
+    thisR.set('asset', assetInfo, 'insert', newBranch);
 end
 
 end

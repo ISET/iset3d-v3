@@ -1,8 +1,8 @@
-function thisR = recipeSet(thisR, param, val, varargin)
+function out = recipeSet(thisR, param, val, varargin)
 % Set a recipe class value
 %
 % Syntax
-%   thisR = recipeSet(thisR, param, val, varargin)
+%   out = recipeSet(thisR, param, val, varargin)
 %
 % Description:
 %   The recipe class manages the PBRT rendering parameters.  The class
@@ -79,13 +79,19 @@ function thisR = recipeSet(thisR, param, val, varargin)
 %    'nbounces'
 %    'autofocus'
 %
+%  Assets
+%    TODO
+%
 %  Materials
+%    TODO
+% ---
 %    'materials'
 %    'materials output file'
 %    'fluorophore concentration'
 %    'fluorophore eem'
 %    'concentration'
-%
+% ---
+
 %  ISETAuto special:
 %    'traffic flow density'%
 %    'traffic time stamp'
@@ -112,6 +118,8 @@ if isequal(param,'help')
     doc('recipe.recipeSet');
     return;
 end
+
+out = [];
 
 %% Parse
 p = inputParser;
@@ -530,7 +538,6 @@ switch param
         thisR.lookAt.up = val;
         
         
-        
         % Microlens
     case 'microlens'
         % Not sure about what this means.  It is on or off
@@ -674,7 +681,9 @@ switch param
         end
 
     case {'materialsoutputfile'}
+        % Deprecated?
         thisR.materials.outputfile = val;
+        
     case {'asset', 'assets'}
         % Typical:    thisR.set(param,val) 
         % This case:  thisR.set('asset',assetName, param, val);
@@ -684,28 +693,31 @@ switch param
         assetName = val;        
         param = varargin{1};
         if numel(varargin) == 2, val   = varargin{2}; end
+        
+        % Some of these functions should be edited to return the new
+        % branch.  Some have been.
         switch param
             case 'add'
-                thisR = piAssetAdd(thisR, assetName, val);
+                piAssetAdd(thisR, assetName, val);
             case {'delete', 'remove'}
-                thisR = piAssetDelete(thisR, assetName);
+                piAssetDelete(thisR, assetName);
             case {'insert'}
-                thisR = piAssetInsert(thisR, assetName, val);
+                piAssetInsert(thisR, assetName, val);
             case {'parent'}
-                thisR = piAssetSetParent(thisR, assetName, val);
+                piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
-                thisR = piAssetTranslate(thisR, assetName, val);
+                out = piAssetTranslate(thisR, assetName, val);
             case {'rotate', 'rotation'}
-                thisR = piAssetRotate(thisR, assetName, val);
+                out = piAssetRotate(thisR, assetName, val);
             case {'scale'}
-                thisR = piAssetScale(thisR,assetName,val);
+                out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}
-                thisR = piAssetMotionAdd(thisR, assetName, val);
+                piAssetMotionAdd(thisR, assetName, val);
             case {'obj2light'}
-                thisR = piAssetObject2Light(thisR, assetName, val);
+                piAssetObject2Light(thisR, assetName, val);
             otherwise
                 % What does this do?
-                thisR = piAssetSet(thisR, assetName, varargin{1},val);
+                piAssetSet(thisR, assetName, varargin{1},val);
         end
         % ZLY added fluorescent
     case {'fluorophoreconcentration'}

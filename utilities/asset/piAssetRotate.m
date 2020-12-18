@@ -1,8 +1,8 @@
-function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
+function newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %% Rotate an asset
 %
 % Synopsis:
-%   thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
+%   newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %
 % Brief description:
 %   Rotate an asset. Function reweitten by Zheng Lyu.
@@ -13,7 +13,7 @@ function thisR = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %   rotation    - rotation vector [x-axis, y-axis, z-axis] (deg)
 % 
 % Returns:
-%   thisR       - modified recipe.
+%   newBranch   - inserted branch
 %
 % Description:
 %   Rotate an asset. 
@@ -68,7 +68,7 @@ end
 rotMatrix = [rotation(3), rotation(2), rotation(1);
              fliplr(eye(3))];
 newBranch = piAssetCreate('type', 'branch');
-newBranch.name   = strcat(thisR.assets.stripID(assetInfo), '_', 'rotate');
+newBranch.name   = strcat(thisR.assets.stripID(assetInfo), '_', 'R');
 newBranch.rotate = rotMatrix;
          
 if isequal(thisNode.type, 'branch')
@@ -89,7 +89,7 @@ if isequal(thisNode.type, 'branch')
 else
     % The node sent in is an object or light.  We create a new node between
     % thisNode and its parent.    
-    thisR = thisR.set('asset', assetInfo, 'insert', newBranch);
+    thisR.set('asset', assetInfo, 'insert', newBranch);
 end
 
 end

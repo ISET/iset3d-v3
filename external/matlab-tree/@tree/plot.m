@@ -69,27 +69,33 @@ function [vLineHandleTree, hLineHandleTree, textHandleTree] = plot(obj, heightTr
         heightTree = tree(obj, 1);
     end
     
+    % Force lower case, allow spaces
+    varargin = ieParamFormat(varargin);
+    
     parser = inputParser;
-    parser.addParamValue('YLabel', [], @(x) ischar(x) || iscell(x));
-    parser.addParamValue('TextRotation', 0, @(x) isnumeric(x) && isscalar(x) );
-    parser.addParamValue('Parent', [], @ishandle);
-    parser.addParamValue('X', 0, @(x) isnumeric(x) && isscalar(x) );
-    parser.addParamValue('Width', 1, @(x) isnumeric(x) && isscalar(x) );
-    parser.addParamValue('NormalizeWidth', false, @(x) islogical(x) && numel(x) == 1 );
-    parser.addParamValue('Sorted', false, @(x) islogical(x) && numel(x) ==1 );
-    parser.addParamValue('DrawLabels', true, @(x) islogical(x) && numel(x) ==1 );
-    
+    parser.addParameter('ylabel', [], @(x) ischar(x) || iscell(x));
+    parser.addParameter('textrotation', 0, @(x) isnumeric(x) && isscalar(x) );
+    parser.addParameter('parent', [], @ishandle);
+    parser.addParameter('x', 0, @(x) isnumeric(x) && isscalar(x) );
+    parser.addParameter('width', 1, @(x) isnumeric(x) && isscalar(x) );
+    parser.addParameter('normalizewidth', false, @(x) islogical(x) && numel(x) == 1 );
+    parser.addParameter('sorted', false, @(x) islogical(x) && numel(x) ==1 );
+    parser.addParameter('drawlabels', true, @(x) islogical(x) && numel(x) ==1 );
+    parser.addParameter('fontsize', 11, @isnumeric);
+    parser.addParameter('fontname', 'Georgia', @ischar);
+
     parser.parse(varargin{:});
-    ylbl    = parser.Results.YLabel;
-    textrot = mod(parser.Results.TextRotation, 360);
-    ax      = parser.Results.Parent;
-    xcorner = parser.Results.X;
-    xwidth  = parser.Results.Width;
-    normalizewidth = parser.Results.NormalizeWidth;
-    sorted  = parser.Results.Sorted;
-    drawlabels = parser.Results.DrawLabels;
-    
- 
+    ylbl    = parser.Results.ylabel;
+    textrot = mod(parser.Results.textrotation, 360);
+    ax      = parser.Results.parent;
+    xcorner = parser.Results.x;
+    xwidth  = parser.Results.width;
+    normalizewidth = parser.Results.normalizewidth;
+    sorted  = parser.Results.sorted;
+    drawlabels = parser.Results.drawlabels;
+    fontsize = parser.Results.fontsize;
+    fontname = parser.Results.fontname;
+
     %% Compute the column width
     
     width = tree(obj, 'clear');
@@ -208,7 +214,7 @@ function [vLineHandleTree, hLineHandleTree, textHandleTree] = plot(obj, heightTr
     if isempty(ax) 
         ax = axes( ...
             'FontName', 'Courier new', ...
-            'FontSize', 9, ...
+            'FontSize', fontsize, ...
             'Color', 'none', ...
             'YDir', 'reverse', ...
             'TickDir', 'out', ...
@@ -279,16 +285,18 @@ function [vLineHandleTree, hLineHandleTree, textHandleTree] = plot(obj, heightTr
     
     for i = iterator
         
-         y1 = ypos.get(i);
-        
+        y1 = ypos.get(i);
         if isempty(y1)
             continue
         end
         
-        y2 = y1 - heightTree.get(i);
-        
         x1 = xpos.get(i) + xcorner;
         
+        % Alternate y value a bit across x values to allow for long names
+        if isodd(round(x1)), delta =  0.0;
+        else,                delta = -0.2;
+        end
+        y2 = y1 - heightTree.get(i) + delta;
         
         if drawlabels
             
@@ -301,13 +309,14 @@ function [vLineHandleTree, hLineHandleTree, textHandleTree] = plot(obj, heightTr
                 content = num2str(content);
             end
             
-            ht = text(x1, y2, contentfun(content), ...  A hack to have text displayed above bars
+            % A hack to have text displayed above bars
+            ht = text(x1, y2, contentfun(content), ...  
                 'HorizontalAlignment', halign,...
                 'Rotation', textrot, ...
                 'VerticalAlignment', valign, ...
-                'FontName', 'Courier new', ...
+                'FontName', fontname, ...
                 'Interpreter', 'none', ...
-                'FontSize', 12);
+                'FontSize', fontsize);
             
             textHandleTree = textHandleTree.set(i, ht);
             
@@ -330,7 +339,7 @@ function [vLineHandleTree, hLineHandleTree, textHandleTree] = plot(obj, heightTr
                 'Color', LINE_COLOR, ...
                 'LineWidth', 5);
         else
-            hl = line(x1, y1, ...
+            hl = line(x1, y1 + delta, ...
                 'Color', LINE_COLOR, ...
                 'Marker', '.', ...
                 'MarkerSize', 14);

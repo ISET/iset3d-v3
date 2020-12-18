@@ -276,19 +276,18 @@ classdef tree
               rcolor = [ 0.6 0.2 0.2 ];
               aboveTreshold = sdur > 10; % true if longer than 10 minutes
             %}
-            newTree = tree;
             
-            newNames = obj.stripID;
-            for ii=1:numel(newNames)
-                if numel(newNames{ii}) > 12
-                    newNames{ii} = [newNames{ii}(1:4),'..',newNames{ii}(end-4:end)];
-                end
-            end
-            
+            % Open the plotting window
             ieNewGraphWin([],'wide');
+
+            % Remove the IDs from the names and create a new tree
+            newTree = tree;
+            newNames = obj.stripID;
             newTree.Node = newNames';
             newTree.Parent = obj.Parent;
-            newTree.plot();
+            
+            % Plot
+            newTree.plot([],'font size',14);
             
         end
         
