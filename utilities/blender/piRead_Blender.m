@@ -1023,8 +1023,13 @@ for ii = 1:numsLines
     floatuv = mat2str(floatuv);
     
     % Rewrite 'Shape' line in pbrt format
-    newLine = append('Shape "',Shape,'" "integer indices" ',integerindices, ...
+    if isempty(plyTexture)
+        newLine = append('Shape "',Shape,'" "integer indices" ',integerindices, ...
+        ' "point P" ',pointP,' "normal N" ',normalN);
+    else
+        newLine = append('Shape "',Shape,'" "integer indices" ',integerindices, ...
         ' "point P" ',pointP,' "normal N" ',normalN,' "float uv" ',floatuv);
+    end
     
     % Replace the old 'Shape' line with the rewritten line
     txtLines{sLines(ii)} = newLine;
