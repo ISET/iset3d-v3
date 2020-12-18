@@ -1,16 +1,17 @@
 %% Render a pbrt image exported from Blender
 %
 % Description:
-%    A tutorial on rendering a pbrt image that was exported from Blender
-%    using the Blender-to-pbrt exporter:
-%    https://github.com/stig-atle/io_scene_pbrt
-
+%    A tutorial for making simple modifications (translate/rotate/scale an
+%    object, change material/color of an object, add texture to an object)
+%    to an image exported from Blender with the Blender-to-pbrt exporter
+%    (https://github.com/stig-atle/io_scene_pbrt).
+%
 %    A tutorial on how to use the Blender exporter can be found here: 
 %    https://github.com/ISET/iset3d/wiki/Blender
-
+%
 %    The current tutorial uses an image that was exported from Blender and 
 %    which is included in the iset3d repository.
-
+%
 %    To use your own output from the Blender-to-pbrt exporter:
 %    Put the output (a pbrt file and a 'meshes' folder) into a new folder 
 %    within your iset3d installation: 
@@ -24,10 +25,8 @@
 %    of their name.  These functions were written to understand the dialect
 %    of pbrt created by the Blender exporter.
 %
-%    This tutorial is adapted from t_piIntro_scenefromweb.m
-
 % History:
-%   11/27/20  amn  Wrote it.
+%   11/27/20  amn  Wrote it, adapted from t_piIntro_scenefromweb.m.
 %   11/29/20  dhb  Edited it.
 %   12/03/20  amn  Added color change section.
 %   12/07/20  amn  Updated the Blender scene, added texture sections.
