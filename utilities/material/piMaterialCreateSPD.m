@@ -1,13 +1,24 @@
-function vec = piMaterialCreateSPD(wave, spd)
+function vec = piMaterialCreateSPD(wave, spd, varargin)
 % Generate spectrum in PBRT version with wavelength and the spd
 %
-% Examples 
+% Synopsis:
+%   vec = piMaterialCreateSPD(wave, spd, varargin)
+%
+% Inputs:
+%   
 
+% Examples 
 %{
 wave = 400:10:700;
 spd = 300:10:600;
 vec = piMaterialCreateSPD(wave, spd);
 %}
+
+%% parse input
+p = inputParser;
+p.addRequired('wave', @isvector);
+p.addRequired('spd', @isvector);
+p.parse(wave, spd, varargin{:});
 
 %% Check if wave and spd have same length
 if numel(wave) ~= numel(spd)

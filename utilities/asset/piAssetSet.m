@@ -38,6 +38,7 @@ p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
 p.addRequired('param', @ischar);
 p.parse(thisR, assetInfo, param, varargin{:});
 
+param = ieParamFormat(param);
 %%
 % If assetInfo is a node name, find the id
 if ischar(assetInfo)
@@ -62,10 +63,12 @@ switch thisNode.type
         switch param
             case {'name'}
                 thisNode.name = val;
-            case {'mediumInterface'}
+            case {'mediuminterface'}
                 thisNode.mediumInterface = val;
             case {'material'}
                 thisNode.material = val;
+            case {'materialname'}
+                thisNode.material.namedmaterial = val;
             case {'shape'}
                 thisNode.shape = val;
             case {'output'}

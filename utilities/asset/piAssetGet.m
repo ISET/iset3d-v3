@@ -41,6 +41,7 @@ p.addRequired('thisAsset', @isstruct);
 p.addRequired('param', @ischar);
 p.parse(thisAsset,param, varargin{:});
 
+param = ieParamFormat(param);
 %%
 
 val = [];
@@ -50,10 +51,12 @@ switch thisAsset.type
         switch param
             case {'name'}
                 val = thisAsset.name;
-            case {'mediumInterface'}
+            case {'mediuminterface'}
                 val = thisAsset.mediumInterface;
             case {'material'}
                 val = thisAsset.material;
+            case {'materialname'}
+                val = thisAsset.material.namedmaterial;
             case {'shape'}
                 val = thisAsset.shape;
             case {'output'}

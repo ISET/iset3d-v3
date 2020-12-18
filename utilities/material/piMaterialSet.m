@@ -90,7 +90,7 @@ if isfield(material, pName)
             % It is a file name, so the type has to be spectrum or texture,
             % depending on the extension
             [~, ~, e] = fileparts(val); % Check extension
-            if isempty(e) || isequal(e, '.spd')
+            if isequal(e, '.spd')
                 material.(pName).type = 'spectrum';
             else
                 material.(pName).type = 'texture';

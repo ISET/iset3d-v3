@@ -112,14 +112,15 @@ for ii = 1:numel(children)
             fprintf(fid, strcat("NamedMaterial ", '"',...
                             thisNode.material.namedmaterial, '"', '\n'));
         end
-        
-        % I don't know what's this used for, but commenting here.
-        if ~isempty(thisNode.output)
-            % There is an output slot
-            [~,output] = fileparts(thisNode.output);
-            fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);            
-        elseif ~isempty(thisNode.shape)
-            % output is empty but there is a shape slot we also open the
+        %{
+            % I don't know what's this used for, but commenting here.
+            if ~isempty(thisNode.output)
+                % There is an output slot
+                [~,output] = fileparts(thisNode.output);
+                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output); 
+        %}
+        if ~isempty(thisNode.shape)
+            % There is a shape slot we also open the
             % geometry file.
             name = thisNode.name;
             
@@ -129,9 +130,6 @@ for ii = 1:numel(children)
             fprintf(geometryFile,'%s',shapeText);
             fclose(geometryFile);
             fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
-        else
-            % For camera case we get here. Doing nothing. In the future
-            % maybe we will have something to put?
         end
         
         fprintf(fid, 'ObjectEnd\n\n');

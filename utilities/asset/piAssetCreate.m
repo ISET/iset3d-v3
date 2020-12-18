@@ -34,7 +34,6 @@ switch type
         obj.mediumInterface = [];
         obj.material = [];
         obj.shape = [];
-        obj.output = [];
     case 'light'
         obj.name = 'light';
         obj.lght = [];
