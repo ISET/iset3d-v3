@@ -43,7 +43,7 @@ thisR.assets
 % You can display the assets tree structure in the command window.
 thisR.assets.show;
 
-% thisR.assets.show;
+% thisR.assets.print;
 % thisR.assets.findleaves
 % thisR.assets.names
 % t = thisR.assets.stripID
@@ -84,12 +84,12 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Manipulate the front figure
 
 % This is a leaf asset describing the blue man in the SimpleScene
-thisAsset = 'figure_3m_material_uber_blue'; 
+assetName = 'figure_3m_material_uber_blue'; 
 
 % This places a new branch node representating a rotation just above the
 % named leaf asset.  The rotation is (x,y,z) in degrees.  We are rotating
 % around the z-axis in this case.
-thisR.set('asset', thisAsset, 'rotate', [0, 0, 45]);
+thisR.set('asset', assetName, 'rotate', [0, 0, 45]);
 
 % Notice that there is a new node just above the 015ID_ asset.
 thisR.assets.print;
