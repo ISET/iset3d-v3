@@ -213,19 +213,32 @@ classdef tree
             end
         end
         
-        function newNames = stripID(obj, id)
-            %
+        function [newNames,obj] = stripID(obj, id, replace)
+            % Returns the names with stripped ID.  But it does not appear
+            % to strip the names in this tree.
+            if notDefined('replace'), replace = false; end
             if notDefined('id')
                 newNames = cell(1, obj.nnodes);
                 for ii=1:obj.nnodes
                     newNames{ii} = obj.stripID(ii);
                 end
+                
+                % We have the new names and user said replace them all
+                if replace
+                    disp('Replacing names')
+                    for jj=1:obj.nnodes
+                        if jj==1, obj.Node{1} = strrep(newNames{1},'_','|');
+                        else
+                            obj.Node{jj}.name = strrep(newNames{jj},'_',' ');
+                        end
+                    end
+                end
+                
                 return;
             end
             
             if ~obj.isRoot(id)
                 newNames = obj.Node{id}.name;
-
             else
                 newNames = obj.Node{id};
             end
@@ -263,12 +276,20 @@ classdef tree
               rcolor = [ 0.6 0.2 0.2 ];
               aboveTreshold = sdur > 10; % true if longer than 10 minutes
             %}
+            newTree = tree;
             
-            % Better to strip the IDs before plotting.
-            str = obj.tostring;
+            newNames = obj.stripID;
+            for ii=1:numel(newNames)
+                if numel(newNames{ii}) > 12
+                    newNames{ii} = [newNames{ii}(1:4),'..',newNames{ii}(end-4:end)];
+                end
+            end
+            
             ieNewGraphWin([],'wide');
-            T = text(0.1,0.5,str);
-            axis off
+            newTree.Node = newNames';
+            newTree.Parent = obj.Parent;
+            newTree.plot();
+            
         end
         
         % Check that a node has its ID embedded in its name.

@@ -41,8 +41,9 @@ thisR = piRecipeDefault('scene name', 'SimpleScene');
 thisR.assets
 
 % You can display the assets tree structure in the command window.
-str = thisR.assets.print;
+thisR.assets.show;
 
+% thisR.assets.show;
 % thisR.assets.findleaves
 % thisR.assets.names
 % t = thisR.assets.stripID
