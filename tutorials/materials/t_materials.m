@@ -1,4 +1,9 @@
-%% Create a new material
+%% Demonstrate how to control material properties
+%
+%
+% See also
+%   t_assets, t_piIntro*
+%
 
 %% Initialize
 ieInit;
@@ -8,23 +13,37 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name', 'SimpleScene');
 
 %% A low resolution rendering as baseline
+
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5); 
 
 piWrite(thisR);
-[scene, res] = piRender(thisR, 'render type', 'radiance');
+scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'reference scene');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
-%% Print material list
+%% Print a list of the materials in the scene
+
 thisR.get('material print');
+
+%% Print the material of a particular asset
+
+thisR.assets.show;
+
+assetName = 'figure_3m_material_uber_blue'; 
+thisR.get('asset',assetName,'material name')
+
+% This will become a mirror.  For now it is the black surface at the
+% ceiling.
+assetName = 'mirror_material_mirror';
+thisR.get('asset',assetName,'material name')
 
 %% Get a material and check its properties
 
-% Find this material
+% Find a material and print its properties
 matName = 'uber_blue';
 thisMat = thisR.get('material', matName)
 
@@ -46,18 +65,19 @@ kdVal = thisR.get('material', matName, 'kd value')
 % Check property type
 kdType = thisR.get('material', matName, 'kd type')
 
-%% Now change material color
+%% Now change material color using the RGB format
 
-% Change diffuse property
+% Change diffuse reflectance to be green
 thisR.set('material', matName, 'kd value', [0 0.5 0]);
 
 piWrite(thisR);
-[scene, res] = piRender(thisR, 'render type', 'radiance');
+scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change diffuse proerty');
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
 
 %% Assign a new material to the object
+
+% We are going to turn the blue stick figure into a glass figure.
 glass = 'newGlass';
 newMat = piMaterialCreate(glass, 'type', 'glass');
 thisR.set('material', 'add', newMat);
@@ -66,19 +86,19 @@ thisR.set('material', 'add', newMat);
 % n = thisR.assets.names;
 
 assetName = 'figure_3m_material_uber_blue';
-
 curName = thisR.get('asset', assetName, 'material name');
+disp(['The current material is',curName]);
 
+% We turn it into glass
 thisR.set('asset', assetName, 'material name', glass);
 
+%% Render it
 piWrite(thisR);
-[scene, res] = piRender(thisR, 'render type', 'radiance');
+scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change figure to glass');
-
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
 
-%% Change the blackboard to a mirror
+%% Change the black ceiling material into a mirror
 mirror = 'newMirror';
 
 newMat = piMaterialCreate(mirror, 'type', 'mirror');
@@ -92,33 +112,39 @@ curName = thisR.get('asset', assetName, 'material name');
 thisR.set('asset', assetName, 'material name', mirror);
 
 piWrite(thisR);
-[scene, res] = piRender(thisR, 'render type', 'radiance');
+scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change board to mirror');
-
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
 
 %% Change the mirror to a matte material with spectral reflectance
-matte = 'newMatte';
-newMatte = piMaterialCreate(matte, 'type', 'matte');
+
+assetName = 'mirror_material_mirror';
+
+matteName = 'newMatte';
+newMatte = piMaterialCreate(matteName, 'type', 'matte');
 thisR.set('material', 'add', newMatte);
 
-% Set a spectral reflectance to the matte material.
+% Set the spectral reflectance of the matte material to the reflectance of
+% the 10th chip in the MCC.  It is very red.
 wave = 400:10:700;
 mccRefs = ieReadSpectra('macbethChart', wave);
 thisRef = mccRefs(:, 10);
+ieNewGraphWin;
+plotReflectance(wave,thisRef);
 
-% Make reflectance have PBRT spd format
+% Convert the reflectance to PBRT spd format
 spdRef = piMaterialCreateSPD(wave, thisRef);
-thisR.set('material', matte, 'kd value', spdRef);
+
+% Store the spd reflectance as the diffuse reflectance of the newMatte
+% material
+thisR.set('material', matteName, 'kd value', spdRef);
 
 % Assign material
-thisR.set('asset', assetName, 'material name', matte);
+thisR.set('asset', assetName, 'material name', matteName);
 
 piWrite(thisR);
 [scene, res] = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Board with spectral reflectance');
-
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
@@ -131,3 +157,5 @@ thisR.set('material', 'delete', deleteName);
 
 % Check it's really deleted.
 thisR.get('material print');
+
+%% END
