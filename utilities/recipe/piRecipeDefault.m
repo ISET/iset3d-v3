@@ -262,6 +262,16 @@ switch ieParamFormat(sceneName)
             if ~exist(fname, 'file'), error('File not found'); end
         end
         exporter = 'C4D';
+    case 'bunny'
+        sceneName = 'bunny';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['bunny','.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'C4D';        
     case {'cornellbox', 'cornell_box'}
         sceneName = 'cornell_box';
         % Local
@@ -277,6 +287,16 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['Cornell_Box_Multiple_Cameras_Bunny_charts','.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'C4D';
+    case {'cornellboxreference'}
+        sceneName = 'CornellBoxReference';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['CornellBoxReference','.pbrt']);
         if ~exist(fname,'file')
             ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
             if ~exist(fname, 'file'), error('File not found'); end
