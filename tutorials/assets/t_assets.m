@@ -62,9 +62,6 @@ thisR.get('asset id','002ID_sky')
 % To use the node number and get the struct, work directly with the assets
 thisR.assets.get(2)
 
-% You can retrieve a particuly asset propert this way
-thisR.get('asset','sky','position')
-
 %% Here is a low resolution rendering of the scene as baseline
 
 % We set a low resolution for speed.  We are going to manipulate the assets

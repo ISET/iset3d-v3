@@ -65,7 +65,7 @@ end
 % New branch node
 newBranch = piAssetCreate('type', 'branch');
 newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'T');
-newBranch.position = reshape(translation, 1, 3);
+newBranch.translation = reshape(translation, 1, 3);
 
 if isequal(thisNode.type, 'branch')
     % If the node is branch

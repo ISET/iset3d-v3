@@ -134,6 +134,14 @@ classdef tree
            
         end
         
+        function val = leaftoroot(obj, id)
+            val = [];
+            while ~obj.isRoot(id)
+                val = [val id];
+                id = obj.getparent(id);
+            end
+        end
+        
         function IDs = findleaves(obj)
            %% FINDLEAVES  Return the IDs of all the leaves of the tree.
            parents = obj.Parent;

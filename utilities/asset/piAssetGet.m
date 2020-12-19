@@ -61,8 +61,6 @@ switch thisAsset.type
                 val = thisAsset.shape;
             case {'output'}
                 val = thisAsset.output;
-            case {'position'}
-                val = piAssetGet(thisR, thisR.assets.getparent(assetInfo), param);
             otherwise
                 warning('Node %s does not have field: %s. Empty return', thisAsset.name, param)
                 return;
@@ -73,8 +71,6 @@ switch thisAsset.type
                 val = thisAsset.name;
             case {'lght'}
                 val = thisAsset.lght;
-            case {'position'}
-                val = piAssetGet(thisR, thisR.assets.getparent(assetInfo), param);
             otherwise
                 warning('Node %s does not have field: %s. Empty return', thisAsset.name, param)
                 return;
@@ -87,8 +83,8 @@ switch thisAsset.type
                 val = thisAsset.size;
             case {'scale'}
                 val = thisAsset.scale;
-            case {'position'}
-                val = thisAsset.position;
+            case {'translation'}
+                val = thisAsset.translation;
             case {'rotate'}
                 val = thisAsset.rotate;
             case {'motion'}

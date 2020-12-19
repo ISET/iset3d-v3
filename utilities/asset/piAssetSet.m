@@ -73,8 +73,8 @@ switch thisNode.type
                 thisNode.shape = val;
             case {'output'}
                 thisNode.output = val;
-            case {'position'}
-                thisNode.position = val;
+            case {'translation'}
+                thisNode.translation = val;
             otherwise
                 warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
                 return;
@@ -101,8 +101,8 @@ switch thisNode.type
                 thisNode.size = val;
             case {'scale'}
                 thisNode.scale = val;
-            case {'position'}
-                thisNode.position = val;
+            case {'translation'}
+                thisNode.translation = val;
             otherwise
                 warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
                 return;

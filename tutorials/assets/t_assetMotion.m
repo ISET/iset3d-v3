@@ -44,7 +44,7 @@ thisR.set('nbounces',5);
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on
 % automobile parts.  
-piMaterialGroupAssign(thisR);
+% piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
 %
@@ -74,7 +74,7 @@ sceneSet(scene,'gamma',0.7);
 % Move this asset
 thisAssetName = 'figure_3m_material_uber_blue';
 
-assetPos = thisR.get('asset', thisAssetName, 'position');
+assetPos = thisR.get('asset', thisAssetName, 'translation');
 % The motion blur is assigned to a particular asset.  In this example,
 % we are moving the third asset, assets(3)
 

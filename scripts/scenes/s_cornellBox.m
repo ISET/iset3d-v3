@@ -7,9 +7,9 @@ thisR = piRecipeDefault('scene name', 'cornell box reference');
 
 %% A low resolution rendering as baseline
 thisR.set('film resolution',[200 150]);
-thisR.set('rays per pixel',32);
+thisR.set('rays per pixel',16);
 thisR.set('fov',30);
-thisR.set('nbounces',5); 
+thisR.set('nbounces',2); 
 
 %% Turn an asset to an object
 %{
@@ -29,9 +29,12 @@ assetName = 'Area Light_material_areaLightMat';
 thisR.set('asset', assetName, 'obj2light', areaLight);
 
 %% Render
+%{
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+%}
 
 %% Add bunny in the box
 bunnyAsset = piAssetLoad('bunny');
@@ -41,7 +44,8 @@ largeCubeName = 'Cube_Large_material_CubeLarge';
 parentAsset = thisR.get('asset parent', largeCubeName);
 
 % Add the bunny under parent node
-thisR.set('asset', parentAsset.name, 'add', bunnyAsset);
+% thisR.set('asset', parentAsset.name, 'add', bunnyAsset);
+thisAsset = thisR.set('asset', 'root', 'add', bunnyAsset);
 
 % thisR.set('asset', largeCubeName, 'delete');
 %{
@@ -52,13 +56,20 @@ thisR.set('asset', parentAsset.name, 'add', bunnyAsset);
 % Translate the buny a bit
 % pos = thisR.get('asset', bunnyAsset.name, 'position')
 
-% Get the rotation of cube
-rotation = thisR.get('asset', parentAsset.name, 'rotate');
-pos = thisR.get('asset', parentAsset.name, 'position');
+pos = thisR.get('asset', bunnyAsset.name, 'world position');
 
 
-thisR.set('asset', bunnyAsset.name, 'rotate', [0 40.8444 0]);
-thisR.set('asset', bunnyAsset.name, 'translate', [-0.03 -0.07 -0.05]);
+posSmallCube = thisR.get('asset', 'Cube_Small_material_CubeSmall', 'world position');
+% % Get the rotation of cube
+% rotation = thisR.get('asset', parentAsset.name, 'rotate');
+% pos = thisR.get('asset', parentAsset.name, 'translation');
+
+
+% thisR.set('asset', bunnyAsset.name, 'rotate', [0 40.8444 0]);
+% R = thisR.set('asset', bunnyAsset.name, 'rotate', [0 45 0]);
+% T = thisR.set('asset', bunnyAsset.name, 'translate', [-0.03 -0.07 -0.05]);
+% thisR.set('asset', T.name, 'delete')
+% thisR.set('asset', bunnyAsset.name, 'translate', [-0.5 0 0]);
 
 %% Add material to bunny
 % Create a spectral reflectance of bunny
@@ -80,3 +91,4 @@ thisR.set('asset', bunnyAsset.name, 'material name', bunnyMat.name);
 piWrite(thisR);
 [scene, res] = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');

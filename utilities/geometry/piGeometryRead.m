@@ -166,7 +166,7 @@ while i <= length(txt)
         [name, sz] = piParseObjectName(currentLine);
         
     elseif piContains(currentLine,'ConcatTransform')
-        [rot, position] = piParseConcatTransform(currentLine);
+        [rot, translation] = piParseConcatTransform(currentLine);
         
     elseif piContains(currentLine,'MediumInterface')
         % MediumInterface could be water or other scattering media.
@@ -225,8 +225,8 @@ while i <= length(txt)
                     resLight.lght{1}.rotate = rot;
                 end
                 
-                if exist('position', 'var')
-                    resLight.lght{1}.position = position;
+                if exist('translation', 'var')
+                    resLight.lght{1}.translation = translation;
                 end
                 
             end
@@ -236,7 +236,7 @@ while i <= length(txt)
             subtrees = cat(1, subtrees, tree(resLight));
             trees = subtrees;
 
-        elseif exist('rot','var') || exist('position','var')
+        elseif exist('rot','var') || exist('translation','var')
            % This is a 'branch' node
            
             % resCurrent = createGroupObject();
@@ -246,7 +246,7 @@ while i <= length(txt)
             if exist('name','var'), resCurrent.name = sprintf('%s', name); end
             if exist('sz','var'), resCurrent.size = sz; end
             if exist('rot','var'), resCurrent.rotate = rot; end
-            if exist('position','var'), resCurrent.position = position; end
+            if exist('translation','var'), resCurrent.translation = translation; end
             
             %{
                 resCurrent.groupobjs = groupobjs;
@@ -321,187 +321,3 @@ end
 parsedUntil = i;
 
 end
-%}
-
-
-
-%%
-%%
-%{
-function [res, children, parsedUntil] = parseGeometryText(txt, name)
-%
-% Inputs:
-%
-%   txt         - remaining text to parse
-%   name        - current object name
-%
-% Outputs:
-%   res         - struct of results
-%   children    - Attributes under the current object
-%   parsedUntil - line number of the parsing end
-%
-% Description:
-%
-%   The geometry text comes from C4D export. We parse the lines of text in 
-%   'txt' cell array and recrursively create a tree structure of geometric objects.
-
-res = [];
-groupobjs = [];
-children = [];
-
-i = 1;
-while i <= length(txt)
-    
-    currentLine = txt{i};
-    
-    % Return if we've reached the end of current attribute
-    if strcmp(currentLine,'AttributeEnd')
-        
-        % Assemble all the read attributes into either a groub object, or a
-        % geometry object. Only group objects can have subnodes (not
-        % children). This can be confusing but is somewhat similar to
-        % previous representation.
-        
-        if exist('rot','var') || exist('position','var')
-            resCurrent = createGroupObject();
-            
-            % If present populate fields.
-            if exist('name','var'), resCurrent.name = name; end
-            if exist('sz','var'), resCurrent.size = sz; end
-            if exist('rot','var'), resCurrent.rotate = rot; end
-            if exist('position','var'), resCurrent.position = position; end
-            
-            resCurrent.groupobjs = groupobjs;
-            resCurrent.children = children;
-            children = [];
-            res = cat(1,res,resCurrent);
-            
-        elseif exist('shape','var') || exist('mediumInterface','var') || exist('mat','var') || exist('areaLight','var') || exist('lght','var')
-            resChildren = createGeometryObject();
-            
-            if exist('shape','var'), resChildren.shape = shape; end
-            if exist('medium','var'), resChildren.medium = medium; end
-            if exist('mat','var'), resChildren.material = mat; end
-            if exist('lght','var'), resChildren.light = lght; end
-            if exist('areaLight','var'), resChildren.areaLight = areaLight; end
-            if exist('name','var'), resChildren.name = name; end
-            
-            children = cat(1,children, resChildren);
-        
-        elseif exist('name','var')
-            resCurrent = createGroupObject();
-            if exist('name','var'), resCurrent.name = name; end
-           
-            resCurrent.groupobjs = groupobjs;
-            resCurrent.children = children;
-            children = [];
-            res = cat(1,res,resCurrent);  
-        end
-           
-        parsedUntil = i;
-        return;
-        
-    elseif strcmp(currentLine,'AttributeBegin')
-        % This is an Attribute inside an Attribute
-        [subnodes, subchildren, retLine] = parseGeometryText(txt(i+1:end), name);
-        groupobjs = cat(1, groupobjs, subnodes);
-        
-        % Give an index to the subchildren to make it different from its
-        % parents and brothers (we are not sure if it works for more than
-        % two levels). We name the subchildren based on the line number and
-        % how many subchildren there are already.
-        if ~isempty(subchildren)
-            subchildren.name = sprintf('%d_%d_%s', i, numel(children)+1, subchildren.name);
-        end
-        children = cat(1, children, subchildren);
-        i =  i + retLine;
-        
-    elseif piContains(currentLine,'#ObjectName')
-        [name, sz] = parseObjectName(currentLine);
-        
-    elseif piContains(currentLine,'ConcatTransform')
-        [rot, position] = parseConcatTransform(currentLine);
-        
-    elseif piContains(currentLine,'MediumInterface')
-        % MediumInterface could be water or other scattering media.
-        medium = currentLine;
-        
-    elseif piContains(currentLine,'NamedMaterial')
-        mat = currentLine;
-        
-    elseif piContains(currentLine,'AreaLightSource')
-        areaLight = currentLine;
-        
-    elseif piContains(currentLine,'LightSource') ||...
-            piContains(currentLine, 'Rotate') ||...
-            piContains(currentLine, 'Scale')
-        if ~exist('lght','var')
-            lght{1} = currentLine;
-        else
-            lght{end+1} = currentLine;
-        end
-        
-    elseif piContains(currentLine,'Shape')
-        shape = currentLine;
-    else
-      %  warning('Current line skipped: %s', currentLine);
-    end
-
-    i = i+1;
-end
-
-res = createGroupObject();
-res.name = 'root';
-res.groupobjs = groupobjs;
-res.children = children;
-
-parsedUntil = i;
-
-end
-
-
-%%
-function obj = createGroupObject()
-% Initialize a structure representing a group object.
-%
-% What makes something a group object rather than a child?
-% What if we want to read the nodes and edges of an object, can we do it?
-
-obj.name = [];      % String
-obj.size.l = 0;     % Length
-obj.size.w = 0;     % Width
-obj.size.h = 0;     % Height
-obj.size.pmin = [0 0];    % No idea
-obj.size.pmax = [0 0];    % No idea
-
-obj.scale = [1 1 1];
-obj.position = [0 0 0];   % Maybe the middle of the object?
-
-obj.rotate = [0 0 0;
-              0 0 1;
-              0 1 0;
-              1 0 0];
-
-obj.children = [];
-obj.groupobjs = [];
-          
-
-end
-
-%%
-function obj = createGeometryObject()
-
-% This function creates a geometry object and initializes all fields to
-% empty values.
-
-obj.name = [];
-obj.index = [];
-obj.mediumInterface = [];
-obj.material = [];
-obj.light = [];
-obj.areaLight = [];
-obj.shape = [];
-obj.output = [];
-
-end
-%}

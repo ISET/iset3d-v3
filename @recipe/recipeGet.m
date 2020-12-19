@@ -946,12 +946,54 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'asset'}
         % thisR.get('asset',assetName or ID);  % Returns the asset
         % thisR.get('asset',assetName,param);  % Returns the param val
-        [~,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
+        
+
+        [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
         if length(varargin) == 1
             val = thisAsset;
             return;
         else 
-            val = piAssetGet(thisAsset,varargin{2});
+            switch ieParamFormat(varargin{2})
+                case 'worldposition'
+                    if ~thisR.assets.isleaf(id)
+                        warning('Only leaves have positions')
+                    else
+                        leafToRoot = thisR.assets.leaftoroot(id);
+                        
+                        pos = zeros(3, 1);
+                        for ii=2:numel(leafToRoot)
+                            thisAsset = thisR.get('asset', leafToRoot(ii));
+                            pos = pos +...
+                                reshape(piAssetGet(thisAsset, 'translation'), 3, 1);
+                        end
+                        val = pos;
+                    end
+                case 'worldrotation'
+                    if ~thisR.assets.isleaf(id)
+                        warning('Only leaves have rotations')
+                    else
+                        leafToRoot = thisR.assets.leaftoroot(id);
+                        
+                        rot = zeros(3, 1);
+                        for ii=2:numel(leafToRoot)
+                            thisAsset = thisR.get('asset', leafToRoot(ii));
+                            thisRot = piAssetGet(thisAsset, 'rotate');
+                            rot = rot + thisRot(1,:)';
+                        end
+                        val = flipud(rot);
+                    end                    
+                case 'translation'
+                    % Translation is always in the branch, not in the
+                    % leaf.
+                    if thisR.assets.isleaf(id)
+                        parentID = thisR.get('asset parent id', id);
+                        val = thisR.get('asset', parentID, 'translation');
+                    else
+                        val = piAssetGet(thisAsset, 'translation');
+                    end
+                otherwise                    
+                    val = piAssetGet(thisAsset,varargin{2});
+            end
         end
     case {'assetid'}
         % thisR.get('asset id',assetName);  % ID from name
@@ -970,6 +1012,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         if ischar(thisNode)
             % It is a name, get the ID
             thisNodeID = piAssetFind(thisR.assets,'name',thisNode);
+        elseif isnumeric(thisNode)
+            thisNodeID = thisNode;
         end
         val = thisR.assets.getparent(thisNodeID);
     case {'assetparent'}
