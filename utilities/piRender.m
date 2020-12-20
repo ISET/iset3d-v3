@@ -13,7 +13,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               will be applied to the rendered ieObject prior to return.
 %
 %  renderType - Determine which types to render.  PBRT can render
-%               radiance, metadata (e.g., depth, mesh, material), the
+%               radiance, metadata (e.g., depth, mesh, material),
 %               the illuminant, or some combinations.  The options
 %               are:
 %
@@ -22,7 +22,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %      'both'     - radiance and depth
 %      'radiance' - spectral radiance (or irradiance of an oi)
 %      'illuminant'  - radiance and illuminant data
-%      'illuminantonly' - The materials are set to matte white and
+%      'illuminant only'- The materials are set to matte white and
 %                         rendered.  The spatial-spectral energy is
 %                         returned in a form that can be used as a
 %                         scene illuminant.

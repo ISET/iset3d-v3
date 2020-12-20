@@ -1009,7 +1009,9 @@ switch ieParamFormat(param)  % lower case, no spaces
         %
         % Returns the id of the parent node
         thisNode = varargin{1};
-        if ischar(thisNode)
+        if isstruct(thisNode)
+            thisNodeID = piAssetFind(thisR.assets,'name',thisNode.name);
+        elseif ischar(thisNode)
             % It is a name, get the ID
             thisNodeID = piAssetFind(thisR.assets,'name',thisNode);
         elseif isnumeric(thisNode)
