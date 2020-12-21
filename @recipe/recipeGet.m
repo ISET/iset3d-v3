@@ -943,7 +943,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = thisR.light;
         
     % Assets - more work needed here.
-    case {'asset'}
+    case {'asset', 'assets'}
         % thisR.get('asset',assetName or ID);  % Returns the asset
         % thisR.get('asset',assetName,param);  % Returns the param val
         
@@ -954,34 +954,99 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         else 
             switch ieParamFormat(varargin{2})
-                case 'worldposition'
-                    if ~thisR.assets.isleaf(id)
-                        warning('Only leaves have positions')
-                    else
-                        leafToRoot = thisR.assets.leaftoroot(id);
-                        
-                        pos = zeros(3, 1);
-                        for ii=2:numel(leafToRoot)
-                            thisAsset = thisR.get('asset', leafToRoot(ii));
-                            pos = pos +...
-                                reshape(piAssetGet(thisAsset, 'translation'), 3, 1);
-                        end
-                        val = pos;
-                    end
+                case 'path to root'
+                    val = thisR.assets.leaftoroot(id);
                 case 'worldrotation'
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have rotations')
                     else
                         leafToRoot = thisR.assets.leaftoroot(id);
                         
-                        rot = zeros(3, 1);
-                        for ii=2:numel(leafToRoot)
+                        %{
+                            rot = zeros(3, 1);
+                            for ii=2:numel(leafToRoot)
+                                thisAsset = thisR.get('asset', leafToRoot(ii));
+                                thisRot = piAssetGet(thisAsset, 'rotate');
+                                rot = rot + thisRot(1,:)';
+                            end
+                            val = flipud(rot);
+                        %}
+                        
+                        % World axis with homogeneous coordinates.
+                        % Represented in matrix (4 x 3), with each row
+                        % represents one dimension.
+                        aXYZ = [eye(3); zeros(1, 3)];
+                        curXYZ = aXYZ;
+                        for ii=numel(leafToRoot):-1:2
                             thisAsset = thisR.get('asset', leafToRoot(ii));
-                            thisRot = piAssetGet(thisAsset, 'rotate');
-                            rot = rot + thisRot(1,:)';
+                            thisRot = fliplr(piAssetGet(thisAsset, 'rotate')); % PBRT uses wired order of ZYX
+                            % Calculate rotation transform
+                            thisRotM = eye(4);
+                            for jj=1:size(thisRot, 2)
+                                if thisRot(1, jj) ~= 0
+                                    % rotation matrix from basis axis
+                                    rotM = piTransformRotation(curXYZ(:, jj), thisRot(1, jj));
+                                    thisRotM = rotM * thisRotM;
+                                end
+                            end
+                            % Update x y z axis
+                            [~, ~, ~, curXYZ] = piTransformAxis(curXYZ(:,1), curXYZ(:,2),curXYZ(:,3),thisRotM);
                         end
-                        val = flipud(rot);
-                    end                    
+                    end
+                    
+                    val = curXYZ(1:3, 1:3);
+                    
+                    rotY = -atan2d(curXYZ(3, 1), curXYZ(1, 1)); % az
+                    rotZ = atan2d(curXYZ(2, 1), sqrt(curXYZ(1, 1)^2+curXYZ(3, 1)^2)); % el
+                    
+                    rotX = -atan2d(curXYZ(2, 3), curXYZ(3, 3)); % az
+                    
+                    a = 1;
+                case 'worldposition'
+                    if ~thisR.assets.isleaf(id)
+                        warning('Only leaves have positions')
+                    else
+                        leafToRoot = thisR.assets.leaftoroot(id);
+                        
+                        %{
+                            pos = zeros(3, 1);
+                            for ii=2:numel(leafToRoot)
+                                thisAsset = thisR.get('asset', leafToRoot(ii));
+                                pos = pos +...
+                                    reshape(piAssetGet(thisAsset, 'translation'), 3, 1);
+                            end
+                            val = pos;
+                        %}
+                        % World axis with homogeneous coordinates.
+                        % Represented in matrix (4 x 3), with each row
+                        % represents one dimension.
+                        % World axis with homogeneous coordinates.
+                        % Represented in matrix (4 x 3), with each row
+                        % represents one dimension.
+                        aXYZ = [eye(3); zeros(1, 3)];
+                        curXYZ = aXYZ;
+                        trans = zeros(4);
+                        for ii=numel(leafToRoot):-1:2
+                            thisAsset = thisR.get('asset', leafToRoot(ii));
+                            thisRot = fliplr(piAssetGet(thisAsset, 'rotate')); % PBRT uses wired order of ZYX
+                            thisTrans = piAssetGet(thisAsset, 'translate');
+                            % Calculate rotation transform
+                            for jj=1:size(thisRot, 2)
+                                transM = piTransformTranslation(curXYZ(:, 1), curXYZ(:, 2), curXYZ(:, 3), thisTrans);
+                                trans = trans + transM;
+                                if thisRot(1, jj) ~= 0
+                                    % rotation matrix from basis axis
+                                    rotM = piTransformRotation(curXYZ(:, jj), thisRot(1, jj));
+                                    % Update x y z axis
+                                    [~, ~, ~, curXYZ] = piTransformAxis(aXYZ(:,1), aXYZ(:,2),aXYZ(:,3),rotM);
+                                end
+                            end
+                        end
+                    end
+                    
+                    % Not sure if this is correct.
+                    val = trans + ones(4);
+                 
                 case 'translation'
                     % Translation is always in the branch, not in the
                     % leaf.
