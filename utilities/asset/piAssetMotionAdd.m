@@ -11,17 +11,17 @@ disp(thisR.assets.tostring)
 
 % branch node
 branchName = '006ID_Sun';
-thisR = thisR.set('asset', branchName, 'motion', 'rotation', [0 0 45],...
+thisR.set('asset', branchName, 'motion', 'rotation', [0 0 45],...
                     'translation', [0.5 0 0]);
 disp(thisR.assets.tostring)
 
 % light node
 objName = '010ID_Moon Light';
-thisR = thisR.set('asset', objName, 'motion', 'rotation', [0 0 45],...
+thisR.set('asset', objName, 'motion', 'rotation', [0 0 45],...
                     'translation', [0.5 0 0]);
 disp(thisR.assets.tostring)
 
-thisR = thisR.set('asset', objName, 'motion', 'rotation', [0 0 45],...
+thisR.set('asset', objName, 'motion', 'rotation', [0 0 45],...
                     'translation', [0.5 0 0]);
 disp(thisR.assets.tostring)
 %}
@@ -69,8 +69,8 @@ itself.
 %}
              
 % Form motion struct by only having the translation and rotation
-motion.position = reshape(translation, 1, 3);
-motion.rotate = rotMatrix;
+motion.translation = reshape(translation, 1, 3);
+motion.rotation = rotMatrix;
 % New branch node
 newBranch = piAssetCreate('type', 'branch');
 newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'move');
@@ -81,7 +81,7 @@ if isequal(thisNode.type, 'branch')
     childID = thisR.assets.getchildren(assetInfo);
     
     % Add the new node as child of thisNode
-    thisR = thisR.set('asset', thisNode.name, 'add', newBranch);
+    thisR.set('asset', thisNode.name, 'add', newBranch);
     
     % Set the parent of children of thisNode be the newBranch
     for ii=1:numel(childID)

@@ -214,11 +214,11 @@ for ii = 1:numel(children)
                                                       thisNode.translation(3)), '\n'));
         % Rotation
         fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotate(:, 1)), '\n'));
+                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotation(:, 1)), '\n'));
         fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotate(:, 2)), '\n'));
+                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotation(:, 2)), '\n'));
         fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotate(:, 3)), '\n'));
+                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotation(:, 3)), '\n'));
         
         % Scale
         fprintf(fid, strcat(spacing, indentSpacing,...
@@ -240,8 +240,8 @@ for ii = 1:numel(children)
                                                               pos(3)), '\n'));
                 end
                 
-                if isfield(thisNode.motion, 'rotate') && ~isempty(thisNode.motion.rotate)
-                    rot = thisNode.motion.rotate;
+                if isfield(thisNode.motion, 'rotation') && ~isempty(thisNode.motion.rotation)
+                    rot = thisNode.motion.rotation;
                     
                     % Write out rotation
                     fprintf(fid, strcat(spacing, indentSpacing,...

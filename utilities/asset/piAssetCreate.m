@@ -24,7 +24,7 @@ switch type
         obj.size.pmax = [0 0];
         obj.scale = [1 1 1];
         obj.translation = [0 0 0];
-        obj.rotate = [0 0 0;
+        obj.rotation = [0 0 0;
               0 0 1;
               0 1 0;
               1 0 0];

@@ -83,9 +83,9 @@ switch thisAsset.type
                 val = thisAsset.size;
             case {'scale'}
                 val = thisAsset.scale;
-            case {'translation'}
+            case {'translation', 'translate'}
                 val = thisAsset.translation;
-            case {'rotate'}
+            case {'rotation', 'rotate'}
                 val = thisAsset.rotate;
             case {'motion'}
                 val = thisAsset.motion;

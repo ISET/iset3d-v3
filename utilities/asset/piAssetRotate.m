@@ -69,7 +69,7 @@ rotMatrix = [rotation(3), rotation(2), rotation(1);
              fliplr(eye(3))];
 newBranch = piAssetCreate('type', 'branch');
 newBranch.name   = strcat(thisR.assets.stripID(assetInfo), '_', 'R');
-newBranch.rotate = rotMatrix;
+newBranch.rotation = rotMatrix;
          
 if isequal(thisNode.type, 'branch')
     % The node sent in is a branch node.  Get a list of the ids of its

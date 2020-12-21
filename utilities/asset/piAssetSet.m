@@ -73,8 +73,6 @@ switch thisNode.type
                 thisNode.shape = val;
             case {'output'}
                 thisNode.output = val;
-            case {'translation'}
-                thisNode.translation = val;
             otherwise
                 warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
                 return;
@@ -85,10 +83,6 @@ switch thisNode.type
                 thisNode.name = val;
             case {'lght', 'light'}
                 thisNode.lght = val;
-            case {'rotate'}
-                thisNode.rotate = val;
-            case {'motion'}
-                thisNode.motion = val;
             otherwise
                 warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
                 return;
@@ -101,12 +95,16 @@ switch thisNode.type
                 thisNode.size = val;
             case {'scale'}
                 thisNode.scale = val;
-            case {'translation'}
+            case {'translation', 'translate'}
                 thisNode.translation = val;
+            case {'rotation', 'rotate'}
+                thisNode.rotate = val;
+            case {'motion'}
+                thisNode.motion = val;
             otherwise
                 warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
                 return;
-        end                
+        end
 end
 
 thisR.assets = thisR.assets.set(assetInfo, thisNode);

@@ -712,7 +712,8 @@ switch param
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}
-                piAssetMotionAdd(thisR, assetName, val);
+                % varargin{2:end} contains translation and rotation info
+                piAssetMotionAdd(thisR, assetName, varargin{2:end});
             case {'obj2light'}
                 piAssetObject2Light(thisR, assetName, val);
             otherwise
