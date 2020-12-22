@@ -98,7 +98,7 @@ switch thisNode.type
             case {'translation', 'translate'}
                 thisNode.translation = val;
             case {'rotation', 'rotate'}
-                thisNode.rotate = val;
+                thisNode.rotation = val;
             case {'motion'}
                 thisNode.motion = val;
             otherwise
