@@ -971,7 +971,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                             end
                             val = flipud(rot);
                         %}
-                        
+                        %{
                         % World axis with homogeneous coordinates.
                         % Represented in matrix (4 x 3), with each row
                         % represents one dimension.
@@ -992,17 +992,24 @@ switch ieParamFormat(param)  % lower case, no spaces
                             % Update x y z axis
                             [~, ~, ~, curXYZ] = piTransformAxis(curXYZ(:,1), curXYZ(:,2),curXYZ(:,3),thisRotM);
                         end
+                        
+                        val = curXYZ(1:3, 1:3);
+                        %}
+                        
+                        [val, ~] = piTransformWorld2Obj(thisR, leafToRoot);
                     end
                     
-                    val = curXYZ(1:3, 1:3);
                     
+                    
+                    %{
                     rotY = -atan2d(curXYZ(3, 1), curXYZ(1, 1)); % az
                     rotZ = atan2d(curXYZ(2, 1), sqrt(curXYZ(1, 1)^2+curXYZ(3, 1)^2)); % el
                     
-                    rotX = -atan2d(curXYZ(2, 3), curXYZ(3, 3)); % az
+                    rotX = -atan2d(curXYZ(2, 3), sqrt(curXYZ(1, 3)^2 + curXYZ(3, 3)^2)); % az
                     
                     a = 1;
-                case 'worldposition'
+                    %}
+                case 'worldtranslation'
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have positions')
                     else
@@ -1017,6 +1024,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                             end
                             val = pos;
                         %}
+                        %{
                         % World axis with homogeneous coordinates.
                         % Represented in matrix (4 x 3), with each row
                         % represents one dimension.
@@ -1042,11 +1050,12 @@ switch ieParamFormat(param)  % lower case, no spaces
                                 end
                             end
                         end
+                        %}
+                        [~, val] = piTransformWorld2Obj(thisR, leafToRoot);
                     end
-                    
-                    % Not sure if this is correct.
-                    val = trans + ones(4);
-                 
+                case 'worldposition'
+                    val = thisR.get('asset', id, 'world translation');
+                    val = val(1:3, 4)';
                 case 'translation'
                     % Translation is always in the branch, not in the
                     % leaf.

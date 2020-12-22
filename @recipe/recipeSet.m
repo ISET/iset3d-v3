@@ -707,8 +707,14 @@ switch param
                 piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
                 out = piAssetTranslate(thisR, assetName, val);
+            case {'world translate', 'world translation'}
+                % Translate in world axis orientation.
+                rotM = thisR.get('asset', assetName, 'world rotation'); % Get new axis orientation
+                newTrans = inv(rotM) * [reshape(val, numel(val), 1); 0];
+                out = piAssetTranslate(thisR, assetName, newTrans(1:3));
             case {'rotate', 'rotation'}
                 out = piAssetRotate(thisR, assetName, val);
+            
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}

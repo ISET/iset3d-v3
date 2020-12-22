@@ -17,31 +17,44 @@ thisR.set('nbounces',5);
 assetName = 'figure_3m_material_uber_blue';
 
 %%
-%{
-R1 = thisR.set('asset', assetName, 'rotation', [0 0 45]);
-
-T1 = thisR.set('asset', assetName, 'translation', [1 0 0]);
-
-R2 = thisR.set('asset', assetName, 'rotation', [45 0 0]);
-
-T2 = thisR.set('asset', assetName, 'translation', [0 -1 0]);
-%}
+rotM1 = thisR.get('asset', assetName, 'world rotation');
+transM1 = thisR.get('asset', assetName, 'world position');
 
 %%
-% T1 = thisR.set('asset', assetName, 'translation', [1 0 0]);
+
 R1 = thisR.set('asset', assetName, 'rotation', [45 45 0]);
-% R2 = thisR.set('asset', assetName, 'rotation', [0 90 0]);
+R2 = thisR.set('asset', assetName, 'rotation', [0 90 0]);
 
+% T1 = thisR.set('asset', assetName, 'translation', [1 0 0]);
+T1 = thisR.set('asset', assetName, 'world translation', [0 0.5 0]);
 
+% R2 = thisR.set('asset', assetName, 'rotation', [45 0 0]);
 % R2 = thisR.set('asset', assetName, 'rotation', [0 45 0]);
 
 %%
-res = thisR.get('asset', assetName, 'world rotation');
+rotM2 = thisR.get('asset', assetName, 'world rotation');
+transM2 = thisR.get('asset', assetName, 'world position');
 %%
 piWrite(thisR)
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
+
+%%
+R3 = thisR.set('asset', assetName, 'rotation', [20 78 0]);
+R4 = thisR.set('asset', assetName, 'rotation', [0 0 48]);
+T2 = thisR.set('asset', assetName, 'world translation', [-0.5 0 -0.5]);
+
+%%
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%%
+rotM3 = thisR.get('asset', assetName, 'world rotation');
+transM3 = thisR.get('asset', assetName, 'world position');
+%%
 
 % piTransformAxis
 %   Get the three transformed axis with a transformation and the original

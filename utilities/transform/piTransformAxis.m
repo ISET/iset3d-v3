@@ -41,6 +41,6 @@ newAX = transform * aX;
 newAY = transform * aY;
 newAZ = transform * aZ;
 
-newAXYZ = [newAX newAY newAZ];
+newAXYZ = cat(2, newAX, newAY, newAZ, [0;0;0;1]);
 
 end
