@@ -709,12 +709,16 @@ switch param
                 out = piAssetTranslate(thisR, assetName, val);
             case {'world translate', 'world translation'}
                 % Translate in world axis orientation.
-                rotM = thisR.get('asset', assetName, 'world rotation'); % Get new axis orientation
+                rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
                 newTrans = inv(rotM) * [reshape(val, numel(val), 1); 0];
                 out = piAssetTranslate(thisR, assetName, newTrans(1:3));
             case {'rotate', 'rotation'}
                 out = piAssetRotate(thisR, assetName, val);
-            
+            case {'world rotate', 'world rotation'}
+                rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
+                newRot = inv(rotM) * [reshape(val, numel(val), 1); 0];
+                newDegs = piTransformRotM2Degs(newRot); % 1 x 3 vector for rotation around x, y z axis in object space.
+                out = piAssetRotate(thisR, assetName, newDegs);
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}

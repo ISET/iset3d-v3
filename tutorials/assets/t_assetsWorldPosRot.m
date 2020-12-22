@@ -15,15 +15,37 @@ thisR.set('nbounces',5);
 
 %%
 assetName = 'figure_3m_material_uber_blue';
+%{
+thisAsset = thisR.get('asset parent', assetName);
+
+thisR.set('asset', thisAsset.name, 'delete');
+thisR.set('to', [0 0 0]);
+%}
+T1 = thisR.set('asset', assetName, 'translation', [1 0 0]);
+pos1 = thisR.get('asset', assetName, 'world position');
+thisR.set('to', pos1);
+
+yellowAssetName = 'figure_6m_material_uber';
+posYellow = thisR.get('asset', yellowAssetName, 'world position');
+thisR.set('from', posYellow + [0 0 -0.2]);
+%%
+rotM1 = thisR.get('asset', assetName, 'world rotation matrix');
+transM1 = thisR.get('asset', assetName, 'world translation');
+pos1 = thisR.get('asset', assetName, 'world position');
 
 %%
-rotM1 = thisR.get('asset', assetName, 'world rotation');
-transM1 = thisR.get('asset', assetName, 'world position');
+
+R1 = thisR.set('asset', assetName, 'rotation', [0 0 45]);
+R2 = thisR.set('asset', assetName, 'rotation', [0 45 0]);
+%%
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
 
 %%
 
-R1 = thisR.set('asset', assetName, 'rotation', [45 45 0]);
-R2 = thisR.set('asset', assetName, 'rotation', [0 90 0]);
+
 
 % T1 = thisR.set('asset', assetName, 'translation', [1 0 0]);
 T1 = thisR.set('asset', assetName, 'world translation', [0 0.5 0]);
@@ -32,8 +54,13 @@ T1 = thisR.set('asset', assetName, 'world translation', [0 0.5 0]);
 % R2 = thisR.set('asset', assetName, 'rotation', [0 45 0]);
 
 %%
-rotM2 = thisR.get('asset', assetName, 'world rotation');
-transM2 = thisR.get('asset', assetName, 'world position');
+% Rotate z x z - extrinsic rotation - gamma, beta, alpha
+rotAng = thisR.get('asset', assetName, 'world rotation angle');
+
+%%
+rotM2 = thisR.get('asset', assetName, 'world rotation matrix');
+transM2 = thisR.get('asset', assetName, 'world translation');
+pos2 = thisR.get('asset', assetName, 'world position');
 %%
 piWrite(thisR)
 scene = piRender(thisR, 'render type', 'radiance');
@@ -52,8 +79,9 @@ sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
 %%
-rotM3 = thisR.get('asset', assetName, 'world rotation');
+rotM3 = thisR.get('asset', assetName, 'world rotation matrix');
 transM3 = thisR.get('asset', assetName, 'world position');
+
 %%
 
 % piTransformAxis
@@ -69,6 +97,4 @@ transM3 = thisR.get('asset', assetName, 'world position');
 To get the equivalent rotation of an object:
 for each node, get the rotation transform, multiply the matrices. Calculate
 the angle of the multiplied matrix
-
-
 %}

@@ -4,7 +4,7 @@ function [rotM, transM] = piTransformWorld2Obj(thisR, leafToRoot)
 % Represented in matrix (4 x 4), with each row
 % represents one dimension.
 rotM = eye(4);
-transM = ones(4);
+transM = eye(4);
 for ii=numel(leafToRoot):-1:2
     % Get asset and its rotation and translation
     thisAsset = thisR.get('asset', leafToRoot(ii));
