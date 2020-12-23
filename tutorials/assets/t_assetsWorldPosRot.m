@@ -82,6 +82,80 @@ sceneSet(scene, 'render flag', 'hdr');
 rotM3 = thisR.get('asset', assetName, 'world rotation matrix');
 transM3 = thisR.get('asset', assetName, 'world position');
 
+
+%% Set up a simple scene as an example
+ieInit;
+if ~piDockerExists, piDockerConfig; end
+
+%%
+thisR = piRecipeDefault('scene name', 'simple scene');
+
+thisR.set('film resolution',[200 150]);
+thisR.set('rays per pixel',32);
+thisR.set('fov',45);
+thisR.set('nbounces',5); 
+
+%%
+% thisR.assets.show;
+
+%%
+assetName = 'figure_3m_material_uber_blue';
+
+%%
+R1 = thisR.set('asset', assetName, 'rotation', [0 0 45]);
+
+%%
+rotAng = thisR.get('asset', assetName, 'world rotation angle');
+
+
+%%
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%%
+thisR.set('asset', R1.name, 'delete');
+thisR.set('asset', R2.name, 'delete');
+
+R3 = thisR.set('asset', assetName, 'rotation', rotAng);
+%%
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%%
+thisR.set('asset', assetName, 'world rotate', [90 0 0]);
+
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%%
+thisR.set('asset', assetName, 'world rotate', [-45 -45 0]);
+
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%%
+thisR.set('asset', assetName, 'world rotate', [-45 0 0]);
+
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%%
+thisR.set('asset', assetName, 'world rotate', [0 0 180]);
+
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
 %%
 
 % piTransformAxis

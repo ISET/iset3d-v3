@@ -1011,12 +1011,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     %}
                 case 'worldrotationangle'
                     rotM = thisR.get('asset', id, 'world rotation matrix');
-                    % [alpha, beta, gamma]. The following calculation is
-                    % adopted for left-handed orientation.
-                    val = zeros(1, 3);
-                    val(1) = -acosd(-rotM(2, 3)/sqrt(1-rotM(3, 3)^2));
-                    val(2) = -acosd(rotM(3, 3));
-                    val(3) = acosd(rotM(3, 2)/sqrt(1-rotM(3, 3)^2));
+                    val = piTransformRotM2Degs(rotM);
                 case 'worldtranslation'
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have positions')

@@ -715,10 +715,30 @@ switch param
             case {'rotate', 'rotation'}
                 out = piAssetRotate(thisR, assetName, val);
             case {'world rotate', 'world rotation'}
-                rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
-                newRot = inv(rotM) * [reshape(val, numel(val), 1); 0];
-                newDegs = piTransformRotM2Degs(newRot); % 1 x 3 vector for rotation around x, y z axis in object space.
-                out = piAssetRotate(thisR, assetName, newDegs);
+                % Get current rotation matrix
+                curRotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
+                
+                % Loop through the three rotation                
+                for ii=1:numel(val)
+                    if ~isequal(val(ii), 0)
+                        % Axis in world space
+                        axWorld = zeros(4, 1);
+                        axWorld(ii) = 1;
+                        
+                        % Axis orientation in object space
+                        axObj = inv(curRotM) * axWorld;
+                        thisAng = val(ii);
+                        
+                        % Get the rotation matrix in object space
+                        thisM = piTransformRotation(axObj, thisAng);
+                        
+                        % Get rotation deg around x, y and z axis in object
+                        % space.
+                        rotDeg = piTransformRotM2Degs(thisM);
+                        
+                        thisR.set('asset', assetName, 'rotate', rotDeg);
+                    end
+                end
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}
