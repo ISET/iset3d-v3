@@ -3,7 +3,7 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %%
-thisR = piRecipeDefault('scene name', 'simple scene');
+thisR = piRecipeDefault('scene name', 'Simple Scene');
 
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',32);
