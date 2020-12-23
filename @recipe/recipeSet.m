@@ -718,6 +718,7 @@ switch param
                 % Get current rotation matrix
                 curRotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
                 
+                newRotM = eye(4);
                 % Loop through the three rotation                
                 for ii=1:numel(val)
                     if ~isequal(val(ii), 0)
@@ -731,14 +732,13 @@ switch param
                         
                         % Get the rotation matrix in object space
                         thisM = piTransformRotation(axObj, thisAng);
-                        
-                        % Get rotation deg around x, y and z axis in object
-                        % space.
-                        rotDeg = piTransformRotM2Degs(thisM);
-                        
-                        thisR.set('asset', assetName, 'rotate', rotDeg);
+                        newRotM = thisM * newRotM;
                     end
                 end
+                % Get rotation deg around x, y and z axis in object
+                % space.
+                rotDeg = piTransformRotM2Degs(newRotM);
+                thisR.set('asset', assetName, 'rotate', rotDeg);
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}

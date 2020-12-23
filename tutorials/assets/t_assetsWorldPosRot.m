@@ -45,8 +45,6 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %%
 
-
-
 % T1 = thisR.set('asset', assetName, 'translation', [1 0 0]);
 T1 = thisR.set('asset', assetName, 'world translation', [0 0.5 0]);
 
@@ -102,7 +100,7 @@ thisR.set('nbounces',5);
 assetName = 'figure_3m_material_uber_blue';
 
 %%
-R1 = thisR.set('asset', assetName, 'rotation', [0 0 45]);
+R1 = thisR.set('asset', assetName, 'rotation', [0 90 45]);
 
 %%
 rotAng = thisR.get('asset', assetName, 'world rotation angle');
@@ -126,36 +124,21 @@ sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
 %%
-thisR.set('asset', assetName, 'world rotate', [90 0 0]);
-
-piWrite(thisR)
-scene = piRender(thisR, 'render type', 'radiance');
-sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
-
-%%
-thisR.set('asset', assetName, 'world rotate', [-45 -45 0]);
-
-piWrite(thisR)
-scene = piRender(thisR, 'render type', 'radiance');
-sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
-
-%%
-thisR.set('asset', assetName, 'world rotate', [-45 0 0]);
-
-piWrite(thisR)
-scene = piRender(thisR, 'render type', 'radiance');
-sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
-
-%%
 thisR.set('asset', assetName, 'world rotate', [0 0 180]);
 
 piWrite(thisR)
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
+
+%%
+thisR.set('asset', assetName, 'world rotate', [0 90 0]);
+
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
 %%
 
 % piTransformAxis
