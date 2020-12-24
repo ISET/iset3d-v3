@@ -271,6 +271,16 @@ switch ieParamFormat(sceneName)
             ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
             if ~exist(fname, 'file'), error('File not found'); end
         end
+        exporter = 'C4D';      
+    case 'coordinate'
+        sceneName = 'coordinate';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['coordinate','.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
         exporter = 'C4D';        
     case {'cornellbox', 'cornell_box'}
         sceneName = 'cornell_box';

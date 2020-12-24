@@ -33,12 +33,12 @@ thisR.get('material print');
 
 thisR.assets.show;
 
-assetName = 'figure_3m_material_uber_blue'; 
+assetName = 'figure_3m_O'; 
 thisR.get('asset',assetName,'material name')
 
 % This will become a mirror.  For now it is the black surface at the
 % ceiling.
-assetName = 'mirror_material_mirror';
+assetName = 'mirror_O';
 thisR.get('asset',assetName,'material name')
 
 %% Get a material and check its properties
@@ -85,7 +85,7 @@ thisR.set('material', 'add', newMat);
 % Find the figure asset
 % n = thisR.assets.names;
 
-assetName = 'figure_3m_material_uber_blue';
+assetName = 'figure_3m_O';
 curName = thisR.get('asset', assetName, 'material name');
 disp(['The current material is',curName]);
 
@@ -105,7 +105,7 @@ newMat = piMaterialCreate(mirror, 'type', 'mirror');
 thisR.set('material', 'add', newMat);
 
 % Find the blackboard
-assetName = 'mirror_material_mirror';
+assetName = 'mirror_O';
 
 curName = thisR.get('asset', assetName, 'material name');
 
@@ -118,7 +118,7 @@ sceneWindow(scene);
 
 %% Change the mirror to a matte material with spectral reflectance
 
-assetName = 'mirror_material_mirror';
+assetName = 'mirror_O';
 
 matteName = 'newMatte';
 newMatte = piMaterialCreate(matteName, 'type', 'matte');

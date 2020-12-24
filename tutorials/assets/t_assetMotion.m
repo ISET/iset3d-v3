@@ -72,7 +72,7 @@ sceneSet(scene,'gamma',0.7);
 [~, names] = thisR.assets.tostring;
 
 % Move this asset
-thisAssetName = 'figure_3m_material_uber_blue';
+thisAssetName = 'figure_3m_O';
 
 assetPos = thisR.get('asset', thisAssetName, 'translation');
 % The motion blur is assigned to a particular asset.  In this example,

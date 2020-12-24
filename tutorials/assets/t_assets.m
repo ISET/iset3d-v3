@@ -54,10 +54,10 @@ thisR.assets.show;
 % You do not need to include the prepended XXXID_ part of the object.
 
 % Ask for just the asset and you get the struct
-thisR.get('asset','sky')
+thisR.get('asset','sky_B')
 
 % You can request just the id and prepend the ID.  Goofy, but there it is
-thisR.get('asset id','002ID_sky')
+thisR.get('asset id','002ID_sky_B')
 
 % To use the node number and get the struct, work directly with the assets
 thisR.assets.get(2)
@@ -81,7 +81,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Manipulate the front figure
 
 % This is a leaf asset describing the blue man in the SimpleScene
-assetName = 'figure_3m_material_uber_blue'; 
+assetName = 'figure_3m_O'; 
 
 % This places a new branch node representating a rotation just above the
 % named leaf asset.  The rotation is (x,y,z) in degrees.  We are rotating
@@ -102,7 +102,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Translate
 
 % This is the object representing the yellow man
-assetName = 'figure_6m_material_uber';
+assetName = 'figure_6m_O';
 
 % In this example, we find the branch node that is just above the yellow
 % man, representing its position, rotation and such.
@@ -126,7 +126,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Scale
 
 % This is the object representing the yellow man
-assetName = 'figure_6m_material_uber';
+assetName = 'figure_6m_O';
 
 % We scale the size of the yellow man
 thisR.set('asset', assetName, 'scale', 1.2);
@@ -147,7 +147,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Add a copy of an existing object
 
 % The blue man.
-thisAsset = 'figure_3m_material_uber_blue'; 
+thisAsset = 'figure_3m_O'; 
 
 % Get the blue man that we will modify into a new asset.
 newAsset = thisR.get('asset',thisAsset);
@@ -175,7 +175,7 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %% Delete an existing object
 
-thisAsset = 'figure_3m_material_uber_blue'; 
+thisAsset = 'figure_3m_O'; 
 thisR.set('asset',thisAsset,'delete');
 thisR.assets.print;
 
@@ -198,7 +198,7 @@ areaLight = piLightSet(areaLight, [], 'lightspectrum', lightName);
 areaLight = piLightSet(areaLight, [], 'spectrum scale', 3e-1);
 
 % This is the red sphere at the back
-assetName = '019ID_Sphere_material_BODY'; 
+assetName = '019ID_Sphere_material_BODY_O'; 
 
 % This converts the sphere asset into a glowing D65 ball.  Notice that it
 % did not add any new nodes.  It simply changed the properties of the
@@ -223,7 +223,7 @@ sceneSet(scene, 'render flag', 'hdr');
 % We are ignoring this now until the material sets/gets are finished.
 %
 %{
-assetNameOne = '017ID_figure_6m_material_uber';
+assetNameOne = '017ID_figure_6m_O';
 
 % Get a 'branch' node, which has rotation and position info
 mat = thisR.get('asset', assetNameOne, 'material');

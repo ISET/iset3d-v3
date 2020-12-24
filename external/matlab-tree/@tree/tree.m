@@ -235,7 +235,7 @@ classdef tree
                 if replace
                     disp('Replacing names')
                     for jj=1:obj.nnodes
-                        if jj==1, obj.Node{1} = strrep(newNames{1},'_','|');
+                        if ischar(obj.Node{jj}), obj.Node{jj} = strrep(newNames{jj},'_','|');
                         else
                             obj.Node{jj}.name = strrep(newNames{jj},'_',' ');
                         end
@@ -245,9 +245,9 @@ classdef tree
                 return;
             end
             
-            if ~obj.isRoot(id)
+            if isstruct(obj.Node{id})
                 newNames = obj.Node{id}.name;
-            else
+            elseif ischar(obj.Node{id})
                 newNames = obj.Node{id};
             end
             
@@ -389,9 +389,8 @@ classdef tree
         end
         
         % Test if this is the root node.  Should be a static method.
-        function val = isRoot(~, id)
-            % Check if it is root node. Yes if id is 1.
-            if id == 1
+        function val = isRoot(obj, id)
+            if obj.getparent(id) == 0
                 val = true;
             else
                 val = false;

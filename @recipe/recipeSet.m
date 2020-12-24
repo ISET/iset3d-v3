@@ -696,7 +696,7 @@ switch param
         
         % Some of these functions should be edited to return the new
         % branch.  Some have been.
-        switch param
+        switch ieParamFormat(param)
             case 'add'
                 piAssetAdd(thisR, assetName, val);
             case {'delete', 'remove'}
@@ -707,14 +707,14 @@ switch param
                 piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
                 out = piAssetTranslate(thisR, assetName, val);
-            case {'world translate', 'world translation'}
+            case {'worldtranslate', 'worldtranslation'}
                 % Translate in world axis orientation.
                 rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
                 newTrans = inv(rotM) * [reshape(val, numel(val), 1); 0];
                 out = piAssetTranslate(thisR, assetName, newTrans(1:3));
             case {'rotate', 'rotation'}
                 out = piAssetRotate(thisR, assetName, val);
-            case {'world rotate', 'world rotation'}
+            case {'worldrotate', 'worldrotation'}
                 % Get current rotation matrix
                 curRotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
                 
@@ -738,7 +738,7 @@ switch param
                 % Get rotation deg around x, y and z axis in object
                 % space.
                 rotDeg = piTransformRotM2Degs(newRotM);
-                thisR.set('asset', assetName, 'rotate', rotDeg);
+                out = thisR.set('asset', assetName, 'rotate', rotDeg);
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}
@@ -746,6 +746,22 @@ switch param
                 piAssetMotionAdd(thisR, assetName, varargin{2:end});
             case {'obj2light'}
                 piAssetObject2Light(thisR, assetName, val);
+            case {'graft', 'subtreeadd'}
+                id = thisR.get('asset', assetName, 'id');
+                rootSTID = thisR.assets.nnodes + 1;
+                thisR.assets = thisR.assets.graft(id, val);
+                thisR.assets = thisR.assets.uniqueNames;
+                % Get the root node of the subtree.
+                out = thisR.get('asset', rootSTID);
+            case {'graftwithmaterial', 'graftwithmaterials'}
+                [assetTree, matList] = piAssetTreeLoad(val);
+                out = thisR.set('asset', assetName, 'graft', assetTree);
+                for ii=1:numel(matList)
+                    thisR.set('material', 'add', matList{ii});
+                end
+            case {'chop', 'cut'}
+                id = thisR.get('asset', assetName, 'id');
+                thisR.assets = thisR.assets.chop(id);
             otherwise
                 % What does this do?
                 piAssetSet(thisR, assetName, varargin{1},val);

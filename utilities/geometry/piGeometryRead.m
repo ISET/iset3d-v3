@@ -231,7 +231,7 @@ while i <= length(txt)
                 
             end
             
-            if exist('name', 'var'), resLight.name = sprintf('%s', name); end
+            if exist('name', 'var'), resLight.name = sprintf('%s_L', name); end
             
             subtrees = cat(1, subtrees, tree(resLight));
             trees = subtrees;
@@ -243,9 +243,9 @@ while i <= length(txt)
             resCurrent = piAssetCreate('type', 'branch');
             
             % If present populate fields.
-            if exist('name','var'), resCurrent.name = sprintf('%s', name); end
+            if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end
             if exist('sz','var'), resCurrent.size = sz; end
-            if exist('rot','var'), resCurrent.rotate = rot; end
+            if exist('rot','var'), resCurrent.rotation = rot; end
             if exist('translation','var'), resCurrent.translation = translation; end
             
             %{
@@ -271,11 +271,11 @@ while i <= length(txt)
             
             if exist('mat','var')
                 resObject.material = mat; 
-                resObject.name = sprintf('%s_material_%s', resObject.name, mat.namedmaterial);
+                resObject.name = sprintf('%s_O', resObject.name);
             end
             if exist('medium','var')
                 resObject.medium = medium; 
-                resObject.name = sprintf('%s_medium_%s', resObject.name, medium);
+                resObject.name = sprintf('%s_O', resObject.name);
             end
             
             subtrees = cat(1, subtrees, tree(resObject));
@@ -284,7 +284,7 @@ while i <= length(txt)
         elseif exist('name','var')
             % resCurrent = createGroupObject();
             resCurrent = piAssetCreate('type', 'branch');
-            if exist('name','var'), resCurrent.name = sprintf('%s', name); end
+            if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end
             
             %{
             resCurrent.groupobjs = groupobjs;

@@ -7,14 +7,14 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Save bunny asset
 assetSceneName = 'bunny';
-assetName = 'Bunny_material_BunnyMat';
+thisR = piRecipeDefault('scene name', assetSceneName);
+assetName = 'Bunny_O';
+subTree = thisR.get('asset', assetName, 'subtree');
 
-thisR = piRecipeDefault('scene name', 'bunny');
-
-thisAsset = thisR.get('asset', assetName);
-
+matList = thisR.get('materials');
 outputPath = fullfile(piRootPath, 'data', 'assets', 'bunny.mat');
-p = piAssetSave(thisAsset, 'outFilePath', outputPath);
+
+p = piAssetTreeSave(subTree, matList, 'outFilePath', outputPath);
 
 %% Load bunny asset
-loadedAsset = piAssetLoad('bunny');
+loadedAsset = piAssetTreeLoad('bunny');

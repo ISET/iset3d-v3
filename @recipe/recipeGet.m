@@ -947,14 +947,18 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('asset',assetName or ID);  % Returns the asset
         % thisR.get('asset',assetName,param);  % Returns the param val
         
-
         [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
         if length(varargin) == 1
             val = thisAsset;
             return;
         else 
             switch ieParamFormat(varargin{2})
-                case 'path to root'
+                case 'id'
+                    val = id;
+                case 'subtree'
+                    % thisR.get('asset', assetName, 'subtree');
+                    val = thisR.assets.subtree(id);
+                case 'pathtoroot'
                     val = thisR.assets.leaftoroot(id);
                 case 'worldrotationmatrix'
                     if ~thisR.assets.isleaf(id)
@@ -1012,7 +1016,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 case 'worldrotationangle'
                     rotM = thisR.get('asset', id, 'world rotation matrix');
                     val = piTransformRotM2Degs(rotM);
-                case 'worldtranslation'
+                case {'worldtranslation', 'worldtranslationmatrix'}
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have positions')
                     else
