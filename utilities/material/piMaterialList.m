@@ -12,7 +12,7 @@ function list = piMaterialList(thisR)
 %   type.
 %
 %   At present our library contains 13 material types.
-% 
+%
 % Inputs:
 %   thisR:   A recipe.  If missing, the whole library is printed
 %
@@ -32,7 +32,8 @@ function list = piMaterialList(thisR)
  mTypes = piMateriallib;
  disp(mTypes)
 %}
-%%
+
+%% Whole library
 
 if notDefined('thisR')
     fprintf('The material library\n-------------------\n');
@@ -41,30 +42,23 @@ if notDefined('thisR')
     return;
 end
 
+%% Just the materials of this scene
 
-%% The user sent in a recipe.  So print the materials in this scene
-
-nMaterials = numel(thisR.materials.list);
+nMaterials = thisR.get('n material');
 
 [~,sceneName] = fileparts(thisR.inputFile);
-fprintf('\nMaterials in the scene %s\n',sceneName);
+fprintf('\nScene materials: %s\n',sceneName);
 fprintf('-------------------------------\n');
 
 fprintf('  Name  \t [Type]\n');
 fprintf('-------------------------------\n');
 
-list = cell(1,nMaterials);
-
 for ii =1:nMaterials
-    list{ii} = sprintf('%d: %s: \t [ %s ]\n', ii, ...
+    fprintf('%d: %s: \t [ %s ]\n', ii, ...
         thisR.materials.list{ii}.name, ...
-        thisR.materials.list{ii}.stringtype);
-end
-for ii =1:nMaterials
-    fprintf('%s',list{ii});
+        thisR.materials.list{ii}.type);
 end
 
 fprintf('-------------------------------\n');
-
 
 end

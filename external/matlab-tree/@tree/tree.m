@@ -147,7 +147,6 @@ classdef tree
            parents = obj.Parent;
            IDs = (1 : numel(parents)); % All IDs
            IDs = setdiff(IDs, parents); % Remove those which are marked as parent
-           
         end
         
         function content = get(obj, ID)

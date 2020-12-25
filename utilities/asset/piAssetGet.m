@@ -51,6 +51,8 @@ switch thisAsset.type
         switch param
             case {'name'}
                 val = thisAsset.name;
+            case {'type'}
+                val = thisAsset.type;
             case {'mediuminterface'}
                 val = thisAsset.mediumInterface;
             case {'material'}
@@ -69,6 +71,8 @@ switch thisAsset.type
         switch param
             case {'name'}
                 val = thisAsset.name;
+            case {'type'}
+                val = thisAsset.type;
             case {'lght'}
                 val = thisAsset.lght;
             otherwise
@@ -79,12 +83,15 @@ switch thisAsset.type
         switch param
             case {'name'}
                 val = thisAsset.name;
+            case {'type'}
+                val = thisAsset.type;
             case {'size'}
                 val = thisAsset.size;
             case {'scale'}
                 val = thisAsset.scale;
             case {'translation', 'translate'}
                 val = thisAsset.translation;
+
             case {'rotation', 'rotate'}
                 val = thisAsset.rotation;
             case {'motion'}

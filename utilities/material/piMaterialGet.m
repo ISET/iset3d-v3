@@ -1,5 +1,5 @@
 function val = piMaterialGet(material, param, varargin)
-%%
+% Get the value of a material parameter
 %
 % Synopsis:
 %   val = piMaterialGet(material, param, varargin)
@@ -54,7 +54,10 @@ if isfield(material, pName)
         return;
     end
     
-    % If type and val are both empty, return the parameter struct
+    % If type and val are both empty, return the parameter struct.  We
+    % should expand this out to list the individual parameters that are
+    % legitimate.  The materials have lots of parameters not accessible
+    % this way (BW).
     if isempty(pTypeVal)
         val = material.(pName);
     elseif isequal(pTypeVal, 'type')
@@ -67,32 +70,5 @@ else
             param, material.type);
 end
 
-
-%{
-%% Return different values depending on inputs
-
-if ~isempty(idx)
-    % Just one of the textures
-    thisMaterial = thisR.materials.list{idx};
-    if ~isempty(param)
-        % A parameter of that texture
-        val = thisMaterial.(param);
-    else
-        val = thisMaterial;
-    end
-else
-    % Return all textures
-    if ~isfield(thisR.materials, 'list')
-        val = {};
-    else
-        val = thisR.materials.list;
-    end
-end
-
-%% Print all materials
-
-if p.Results.print
-   
-end
 %}
 end

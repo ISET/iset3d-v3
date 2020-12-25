@@ -1,4 +1,4 @@
-%% The first in a series of scripts introducing iset3d calculations
+%% Introducing iset3d calculations
 %
 % Brief description:
 %  This script renders the sphere scene in the data directory of the ISET3d
@@ -12,17 +12,22 @@
 %    docker pull vistalab/pbrt-v3-spectral
 %
 % Description
-%  The scripts uses a very simple recipe for a sphere that is included in
-%  the iset3d repository.  It sets up the recipe properties by adding a
-%  light, setting some resolution parameters, and then calling the render
-%  method.  That method invokes the PBRT docker.  The output of PBRT is
-%  loaded into an ISET scene structure.
+%  The scripts introduces how to read one of the ISET3d default scenes to
+%  create recipe.  
+%
+%  The script 
+%
+%    * initializes the recipe
+%    * adds a light
+%    * sets film resolution parameters
+%    * calls the renderer that invokes the PBRT docker
+%    * loads the radiance and depth map into an ISET scene structure.
 %
 % Authors
 %  TL, BW, ZL, ZLy SCIEN 2017
 %
 % See also
-%   t_piIntro_*
+%   t_piIntro_*, piRecipeDefault, recipe
 %
 
 % History:
@@ -31,13 +36,13 @@
 %% Initialize ISET and Docker
 %
 % We start up ISET and check that the user is configured for docker
-clear; close all; ieInit;
+ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
 thisR = piRecipeDefault('scene name','sphere');
 
-%% Add a point light
+% Add a point light, needed by this scene.
 thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
 
 % You can also try this light if you like, which is more blue and distant
@@ -65,8 +70,9 @@ piWrite(thisR);
 [scene, result] = piRender(thisR);
 sceneWindow(scene);
 
-%% Note that we also computed the depth map
+%% We also computed the depth map
 %
-% Show it by uncommenting the line below.
-% scenePlot(scene,'depth map');
+%
+scenePlot(scene,'depth map');
 
+%%

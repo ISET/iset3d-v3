@@ -860,14 +860,19 @@ switch ieParamFormat(param)  % lower case, no spaces
         val.film   = thisR.film;
         val.filter = thisR.filter;
         
+        % Materials.  Still needs work, but exists (BW).
     case {'materials', 'material'}
-        %{
-            thisMat = thisR.get('material', matName);
-            nameCheck = thisR.get('material', matName, 'name');
-            kd = thisR.get('material', matName, 'kd');
-            kdType = thisR.get('material', matName, 'kd type');
-            kdVal = thisR.get('material', matName, 'kd value');
-        %}
+        % thisR = piRecipeDefault('scene name','SimpleScene');
+        % materials = thisR.get('materials');
+        % thisMat = thisR.get('material', 'BODY');
+        % nameCheck = thisR.get('material', 'uber', 'name');
+        % kd = thisR.get('material', 'uber', 'kd');
+        % kdType = thisR.get('material', 'uber', 'kd type');
+        % kdVal = thisR.get('material', 'uber', 'kd value');
+        %
+        % Get a  property from a material or a material property named in
+        % this recipe. 
+
         if isempty(varargin)
             % Return the whole material list
             if isfield(thisR.materials, 'list')
@@ -907,42 +912,58 @@ switch ieParamFormat(param)  % lower case, no spaces
             error('Wrong parameter number. One at a time');
         end
     case {'nmaterial', 'nmaterials', 'materialnumber', 'materialsnumber'}
+        % thisR.get('n materials')
+        % Number of materials in this scene.
         if isfield(thisR.materials, 'list')
             val = numel(thisR.materials.list);
         else
             val = 0;
         end        
-    case {'printmaterials', 'materialsprint', 'materialprint', 'printmaterial'}
-        nMaterials = thisR.get('n material');
-        
-        [~,sceneName] = fileparts(thisR.inputFile);
-        fprintf('\nMaterials in the scene %s\n',sceneName);
-        fprintf('-------------------------------\n');
-        
-        fprintf('  Name  \t [Type]\n');
-        fprintf('-------------------------------\n');
-                
-        for ii =1:nMaterials
-            fprintf('%d: %s: \t [ %s ]\n', ii, ...
-                thisR.materials.list{ii}.name, ...
-                thisR.materials.list{ii}.type);
-        end
-        
-        fprintf('-------------------------------\n');
-        val = [];
+    case {'materialsprint','printmaterials', 'materialprint', 'printmaterial'}
+        % thisR.get('materials print');
+        %
+        % These are the materials that are named in the tree hierarchy.        
+        piMaterialList(thisR);
     case {'materialsoutputfile'}
+        % Unclear why this is still here.  Probably deprecated.
         val = thisR.materials.outputfile;
         
+        % Getting ready for textures
     case{'texture'}
         if isfield(thisR.textures, 'list')
             val = thisR.textures.list;
         else
             val = {};
         end
+        
+        % Getting read for lights
     case{'light'}
         val = thisR.light;
         
-    % Assets - more work needed here.
+    % Leafs (objects) in the tree.
+    case {'objectmaterials'}
+        % val = thisR.get('assets','object materials');
+        %
+        % Sometimes tree class thinks what we call is a branch is a leaf
+        % because, well, we don't put an object below a branch node.  We
+        % should trim the tree of useless branches (any branch that has no
+        % object beneath it).  Maybe.  (BW).
+        ids = piAssetFind(thisR.assets,'type','object');
+        leafMaterial = cell(1,numel(ids));
+        leafNames = cell(1,numel(ids));
+        cnt = 1;
+        for ii=ids
+            thisAsset = thisR.get('asset',ii);
+            leafNames{cnt} = thisAsset.name;
+            leafMaterial{cnt} = piAssetGet(thisAsset,'material name');
+            cnt = cnt + 1;
+        end
+        val.leafNames = leafNames;
+        val.leafMaterial = leafMaterial;
+    case {'leafs'}
+        val = thisR.assets.findleaves;
+                    
+    % Asset specific gets - more work needed here.
     case {'asset', 'assets'}
         % thisR.get('asset',assetName or ID);  % Returns the asset
         % thisR.get('asset',assetName,param);  % Returns the param val
@@ -952,65 +973,45 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisAsset;
             return;
         else 
+            if strncmp(varargin{2},'material',8)
+                [~,material] = piMaterialFind(thisR.materials.list,...
+                    'name',thisAsset.material.namedmaterial);
+            end
             switch ieParamFormat(varargin{2})
                 case 'id'
                     val = id;
                 case 'subtree'
                     % thisR.get('asset', assetName, 'subtree');
                     val = thisR.assets.subtree(id);
-                case 'pathtoroot'
+                case {'leaftoroot','pathtoroot'}
+                    % thisR.get('asset',assetName,'leaf to root');
+                    % Sequence of ids from the leaf to root
+                    % We should check that id is a leaf??? (BW)
                     val = thisR.assets.leaftoroot(id);
+                    
+                    % Get material properties from this asset
+                case 'material'
+                    % thisR.get('asset',assetName,'material');
+                    val = material;
+                case 'materialname'
+                    val = material.name;
+                case 'materialtype'
+                    val = material.type;
+                    
+                    % World position and orientation properties.
                 case 'worldrotationmatrix'
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have rotations')
                     else
+                        % Deleted a lot of code comments from here 12/24 (BW).
                         leafToRoot = thisR.assets.leaftoroot(id);
-                        
-                        %{
-                            rot = zeros(3, 1);
-                            for ii=2:numel(leafToRoot)
-                                thisAsset = thisR.get('asset', leafToRoot(ii));
-                                thisRot = piAssetGet(thisAsset, 'rotate');
-                                rot = rot + thisRot(1,:)';
-                            end
-                            val = flipud(rot);
-                        %}
-                        %{
-                        % World axis with homogeneous coordinates.
-                        % Represented in matrix (4 x 3), with each row
-                        % represents one dimension.
-                        aXYZ = [eye(3); zeros(1, 3)];
-                        curXYZ = aXYZ;
-                        for ii=numel(leafToRoot):-1:2
-                            thisAsset = thisR.get('asset', leafToRoot(ii));
-                            thisRot = fliplr(piAssetGet(thisAsset, 'rotate')); % PBRT uses wired order of ZYX
-                            % Calculate rotation transform
-                            thisRotM = eye(4);
-                            for jj=1:size(thisRot, 2)
-                                if thisRot(1, jj) ~= 0
-                                    % rotation matrix from basis axis
-                                    rotM = piTransformRotation(curXYZ(:, jj), thisRot(1, jj));
-                                    thisRotM = rotM * thisRotM;
-                                end
-                            end
-                            % Update x y z axis
-                            [~, ~, ~, curXYZ] = piTransformAxis(curXYZ(:,1), curXYZ(:,2),curXYZ(:,3),thisRotM);
-                        end
-                        
-                        val = curXYZ(1:3, 1:3);
-                        %}
-                        
                         [val, ~] = piTransformWorld2Obj(thisR, leafToRoot);
                     end
-                    
-                    
-                    
                     %{
+                    % Can we delete?
                     rotY = -atan2d(curXYZ(3, 1), curXYZ(1, 1)); % az
                     rotZ = atan2d(curXYZ(2, 1), sqrt(curXYZ(1, 1)^2+curXYZ(3, 1)^2)); % el
-                    
                     rotX = -atan2d(curXYZ(2, 3), sqrt(curXYZ(1, 3)^2 + curXYZ(3, 3)^2)); % az
-                    
                     a = 1;
                     %}
                 case 'worldrotationangle'
@@ -1020,47 +1021,13 @@ switch ieParamFormat(param)  % lower case, no spaces
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have positions')
                     else
-                        leafToRoot = thisR.assets.leaftoroot(id);
-                        
-                        %{
-                            pos = zeros(3, 1);
-                            for ii=2:numel(leafToRoot)
-                                thisAsset = thisR.get('asset', leafToRoot(ii));
-                                pos = pos +...
-                                    reshape(piAssetGet(thisAsset, 'translation'), 3, 1);
-                            end
-                            val = pos;
-                        %}
-                        %{
-                        % World axis with homogeneous coordinates.
-                        % Represented in matrix (4 x 3), with each row
-                        % represents one dimension.
-                        % World axis with homogeneous coordinates.
-                        % Represented in matrix (4 x 3), with each row
-                        % represents one dimension.
-                        aXYZ = [eye(3); zeros(1, 3)];
-                        curXYZ = aXYZ;
-                        trans = zeros(4);
-                        for ii=numel(leafToRoot):-1:2
-                            thisAsset = thisR.get('asset', leafToRoot(ii));
-                            thisRot = fliplr(piAssetGet(thisAsset, 'rotate')); % PBRT uses wired order of ZYX
-                            thisTrans = piAssetGet(thisAsset, 'translate');
-                            % Calculate rotation transform
-                            for jj=1:size(thisRot, 2)
-                                transM = piTransformTranslation(curXYZ(:, 1), curXYZ(:, 2), curXYZ(:, 3), thisTrans);
-                                trans = trans + transM;
-                                if thisRot(1, jj) ~= 0
-                                    % rotation matrix from basis axis
-                                    rotM = piTransformRotation(curXYZ(:, jj), thisRot(1, jj));
-                                    % Update x y z axis
-                                    [~, ~, ~, curXYZ] = piTransformAxis(aXYZ(:,1), aXYZ(:,2),aXYZ(:,3),rotM);
-                                end
-                            end
-                        end
-                        %}
+                        % Deleted a lot of code comments from here 12/24 (BW).
+                        leafToRoot = thisR.assets.leaftoroot(id);                        
                         [~, val] = piTransformWorld2Obj(thisR, leafToRoot);
                     end
+                    
                 case 'worldposition'
+                    % thisR.get('asset',idOrName,'world position')
                     val = thisR.get('asset', id, 'world translation');
                     val = val(1:3, 4)';
                 case 'translation'
@@ -1106,6 +1073,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         parentNode = thisR.get('asset parent id',thisNode);
         val = thisR.assets.Node{parentNode};   
 
+        % Delete this stuff when we get ready to merge.
         %{
     case {'groupnames'}
         % Cell array (2D) of the groupobj names

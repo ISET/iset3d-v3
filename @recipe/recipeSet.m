@@ -622,14 +622,15 @@ switch param
         
         % Materials should be built up here.
     case {'materials', 'material'}
-        %{
-            thisR.set('material', materialList);
-            thisR.set('material', matName, newMaterial);
-            thisR.set('material', 'add', newMaterial);
-            thisR.set('material', 'delete', matName);
-            thisR.set('material', matName, 'PARAM TYPE', VAL);
-        %}
-        % Set a new list of materials
+        % Act on the list of materials
+        %
+        % thisR.set('material', materialList);
+        % thisR.set('material', matName, newMaterial);
+        % thisR.set('material', 'add', newMaterial);
+        % thisR.set('material', 'delete', matName);
+        % thisR.set('material', matName, 'PARAM TYPE', VAL);
+        
+        % In this case, we completely replace the material list.
         if isempty(varargin)
             if iscell(val)
                 thisR.materials.list = val;
@@ -639,13 +640,16 @@ switch param
             return;
         end
         
-        % Add/delete a material        
+        % Add/delete a specific material
         switch val
             case {'add'}
+                % thisR.set('material', 'add', material struct);
+                % Could use 'end + 1'
                 nMaterial = thisR.get('n material');
                 thisR.materials.list{nMaterial + 1} = varargin{1};
                 return;
             case {'delete', 'remove'}
+                % thisR.set('material', 'delete', idxORname);
                 if isnumeric(varargin{1})
                     thisR.materials.list{varargin{1}} = {};
                 else
@@ -653,10 +657,18 @@ switch param
                     thisR.materials.list(matIdx) = [];
                 end
                 return;
-                
+            case {'replace'}
+                % thisR.set('material','replace', idxORname-1, newmaterial-2)
+                idx = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                thisR.materials.list{idx} = varargin{2};
+                return;
+            otherwise
+                % val is something else.  We pass it along to the next
+                % section of code.
         end
+
         
-        % Get index in material list
+        % Get index and material struct from the material list
         if ischar(val)
             % Search by name, find the index
             [matIdx, thisMat] = piMaterialFind(thisR.materials.list, 'name', val);
@@ -674,12 +686,15 @@ switch param
         end
         
         if numel(varargin{1}) == 1
+            % A material struct was sent in as the first argument.  We
+            % should check it and then set it.
             thisR.materials.list{matIdx} = varargin{1};
         else
+            % A material name and property was sent in.  We set it.
             thisMat = piMaterialSet(thisMat, varargin{1}, varargin{2});
             thisR.set('materials', matIdx, thisMat);
         end
-
+        %}
     case {'materialsoutputfile'}
         % Deprecated?
         thisR.materials.outputfile = val;
@@ -688,8 +703,12 @@ switch param
         % Typical:    thisR.set(param,val) 
         % This case:  thisR.set('asset',assetName, param, val);
         %
-        % All of these operations need the whole tree, so we send in the
-        % recipe with thisR.assets.  We could send in just assets, but ..
+        % These operations need the whole tree, so we send in the
+        % recipe that contains the asset tree, thisR.assets.
+        
+        % Given the calling convention, val is assetName and
+        % varargin{1} is the param, and varargin{2} is the value, if
+        % needed.
         assetName = val;        
         param = varargin{1};
         if numel(varargin) == 2, val   = varargin{2}; end
