@@ -987,6 +987,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('asset',assetName,param);  % Returns the param val
         
         [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
+        if isempty(id), error('Could not find asset %s\n',varargin{1}); end
         if length(varargin) == 1
             val = thisAsset;
             return;

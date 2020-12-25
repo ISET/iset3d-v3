@@ -91,7 +91,30 @@ sceneWindow(scene);
 
 %% Make the ball glass and then a mirror.  
 
+% Not yet working.  Maybe we need an environmental light and we should add
+% one?
+
 %{
+%% Where is the sphere?
+
+assetName = 'Sphere_O';
+spherePosition    = thisR.get('asset', assetName, 'world position');
+cameraPosition    = thisR.get('from');
+% thisR.set('from',1e-1*cameraPosition);
+thisR.set('to',spherePosition);
+
+thisR.get('from')
+thisR.get('to')
+thisR.get('asset',assetName,'world position')
+
+thisR.set('asset',assetName,'scale',[0.5 0.5 0.5]);
+
+%%
+piWrite(thisR);
+scene = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
+sceneWindow(scene);
+
 % Glass and mirror are not working.  Ask ZLyu why
 %
 glassName = 'glass';

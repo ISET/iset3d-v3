@@ -725,6 +725,7 @@ switch param
             case {'parent'}
                 piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
+                % thisR.set('asset',assetName,'translate',val);
                 out = piAssetTranslate(thisR, assetName, val);
             case {'worldtranslate', 'worldtranslation'}
                 % Translate in world axis orientation.
@@ -762,7 +763,7 @@ switch param
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}
                 % varargin{2:end} contains translation and rotation info
-                piAssetMotionAdd(thisR, assetName, varargin{2:end});
+                out = piAssetMotionAdd(thisR, assetName, varargin{2:end});
             case {'obj2light'}
                 piAssetObject2Light(thisR, assetName, val);
             case {'graft', 'subtreeadd'}
