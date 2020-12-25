@@ -22,7 +22,8 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read pbrt file for a Cinema4D exported scene
 
-thisR = piRecipeDefault('scene name','sphere');
+sceneName = 'sphere';
+thisR = piRecipeDefault('scene name',sceneName);
 % thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
 
 thisR = piLightAdd(thisR, 'type', 'distant', 'light spectrum', [9000 0.001],...
@@ -33,6 +34,17 @@ thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5);
 
+% Render
+piWrite(thisR);
+scene = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
+sceneWindow(scene);
+
+%{
+thisR.assets.show;
+id = thisR.get('asset id','Sphere_B');
+thisR.set('asset',id,'delete');
+%}
 %% The material library
 
 % Print out the named materials in this scene.
@@ -42,13 +54,6 @@ thisR.get('materials print');
 % will be creating the material library in a directory within ISET3d, and
 % expanding on them.
 piMaterialList;
-
-%% Render
-
-piWrite(thisR);
-scene = piRender(thisR);
-scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
-sceneWindow(scene);
 
 %% Add a red matte surface
 
@@ -65,7 +70,7 @@ thisR.get('print materials');
 % it in the PBRT spd format.
 wave = 400:10:700;
 reflectance = ones(size(wave));
-reflectance(1:20) = 0;
+reflectance(1:17) = 0;
 spdRef = piMaterialCreateSPD(wave, reflectance);
 
 % Store the reflectance as the diffuse reflectance of the redMatte
@@ -75,26 +80,30 @@ thisR.set('material', redMatte, 'kd value', spdRef);
 %%
 assetName = 'Sphere_O';
 thisR.set('asset',assetName,'material name',redMatte);
-thisR.get('object materials')
+thisR.get('object material')
 % thisR.assets.show;
 
 %% Let's have a look
 piWrite(thisR);
 scene = piRender(thisR);
-scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
+scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
 
-%% Make the ball glass
+%% Make the ball glass and then a mirror.  
 
 %{
 % Glass and mirror are not working.  Ask ZLyu why
 %
-mirrorName = 'glass';
-newMirror = piMaterialCreate(mirrorName, 'type', 'glass');
-thisR.set('material', 'add', newMirror);
+glassName = 'glass';
+glass = piMaterialCreate(glassName, 'type', 'glass');
+thisR.set('material', 'add', glass);
 thisR.get('print materials');
-thisR.set('asset', assetName, 'material name', mirrorName);
-thisR.get('object materials')
+thisR.set('asset', assetName, 'material name', glassName);
+thisR.get('object material')
+
+% Putting back the red or white seems to work
+%  thisR.set('asset', assetName, 'material name', redMatte);
+%  thisR.set('asset', assetName, 'material name', 'white');
 
 %
 piWrite(thisR);

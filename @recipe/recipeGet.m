@@ -927,6 +927,47 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'materialsoutputfile'}
         % Unclear why this is still here.  Probably deprecated.
         val = thisR.materials.outputfile;
+    case {'objectmaterial','materialobject'}
+        % val = thisR.get('object material');
+        %
+        % Cell arrays of object names and corresponding material
+        % names.
+        %
+        % We do not use findleaves because sometimes tree class
+        % thinks what we call is a branch is a leaf because,
+        % well, we don't put an object below a branch node.  We
+        % should trim the tree of useless branches (any branch
+        % that has no object beneath it). Maybe.  (BW).
+        ids = thisR.get('objects');
+        leafMaterial = cell(1,numel(ids));
+        leafNames = cell(1,numel(ids));
+        cnt = 1;
+        for ii=ids
+            thisAsset = thisR.get('asset',ii);
+            leafNames{cnt} = thisAsset.name;
+            leafMaterial{cnt} = piAssetGet(thisAsset,'material name');
+            cnt = cnt + 1;
+        end
+        val.leafNames = leafNames;
+        val.leafMaterial = leafMaterial;
+    case {'objects'}
+        % Indices to the objects
+        nnodes = thisR.assets.nnodes;
+        val = [];
+        for ii=1:nnodes
+            thisNode = thisR.assets.Node{ii};
+            if isfield(thisNode,'type') && isequal(thisNode.type,'object')
+                val = [val,ii]; %#ok<AGROW>
+            end
+        end
+    case {'objectnames'}
+        % Names of the objects
+        ids = thisR.get('objects');
+        names = thisR.assets.names;
+        val = cell(1,numel(ids));
+        for ii = 1:numel(ids)
+            val{ii} = names{ids(ii)};
+        end
         
         % Getting ready for textures
     case{'texture'}
@@ -939,29 +980,6 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Getting read for lights
     case{'light'}
         val = thisR.light;
-        
-    % Leafs (objects) in the tree.
-    case {'objectmaterials'}
-        % val = thisR.get('assets','object materials');
-        %
-        % Sometimes tree class thinks what we call is a branch is a leaf
-        % because, well, we don't put an object below a branch node.  We
-        % should trim the tree of useless branches (any branch that has no
-        % object beneath it).  Maybe.  (BW).
-        ids = piAssetFind(thisR.assets,'type','object');
-        leafMaterial = cell(1,numel(ids));
-        leafNames = cell(1,numel(ids));
-        cnt = 1;
-        for ii=ids
-            thisAsset = thisR.get('asset',ii);
-            leafNames{cnt} = thisAsset.name;
-            leafMaterial{cnt} = piAssetGet(thisAsset,'material name');
-            cnt = cnt + 1;
-        end
-        val.leafNames = leafNames;
-        val.leafMaterial = leafMaterial;
-    case {'leafs'}
-        val = thisR.assets.findleaves;
                     
     % Asset specific gets - more work needed here.
     case {'asset', 'assets'}
@@ -997,7 +1015,8 @@ switch ieParamFormat(param)  % lower case, no spaces
                     val = material.name;
                 case 'materialtype'
                     val = material.type;
-                    
+                    % Leafs (objects) in the tree.
+                
                     % World position and orientation properties.
                 case 'worldrotationmatrix'
                     if ~thisR.assets.isleaf(id)
