@@ -1,29 +1,50 @@
-%% Set up a simple scene as an example
+%% Chop and graft a subtree
+%
+% Assets are stored as trees.  We can add and remove subtrees, say taking
+% one subtree for scene1 and moving it into scene2.
+% 
+% ZLY/BW
+%
+% See also
+%
+
+%%
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%%
-thisR = piRecipeDefault('scene name', 'simple scene');
+%% Simple base scene
 
+thisR = piRecipeDefault('scene name', 'simple scene');
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5); 
+
+% Render
+piWrite(thisR);
+scene = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
+sceneWindow(scene);
+
+%% Select a subtree
+
 thisR.assets.show;
 
-%% Select the subtree
+% Get the subtree under the mirror branch
 thisAssetName = 'mirror_B';
+
+% Could become
+%
+%  thisR.get('asset',thisAssetName,'subtree');
+%
 id = thisR.get('asset', thisAssetName, 'id');
-[st, index] = thisR.assets.subtree(id);
+st = thisR.assets.subtree(id);
 [~, st] = st.stripID([], true);
-
-%% Plot the subtree
+st.names
 st.show;
-% Save
-outPath = fullfile(piRootPath, 'local', 'simplesceneST.mat');
-save(outPath, 'st');
 
-%% Chop the tree
+%% Chop a subtree, deleting the black mirror
+
 thisR.assets = thisR.assets.chop(id);
 thisR.assets.show;
 
@@ -33,33 +54,54 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
-%% Merge the subtree back
+%% Graft the subtree back onto the root
+
+assetName = 'root';
+thisR.set('asset', assetName, 'graft', st); % Graft the subtree under this asset.
+
+% Render
+piWrite(thisR);
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%% Extract the lighting subtree
+
+id = thisR.get('asset', 'sky_B', 'id');
+[st, index] = thisR.assets.subtree(id);
+[~, st] = st.stripID([], true);
+st.names
+st.show;
+
+%% Add the lighting to another scene
+
+sceneName = 'sphere';
+thisR = piRecipeDefault('scene name',sceneName);
+thisR = piLightAdd(thisR, 'type', 'distant', ...
+    'light spectrum', [9000 0.001],...
+    'camera coordinate', true);
+
+% Render
+piWrite(thisR);
+scene = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
+sceneWindow(scene);
+
+thisR.assets.show;
+
+%%  Not yet understood.  Ask ZLY
+
+% We add the light onto the root of the Sphere scene.  That works, but the
+% rendering doesn't make sense to me.
+
 assetName = 'root';
 thisR.set('asset', assetName, 'graft', st); % Graft the subtree under this asset.
 thisR.assets.show;
 
 % Render
 piWrite(thisR);
-scene = piRender(thisR, 'render type', 'radiance');
+scene = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
 
-%% Another example
-thisAssetName = 'Sphere_O';
-thisSt = thisR.get('asset', thisAssetName, 'subtree');
-thisR.set('asset', thisAssetName, 'chop');
-thisR.assets.show;
-
-% Graft the tree under
-thisR.set('asset', 'figure_6m_B', 'graft', thisSt);
-thisR.assets.show;
-
-% Shift the sphere towards camera by 1m
-thisR.set('asset', thisAssetName, 'world translate', [0 0 -1]);
-thisR.set('asset', thisAssetName, 'scale', 0.3);
-
-% Render
-piWrite(thisR);
-scene = piRender(thisR, 'render type', 'radiance');
-sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
+%%

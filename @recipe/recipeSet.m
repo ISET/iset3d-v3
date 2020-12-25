@@ -717,11 +717,13 @@ switch param
         % branch.  Some have been.
         switch ieParamFormat(param)
             case 'add'
-                piAssetAdd(thisR, assetName, val);
+                out = piAssetAdd(thisR, assetName, val);
             case {'delete', 'remove'}
+                % thisR.set('asset',assetName,'delete');
                 piAssetDelete(thisR, assetName);
             case {'insert'}
-                piAssetInsert(thisR, assetName, val);
+                % thisR.set('asset',assetName,'insert');
+                out = piAssetInsert(thisR, assetName, val);
             case {'parent'}
                 piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
@@ -730,7 +732,8 @@ switch param
             case {'worldtranslate', 'worldtranslation'}
                 % Translate in world axis orientation.
                 rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
-                newTrans = inv(rotM) * [reshape(val, numel(val), 1); 0];
+                % newTrans = inv(rotM) * [reshape(val, numel(val), 1); 0];
+                newTrans = rotM \ [reshape(val, numel(val), 1); 0];
                 out = piAssetTranslate(thisR, assetName, newTrans(1:3));
             case {'rotate', 'rotation'}
                 out = piAssetRotate(thisR, assetName, val);
@@ -747,7 +750,8 @@ switch param
                         axWorld(ii) = 1;
                         
                         % Axis orientation in object space
-                        axObj = inv(curRotM) * axWorld;
+                        % axObj = inv(curRotM) * axWorld;
+                        axObj = curRotM \ axWorld;
                         thisAng = val(ii);
                         
                         % Get the rotation matrix in object space
@@ -783,10 +787,11 @@ switch param
                 id = thisR.get('asset', assetName, 'id');
                 thisR.assets = thisR.assets.chop(id);
             otherwise
-                % What does this do?
+                % Set a parameter of an asset to val
                 piAssetSet(thisR, assetName, varargin{1},val);
         end
-        % ZLY added fluorescent
+        
+        % ZLY added fluorescent sets
     case {'fluorophoreconcentration'}
         % thisR.set('fluorophore concentration',val,idx)
         if isempty(varargin), error('Material name or index required'); end

@@ -1,8 +1,8 @@
-function [thisR, id] = piAssetAdd(thisR, parentInfo, node, varargin)
-%%
+function id = piAssetAdd(thisR, parentInfo, node, varargin)
+% Add a node to the tree below the specified parent
 %
 % Synopsis:
-%   [thisR, id] = piAssetAdd(thisR, parentInfo, node, varargin)
+%   id = piAssetAdd(thisR, parentInfo, node, varargin)
 % 
 % Brief description:
 %   Attach a node under a parent node.
@@ -13,19 +13,19 @@ function [thisR, id] = piAssetAdd(thisR, parentInfo, node, varargin)
 %   node       - the node to be added under the parent node.
 %
 % Returns:
-%   thisR      - modified recipe.
 %   id         - id of the newly added node.
 %
 
 % Examples:
 %{
-thisR = piRecipeDefault('scene name', 'Simple scene');
-disp(thisR.assets.tostring)
-thisNode = thisR.get('asset', '004ID_Sky1');
-thisNode.name = 'Sky1_copy';
-thisR = thisR.set('asset', '004ID_Sky1', 'add', thisNode);
-disp(thisR.assets.tostring)
+ thisR = piRecipeDefault('scene name', 'Simple scene');
+ thisNode = thisR.get('asset', 'Sky1_L');
+ thisNode.name = 'Sky1_L_copy';
+ id = thisR.set('asset', 'Sky1_L', 'add', thisNode);
+ thisR.assets.show;
+ thisR.get('asset',id)
 %}
+
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
@@ -33,12 +33,13 @@ p.addRequired('parentInfo', @(x)(ischar(x) || isscalar(x)));
 p.addRequired('node', @isstruct);
 
 p.parse(thisR, parentInfo, node, varargin{:});
-thisR = p.Results.thisR;
-parentInfo = p.Results.parentInfo;
-node = p.Results.node;
 
-%%
-% If assetInfo is a node name, find the id
+thisR      = p.Results.thisR;
+parentInfo = p.Results.parentInfo;
+node       = p.Results.node;
+
+%% If parentInfo is a node name, find the id
+
 if ischar(parentInfo)
     parentName = parentInfo;
     parentInfo = piAssetFind(thisR.assets, 'name', parentInfo);
@@ -49,6 +50,7 @@ if ischar(parentInfo)
 end
 
 %% Check if the parent node exists
+
 if ~isempty(thisR.assets.get(parentInfo))
     [thisR.assets, id] = thisR.assets.addnode(parentInfo, node);
     % Format the new node name.

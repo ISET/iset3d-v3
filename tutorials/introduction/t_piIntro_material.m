@@ -16,6 +16,9 @@
 % See also
 %   t_piIntro_*
 
+% TODO:
+%  See notes at end.
+
 %% Initialize ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
@@ -40,11 +43,6 @@ scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
 
-%{
-thisR.assets.show;
-id = thisR.get('asset id','Sphere_B');
-thisR.set('asset',id,'delete');
-%}
 %% The material library
 
 % Print out the named materials in this scene.

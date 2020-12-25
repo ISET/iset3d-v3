@@ -1,9 +1,9 @@
-function thisR = piAssetInsert(thisR, assetInfo, newNode, varargin)
+function id = piAssetInsert(thisR, assetInfo, newNode, varargin)
 % Insert a new node between an existing node and its parent
 %
 % Synopsis:
-%   thisR = piAssetInsert(thisR, assetInfo, node, varargin)
-% 
+%   id = piAssetInsert(thisR, assetInfo, node)
+%
 % Brief description:
 %   The assetInfo defines the node.  The newNode will be inserted between
 %   the node and its parent.
@@ -14,19 +14,19 @@ function thisR = piAssetInsert(thisR, assetInfo, newNode, varargin)
 %   node       - the node to insert.
 %
 % Returns:
-%   thisR      - modified recipe.
 %   id         - id of the newly inserted node.
 %
 
 % Examples:
 %{
  thisR = piRecipeDefault('scene name', 'Simple scene');
- disp(thisR.assets.tostring)
+ thisR.assets.show;
+
  newNode = piAssetCreate('type', 'branch');
  newNode.name = 'New node';
- thisR = thisR.set('asset', '004ID_Sky1', 'insert', newNode);
- disp(thisR.assets.tostring)
+ id = thisR.set('asset', 'Sky1_L', 'insert', newNode);
 %}
+
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
@@ -38,7 +38,8 @@ thisR = p.Results.thisR;
 assetInfo = p.Results.assetInfo;
 newNode = p.Results.newNode;
 
-% If assetInfo is a node name, find the id
+%% If assetInfo is a node name, find the id.  If an id, find the name
+
 if isnumeric(assetInfo)
     assetID   = assetInfo;
     assetName = thisR.assets.get(assetID).name;
@@ -47,22 +48,22 @@ else
     assetID   = piAssetFind(thisR.assets,'name',assetName);
 end
 
+%% Specify the current node and the new node
 
-%% Insert
 % Get node and its parent.
-thisNode   = thisR.get('asset', assetName);
+thisNode     = thisR.get('asset', assetName);
 parentNodeID = thisR.assets.getparent(assetID);
 parentNode   = thisR.assets.get(parentNodeID);
 
-% Attach the new node under parent node.
+% Attach the new node under parent of thisNode.
 newNode.type = 'branch'; % Enforce it is branch node
-thisR.set('asset', parentNode.name, 'add', newNode);
 
-% Change the parent of thisNode to the new node
-% NOTE: name of newNode will be changed when adding in the tree. The new
-% node will be the last node in the node cell array, so checking the last
-% element.
-thisR.set('asset', thisNode.name, 'parent',...
-            thisR.get('asset', thisR.assets.nnodes, 'name'));
+% The newNode is added below the parent node.
+% NOTE: The name of newNode name will be changed to force it to be unique
+% when it is addded to the tree.
+id = thisR.set('asset', parentNode.name, 'add', newNode);
+
+% Change the parent of thisNode to be the newNode
+thisR.set('asset', thisNode.name, 'parent', id);
 
 end
