@@ -11,8 +11,20 @@ p.addRequired('material', @isstruct);
 p.parse(material, varargin{:});
 
 %% Concatatenate string
+
+% BUG
+% Legacy material formats ... sigh. Do we need to convert all of the
+% material structs in the scenes?
+%
+% BUG:  ZLY and BW to address.
 valName = sprintf('MakeNamedMaterial "%s" ',material.name);
-valType = sprintf(' "string type" "%s" ',material.type);
+if isfield(material,'type')
+    valType = sprintf(' "string type" "%s" ',material.type);
+elseif isfield(material,'stringtype')
+    valType = sprintf(' "string type" "%s" ',material.stringtype);
+else
+    error('Bad material structure. %s.', material.name)
+end
 
 val = strcat(valName, valType);
 
@@ -20,8 +32,9 @@ val = strcat(valName, valType);
 matParams = fieldnames(material);
 
 for ii=1:numel(matParams)
-    if ~isequal(matParams{ii}, 'name') && ~isequal(matParams{ii}, 'type') &&...
-         ~isempty(material.(matParams{ii}).value)
+    if ~isequal(matParams{ii}, 'name') && ...
+            ~isequal(matParams{ii}, 'type') && ...
+            ~isempty(material.(matParams{ii}).value)
          thisType = material.(matParams{ii}).type;
          thisVal = material.(matParams{ii}).value;
          

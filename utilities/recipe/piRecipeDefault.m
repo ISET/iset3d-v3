@@ -1,37 +1,43 @@
 function thisR = piRecipeDefault(varargin)
-% Returns a recipe to one of our standard scenes.
+% Returns a recipe to an ISET3d standard scene
 %
 % Syntax
 %   thisR = piRecipeDefault(varargin)
+%
+% Description:
+%  piRecipeDefault reads in PBRT scene text files in the data/V3
+%  repository.  It is also capable of using ieWebGet to retrieve pbrt
+%  scenes, from the web and install them locally.
 %
 % Inputs
 %   N/A  - Default returns the MCC scene
 %
 % Optional key/val pairs
-%   scene name - The PBRT scene name
-%     MacBethChecker (default)
-%     SimpleScene
-%     checkerboard
-%     slantedBar
-%     chessSet
-%     chessSetScaled
-%     teapot
-%     numbers at depth
+%   scene name - Specify a PBRT scene name from the data/V3 directory.
+%     Here are some names: 
+%       MacBethChecker (default)
+%       SimpleScene
+%       checkerboard
+%       slantedBar
+%       chessSet
+%       chessSetScaled
+%       teapot
+%       numbers at depth
 %
-%   write      -  Call piWrite (default is true).  Writes into iset3d/local
+%   write      -  Call piWrite (default is false). Immediately writes into
+%                 iset3d/local, without any editing.
 %
 % Outputs
-%   thisR - the recipe
+%   thisR - the ISET3d recipe with information from the PBRT scene file.
 %
-% Description:
-%  Mainly this function reads in scenes that are already in the data/V3
-%  repository within ISET3D, but by using ieWebGet it can now retrieve
-%  many assets, especially pbrt scenes, from the web and install them.
 %
 % See also
 %  @recipe, recipe.list
 
 % Examples:
+%{
+ thisR = recipe; thisR.list;
+%}
 %{
    thisR = piRecipeDefault; piWrite(thisR);
    piWrite(thisR);
@@ -78,7 +84,7 @@ function thisR = piRecipeDefault(varargin)
 %{
    thisR = piRecipeDefault('scene name','MacBeth Checker CusLight');
    piWrite(thisR); 
-   scene = piRender(thisR);
+   [scene, results] = piRender(thisR);
    sceneWindow(scene);
 %}
 
