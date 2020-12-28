@@ -264,18 +264,16 @@ while i <= length(txt)
             resObject = piAssetCreate('type', 'object');
             if exist('name','var')
                 % resObject.name = sprintf('%d_%d_%s',i, numel(subtrees)+1, name); 
-                resObject.name = name;
+                resObject.name = sprintf('%s_O', name);
             end
 
             if exist('shape','var'), resObject.shape = shape; end
             
             if exist('mat','var')
                 resObject.material = mat; 
-                resObject.name = sprintf('%s_O', resObject.name);
             end
             if exist('medium','var')
                 resObject.medium = medium; 
-                resObject.name = sprintf('%s_O', resObject.name);
             end
             
             subtrees = cat(1, subtrees, tree(resObject));

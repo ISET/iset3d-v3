@@ -147,9 +147,8 @@ materiallib.fourier.stringtype = 'fourier';
 materiallib.fourier.bsdffile = 'bsdfs/roughglass_alpha_0.2.bsdf';
 
 %% TotalReflect
-materiallib.totalreflect.stringtype = 'matte';
-materiallib.totalreflect.spectrumkd = [400 1 800 1];
-
+materiallib.totalreflect = piMaterialCreate('totalReflect',...
+                            'type', 'matte', 'spectrum kd', [400 1 800 1]);
 
 %%
 materiallib_updated = piMaterialEmptySlot(materiallib);

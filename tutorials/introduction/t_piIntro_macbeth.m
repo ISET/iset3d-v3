@@ -72,7 +72,8 @@ piWrite(thisR, 'overwritematerials', true);
 % By default we get the radiance map and the depth map. The depth map is
 % distance from camera to each point along the line of sight.  See
 % t_piIntro_macbeth_zmap for how to compute a zmap.
-[scene, result] = piRender(thisR,'render type','all');
+[scene, result] = piRender(thisR,'render type','all',...
+                                'scaleIlluminance', false);
 sceneWindow(scene);
 
 % Plot the depth map.  For some reason scenePlot just shows this as all

@@ -134,7 +134,7 @@ classdef tree
            
         end
         
-        function val = leaftoroot(obj, id)
+        function val = nodetoroot(obj, id)
             val = [];
             while ~obj.isRoot(id)
                 val = [val id];

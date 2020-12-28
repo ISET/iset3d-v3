@@ -1002,11 +1002,11 @@ switch ieParamFormat(param)  % lower case, no spaces
                 case 'subtree'
                     % thisR.get('asset', assetName, 'subtree');
                     val = thisR.assets.subtree(id);
-                case {'leaftoroot','pathtoroot'}
+                case {'nodetoroot','pathtoroot'}
                     % thisR.get('asset',assetName,'leaf to root');
                     % Sequence of ids from the leaf to root
                     % We should check that id is a leaf??? (BW)
-                    val = thisR.assets.leaftoroot(id);
+                    val = thisR.assets.nodetoroot(id);
                     
                     % Get material properties from this asset
                 case 'material'
@@ -1020,13 +1020,15 @@ switch ieParamFormat(param)  % lower case, no spaces
                 
                     % World position and orientation properties.
                 case 'worldrotationmatrix'
+                    %{
+                    % Should allow branch node as well.
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have rotations')
                     else
-                        % Deleted a lot of code comments from here 12/24 (BW).
-                        leafToRoot = thisR.assets.leaftoroot(id);
-                        [val, ~] = piTransformWorld2Obj(thisR, leafToRoot);
-                    end
+                    %}
+                    % Deleted a lot of code comments from here 12/24 (BW).
+                    nodeToRoot = thisR.assets.nodetoroot(id);
+                    [val, ~] = piTransformWorld2Obj(thisR, nodeToRoot);
                     %{
                     % Can we delete?
                     rotY = -atan2d(curXYZ(3, 1), curXYZ(1, 1)); % az
@@ -1038,13 +1040,15 @@ switch ieParamFormat(param)  % lower case, no spaces
                     rotM = thisR.get('asset', id, 'world rotation matrix');
                     val = piTransformRotM2Degs(rotM);
                 case {'worldtranslation', 'worldtranslationmatrix'}
+                    %{
+                    % Should allow branch node as well.
                     if ~thisR.assets.isleaf(id)
                         warning('Only leaves have positions')
                     else
+                    %}
                         % Deleted a lot of code comments from here 12/24 (BW).
-                        leafToRoot = thisR.assets.leaftoroot(id);                        
-                        [~, val] = piTransformWorld2Obj(thisR, leafToRoot);
-                    end
+                        nodeToRoot = thisR.assets.nodetoroot(id);                        
+                        [~, val] = piTransformWorld2Obj(thisR, nodeToRoot);
                     
                 case 'worldposition'
                     % thisR.get('asset',idOrName,'world position')

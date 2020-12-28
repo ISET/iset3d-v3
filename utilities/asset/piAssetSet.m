@@ -82,7 +82,14 @@ switch thisNode.type
             case {'name'}
                 thisNode.name = val;
             case {'lght', 'light'}
-                thisNode.lght = val;
+                % If it is an area light, we only allow one light since
+                % area light occupies physical space. Otherwise the light
+                % is appended since they don't take physical space.
+                if isequal(val.type, 'area')
+                    thisNode.lght{1} = val;
+                else
+                    thisNode.lght{end+1} = val;
+                end
             otherwise
                 warning('Node %s does not have field: %s. Change nothing.', thisNode.name, param)
                 return;
