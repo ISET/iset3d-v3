@@ -29,8 +29,9 @@ sceneName = 'sphere';
 thisR = piRecipeDefault('scene name',sceneName);
 % thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
 
-thisR = piLightAdd(thisR, 'type', 'distant', 'light spectrum', [9000 0.001],...
-                        'camera coordinate', true);
+thisR = piLightAdd(thisR, 'type', 'distant', ...
+    'light spectrum', [9000 0.001],...
+    'camera coordinate', true);
 
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',32);
@@ -121,6 +122,11 @@ thisR.set('material', 'add', glass);
 thisR.get('print materials');
 thisR.set('asset', assetName, 'material name', glassName);
 thisR.get('object material')
+
+% We want something like
+%
+%   thisR.set('skymap',filename); 
+%
 
 % Putting back the red or white seems to work
 %  thisR.set('asset', assetName, 'material name', redMatte);

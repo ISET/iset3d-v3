@@ -13,7 +13,7 @@ function [thisR,skymapInfo] = piSkymapAdd(thisR,skyName)
 %   none, but thisR.world is modified.
 %
 % Example:
-%    piAddSkymap(thisR,'day');
+%    piSkymapAdd(thisR,'day');
 %
 % Zhenyi,2018
 

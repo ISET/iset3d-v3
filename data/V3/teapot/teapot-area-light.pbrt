@@ -22,7 +22,8 @@ WorldBegin
 
 AttributeBegin
     # AAA
-    AreaLightSource "area" "integer nsamples" [16 ] "color L" [8 8 8]
+    AreaLightSource "diffuse" "integer nsamples" [16 ] "rgb L" [8 8 8]
+    "bool twosided" "true"
     Material "matte"  "color Kd"  [0.000000 0.000000 0.000000]
     Translate 2.000000 -4.000000 4.000000
     Rotate -120.000000 1.000000 0.000000 0.000000
