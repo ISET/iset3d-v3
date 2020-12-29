@@ -307,6 +307,14 @@ switch param
         
         thisR.camera.shutterclose.type = 'float';
         thisR.camera.shutterclose.value = val;
+    case {'shutteropen'}
+        % thisR.set('shutter open',time)
+        thisR.camera.shutteropen.type  = 'float';
+        thisR.camera.shutteropen.value = val;        
+    case {'shutterclose'}
+        % thisR.set('shutter close',time)
+        thisR.camera.shutterclose.type = 'float';
+        thisR.camera.shutterclose.value = val;
         
         % Lens related
     case 'lensfile'

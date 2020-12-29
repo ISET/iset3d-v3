@@ -335,6 +335,23 @@ switch ieParamFormat(param)  % lower case, no spaces
         catch
             val = 1;  % 1 sec is the default.  Too long.
         end
+    case {'shutteropen'}
+        % thisR.get('shutter open');   % Time in sec
+        try
+            val = thisR.camera.shutteropen.value;
+        catch
+            val = 0;
+        end
+        
+    case {'shutterclose'} 
+        % thisR.get('shutter close');  % Time in sec
+        % When not set, the exposure duration is 1 sec and open,close are
+        % [0,1]
+        try
+            val = thisR.camera.shutterclose.value;
+        catch
+            val = 1;
+        end
         
         % Lens and optics
     case 'opticstype'
