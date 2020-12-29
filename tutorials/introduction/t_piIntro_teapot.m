@@ -1,7 +1,6 @@
-%% The first in a series of scripts introducing iset3d calculations
-% Underdevelopment for the area light
+%% Render teapot scene
 %
-% Brief description:
+% Description:
 %
 %  This introduction renders the teapot scene in the data directory of the
 %  ISET3d repository. This introduction sets up a very simple recipe, runs
@@ -42,17 +41,14 @@ thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
 thisR.set('max depth',1); % Number of bounces
 
-%% Render
+%% Write out recipe and render. Then show.
 piWrite(thisR);
-
-%% This is a pinhole case. So we are rendering a scene.
-%
-% Render and show it
 [scene, result] = piRender(thisR);
 sceneWindow(scene);
 scene = sceneSet(scene,'gamma',0.7);
 
-%% Notice that we also computed the depth map
+%% Notice that we also computed the depth map.
+% This is the default for piRender.
 scenePlot(scene,'depth map');
 
 %%
