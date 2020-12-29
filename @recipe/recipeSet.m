@@ -19,10 +19,10 @@ function out = recipeSet(thisR, param, val, varargin)
 %  %Scene
 %    'mm units'   - Logical (true/false)
 %    'exporter'   - Information about where the PBRT file came from
-%    'lookat'     - includes the 'from','to', and 'up vectors
+%    'lookat'     - includes the 'from','to', and 'up' vectors
 %    'from'       - Position of the camera
-%    'to'         - A position the camera is pointed up
-%    'up'         - The direction that is up, not always the y-direction
+%    'to'         - Position the camera is pointed to
+%    'up'         - The up direction, not always the y-direction
 %
 %  % Camera
 %    'camera'     - Struct with camera information
@@ -639,62 +639,63 @@ switch param
             end
             return;
         end
-        
-        % Add/delete a specific material
-        switch val
-            case {'add'}
-                % thisR.set('material', 'add', material struct);
-                % Could use 'end + 1'
-                nMaterial = thisR.get('n material');
-                thisR.materials.list{nMaterial + 1} = varargin{1};
-                return;
-            case {'delete', 'remove'}
-                % thisR.set('material', 'delete', idxORname);
-                if isnumeric(varargin{1})
-                    thisR.materials.list{varargin{1}} = {};
-                else
-                    [matIdx, ~] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
-                    thisR.materials.list(matIdx) = [];
-                end
-                return;
-            case {'replace'}
-                % thisR.set('material','replace', idxORname-1, newmaterial-2)
-                idx = piMaterialFind(thisR.materials.list, 'name', varargin{1});
-                thisR.materials.list{idx} = varargin{2};
-                return;
-            otherwise
-                % val is something else.  We pass it along to the next
-                % section of code.
-        end
-
-        
         % Get index and material struct from the material list
-        if ischar(val)
-            % Search by name, find the index
-            [matIdx, thisMat] = piMaterialFind(thisR.materials.list, 'name', val);
-            if isempty(thisMat)
-                warning('Could not find material. Return.')
-                return;
-            end
-        elseif isnumeric(val) &&...
-                val <= numel(thisR.materials.list)
+        % Search by name or index
+        if isnumeric(val) && val <= numel(thisR.materials.list)
+            % User sent in an index.  That's how we get the material
             matIdx = val;
             thisMat = thisR.materials.list{val};
-        else
-            warning('Could not find material');
-            return;
+        elseif isstruct(val)
+            % They sent in a struct
+            if isfield(val,'name'), matName = val.name;
+                % It has a name slot.
+                [matIdx, thisMat] = piMaterialFind(thisR.materials.list, 'name', matName);
+            else
+                error('Bad struct.');
+            end
+        elseif ischar(val)
+            % It is either a special command or the material name            
+            switch val
+                case {'add'}
+                    % thisR.set('material', 'add', material struct);
+                    % Could use 'end + 1'
+                    nMaterial = thisR.get('n material');
+                    thisR.materials.list{nMaterial + 1} = varargin{1};
+                    return;
+                case {'delete', 'remove'}
+                    % thisR.set('material', 'delete', idxORname);
+                    if isnumeric(varargin{1})
+                        thisR.materials.list{varargin{1}} = {};
+                    else
+                        [matIdx, ~] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                        thisR.materials.list(matIdx) = [];
+                    end
+                    return;
+                case {'replace'}
+                    % thisR.set('material','replace', idxORname-1, newmaterial-2)
+                    idx = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                    thisR.materials.list{idx} = varargin{2};
+                    return;
+                otherwise
+                    % Probably the material name.
+                    matName = val;
+                    [matIdx, thisMat] = piMaterialFind(thisR.materials.list, 'name', matName);
+            end
         end
         
+        % At this point we have the material.
         if numel(varargin{1}) == 1
-            % A material struct was sent in as the first argument.  We
-            % should check it and then set it.
+            % A material struct was sent in as the only argument.  We
+            % should check it, make sure its name is unique, and then set
+            % it.
             thisR.materials.list{matIdx} = varargin{1};
         else
-            % A material name and property was sent in.  We set it.
+            % A material name and property was sent in.  We set the
+            % property and then update the material in the list.
             thisMat = piMaterialSet(thisMat, varargin{1}, varargin{2});
             thisR.set('materials', matIdx, thisMat);
         end
-        %}
+        
     case {'materialsoutputfile'}
         % Deprecated?
         thisR.materials.outputfile = val;

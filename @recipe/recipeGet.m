@@ -175,7 +175,6 @@ p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
-% p.addOptional('material', [], @iscell);
 
 p.parse(thisR,param);
 
@@ -862,13 +861,15 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         % Materials.  Still needs work, but exists (BW).
     case {'materials', 'material'}
+        % thisR.Get('material',matName,property)
+        %
         % thisR = piRecipeDefault('scene name','SimpleScene');
         % materials = thisR.get('materials');
-        % thisMat = thisR.get('material', 'BODY');
+        % thisMat   = thisR.get('material', 'BODY');
         % nameCheck = thisR.get('material', 'uber', 'name');
-        % kd = thisR.get('material', 'uber', 'kd');
+        % kd     = thisR.get('material', 'uber', 'kd');
         % kdType = thisR.get('material', 'uber', 'kd type');
-        % kdVal = thisR.get('material', 'uber', 'kd value');
+        % kdVal  = thisR.get('material', 'uber', 'kd value');
         %
         % Get a  property from a material or a material property named in
         % this recipe. 
@@ -885,32 +886,45 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
-        % Get index in material list
-        if ischar(varargin{1})
-            % Search by name, find the index
-            [~, thisMat] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
-            if isempty(thisMat)
-                warning('Could not find material. Return.')
-                return;
-            end
-        elseif isnumeric(varargin{1}) &&...
-                varargin{1} <= numel(thisR.materials.list)
-            matIdx = varargin{1};
-            thisMat = thisR.materials.list{matIdx};
-        else
-            warning('Could not find material. Return');
-            return;
-        end
+        switch ieParamFormat(varargin{1})
+            % Special cases
+            case 'names'
+                % thisR.get('material','names');
+                n = numel(thisR.materials.list);
+                val = cell(1,n);
+                for ii=1:n
+                    val{ii} = thisR.materials.list{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the material name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.materials.list)
+                    % Search by index.  Get the material directly.
+                    matIdx = varargin{1};
+                    thisMat = thisR.materials.list{matIdx};
+                elseif isstruct(varargin{1})
+                    % The user sent in the material.  We hope.
+                    % We should have a slot in material that identifies itself as a
+                    % material.  Maybe a test like "material.type ismember valid
+                    % materials."
+                    thisMat = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisMat] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                end
+                
+                if isempty(thisMat)
+                    warning('Could not find material. Return.')
+                    return;
+                end
+                
+                % Return the material property
+                % thisR.get('material', material/idx/name, property)
+                % Return the material property
+                val = piMaterialGet(thisMat, varargin{2});
+        end                        
         
-        % Get a certain material value
-        if numel(varargin) == 1
-            % Getting the material
-            val = thisMat;
-        elseif numel(varargin) == 2
-            val = piMaterialGet(thisMat, varargin{2});
-        else
-            error('Wrong parameter number. One at a time');
-        end
     case {'nmaterial', 'nmaterials', 'materialnumber', 'materialsnumber'}
         % thisR.get('n materials')
         % Number of materials in this scene.

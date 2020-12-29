@@ -1,5 +1,7 @@
 %% t_assets
 %
+%  Deprecated.  Use tls_assets
+%
 % Introduction to the assets and their methods.
 %
 % The assets are stored in ISET3d using a tree structure. Each node in the

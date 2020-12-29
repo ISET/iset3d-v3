@@ -57,28 +57,30 @@ piMaterialList;
 %% Add a red matte surface
 
 % Create a red matte material
-redMatte = 'redMatte';
-newMatte = piMaterialCreate(redMatte, 'type', 'matte');
+redMatte = piMaterialCreate('redMatte', 'type', 'matte');
 
 % Add the material to the materials list
-thisR.set('material', 'add', newMatte);
-thisR.get('print materials');
+thisR.set('material', 'add', redMatte);
+thisR.get('materials print');
 
-%%
-% Set the spectral reflectance of the matte material to be very red.  Put
-% it in the PBRT spd format.
+%% Set the spectral reflectance of the matte material to be very red.  
+
 wave = 400:10:700;
 reflectance = ones(size(wave));
 reflectance(1:17) = 0;
+
+% Put it in the PBRT spd format.
 spdRef = piMaterialCreateSPD(wave, reflectance);
 
 % Store the reflectance as the diffuse reflectance of the redMatte
 % material
 thisR.set('material', redMatte, 'kd value', spdRef);
 
-%%
+%% Set the material 
 assetName = 'Sphere_O';
-thisR.set('asset',assetName,'material name',redMatte);
+thisR.set('asset',assetName,'material name',redMatte.name);
+
+% Show that we set it
 thisR.get('object material')
 % thisR.assets.show;
 
@@ -88,34 +90,35 @@ scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
 
-%% Make the ball glass and then a mirror.  
+%% Make the sphere glass
 
-% Not yet working.  Maybe we need an environmental light and we should add
-% one?
-
-%{
-%% Where is the sphere?
-
+% Add an environmental light so we can see the glass or mirro
 assetName = 'Sphere_O';
-spherePosition    = thisR.get('asset', assetName, 'world position');
-cameraPosition    = thisR.get('from');
-% thisR.set('from',1e-1*cameraPosition);
-thisR.set('to',spherePosition);
-
-thisR.get('from')
-thisR.get('to')
-thisR.get('asset',assetName,'world position')
-
 thisR.set('asset',assetName,'scale',[0.5 0.5 0.5]);
+load('roomLight','roomLight')
+thisR.lights{1} = roomLight;
 
-%%
+% Check that the exr file is in the directory.  Should not be needed in the
+% future.
+%
+% We want something like
+%
+%   thisR.set('skymap',filename); 
+%
+if ~exist(fullfile(thisR.get('output dir'),'room.exr'),'file')
+    exrFile = which('room.exr');
+    copyfile(exrFile,thisR.get('output dir'))
+end
+
+% Here is the environment
 piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
+sceneSet(scene,'render flag','hdr')
 
-% Glass and mirror are not working.  Ask ZLyu why
-%
+%% Make the sphere glass 
+
 glassName = 'glass';
 glass = piMaterialCreate(glassName, 'type', 'glass');
 thisR.set('material', 'add', glass);
@@ -123,20 +126,38 @@ thisR.get('print materials');
 thisR.set('asset', assetName, 'material name', glassName);
 thisR.get('object material')
 
-% We want something like
-%
-%   thisR.set('skymap',filename); 
-%
-
-% Putting back the red or white seems to work
-%  thisR.set('asset', assetName, 'material name', redMatte);
-%  thisR.set('asset', assetName, 'material name', 'white');
-
-%
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene, 'name', 'Change sphere to mirror');
+scene = sceneSet(scene, 'name', 'Change sphere to glass');
 sceneWindow(scene);
-%}
 
-%%
+%% One more camera position
+
+% Where is the sphere ...
+assetPosition = thisR.get('asset',assetName,'world position');
+thisR.set('to',assetPosition);
+
+origFrom = [0 0 -500];  % Original from position
+
+% Set the camera from position a little higher and closer
+thisR.set('from',assetPosition + [0 100 -400]);
+
+piWrite(thisR);
+scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name', 'Change sphere to glass');
+sceneWindow(scene);
+
+%% Change the sphere to a mirror in the future.  
+mirrorName = 'mirror2';
+mirror = piMaterialCreate(mirrorName, 'type', 'mirror');
+thisR.set('material', 'add', mirror);
+thisR.get('print materials');
+thisR.set('asset', assetName, 'material name', mirrorName);
+thisR.get('object material')
+
+piWrite(thisR);
+scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name', 'Change sphere to glass');
+sceneWindow(scene);
+
+%% END
