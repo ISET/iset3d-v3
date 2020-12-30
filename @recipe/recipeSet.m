@@ -33,7 +33,9 @@ function out = recipeSet(thisR, param, val, varargin)
 %
 %    'object distance' - Distance between from and to
 %    'accommodation'   - Inverse of the focus distance
-%    'exposure time'   - ????
+%    'exposure time'   - forces shutteropen to 0
+%    'shutteropen'     - time for shutter opening
+%    'shutterclose'    - time at which shutter closes
 %    'focus distance'  - Distance to where the camera is in best focus
 %    'focal distance'  - Used with pinhole to define image plane distance
 %                        from the pinhole
@@ -309,18 +311,22 @@ switch param
         thisR.camera.shutterclose.value = val;
     case {'shutteropen'}
         % thisR.set('shutter open',time)
-        %if val > thisR.camera.shutterclose
-        %    warning('Open time later than open time');
-        %end
+        if isfield(thisR.camera,'shutterclose')
+            if val > thisR.camera.shutterclose.value
+                warning('Open time later than open time');
+            end
+        end
         thisR.camera.shutteropen.type  = 'float';
         thisR.camera.shutteropen.value = val;        
     case {'shutterclose'}
         % thisR.set('shutter close',time)
-        %if val < thisR.camera.shutteropen
-        %    warning('Close time earlier than open time');
-        %end
+        if isfield(thisR.camera,'shutteropen')
+            if val < thisR.camera.shutteropen.value
+                warning('Close time earlier than open time');
+            end
+        end
         thisR.camera.shutterclose.type = 'float';
-        thisR.camera.shutterclose.value = val;
+        thisR.camera.shutterclose.value = val; %single(val);
         
         % Lens related
     case 'lensfile'
