@@ -200,7 +200,7 @@ areaLight = piLightSet(areaLight, [], 'lightspectrum', lightName);
 areaLight = piLightSet(areaLight, [], 'spectrum scale', 3e-1);
 
 % This is the red sphere at the back
-assetName = '019ID_Sphere_material_BODY_O'; 
+assetName = '019ID_Sphere_O'; 
 
 % This converts the sphere asset into a glowing D65 ball.  Notice that it
 % did not add any new nodes.  It simply changed the properties of the

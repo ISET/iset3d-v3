@@ -1,0 +1,26 @@
+Transform [0.999970099314 8.66172301555e-05 0.00773259174831 0  8.88110657064e-16 0.999937268228 -0.0112008753757 0  -0.00773307685793 0.0112005404618 0.999907369418 0  -216.872372598 -375.035344339 3032.43434345 1]
+
+Camera "perspective"
+ "float fov" [28.841546255]
+ "float focaldistance" [2000.0]
+ "float lensradius" [0]
+
+Sampler "halton"
+ "integer pixelsamples" [128]
+
+Film "image"
+ "string filename" ["SimpleScene.exr"]
+ "integer xresolution" [640]
+ "integer yresolution" [480]
+
+Integrator "directlighting"
+ "integer maxdepth" [5]
+ "string strategy" "all"
+
+WorldBegin
+LightSource "infinite" "rgb scale" [3.0 3.0 3.0]
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	Include "SimpleScene_materials.pbrt"
+	Include "SimpleScene_geometry.pbrt"
+WorldEnd
