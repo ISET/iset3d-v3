@@ -309,16 +309,16 @@ switch param
         thisR.camera.shutterclose.value = val;
     case {'shutteropen'}
         % thisR.set('shutter open',time)
-        if val > thisR.camera.shutterclose
-            warning('Open time later than open time');
-        end
+        %if val > thisR.camera.shutterclose
+        %    warning('Open time later than open time');
+        %end
         thisR.camera.shutteropen.type  = 'float';
         thisR.camera.shutteropen.value = val;        
     case {'shutterclose'}
         % thisR.set('shutter close',time)
-        if val < thisR.camera.shutteropen
-            warning('Close time earlier than open time');
-        end
+        %if val < thisR.camera.shutteropen
+        %    warning('Close time earlier than open time');
+        %end
         thisR.camera.shutterclose.type = 'float';
         thisR.camera.shutterclose.value = val;
         
