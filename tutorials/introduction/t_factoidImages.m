@@ -26,7 +26,7 @@
 %     Q. HOW DO I CONNECT THE INDICATOR WITH THE UNDERLYING DATA STRUCTURE?
 %
 %   mesh - Indicator variable for the mesh at each pixel.
-%      Q. THIS LOOKS LIKE WHAT I EXPECTED FOR THE MATERIAL MAP.  WHAT IS A 
+%      Q. THIS LOOKS LIKE WHAT I EXPECTED FOR THE MATERIAL MAP.  WHAT IS A
 %      MESH?
 %      Q. HOW DO I CONNECT THE INDICATOR WITH THE UNDERLYING DATA STRUCTURE?
 
@@ -38,9 +38,9 @@
 %      CAMERA IS LOOKING.  THE INTUITION IS ONLY GOOD IF Y IS UP and X IS
 %      TO THE RIGHT FROM THE CAMERA'S POINT OF VIEW.
 %
-%   surface normals - 
+%   surface normals -
 %      Q. IS THERE A WAY TO GET SURFACE NORMALS?
-% 
+%
 % Dependencies:
 %    ISET3d, (ISETCam or ISETBio), JSONio
 %
@@ -58,42 +58,73 @@
 clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Set the input folder name
-%
-% This is currently set to a folder included in the iset3d repository
-% but you can change it to your new folder (as described in heading above).
-sceneName = 'BlenderSceneBlobs';
-
-%% Set name of pbrt file exported from Blender
-%
-% This is currently set to a pbrt file included in the iset3d repository
-% but you can change it to the pbrt file you exported from Blender.
-pbrtName = 'BlenderSceneBlobs'; 
-
-%% Set pbrt file path
-%
-% This is currently set to the file included in the iset3d repository
-% but you can change it to the file path for your exported file.
-filePath = fullfile(piRootPath,'local','scenes',sceneName);
-fname = fullfile(filePath,[pbrtName,'.pbrt']);
-if ~exist(fname,'file')
-    error('File not found - see tutorial header for instructions'); 
+%% Get scene to render
+whichScene = 'simpleScene'
+switch (whichScene)
+    case 'simpleScene'
+        % Initialize ISET and Docker
+        %
+        % We start up ISET and check that the user is configured for docker
+        clear; close all; ieInit;
+        if ~piDockerExists, piDockerConfig; end
+        
+        % Read the scene recipe file
+        %
+        % Need a scene that has a material library
+        sceneName = 'SimpleScene';
+        thisR = piRecipeDefault('scene name','SimpleScene');
+        
+        % Set render quality
+        %
+        % This is a low resolution for speed.
+        thisR.set('film resolution',[200 150]);
+        thisR.set('rays per pixel',32);
+        thisR.set('fov',45);
+        thisR.set('nbounces',1);
+        
+        % The output will be written here
+        outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
+        thisR.set('outputFile',outFile);
+    case 'blobbie'
+        % Set the input folder name
+        %
+        % This is currently set to a folder included in the iset3d repository
+        % but you can change it to your new folder (as described in heading above).
+        sceneName = 'BlenderSceneBlobs';
+        
+        % Set name of pbrt file exported from Blender
+        %
+        % This is currently set to a pbrt file included in the iset3d repository
+        % but you can change it to the pbrt file you exported from Blender.
+        pbrtName = 'BlenderSceneBlobs';
+        
+        % Set pbrt file path
+        %
+        % This is currently set to the file included in the iset3d repository
+        % but you can change it to the file path for your exported file.
+        filePath = fullfile(piRootPath,'local','scenes',sceneName);
+        fname = fullfile(filePath,[pbrtName,'.pbrt']);
+        if ~exist(fname,'file')
+            error('File not found - see tutorial header for instructions');
+        end
+        
+        % Read scene
+        %
+        % piRead_Blender.m is an edited version of piRead.m
+        % that can read pbrt files exported from Blender.
+        exporter = 'Blender';
+        thisR = piRead_Blender(fname,'exporter',exporter);
+        
+        % Change render quality
+        %
+        % Decrease the resolution to decrease rendering time.
+        raysperpixel = thisR.get('rays per pixel');
+        filmresolution = thisR.get('film resolution');
+        thisR.set('rays per pixel', raysperpixel/2);
+        thisR.set('film resolution',filmresolution/2);
+    otherwise
+        error('Unknown scene requested');
 end
-
-%% Read scene
-%
-% piRead_Blender.m is an edited version of piRead.m
-% that can read pbrt files exported from Blender.
-exporter = 'Blender';
-thisR = piRead_Blender(fname,'exporter',exporter);
-
-%% Change render quality
-%
-% Decrease the resolution to decrease rendering time.
-raysperpixel = thisR.get('rays per pixel');
-filmresolution = thisR.get('film resolution');
-thisR.set('rays per pixel', raysperpixel/2);
-thisR.set('film resolution',filmresolution/2);
 
 %% Save the recipe information
 %
