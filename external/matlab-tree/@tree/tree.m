@@ -298,6 +298,47 @@ classdef tree
             
         end
         
+        function T = showUI(obj)
+            % Bring up a uifigure with collapsible tree
+            fig = uifigure('Name','Assets Collection');
+            t = uitree(fig,'Position',[80 10 400 400],'SelectionChangedFcn',@getNodeData);
+            
+            % First level nodes
+            assets = uitreenode(t,'Text','Assets','NodeData',[]);
+            root = 1;
+            createAssetsTree(assets, obj, 1);
+            
+            expand(t,'all');
+            % User data is saved at t.UserData;
+            thisAsset = t.UserData;
+            %%
+            function createAssetsTree(assets, obj, rootId)
+                Ids = obj.getchildren(rootId);
+                for ii = 1:length(Ids)
+                    thisNode = obj.get(Ids(ii));
+                    switch thisNode.type
+                        case 'branch'
+                            branch = uitreenode(assets,'Text',thisNode.name);
+                            branch.UserData = thisNode;
+                            createAssetsTree(branch, obj, Ids(ii));
+                        otherwise
+                            node = uitreenode(assets,'Text',thisNode.name);
+                            node.UserData = thisNode;
+                    end
+                end
+            end
+            
+            function getNodeData(tree,~)
+                node = tree.SelectedNodes;
+                if ~isempty(node.UserData)
+                    tree.UserData = node.UserData;
+                    disp('--------Selected Node-----------');
+                    display(node.UserData);
+                end 
+            end
+        end
+        
+        
         % Check that a node has its ID embedded in its name.
         function val = hasID(obj, id)
             % The name format is usually XXXID_<>, where XXX is the integer
