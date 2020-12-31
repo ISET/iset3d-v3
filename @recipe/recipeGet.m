@@ -929,17 +929,19 @@ switch ieParamFormat(param)  % lower case, no spaces
                 elseif ischar(varargin{1})
                     % Search by name, find the index
                     [~, thisMat] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                    val = thisMat;
                 end
                 
                 if isempty(thisMat)
                     warning('Could not find material. Return.')
                     return;
                 end
-                
-                % Return the material property
-                % thisR.get('material', material/idx/name, property)
-                % Return the material property
-                val = piMaterialGet(thisMat, varargin{2});
+                if numel(varargin) >= 2
+                    % Return the material property
+                    % thisR.get('material', material/idx/name, property)
+                    % Return the material property
+                    val = piMaterialGet(thisMat, varargin{2});
+                end
         end                        
         
     case {'nmaterial', 'nmaterials', 'materialnumber', 'materialsnumber'}
