@@ -95,6 +95,7 @@ sceneWindow(scene);
 % Add an environmental light so we can see the glass or mirro
 assetName = 'Sphere_O';
 thisR.set('asset',assetName,'scale',[0.5 0.5 0.5]);
+fileLight = fullfile(piRootPath,'data','lights','roomLight.mat');
 load('roomLight','roomLight')
 thisR.lights{1} = roomLight;
 
