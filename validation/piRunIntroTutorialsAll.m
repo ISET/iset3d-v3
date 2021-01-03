@@ -8,8 +8,8 @@ function status = piRunIntroTutorialsAll
 %    Run all of the iset3d intro tutorials that we think should work, and print
 %    out a report at the end as to whether they threw errors, or not.
 %    Scripts inside of piRootPath/tutorials/introduciton are run, except that
-%    scripts within any directory named 'underDevelopment' or "support"
-%    are skipped.
+%    scripts within any directory named 'underDevelopment', "xDeprecatetd",
+%    or "support" are skipped.
 %
 % Inputs:
 %    None
@@ -35,7 +35,9 @@ p = struct(...
 scriptsToSkip = {...
     'underDevelopment' ...
     'support' ...
+    'xDeprecatetd' ...
     };
+
 
 %% Use UnitTestToolbox method to do this.
 status = UnitTest.runProjectTutorials(p, scriptsToSkip, 'All');
