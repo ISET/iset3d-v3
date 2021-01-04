@@ -37,7 +37,7 @@ sceneWindow(scene);
 
 % First get the cube
 % This asset is a cube, or part of it, at the bottom of the tree.
-assetName = '005ID_Cube_O'; 
+assetName = '003ID_Cube_B'; %'005ID_Cube_O'; 
 thisAsset = thisR.get('asset',assetName);
 
 % This places a new branch node representating a rotation just above the
@@ -45,7 +45,7 @@ thisAsset = thisR.get('asset',assetName);
 % around the z-axis in this case.
 %
 % But the call to set the rotation crashes out.
-thisR.set('asset', thisAsset, 'rotate', [0, 0, 45]);
+thisR.set('asset', thisAsset.name, 'rotate', [0, 0, 45]);
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Rotation');
