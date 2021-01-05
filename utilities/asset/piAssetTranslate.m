@@ -1,50 +1,55 @@
 function newBranch = piAssetTranslate(thisR, assetInfo, translation,varargin)
-%%
+%% Translate an asset
 %
 % Synopsis:
 %   newBranch = piAssetTranslate(thisR, assetInfo, translation, varargin)
 %
-% Brief description:
-%   Translate the position of an asset. Function rewritten by Zheng Lyu.
+% Description:
+%   Translate an asset.
+%
+%   If the asset is a branch node, translate it.
+%
+%   If the asset is an object or light, insert a branch node representing 
+%   translation between the node and its parent.
 %
 % Inputs:
 %   thisR       - recipe
 %   assetInfo   - asset node name or id
 %   translation - translation vector
 %
-% Return
+% Outputs:
 %   newBranch   - the newly inserted branch
-%
-% Description
-%   Translate an asset. If the asset is a branch node, move it.
-%   If the asset is an object or light, insert a branch node representing 
-%   translation between the node and its parent.
-%
-% ZL, Vistasoft Team, 2018
-% ZLY, Vistasoft Team, 2020
 %
 % See also
 %   piAsset*
 %
 
-% Example:
+% History:
+%   ZL, Vistasoft Team, 2018
+%   ZLY, Vistasoft Team, 2020
+%
+%   01/05/21  dhb  Put comments closer to ISETBio standard form.
+%                  Little bit of commenting
+%                  Fix example so it runs
+
+
+% Examples:
 %{
 thisR = piRecipeDefault('scene name', 'Simple scene');
 disp(thisR.assets.tostring)
 
-thisR = thisR.set('asset', '004ID_Sky1', 'translate', [1, 1, 1]);
+thisR.set('asset', '004ID_Sky1_L', 'translate', [1, 1, 1]);
 disp(thisR.assets.tostring)
 %}
-%% Parse input
 
+%% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
 p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
 p.addRequired('translation', @isvector);
 p.parse(thisR, assetInfo, translation, varargin{:})
 
-%%
-% If assetInfo is a node name, find the id
+%% If assetInfo is a node name, find the id
 if ischar(assetInfo)
     assetName = assetInfo;
     assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
@@ -54,15 +59,14 @@ if ischar(assetInfo)
     end
 end
 
-%%
+%% Get asset node
 thisNode = thisR.assets.get(assetInfo);
-
 if isempty(thisNode)
     warning('Couldn not find an asset with name %d:', assetInfo);
     return;
 end
 
-% New branch node
+%% Put translation onto a new branch node
 newBranch = piAssetCreate('type', 'branch');
 newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'T');
 newBranch.translation = reshape(translation, 1, 3);

@@ -4,17 +4,6 @@ function newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 % Synopsis:
 %   newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %
-% Brief description:
-%   Rotate an asset. Function reweitten by Zheng Lyu.
-% 
-% Inputs:
-%   thisR       - recipe.
-%   assetInfo   - asset name or id
-%   rotation    - rotation vector [x-axis, y-axis, z-axis] (deg)
-% 
-% Returns:
-%   newBranch   - inserted branch
-%
 % Description:
 %   Rotate an asset. 
 %
@@ -23,6 +12,14 @@ function newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %
 %   If the asset is an object or light, insert a branch node representing
 %   rotation between the node and its parent.
+% 
+% Inputs:
+%   thisR       - recipe.
+%   assetInfo   - asset name or id
+%   rotation    - rotation vector [x-axis, y-axis, z-axis] (deg)
+% 
+% Outputs:
+%   newBranch   - inserted branch
 %   
 % ZL, Vistasoft Team, 2018
 % ZLY, Vistasoft Team, 2020
@@ -31,14 +28,25 @@ function newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %   piAsset*
 %
 
-% Example:
+% History:
+%   ZL, Vistasoft Team, 2018
+%   ZLY, Vistasoft Team, 2020
+%
+%   01/05/21  dhb  Put comments closer to ISETBio standard form.
+%                  Little bit of commenting
+%                  Fix bug where it was thisR = thisR.set(...), which
+%                      doesn't work at all anymore.
+%                  Fix example so it runs
+
+% Examples:
 %{
 thisR = piRecipeDefault('scene name', 'Simple scene');
 disp(thisR.assets.tostring)
 
-thisR = thisR.set('asset', '004ID_Sky1', 'rotation', [45, 0, 0]);
+thisR.set('asset', '004ID_Sky1_L', 'rotation', [45, 0, 0]);
 disp(thisR.assets.tostring)
 %}
+
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
@@ -46,8 +54,7 @@ p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
 p.addRequired('rotation', @isvector);
 p.parse(thisR, assetInfo, rotation, varargin{:});
 
-%%
-% If assetInfo is a name, find the id
+%% If assetInfo is a name, find the id
 if ischar(assetInfo)
     assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
     if isempty(assetInfo)
@@ -56,15 +63,14 @@ if ischar(assetInfo)
     end
 end
 
+%% Get asset node
 thisNode = thisR.assets.get(assetInfo);
-
-%% 
 if isempty(thisNode)
     warning('Could not find an asset with name %d:', assetInfo);
     return;
 end
 
-% Create the rotation matrix
+% Create the rotation matrix and put it onto a new branch node
 rotMatrix = [rotation(3), rotation(2), rotation(1);
              fliplr(eye(3))];
 newBranch = piAssetCreate('type', 'branch');
@@ -78,7 +84,7 @@ if isequal(thisNode.type, 'branch')
     
     % Add the new node, which is also a branch, as child of the input branch
     % node.
-    thisR = thisR.set('asset', thisNode.name, 'add', newBranch);
+    thisR.set('asset', thisNode.name, 'add', newBranch);
     
     % Set the children of the original branch node will now be children of
     % this new branch node
