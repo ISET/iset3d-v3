@@ -39,6 +39,7 @@ sceneWindow(scene);
 % This asset is a cube, or part of it, at the bottom of the tree.
 assetName = '003ID_Cube_B'; %'005ID_Cube_O'; 
 thisAsset = thisR.get('asset',assetName);
+sceneSet(scene, 'render flag', 'hdr');
 
 % This places a new branch node representating a rotation just above the
 % named leaf asset.  The rotation is (x,y,z) in degrees.  We are rotating
@@ -50,6 +51,7 @@ piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Rotation');
 sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
 
 % % Loop through all assets and act on the cube.
 % for ii = 1:length(thisR.assets.groupobjs)
