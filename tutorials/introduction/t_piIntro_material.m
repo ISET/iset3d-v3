@@ -89,6 +89,7 @@ piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
+sceneSet(scene,'render flag','hdr');
 
 %% Make the sphere glass
 
@@ -119,7 +120,6 @@ sceneWindow(scene);
 sceneSet(scene,'render flag','hdr')
 
 %% Make the sphere glass 
-
 glassName = 'glass';
 glass = piMaterialCreate(glassName, 'type', 'glass');
 thisR.set('material', 'add', glass);
@@ -131,6 +131,7 @@ piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change sphere to glass');
 sceneWindow(scene);
+sceneSet(scene,'render flag','hdr');
 
 %% One more camera position
 
@@ -142,11 +143,11 @@ origFrom = [0 0 -500];  % Original from position
 
 % Set the camera from position a little higher and closer
 thisR.set('from',assetPosition + [0 100 -400]);
-
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change sphere to glass');
 sceneWindow(scene);
+sceneSet(scene,'render flag','hdr');
 
 %% Change the sphere to a mirror in the future.  
 mirrorName = 'mirror2';
@@ -160,5 +161,6 @@ piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change sphere to glass');
 sceneWindow(scene);
+sceneSet(scene,'render flag','hdr');
 
 %% END
