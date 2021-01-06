@@ -803,7 +803,7 @@ switch param
                 out = thisR.get('asset', rootSTID);
             case {'graftwithmaterial', 'graftwithmaterials'}
                 [assetTree, matList] = piAssetTreeLoad(val);
-                out = thisR.set('asset', assetName, 'graft', assetTree);
+                [~,out] = thisR.set('asset', assetName, 'graft', assetTree);
                 for ii=1:numel(matList)
                     thisR.set('material', 'add', matList{ii});
                 end
