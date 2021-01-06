@@ -68,10 +68,10 @@ classdef recipe < matlab.mixin.Copyable
             val = recipeGet(obj,varargin{:});
         end
         
-        function val = set(obj,varargin)
+        function [obj, val] = set(obj,varargin)
             % Sets parameters of the recipe.  Shortens the set call, mainly, and
             % does some parameter value checking.
-            val = recipeSet(obj,varargin{:});
+            [obj, val] = recipeSet(obj,varargin{:});
         end
         
     end

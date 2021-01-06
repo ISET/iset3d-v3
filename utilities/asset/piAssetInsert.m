@@ -61,7 +61,7 @@ newNode.type = 'branch'; % Enforce it is branch node
 % The newNode is added below the parent node.
 % NOTE: The name of newNode name will be changed to force it to be unique
 % when it is addded to the tree.
-id = thisR.set('asset', parentNodeID, 'add', newNode);
+[~, id] = thisR.set('asset', parentNodeID, 'add', newNode);
 
 % Change the parent of thisNode to be the newNode
 thisR.set('asset', thisNode.name, 'parent', id);

@@ -15,7 +15,7 @@ function ieObject = piDat2ISET(inputFile,varargin)
 %   recipe           -  The recipe used to create the file
 %   mean luminance   -  Set the mean illuminance
 %   mean luminance per mm2 - Set the mean illuminance per square pupil mm
-%   scaleIlluminance -  if true, we scale the mean illuminance by the pupil
+%   scalePupilArea -  if true, we scale the mean illuminance by the pupil
 %                       diameter.
 %
 % Output
@@ -45,7 +45,7 @@ p.addParameter('wave', [], @isnumeric);
 
 % For the OI case
 p.addParameter('meanilluminancepermm2',5,@isnumeric);
-p.addParameter('scaleilluminance',true,@islogical);
+p.addParameter('scalepupilarea',true,@islogical);
 
 % For the pinhole case
 p.addParameter('meanluminance',100,@isnumeric);
@@ -55,7 +55,7 @@ label       = p.Results.label;
 thisR       = p.Results.recipe;
 
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
-scaleIlluminance      = p.Results.scaleilluminance;
+scalePupilArea      = p.Results.scalepupilarea;
 meanLuminance         = p.Results.meanluminance;
 wave                  = p.Results.wave;
 
@@ -155,7 +155,7 @@ switch lower(cameraType)
         
         % We set meanIlluminance per square millimeter of the lens
         % aperture.
-        if(scaleIlluminance)
+        if(scalePupilArea)
             aperture = oiGet(ieObject,'optics aperture diameter');
             lensArea = pi*(aperture*1e3/2)^2;
             meanIlluminance = meanIlluminancepermm2*lensArea;
@@ -194,7 +194,7 @@ switch lower(cameraType)
         
         % We set meanIlluminance per square millimeter of the lens
         % aperture.
-        if(scaleIlluminance)
+        if(scalePupilArea)
             aperture = oiGet(ieObject,'optics aperture diameter');
             lensArea = pi*(aperture*1e3/2)^2;
             meanIlluminance = meanIlluminancepermm2*lensArea;
@@ -212,13 +212,11 @@ switch lower(cameraType)
             ieObject = sceneSet(ieObject,'fov',thisR.get('fov'));
         end
         
-        if(scaleIlluminance)
-            % In this case we cannot scale by the area because the aperture
-            % is a pinhole.  The ieObject is a scene.  So we use the mean
-            % luminance parameter (default is 100 cd/m2).
-            ieObject = sceneAdjustLuminance(ieObject,meanLuminance);
-            ieObject = sceneSet(ieObject,'luminance',sceneCalculateLuminance(ieObject));
-        end
+        % In this case we cannot scale by the area because the aperture
+        % is a pinhole.  The ieObject is a scene.  So we use the mean
+        % luminance parameter (default is 100 cd/m2).
+        ieObject = sceneAdjustLuminance(ieObject,meanLuminance);
+        ieObject = sceneSet(ieObject,'luminance',sceneCalculateLuminance(ieObject));
     otherwise
         error('Unknown optics type %s\n',cameraType);       
 end

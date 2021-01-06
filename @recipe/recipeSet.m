@@ -1,9 +1,12 @@
-function out = recipeSet(thisR, param, val, varargin)
+function [thisR, out] = recipeSet(thisR, param, val, varargin)
 % Set a recipe class value
 %
 % Syntax
-%   out = recipeSet(thisR, param, val, varargin)
-%
+%   [thisR, out] = recipeSet(thisR, param, val, varargin)
+%     Returns us (thisR) as the primary result, which should be un-needed because
+%     we are a by-reference (handle) class. Second result is an optional
+%     error code or other return value.
+% 
 % Description:
 %   The recipe class manages the PBRT rendering parameters.  The class
 %   has many fields specifying camera and rendering parameters. This
