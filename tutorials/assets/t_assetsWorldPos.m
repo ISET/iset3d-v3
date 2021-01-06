@@ -50,8 +50,8 @@ pos1    = thisR.get('asset', assetName, 'world position');
 
 %% Add two rotations and render
 
-R1 = thisR.set('asset', assetName, 'rotation', [0 0 45]);
-R2 = thisR.set('asset', assetName, 'rotation', [0 45 0]);
+[~,R1] = thisR.set('asset', assetName, 'rotation', [0 0 45]);
+[~,R2] = thisR.set('asset', assetName, 'rotation', [0 45 0]);
 
 % Render 
 piWrite(thisR)
@@ -62,7 +62,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Translate along y axis in world space
 
 % This moves the object up in the screen
-T1 = thisR.set('asset', assetName, 'world translation', [0 0.5 0]);
+[~,T1] = thisR.set('asset', assetName, 'world translation', [0 0.5 0]);
 
 % Check rotation matrix and position
 rotM2   = thisR.get('asset', assetName, 'world rotation matrix');
@@ -92,12 +92,12 @@ sceneSet(scene, 'render flag', 'hdr');
 %% More examples
 
 % These are object-coordinate transforms
-R3 = thisR.set('asset', assetName, 'rotation', [20 78 0]);
+[~,R3] = thisR.set('asset', assetName, 'rotation', [20 78 0]);
 
-R4 = thisR.set('asset', assetName, 'rotation', [0 0 48]);
+[~,R4] = thisR.set('asset', assetName, 'rotation', [0 0 48]);
 
 % World transform
-T2 = thisR.set('asset', assetName, 'world translation', [-0.5 0 -0.5]);
+[~,T2] = thisR.set('asset', assetName, 'world translation', [-0.5 0 -0.5]);
 
 % Render
 piWrite(thisR)

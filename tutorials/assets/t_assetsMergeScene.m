@@ -20,10 +20,10 @@ coorST = coorRecipe.get('asset', rootST, 'subtree');
 %% Graft the subtree under root
 thisR.assets.show;
 assetName = 'root';
-rootST1 = thisR.set('asset', assetName, 'graft', coorST);
+[~,rootST1] = thisR.set('asset', assetName, 'graft', coorST);
 
 assetName = 'figure_3m_B';
-rootST2 = thisR.set('asset', assetName, 'graft', coorST);
+[~,rootST2] = thisR.set('asset', assetName, 'graft', coorST);
 thisR.assets.show;
 
 %% Check the world position
@@ -32,7 +32,7 @@ posCoor = thisR.get('asset', '039ID_origin_O', 'world position');
 posCoor2 = thisR.get('asset', '052ID_origin_O', 'world position');
 
 %% Translate coordinate next to blue guy
-T1 = thisR.set('asset', '040ID_Coordinate_B', 'translate', [-0.1 0 0]);
+[~,T1] = thisR.set('asset', '040ID_Coordinate_B', 'translate', [-0.1 0 0]);
 
 %%
 piWrite(thisR);
@@ -44,14 +44,14 @@ sceneSet(scene, 'render flag', 'hdr');
 % First chop the two coordinate tree
 thisR.set('asset', rootST1.name, 'chop');
 thisR.set('asset', rootST2.name, 'chop');
-
 thisR.assets.show;
 
 % Graft with materials
 assetTreeName = 'coordinate';
-rootST3 = thisR.set('asset', assetName, 'graft with materials', assetTreeName);
+[~,rootST3] = thisR.set('asset', assetName, 'graft with materials', assetTreeName);
 thisR.set('asset', rootST3.name, 'scale', 3);
-T2 = thisR.set('asset', rootST3.name, 'translate', [-0.5 0 0]);
+[~,T2] = thisR.set('asset', rootST3.name, 'translate', [-0.5 0 0]);
+
 %%
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');

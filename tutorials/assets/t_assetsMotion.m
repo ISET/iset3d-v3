@@ -64,7 +64,7 @@ fprintf('Object position: \n    x: %.1f, y: %0.1f, depth: %.1f \n',...
 thisR.set('cameraexposure', 0.5);
 
 % This sets the motion translation.  Make it return the T1!!!
-T1 = thisR.set('asset', thisAssetName, 'motion', 'translation', [0.1, 0.1, 0]);
+[~,T1] = thisR.set('asset', thisAssetName, 'motion', 'translation', [0.1, 0.1, 0]);
 
 % Make this work!!!
 % thisR.get('asset',thisAssetName,'motion','translation')
@@ -86,7 +86,7 @@ sceneWindow(scene);
 
 %% Add some rotation to the motion
 
-R1 = thisR.set('asset', thisAssetName, 'motion', 'rotation', [0, 0, 30]);
+[~,R1] = thisR.set('asset', thisAssetName, 'motion', 'rotation', [0, 0, 30]);
 
 piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR, 'render type', 'radiance');
