@@ -13,8 +13,8 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Simple base scene
-
-thisR = piRecipeDefault('scene name', 'simple scene');
+sceneName = 'simple scene';
+thisR = piRecipeDefault('scene name', sceneName);
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);

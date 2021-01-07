@@ -54,7 +54,12 @@ t1 = tree('root');
 t2 = tree();
 t2 = t2.addnode(1, 'rr');
 t2 = t2.addnode(1, 'cc');
-t2 = t2.removenode(1);
+try
+	t2 = t2.removenode(1);
+    fprintf('*** Surprisingly, was able to remove root node ***\n');
+catch
+    fprintf('*** As expected, cannot remove root node from tree ***\n');
+end
 t1 = t1.graft(1, t2);
 disp(t1.tostring)
 

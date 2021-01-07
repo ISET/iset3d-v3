@@ -35,7 +35,7 @@ initialAng = thisR.get('asset', assetName, 'world rotation angle');
 disp(initialAng)
 
 % First rotation
-R1 = thisR.set('asset', assetName, 'rotation', [0 90 45]);
+[~,R1] = thisR.set('asset', assetName, 'rotation', [0 90 45]);
 
 % Check rotation angle
 rotAng = thisR.get('asset', assetName, 'world rotation angle');

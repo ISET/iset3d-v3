@@ -249,7 +249,7 @@ sceneWindow(scene);
 
 %% Add motion assetTwo
 %{
-thisR = thisR.set('asset', assetNameTwo, 'motion',...
+[,thisR] = thisR.set('asset', assetNameTwo, 'motion',...
                     'rotation',[0, 0, 10], 'translation', [0, 0, -0.1]);
 
 % Write and render

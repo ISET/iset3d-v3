@@ -41,7 +41,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %  mean luminance -  If a scene, this mean luminance
 %                 (default 100 cd/m2) 
 %  mean illuminance per mm2 - default is 5 lux
-%  scaleIlluminance
+%  scalePupilArea
 %             - if true, scale the mean illuminance by the pupil
 %               diameter in piDat2ISET (default is true)
 %  reuse      - Boolean. Indicate whether to use an existing file if one of
@@ -110,9 +110,9 @@ varargin = ieParamFormat(varargin);
 rTypes = {'radiance','depth','both','all','coordinates','material','mesh', 'illuminant','illuminantonly'};
 p.addParameter('rendertype','both',@(x)(ismember(ieParamFormat(x),rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
-p.addParameter('meanluminance',[],@isnumeric);
+p.addParameter('meanluminance',100,@isnumeric);
 p.addParameter('meanilluminancepermm2',[],@isnumeric);
-p.addParameter('scaleIlluminance',true,@islogical);
+p.addParameter('scalepupilarea',true,@islogical);
 p.addParameter('reuse',false,@islogical);
 p.addParameter('reflectancerender', false, @islogical);
 p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:latest',@ischar);
@@ -122,7 +122,8 @@ p.parse(thisR,varargin{:});
 renderType       = ieParamFormat(p.Results.rendertype);
 version          = p.Results.version;
 dockerImageName  = p.Results.dockerimagename;
-scaleIlluminance = p.Results.scaleIlluminance;
+scalePupilArea = p.Results.scalepupilarea;
+meanLuminance    = p.Results.meanluminance;
 wave             = p.Results.wave;
 fprintf('Docker container %s\n',dockerImageName);
 
@@ -354,8 +355,9 @@ for ii = 1:length(filesToRender)
             ieObject = piDat2ISET(outFile,...
                 'label','radiance',...
                 'recipe',thisR,...
-                'scaleIlluminance',scaleIlluminance,...
-                'wave',dockerWave);
+                'scalePupilArea',scalePupilArea,...
+                'wave',dockerWave, ...
+                'meanluminance', meanLuminance);
         case {'metadata'}
             metadata = piDat2ISET(outFile,...
                 'label','mesh',...
@@ -377,16 +379,18 @@ for ii = 1:length(filesToRender)
             % PBRT rendered data for white matte surfaces
             illuminantPhotons = piDat2ISET(outFile,...
                 'label', 'illuminant',...
-                'scaleIlluminance',scaleIlluminance,...
-                'wave', dockerWave);
+                'scalePupilArea',scalePupilArea,...
+                'wave', dockerWave, ...
+                'meanluminance', meanLuminance);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject, 'illuminant photons', illuminantPhotons);
             end            
         case {'illuminantonly'}
             ieObject = piDat2ISET(outFile,...
                 'label', 'illuminantonly', ...
-                'scaleIlluminance',scaleIlluminance,...
-                'wave', dockerWave);
+                'scalePupilArea',scalePupilArea,...
+                'wave', dockerWave, ...
+                'meanluminance', meanLuminance);
     end
 
 end

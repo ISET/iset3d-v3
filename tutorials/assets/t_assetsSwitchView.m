@@ -19,7 +19,7 @@ thisAsset = thisR.get('asset parent', assetName);
 thisR.set('asset', thisAsset.name, 'delete');
 thisR.set('to', [0 0 0]);
 %}
-T1 = thisR.set('asset', assetName, 'translation', [1 0 0]);
+[~,T1] = thisR.set('asset', assetName, 'translation', [1 0 0]);
 pos1 = thisR.get('asset', assetName, 'world position');
 thisR.set('to', pos1);
 
