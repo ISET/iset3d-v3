@@ -1,6 +1,6 @@
 # Exported by PBRT exporter for Cinema 4D 
-Transform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 -0.149999999905 0.6 1]
-Camera "perspective" "float fov" [31.332533537] "float focaldistance" [2000.0] "float lensradius" [0]
+Transform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 -0.125 0.4 1]
+Camera "perspective" "float fov" [48.2106066326] "float focaldistance" [2000.0] "float lensradius" [0]
 Sampler "halton" "integer pixelsamples" [32]
 Film "image" "string filename" ["CornellBoxReference.exr"] "integer xresolution" [1280] "integer yresolution" [720]
 Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"

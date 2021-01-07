@@ -78,7 +78,7 @@ if isequal(thisNode.type, 'branch')
     
     % Add the new node, which is also a branch, as child of the input branch
     % node.
-    thisR = thisR.set('asset', thisNode.name, 'add', newBranch);
+    thisR.set('asset', thisNode.name, 'add', newBranch);
     
     % Set the children of the original branch node will now be children of
     % this new branch node
