@@ -26,7 +26,7 @@
 %     Q. HOW DO I CONNECT THE INDICATOR WITH THE UNDERLYING DATA STRUCTURE?
 %
 %   mesh - Indicator variable for the mesh at each pixel.
-%      Q. THIS LOOKS LIKE WHAT I EXPECTED FOR THE MATERIAL MAP.  WHAT IS A 
+%      Q. THIS LOOKS LIKE WHAT I EXPECTED FOR THE MATERIAL MAP.  WHAT IS A
 %      MESH?
 %      Q. HOW DO I CONNECT THE INDICATOR WITH THE UNDERLYING DATA STRUCTURE?
 
@@ -34,11 +34,13 @@
 %      Q. THESE ARE NOT AS I EXPECTED THEM TO LOOK.  FOR EXAMPLE, I
 %      EXPECTED THE IMAGE OF THE X COORDINATE TO BE MORE OR LESS A LEFT TO
 %      RIGHT GRADIENT IN THE IMAGE.  CAN SOMEONE UNPACK WHY THESE LOOK THE
-%      WAY THEY DO?
+%      WAY THEY DO?  -- ONE ANSWER, IT'S GOING TO DEPEND ON WHICH WAY THE
+%      CAMERA IS LOOKING.  THE INTUITION IS ONLY GOOD IF Y IS UP and X IS
+%      TO THE RIGHT FROM THE CAMERA'S POINT OF VIEW.
 %
-%   surface normals - 
+%   surface normals -
 %      Q. IS THERE A WAY TO GET SURFACE NORMALS?
-% 
+%
 % Dependencies:
 %    ISET3d, (ISETCam or ISETBio), JSONio
 %
@@ -48,45 +50,96 @@
 %% History:
 %   12/27/20 dhb  Started on this, although mostly just produced questions
 %                 about things I don't understand.
+%   12/29/20 dhb  Convert to work on blobbie image.
 
 %% Initialize ISET and Docker
 %
-% We start up ISET and check that the user is configured for docker
+% We start up ISET and check that the user is configured for docker.
 clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read the scene recipe file
+%% Get scene to render
+whichScene = 'simpleScene'
+switch (whichScene)
+    case 'simpleScene'
+        % Initialize ISET and Docker
+        %
+        % We start up ISET and check that the user is configured for docker
+        clear; close all; ieInit;
+        if ~piDockerExists, piDockerConfig; end
+        
+        % Read the scene recipe file
+        %
+        % Need a scene that has a material library
+        sceneName = 'SimpleScene';
+        thisR = piRecipeDefault('scene name','SimpleScene');
+        
+        % Set render quality
+        %
+        % This is a low resolution for speed.
+        thisR.set('film resolution',[200 150]);
+        thisR.set('rays per pixel',32);
+        thisR.set('fov',45);
+        thisR.set('nbounces',1);
+        
+        % The output will be written here
+        outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
+        thisR.set('outputFile',outFile);
+    case 'blobbie'
+        % Set the input folder name
+        %
+        % This is currently set to a folder included in the iset3d repository
+        % but you can change it to your new folder (as described in heading above).
+        sceneName = 'BlenderSceneBlobs';
+        
+        % Set name of pbrt file exported from Blender
+        %
+        % This is currently set to a pbrt file included in the iset3d repository
+        % but you can change it to the pbrt file you exported from Blender.
+        pbrtName = 'BlenderSceneBlobs';
+        
+        % Set pbrt file path
+        %
+        % This is currently set to the file included in the iset3d repository
+        % but you can change it to the file path for your exported file.
+        filePath = fullfile(piRootPath,'local','scenes',sceneName);
+        fname = fullfile(filePath,[pbrtName,'.pbrt']);
+        if ~exist(fname,'file')
+            error('File not found - see tutorial header for instructions');
+        end
+        
+        % Read scene
+        %
+        % piRead_Blender.m is an edited version of piRead.m
+        % that can read pbrt files exported from Blender.
+        exporter = 'Blender';
+        thisR = piRead_Blender(fname,'exporter',exporter);
+        
+        % Change render quality
+        %
+        % Decrease the resolution to decrease rendering time.
+        raysperpixel = thisR.get('rays per pixel');
+        filmresolution = thisR.get('film resolution');
+        thisR.set('rays per pixel', raysperpixel/2);
+        thisR.set('film resolution',filmresolution/2);
+    otherwise
+        error('Unknown scene requested');
+end
+
+%% Save the recipe information
 %
-% Need a scene that has a material library
-sceneName = 'SimpleScene';
-thisR = piRecipeDefault('scene name','SimpleScene');
+% piWrite_Blender.m is an edited version of piWrite.m
+% that understands the exporter being set to 'Blender'.
+piWrite_Blender(thisR);
 
-%% Set render quality
+%% Render and display radiance image
 %
-% This is a low resolution for speed.
-thisR.set('film resolution',[200 150]);
-thisR.set('rays per pixel',32);
-thisR.set('fov',45);
-thisR.set('nbounces',1); 
-
-%% The output will be written here
-outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
-thisR.set('outputFile',outFile);
-
-%% Set up the render quality
-%
-% There are many different parameters that can be set.
-thisR.set('film resolution',[192 192]);
-thisR.set('pixel samples',128);
-thisR.set('max depth',1); % Number of bounces
-
-%% Write out recipe
-piWrite(thisR);
-
-%% Render radiance image and show.
-[theScene] = piRender(thisR,'renderType','radiance');
+% piRender_Blender.m is an edited version of piRender.m
+% that understands the exporter being set to 'Blender'.
+theScene = piRender_Blender(thisR,'render type','radiance');
+theScene = sceneSet(theScene,'name','Blender export');
 sceneWindow(theScene);
-theScene = sceneSet(theScene,'gamma',0.7);
+sceneSet(theScene,'gamma',0.5);
 
 %% Render depth map and show.
 %
@@ -96,7 +149,7 @@ theScene = sceneSet(theScene,'gamma',0.7);
 theScene = sceneSet(theScene,'depth map',depthMap);
 scenePlot(theScene,'depth map');
 
-%% Render illumination image and show. Broken.
+%% Render illumination image and show.
 [sceneIllumination] = piRender(thisR,'renderType','illuminant only');
 theScene = sceneSet(theScene,'illuminant photons',sceneIllumination);
 scenePlot(theScene,'illuminant image');
@@ -106,14 +159,21 @@ scenePlot(theScene,'illuminant image');
 % This is an image with a material indicator variable at each pixel.
 % This only has two discrete values in it, which doesn't make sense to me.
 [materialMap] = piRender(thisR,'renderType','material');
-figure; imshow(materialMap/max(materialMap(:)));
+figure; imshow(materialMap/max(materialMap(:))); title('Material map')
 
 %% Mesh
 %
 % This should have a label for the mesh at each pixel.  It looks like
 % expect for the material map.  I don't think I know what a mesh is.
 [meshMap] = piRender(thisR,'renderType','mesh');
-figure; imshow(meshMap/max(meshMap(:)));
+figure; imshow(meshMap/max(meshMap(:))); title('Mesh map');
+fprintf('The image is made up of %d different meshes\n',length(unique(meshMap(:))));
+oneObjectMeshMap = zeros(size(meshMap));
+[m,n] = size(meshMap);
+theMeshIndex = meshMap(round(m/2),round(n/2));
+oneObjectMeshMap(meshMap == theMeshIndex) = 1;
+figure; imshow(oneObjectMeshMap); title('One Mesh');
+
 
 %% Image coordinates
 %
