@@ -1,13 +1,10 @@
 %% Teapot example for iset3d calculations
 %
-% Underdevelopment for the area light
-%
-% BUG: Where is the light?
-%
 % Brief description:
-%  This introduction renders the teapot scene in the data directory of the
-%  ISET3d repository. This introduction sets up a very simple recipe, runs
-%  the docker command, and loads the result into an ISET scene structure.
+%  Renders the teapot scene in the data directory of the ISET3d repository.
+%
+%  This introduction sets up a very simple recipe, runs the docker command,
+%  and loads the result into an ISET scene structure.
 % 
 % Dependencies:
 %    ISET3d, (ISETCam or ISETBio), JSONio
@@ -37,7 +34,7 @@ thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
 thisR.set('max depth',1); % Number of bounces
 
-%% Render
+%% Write out recipe and render. Then show.
 piWrite(thisR);
 
 % This is a pinhole case. So we are rendering a scene.
@@ -45,8 +42,8 @@ piWrite(thisR);
 sceneWindow(scene);
 scene = sceneSet(scene,'gamma',0.7);
 
-%% Notice that we also computed the depth map
-
+%% Notice that we also computed the depth map.
+% This is the default for piRender.
 scenePlot(scene,'depth map');
 
 %% END

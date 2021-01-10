@@ -1,0 +1,350 @@
+Film "image" "integer xresolution" [1366] "integer yresolution" [768] "string filename" "output00001.exr"
+PixelFilter "box" "float xwidth" [0.5] "float ywidth" [0.5] 
+Accelerator "bvh" 
+"string splitmethod" "sah"
+"integer maxnodeprims" [4]
+Sampler "halton"
+"integer pixelsamples" [100]
+"bool samplepixelcenter" "false"
+Integrator "path"
+"integer maxdepth" [10]
+Scale -1 1 1 #avoid the 'flipped image' bug..
+LookAt	0.0 -10.0 0.0
+	0.0 -9.0 4.371138828673793e-08
+	0.0 -4.371138828673793e-08 1.0
+
+Camera "perspective"
+"float fov" [22.89519204617112]
+WorldBegin
+
+	AttributeBegin
+		Transform [3.500000 0.000000 0.000000 0.000000 0.000000 3.000000 0.000000 0.000000 0.000000 0.000000 0.050000 0.000000 0.000000 1.000000 -2.000000 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.07421359419822693 0.0382043719291687 0.0382043793797493]		
+		Shape "plymesh" "string filename" ["meshes/00001/Floor_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [-0.000000 0.000000 -2.500000 0.000000 0.000000 3.000000 0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000 -3.500000 1.000000 0.500000 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.982250452041626 0.9130989909172058 0.7912981510162354]		
+		Shape "plymesh" "string filename" ["meshes/00001/WallLeft_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [3.500000 0.000000 0.000000 0.000000 0.000000 -0.000000 2.500000 0.000000 0.000000 -0.050000 -0.000000 0.000000 0.000000 4.000000 0.500000 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.982250452041626 0.9130989909172058 0.7912981510162354]		
+		Shape "plymesh" "string filename" ["meshes/00001/WallBack_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [-0.000000 0.000000 -2.500000 0.000000 0.000000 3.000000 0.000000 0.000000 0.050000 0.000000 -0.000000 0.000000 3.500000 1.000000 0.500000 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.982250452041626 0.9130989909172058 0.7912981510162354]		
+		Shape "plymesh" "string filename" ["meshes/00001/WallRight_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [-1.409539 0.513030 0.000000 0.000000 -0.017078 -0.046920 0.002617 0.000000 0.035800 0.098359 1.997259 0.000000 2.001560 3.083099 0.038460 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.09238307178020477 0.09238307178020477 0.09238307178020477]		
+		Shape "plymesh" "string filename" ["meshes/00001/MirrorFrame_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [-0.419929 0.152244 0.010343 0.000000 -0.005032 -0.013667 -0.003113 0.000000 -0.029781 -0.121708 0.582400 0.000000 2.009710 3.234956 -1.360549 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.09238307178020477 0.09238307178020477 0.09238307178020477]		
+		Shape "plymesh" "string filename" ["meshes/00001/MirrorStand_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [-1.409539 0.513030 0.000000 0.000000 -0.017078 -0.046920 0.002617 0.000000 0.035800 0.098359 1.997259 0.000000 2.001560 3.083099 0.038460 1.000000 ]
+		Material "mirror"		
+		"color Kr" [ 0.800000011920929 0.800000011920929 0.800000011920929]		
+		Shape "plymesh" "string filename" ["meshes/00001/Mirror_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.690370 -0.452933 0.000000 0.000000 0.388229 1.448889 0.000000 0.000000 0.000000 0.000000 0.075000 0.000000 -0.182173 -0.147841 -0.750113 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.5365875363349915 0.5365875363349915 0.5365875363349915]		
+		Shape "plymesh" "string filename" ["meshes/00001/Table_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.100000 0.000000 0.000000 0.000000 0.000000 0.100000 0.000000 0.000000 0.000000 0.000000 0.562500 0.000000 -1.380959 1.566466 -1.385439 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.5365875363349915 0.5365875363349915 0.5365875363349915]		
+		Shape "plymesh" "string filename" ["meshes/00001/TableLegBackLeft_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.100000 0.000000 0.000000 0.000000 0.000000 0.100000 0.000000 0.000000 0.000000 0.000000 0.562500 0.000000 1.702323 0.740886 -1.385439 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.5365875363349915 0.5365875363349915 0.5365875363349915]		
+		Shape "plymesh" "string filename" ["meshes/00001/TableLegBackRight_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.100000 0.000000 0.000000 0.000000 0.000000 0.100000 0.000000 0.000000 0.000000 0.000000 0.562500 0.000000 -2.053098 -1.039439 -1.385439 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.5365875363349915 0.5365875363349915 0.5365875363349915]		
+		Shape "plymesh" "string filename" ["meshes/00001/TableLegFrontLeft_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.100000 0.000000 0.000000 0.000000 0.000000 0.100000 0.000000 0.000000 0.000000 0.000000 0.562500 0.000000 1.010919 -1.844133 -1.385439 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 0.5365875363349915 0.5365875363349915 0.5365875363349915]		
+		Shape "plymesh" "string filename" ["meshes/00001/TableLegFrontRight_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.420269 0.112611 -0.009862 0.000000 -0.097110 0.340226 -0.253418 0.000000 -0.057863 0.246920 0.353676 0.000000 -1.563004 -0.530514 -0.460135 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.004391208291053772 0.7529426217079163 0.2917707562446594]		
+		"color Kt" [ 0.004391208291053772 0.7529426217079163 0.2917707562446594]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/Monkey_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.069070 0.000000 -0.011374 0.000000 0.000000 0.070000 0.000000 0.000000 0.021124 0.000000 0.128272 0.000000 -0.937790 -1.006087 0.004498 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"color Ks" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotArmLeft_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.069070 0.000000 0.011374 0.000000 0.000000 0.070000 0.000000 0.000000 -0.021124 0.000000 0.128272 0.000000 -0.264145 -1.006087 0.004498 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"color Ks" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotArmRight_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.031276 0.000000 0.000000 0.000000 0.000000 0.031276 0.000000 0.000000 0.000000 0.000000 0.031276 0.000000 -0.596155 -1.233920 0.039682 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.250158429145813 0.25015830993652344 0.2501583695411682]		
+		"color Ks" [ 0.800000011920929 0.800000011920929 0.800000011920929]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotButton1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.031276 0.000000 0.000000 0.000000 0.000000 0.031276 0.000000 0.000000 0.000000 0.000000 0.031276 0.000000 -0.596155 -1.233920 -0.101981 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.250158429145813 0.25015830993652344 0.2501583695411682]		
+		"color Ks" [ 0.800000011920929 0.800000011920929 0.800000011920929]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotButton2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.031276 0.000000 0.000000 0.000000 0.000000 0.031276 0.000000 0.000000 0.000000 0.000000 0.031276 0.000000 -0.596155 -1.233920 -0.248790 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.250158429145813 0.25015830993652344 0.2501583695411682]		
+		"color Ks" [ 0.800000011920929 0.800000011920929 0.800000011920929]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotButton3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.035000 0.000000 0.000000 0.000000 0.000000 0.035000 0.000000 0.000000 0.000000 0.000000 0.035000 0.000000 -0.711739 -1.192410 0.499080 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.250158429145813 0.25015830993652344 0.2501583695411682]		
+		"color Ks" [ 0.800000011920929 0.800000011920929 0.800000011920929]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotEyeLeft_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.035000 0.000000 0.000000 0.000000 0.000000 0.035000 0.000000 0.000000 0.000000 0.000000 0.035000 0.000000 -0.502524 -1.192410 0.499080 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.250158429145813 0.25015830993652344 0.2501583695411682]		
+		"color Ks" [ 0.800000011920929 0.800000011920929 0.800000011920929]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotEyeRight_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.250000 0.000000 0.000000 0.000000 0.000000 0.200000 0.000000 0.000000 0.000000 0.000000 0.200000 0.000000 -0.600010 -0.995144 0.426704 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"color Ks" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotHead_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.070000 0.000000 0.000000 0.000000 0.000000 0.070000 0.000000 0.000000 0.000000 0.000000 0.130000 0.000000 -0.723701 -1.000000 -0.546096 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"color Ks" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotLegLeft_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.070000 0.000000 0.000000 0.000000 0.000000 0.070000 0.000000 0.000000 0.000000 0.000000 0.130000 0.000000 -0.480626 -1.000000 -0.546096 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"color Ks" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotLegRight_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.100000 0.000000 0.000000 0.000000 0.000000 0.052022 0.000000 0.000000 0.000000 0.000000 0.030000 0.000000 -0.603047 -1.189925 0.332945 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.250158429145813 0.25015830993652344 0.2501583695411682]		
+		"color Ks" [ 0.800000011920929 0.800000011920929 0.800000011920929]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotMouth_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.070000 0.000000 0.000000 0.000000 0.000000 0.070000 0.000000 0.000000 0.000000 0.000000 0.020000 0.000000 -0.601238 -1.000459 0.202472 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"color Ks" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotNeck_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.250000 0.000000 0.000000 0.000000 0.000000 0.200000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 -0.600010 -0.995144 -0.117042 1.000000 ]
+		Material "plastic"		
+		"color Kd" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"color Ks" [ 0.2345505654811859 0.38132616877555847 0.7991030216217041]		
+		"float roughness" [0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/RobotTorso_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [-0.159189 0.390048 0.115230 0.000000 -0.367444 -0.190974 0.138819 0.000000 0.174358 -0.046347 0.397754 0.000000 -0.083395 -0.279098 -0.293158 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.5209954977035522 0.6795425415039062 0.7991030216217041]		
+		"color Kt" [ 0.5209954977035522 0.6795425415039062 0.7991030216217041]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/ToyTop_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.893585 0.217141 -0.539405 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.7230552434921265 0.6307572722434998 0.7991030216217041]		
+		"color Kt" [ 0.7230552434921265 0.6307572722434998 0.7991030216217041]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/Bowl_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 1.013911 0.624086 -0.252315 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.07618542015552521 0.013702082447707653 0.3813261091709137]		
+		"color Kt" [ 0.07618542015552521 0.013702082447707653 0.3813261091709137]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/SphereBack_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 0.736644 0.149177 -0.367606 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.7991031408309937 0.2622506022453308 0.4232676923274994]		
+		"color Kt" [ 0.7991031408309937 0.2622506022453308 0.4232676923274994]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/SphereLeft_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 1.284361 0.149177 -0.276975 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.9130990505218506 0.8227859139442444 0.17464756965637207]		
+		"color Kt" [ 0.9130990505218506 0.8227859139442444 0.17464756965637207]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/SphereRight_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 0.000000 0.000000 0.000000 0.300000 0.000000 0.936455 0.254552 0.138331 1.000000 ]
+		Material "glass"		
+		"color Kr" [ 0.7991030812263489 0.4969329833984375 0.730461061000824]		
+		"color Kt" [ 0.7991030812263489 0.4969329833984375 0.730461061000824]		
+		"float uroughness" [0.0]		
+		"float vroughness" [0.0]		
+		"float index" [1.3329999446868896]		
+		Shape "plymesh" "string filename" ["meshes/00001/SphereTop_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.150000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 1.010314 -1.679078 -0.485151 1.000000 ]
+		Material "matte"		
+		"float sigma" [0.0]		
+		"color Kd" [ 1.0 0.0 0.0]		
+		Shape "plymesh" "string filename" ["meshes/00001/Cup_mat0.ply"]
+	AttributeEnd
+	
+
+WorldEnd
