@@ -24,17 +24,27 @@ thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5); 
 
-% Render
+% Render. 
+%
+% This image would look better if we used
+%    sceneSet(scene, 'render flag', 'hdr');
+% but then the coordinate image below would appear all 
+% black.  Setting the gamma to 0.5 enables us to see
+% all the images generated in this tutorial OK, but
+% doesn't optimize the appearance of any of them in the
+% scene window. You can use the controls in the scene
+% window itself to explore how different choices affect
+% the appearance of all the images.
 piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
+sceneSet(scene, 'gamma', 0.5);
 
 %% Get and render a second scene (the coordinate scene)
 %
-% THIS SHOWS UP AS ENTIRELY BLACK, FOR REASONS I DON'T UNDERSTAND.  MAYBE
-% THE COORDINATE SCENE DOES NOT HAVE A LIGHT SOURCE.  NEED TO EXPLAIN HERE.
+% This is a test scene that has bars aligned with the x, y, and z axes of
+% the coordinate system.
 assetSceneName = 'coordinate';
 assetR = piRecipeDefault('scene name', assetSceneName);
 assetR.assets.show;
@@ -48,7 +58,6 @@ piWrite(assetR);
 scene = piRender(assetR);
 scene = sceneSet(scene,'name',sprintf('%s',assetSceneName));
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
 
 %% Add the coordinate scene assets to the simple scene
 %
@@ -97,7 +106,6 @@ piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name',sprintf('%s - coord added',sceneName));
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
 
 %% Add elements from the coordinate scene in another way
 %
@@ -122,4 +130,3 @@ thisR.set('asset', rootST3.name, 'scale', 3);
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
