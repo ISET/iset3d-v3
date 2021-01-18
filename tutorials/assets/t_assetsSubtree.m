@@ -5,11 +5,14 @@
 % 
 % ZLY/BW
 %
-% See also
+% See also tls_assets.mlx
 %
 
-%%
-ieInit;
+%% History
+%    01/09/21  dhb  Added comments and a little cleaning.
+
+%% Initialize
+clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Simple base scene
@@ -20,88 +23,107 @@ thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5); 
 
-% Render
+%% Render
 piWrite(thisR);
 scene = piRender(thisR);
-scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
+scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
 
 %% Select a subtree
-
+%
+% Show the tree
 thisR.assets.show;
 
-% Get the subtree under the mirror branch
+% Get the subtree under the black mirror branch
+%
+% This sequence might eventually become
+%   thisR.get('asset',thisAssetName,'subtree');
 thisAssetName = 'mirror_B';
-
-% Could become
-%
-%  thisR.get('asset',thisAssetName,'subtree');
-%
 id = thisR.get('asset', thisAssetName, 'id');
-st = thisR.assets.subtree(id);
-[~, st] = st.stripID([], true);
-st.names
-st.show;
+mirrorSubtree = thisR.assets.subtree(id);
+[~, mirrorSubtree] = mirrorSubtree.stripID([], true);
 
-%% Chop a subtree, deleting the black mirror
+% You can look at the subtree, it's just another
+% tree.
+mirrorSubtree.names
+mirrorSubtree.show;
 
+%% Chop off a subtree, deleting the black mirror
 thisR.assets = thisR.assets.chop(id);
 thisR.assets.show;
 
-% Render
+% Render without the black mirror
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name',sprintf('%s - mirror removed',sceneName));
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
 %% Graft the subtree back onto the root
-
+% 
+% We can do this because we snagged it before chopping
 assetName = 'root';
-thisR.set('asset', assetName, 'graft', st); % Graft the subtree under this asset.
+thisR.set('asset', assetName, 'graft', mirrorSubtree);
 
 % Render
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name',sprintf('%s - mirror restored',sceneName));
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
 %% Extract the lighting subtree
-
 id = thisR.get('asset', 'sky_B', 'id');
-[st, index] = thisR.assets.subtree(id);
-[~, st] = st.stripID([], true);
-st.names
-st.show;
+[lightingSubtree, index] = thisR.assets.subtree(id);
+[~, lightingSubtree] = lightingSubtree.stripID([], true);
+lightingSubtree.names
+lightingSubtree.show;
 
-%% Add the lighting to another scene
-
+%% Render another scene
 sceneName = 'sphere';
 thisR = piRecipeDefault('scene name',sceneName);
 thisR = piLightAdd(thisR, 'type', 'distant', ...
     'light spectrum', [9000 0.001],...
     'camera coordinate', true);
+thisR.assets.show;
 
 % Render
 piWrite(thisR);
 scene = piRender(thisR);
-scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
+scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
 
-thisR.assets.show;
-
-%%  Not yet understood.  Ask ZLY
-
-% We add the light onto the root of the Sphere scene.  That works, but the
-% rendering doesn't make sense to me.
-
+%% Add first scene lighting to second
+%
+% Adding works, but we don't fully understand the rendering itself.
+%
+% Needs a little more thought and explanation.
 assetName = 'root';
-thisR.set('asset', assetName, 'graft', st); % Graft the subtree under this asset.
+thisR.set('asset', assetName, 'graft', lightingSubtree); 
 thisR.assets.show;
 
 % Render
 piWrite(thisR);
 scene = piRender(thisR);
-scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
+scene = sceneSet(scene,'name',sprintf('%s - light added',sceneName));
 sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
 
-%%
+%% Add the mirror to the sphere scene
+%
+% Adding works, but the mirror isn't visible. Maybe not in the FOV?
+%
+% Needs a little more thought and explanation.
+assetName = 'root';
+thisR.set('asset', assetName, 'graft', mirrorSubtree); 
+thisR.assets.show;
+
+% Render
+piWrite(thisR);
+scene = piRender(thisR);
+scene = sceneSet(scene,'name',sprintf('%s - mirror added',sceneName));
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+

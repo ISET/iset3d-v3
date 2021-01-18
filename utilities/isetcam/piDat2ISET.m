@@ -35,8 +35,11 @@ function ieObject = piDat2ISET(inputFile,varargin)
 %}
 
 %%
+
+% Why was this commented out???  BW put it back.
+varargin =ieParamFormat(varargin);
+
 p = inputParser;
-%varargin =ieParamFormat(varargin);
 p.addRequired('inputFile',@(x)(exist(x,'file')));
 p.addParameter('label','radiance',@(x)ischar(x));
 
@@ -55,7 +58,7 @@ label       = p.Results.label;
 thisR       = p.Results.recipe;
 
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
-scalePupilArea      = p.Results.scalepupilarea;
+scalePupilArea        = p.Results.scalepupilarea;
 meanLuminance         = p.Results.meanluminance;
 wave                  = p.Results.wave;
 

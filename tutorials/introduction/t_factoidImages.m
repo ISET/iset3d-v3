@@ -29,9 +29,7 @@
 %      Q. THIS LOOKS LIKE WHAT I EXPECTED FOR THE MATERIAL MAP.  WHAT IS A
 %      MESH?
 %      Q. HOW DO I CONNECT THE INDICATOR WITH THE UNDERLYING DATA STRUCTURE?
-%      I AM NOT SEEING ANY ID IN INDIVIDUAL ASSETS THAT MATCHES UP TO THE
-%      VALUES IN THE MESH MAP.
-%
+
 %   image coordinates - 3d scene coordinates at each pixel.
 %      Q. THESE ARE NOT AS I EXPECTED THEM TO LOOK.  FOR EXAMPLE, I
 %      EXPECTED THE IMAGE OF THE X COORDINATE TO BE MORE OR LESS A LEFT TO
@@ -57,7 +55,7 @@
 %% Initialize ISET and Docker
 %
 % We start up ISET and check that the user is configured for docker.
-clear; close all; ieInit;
+ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Get scene to render
@@ -87,10 +85,6 @@ switch (whichScene)
         % The output will be written here
         outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
         thisR.set('outputFile',outFile);
-        
-        % Save scene
-        piWrite(thisR);
-
     case 'blobbie'
         % Set the input folder name
         %
@@ -128,24 +122,24 @@ switch (whichScene)
         filmresolution = thisR.get('film resolution');
         thisR.set('rays per pixel', raysperpixel/2);
         thisR.set('film resolution',filmresolution/2);
-        
-        %% Save the recipe information
-        %
-        % piWrite_Blender.m is an edited version of piWrite.m
-        % that understands the exporter being set to 'Blender'.
-        piWrite_Blender(thisR);
     otherwise
         error('Unknown scene requested');
 end
+
+%% Save the recipe information
+%
+% piWrite_Blender.m is an edited version of piWrite.m
+% that understands the exporter being set to 'Blender'.
+piWrite_Blender(thisR);
 
 %% Render and display radiance image
 %
 % piRender_Blender.m is an edited version of piRender.m
 % that understands the exporter being set to 'Blender'.
-theScene = piRender(thisR,'render type','radiance');
+theScene = piRender_Blender(thisR,'render type','radiance');
 theScene = sceneSet(theScene,'name','Blender export');
 sceneWindow(theScene);
-sceneSet(theScene, 'render flag', 'hdr');
+sceneSet(theScene,'gamma',0.5);
 
 %% Render depth map and show.
 %
@@ -174,27 +168,12 @@ figure; imshow(materialMap/max(materialMap(:))); title('Material map')
 [meshMap] = piRender(thisR,'renderType','mesh');
 figure; imshow(meshMap/max(meshMap(:))); title('Mesh map');
 fprintf('The image is made up of %d different meshes\n',length(unique(meshMap(:))));
+oneObjectMeshMap = zeros(size(meshMap));
+[m,n] = size(meshMap);
+theMeshIndex = meshMap(round(m/2),round(n/2));
+oneObjectMeshMap(meshMap == theMeshIndex) = 1;
+figure; imshow(oneObjectMeshMap); title('One Mesh');
 
-%% Look at each mesh one by one
-%
-% This pretty much makes sense
-theOneMeshFig = figure;
-theMeshIndices = unique(meshMap(:));
-for ii = 1:length(theMeshIndices)
-    theMeshIndex = theMeshIndices(ii);
-    oneObjectMeshMap = zeros(size(meshMap));
-    oneObjectMeshMap(meshMap == theMeshIndex) = 1;
-    figure(theOneMeshFig); clf;
-    imshow(oneObjectMeshMap); title(sprintf('Mesh %d of %d, index value %d',ii,length(theMeshIndices),theMeshIndex));
-    pause(1);
-end
-
-%% Get an asset
-%
-% Does anything about this connect to the indices in the mesh map?
-% Not obviously.
-thisAssetName = 'figure_3m_O'; 
-theAsset = thisR.get('asset',thisAssetName);
 
 %% Image coordinates
 %
@@ -203,3 +182,5 @@ theAsset = thisR.get('asset',thisAssetName);
 figure; imagesc(coords(:,:,1)); title('X coordinates');
 figure; imagesc(coords(:,:,2)); title('Y coordinates');
 figure; imagesc(coords(:,:,3)); title('Z coordinates');
+
+%%
