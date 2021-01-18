@@ -50,7 +50,7 @@ function [thisR, out] = recipeSet(thisR, param, val, varargin)
 %     'lens file'    - JSON file for omni.  Older models (realistic) use dat-file
 %     'lens radius'  - Only for perspective camera.  Use aperture diameter
 %                      for omni
-%     'aperture diameter'
+%     'aperture diameter' - mm
 %     'fov'
 %     'diffraction'
 %     'chromatic aberration'
