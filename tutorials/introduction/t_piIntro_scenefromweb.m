@@ -54,7 +54,7 @@ pbrtName = 'scene';
 FilePath = fullfile(piRootPath,'local','scenes',sceneName);
 fname = fullfile(FilePath,[pbrtName,'.pbrt']);
 if ~exist(fname,'file'), error('File not found'); end
-exporter = 'Copy';
+exporter = 'C4D';
 thisR = piRead(fname);
 thisR.set('exporter',exporter);
 

@@ -62,7 +62,8 @@ for ii=1:numel(txtLines)
     matName = thisLine{2}; % Material name
     matType = thisLine{4}; % Material type
     newMat = piMaterialCreate(matName, 'type', matType);
-
+    
+    
     % For strings 3 to the end, parse
     for ss = 5:2:numel(thisLine)
         % Get parameter type and name

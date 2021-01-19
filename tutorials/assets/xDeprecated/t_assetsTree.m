@@ -6,12 +6,15 @@ ieInit;
 
 %% 
 t = tree('root');
+% matlab builtin
+t_mat = uitree();
 
 %% Create a 'branch' asset node
 node = piAssetCreate('type', 'branch');
 
 %% Create an 'object' asset node
-object = piAssetCreate('type', 'object');
+% object = piAssetCreate('type', 'object');
+category1 = uitreenode(t_mat,'Text','object','NodeData',[]);
 
 %% Create a 'light' asset node
 light = piAssetCreate('type', 'light');

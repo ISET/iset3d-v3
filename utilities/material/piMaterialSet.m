@@ -32,7 +32,7 @@ function material = piMaterialSet(material, param, val, varargin)
 
 % check the parameter name and type/val flag
 nameTypeVal = strsplit(param, ' ');
-pName    = nameTypeVal{1};
+pName    = lower(nameTypeVal{1});
 
 % Whether it is specified to set a type or a value.
 if numel(nameTypeVal) > 1
@@ -45,14 +45,14 @@ end
 p = inputParser;
 p.addRequired('material', @(x)(isstruct(x)));
 p.addRequired('param', @ischar);
-p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || isbool));
+p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || islogical(x)));
 
 p.parse(material, param, val, varargin{:});
 
 %% if obj is a material struct
 % materialInfo has no meaning
-
-if isfield(material, pName)
+% isfield(material, pName)
+if true
     % Set name or type
     if isequal(pName, 'name') || isequal(pName, 'type')
         material.(pName) = val;
@@ -95,7 +95,7 @@ if isfield(material, pName)
             else
                 material.(pName).type = 'texture';
             end
-        elseif isbool(val)
+        elseif islogical(val)
             material.(pName).type = 'bool';
         end
     end

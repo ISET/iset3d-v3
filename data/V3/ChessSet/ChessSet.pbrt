@@ -7,8 +7,8 @@ Sampler "halton"
  "integer pixelsamples" [32]
 
 Film "image"
- "integer xresolution" [128]
- "integer yresolution" [128]
+ "integer xresolution" [800]
+ "integer yresolution" [800]
 
 Integrator "path"
  "integer maxdepth" [5]
