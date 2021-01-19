@@ -174,7 +174,6 @@ theMeshIndex = meshMap(round(m/2),round(n/2));
 oneObjectMeshMap(meshMap == theMeshIndex) = 1;
 figure; imshow(oneObjectMeshMap); title('One Mesh');
 
-
 %% Image coordinates
 %
 % I don't why these images look the way they do.
@@ -182,5 +181,3 @@ figure; imshow(oneObjectMeshMap); title('One Mesh');
 figure; imagesc(coords(:,:,1)); title('X coordinates');
 figure; imagesc(coords(:,:,2)); title('Y coordinates');
 figure; imagesc(coords(:,:,3)); title('Z coordinates');
-
-%%
