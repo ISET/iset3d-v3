@@ -12,7 +12,7 @@ outfile = p.Results.output;
 %% convert %s mkdir mesh && cd mesh &&
 basecmd = 'docker run -t --volume="%s":"%s" %s pbrt --toply %s';
 [volume, ~, ~]=fileparts(fname);
-dockerimage = 'camerasimulation/pbrt-v3-spectral:distortion';
+dockerimage = 'vistalab/pbrt-v3-spectral:latest';
 % copy .ply files from docker to host
 
 %%
@@ -31,7 +31,7 @@ containerId = containers{9};
 fid = fopen(outfile,'w+');
 fprintf(fid, result);
 fclose(fid);
-for ii = 1:500
+for ii = 1:5000
     cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/mesh_%05d.ply %s',containerId, ii, host_volume);
     [status_copy,~]=system(cpcmd);
     if status_copy
