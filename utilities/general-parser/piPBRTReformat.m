@@ -1,8 +1,8 @@
-function outputFull = piFileReformat(fname,varargin)
+function outputFull = piPBRTReformat(fname,varargin)
 %% format a pbrt file from arbitrary source to standard format
 %
 % Syntax:
-%    outputFull = piFileReformat(fname,varargin)
+%    outputFull = piPBRTReformat(fname,varargin)
 %
 % Brief
 %    PBRT V3 files can appear in many formats.  This function uses the PBRT
@@ -28,7 +28,7 @@ function outputFull = piFileReformat(fname,varargin)
 % Examples:
 %{
 fname = fullfile(piRootPath,'data','V3','SimpleScene','SimpleScene.pbrt');
-pi
+piPBRTReformat(fname);
 %}
 
 %% Parse
@@ -52,8 +52,6 @@ outputFull = p.Results.outputfull;
 % render the data, it just converts it.
 basecmd = 'docker run -t --volume="%s":"%s" %s pbrt --toply %s';
 
-% basecmd = 'docker run -t --volume="%s":"%s" %s pbrt --toply %s > outputFile';
-
 % The directory of the input file
 [volume, ~, ~] = fileparts(fname);
 
@@ -67,8 +65,7 @@ disp(dockercmd)
 
 %% Run the command
 
-% The variable 'result' has the formatted data.  For some reason, PBRT does
-% not output the data directly to files.
+% The variable 'result' has the formatted data.
 [status_convert, result] = system(dockercmd);
 
 if ~status_convert
@@ -88,6 +85,8 @@ if ~status_convert
     % We need the container ID later.  If we only have one container running,
     % this will work.  If we happen to be running multiple containers, that
     % could be a problem.  We can check at some point.
+    %
+    % We should look for the specific container.
     containers  = textscan(containers,'%q');
     containers  = containers{1};
     containerId = containers{9};
@@ -95,8 +94,11 @@ if ~status_convert
     %% Save the reformatted data in 'result'
     
     [outputDir, ~, ~] = fileparts(outputFull);
+    if ~exist(outputDir,'dir')
+        mkdir(outputDir);
+    end
     
-    fid = fopen(outfile,'w+');
+    fid = fopen(outputFull,'w+');
     fprintf(fid, result);
     fclose(fid);
     
@@ -104,7 +106,6 @@ if ~status_convert
     %
     %   docker ls %s:/pbrt/pbrt-v3-spectral/build/mesh_*.ply
     %
-    
     for ii = 1:5000
         cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/mesh_%05d.ply %s',containerId, ii, outputDir);
         [status_copy, ~ ] = system(cpcmd);
@@ -114,7 +115,7 @@ if ~status_convert
             break;
         end
     end
-    fprintf('File is formated as %s \n', outfile);
+    fprintf('Formatted file is in %s \n', outputDir);
     
     % tell user there is something wrong.
 else
@@ -125,9 +126,8 @@ end
 
 %% Either way, stop the container if it is still running.
 
+% Try to get rid of the return from this system command.
 rmCmd = sprintf('docker rm %s',containerId);
-[~, results] = system(rmCmd);
-
-disp(results)
+system(rmCmd);
 
 end
