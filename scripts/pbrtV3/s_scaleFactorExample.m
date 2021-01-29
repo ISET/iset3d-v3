@@ -1,17 +1,19 @@
 %% Test the scale factor parameter in piRender.
 %
 % TL SCIEN 2017
+% DJC Fixed to run with current pi interface 2021
 
 %% Initialize ISET and Docker
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the file
-recipe = piRead(fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt'),'version',3);
+%recipe = piRead(fullfile(piRootPath,'data','V3','teapot','teapot-area-light.pbrt'));
+recipe = piRecipeDefault('scene name','teapot');
 
 %% Add a camera
-recipe.set('camera','realistic');
-recipe.set('lensfile',fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat'));
+%recipe.set('camera','realistic');
+recipe.camera = piCameraCreate('omni','lensFile','dgauss.22deg.3.0mm.json');
 recipe.set('filmdiagonal',35); 
 
 %% Change render quality
