@@ -27,10 +27,15 @@ ieInit;
 % The teapot scene in its original form does not have assets that can be
 % parsed.  So in this case, the 'formatted' output does not have any 'ply'
 % files.
-thisR = piRecipeDefault('scene name','teapot','toply',true);
-thisR.set('film resolution',[300 300]*1.5);
+% thisR = piRecipeDefault('scene name','teapot','toply',true);
+
+fname = fullfile(piRootPath,'data','V3','SimpleScene','SimpleScene.pbrt');
+formattedFname = piPBRTReformat(fname);
+
+thisR = piRead(formattedFname);
+thisR.set('film resolution',[300 200]*1.5);
 thisR.set('rays per pixel',32);
-thisR.set('fov',30);
+thisR.set('fov',45);
 thisR.set('nbounces',5);
 
 piWrite(thisR);
@@ -40,7 +45,7 @@ piWrite(thisR);
 disp('*** Rendering...')
 [scene,result] = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
-scene = sceneSet(scene, 'scene name',name);
+% scene = sceneSet(scene, 'scene name',name);
 
 
 %%

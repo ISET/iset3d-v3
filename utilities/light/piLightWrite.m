@@ -256,7 +256,10 @@ for ii = 1:numel(thisR.lights)
                     rotate = rotate{1};
                 end
                 rot_size = size(rotate);
-                for rr = 1:rot_size(1)
+                if rot_size(1)>rot_size(2)
+                    rotate = rotate';
+                end
+                for rr = 1:3
                     thisRotate = rotate(rr,:);
                     degree = thisRotate(1);
                     if thisRotate(2)==1 

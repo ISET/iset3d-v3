@@ -161,8 +161,10 @@ piWriteCopy(thisR,overwriteresources,overwritepbrtfile)
 if isequal(thisR.get('optics type'),'lens')
     % realisticEye has a lens file slot but it is empty. So we check
     % whether there is a lens file or not.
+    
     if ~isempty(thisR.get('lensfile'))
         piWriteLens(thisR,overwritelensfile);
+        
     end
 end
 
@@ -496,37 +498,40 @@ for ofns = outerFields'
                 % file. Perhaps we should have a better test here, say an
                 % exist() test. (BW).
                 [~,name,ext] = fileparts(currValue);
-
-                if(~isempty(ext))
-                    % This looks like a file with an extension. If it is a
-                    % lens file or an iorX.spd file, indicate that it is in
-                    % the lens/ directory. Otherwise, copy the file to the
-                    % working directory.
-                    
-                    fileName = strcat(name,ext);
-                    if strcmp(ifn,'specfile') || strcmp(ifn,'lensfile')
-                        % It is a lens, so just update the name.  It
-                        % was already copied
-                        % This should work.
-                        % currValue = strcat('lens',[filesep, strcat(name,ext)]);
-                        if ispc()
-                            currValue = strcat('lens/',strcat(name,ext));
+                % only if the file is in lens folder
+                if ~isempty(which(currValue))
+                    if(~isempty(ext))
+                        % This looks like a file with an extension. If it is a
+                        % lens file or an iorX.spd file, indicate that it is in
+                        % the lens/ directory. Otherwise, copy the file to the
+                        % working directory.
+                        
+                        fileName = strcat(name,ext);
+                        if strcmp(ifn,'specfile') || strcmp(ifn,'lensfile')
+                            % It is a lens, so just update the name.  It
+                            % was already copied
+                            % This should work.
+                            % currValue = strcat('lens',[filesep, strcat(name,ext)]);
+                            if ispc()
+                                currValue = strcat('lens/',strcat(name,ext));
+                            else
+                                currValue = fullfile('lens',strcat(name,ext));
+                            end
+                        elseif piContains(ifn,'ior')
+                            % The the innerfield name contains the ior string,
+                            % then we change it to this
+                            currValue = strcat('lens',[filesep, strcat(name,ext)]);
                         else
-                            currValue = fullfile('lens',strcat(name,ext));
+                            [success,~,id]  = copyfile(currValue,workingDir);
+                            if ~success && ~strcmp(id,'MATLAB:COPYFILE:SourceAndDestinationSame')
+                                warning('Problem copying %s\n',currValue);
+                            end
+                            % Update the file for the relative path
+                            currValue = fileName;
                         end
-                    elseif piContains(ifn,'ior')
-                        % The the innerfield name contains the ior string,
-                        % then we change it to this
-                        currValue = strcat('lens',[filesep, strcat(name,ext)]);
-                    else
-                        [success,~,id]  = copyfile(currValue,workingDir);
-                        if ~success && ~strcmp(id,'MATLAB:COPYFILE:SourceAndDestinationSame')
-                            warning('Problem copying %s\n',currValue);
-                        end
-                        % Update the file for the relative path
-                        currValue = fileName;
                     end
                 end
+                   
                                 
             elseif(strcmp(currType,'spectrum') && ~ischar(currValue))
                 % A spectrum of type [wave1 wave2 value1 value2]. TODO:
@@ -593,7 +598,7 @@ if creatematerials
             % materials.
             if piContains(currLine, 'geometry.pbrt')
                     [~,n] = fileparts(thisR.outputFile);
-                    currLine =  sprintf('Include "%s_geometry.pbrt" \n', n);
+                    currLine =  sprintf('Include "%s_geometry.pbrt"', n);
             end
         end
         

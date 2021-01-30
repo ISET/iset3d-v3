@@ -85,6 +85,9 @@ if true
                 else
                     material.(pName).type = 'spectrum';
                 end
+            else
+                % if not a rgb or specrum type, it's a single float.
+                material.(pName).type = 'float';
             end
         elseif ischar(val)
             % It is a file name, so the type has to be spectrum or texture,

@@ -70,45 +70,11 @@ varargin =ieParamFormat(varargin);
 p = inputParser;
 
 p.addRequired('fname', @(x)(exist(fname,'file')));
-p.addParameter('toply', true , @islogical);
 
 p.parse(fname,varargin{:});
-toply  = p.Results.toply;
 thisR = recipe;
-%% Format pbrt files
-[inputdir, inputname, ext]=fileparts(fname);
-if toply
-    formattedDir = fullfile(piRootPath,'local',[inputname,'_formatted']);
-    Formattedfname = fullfile(formattedDir, [inputname, ext]);
-    if ~exist(formattedDir, 'dir')
-        mkdir(formattedDir);
-    end
-    % copy files from data folder to formatted folder
-    copyFolder(inputdir, formattedDir);
-    
-    piFileReformat(fname, 'output', Formattedfname);
-    
-    % in case there are extra materials and geometry files
-    % format scene_materials.pbrt/ scene_geometry.pbrt and save them at the
-    % same place with scene.pbrt
-    inputMaterialfname  = fullfile(inputdir,  [inputname, '_materials', ext]);
-    outputMaterialfname = fullfile(formattedDir, [inputname, '_materials', ext]);
-    inputGeometryfname  = fullfile(inputdir,  [inputname, '_geometry',  ext]);
-    outputGeometryfname = fullfile(formattedDir, [inputname, '_geometry',  ext]);
-    
-    if exist(inputMaterialfname, 'file')
-        piFileReformat(inputMaterialfname, 'output', outputMaterialfname);
-    end
-    
-    if exist(inputGeometryfname, 'file')
-        piFileReformat(inputGeometryfname, 'output', outputGeometryfname);
-    end
-    
-    % send input name to recipe.
-    thisR.inputFile = Formattedfname;
-else
-    thisR.inputFile =fname;
-end
+[~, inputname, ~]=fileparts(fname);
+thisR.inputFile =fname;
 % summary = sprintf('Read summary %s\n',fname);
 
 %% Set the default output directory
@@ -254,7 +220,7 @@ else
     % shape ...
     disp('*** No AttributeBegin/End pair found. Set recipe.assets to empty');
 end
-toc
+
 disp('***Scene parsed.')
 % remove this line after we become more sure that we can deal with scenes
 % which are not exported by C4D.

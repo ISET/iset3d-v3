@@ -28,7 +28,7 @@ function outputFull = piPBRTReformat(fname,varargin)
 % Examples:
 %{
 fname = fullfile(piRootPath,'data','V3','SimpleScene','SimpleScene.pbrt');
-piPBRTReformat(fname);
+formattedFname = piPBRTReformat(fname);
 %}
 
 %% Parse
@@ -40,27 +40,36 @@ varargin = ieParamFormat(varargin);
 % found.
 p = inputParser;
 p.addRequired('fname',@(x)(exist(fname,'file')));
-[~,thisName,ext] = fileparts(fname);
+[inputdir,thisName,ext] = fileparts(fname);
 p.addParameter('outputfull',fullfile(piRootPath,'local','formatted',thisName,[thisName,ext]),@ischar);
 
 p.parse(fname,varargin{:});
 outputFull = p.Results.outputfull;
 
+
+[outputDir, ~, ~] = fileparts(outputFull);
+if ~exist(outputDir,'dir')
+    mkdir(outputDir);
+end
+
+% copy files from input folder to output folder
+copyFolder(inputdir, outputDir);
+
 %% convert %s mkdir mesh && cd mesh &&
 
 % The Docker base command includes 'toply'.  In that case, it does not
 % render the data, it just converts it.
-basecmd = 'docker run -t --volume="%s":"%s" %s pbrt --toply %s';
+basecmd = 'docker run -t --name %s --volume="%s":"%s" %s pbrt --toply %s > %s';
 
 % The directory of the input file
 [volume, ~, ~] = fileparts(fname);
 
 % Which docker image we run
 dockerimage = 'vistalab/pbrt-v3-spectral:latest';
-
+% Give a name to docker container
+dockercontainerName = ['ISET3d-',thisName,'-',num2str(randi(100))];
 %% Build the command
-
-dockercmd = sprintf(basecmd, volume, volume, dockerimage, fname);
+dockercmd = sprintf(basecmd, dockercontainerName, volume, volume, dockerimage, fname, outputFull);
 disp(dockercmd)
 
 %% Run the command
@@ -71,43 +80,13 @@ disp(dockercmd)
 if ~status_convert
     % Status is good.  So do stuff
     
-    % We put this warning in.  We do not want it stored as part of the
-    % conversion, so we erase it.
-    if contains(result, 'Warning: No metadata written out.')
-        result = erase(result, 'Warning: No metadata written out.');
-    end
-    
-    %% Get docker container id
-    
-    % All the running docker containers are listed in containers
-    [~, containers] = system('docker ps -a');
-    
-    % We need the container ID later.  If we only have one container running,
-    % this will work.  If we happen to be running multiple containers, that
-    % could be a problem.  We can check at some point.
-    %
-    % We should look for the specific container.
-    containers  = textscan(containers,'%q');
-    containers  = containers{1};
-    containerId = containers{9};
-    
-    %% Save the reformatted data in 'result'
-    
-    [outputDir, ~, ~] = fileparts(outputFull);
-    if ~exist(outputDir,'dir')
-        mkdir(outputDir);
-    end
-    
-    fid = fopen(outputFull,'w+');
-    fprintf(fid, result);
-    fclose(fid);
-    
     % Would something like this run ?
     %
     %   docker ls %s:/pbrt/pbrt-v3-spectral/build/mesh_*.ply
     %
+    
     for ii = 1:5000
-        cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/mesh_%05d.ply %s',containerId, ii, outputDir);
+        cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/mesh_%05d.ply %s',dockercontainerName, ii, outputDir);
         [status_copy, ~ ] = system(cpcmd);
         if status_copy
             % If it fails we assume that is because there is no corresponding
@@ -127,7 +106,55 @@ end
 %% Either way, stop the container if it is still running.
 
 % Try to get rid of the return from this system command.
-rmCmd = sprintf('docker rm %s',containerId);
+rmCmd = sprintf('docker rm %s',dockercontainerName);
 system(rmCmd);
+%%
+% In case there are extra materials and geometry files
+% format scene_materials.pbrt and scene_geometry.pbrt, then save them at the
+% same place with scene.pbrt
+inputMaterialfname  = fullfile(inputdir,  [thisName, '_materials', ext]);
+outputMaterialfname = fullfile(outputDir, [thisName, '_materials', ext]);
+inputGeometryfname  = fullfile(inputdir,  [thisName, '_geometry',  ext]);
+outputGeometryfname = fullfile(outputDir, [thisName, '_geometry',  ext]);
 
+if exist(inputMaterialfname, 'file')
+    piPBRTReformat(inputMaterialfname, 'outputfull', outputMaterialfname);
+end
+
+if exist(inputGeometryfname, 'file')
+    piPBRTReformat(inputGeometryfname, 'outputfull', outputGeometryfname);
+end
+
+end
+
+
+function copyFolder(inputDir, outputDir)
+    sources = dir(inputDir);
+    status  = true;
+    for i=1:length(sources)
+        if startsWith(sources(i).name(1),'.')
+            % Skip dot-files
+            continue;
+        elseif sources(i).isdir && (strcmpi(sources(i).name,'spds') || strcmpi(sources(i).name,'textures'))
+            % Copy the spds and textures directory files.
+            status = status && copyfile(fullfile(sources(i).folder, sources(i).name), fullfile(outputDir,sources(i).name));
+        else
+            % Selectively copy the files in the scene root folder
+            [~, ~, extension] = fileparts(sources(i).name);
+            if ~(piContains(extension,'pbrt') || piContains(extension,'zip') || piContains(extension,'json'))
+                thisFile = fullfile(sources(i).folder, sources(i).name);
+                fprintf('Copying %s\n',thisFile)
+                status = status && copyfile(thisFile, fullfile(outputDir,sources(i).name));
+            end
+        end
+    end
+    
+    if(~status)
+        error('Failed to copy input directory to docker working directory.');
+    else
+        fprintf('Copied resources from:\n');
+        fprintf('%s \n',inputDir);
+        fprintf('to \n');
+        fprintf('%s \n \n',outputDir);
+    end
 end
