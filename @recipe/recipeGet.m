@@ -31,7 +31,7 @@ function val = recipeGet(thisR, param, varargin)
 %     'rendered dir'      - directory with rendered data
 %     'rendered basename' - basename of rendered dat-file
 %
-%    % Scene properties 
+%    % Scene properties
 %     'exporter'  - Where the scene came from
 %     'mm units'  - Some scenes were given to us in mm, rathern m, units
 %     'depth range'      - Depth range of the scene elements given the
@@ -83,7 +83,7 @@ function val = recipeGet(thisR, param, varargin)
 %      'focus distance'     - Distance to in-focus plane  (m)
 %      'focal distance'     - Used with pinhole, which has infinite depth
 %                             of field, to specify the distance from the
-%                             pinhole and film 
+%                             pinhole and film
 %      'accommodation'      - Inverse of focus distance (diopters)
 %      'fov'                - Field of view (deg)
 %      'aperture diameter'   - For most cameras, but not human eye
@@ -93,7 +93,7 @@ function val = recipeGet(thisR, param, varargin)
 %      'num ca bands'        - Number of chromatic aberration spectral bands
 %
 %    % Film and retina
-%      'film subtype' 
+%      'film subtype'
 %      'film distance'      - PBRT adjusts the film distance so that an
 %                             object at the focus distance is in focus.
 %                             This is that distance. If a pinhole, it might
@@ -104,8 +104,8 @@ function val = recipeGet(thisR, param, varargin)
 %      'film x resolution'  - Number of x dimension samples
 %      'film y resolution'  - Number of y-dimension samples
 %      'film diagonarl'     - Size in mm
-%      
-%   
+%
+%
 %      % Special retinal properties for human eye models
 %      'retina distance'
 %      'eye radius'
@@ -144,7 +144,7 @@ function val = recipeGet(thisR, param, varargin)
 %
 %    % Textures
 %      'texture'
-%      
+%
 %    % Lighting information
 %      'light'
 %
@@ -162,7 +162,7 @@ function val = recipeGet(thisR, param, varargin)
 
 % Programming todo
 %   * Lots of gets needed for the assets, materials, lighting, ...
-%  
+%
 
 %% Parameters
 
@@ -175,15 +175,15 @@ p = inputParser;
 vFunc = @(x)(isequal(class(x),'recipe'));
 p.addRequired('thisR',vFunc);
 p.addRequired('param',@ischar);
-% p.addOptional('material', [], @iscell);
 
 p.parse(thisR,param);
 
 val = [];
 
 %%
+
 switch ieParamFormat(param)  % lower case, no spaces
-    
+   
     % File management
     case 'inputfile'
         % The place where the PBRT scene files start before being modified
@@ -241,6 +241,20 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.camera.mmUnits.value;
         end
         % Scene and camera direction
+    case {'transformtimes'}
+        val = thisR.transformTimes;
+    case {'transformtimesstart'}
+        if isfield(thisR.transformTimes, 'strat')
+            val = thisR.transformTimes.start;
+        else
+            val = [];
+        end
+    case {'transformtimesend'}
+        if isfield(thisR.transformTimes, 'end')
+            val = thisR.transformTimes.end;
+        else
+            val = [];
+        end        
     case 'objectdistance'
         % thisR.get('object distance',units)
         diff = thisR.lookAt.from - thisR.lookAt.to;
@@ -320,6 +334,23 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.camera.shutterclose.value - thisR.camera.shutteropen.value;
         catch
             val = 1;  % 1 sec is the default.  Too long.
+        end
+    case {'shutteropen'}
+        % thisR.get('shutter open');   % Time in sec
+        try
+            val = thisR.camera.shutteropen.value;
+        catch
+            val = 0;
+        end
+        
+    case {'shutterclose'} 
+        % thisR.get('shutter close');  % Time in sec
+        % When not set, the exposure duration is 1 sec and open,close are
+        % [0,1]
+        try
+            val = thisR.camera.shutterclose.value;
+        catch
+            val = 1;
         end
         
         % Lens and optics
@@ -551,7 +582,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         
     case {'eyeradius','retinaradius'}
         % thisR.get('eye radius','m');
-        % Default storage in mm.  
+        % Default storage in mm.
         %
         % Originally called retina radius, but it really is the
         % radius of the eye ball, not the retina.
@@ -602,7 +633,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         %
         % See the PPT about the eyeball geometry, defining the retina
         % radius, distance, and semidiam
-       
+        
         eyeRadius     = thisR.get('retina radius','mm');
         focalDistance = thisR.get('retina distance','mm');
         d = focalDistance - eyeRadius;
@@ -667,7 +698,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     % There is no FOV. We hneed a film distance and size to
                     % know the FOV.  With no film distance, we are in
                     % trouble.  So, we set an arbitrary distance and tell
-                    % the user to fix it. 
+                    % the user to fix it.
                     filmDistance = 3*filmDiag;  % Just made that up.
                     thisR.set('film distance',filmDistance);
                     warning('Set film distance  to %f (arbitrarily)',filmDistance);
@@ -739,7 +770,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = thisR.camera.diffractionEnabled.value;
         end
         if isequal(val,'true'), val = true; else, val = false; end
-
+        
     case 'chromaticaberration'
         % thisR.get('chromatic aberration')
         % True or false (on or off)
@@ -845,30 +876,262 @@ switch ieParamFormat(param)  % lower case, no spaces
         val.film   = thisR.film;
         val.filter = thisR.filter;
         
-    case{'materials'}
-        if isfield(thisR.materials, 'list')
-            val = thisR.materials.list;
-        else
-            % Should this be just empty, or an empty cell?
-            val = {};
+        % Materials.  Still needs work, but exists (BW).
+    case {'materials', 'material'}
+        % thisR.Get('material',matName,property)
+        %
+        % thisR = piRecipeDefault('scene name','SimpleScene');
+        % materials = thisR.get('materials');
+        % thisMat   = thisR.get('material', 'BODY');
+        % nameCheck = thisR.get('material', 'uber', 'name');
+        % kd     = thisR.get('material', 'uber', 'kd');
+        % kdType = thisR.get('material', 'uber', 'kd type');
+        % kdVal  = thisR.get('material', 'uber', 'kd value');
+        %
+        % Get a  property from a material or a material property named in
+        % this recipe. 
+
+        if isempty(varargin)
+            % Return the whole material list
+            if isfield(thisR.materials, 'list')
+                val = thisR.materials.list;
+            else
+                % Should this be just empty, or an empty cell?
+                warning('No material in this recipe')
+                val = {};
+            end
+            return;
         end
-    case {'materialsoutputfile'}
-        val = thisR.materials.outputfile;
         
+        switch ieParamFormat(varargin{1})
+            % Special cases
+            case 'names'
+                % thisR.get('material','names');
+                n = numel(thisR.materials.list);
+                val = cell(1,n);
+                for ii=1:n
+                    val{ii} = thisR.materials.list{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the material name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.materials.list)
+                    % Search by index.  Get the material directly.
+                    matIdx = varargin{1};
+                    thisMat = thisR.materials.list{matIdx};
+                elseif isstruct(varargin{1})
+                    % The user sent in the material.  We hope.
+                    % We should have a slot in material that identifies itself as a
+                    % material.  Maybe a test like "material.type ismember valid
+                    % materials."
+                    thisMat = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisMat] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                    val = thisMat;
+                end
+                
+                if isempty(thisMat)
+                    warning('Could not find material. Return.')
+                    return;
+                end
+                if numel(varargin) >= 2
+                    % Return the material property
+                    % thisR.get('material', material/idx/name, property)
+                    % Return the material property
+                    val = piMaterialGet(thisMat, varargin{2});
+                end
+        end                        
+        
+    case {'nmaterial', 'nmaterials', 'materialnumber', 'materialsnumber'}
+        % thisR.get('n materials')
+        % Number of materials in this scene.
+        if isfield(thisR.materials, 'list')
+            val = numel(thisR.materials.list);
+        else
+            val = 0;
+        end        
+    case {'materialsprint','printmaterials', 'materialprint', 'printmaterial'}
+        % thisR.get('materials print');
+        %
+        % These are the materials that are named in the tree hierarchy.        
+        piMaterialList(thisR);
+    case {'materialsoutputfile'}
+        % Unclear why this is still here.  Probably deprecated.
+        val = thisR.materials.outputfile;
+    case {'objectmaterial','materialobject'}
+        % val = thisR.get('object material');
+        %
+        % Cell arrays of object names and corresponding material
+        % names.
+        %
+        % We do not use findleaves because sometimes tree class
+        % thinks what we call is a branch is a leaf because,
+        % well, we don't put an object below a branch node.  We
+        % should trim the tree of useless branches (any branch
+        % that has no object beneath it). Maybe.  (BW).
+        ids = thisR.get('objects');
+        leafMaterial = cell(1,numel(ids));
+        leafNames = cell(1,numel(ids));
+        cnt = 1;
+        for ii=ids
+            thisAsset = thisR.get('asset',ii);
+            leafNames{cnt} = thisAsset.name;
+            leafMaterial{cnt} = piAssetGet(thisAsset,'material name');
+            cnt = cnt + 1;
+        end
+        val.leafNames = leafNames;
+        val.leafMaterial = leafMaterial;
+    case {'objects'}
+        % Indices to the objects
+        nnodes = thisR.assets.nnodes;
+        val = [];
+        for ii=1:nnodes
+            thisNode = thisR.assets.Node{ii};
+            if isfield(thisNode,'type') && isequal(thisNode.type,'object')
+                val = [val,ii]; %#ok<AGROW>
+            end
+        end
+    case {'objectnames'}
+        % Names of the objects
+        ids = thisR.get('objects');
+        names = thisR.assets.names;
+        val = cell(1,numel(ids));
+        for ii = 1:numel(ids)
+            val{ii} = names{ids(ii)};
+        end
+        
+        % Getting ready for textures
     case{'texture'}
         if isfield(thisR.textures, 'list')
             val = thisR.textures.list;
         else
             val = {};
         end
+        
+        % Getting read for lights
     case{'light'}
         val = thisR.light;
+                    
+    % Asset specific gets - more work needed here.
+    case {'asset', 'assets'}
+        % thisR.get('asset',assetName or ID);  % Returns the asset
+        % thisR.get('asset',assetName,param);  % Returns the param val
         
-        % Assets - more work needed here.
+        [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
+        if isempty(id), error('Could not find asset %s\n',varargin{1}); end
+        if length(varargin) == 1
+            val = thisAsset;
+            return;
+        else 
+            if strncmp(varargin{2},'material',8)
+                [~,material] = piMaterialFind(thisR.materials.list,...
+                    'name',thisAsset.material.namedmaterial);
+            end
+            switch ieParamFormat(varargin{2})
+                case 'id'
+                    val = id;
+                case 'subtree'
+                    % thisR.get('asset', assetName, 'subtree');
+                    val = thisR.assets.subtree(id);
+                case {'nodetoroot','pathtoroot'}
+                    % thisR.get('asset',assetName,'leaf to root');
+                    % Sequence of ids from the leaf to root
+                    % We should check that id is a leaf??? (BW)
+                    val = thisR.assets.nodetoroot(id);
+                    
+                    % Get material properties from this asset
+                case 'material'
+                    % thisR.get('asset',assetName,'material');
+                    val = material;
+                case 'materialname'
+                    val = material.name;
+                case 'materialtype'
+                    val = material.type;
+                    % Leafs (objects) in the tree.
+                
+                    % World position and orientation properties.
+                case 'worldrotationmatrix'
+                    %{
+                    % Should allow branch node as well.
+                    if ~thisR.assets.isleaf(id)
+                        warning('Only leaves have rotations')
+                    else
+                    %}
+                    % Deleted a lot of code comments from here 12/24 (BW).
+                    nodeToRoot = thisR.assets.nodetoroot(id);
+                    [val, ~] = piTransformWorld2Obj(thisR, nodeToRoot);
+                    %{
+                    % Can we delete?
+                    rotY = -atan2d(curXYZ(3, 1), curXYZ(1, 1)); % az
+                    rotZ = atan2d(curXYZ(2, 1), sqrt(curXYZ(1, 1)^2+curXYZ(3, 1)^2)); % el
+                    rotX = -atan2d(curXYZ(2, 3), sqrt(curXYZ(1, 3)^2 + curXYZ(3, 3)^2)); % az
+                    a = 1;
+                    %}
+                case 'worldrotationangle'
+                    rotM = thisR.get('asset', id, 'world rotation matrix');
+                    val = piTransformRotM2Degs(rotM);
+                case {'worldtranslation', 'worldtranslationmatrix'}
+                    %{
+                    % Should allow branch node as well.
+                    if ~thisR.assets.isleaf(id)
+                        warning('Only leaves have positions')
+                    else
+                    %}
+                        % Deleted a lot of code comments from here 12/24 (BW).
+                        nodeToRoot = thisR.assets.nodetoroot(id);                        
+                        [~, val] = piTransformWorld2Obj(thisR, nodeToRoot);
+                    
+                case 'worldposition'
+                    % thisR.get('asset',idOrName,'world position')
+                    val = thisR.get('asset', id, 'world translation');
+                    val = val(1:3, 4)';
+                case 'translation'
+                    % Translation is always in the branch, not in the
+                    % leaf.
+                    if thisR.assets.isleaf(id)
+                        parentID = thisR.get('asset parent id', id);
+                        val = thisR.get('asset', parentID, 'translation');
+                    else
+                        val = piAssetGet(thisAsset, 'translation');
+                    end
+                otherwise                    
+                    val = piAssetGet(thisAsset,varargin{2});
+            end
+        end
+    case {'assetid'}
+        % thisR.get('asset id',assetName);  % ID from name
+        val = piAssetFind(thisR.assets,'name',varargin{1});
     case {'assetroot'}
-        % The root of all assets
-        val = thisR.assets;
-        
+        % The root of all assets just has a name, not properties.
+        val = thisR.assets.get(1);
+    case {'assetnames'}
+        % The names without the XXXID_ prepended
+        val = thisR.assets.stripID;
+    case {'assetparentid'}
+        % thisR.get('asset parent id',assetName or ID);
+        %
+        % Returns the id of the parent node
+        thisNode = varargin{1};
+        if isstruct(thisNode)
+            thisNodeID = piAssetFind(thisR.assets,'name',thisNode.name);
+        elseif ischar(thisNode)
+            % It is a name, get the ID
+            thisNodeID = piAssetFind(thisR.assets,'name',thisNode);
+        elseif isnumeric(thisNode)
+            thisNodeID = thisNode;
+        end
+        val = thisR.assets.getparent(thisNodeID);
+    case {'assetparent'}
+        % thisR.get('asset parent',assetName)
+        %
+        thisNode = varargin{1};
+        parentNode = thisR.get('asset parent id',thisNode);
+        val = thisR.assets.Node{parentNode};   
+
+        % Delete this stuff when we get ready to merge.
+        %{
     case {'groupnames'}
         % Cell array (2D) of the groupobj names
         % val{level}{idx}
@@ -926,7 +1189,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         % Find the group and child
         val = thisG(idx(2)).children(idx(3));
-        
+        %}
+
     otherwise
         error('Unknown parameter %s\n',param);
 end

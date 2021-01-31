@@ -1,40 +1,112 @@
-function thisR = piMaterialSet(thisR, materialIdx, param, val, varargin)
-%% Set the material properties
+function material = piMaterialSet(material, param, val, varargin)
+%% 
 %
 % Synopsis
-%    thisR = piMaterialSet(thisR, materialIdx, param, val, varargin)
+%    material = piMaterialSet(material, param, val, varargin)
 %
-% Description
-%   Set one of the material properties.  Works only for recipe version 2
+% Brief description
+%   Set one of the material properties.
 %
 % Inputs:
-%    thisR
-%    materialIdx
-%    param
-%    val
+%   material    - material struct.
+%   param       - material property
+%   val         - property value
 %
 % Optional key/value pairs
+%   type        - property type
+%   val         - property val
 %
 % Returns
-%   (thisR) modified recipe
+%   material    -  modified material struct
 %
 % See also
 %   piMaterialGet, piMaterial*
 
+% Examples:
+%{
+    mat = piMaterialCreate('new material', 'kd', [400 1 800 1]);
+    mat = piMaterialSet(mat, 'kd val', [1 1 1]);
+%}
 
 %% Parse inputs
-param = ieParamFormat(param);
+
+% check the parameter name and type/val flag
+nameTypeVal = strsplit(param, ' ');
+pName    = nameTypeVal{1};
+
+% Whether it is specified to set a type or a value.
+if numel(nameTypeVal) > 1
+    pTypeVal = nameTypeVal{2};
+else
+    % Set a whole struct
+    pTypeVal = '';
+end
 
 p = inputParser;
-p.addRequired('recipe', @(x)(isa(x, 'recipe')));
-p.addRequired('materialIdx');
+p.addRequired('material', @(x)(isstruct(x)));
 p.addRequired('param', @ischar);
-p.addRequired('val');
+p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || isbool));
 
-% varargin is not parsed. Due to multiple fluorophores. See below
-p.parse(thisR, materialIdx, param, val); 
-idx = p.Results.materialIdx;
+p.parse(material, param, val, varargin{:});
 
+%% if obj is a material struct
+% materialInfo has no meaning
+
+if isfield(material, pName)
+    % Set name or type
+    if isequal(pName, 'name') || isequal(pName, 'type')
+        material.(pName) = val;
+        return;
+    end
+    
+    % Set a whole struct
+    if isempty(pTypeVal)
+        material.(pName) = val;
+        return;
+    end
+    
+    % Set parameter type
+    if isequal(pTypeVal, 'type')
+        material.(pName).type = type;
+        return;
+    end
+    
+    % Set parameter value
+    if isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
+        material.(pName).value = val;
+
+        % Changing property type if the user doesn't specify it.
+        if isnumeric(val)
+            if numel(val) == 3
+                material.(pName).type = 'rgb';
+            elseif numel(val) > 3
+                if piMaterialISEEM(val)
+                    material.(pName).type = 'photolumi';
+                else
+                    material.(pName).type = 'spectrum';
+                end
+            end
+        elseif ischar(val)
+            % It is a file name, so the type has to be spectrum or texture,
+            % depending on the extension
+            [~, ~, e] = fileparts(val); % Check extension
+            if isequal(e, '.spd')
+                material.(pName).type = 'spectrum';
+            else
+                material.(pName).type = 'texture';
+            end
+        elseif isbool(val)
+            material.(pName).type = 'bool';
+        end
+    end
+else
+    warning('Parameter: %s does not exist in material type: %s',...
+                pName, material.type);
+end
+
+%%
+% NOTE: keep it longer for a while
+%{
 %% Conditions where we need to convert spectrum from numeric to char
 if piContains(param, ['spectrum', 'rgb', 'color']) && isnumeric(val)
     val = strrep(strcat('[', num2str(val), ']'), ' ', ' ');
@@ -42,15 +114,13 @@ end
 
 %% Check recipe version
 
-% Only works for recipeVer = 2.
-
 %% Do the set
 switch param
     case 'fluorophoreeem'
         fluorophoresName = val;
         if isempty(fluorophoresName)
-            thisR.materials.list{idx}.photolumifluorescence = '';
-            thisR.materials.list{idx}.floatconcentration = [];
+            obj.materials.list{idx}.photolumifluorescence = '';
+            obj.materials.list{idx}.floatconcentration = [];
         else
             wave = 365:5:705; % By default it is the wavelength range used in pbrt
 
@@ -65,69 +135,69 @@ switch param
             % The data are converted to a vector like this
             flatEEM = eem';
             vec = [wave(1) wave(2)-wave(1) wave(end) flatEEM(:)'];
-            thisR.materials.list{idx}.photolumifluorescence = vec;
+            obj.materials.list{idx}.photolumifluorescence = vec;
         end
     case 'fluorophoreconcentration'
-        thisR.materials.list{idx}.floatconcentration = val;
+        obj.materials.list{idx}.floatconcentration = val;
     case 'delete'
         % Delete one of the field in this material struct
-        if isfield(thisR.materials.list{idx}, val)
-            thisR.materials.list{idx} = rmfield(thisR.materials.list{idx}, val);
+        if isfield(obj.materials.list{idx}, val)
+            obj.materials.list{idx} = rmfield(obj.materials.list{idx}, val);
         end
     otherwise
         % Set the rgb or spetrum value.  We should check that the param is
         % a valid field from below.
-        thisR.materials.list{idx}.(param) = val;
+        obj.materials.list{idx}.(param) = val;
         
         % Clean up the unnecessary color fields 
         if strncmp(param,'texture',7)
             % if a texture do this
             switch param(end-2:end)
                 case 'kd'
-                    piMaterialSet(thisR, idx, 'delete', 'rgbkd');
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
-                    piMaterialSet(thisR, idx, 'delete', 'colorkd');
+                    piMaterialSet(obj, idx, 'delete', 'rgbkd');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumkd');
+                    piMaterialSet(obj, idx, 'delete', 'colorkd');
                 case 'ks'
-                    piMaterialSet(thisR, idx, 'delete', 'rgbks');
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumks');
-                    piMaterialSet(thisR, idx, 'delete', 'colorks');
+                    piMaterialSet(obj, idx, 'delete', 'rgbks');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumks');
+                    piMaterialSet(obj, idx, 'delete', 'colorks');
                 case 'kr'
-                    piMaterialSet(thisR, idx, 'delete', 'rgbkr');
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
-                    piMaterialSet(thisR, idx, 'delete', 'colorkr');
+                    piMaterialSet(obj, idx, 'delete', 'rgbkr');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumkr');
+                    piMaterialSet(obj, idx, 'delete', 'colorkr');
             end
         else
             % otherwise not a texture so do this
             switch param
                 case 'spectrumkd'
-                    piMaterialSet(thisR, idx, 'delete', 'rgbkd');
-                    piMaterialSet(thisR, idx, 'delete', 'colorkd');
+                    piMaterialSet(obj, idx, 'delete', 'rgbkd');
+                    piMaterialSet(obj, idx, 'delete', 'colorkd');
                 case 'rgbkd'
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
-                    piMaterialSet(thisR, idx, 'delete', 'colorkd');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumkd');
+                    piMaterialSet(obj, idx, 'delete', 'colorkd');
                 case 'colorkd'
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumkd');
-                    piMaterialSet(thisR, idx, 'delete', 'rgbkd');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumkd');
+                    piMaterialSet(obj, idx, 'delete', 'rgbkd');
                 case 'spectrumks'
-                    piMaterialSet(thisR, idx, 'delete', 'rgbks');
-                    piMaterialSet(thisR, idx, 'delete', 'colorks');
+                    piMaterialSet(obj, idx, 'delete', 'rgbks');
+                    piMaterialSet(obj, idx, 'delete', 'colorks');
                 case 'rgbks'
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumks');
-                    piMaterialSet(thisR, idx, 'delete', 'colorks');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumks');
+                    piMaterialSet(obj, idx, 'delete', 'colorks');
                 case 'colorks'
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumks');
-                    piMaterialSet(thisR, idx, 'delete', 'rgbks');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumks');
+                    piMaterialSet(obj, idx, 'delete', 'rgbks');
                 case 'spectrumkr'
-                    piMaterialSet(thisR, idx, 'delete', 'rgbkr');
-                    piMaterialSet(thisR, idx, 'delete', 'colorkr');
+                    piMaterialSet(obj, idx, 'delete', 'rgbkr');
+                    piMaterialSet(obj, idx, 'delete', 'colorkr');
                 case 'rgbkr'
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
-                    piMaterialSet(thisR, idx, 'delete', 'colorkr');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumkr');
+                    piMaterialSet(obj, idx, 'delete', 'colorkr');
                 case 'colorkr'
-                    piMaterialSet(thisR, idx, 'delete', 'spectrumkr');
-                    piMaterialSet(thisR, idx, 'delete', 'rgbkr');
+                    piMaterialSet(obj, idx, 'delete', 'spectrumkr');
+                    piMaterialSet(obj, idx, 'delete', 'rgbkr');
             end
         end
 end
-
+%}
 end

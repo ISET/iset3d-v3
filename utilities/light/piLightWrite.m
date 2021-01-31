@@ -1,4 +1,4 @@
-function piLightWrite(thisR)
+function lightSourceText = piLightWrite(thisR, varargin)
 % Write a file with the lights for this recipe
 %
 % Synopsis
@@ -31,9 +31,14 @@ function piLightWrite(thisR)
 %}
 
 %% parse inputs
+varargin = ieParamFormat(varargin);
+
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
-p.parse(thisR);
+p.addParameter('writefile', true);
+p.parse(thisR, varargin{:});
+
+writefile = p.Results.writefile;
 
 %% Write out light sources one by one
 lightSourceText = cell(1, numel(thisR.lights));
@@ -44,9 +49,7 @@ for ii = 1:numel(thisR.lights)
     thisLightSource = thisR.lights{ii};
     if isfield(thisLightSource, 'type'), type = thisLightSource.type;
     else, type = 'point'; end
-    
-
-    
+   
     if isfield(thisLightSource, 'from'), from = thisLightSource.from;
     else, from = [0 0 0]; end
     
@@ -85,7 +88,8 @@ for ii = 1:numel(thisR.lights)
     if isfield(thisLightSource, 'line'), line = thisLightSource.line;
     else, line = {}; end
     
-    % This is the parameter especially used by infinite light
+    % This is the parameter especially used by infinite light and area
+    % light
     if isfield(thisLightSource, 'nsamples'), nsamples = thisLightSource.nsamples;
     else, nsamples = 16; end
     
@@ -98,6 +102,24 @@ for ii = 1:numel(thisR.lights)
         end
     else
         twosided = 'false';
+    end
+    
+    if isfield(thisLightSource, 'rotate')
+        rotate = thisLightSource.rotate;
+    else
+        rotate = [];
+    end
+    
+    if isfield(thisLightSource, 'position')
+        position = thisLightSource.position;
+    else
+        position = [];
+    end
+    
+    if isfield(thisLightSource, 'shape') && ~isempty(thisLightSource.shape)
+        shape = thisLightSource.shape;
+    else
+        shape = [];
     end
     
     %% Write out lightspectrum to the file
@@ -210,23 +232,46 @@ for ii = 1:numel(thisR.lights)
                 lightSourceText{ii}.line{pos} = sprintf('LightSource "infinite" "string mapname" "%s" "integer nsamples" [%d]', mapname, nsamples);
             end
         case 'area'
-            lightSourceText{ii}.line = line;
-            lightSourceText{ii}.line{pos} = sprintf('AreaLightSource "diffuse" "%s L" %s "bool twosided" "%s" "integer nsamples" [%d]',...
-                spectrumType, lightSpectrum, twosided, nsamples);
+            % lightSourceText{ii}.line = line;
+            % lightSourceText{ii}.line{pos} = sprintf('AreaLightSource "diffuse" "%s L" %s "bool twosided" "%s" "integer nsamples" [%d]',...
+            %     spectrumType, lightSpectrum, twosided, nsamples);
+            lightSourceText{ii}.line{1} = 'AttributeBegin';
+            if ~isempty('position')
+                lightSourceText{ii}.line{end+1} = sprintf('Translate %.3f %.3f %.3f\n',...
+                        position(1), position(2), position(3));
+            end
+            if ~isempty('rotate')
+                lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f %.3f %.3f %.3f \n',...
+                                                    rotate(:,1)); % Z
+                lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f %.3f %.3f %.3f \n',...
+                                                    rotate(:,2)); % Y
+                lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f %.3f %.3f %.3f \n',...
+                                                    rotate(:,3)); % X                                               
+            end
+            % Add light properties
+            lightSourceText{ii}.line{end+1} = sprintf('AreaLightSource "diffuse" "%s L" %s "bool twosided" "%s" "integer nsamples" [%d]',...
+                         spectrumType, lightSpectrum, twosided, nsamples);
+            % Add shape information
+            if ~isempty('shape')
+                lightSourceText{ii}.line{end+1} = piShape2Text(shape);
+            end
             
+            lightSourceText{ii}.line{end+1} = 'AttributeEnd';
     end
 end
 
-%% Write to scene_lights.pbrt file
-[workingDir, n] = fileparts(thisR.outputFile);
-fname_lights = fullfile(workingDir, sprintf('%s_lights.pbrt', n));
+if writefile
+    %% Write to scene_lights.pbrt file
+    [workingDir, n] = fileparts(thisR.outputFile);
+    fname_lights = fullfile(workingDir, sprintf('%s_lights.pbrt', n));
 
-fid = fopen(fname_lights, 'w');
-fprintf(fid, '# Exported by piLightWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
+    fid = fopen(fname_lights, 'w');
+    fprintf(fid, '# Exported by piLightWrite on %i/%i/%i %i:%i:%0.2f \n',clock);
 
-for ii = 1:numel(lightSourceText)
-    for jj = 1:numel(lightSourceText{ii}.line)
-        fprintf(fid, '%s \n',lightSourceText{ii}.line{jj});
+    for ii = 1:numel(lightSourceText)
+        for jj = 1:numel(lightSourceText{ii}.line)
+            fprintf(fid, '%s \n',lightSourceText{ii}.line{jj});
+        end
     end
 end
 end

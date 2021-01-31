@@ -1,11 +1,26 @@
 function piMaterialWrite(thisR)
-% Write the material file from PBRT V3, as input from Cinema 4D
+%%
+% Synopsis:
+%   piMaterialWrite(thisR)
 %
-% The main scene file (scene.pbrt) includes a scene_materials.pbrt
-% file.  This routine writes out the materials file from the
-% information in the recipe.
+% Brief description:
+%   Write material and texture information in material pbrt file.
+%
+% Inputs:
+%   thisR   - recipe.
+%
+% Outputs:
+%   None
+%
+% Description:
+%   Write the material file from PBRT V3, as input from Cinema 4D
+%
+%   The main scene file (scene.pbrt) includes a scene_materials.pbrt
+%   file.  This routine writes out the materials file from the
+%   information in the recipe.
 %
 % ZL, SCIEN STANFORD, 2018
+% ZLY, SCIEN STANFORD, 2020
 
 %%
 p = inputParser;

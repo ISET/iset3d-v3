@@ -1,5 +1,8 @@
 %% Test a pbrtv3 scene with material property modified.
 %
+% Deprecated
+% 
+%
 % Creates an image with glass and a mirror and text and some objects.
 % The materials are pulled in from Cinema 4D.  They can be edited for
 % specularity and diffusivity and type.  More explanation of this will

@@ -1,67 +1,93 @@
-function asset = piAssetTranslate(asset, translation,varargin)
-% Translation for an array of assets
+function newBranch = piAssetTranslate(thisR, assetInfo, translation,varargin)
+%% Translate an asset
 %
-% Synopsis
-%   asset = piAssetTranslate(asset, translation,varargin)
+% Synopsis:
+%   newBranch = piAssetTranslate(thisR, assetInfo, translation, varargin)
 %
-% Brief description
-%   Translate the position of an array of assets
+% Description:
+%   Translate an asset.
 %
-% Input
-%   asset
-%   translation
+%   If the asset is a branch node, translate it.
 %
-% Optional key/value pair
-%   instances num
+%   If the asset is an object or light, insert a branch node representing 
+%   translation between the node and its parent.
 %
-% Return
-%   asset - the modified asset
+% Inputs:
+%   thisR       - recipe
+%   assetInfo   - asset node name or id
+%   translation - translation vector
 %
-% Description
-%  When an asset (say a car) comes from the database, the positive x is
-%  the heading direction.  The default center of the car is 0 0 0.  If
-%  the position slot of the asset is not present, we assume the value
-%  is [0,0,0].   (Need better comment here).
-%
-% ZL, Vistasoft Team, 2018
+% Outputs:
+%   newBranch   - the newly inserted branch
 %
 % See also
 %   piAsset*
 %
-% TODO:  
-%   Why is translate a cell array instead of a vector?
-%   We need piAssetGet, piAssetSet.  And this should be called by
-%
-%     piAssetSet(thisR,idx,'translate',tVector);
-%
-%
 
-%%
-varargin = ieParamFormat(varargin);
+% History:
+%   ZL, Vistasoft Team, 2018
+%   ZLY, Vistasoft Team, 2020
+%
+%   01/05/21  dhb  Put comments closer to ISETBio standard form.
+%                  Little bit of commenting
+%                  Fix example so it runs
 
+
+% Examples:
+%{
+thisR = piRecipeDefault('scene name', 'Simple scene');
+disp(thisR.assets.tostring)
+
+thisR.set('asset', '004ID_Sky1_L', 'translate', [1, 1, 1]);
+disp(thisR.assets.tostring)
+%}
+
+%% Parse input
 p = inputParser;
-p.addParameter('instancesnum',1)
-p.parse(varargin{:})
+p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
+p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
+p.addRequired('translation', @isvector);
+p.parse(thisR, assetInfo, translation, varargin{:})
 
-pos_d = p.Results.instancesnum;   % The variable name is confusing (BW)
-%% 
-for dd = 1:pos_d
-    for ii=1:length(asset)
-        % Add the translation
-        if ~isempty(translation{dd})
-            translation{dd} = reshape(translation{dd},3,1);
-        else
-            translation{dd} = [0;0;0];
-        end
-        asset(ii).position(:,dd) = asset(ii).position(:,dd) + translation{dd};
-        
-        %{
-        % Update the position of the x-z 2d box of the asset that we use
-        % for machine learning identification.
-        %     asset(ii).size.pmin = asset(ii).size.pmin + [translation(1) translation(3)];
-        %     asset(ii).size.pmax = asset(ii).size.pmax + [translation(1) translation(3)];
-        %}
-        
+%% If assetInfo is a node name, find the id
+if ischar(assetInfo)
+    assetName = assetInfo;
+    assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
+    if isempty(assetInfo)
+        warning('Couldn not find an asset with name %s:', assetName);
+        return;
     end
 end
+
+%% Get asset node
+thisNode = thisR.assets.get(assetInfo);
+if isempty(thisNode)
+    warning('Couldn not find an asset with name %d:', assetInfo);
+    return;
+end
+
+%% Put translation onto a new branch node
+newBranch = piAssetCreate('type', 'branch');
+newBranch.name = strcat(thisR.assets.stripID(assetInfo), '_', 'T');
+newBranch.translation = reshape(translation, 1, 3);
+
+if isequal(thisNode.type, 'branch')
+    % If the node is branch
+    % Get the children id of thisNode
+    childID = thisR.assets.getchildren(assetInfo);
+    
+    % Add the new node as child of thisNode
+    thisR.set('asset', thisNode.name, 'add', newBranch);
+    
+    % Set the parent of children of thisNode be the newBranch
+    for ii=1:numel(childID)
+        thisR.set('asset', childID(ii), 'parent',...
+                thisR.get('asset', thisR.assets.nnodes, 'name'));
+    end
+else
+    % Node is object or light
+    % Insert the newBranch node under its parent
+    thisR.set('asset', assetInfo, 'insert', newBranch);
+end
+
 end

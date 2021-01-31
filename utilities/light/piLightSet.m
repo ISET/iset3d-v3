@@ -1,12 +1,13 @@
-function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
+function obj = piLightSet(obj, lightIdx, param, val, varargin)
 % Set a light source parameter
 %
 % Synopsis
 %  thisR = piLightSet(thisR, lightIdx, param, val, varargin)
 %
 % Inputs
-%   thisR:    Recipe containing a lightSource cell array
-%   lightIdx: Index into which light in the cell array
+%   obj:    Recipe containing a lightSource cell array / A light struct
+%   lightIdx: Index into which light in the cell array / [] if obj is a
+%             light struct
 %   param:    The parameter to set
 %   val:      The new value
 %
@@ -103,27 +104,36 @@ function thisR = piLightSet(thisR, lightIdx, param, val, varargin)
     sceneWindow(scene);
 %}
 
+%{
+    light = piLightCreate;
+    thisR = piLightSet(light, [], 'light spectrum', 'D50')
+%}
 %% Parse inputs
 param = ieParamFormat(param);
 varargin = ieParamFormat(varargin);
 
 p  = inputParser;
-p.addRequired('recipe', @(x)(isa(x, 'recipe')));
-p.addRequired('lightIdx');
+p.addRequired('recipe', @(x)(isa(x, 'recipe') || isa(x, 'struct')));
+p.addRequired('lightIdx', @isnumeric);
 p.addRequired('param', @ischar);
 p.addRequired('val');
 
-p.parse(thisR, lightIdx, param, val, varargin{:});
+p.parse(obj, lightIdx, param, val, varargin{:});
 idx = p.Results.lightIdx;
 
-if isfield(thisR.lights{idx}, param)
-    if isnumeric(val) && isequal(size(val), [3 1])
-        val = val';
+if isa(obj, 'recipe')
+    obj.lights{idx} = piLightSet(obj.lights{idx}, [], param, val);
+
+elseif isa(obj, 'struct')
+    if isfield(obj, param)
+        if isnumeric(val) && isequal(size(val), [3 1])
+            val = val';
+        end
+        obj.(param) = val;
+    else
+        obj.(param) = val;
+        warning('Parameters: "%s" not in current fields of light type: "%s". Adding', param, obj.type)
     end
-    thisR.lights{idx}.(param) = val;
-else
-    thisR.lights{idx}.(param) = val;
-    warning('Parameters: "%s" not in current fields of light type: "%s". Adding', param, thisR.lights{idx}.type)
 end
 
 %%

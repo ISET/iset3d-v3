@@ -121,6 +121,9 @@ catch
     thisR.set('film diagonal',1);
 end
 
+%% Extract transform time block
+thisR.transformTimes = piBlockExtract(txtLines, 'blockName', 'TransformTimes', 'exporter', thisR.exporter);
+
 %% Extract surface pixel filter block
 thisR.filter = piBlockExtract(txtLines,'blockName','PixelFilter','exporter',thisR.exporter);
 
@@ -136,6 +139,7 @@ flip = piReadLookAt(thisR,txtLines);
 if(flip)
     thisR.scale = [-1 1 1];
 end
+
 %% Read the light sources and delete them in world
 switch thisR.get('exporter')
     case 'C4D'
@@ -294,7 +298,7 @@ if isequal(thisR.exporter,'C4D')
     
     % Check if the materials.pbrt exist
     if ~exist(inputFile_materials,'file'), error('File not found'); end
-    [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials);
+    thisR.materials.list = piMaterialRead(thisR, inputFile_materials);
     thisR.materials.inputFile_materials = inputFile_materials;
     
     % Call material lib

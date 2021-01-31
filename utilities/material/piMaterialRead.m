@@ -1,30 +1,32 @@
-function [materialList, materialLines] = piMaterialRead(thisR, fname,varargin)
-% Parses a *_material.pbrt file written by the PBRT Cinema 4D exporter
+function materialList = piMaterialRead(thisR, fname,varargin)
+%%
 %
-% Syntax:
-%   [materialR, txtLines] = piReadMaterial(fname,varargin)
+% Synopsis:
+%   materialList = piReadMaterial(fname,varargin)
 %
-% Description
-%  PBRT version 3 has a nice FBX exporter (Cinema 4D format).  We read
-%  that file here so we can adjust the material properties within
-%  Matlab.
+% Brief description:
+%   Parses a *_material.pbrt file written by the PBRT Cinema 4D exporter
 %
 % Inputs
-%  fname:  Text file 
+%   thisR   - recipe .
+%   fname   - material pbrt file path. 
 %
-% Outputs:
-%  materials: Array of material structs
-%  txtLines:  All the text in the file
+% Returns:
+%   materials: Array of material structs
+%
+% Description
+%   PBRT version 3 has a nice FBX exporter (Cinema 4D format).  We read
+%   that file here so we can adjust the material properties within
+%   Matlab.
+%   The material text lines will be parsed as a cell array with properties
+%   parsed in struct.
 %
 % ZL SCIEN Stanford, 2018
+% ZLY SCIEN Stanford, 2020
 %
 % See also:
 %   piBlockExtract, piWriteMaterial
    
-%{
-materials = piReadMaterial('carandbuilding_materials.pbrt','version',3);
-%}
-
 %% Parse.  Only PBRT ver3 is supported
 p = inputParser;
 p.addRequired('thiR', @(x)(isa(x, 'recipe')));
@@ -41,8 +43,10 @@ txtLines = tmp{1};
 fclose(fileID);
 
 materialLines = piMaterialsFromText(txtLines);
-if isempty(materialLines), materialList = [];
-else,materialList = piBlockExtractMaterial(thisR, materialLines);
+if ~isempty(materialLines)
+    materialList = piBlockExtractMaterial(thisR, materialLines);
+else
+    materialList = {};
 end
 
 end

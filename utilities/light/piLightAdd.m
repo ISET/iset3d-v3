@@ -56,6 +56,7 @@ function thisR = piLightAdd(thisR, varargin)
 %           reference.
 %
 % Zhenyi, TL, SCIEN, 2019
+% Zheng L, SCIEN, 2020
 %
 % See also:
 %   piLightSet, piLightCreate
@@ -118,9 +119,21 @@ else
     
     % We create the light with parameters sent in by varargin. We call
     % piLightCreate.  The new light is attached to the recipe upon return.
-    piLightCreate(thisR, newVarargin{:});
+    newLight = piLightCreate(newVarargin{:});
+    %% Add the light to the recipe
+
+    val = numel(piLightGet(thisR,'print',false));
+    thisR.lights{val+1} = newLight;
+    idx = val + 1;
     
+    %% Now if the user sent in any additional arguments ...
+
+    for ii=1:2:length(varargin)
+        piLightSet(thisR,idx, newVarargin{ii}, newVarargin{ii+1});
+    end
 end
+
+
 
 %% Tell the user the status.  We might turn this off some day.
 

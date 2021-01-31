@@ -1,0 +1,14 @@
+AttributeBegin
+	#ObjectName SlantedBar:Vector(0.046, 0.06, 0)
+	ConcatTransform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 0.06 2.80674228626e-19 1]
+	AttributeBegin
+        #ObjectName Black:Vector(0, 0, 0)
+		NamedMaterial "BlackMat"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [0.0455 -0.06 6.17933763688e-18 0.0285 -0.06 5.1383878576e-18 -0.0285 0.06 -5.69973631485e-18 0.0455 0.06 -1.16854315801e-18 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [6.12323426293e-17 -6.12323426293e-17 -1.0 6.12323426293e-17 -6.12323426293e-17 -1.0 6.12323426293e-17 -6.12323426293e-17 -1.0 6.12323426293e-17 -6.12323426293e-17 -1.0 ]
+	AttributeEnd
+	AttributeBegin
+        #ObjectName White:Vector(0, 0, 0)
+		NamedMaterial "WhiteMat"
+		Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-0.0455 0.06 1.16854315801e-18 -0.0281 0.06 2.23398587327e-18 0.0285 -0.06 -1.64814448003e-18 -0.0455 -0.06 -6.17933763688e-18 ] "float uv" [0.0 -1.0 0.0 0.0 1.0 0.0 1.0 -1.0 ] "normal N" [6.12323426293e-17 6.12323426293e-17 -1.0 6.12323426293e-17 6.12323426293e-17 -1.0 6.12323426293e-17 6.12323426293e-17 -1.0 6.12323426293e-17 6.12323426293e-17 -1.0 ]
+	AttributeEnd
+AttributeEnd

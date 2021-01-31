@@ -1,0 +1,13 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [0.827260466006 -0.309853002503 -0.468648309742 0  0.0 0.8341630609 -0.551517894387 0  0.56181858405 0.456248950321 0.690070122485 0  0.12196130112 0.0456661654804 1.33759164588 1]
+Camera "perspective" "float fov" [31.417275658] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["coordinate.exr"] "integer xresolution" [1280] "integer yresolution" [720]
+Integrator "directlighting" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.318546778125 0.318546778125 0.318546778125] "float index" [1.333]
+	LightSource "distant" "rgb L" [1 1 1] "point from" [0 0 0] "point to" [-0.238568766955 -0.53272536335 0.811965859223]
+	Include "coordinate_materials.pbrt"
+	Include "coordinate_geometry.pbrt"
+WorldEnd

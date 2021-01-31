@@ -34,7 +34,7 @@ varargin = ieParamFormat(varargin);
 p  = inputParser;
 p.addRequired('thisR', @(x)(isa(x,'recipe')));
 p.addRequired('intext', @iscell);
-p.addParameter('print',true);
+p.addParameter('printinfo',true);
 
 p.parse(thisR, intext, varargin{:});
 
@@ -92,6 +92,21 @@ for ii = 1:nLights
                 lightSources{ii}.twosided = 1;
             end
         end
+        
+        % Parse ConcatTransform
+        concatTrans = find(piContains(lightSources{ii}.line, 'ConcatTransform'));
+        if concatTrans
+            [rot, position] = piParseConcatTransform(lightSources{ii}.line{concatTrans});
+            lightSources{ii}.rotate = rot;
+            lightSources{ii}.position = position;
+        end
+        
+        % Parse shape
+        shp = find(piContains(lightSources{ii}.line, 'Shape'));
+        if shp
+            lightSources{ii}.shape = piParseShape(lightSources{ii}.line{shp});
+        end
+        
         
     else
         % Assign type
@@ -170,48 +185,75 @@ for ii = 1:nLights
         end
     end
     
+    % Find common parameters
+    
+    % Set spectrum
+    % Look for spectrum L/I
+    spectrum  = find(piContains(thisLineStr, 'spectrum L')+piContains(thisLineStr, 'spectrum I'));
+    if spectrum
+        if isnan(str2double(thisLineStr{spectrum+1}))
+            thisSpectrum = thisLineStr{spectrum+1};
+        else
+            thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
+        end
+    end
 
-        % Set spectrum
-        % Look for spectrum L/I
-        spectrum  = find(piContains(thisLineStr, 'spectrum L')+piContains(thisLineStr, 'spectrum I'));
-        if spectrum
-            if isnan(str2double(thisLineStr{spectrum+1}))
-                thisSpectrum = thisLineStr{spectrum+1};
-            else
-                thisSpectrum = piParseNumericString(thisLineStr{spectrum+1});
-            end
+    % Look for rgb/color L/I
+    rgb = find(piContains(thisLineStr, 'color L') +...
+               piContains(thisLineStr, 'rgb L')+...
+               piContains(thisLineStr, 'color I') +...
+               piContains(thisLineStr, 'rgb I'));
+    if rgb
+        if isnan(str2double(thisLineStr{rgb+1}))
+            thisSpectrum = str2num([thisLineStr{rgb+1}, ' ',...
+                            thisLineStr{rgb+2}, ' ',...
+                            thisLineStr{rgb+3}]);
+        else
+            thisSpectrum = piParseNumericString([thisLineStr{rgb+1}, ' ',...
+                            thisLineStr{rgb+2}, ' ',...
+                            thisLineStr{rgb+3}]);
         end
+    end
 
-        % Look for rgb/color L/I
-        rgb = find(piContains(thisLineStr, 'color L') +...
-                   piContains(thisLineStr, 'rgb L')+...
-                   piContains(thisLineStr, 'color I') +...
-                   piContains(thisLineStr, 'rgb I'));
-        if rgb
-            if isnan(str2double(thisLineStr{rgb+1}))
-                thisSpectrum = str2num([thisLineStr{rgb+1}, ' ',...
-                                thisLineStr{rgb+2}, ' ',...
-                                thisLineStr{rgb+3}]);
-            else
-                thisSpectrum = piParseNumericString([thisLineStr{rgb+1}, ' ',...
-                                thisLineStr{rgb+2}, ' ',...
-                                thisLineStr{rgb+3}]);
-            end
-        end
-        
-        % Look for blackbody L, the first parameter is the temperature in
-        % Kelvin, and the second giving a scale factor.
-        blk = find(piContains(thisLineStr, 'blackbody L'));
-        if blk
-            thisSpectrum = piParseNumericString([thisLineStr{blk+1}, ' ',...
-                thisLineStr{blk+2}]);
-        end
+    % Look for blackbody L, the first parameter is the temperature in
+    % Kelvin, and the second giving a scale factor.
+    blk = find(piContains(thisLineStr, 'blackbody L'));
+    if blk
+        thisSpectrum = piParseNumericString([thisLineStr{blk+1}, ' ',...
+            thisLineStr{blk+2}]);
+    end
+    
     if exist('thisSpectrum', 'var')
         lightSources{ii}.lightspectrum = thisSpectrum;
     end
+    
+    % Look up rotate
+    rot = find(piContains(lightSources{ii}.line, 'Rotate'));
+    if rot
+        [~, lightSources{ii}.rotate] = piParseVector(lightSources{ii}.line(rot));
+    end
+    
+    % Look up translation
+    trans = find(piContains(lightSources{ii}.line, 'Translate'));
+    if trans
+        [~, lightSources{ii}.position] = piParseVector(lightSources{ii}.line(trans));
+    end
+    
+    % Look up scale
+    scl = find(piContains(lightSources{ii}.line, 'Scale'));
+    if scl
+        [~, lightSources{ii}.scale] = piParseVector(lightSources{ii}.line(scl));
+    end
 end
 
-if p.Results.print
+%% Give to light
+for ii = 1:numel(lightSources)
+    if ~isfield(lightSources{ii}, 'name')
+        lightSources{ii}.name = sprintf('#%d_Light_type:%s', ii, lightSources{ii}.type);
+    end
+end
+
+if p.Results.printinfo
     disp('---------------------')
     disp('*****Light Type******')
     for ii = 1:length(lightSources)

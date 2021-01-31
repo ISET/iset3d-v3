@@ -37,6 +37,7 @@ classdef recipe < matlab.mixin.Copyable
         scale;       % Optional scale factor to flip handedness
         world;       % A cell array with all the WorldBegin/End contents
         lights;       % Light sources
+        transformTimes; % Transform start and end time
         
         % INPUTFILE -  
         inputFile = '';    % Original PBRT input file
@@ -67,10 +68,10 @@ classdef recipe < matlab.mixin.Copyable
             val = recipeGet(obj,varargin{:});
         end
         
-        function val = set(obj,varargin)
+        function [obj, val] = set(obj,varargin)
             % Sets parameters of the recipe.  Shortens the set call, mainly, and
             % does some parameter value checking.
-            val = recipeSet(obj,varargin{:});
+            [obj, val] = recipeSet(obj,varargin{:});
         end
         
     end

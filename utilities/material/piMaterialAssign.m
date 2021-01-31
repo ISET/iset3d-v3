@@ -48,7 +48,7 @@ p.parse(thisR, materialName,target,varargin{:});
 
 %% Find which material in the list matches the material string
 
-idx = piMaterialFind(thisR, 'name', materialName);
+idx = piMaterialFind(thisR.materials.list, 'name', materialName);
 
 %% Assign Material
 % Check if carpaint_mix is wanted

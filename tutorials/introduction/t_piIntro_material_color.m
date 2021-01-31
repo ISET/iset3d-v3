@@ -42,7 +42,7 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
+sceneSet(scene,'render flag','hdr');
 
 %% Change the color of an object
 
@@ -63,10 +63,10 @@ slotnum  = 5;
 material_per_object = thisR.get('materials');
 
 % Note the material type of the 'mirror' object
-currentmaterial = material_per_object{slotnum}.stringtype;
+currentmaterial = material_per_object{slotnum}.type;
 
 % Note the color of that material (rgb values for the diffuse component)
-currentcolor = material_per_object{slotnum}.rgbkd;
+currentcolor = material_per_object{slotnum}.kd.value;
 fprintf('The current material of the mirror object is: %s\n', currentmaterial);
 fprintf('The current color of that material is: %.0f %.0f %.0f\n', currentcolor);
 
@@ -77,7 +77,7 @@ fprintf('The current color of that material is: %.0f %.0f %.0f\n', currentcolor)
 target = thisR.materials.lib.plastic;
 
 % Select a new color for the diffuse component of the 'plastic' material
-target.rgbkd = [1 0 0]; % red color
+target.kd.value = [1 0 0]; % red color
 
 % Assign the 'mirror' object the 'plastic' material with the new color (red)
 piMaterialAssign(thisR,partName,target);
@@ -90,7 +90,7 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Changed mirror object to have red plastic material'));
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
+sceneSet(scene,'render flag','hdr');
 
 %% Change the material and material color of a different object
 
@@ -109,4 +109,4 @@ piWrite(thisR,'creatematerials',true);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Changed front person to have cyan plastic material'));
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
+sceneSet(scene,'render flag','hdr');

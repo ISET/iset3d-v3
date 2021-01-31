@@ -120,27 +120,15 @@ switch str
         % fprintf('\n');
         
     case 'assets'
-        fprintf('\nAssets\n-----------\n');
         if isempty(thisR.assets), return; end
-        out = thisR.assets;
-        nAssets = numel(out);
-        fprintf('Number:  %d\n',nAssets);
-        nMoving = 0;
-        for ii=1:nAssets
-            if isfield(out, 'motion')
-                if ~isempty(out(ii).motion)
-                    nMoving = nMoving + 1;
-                end
-            end
-        end
-        fprintf('Moving  assets: %d\n',nMoving);
-        fprintf('Static  assets: %d\n',nAssets - nMoving);
-        namelist = cell(nAssets,1);
-        for ii=1:nAssets
-            namelist{ii} = thisR.assets(ii).name;
-        end
+        nAssets = thisR.assets.nnodes;
+        fprintf('\nAssets (%d)\n-----------\n',nAssets);
+        namelist = thisR.assets.names;
         namelist = sort(unique(namelist));
-        % fprintf('\n');
+        for ii=1:nAssets
+            fprintf(' %s \n',namelist{ii});
+        end
+        fprintf('-----------\n\n');
         
     case 'materials'
         fprintf('\nMaterials\n-----------\n');

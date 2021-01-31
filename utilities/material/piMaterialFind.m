@@ -1,21 +1,25 @@
-function mList = piMaterialFind(thisR, field, val)
-%% Find materials in the list such that the field equals a value
+function [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
+% Find materials in the list with a parameter that matches a value
 %
 % Synopsis
-%   mList = piMaterialFind(thisR, field, val)
+%   [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
+%
+% Brief
+%   Return the index of material(s) whose parameter matches val.
 %
 % Inputs
-%   thisR
-%   field  - Name of the field
-%   val    - Value of the field
+%   mList   - material list cell array (thisR.materials.list)
+%   param   - parameter name
+%   val     - value to match
 %
 % Return
-%   mList  - List of materials that have a field with a specific name and
-%   value
+%   mIdx  - Index to the List of materials that have a field with a specific name and
+%   mCollection - if requested, return the materials as a cell array.
 %
-%
-% The new recipe version (2) we return the material as an index into the
-% materials.list(). 
+% Description
+%   Materials in a recipe are stored as a cell array.  We return the
+%   material index into the thisR.materials.list.
+%   
 %
 % In the original version the materials.list was not an
 % array.  Instead, it was organized as a set of field names like
@@ -27,45 +31,52 @@ function mList = piMaterialFind(thisR, field, val)
 % See also
 %  piMaterial*
 
+% Examples
+%{
+    thisR = piRecipeDefault;
+    % Index of the materials whose name matches 'Mat'
+    idx = piMaterialFind(thisR.materials.list, 'name', 'Mat');
+    % Index and the material
+    [idx,m] = piMaterialFind(thisR.materials.list, 'name', 'Mat');
+    [idx,m] = piMaterialFind(thisR.materials.list, 'name', 'Patch19Material');
+    [idx,m] = piMaterialFind(thisR.materials.list, 'type', 'uber');
+%}
+
+%% parse input
+p = inputParser;
+p.addRequired('mList', @iscell);
+p.addRequired('param', @ischar)
+p.parse(mList, param, varargin{:});
 
 %% Format 
-field = ieParamFormat(field);
+param = ieParamFormat(param);
 
 %%
-if isstruct(thisR.materials.list)
-    % The returned material list is a cell array of field names
-    mList = {};
-    fNames = fieldnames(thisR.materials.list);
-    for ii = 1:numel(fNames)
-        if ischar(val)
-            if strcmp(thisR.materials.list.(fNames{ii}).(field), val)
-                mList{end+1} = fNames{ii};
-            end
-        elseif isnumeric(val)
-            if isequal(thisR.materials.list{ii}.(field), val)
-                mList{end+1} = fNames{ii};
-            end
+
+mIdx = [];
+mCollection = {};
+cnt = 0;
+for ii = 1:numel(mList)
+    if isfield(mList{ii}, param)
+        if isequal(param, 'name') || isequal(param, 'type')
+            curVal = mList{ii}.(param);
+        else
+            % All parameters beside 'name' and 'type'
+            % This is really not great because there are properties within
+            % these properties.  So we need to improve this (BW).
+            curVal = mList{ii}.(param).value;
         end
         
-    end
-elseif iscell(thisR.materials.list)
-    % The return material list is a vector
-    mList = [];
-    for ii = 1:numel(thisR.materials.list)
-        if isfield(thisR.materials.list{ii}, field)
-            if ischar(val)
-                if strcmp(thisR.materials.list{ii}.(field), val)
-                    mList(end+1) = ii;
-                end
-            elseif isnumeric(val)
-                if isequal(thisR.materials.list{ii}.(field), val)
-                    mList(end+1) = ii;
-                end
-            end
+        if isequal(curVal, val)
+            cnt = cnt + 1;
+            mIdx(cnt) = ii; %#ok<AGROW>
+            mCollection{cnt} = mList{ii}; %#ok<AGROW>
         end
     end
-else
-    error('Bad recipe materials list.');
+end
+
+if cnt == 1
+    mCollection = mCollection{1};
 end
 
 end

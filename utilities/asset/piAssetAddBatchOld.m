@@ -1,4 +1,4 @@
-function [thisR] = piAssetAddBatch(renderRecipe,assets,varargin)
+function [thisR] = piAssetAddBatchOld(renderRecipe,assets,varargin)
 % objects = assets;
 % scene = scene_1;
 % Assemble a scene with objects.

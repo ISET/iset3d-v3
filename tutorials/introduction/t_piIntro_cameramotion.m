@@ -46,7 +46,7 @@ thisR.set('fov',45);
 % This is a convenient routine we use when there are many parts and
 % you are willing to accept ZL's mapping into materials based on
 % automobile parts. 
-piMaterialGroupAssign(thisR);
+% piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
 piWrite(thisR,'creatematerials',true);
