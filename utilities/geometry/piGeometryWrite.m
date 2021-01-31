@@ -104,13 +104,17 @@ for ii = 1:numel(children)
         
         % Write out mediumInterface
         if ~isempty(thisNode.mediumInterface)
-            fprintf(fid, '%s\n', thisNode.mediumInterface);
+            fprintf(fid, strcat("MediumInterface ", '"', thisNode.mediumInterface, '" ','""', '\n'));
         end
         
         % Write out material
         if ~isempty(thisNode.material)
-            fprintf(fid, strcat("NamedMaterial ", '"',...
+            if strcmp(thisNode.material,'none')
+                fprintf(fid, strcat("Material ", '"none"', '\n'));
+            else
+                fprintf(fid, strcat("NamedMaterial ", '"',...
                             thisNode.material.namedmaterial, '"', '\n'));
+            end
         end
         %{
             % I don't know what's this used for, but commenting here.

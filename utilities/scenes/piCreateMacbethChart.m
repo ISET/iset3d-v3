@@ -40,8 +40,8 @@ inputs = p.Results;
 
 macbethRecipe = recipe();
 
-macbethRecipe.camera.type = 'Camera';
-macbethRecipe.set('Camera type','perspective');
+camera = piCameraCreate('perspective');
+macbethRecipe.recipeSet('camera',camera);
 macbethRecipe.set('fov',45);
 
 macbethRecipe.film.type = 'Film';
@@ -91,27 +91,30 @@ indices = [4 0 3
            7 2 6 
            0 5 1 
            0 4 5]'; 
-     
-shape = 'Shape "trianglemesh" "integer indices"';
-indStr = sprintf('%i ',indices);
-pointStr = sprintf('%.3f ',P');
-cubeShape = sprintf('%s [%s] "point P" [%s]\n', shape, indStr, pointStr); 
-      
-macbethRecipe.assets.name = 'root';
-macbethRecipe.assets.scale = [1; 1; 1];
-macbethRecipe.assets.rotate = [ 0 0 0; 0 0 1; 0 1 0; 1 0 0];
-macbethRecipe.assets.position = [0, 0, 0];
-macbethRecipe.assets.groupobjs = [];
-macbethRecipe.assets.children = [];
-macbethRecipe.assets.size.l = 6 * inputs.width;
-macbethRecipe.assets.size.h = 4 * inputs.height;
-macbethRecipe.assets.size.w = inputs.depth;
-macbethRecipe.assets.size.pmin = [-dx; -dy; -dz];
-macbethRecipe.assets.size.pmax = [dx; dy; dz];
+   
+cubeShape.meshshape = 'trianglemesh';
+cubeShape.integerindices = ['[', sprintf('%i ',indices), ']'];
+cubeShape.pointp = ['[' sprintf('%.3f ',P') ']'];
+
+macbethRecipe.assets = tree();
+macbethRecipe.assets.set(1,'root');
+
+macbethChart = piAssetCreate('type','branch');
+macbethChart.name = 'MacbethChart';
+macbethChart.size.l = 6 * inputs.width;
+macbethChart.size.h = 4 * inputs.height;
+macbethChart.size.w = inputs.depth;
+macbethChart.size.pmin = [-dx; -dy; -dz];
+macbethChart.size.pmax = [dx; dy; dz];
+
+[macbethRecipe.assets, macbethChartID] = macbethRecipe.assets.addnode(1,macbethChart);
+
 
 wave = 400:10:700;
 macbethSpectra = ieReadSpectra(which('macbethChart.mat'),wave);
 
+
+macbethRecipe.materials.list = {};
 for x=1:6
     for y=1:4
         
@@ -120,42 +123,33 @@ for x=1:6
         xOffset = -(x - 3 - 1)*inputs.width - inputs.width/2;
         yOffset = -(y - 2 - 1)*inputs.height - inputs.height/2;
 
-        newAsset.groupobjs = [];
-        newAsset.size.l = inputs.width;
-        newAsset.size.h = inputs.height;
-        newAsset.size.w = inputs.depth;
-        newAsset.size.pmin = [-dx; -dy; -dz];
-        newAsset.size.pmax = [dx; dy; dz];
-        newAsset.scale = [1; 1; 1];
-        newAsset.name = sprintf('Cube_%02i',cubeID);
-        newAsset.rotate = [ 0 0 0; 0 0 1; 0 1 0; 1 0 0];
-        newAsset.position = [xOffset; yOffset; 0];
-        newAsset.children.name = sprintf('Cube_%02i',cubeID);
-        newAsset.children.index  = [];
-        newAsset.children.mediumInterface = [];
-        newAsset.children.material = sprintf('NamedMaterial "Cube_%02i_material"',cubeID);
-        newAsset.children.areaLight = [];
-        newAsset.children.output = [];
-        newAsset.children.light = [];
-        newAsset.children.shape = cubeShape;
+        
+        macbethCubeBranch = piAssetCreate('type','branch');
+        macbethCubeBranch.name = sprintf('Cube_%02i_B',cubeID);
+        macbethCubeBranch.size.l = inputs.width;
+        macbethCubeBranch.size.h = inputs.height;
+        macbethCubeBranch.size.w = inputs.depth;
+        macbethCubeBranch.size.pmin = [-dx; -dy; -dz];
+        macbethCubeBranch.size.pmax = [dx; dy; dz];
+        macbethCubeBranch.translation = [xOffset; yOffset; 0];
+        [macbethRecipe.assets, cubeBranchID] = macbethRecipe.assets.addnode(macbethChartID,macbethCubeBranch);
+        
+        macbethCube = piAssetCreate('type','object');
+        macbethCube.name = sprintf('Cube_%02i',cubeID);
+        macbethCube.type = 'object';
+        macbethCube.material.namedmaterial = sprintf('Cube_%02i_material',cubeID);
+        macbethCube.shape = cubeShape;
+        macbethCube.mediumInterface = [];        
+        macbethRecipe.assets = macbethRecipe.assets.addnode(cubeBranchID,macbethCube);
 
-        macbethRecipe.assets.groupobjs = cat(1,macbethRecipe.assets.groupobjs,newAsset);
         
         data = [wave(:), macbethSpectra(:,cubeID)]';
         
-        currentMaterial = piMaterialCreate(macbethRecipe, 'name', sprintf('Cube_%02i_material',cubeID),...
-            'stringtype','matte','spectrumkd',data(:));
+        currentMaterial = piMaterialCreate(sprintf('Cube_%02i_material',cubeID),...
+            'type','matte','kd',data(:)');
         
-        %{
-        currentMaterial = piMaterialCreate();
-        currentMaterial.name = sprintf('Cube_%02i_material',cubeID);
-        currentMaterial.string = 'matte';
-        
-        
-        currentMaterial.spectrumkd = data(:);
-        
-        macbethRecipe.materials.list.(currentMaterial.name) = currentMaterial;
-           %}
+        macbethRecipe.materials.list = cat(1, macbethRecipe.materials.list, currentMaterial);
+         
     end
 end
 macbethRecipe.materials.txtLines = {};
