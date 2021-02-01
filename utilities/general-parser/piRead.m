@@ -89,7 +89,7 @@ txtLines = strrep(txtLines, '[ "', '"');
 txtLines = strrep(txtLines, '" ]', '"');
 [options, world] = piReadWorldText(thisR, txtLines);
 
-%% Read opions information
+%% Read options information
 % think about using piParameterGet;
 % Extract camera block
 thisR.camera = piParseOptions(options, 'Camera');
@@ -152,37 +152,46 @@ else
     thisR.scale = [values{2} values{3} values{4}];
 end
 
-%%  Read world information
-% Read Material.pbrt file
+%%  Read world information for the Include files
+
 if any(piContains(world,'Include')) && ...
         any(piContains(world,'_materials.pbrt'))
-    % find material file
+    
+    % Find material file
     materialIdx = find(contains(world, '_materials.pbrt'), 1);
+    
+    % We get the name of the file we want to include.
     material_fname = erase(world{materialIdx},{'Include "','"'});
+    
     inputDir = thisR.get('inputdir');
     inputFile_materials = fullfile(inputDir, material_fname);
     if ~exist(inputFile_materials,'file'), error('File not found'); end
+    
+    % We found the material file.  We read it.
     [materialLines, ~] = piReadText(inputFile_materials);
+    
+    % Change to the single line format from the standard block format with
+    % indented lines
     materialLinesFormatted = piFormatConvert(materialLines);
+    
     % Read material and texture
     [materialLists, materialtxtLines, texureList, textxtLines] = parseMaterialTexture(materialLinesFormatted);
     fprintf('Read %d materials.\n', numel(materialLists));
     fprintf('Read %d textures.\n', numel(texureList));
     
-    % Read geometry
+    % Read the geometry file and do the same.
     geometryIdx = find(contains(world, '_geometry.pbrt'), 1);
     geometry_fname = erase(world{geometryIdx},{'Include "','"'});
     inputFile_geometry = fullfile(inputDir, geometry_fname);
     if ~exist(inputFile_geometry,'file'), error('File not found'); end
-
+    % Could this be piReadText too?
     fileID = fopen(inputFile_geometry);
     tmp = textscan(fileID,'%s','Delimiter','\n');
     geometryLines = tmp{1};
     fclose(fileID);
     
-    % convert geometryLines into a c4d format, so we can save us some time
-    % to write a new parse.
-    
+    % convert geometryLines into from the standard block indented format in
+    % to the single line format.
     geometryLinesFormatted = piFormatConvert(geometryLines);
     [trees, ~] = parseGeometryText(thisR, geometryLinesFormatted,'');
 else
@@ -222,9 +231,11 @@ else
 end
 
 disp('***Scene parsed.')
+
 % remove this line after we become more sure that we can deal with scenes
 % which are not exported by C4D.
 thisR.exporter = 'C4D';
+
 end
 
 %% Helper functions
@@ -247,14 +258,20 @@ end
 %% Find the text in WorldBegin/End section
 function [options, world] = piReadWorldText(thisR,txtLines)
 % 
-% Finds the text lines from WorldBegin
+% Finds all the text lines from WorldBegin
 % It puts the world section into the thisR.world.
 % Then it removes the world section from the txtLines
 %
-% Why doesn't this go to WorldEnd?  We are hoping that nothing is important
-% after WorldEnd.  But ...
-%
+% Question: Why doesn't this go to WorldEnd?  We are hoping that nothing is
+% important after WorldEnd.  In our experience, we see some files that
+% never even have a WorldEnd, just a World Begin.
 
+% The general parser (toply) writes out the PBRT file in a block format with
+% indentations.  Zheng's Matlab parser (started with Cinema4D), expects the
+% blocks to be in a single line. 
+%
+% This function converts the blocks to a single line.  This function is
+% used a few places in piRead().
 txtLines = piFormatConvert(txtLines);
 
 worldBeginIndex = 0;
@@ -275,6 +292,7 @@ end
 % Store the text from WorldBegin to the end here
 world = txtLines(worldBeginIndex:end);
 thisR.world = world;
+
 % Store the text lines from before WorldBegin here
 options = txtLines(1:(worldBeginIndex-1));
 
@@ -428,29 +446,49 @@ function copyFolder(inputDir, outputDir)
 end
 %}
 
+%% Parse several critical recipe options
 function [s, blockLine] = piParseOptions(txtLines, blockName)
+% Parse the options for a specific block
+%
+
+% How many lines of text?
 nline = numel(txtLines);
 s = [];ii=1;
+
 while ii<=nline
     blockLine = txtLines{ii};
-    if length(blockLine) >= length('Shape')
-        if strncmp(blockLine,blockName, length(blockName))
+    % There is enough stuff to make it worth checking 
+    if length(blockLine) >= 5 % length('Shape')
+        % If the blockLine matches the BlockName, do something
+        if strncmp(blockLine, blockName, length(blockName))
             s=[];
+            
+            % If it is Transform, do this and then return
             if (strcmp(blockName,'Transform') || ...
                     strcmp(blockName,'LookAt')|| ...
                     strcmp(blockName,'ConcatTransform')|| ...
                     strcmp(blockName,'Scale'))
                 return;
             end
-            thisLine = strrep(blockLine,'[','');
-            thisLine = strrep(thisLine,']','');
-            thisLine = textscan(thisLine,'%q');
+            
+            % It was not Transform.  So figure it out.
+            thisLine = strrep(blockLine,'[','');  % Get rid of [
+            thisLine = strrep(thisLine,']','');   % Get rid of ]
+            thisLine = textscan(thisLine,'%q');   % Find individual words into a cell array
+            
+            % thisLine is a cell of 1.
+            % It contains a cell array with the individual words.
             thisLine = thisLine{1};
             nStrings = length(thisLine);
             blockType = thisLine{1};
             blockSubtype = thisLine{2};
             s = struct('type',blockType,'subtype',blockSubtype);
             dd = 3;
+            
+            % Build a struct that will be used for representing this type
+            % of Option (Camera, Sampler, Integrator, Film, ...)
+            % This builds the struct and assigns the values of the
+            % parameters
             while dd <= nStrings
                 if piContains(thisLine{dd},' ')
                     C = strsplit(thisLine{dd},' ');
@@ -482,26 +520,40 @@ end
 
 end
 
+%% Determine the properties of the materials and textures
 function [materialList, materialLines, texureList, textureLines]=parseMaterialTexture(txtLines)
+% Parse the txtLines to specify the parameters of the materials and
+% textures
+%
 
-t_index = 1;
-m_index = 1;
-texureList = [];
-materialList = [];
-materialLines=[];
-textureLines=[];
+%% Initialize the parameters we return
+
+texureList    = [];
+materialList  = [];
+materialLines = [];
+textureLines  = [];
+
+% Counters for the textures and materials
+t_index = 0;
+m_index = 0;
+
+%% Loop over each line
 for ii = 1:numel(txtLines)
+    
+    % Parse this line now
     thisLine = txtLines{ii};
+    
     if strncmp(thisLine,'Texture',length('Texture'))
-        texureList{t_index}   = parseBlockTexture(thisLine,ii); 
-        textureLines{t_index} =thisLine;
         t_index = t_index+1;
-    end
-    if strncmp(thisLine,'MakeNamedMaterial',length('MakeNamedMaterial')) ||...
+        texureList{t_index}   = parseBlockTexture(thisLine,ii); 
+        textureLines{t_index} = thisLine;
+        
+    elseif strncmp(thisLine,'MakeNamedMaterial',length('MakeNamedMaterial')) ||...
             strncmp(thisLine,'Material',length('Material'))
-        materialList{m_index} = parseBlockMaterial(thisLine);
-        materialLines{m_index} =thisLine; 
         m_index = m_index+1;
+        materialList{m_index}  = parseBlockMaterial(thisLine);
+        materialLines{m_index} = thisLine; 
+        
     end
 end
 
