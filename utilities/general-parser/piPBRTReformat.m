@@ -53,7 +53,7 @@ if ~exist(outputDir,'dir')
 end
 
 % copy files from input folder to output folder
-copyFolder(inputdir, outputDir);
+piCopyFolder(inputdir, outputDir);
 
 %% convert %s mkdir mesh && cd mesh &&
 
@@ -127,7 +127,11 @@ end
 
 end
 
-
+%% piCopyFolder
+%{
+% Changed to a utility function piCopyFolder
+% Should be deleted after a while.
+%
 function copyFolder(inputDir, outputDir)
     sources = dir(inputDir);
     status  = true;
@@ -158,3 +162,4 @@ function copyFolder(inputDir, outputDir)
         fprintf('%s \n \n',outputDir);
     end
 end
+%}

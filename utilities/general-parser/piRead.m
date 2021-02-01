@@ -392,6 +392,10 @@ end
 newlines(piContains(newlines,'Warning'))=[];
 end
 
+%{
+% Changed to a utility function piCopyFolder
+% Should be deleted after a while.
+%
 function copyFolder(inputDir, outputDir)
     sources = dir(inputDir);
     status  = true;
@@ -422,6 +426,7 @@ function copyFolder(inputDir, outputDir)
         fprintf('%s \n \n',outputDir);
     end
 end
+%}
 
 function [s, blockLine] = piParseOptions(txtLines, blockName)
 nline = numel(txtLines);
