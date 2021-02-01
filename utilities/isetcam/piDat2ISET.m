@@ -13,7 +13,8 @@ function ieObject = piDat2ISET(inputFile,varargin)
 %   label            -  Specify the type of data: radiance, mesh, depth.
 %                       Default is radiance
 %   recipe           -  The recipe used to create the file
-%   mean luminance   -  Set the mean illuminance
+%   mean luminance   -  Set the mean illuminance, if -1 do not scale values
+%                       returned by the renderer.
 %   mean luminance per mm2 - Set the mean illuminance per square pupil mm
 %   scalePupilArea -  if true, we scale the mean illuminance by the pupil
 %                       diameter.
@@ -218,7 +219,9 @@ switch lower(cameraType)
         % In this case we cannot scale by the area because the aperture
         % is a pinhole.  The ieObject is a scene.  So we use the mean
         % luminance parameter (default is 100 cd/m2).
-        ieObject = sceneAdjustLuminance(ieObject,meanLuminance);
+        if meanLuminance > 0
+            ieObject = sceneAdjustLuminance(ieObject,meanLuminance);
+        end
         ieObject = sceneSet(ieObject,'luminance',sceneCalculateLuminance(ieObject));
     otherwise
         error('Unknown optics type %s\n',cameraType);       

@@ -38,8 +38,9 @@ function [ieObject, result] = piRender(thisR,varargin)
 %
 %  version    - PBRT version, 2 or 3.   Default is 3.  2 will be
 %               deprecated.
-%  mean luminance -  If a scene, this mean luminance
-%                 (default 100 cd/m2) 
+%  mean luminance -  If a scene, this mean luminance. If set to a negative
+%                    value values returned by the renderer are used.
+%                    (default 100 cd/m2) 
 %  mean illuminance per mm2 - default is 5 lux
 %  scalePupilArea
 %             - if true, scale the mean illuminance by the pupil
