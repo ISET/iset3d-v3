@@ -81,7 +81,7 @@ p.addParameter('lensfile',lensDefault, @ischar);
 p.parse(cameraType,varargin{:});
 
 lensFile      = p.Results.lensfile;
-if ~exist(lensFile,'file')
+if ~exist(lensFile,'file') && (strcmp(cameraType,'omni') || strcmp(cameraType,'realistic'))
     % This warning could be eliminated after some time.  It arises when we
     % first create one of the human eye models but the output lens
     % directory has not yet had the file written out.

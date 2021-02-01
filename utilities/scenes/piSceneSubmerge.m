@@ -126,123 +126,145 @@ end
             ylabel('y');
             zlabel('z');
 %}
+            
+waterCubeShape.meshshape = 'trianglemesh';
+waterCubeShape.integerindices = ['[', sprintf('%i ',indices), ']'];
+waterCubeShape.pointp = ['[' sprintf('%.3f ',P') ']'];
+            
                   
 if inputs.wallOnly == false
-        
-newAsset.groupobjs = [];
-newAsset.size.l = inputs.sizeX;
-newAsset.size.h = inputs.sizeY;
-newAsset.size.w = inputs.sizeZ;
-newAsset.size.pmin = [-dx; -dy; -dz];
-newAsset.size.pmax = [dx; dy; dz];
-newAsset.scale = [1; 1; 1];
-newAsset.name = 'Water';
-newAsset.rotate = [ 0 0 0; 0 0 1; 0 1 0; 1 0 0];
-newAsset.position = [inputs.offsetX; inputs.offsetY; inputs.offsetZ];
-newAsset.children.name = 'WaterMesh';
-newAsset.children.index  = [];
-newAsset.children.mediumInterface = 'MediumInterface "seawater" ""';
-newAsset.children.material = 'Material "none"';
-newAsset.children.areaLight = [];
-newAsset.children.output = [];
-newAsset.children.light = [];
-
-shape = 'Shape "trianglemesh" "integer indices"';
-indStr = sprintf('%i ',indices);
-pointStr = sprintf('%f ',P');
-
-newAsset.children.shape = sprintf('#Water medium\n%s [%s] "point P" [%s]\n', shape, indStr, pointStr); 
-
-underwater.assets.groupobjs = cat(1,underwater.assets.groupobjs, newAsset);
-
-if isempty(underwater.media)
+       
+    water = piAssetCreate('type','branch');
+    water.name = 'Water';
+    water.size.l = inputs.sizeX;
+    water.size.h = inputs.sizeY;
+    water.size.w = inputs.sizeZ;
+    water.size.pmin = [-dx; -dy; -dz];
+    water.size.pmax = [dx; dy; dz];
+    water.position = [inputs.offsetX; inputs.offsetY; inputs.offsetZ];
     
-    m = piMediumCreate;
-    m.name = "seawater";
-    m.type = "water";
-    m.absFile = absFile;
-    m.vsfFile = vsfFile;
-    m.cPlankton = inputs.cPlankton;
-    m.aCDOM440 = inputs.aCDOM440;
-    m.aNAP400 = inputs.aNAP400;
-    m.cSmall = inputs.cSmall;
-    m.cLarge = inputs.cLarge;
+    [underwater.assets, waterID] = underwater.assets.addnode(1,water);
+    
+    waterCube = piAssetCreate('type','object');
+    waterCube.name = 'WaterMesh';
+    waterCube.mediumInterface = 'Seawater';
+    waterCube.material = 'none';
+    waterCube.shape = waterCubeShape;
+    
+    underwater.assets = underwater.assets.addnode(waterID, waterCube);
 
-    underwater.media.list = m;
-end
 
-% Submerge the camera if needed
-xstart = -dx + inputs.offsetX;
-xend = dx + inputs.offsetX;
+    if isempty(underwater.media)
 
-ystart = -dy + inputs.offsetY;
-yend = dy + inputs.offsetY;
+        m = piMediumCreate;
+        m.name = "Seawater";
+        m.type = "water";
+        m.absFile = absFile;
+        m.vsfFile = vsfFile;
 
-zstart = -dz + inputs.offsetZ;
-zend = dz + inputs.offsetZ;
+        underwater.media.list = m;
+    end
 
-camPos = underwater.get('from');
+    % Submerge the camera if needed
+    xstart = -dx + inputs.offsetX;
+    xend = dx + inputs.offsetX;
 
-if xstart <= camPos(1) && camPos(1) <= xend && ...
-   ystart <= camPos(2) && camPos(2) <= yend && ...
-   zstart <= camPos(3) && camPos(3) <= zend
+    ystart = -dy + inputs.offsetY;
+    yend = dy + inputs.offsetY;
 
-    underwater.camera.medium = "seawater";
+    zstart = -dz + inputs.offsetZ;
+    zend = dz + inputs.offsetZ;
 
-end
+    camPos = underwater.get('from');
 
+    if xstart <= camPos(1) && camPos(1) <= xend && ...
+       ystart <= camPos(2) && camPos(2) <= yend && ...
+       zstart <= camPos(3) && camPos(3) <= zend
+
+        underwater.camera.medium = "Seawater";
+
+    end
 
 end
 
 %% Add a black wall around water volume
 if inputs.wallXY || inputs.wallXZ || inputs.wallYZ
     
-    wallIDs = [];
     
-    if inputs.wallXY, wallIDs = cat(1,wallIDs, [1, 2, 5, 6]); end
-    if inputs.wallYZ, wallIDs = cat(1,wallIDs, [3, 4, 7, 8]); end
-    if inputs.wallXZ, wallIDs = cat(1,wallIDs, [9, 10, 11, 12]); end
+    walls = piAssetCreate('type','branch');
+    walls.name = 'Walls';
+    walls.size.l = inputs.sizeX;
+    walls.size.h = inputs.sizeY;
+    walls.size.w = inputs.sizeZ;
+    walls.size.pmin = [-dx; -dy; -dz];
+    walls.size.pmax = [dx; dy; dz];
+    walls.position = [inputs.offsetX; inputs.offsetY; inputs.offsetZ];
 
+    [underwater.assets, wallsID] =  underwater.assets.addnode(1,walls);
+    
+    
     P = P * 1.01;
     
-    newAsset.groupobjs = [];
-    newAsset.size.l = inputs.sizeX;
-    newAsset.size.h = inputs.sizeY;
-    newAsset.size.w = inputs.sizeZ;
-    newAsset.size.pmin = [-dx; -dy; -dz];
-    newAsset.size.pmax = [dx; dy; dz];
-    newAsset.scale = [1; 1; 1];
-    newAsset.name = 'Wall';
-    newAsset.rotate = [ 0 0 0; 0 0 1; 0 1 0; 1 0 0];
-    newAsset.position = [inputs.offsetX; inputs.offsetY; inputs.offsetZ];
-    newAsset.children.name = 'WallMesh';
-    newAsset.children.index  = [];
-    newAsset.children.mediumInterface = '';
-    newAsset.children.material = 'NamedMaterial "WallMaterial"';
-    newAsset.children.areaLight = [];
-    newAsset.children.output = [];
-    newAsset.children.light = [];
+    if inputs.wallXY 
+        wallIDs = [1, 2, 5, 6];
     
-    shape = 'Shape "trianglemesh" "integer indices"';
-    indStr = sprintf('%i ',indices(:,wallIDs));
-    pointStr = sprintf('%f ',P');
+        wall = piAssetCreate('type','object');
+        wall.name = 'WallXY';
+        wall.material.namedmaterial = 'WallXY_material';
+        wall.shape.meshshape = 'trianglemesh';
+        wall.shape.integerindices = ['[' sprintf('%i ',indices(:,wallIDs)) ']'];
+        wall.shape.pointp = ['[' sprintf('%f ',P') ']'];
+        
+        underwater.assets = underwater.assets.addnode(wallsID,wall);
+        
+        data = [wave(:), zeros(numel(wave),1)]';
+        wallMaterial = piMaterialCreate('WallXY_material',...
+                        'type','matte','kd',data(:)');
+                    
+        underwater.materials.list = cat(1, underwater.materials.list, wallMaterial);
     
-    newAsset.children.shape = sprintf('#Wall\n%s [%s] "point P" [%s]\n', shape, indStr, pointStr);
+    end
     
-    underwater.assets.groupobjs = cat(1,underwater.assets.groupobjs,newAsset);
+    if inputs.wallYZ
+        wallIDs = [3, 4, 7, 8]; 
+        
+        wall = piAssetCreate('type','object');
+        wall.name = 'WallYZ';
+        wall.material.namedmaterial = 'WallYZ_material';
+        wall.shape.meshshape = 'trianglemesh';
+        wall.shape.integerindices = ['[' sprintf('%i ',indices(:,wallIDs)) ']'];
+        wall.shape.pointp = ['[' sprintf('%f ',P') ']'];
+        
+        underwater.assets = underwater.assets.addnode(wallsID,wall);
+        
+        data = [wave(:), zeros(numel(wave),1)]';
+        wallMaterial = piMaterialCreate('WallYZ_material',...
+                        'type','matte','kd',data(:)');
+                    
+        underwater.materials.list = cat(1, underwater.materials.list, wallMaterial);
     
-    data = [wave(:), zeros(numel(wave),1)]';
-    piMaterialCreate(underwater, 'name', 'WallMaterial',...
-                                 'stringtype', 'matte',....
-                                 'spectrumkd', data);
+    end
     
-    % currentMaterial = piMaterialCreate();
-    % currentMaterial.name = 'wallMaterial';
-    % currentMaterial.string = 'matte';
+    if inputs.wallXZ
+        wallIDs = [9, 10, 11, 12];
     
-    
-    % currentMaterial.spectrumkd = data(:);
-    % underwater.materials.list.(currentMaterial.name) = currentMaterial;
+        wall = piAssetCreate('type','object');
+        wall.name = 'WallXZ';
+        wall.material.namedmaterial = 'WallXZ_material';
+        wall.shape.meshshape = 'trianglemesh';
+        wall.shape.integerindices = ['[' sprintf('%i ',indices(:,wallIDs)) ']'];
+        wall.shape.pointp =['[' sprintf('%f ',P') ']'];
+        
+        underwater.assets = underwater.assets.addnode(wallsID,wall);
+        
+        data = [wave(:), zeros(numel(wave),1)]';
+        wallMaterial = piMaterialCreate('WallXZ_material',...
+                        'type','matte','kd',data(:)');
+                    
+        underwater.materials.list = cat(1, underwater.materials.list, wallMaterial);
+        
+    end
+ 
 end
 
 end
