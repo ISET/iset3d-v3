@@ -185,7 +185,7 @@ if any(piContains(world,'Include')) && ...
     inputFile_geometry = fullfile(inputDir, geometry_fname);
     if ~exist(inputFile_geometry,'file'), error('File not found'); end
     % Could this be piReadText too?
-    % we need to read
+    % we need to read file contents with comments
     fileID = fopen(inputFile_geometry);
     tmp = textscan(fileID,'%s','Delimiter','\n');
     geometryLines = tmp{1};
