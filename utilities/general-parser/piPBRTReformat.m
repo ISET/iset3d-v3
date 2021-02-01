@@ -59,7 +59,8 @@ piCopyFolder(inputdir, outputDir);
 
 % The Docker base command includes 'toply'.  In that case, it does not
 % render the data, it just converts it.
-basecmd = 'docker run -t --name %s --volume="%s":"%s" %s pbrt --toply %s > %s';
+% basecmd = 'docker run -t --name %s --volume="%s":"%s" %s pbrt --toply %s > %s && ls';
+basecmd = 'docker run -ti --name %s --volume="%s":"%s" %s /bin/bash -c "pbrt --toply %s > %s; ls mesh_*.ply"';
 
 % The directory of the input file
 [volume, ~, ~] = fileparts(fname);
@@ -69,39 +70,60 @@ dockerimage = 'vistalab/pbrt-v3-spectral:latest';
 % Give a name to docker container
 dockercontainerName = ['ISET3d-',thisName,'-',num2str(randi(100))];
 %% Build the command
-dockercmd = sprintf(basecmd, dockercontainerName, volume, volume, dockerimage, fname, outputFull);
+dockercmd = sprintf(basecmd, dockercontainerName, volume, volume, dockerimage, fname, [thisName, ext]);
+
+% dockercmd = sprintf(basecmd, dockercontainerName, volume, volume, dockerimage, fname, outputFull);
 disp(dockercmd)
 
 %% Run the command
 
 % The variable 'result' has the formatted data.
-[status_convert, result] = system(dockercmd);
+[~, result] = system(dockercmd);
 
-if ~status_convert
-    % Status is good.  So do stuff
+% Copy formatted pbrt files to local directory.
+cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/%s %s',dockercontainerName, [thisName, ext], outputDir);
+[status_copy, ~ ] = system(cpcmd);
+if status_copy
+    disp('No converted file found.');
+end
+
+%% remove "Warning: No metadata written out."
+% Do this only for the main pbrt file
+if ~contains(outputFull,'_materials.pbrt') ||...
+        ~contains(outputFull,'_geometry.pbrt')
     
-    % Would something like this run ?
-    %
-    %   docker ls %s:/pbrt/pbrt-v3-spectral/build/mesh_*.ply
-    %
+    fileIDin = fopen(outputFull);
+    outputFullTmp = fullfile(outputDir, [thisName, '_tmp',ext]);
+    fileIDout = fopen(outputFullTmp, 'w');
     
-    for ii = 1:5000
-        cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/mesh_%05d.ply %s',dockercontainerName, ii, outputDir);
-        [status_copy, ~ ] = system(cpcmd);
-        if status_copy
-            % If it fails we assume that is because there is no corresponding
-            % mesh file.  So, we stop.
-            break;
+    while ~feof(fileIDin)
+        thisline=fgets(fileIDin);
+        if ~contains(thisline,'Warning: No metadata written out.')
+            fprintf(fileIDout, '%s', thisline);
         end
     end
-    fprintf('Formatted file is in %s \n', outputDir);
+    fclose(fileIDin);
+    fclose(fileIDout);
     
-    % tell user there is something wrong.
-else
-    % Status failed.  So tell the user and go home.
-    disp('Reformating file failed.');
-    disp(result);    
+    movefile(outputFullTmp, outputFull);
 end
+%%
+
+% Status is good.  So do stuff
+% find out how many ply mesh files are generated.
+PLYmeshFiles = strsplit(result, '\t');
+for ii = 1:numel(PLYmeshFiles)
+    cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/mesh_%05d.ply %s',dockercontainerName, ii, outputDir);
+    [status_copy, ~ ] = system(cpcmd);
+    if status_copy
+        % If it fails we assume that is because there is no corresponding
+        % mesh file.  So, we stop.
+        break;
+    end
+end
+fprintf('Formatted file is in %s \n', outputDir);
+
+    
 
 %% Either way, stop the container if it is still running.
 

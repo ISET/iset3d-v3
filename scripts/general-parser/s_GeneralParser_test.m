@@ -30,16 +30,19 @@ ieInit;
 % thisR = piRecipeDefault('scene name','teapot','toply',true);
 
 fname = fullfile(piRootPath,'data','V3','SimpleScene','SimpleScene.pbrt');
+% fname = fullfile(piRootPath,'data','V3/ChessSet/ChessSet.pbrt');
+% Format the file
 formattedFname = piPBRTReformat(fname);
-
+% As normal
 thisR = piRead(formattedFname);
+% click on the asset showed in the GUI, thisAsset data is returned. 
+thisR.assets.showUI;
 thisR.set('film resolution',[300 200]*1.5);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5);
 
 piWrite(thisR);
-
 
 %%
 disp('*** Rendering...')

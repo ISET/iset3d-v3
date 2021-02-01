@@ -95,13 +95,13 @@ varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addParameter('scenename','MacBethChecker',@ischar);
 p.addParameter('write',false,@islogical);
-% p.addParameter('toply',true,@islogical);
+
 
 p.parse(varargin{:});
 
 sceneName = p.Results.scenename;
 write     = p.Results.write;
-% toply     = p.Results.toply;     % Output will be in standard ply format
+
 
 %%  To read the file,the upper/lower case must be right
 

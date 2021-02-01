@@ -73,7 +73,7 @@ while i <= length(txt)
 %         [rot, translation, ctform] = piParseConcatTransform(currentLine);
         [translation, rot, scale] = parseTransform(currentLine);
     elseif strncmp(currentLine,'Transform ',10)
-        ctform = [];
+%         ctform = [];
         [translation, rot, scale] = parseTransform(currentLine);
     elseif piContains(currentLine,'MediumInterface')
         % MediumInterface could be water or other scattering media.
@@ -181,7 +181,7 @@ while i <= length(txt)
                 if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end
                 if exist('sz','var'), resCurrent.size = sz; end
                 if exist('rot','var'), resCurrent.rotation = rot; end
-                if exist('ctform','var'), resCurrent.concattransform = ctform; end
+%                 if exist('ctform','var'), resCurrent.concattransform = ctform; end
                 if exist('translation','var'), resCurrent.translation = translation; end
                 if exist('scale','var'), resCurrent.scale = scale; end
                 
