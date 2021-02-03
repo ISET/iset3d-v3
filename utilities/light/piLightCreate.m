@@ -1,22 +1,27 @@
-function lght = piLightCreate(varargin)
-% Create a default light source struct for a recipe
+function lght = piLightCreate(name, varargin)
+%%
+% Create a light source struct for a recipe
 %
-% Synopsis
+% Synopsis:
 %   light = piLightCreate(thisR,varargin)
 %
 % Inputs:
-%   thisR: 
+%   name                    - name of the light
 %
 % Optional key/val pairs
-%   light spectrum:    SPD of the light, defined by a string
-%   type:              Type of light source (e.g., point, spot,
-%                      distant)
-% Returns
-%   thisR:  modified recipe.  But it is passed by pointer so the thisR
-%           is not needed on the return.
+%   type                    - light type (e.g., point, spot,
+%                               distant). Default is point light
+%   other light properties  - depending on light types. Default values can
+%                             be found on PBRT website.
 %
-% Description
-%   Light sources are a struct
+% Description:
+%   The light properties should be given in key/val pairs. For keys. it
+%   should follow the format of 'TYPE KEYNAME'. It's easier for us to
+%   extract type and parameter name using space.
+%
+% Returns
+%   lght                    - created light
+%
 %
 % See also
 %   piLightSet, piLightGet
@@ -24,16 +29,153 @@ function lght = piLightCreate(varargin)
 
 % Examples
 %{
-   thisR = piRecipeDefault;
+   lgt = piLightCreate('new light', '')
 %}
+%%
+% Replace the space in potential parameters. For example, 'rgb I' won't
+% pass parse with the space, but we need the two parts in the string apart
+% to extract type and key. So we replace space with '_' and use '_' as
+% key word.
+for ii=1:2:numel(varargin)
+    varargin{ii} = strrep(varargin{ii}, ' ', '_');
+end
 %% Parse inputs
-varargin = ieParamFormat(varargin);
 p = inputParser;
-p.KeepUnmatched = true;
-p.addParameter('lightspectrum','D65',@(x)(ischar(x)||isnumeric(x)));
+p.addRequired('name', @ischar);
 p.addParameter('type','point',@ischar);
-p.parse(varargin{:});
+p.KeepUnmatched = true;
+p.parse(name, varargin{:});
 
+type = ieParamFormat(p.Results.type);
+%% Construct light struct
+lght.name = name;
+lght.scale.type = 'spectrum';
+lght.scale.value = [];
+
+lght.cameracoordinate = false;
+switch type
+    case 'distant'
+        lght.type = 'distant';
+        
+        lght.spectrum.type = 'spectrum';
+        lght.spectrum.value = [];
+        
+        lght.from.type = 'point';
+        lght.from.value = [];
+        
+        lght.to.type = 'to';
+        lght.to.value = [];
+        
+    case 'goniometric'
+        lght.type = 'goniometric';
+        
+        lght.spectrum.type = 'spectrum';
+        lght.spectrum.value = [];
+        
+        lght.mapname.type = 'string';
+        lght.mapname.value = '';
+        
+    case 'infinite'
+        lght.type = 'infinite';
+        
+        lght.spectrum.type = 'spectrum';
+        lght.spectrum.value = [];
+        
+        lght.samples.type = 'integer';
+        lght.samples.value = [];
+        
+        lght.mapname.type = 'string';
+        lght.mapname.value = '';
+        
+    case 'point'
+        lght.type = 'point';
+        
+        lght.spectrum.type = 'spectrum';
+        lght.spectrum.value = [];
+        
+        lght.from.type = 'point';
+        lght.from.value = [];
+        
+    case 'projection'
+        lght.type = 'projection';
+        
+        lght.spectrum.type = 'spectrum';
+        lght.spectrum.value = [];
+        
+        lght.fov.type = 'float';
+        lght.fov.value = [];
+        
+        lght.mapname.type = 'string';
+        lght.mapname.value = '';
+        
+    case {'spot', 'spotlight'}
+        lght.type = 'spotl';
+        
+        lght.spectrum.type = 'spectrum';
+        lght.spectrum.value = [];
+        
+        lght.from.type = 'point';
+        lght.from.value = [];
+        
+        lght.to.type = 'point';
+        lght.to.value = [];
+        
+        lght.coneangle.type = 'float';
+        lght.coneangle.value = [];
+        
+        lght.conedeltaangle.type = 'float';
+        lght.conedeltaangle.value = [];
+        
+    case {'area', 'arealight'}
+        lght.type = 'diffuse';
+        
+        lght.spectrum.type = 'spectrum';
+        lght.spectrum.value = [];
+        
+        lght.twosided.type = 'bool';
+        lght.twosided.value = [];
+        
+        lght.samples.type = 'integer';
+        lght.samples.value = [];
+        
+        lght.shape.type = 'shape';
+        lght.shape.value = [];
+end
+
+
+%% Put in key/val
+
+for ii=1:2:numel(varargin)
+    thisKey = varargin{ii};
+    thisVal = varargin{ii + 1};
+    
+    if isequal(thisKey, 'type')
+        % Skip since we've taken care of light type above.
+        continue;
+    end
+    
+    keyTypeName = strsplit(thisKey, '_');
+    
+    % keyName is the property name. If it follows 'TYPE_NAME', we need
+    % later, otherwise we need the first one.
+    if piLightISParamType(keyTypeName{1})
+        keyName = ieParamFormat(keyTypeName{2});
+    else
+        keyName = ieParamFormat(keyTypeName{1});
+    end
+    
+    if isfield(lght, keyName)
+        lght = piLightSet(lght, sprintf('%s value', keyName),...
+                              thisVal);
+    else
+        warning('Parameter %s does not exist in material %s',...
+                    keyName, lght.type)
+    end
+end
+
+%% Old version
+%{
+%%
 lightSpectrum = p.Results.lightspectrum;
 if ischar(lightSpectrum)
     % User sent a char, so this must be a file on the path.  In fact, it
@@ -86,5 +228,5 @@ switch type
     otherwise
         % Do nothing
 end
-
+%}
 end

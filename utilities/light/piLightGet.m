@@ -1,4 +1,4 @@
-function val = piLightGet(thisR, varargin)
+function val = piLightGet(lght, param, varargin)
 % Read a light source struct in the recipe
 %
 % Inputs
@@ -22,13 +22,53 @@ function val = piLightGet(thisR, varargin)
 
 % Examples:
 %{
-   thisR = piRecipeDefault;
-   piLightGet(thisR)
-   piLightGet(thisR,'idx',1)
-   piLightGet(thisR,'idx',1,'param','range')
-   piLightGet(thisR,'idx',1,'param','type')
-   piLightGet(thisR,'idx',1,'param','from')
+    lght = piLightCreate('new light');
+    lght = piLightSet(lght, 'spectrum val', 'D50');
+    lght = piLightSet(lght, 'from val', [10 10 10]);
+    spd = piLightGet(lght, 'spectrum val');
+    fromType = piLightGet(lght, 'from type');
+    from = piLightGet(lght, 'from');
 %}
+%% Parse inputs
+
+% Check the parameter name and type/val flag
+nameTypeVal = strsplit(param, ' ');
+pName    = nameTypeVal{1};
+if numel(nameTypeVal) > 1
+    pTypeVal = nameTypeVal{2};
+else
+    pTypeVal = '';
+end
+
+p = inputParser;
+p.addRequired('lght', @isstruct);
+p.addRequired('param', @ischar);
+
+p.parse(lght, param, varargin{:});
+%%
+val = [];
+
+if isfield(lght, pName)
+    % If asking name, type or camera coordinate
+    if isequal(pName, 'name') || isequal(pName, 'type') ||...
+            isequal(pName, 'cameracoordinate')
+        val = lght.(pName);
+        return;
+    end
+    
+    if isempty(pTypeVal)
+        val = lght.(pName);
+    elseif isequal(pTypeVal, 'type')
+        val = lght.(pName).type;
+    elseif isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
+        val = lght.(pName).value;
+    end
+else
+    warning('Parameter: %s does not exist in light type: %s',...
+            param, light.type);    
+end
+%% Old version
+%{
 %% Parse inputs
 
 varargin = ieParamFormat(varargin);
@@ -90,5 +130,5 @@ if p.Results.print
     disp('*********************')
     disp('---------------------')
 end
-
+%}
 end

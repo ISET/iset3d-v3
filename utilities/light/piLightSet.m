@@ -1,4 +1,4 @@
-function obj = piLightSet(obj, lightIdx, param, val, varargin)
+function lght = piLightSet(lght, param, val, varargin)
 % Set a light source parameter
 %
 % Synopsis
@@ -105,9 +105,73 @@ function obj = piLightSet(obj, lightIdx, param, val, varargin)
 %}
 
 %{
-    light = piLightCreate;
-    thisR = piLightSet(light, [], 'light spectrum', 'D50')
+    light = piLightCreate('new light');
+    light = piLightSet(light, 'spectrum val', 'D50');
+    light = piLightSet(light, 'from val', [10 10 10]);
 %}
+
+%% Parse inputs
+
+% check the parameter name and type/val flag
+nameTypeVal = strsplit(param, ' ');
+pName = nameTypeVal{1};
+
+% Whether it is specified to set a type or a value.
+if numel(nameTypeVal) > 1
+    pTypeVal = nameTypeVal{2};
+else
+    % Set a whole struct
+    pTypeVal = '';
+end
+
+p = inputParser;
+p.addRequired('lght', @isstruct);
+p.addRequired('param', @ischar);
+p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || isbool));
+
+p.parse(lght, param, val, varargin{:});
+
+%%
+if isfield(lght, pName)
+    % Set name, type or camera coordinate
+    if isequal(pName, 'name') || isequal(pName, 'type') ||...
+            isequal(pName, 'cameracoordinate')
+        lght.(pName) = val;
+        return;
+    end
+    
+    % Set the whole struct
+    if isempty(pTypeVal)
+        lght.(pName) = val;
+        return
+    end
+    
+    % Set parameter type
+    if isequal(pTypeVal, 'type')
+        lght.(pName).type = type;
+        return;
+    end
+    
+    % Set parameter value
+    if isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
+        lght.(pName).value = val;
+        
+        % Changing property type if the user doesn't specify it.
+        if isequal(pName, 'spectrum') || isequal(pName, 'scale')
+            if numel(val) == 3 && ~ischar(val)
+                lght.(pName).type = 'rgb';
+            elseif numel(val) > 3 || ischar(val)
+                lght.(pName).type = 'spectrum';
+            end
+            return;
+        end
+    end
+else
+    warning('Parameter: %s does not exist in light type: %s',...
+                pName, lght.type);
+end
+%% Old version
+%{
 %% Parse inputs
 param = ieParamFormat(param);
 varargin = ieParamFormat(varargin);
@@ -135,5 +199,5 @@ elseif isa(obj, 'struct')
         warning('Parameters: "%s" not in current fields of light type: "%s". Adding', param, obj.type)
     end
 end
-
+%}
 %%
