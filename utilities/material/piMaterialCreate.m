@@ -29,12 +29,16 @@ function material = piMaterialCreate(name, varargin)
 % Returns:
 %   material                  - created material
 %
+% ieExamplesRun('piMaterialCreate')
+%
+% See Also
+% piMaterialRead.m, piMaterialGet
 
-% Examples
+% Examples:
 %{
     %   
     material = piMaterialCreate('new material', 'type', 'kdsubsurface',...
-                                'kd rgb',[1, 1, 1]);
+                                'kd rgb',[1, 1, 1])
     material = piMaterialCreate('new material',...
                                 'kd rgb',[1, 1, 1]);
     material = piMaterialCreate('new material', 'type', 'uber',...
