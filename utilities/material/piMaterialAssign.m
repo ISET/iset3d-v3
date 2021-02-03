@@ -1,6 +1,7 @@
 function piMaterialAssign(thisR, materialName, target, varargin)
 % Assign a material (target) to the idx material in the recipe
 %
+% This will be removed
 %   We get a target material from the materiallib.  We add the
 %   properties of that target material onto the material (idx) in the
 %   recipe
