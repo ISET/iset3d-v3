@@ -1011,8 +1011,12 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         
         % Getting read for lights
-    case{'light'}
-        val = thisR.light;
+    case{'light', 'lights'}
+        if isfield(thisR, 'lights')
+            val = thisR.lights;
+        else
+            val = {};
+        end
                     
     % Asset specific gets - more work needed here.
     case {'asset', 'assets'}
