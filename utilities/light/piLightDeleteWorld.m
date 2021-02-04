@@ -28,7 +28,7 @@ function thisR = piLightDeleteWorld(thisR, index)
 
 %% Get list of light sources
 
-lightSource = piLightGetFromWorld(thisR, 'print', false);
+lightSource = thisR.lights;
 world = thisR.world;
 
 %%

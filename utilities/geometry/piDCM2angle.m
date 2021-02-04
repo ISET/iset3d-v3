@@ -1,5 +1,6 @@
-function [r1,r2,r3] = piDCM2angle( dcm )
-% Simplified version of the Aerospace toolbox angle conversion utility
+function [r1,r2,r3] = piDCM2angle( dcm, varargin )
+
+%{% Simplified version of the Aerospace toolbox angle conversion utility
 %
 % Syntax:
 %  [r1,r2,r3] = piDCM2angle( dcm )
@@ -41,10 +42,33 @@ function [r1,r2,r3] = piDCM2angle( dcm )
 % until we figure out what's going on.
 % validatedcm(dcm);
 
+if isempty(varargin)
+    type = 'ZYX';
+else
+    type = varargin{1};
+end
 %% This is the transform
+switch type
+    case 'ZYX'
+        [r1,r2,r3] = threeaxisrot( dcm(1,2,:), dcm(1,1,:), -dcm(1,3,:), ...
+            dcm(2,3,:), dcm(3,3,:));
+    case 'ZXY'
+        [r1,r2,r3] = threeaxisrot( -dcm(2,1,:), dcm(2,2,:), dcm(2,3,:), ...
+            -dcm(1,3,:), dcm(3,3,:));
+    case 'XYZ'
+        [r1,r2,r3] = threeaxisrot( -dcm(3,2,:), dcm(3,3,:), dcm(3,1,:), ...
+            -dcm(2,1,:), dcm(1,1,:));
+    case 'XZY'
+        [r1,r2,r3] = threeaxisrot( dcm(2,3,:), dcm(2,2,:), -dcm(2,1,:), ...
+            dcm(3,1,:), dcm(1,1,:));
+    case 'YXZ'
+        [r1,r2,r3] = threeaxisrot( dcm(3,1,:), dcm(3,3,:), -dcm(3,2,:), ...
+            dcm(1,2,:), dcm(2,2,:));
+    case 'YZX'
+        [r1,r2,r3] = threeaxisrot( -dcm(1,3,:), dcm(1,1,:), dcm(1,2,:), ...
+            -dcm(3,2,:), dcm(2,2,:));
+end
 
-[r1,r2,r3] = threeaxisrot( dcm(1,2,:), dcm(1,1,:), -dcm(1,3,:), ...
-    dcm(2,3,:), dcm(3,3,:));
 
 r1 = r1(:);
 r2 = r2(:);

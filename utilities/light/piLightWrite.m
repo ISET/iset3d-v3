@@ -65,9 +65,9 @@ for ii = 1:numel(thisR.lights)
     if isfield(thisLightSource, 'spectrumscale'), spectrumScale = thisLightSource.spectrumscale;
     else, spectrumScale = 1; end
     
-    if isfield(thisLightSource, 'lightspectrum')
+    if isfield(thisLightSource, 'lightspectrum')&& ~isempty(thisLightSource.lightspectrum)
         if isnumeric(thisLightSource.lightspectrum)
-            lightSpectrum = ['[ ' num2str(thisLightSource.lightspectrum), ']'];
+            lightSpectrum = ['[' ,piNum2String(thisLightSource.lightspectrum),']'];
         else
             lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', thisLightSource.lightspectrum, spectrumScale);
         end
@@ -90,7 +90,7 @@ for ii = 1:numel(thisR.lights)
     
     % This is the parameter especially used by infinite light and area
     % light
-    if isfield(thisLightSource, 'nsamples'), nsamples = thisLightSource.nsamples;
+    if isfield(thisLightSource, 'nsamples')&& ~isempty(thisLightSource.nsamples), nsamples = thisLightSource.nsamples;
     else, nsamples = 16; end
     
     % This is the parameter for area light
@@ -104,13 +104,19 @@ for ii = 1:numel(thisR.lights)
         twosided = 'false';
     end
     
-    if isfield(thisLightSource, 'rotate')
+    if isfield(thisLightSource, 'rotate') 
         rotate = thisLightSource.rotate;
     else
         rotate = [];
     end
     
-    if isfield(thisLightSource, 'position')
+    if isfield(thisLightSource, 'concattransform') && ~isempty(thisLightSource.concattransform) 
+        ctform = thisLightSource.concattransform;
+    else
+        ctform = [];
+    end
+    
+    if isfield(thisLightSource, 'position') && ~isempty(thisLightSource.position)
         position = thisLightSource.position;
     else
         position = [];
@@ -236,17 +242,45 @@ for ii = 1:numel(thisR.lights)
             % lightSourceText{ii}.line{pos} = sprintf('AreaLightSource "diffuse" "%s L" %s "bool twosided" "%s" "integer nsamples" [%d]',...
             %     spectrumType, lightSpectrum, twosided, nsamples);
             lightSourceText{ii}.line{1} = 'AttributeBegin';
-            if ~isempty('position')
-                lightSourceText{ii}.line{end+1} = sprintf('Translate %.3f %.3f %.3f\n',...
+            if ~isempty('position') && ~isempty(position)
+                % might remove this;
+                if iscell(position)
+                    position = position{1};
+                end
+                lightSourceText{ii}.line{end+1} = sprintf('Translate %.3f %.3f %.3f',...
                         position(1), position(2), position(3));
             end
-            if ~isempty('rotate')
-                lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f %.3f %.3f %.3f \n',...
-                                                    rotate(:,1)); % Z
-                lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f %.3f %.3f %.3f \n',...
-                                                    rotate(:,2)); % Y
-                lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f %.3f %.3f %.3f \n',...
-                                                    rotate(:,3)); % X                                               
+            if ~isempty('rotate') && ~isempty(rotate)
+                % might remove this;
+                if iscell(rotate)
+                    rotate = rotate{1};
+                end
+                rot_size = size(rotate);
+                if rot_size(1)>rot_size(2)
+                    rotate = rotate';
+                end
+                for rr = 1:3
+                    thisRotate = rotate(rr,:);
+                    degree = thisRotate(1);
+                    if thisRotate(2)==1 
+                        x_degree = degree;
+                    elseif thisRotate(3)==1
+                        y_degree = degree;
+                    elseif thisRotate(4)==1
+                        z_degree = degree;
+                    end
+                end
+                if exist('z_degree','var')
+                    lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f 0 0 1', z_degree);
+                end
+                if exist('y_degree', 'var')
+                    lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f 0 1 0', y_degree);
+                end
+                if exist('x_degree', 'var')
+                    lightSourceText{ii}.line{end+1} = sprintf('Rotate %.3f 1 0 0', x_degree);
+                end
+            elseif exist('ctform', 'var') && ~isempty(ctform)
+                lightSourceText{ii}.line{end+1} = sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', ctform(:));
             end
             % Add light properties
             lightSourceText{ii}.line{end+1} = sprintf('AreaLightSource "diffuse" "%s L" %s "bool twosided" "%s" "integer nsamples" [%d]',...
@@ -272,6 +306,7 @@ if writefile
         for jj = 1:numel(lightSourceText{ii}.line)
             fprintf(fid, '%s \n',lightSourceText{ii}.line{jj});
         end
+        fprintf(fid,'\n');
     end
 end
 end

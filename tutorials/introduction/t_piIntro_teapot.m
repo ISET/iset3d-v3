@@ -28,7 +28,6 @@ if ~piDockerExists, piDockerConfig; end
 
 % This is the teapot scene
 thisR = piRecipeDefault('scene name','teapot');
-
 % Set up the render quality
 thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
