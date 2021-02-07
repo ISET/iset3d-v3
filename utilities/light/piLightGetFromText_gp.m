@@ -1,4 +1,4 @@
-function lightSources = piLightGetFromText(thisR, intext, varargin)
+function lightSources = piLightGetFromText_gp(thisR, intext, varargin)
 % Read a light source struct based on the parameters in the recipe
 %
 % This routine only works for light sources that are exported from

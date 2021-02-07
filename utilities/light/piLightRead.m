@@ -29,11 +29,11 @@ p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
 p.parse(thisR)
 
 %% Get light from world
-thisR.lights = piLightGetFromText(thisR, thisR.world, 'printinfo', false);
+[thisR.lights, lightTextRanges] = piLightGetFromText(thisR, thisR.world, 'printinfo', false);
 
 % Remove the light from the world as we already stored them in thisR.lights
 % do not deal with world block any more
-thisR = piLightDeleteWorld(thisR, 'all');
+thisR = piDeleteWorldText(thisR, lightTextRanges);
 
 % do we need this every time?
 if isempty(thisR.lights)

@@ -1,4 +1,5 @@
-function thisR = piLightDeleteWorld(thisR, index)
+function thisR = piDeleteWorldText(thisR, indices)
+% TODO: Update the description!
 % Remove a light source from a render recipe.
 %
 % Syntax:
@@ -23,16 +24,38 @@ function thisR = piLightDeleteWorld(thisR, index)
 % Description
 %
 % Zhenyi, TL, SCIEN, 2019
+% Zheng Lyu, 2021
 %
 % see also: piLightGet, piLightsAdd
+%%
+p = inputParser;
+p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
+p.addRequired('indices', @iscell);
+p.parse(thisR, indices);
 
+%%
+
+world = thisR.world;
+
+for ii=1:numel(indices)
+    if numel(indices{ii})>1
+        world(indices{ii}(1):indices{ii}(2)) = [];
+    else
+        world(indices{ii}(1)) = [];
+    end
+end
+
+thisR.world = world;
+
+%%
+%{
 %% Get list of light sources
 
 lightSource = thisR.lights;
 world = thisR.world;
 
 %%
-if ischar(index) && strcmp(index, 'all')
+if ischar(indices) && strcmp(indices, 'all')
     
     lightSourceLine = [];
     for ii = 1:length(lightSource)
@@ -56,5 +79,5 @@ else
     
     thisR.world = world; 
 end
-
+%}
 end

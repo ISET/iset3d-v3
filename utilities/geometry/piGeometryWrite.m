@@ -140,17 +140,23 @@ for ii = 1:numel(children)
                 fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output); 
         %}
         if ~isempty(thisNode.shape)
-            % There is a shape slot we also open the
-            % geometry file.
-%             name = thisNode.name;
-            
-            % Convert shape struct to text
+
             shapeText = piShape2Text(thisNode.shape);
-            fprintf(fid, '%s \n',shapeText);
-%             geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
-%             fprintf(geometryFile,'%s',shapeText);
-%             fclose(geometryFile);
-%             fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
+            
+            if ~isempty(thisNode.shape.filename)
+                % If the shape has ply info, do this
+                % Convert shape struct to text
+                fprintf(fid, '%s \n',shapeText);
+            else
+                % If it does not have plt file, do this
+                % There is a shape slot we also open the
+                % geometry file.
+                name = thisNode.name;
+                geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
+                fprintf(geometryFile,'%s',shapeText);
+                fclose(geometryFile);
+                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
+            end
         end
         
         fprintf(fid, 'ObjectEnd\n\n');

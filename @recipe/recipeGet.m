@@ -1012,12 +1012,65 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         % Getting read for lights
     case{'light', 'lights'}
-        if isfield(thisR, 'lights')
-            val = thisR.lights;
-        else
-            val = {};
+        if isempty(varargin)
+            if isfield(thisR, 'lights')
+                val = thisR.lights;
+            else
+                warning('No material in this recipe')
+                val = {};
+            end
+            return;
         end
-                    
+        
+        switch ieParamFormat(varargin{1})
+            case 'names'
+                n = numel(thisR.lights.list);
+                val = cell(1, n);
+                for ii=1:n
+                    val{ii} = thisR.lights.list{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the material name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.lights.list)
+                    % Search by index.  Get the material directly.
+                    lgtIdx = varargin{1};
+                    thisLight = thisR.lights.list{lgtIdx};
+                elseif isstruct(varargin{1})
+                    % The user sent in the material.  We hope.
+                    % We should have a slot in material that identifies itself as a
+                    % material.  Maybe a test like "material.type ismember valid
+                    % materials."
+                    thisLight = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisLight] = piLightFind(thisR.lights.list, 'name', varargin{1});
+                    val = thisLight;
+                end
+                
+                if isempty(thisLight)
+                    warning('Could not find material. Return.')
+                    return;
+                end
+                if numel(varargin) >= 2
+                    % Return the material property
+                    % thisR.get('material', material/idx/name, property)
+                    % Return the material property
+                    val = piLightGet(thisLight, varargin{2});
+                end
+        end
+    case {'nlight', 'nlights', 'light number', 'lights number'}
+        % thisR.get('n lights')
+        % Number of lights in this scene.
+        if isfield(thisR.lights, 'list')
+            val = numel(thisR.lights.list);
+        else
+            val = 0;
+        end                    
+    case {'lightsprint', 'printlights', 'lightprint', 'printlight'}
+        % thisR.get('lights print');
+        piLightList(thisR);
     % Asset specific gets - more work needed here.
     case {'asset', 'assets'}
         % thisR.get('asset',assetName or ID);  % Returns the asset

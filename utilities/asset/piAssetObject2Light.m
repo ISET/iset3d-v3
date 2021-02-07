@@ -53,7 +53,7 @@ lightNode = piAssetCreate('type', 'light');
 lightNode.lght = {lght}; % Convert the light to cell
 lightNode.name = objectName;
 if isequal(lght.type, 'area')
-    lightNode.lght{1}.shape = shape;
+    lightNode.lght{1} = piLightSet(lightNode.lght{1}, 'shape val', shape);
 end
 
 thisR.assets = thisR.assets.set(assetID, lightNode);

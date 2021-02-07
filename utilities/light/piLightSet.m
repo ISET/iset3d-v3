@@ -127,7 +127,8 @@ end
 p = inputParser;
 p.addRequired('lght', @isstruct);
 p.addRequired('param', @ischar);
-p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || isbool));
+p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) ||...
+                            islogical(x) || iscell(x)));
 
 p.parse(lght, param, val, varargin{:});
 
@@ -160,7 +161,9 @@ if isfield(lght, pName)
         if isequal(pName, 'spectrum') || isequal(pName, 'scale')
             if numel(val) == 3 && ~ischar(val)
                 lght.(pName).type = 'rgb';
-            elseif numel(val) > 3 || ischar(val)
+            elseif numel(val) == 2 && ~ischar(val)
+                lght.(pName).type = 'blackbody';
+            elseif (numel(val) > 3 && mod(numel(val), 2) == 0)|| ischar(val)
                 lght.(pName).type = 'spectrum';
             end
             return;

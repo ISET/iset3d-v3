@@ -1,4 +1,4 @@
-function val = piLightGet(lght, param, varargin)
+function [val, txt] = piLightGet(lght, param, varargin)
 % Read a light source struct in the recipe
 %
 % Inputs
@@ -40,25 +40,26 @@ else
     pTypeVal = '';
 end
 
+varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addRequired('lght', @isstruct);
 p.addRequired('param', @ischar);
+p.addParameter('pbrttext', false, @islogical);
 
 p.parse(lght, param, varargin{:});
+
+pbrtText = p.Results.pbrttext;
 %%
 val = [];
 
 if isfield(lght, pName)
     % If asking name, type or camera coordinate
-    if isequal(pName, 'name') || isequal(pName, 'type') ||...
-            isequal(pName, 'cameracoordinate')
+    if (isequal(pName, 'name') || isequal(pName, 'type') ||...
+            isequal(pName, 'cameracoordinate')) || isempty(pTypeVal)
         val = lght.(pName);
-        return;
     end
     
-    if isempty(pTypeVal)
-        val = lght.(pName);
-    elseif isequal(pTypeVal, 'type')
+    if isequal(pTypeVal, 'type')
         val = lght.(pName).type;
     elseif isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
         val = lght.(pName).value;
@@ -66,6 +67,87 @@ if isfield(lght, pName)
 else
     warning('Parameter: %s does not exist in light type: %s',...
             param, light.type);    
+end
+
+%% compose pbrt text
+txt = '';
+if pbrtText && ~isempty(val) &&...
+            (isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val') || isequal(pName, 'type'))
+    switch pName
+        case 'type'
+            if ~isequal(val, 'area')
+                txt = sprintf('LightSource "%s"', val);
+            else
+                txt = sprintf('AreaLightSource "diffuse"');
+            end
+        case 'spectrum'
+            spectrumScale = lght.specscale.value;
+            if ischar(lght.spectrum.value)
+                lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', lght.spectrum.value, spectrumScale);
+            elseif isnumeric(lght.spectrum.value)
+                lightSpectrum = ['[' ,piNum2String(lght.spectrum.value * spectrumScale),']'];
+            end
+            switch lght.type
+                case {'point', 'goniometric', 'projection', 'spot', 'spotlight'} % I
+                    txt = sprintf(' "%s I" %s', lght.spectrum.type, lightSpectrum);
+                case {'distant', 'infinite', 'area'} % L
+                    txt = sprintf(' "%s L" %s', lght.spectrum.type, lightSpectrum);
+            end
+        case 'from'
+            txt = sprintf(' "point from" [%.4f %.4f %.4f]', val(1), val(2), val(3));
+        case 'to'
+            txt = sprintf(' "point to" [%.4f %.4f %.4f]', val(1), val(2), val(3));
+        case 'mapname'
+            txt = sprintf(' "string mapname" "%s"', val);
+        case 'fov'
+            txt = sprintf(' "float fov" [%.4f]', val);
+        case 'nsamples'
+            txt = sprintf(' "integer nsamples" [%d]', val);
+        case 'coneangle'
+            txt = sprintf(' "float coneangle" [%.4f]', coneangle);
+        case 'conedeltaangle'
+            txt = sprintf(' "float conedeltaangle" [%.4f]', conedeltaangle);
+        case 'twosided'
+            if val
+                txt = sprintf(' "bool twosided" "%s"', 'true');
+            else
+                txt = sprintf(' "bool twosided" "%s"', 'false');
+            end   
+        case 'shape'
+            txt = piShape2Text(val);
+        case 'translation'
+            txt = {}; % Change to cells 
+            for ii=1:numel(val)
+                txt{end + 1} = sprintf('Translate %.3f %.3f %.3f',...
+                    val{ii}(1), val{ii}(2),...
+                    val{ii}(3));
+            end
+        case 'rotation'
+            % Copying from Zhenyi's code, Which does not account for multiple
+            % rotations I think
+            %{
+                % might remove this;
+                if iscell(rotate)
+                    rotate = rotate{1};
+                end
+            %}
+            txt = {}; % Change to cells 
+
+            for ii=1:numel(val)
+                curRot = val{ii};
+                curRot = curRot(:)';
+                txt{end + 1} = sprintf('Rotate %.3f %d %d %d', curRot(1),...
+                                    curRot(2), curRot(3), curRot(4));
+            end
+        case 'ctform'
+            for ii=1:numel(val)
+                txt{end + 1} = sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', val{ii}(:));
+            end
+        case 'scale'
+            for ii=1:numel(val)
+                txt{end + 1} = sprintf('Scale %.3f %.3f %.3f', val{ii}(1), val{ii}(2), val{ii}(3));
+            end
+    end
 end
 %% Old version
 %{

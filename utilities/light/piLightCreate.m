@@ -49,10 +49,12 @@ p.parse(name, varargin{:});
 type = ieParamFormat(p.Results.type);
 %% Construct light struct
 lght.name = name;
-lght.scale.type = 'spectrum';
-lght.scale.value = [];
 
-lght.cameracoordinate = false;
+% PBRT allows wavelength by wavelength adjustment - would enable that
+% someday.
+lght.specscale.type = 'float';
+lght.specscale.value = 1;
+
 switch type
     case 'distant'
         lght.type = 'distant';
@@ -60,11 +62,26 @@ switch type
         lght.spectrum.type = 'spectrum';
         lght.spectrum.value = [];
         
+        lght.cameracoordinate = false;
+
         lght.from.type = 'point';
         lght.from.value = [];
         
         lght.to.type = 'to';
         lght.to.value = [];
+        
+        % Potentially has rotationation, transformation or concatransformaiton
+        lght.rotation.type = 'rotation';
+        lght.rotation.value = [];
+        
+        lght.translation.type = 'translation';
+        lght.translation.value = [];
+        
+        lght.ctform.type = 'ctform';
+        lght.ctform.value = [];
+        
+        lght.scale.type = 'scale';
+        lght.scale.value = [];        
         
     case 'goniometric'
         lght.type = 'goniometric';
@@ -81,24 +98,51 @@ switch type
         lght.spectrum.type = 'spectrum';
         lght.spectrum.value = [];
         
-        lght.samples.type = 'integer';
-        lght.samples.value = [];
+        lght.nsamples.type = 'integer';
+        lght.nsamples.value = [];
         
         lght.mapname.type = 'string';
         lght.mapname.value = '';
         
+        % Potentially has rotation, transformation or concatransformaiton
+        lght.rotation.type = 'rotation';
+        lght.rotation.value = [];
+        
+        lght.translation.type = 'translation';
+        lght.translation.value = [];
+        
+        lght.ctform.type = 'ctform';
+        lght.ctform.value = [];
+        
+        lght.scale.type = 'scale';
+        lght.scale.value = [];  
     case 'point'
         lght.type = 'point';
         
         lght.spectrum.type = 'spectrum';
         lght.spectrum.value = [];
         
+        lght.cameracoordinate = false;
+
         lght.from.type = 'point';
         lght.from.value = [];
         
+        % Potentially has rotation, transformation or concatransformaiton
+        lght.rotation.type = 'rotation';
+        lght.rotation.value = [];
+        
+        lght.translation.type = 'translation';
+        lght.translation.value = [];
+        
+        lght.ctform.type = 'ctform';
+        lght.ctform.value = [];
+        
+        lght.scale.type = 'scale';
+        lght.scale.value = [];        
+        
     case 'projection'
         lght.type = 'projection';
-        
+
         lght.spectrum.type = 'spectrum';
         lght.spectrum.value = [];
         
@@ -114,6 +158,8 @@ switch type
         lght.spectrum.type = 'spectrum';
         lght.spectrum.value = [];
         
+        lght.cameracoordinate = false;
+
         lght.from.type = 'point';
         lght.from.value = [];
         
@@ -126,8 +172,21 @@ switch type
         lght.conedeltaangle.type = 'float';
         lght.conedeltaangle.value = [];
         
+        % Potentially has rotation, transformation or concatransformaiton
+        lght.rotation.type = 'rotation';
+        lght.rotation.value = [];
+        
+        lght.translation.type = 'translation';
+        lght.translation.value = [];
+        
+        lght.ctform.type = 'ctform';
+        lght.ctform.value = [];
+        
+        lght.scale.type = 'scale';
+        lght.scale.value = [];
+        
     case {'area', 'arealight'}
-        lght.type = 'diffuse';
+        lght.type = 'area';
         
         lght.spectrum.type = 'spectrum';
         lght.spectrum.value = [];
@@ -135,11 +194,24 @@ switch type
         lght.twosided.type = 'bool';
         lght.twosided.value = [];
         
-        lght.samples.type = 'integer';
-        lght.samples.value = [];
+        lght.nsamples.type = 'integer';
+        lght.nsamples.value = [];
         
         lght.shape.type = 'shape';
         lght.shape.value = [];
+        
+        % Potentially has rotationation, transformation or concatransformaiton
+        lght.rotation.type = 'rotation';
+        lght.rotation.value = [];
+        
+        lght.translation.type = 'translation';
+        lght.translation.value = [];
+        
+        lght.ctform.type = 'ctform';
+        lght.ctform.value = [];
+        
+        lght.scale.type = 'scale';
+        lght.scale.value = [];
 end
 
 
@@ -217,11 +289,11 @@ switch type
         lght.coneangle = 5;
         lght.conedeltaangle = 1;
     case 'area'
-        lght.rotate = [0 0 0;
+        lght.rotationate = [0 0 0;
               0 0 1;
               0 1 0;
               1 0 0];
-        lght.position = [0 0 0];
+        lght.translationition = [0 0 0];
         lght.shape = [];
         lght.booltwosided = false;
         lght.integersamples = 1;
