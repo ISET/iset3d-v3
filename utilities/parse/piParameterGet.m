@@ -3,6 +3,7 @@ function value = piParameterGet(thisLine, match)
 %{
 thisLine = 'AreaLightSource "diffuse" "integer nsamples" [ 16 ] "bool twosided" "true" "rgb L" [ 7.39489317 7.35641623 7.32100344 ]';
 value = piParameterGet(thisLine, 'bool twosided')
+val = piParameterGet(thisLine, 'rgb L')
 %}
 if strcmp(match, 'L')
     match = ' L';

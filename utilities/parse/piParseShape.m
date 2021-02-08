@@ -54,7 +54,8 @@ if find(piContains(keyWords, 'Shape '))
                 %                 shape.filename = keyWords{find(piContains(keyWords, 'filename')) + 2};
             end
             if find(piContains(keyWords, 'integer indices'))
-                shape.integerindices = piParameterGet(txt, 'integer indices');
+                shape.integerindices = uint64(piParameterGet(txt, 'integer indices'));
+                % Convert it to integer format
                 %                 shape.integerindices = keyWords{find(piContains(keyWords, 'integer indices')) + 1};
             end
             if find(piContains(keyWords, 'point P'))
