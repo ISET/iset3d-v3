@@ -55,20 +55,19 @@ lght.name = name;
 lght.specscale.type = 'float';
 lght.specscale.value = 1;
 
+lght.spd.type = 'spectrum';
+lght.spd.value = [];
 switch type
     case 'distant'
         lght.type = 'distant';
         
-        lght.spectrum.type = 'spectrum';
-        lght.spectrum.value = [];
-        
         lght.cameracoordinate = false;
 
         lght.from.type = 'point';
-        lght.from.value = [];
+        lght.from.value = [0 0 0];
         
         lght.to.type = 'to';
-        lght.to.value = [];
+        lght.to.value = [0 0 1];
         
         % Potentially has rotationation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
@@ -84,19 +83,13 @@ switch type
         lght.scale.value = [];        
         
     case 'goniometric'
-        lght.type = 'goniometric';
-        
-        lght.spectrum.type = 'spectrum';
-        lght.spectrum.value = [];
+        lght.type = 'goniometric'; 
         
         lght.mapname.type = 'string';
         lght.mapname.value = '';
         
     case 'infinite'
         lght.type = 'infinite';
-        
-        lght.spectrum.type = 'spectrum';
-        lght.spectrum.value = [];
         
         lght.nsamples.type = 'integer';
         lght.nsamples.value = [];
@@ -118,14 +111,11 @@ switch type
         lght.scale.value = [];  
     case 'point'
         lght.type = 'point';
-        
-        lght.spectrum.type = 'spectrum';
-        lght.spectrum.value = [];
-        
+                
         lght.cameracoordinate = false;
 
         lght.from.type = 'point';
-        lght.from.value = [];
+        lght.from.value = [0 0 0];
         
         % Potentially has rotation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
@@ -142,9 +132,6 @@ switch type
         
     case 'projection'
         lght.type = 'projection';
-
-        lght.spectrum.type = 'spectrum';
-        lght.spectrum.value = [];
         
         lght.fov.type = 'float';
         lght.fov.value = [];
@@ -153,18 +140,15 @@ switch type
         lght.mapname.value = '';
         
     case {'spot', 'spotlight'}
-        lght.type = 'spotl';
-        
-        lght.spectrum.type = 'spectrum';
-        lght.spectrum.value = [];
+        lght.type = 'spot';
         
         lght.cameracoordinate = false;
 
         lght.from.type = 'point';
-        lght.from.value = [];
+        lght.from.value = [0 0 0];
         
-        lght.to.type = 'point';
-        lght.to.value = [];
+        lght.to.type = 'to';
+        lght.to.value = [0 0 1];
         
         lght.coneangle.type = 'float';
         lght.coneangle.value = [];
@@ -187,9 +171,6 @@ switch type
         
     case {'area', 'arealight'}
         lght.type = 'area';
-        
-        lght.spectrum.type = 'spectrum';
-        lght.spectrum.value = [];
         
         lght.twosided.type = 'bool';
         lght.twosided.value = [];
@@ -240,7 +221,7 @@ for ii=1:2:numel(varargin)
         lght = piLightSet(lght, sprintf('%s value', keyName),...
                               thisVal);
     else
-        warning('Parameter %s does not exist in material %s',...
+        warning('Parameter %s does not exist in light %s',...
                     keyName, lght.type)
     end
 end

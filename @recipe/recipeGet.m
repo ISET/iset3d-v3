@@ -903,7 +903,10 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
-        switch ieParamFormat(varargin{1})
+        if ischar(varargin{1})
+            varargin{1} = ieParamFormat(varargin{1});
+        end
+        switch varargin{1}
             % Special cases
             case 'names'
                 % thisR.get('material','names');
@@ -1013,16 +1016,20 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Getting read for lights
     case{'light', 'lights'}
         if isempty(varargin)
-            if isfield(thisR, 'lights')
+            if isprop(thisR, 'lights')
                 val = thisR.lights;
             else
-                warning('No material in this recipe')
+                warning('No lights in this recipe')
                 val = {};
             end
             return;
         end
+
+        if ischar(varargin{1})
+            varargin{1} = ieParamFormat(varargin{1});
+        end
         
-        switch ieParamFormat(varargin{1})
+        switch varargin{1}
             case 'names'
                 n = numel(thisR.lights.list);
                 val = cell(1, n);
@@ -1033,10 +1040,11 @@ switch ieParamFormat(param)  % lower case, no spaces
                 % The first argument indicates the material name and there
                 % must be a second argument for the property
                 if isnumeric(varargin{1}) && ...
-                        varargin{1} <= numel(thisR.lights.list)
+                        varargin{1} <= numel(thisR.lights)
                     % Search by index.  Get the material directly.
                     lgtIdx = varargin{1};
-                    thisLight = thisR.lights.list{lgtIdx};
+                    thisLight = thisR.lights{lgtIdx};
+                    val = thisLight;
                 elseif isstruct(varargin{1})
                     % The user sent in the material.  We hope.
                     % We should have a slot in material that identifies itself as a
@@ -1045,7 +1053,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     thisLight = varargin{1};
                 elseif ischar(varargin{1})
                     % Search by name, find the index
-                    [~, thisLight] = piLightFind(thisR.lights.list, 'name', varargin{1});
+                    [~, thisLight] = piLightFind(thisR.lights, 'name', varargin{1});
                     val = thisLight;
                 end
                 
@@ -1063,8 +1071,8 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'nlight', 'nlights', 'light number', 'lights number'}
         % thisR.get('n lights')
         % Number of lights in this scene.
-        if isfield(thisR.lights, 'list')
-            val = numel(thisR.lights.list);
+        if isprop(thisR, 'lights')
+            val = numel(thisR.lights);
         else
             val = 0;
         end                    

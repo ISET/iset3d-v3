@@ -78,7 +78,7 @@ for ii = 1:nLights
         
         % Spectrum
         spec = piParameterGet(thisLine, 'L');
-        thisLightSource = piLightSet(thisLightSource, 'spectrum val', spec);
+        thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
         
         % Twosided
         twoside = piParameterGet(thisLine, 'bool twosided');
@@ -110,7 +110,7 @@ for ii = 1:nLights
             case 'infinite'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'L');
-                thisLightSource = piLightSet(thisLightSource, 'spectrum val', spec);
+                thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
                 
                 % n samples
                 nsamples = piParameterGet(thisLine, 'integer nsamples');
@@ -123,7 +123,7 @@ for ii = 1:nLights
             case 'spot'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'I');
-                thisLightSource = piLightSet(thisLightSource, 'spectrum val', spec);
+                thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
                 
                 % from
                 from = piParameterGet(thisLine, 'point from');
@@ -144,7 +144,7 @@ for ii = 1:nLights
             case 'point'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'I');
-                thisLightSource = piLightSet(thisLightSource, 'spectrum val', spec);
+                thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
                 
                 % from
                 from = piParameterGet(thisLine, 'point from');
@@ -153,7 +153,7 @@ for ii = 1:nLights
             case 'goniometric'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'I');
-                thisLightSource = piLightSet(thisLightSource, 'spectrum val', spec);
+                thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
                 
                 % mapname
                 mapname = piParameterGet(thisLine, 'string mapname');
@@ -162,7 +162,7 @@ for ii = 1:nLights
             case 'distant'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'L');
-                thisLightSource = piLightSet(thisLightSource, 'spectrum val', spec);
+                thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
                 
                 % from
                 from = piParameterGet(thisLine, 'point from');
@@ -175,7 +175,7 @@ for ii = 1:nLights
             case 'projection'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'I');
-                thisLightSource = piLightSet(thisLightSource, 'spectrum val', spec);               
+                thisLightSource = piLightSet(thisLightSource, 'spd val', spec);               
 
                 % FOV
                 fov = piParameterGet(thisLine, 'float fov');

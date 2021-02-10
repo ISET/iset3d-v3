@@ -1,4 +1,5 @@
 function thisR = piLightDelete(thisR, index)
+%% This function is going to be deprecated
 % Remove a light source from a render recipe.
 %
 % Syntax:

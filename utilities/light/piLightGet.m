@@ -23,9 +23,9 @@ function [val, txt] = piLightGet(lght, param, varargin)
 % Examples:
 %{
     lght = piLightCreate('new light');
-    lght = piLightSet(lght, 'spectrum val', 'D50');
+    lght = piLightSet(lght, 'spd val', 'D50');
     lght = piLightSet(lght, 'from val', [10 10 10]);
-    spd = piLightGet(lght, 'spectrum val');
+    spd = piLightGet(lght, 'spd val');
     fromType = piLightGet(lght, 'from type');
     from = piLightGet(lght, 'from');
 %}
@@ -80,18 +80,18 @@ if pbrtText && ~isempty(val) &&...
             else
                 txt = sprintf('AreaLightSource "diffuse"');
             end
-        case 'spectrum'
+        case 'spd'
             spectrumScale = lght.specscale.value;
-            if ischar(lght.spectrum.value)
-                lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', lght.spectrum.value, spectrumScale);
-            elseif isnumeric(lght.spectrum.value)
-                lightSpectrum = ['[' ,piNum2String(lght.spectrum.value * spectrumScale),']'];
+            if ischar(lght.spd.value)
+                lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', lght.spd.value, spectrumScale);
+            elseif isnumeric(lght.spd.value)
+                lightSpectrum = ['[' ,piNum2String(lght.spd.value * spectrumScale),']'];
             end
             switch lght.type
                 case {'point', 'goniometric', 'projection', 'spot', 'spotlight'} % I
-                    txt = sprintf(' "%s I" %s', lght.spectrum.type, lightSpectrum);
+                    txt = sprintf(' "%s I" %s', lght.spd.type, lightSpectrum);
                 case {'distant', 'infinite', 'area'} % L
-                    txt = sprintf(' "%s L" %s', lght.spectrum.type, lightSpectrum);
+                    txt = sprintf(' "%s L" %s', lght.spd.type, lightSpectrum);
             end
         case 'from'
             txt = sprintf(' "point from" [%.4f %.4f %.4f]', val(1), val(2), val(3));
@@ -104,9 +104,9 @@ if pbrtText && ~isempty(val) &&...
         case 'nsamples'
             txt = sprintf(' "integer nsamples" [%d]', val);
         case 'coneangle'
-            txt = sprintf(' "float coneangle" [%.4f]', coneangle);
+            txt = sprintf(' "float coneangle" [%.4f]', val);
         case 'conedeltaangle'
-            txt = sprintf(' "float conedeltaangle" [%.4f]', conedeltaangle);
+            txt = sprintf(' "float conedeltaangle" [%.4f]', val);
         case 'twosided'
             if val
                 txt = sprintf(' "bool twosided" "%s"', 'true');
@@ -180,7 +180,7 @@ if ~isempty(idx)
             case 'spd'
                 % spd = piLightGet(thisR,'idx',1,'param','spd');
                 val = ieReadSpectra(thisLight.lightspectrum);
-                val = val*thisLight.spectrumscale;
+                val = val*thisLight.spdscale;
             otherwise
                 % A parameter of that light
                 val = thisLight.(param);

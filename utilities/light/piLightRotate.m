@@ -1,4 +1,4 @@
-function thisR = piLightRotate(thisR, idx,varargin)
+function lght = piLightRotate(lght, varargin)
 % Rotate the direction of a light source
 %
 % Synopsis
@@ -23,19 +23,38 @@ function thisR = piLightRotate(thisR, idx,varargin)
     ieInit;
     thisR = piRecipeDefault;
     thisR = piLightDelete(thisR, 'all');
-    thisR = piLightAdd(thisR, 'type', 'spot', 'cameracoordinate', true);
-    
-    piLightGet(thisR);
-    lightNumber = 1;
-    piLightSet(thisR, lightNumber, 'light spectrum', 'D50')
-    piLightSet(thisR, lightNumber, 'coneAngle', 5);
-    [~, lightNumber] = piLightRotate(thisR, lightNumber, 'x rot', 5);
+    spotLight = piLightCreate('new spot', 'type', 'spot',...
+                'cameracoordinate', true,...
+                'spd val', 'D50',...
+                'coneangle val', 5);
+    spotLight = piLightRotate(spotLight, 'x rot', 5);
+    thisR.set('light', 'add', spotLight);
 
     piWrite(thisR, 'overwritematerials', true);
 
     % Render
     [scene, result] = piRender(thisR, 'render type','radiance');
     sceneWindow(scene);
+
+%}
+%{
+    % Another way of setting rotation
+    ieInit;
+    thisR = piRecipeDefault;
+    thisR = piLightDelete(thisR, 'all');
+    spotLight = piLightCreate('new spot', 'type', 'spot',...
+                'cameracoordinate', true,...
+                'spd val', 'D50',...
+                'coneangle val', 5);
+    thisR.set('light', 'add', spotLight);
+    thisR.set('light', 'rotate', 'new spot', [5 0 0]);
+
+    piWrite(thisR, 'overwritematerials', true);
+
+    % Render
+    [scene, result] = piRender(thisR, 'render type','radiance');
+    sceneWindow(scene);
+
 %}
 %% parse
 
@@ -43,16 +62,16 @@ function thisR = piLightRotate(thisR, idx,varargin)
 varargin = ieParamFormat(varargin);
 p = inputParser;
 
-p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
+p.addRequired('lght', @isstruct);
 
 p.addParameter('xrot', 0, @isscalar);
 p.addParameter('yrot', 0, @isscalar);
 p.addParameter('zrot', 0, @isscalar);
 p.addParameter('order',['x', 'y', 'z'], @isvector);
 
-p.parse(thisR, varargin{:});
+p.parse(lght, varargin{:});
 
-thisR  = p.Results.thisR;
+lght  = p.Results.lght;
 xrot   = p.Results.xrot;
 yrot   = p.Results.yrot;
 zrot   = p.Results.zrot;
@@ -60,13 +79,15 @@ order  = p.Results.order;
 
 %% Rotate the light
 
-if ~isfield(thisR.lights{idx}, 'to')
+if ~isfield(lght, 'to')
     warning('This light does not have to! Doing nothing.');
 else
     for ii = 1:numel(order)
         thisAxis = order(ii);
-
-        to = thisR.lights{idx}.to - thisR.lights{idx}.from;
+        
+        toVal = piLightGet(lght, 'to val');
+        fromVal = piLightGet(lght, 'from val');
+        toDir = toVal - fromVal;
         switch thisAxis
             case 'x'
                 rotationMatrix = rotationMatrix3d([deg2rad(xrot),0,0]);
@@ -78,12 +99,15 @@ else
                 error('Unknown axis: %s.\n', thisAxis);
         end
 
-        newto = reshape(to, [1, 3]) * rotationMatrix;
-
-        if ii ~= 1
-            idx = numel(thisR.lights);
-        end
-        piLightSet(thisR, idx, 'to', thisR.lights{idx}.from + newto);
+        newto = reshape(toDir, [1, 3]) * rotationMatrix;
+        
+        %{
+            if ii ~= 1
+                idx = numel(thisR.lights);
+            end
+        %}
+        lght = piLightSet(lght, 'to val', fromVal + newto);
+        % piLightSet(thisR, idx, 'to', thisR.lights{idx}.from + newto);
     end
 end
 

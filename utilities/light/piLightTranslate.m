@@ -1,4 +1,4 @@
-function thisR = piLightTranslate(thisR, idx, varargin)
+function lght = piLightTranslate(lght, varargin)
 % Translate the from and to values of a light source
 %
 % Syntax
@@ -37,13 +37,29 @@ function thisR = piLightTranslate(thisR, idx, varargin)
     ieInit;
     thisR = piRecipeDefault;
     thisR = piLightDelete(thisR, 'all');
-    thisR = piLightAdd(thisR, 'type', 'spot', 'cameracoordinate', true);
-    
-    piLightGet(thisR);
-    lightNumber = 1;
-    piLightSet(thisR, lightNumber, 'light spectrum', 'D50')
-    piLightSet(thisR, lightNumber, 'coneAngle', 5);
-    [~, lightNumber] = piLightTranslate(thisR, lightNumber, 'x shift', 1);
+    spotLight = piLightCreate('new spot', 'type', 'spot',...
+                'cameracoordinate', true,...
+                'spd val', 'D50',...
+                'coneangle val', 5);
+    spotLight = piLightTranslate(spotLight, 'x shift', 1);
+    thisR.set('light', 'add', spotLight);
+
+    piWrite(thisR, 'overwritematerials', true);
+
+    % Render
+    [scene, result] = piRender(thisR, 'render type','radiance');
+    sceneWindow(scene);
+%}
+%{
+    ieInit;
+    thisR = piRecipeDefault;
+    thisR = piLightDelete(thisR, 'all');
+    spotLight = piLightCreate('new spot', 'type', 'spot',...
+                'cameracoordinate', true,...
+                'spd val', 'D50',...
+                'coneangle val', 5);
+    thisR.set('light', 'add', spotLight);
+    thisR.set('light', 'translate', 'new spot', [1 0 0]);
 
     piWrite(thisR, 'overwritematerials', true);
 
@@ -57,34 +73,40 @@ function thisR = piLightTranslate(thisR, idx, varargin)
 varargin = ieParamFormat(varargin);
 p = inputParser;
 
-p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
+p.addRequired('lght', @isstruct);
 
 p.addParameter('xshift', 0, @isscalar);
 p.addParameter('yshift', 0, @isscalar);
 p.addParameter('zshift', 0, @isscalar);
 p.addParameter('fromto', 'both', @(x)(ismember(x,{'from','to','both'})));
+p.addParameter('up', [0, 1, 0], @isnumeric);
 
-p.parse(thisR, varargin{:});
+p.parse(lght, varargin{:});
 
-thisR  = p.Results.thisR;
+lght  = p.Results.lght;
 xshift = p.Results.xshift;
 yshift = p.Results.yshift;
 zshift = p.Results.zshift;
 fromto = p.Results.fromto;
+up = p.Results.up;
 
 %% Adjust the from
+if ~isfield(lght, 'from')
+    warning('Light type: %s does not have from field', lght.type);
+    return;
+end
+from = piLightGet(lght, 'from val');
 
-from = thisR.lights{idx}.from;
-
-if isfield(thisR.lights{idx}, 'to')
-    direction = thisR.lights{idx}.to - from; % The to to - from.
+if isfield(lght, 'to')
+    to = piLightGet(lght, 'to val');
+    direction = to - from; % The to to - from.
     direction = direction/norm(direction);
 
     % The three should follow the 'left hand rule' for the axis
     lightX = cross([0 1 0],direction); lightX = lightX/norm(lightX);
     lightY = cross(lightX,direction); lightY = lightY/norm(lightY);
     % We want cameraY to be pointing in the same to as lookAt.up
-    up = thisR.get('up');
+    % up = thisR.get('up');
     if lightY*up' < 0, lightY = -1*lightY; end
     lightX = reshape(lightX, size(direction)); lightY = reshape(lightY, size(direction));
     
@@ -98,17 +120,17 @@ shift = xshift*lightX + yshift*lightY + zshift*direction;
 
 switch fromto
     case 'from'
-        piLightSet(thisR, idx, 'from', from + shift);
+        lght = piLightSet(lght, 'from val', from + shift);
     case 'to'
-        if isfield(thisR.lights{idx}, 'to')
-            piLightSet(thisR, idx, 'to', thisR.lights{idx}.to + shift);
+        if isfield(lght, 'to')
+            lght = piLightSet(lght, 'to val', lght.to.val + shift);
         else
             warning('This light does not have to. It cannot be changed');
         end
     case 'both'
-        piLightSet(thisR, idx, 'from', from + shift);
-        if isfield(thisR.lights{idx}, 'to')
-            piLightSet(thisR, idx, 'to', thisR.lights{idx}.to + shift);
+        lght = piLightSet(lght, 'from val', from + shift);
+        if isfield(lght, 'to')
+            lght = piLightSet(lght, 'to val', lght.to.value + shift);
         else
             warning('This light does not have to. It cannot be changed');
         end

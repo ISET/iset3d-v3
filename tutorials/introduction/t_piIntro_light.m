@@ -13,14 +13,14 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name','MacBethChecker');
 
 %% Check the light list that came with the scene
-initialLightList = piLightGet(thisR);
-for ii = 1:length(initialLightList)
-    initialLightList{ii}
+nLight = thisR.get('n light');
+for ii = 1:nLight
+    thisR.get('light', ii)
 end
 
 %% Remove all the lights
-thisR = piLightDelete(thisR, 'all');
-lightList = piLightGet(thisR);
+thisR.set('light', 'delete', 'all');
+lightList = thisR.get('light');
 if (~isempty(lightList))
     error('Light list was not deleted');
 end
@@ -32,14 +32,14 @@ end
 %
 % The cone delta angle parameter describes how rapidly the light falls off
 % at the edges (also in degrees).
-thisR = piLightAdd(thisR,... 
-    'type','spot',...
-    'light spectrum','equalEnergy',...
-    'spectrum scale', 1,...
-    'cone angle',20,...
-    'cone delta angle', 3, ...
-    'cameracoordinate', true);
-
+newLight = piLightCreate('new spot light',...
+                        'type','spot',...
+                        'spd spectrum','equalEnergy',...
+                        'specscale float', 1,...
+                        'coneangle float',20,...
+                        'conedeltaangle float', 3, ...
+                        'cameracoordinate', true);
+thisR.set('light', 'add', newLight);
 %% Set up the render parameters
 % 
 % This moves the camera closer to the color checker,
@@ -51,7 +51,7 @@ piCameraTranslate(thisR,'z shift',2);
 
 %% Render and take a look
 piWrite(thisR);
-scene = piRender(thisR, 'render type', 'radiance');
+[scene, result] = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Equal energy (spot)');
 sceneWindow(scene);
 
@@ -60,7 +60,7 @@ sceneWindow(scene);
 % We just have one light, and can set its properites with
 % piLightSet, indexing into the first light.
 lightIndex = 1;
-piLightSet(thisR,lightIndex,'cone angle', 10);
+thisR.set('light', lightIndex, 'coneangle val', 10);
 
 %% Render
 piWrite(thisR);
@@ -70,7 +70,7 @@ piWrite(thisR);
 % Note use of piLightGet to obtain the cone angle of the light.
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Equal energy (spot)');
-val = piLightGet(thisR,'idx',lightIndex,'param','coneangle','print',false);
+val = thisR.get('light', lightIndex, 'coneangle val');
 scene = sceneSet(scene,'name',sprintf('EE spot %d',val));
 sceneWindow(scene);
 
@@ -78,15 +78,15 @@ sceneWindow(scene);
 %
 % Here we're changing enough that it's easier to delete the
 % existing light and add another from scratch.
-thisR = piLightDelete(thisR, 'all');
-thisR = piLightAdd(thisR,... 
-    'type','point',...
-    'light spectrum','Tungsten',...
-    'spectrumscale', 1,...
-    'cameracoordinate', true);
-
+thisR.set('light', 'delete', 'all');
+pointLight = piLightCreate('new point',...
+                           'type', 'point', ...
+                           'spd spectrum', 'Tungsten',...
+                           'specscale float', 1,...
+                           'cameracoordinate', true);
+thisR.set('light', 'add', pointLight);
 %% Check the light list
-lightList = piLightGet(thisR);
+lightList = thisR.get('light');
 for ii = 1:length(lightList)
     lightList{ii}
 end
