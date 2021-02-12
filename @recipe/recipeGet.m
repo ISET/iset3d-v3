@@ -903,9 +903,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
+        %{
         if ischar(varargin{1})
             varargin{1} = ieParamFormat(varargin{1});
         end
+        %}
         switch varargin{1}
             % Special cases
             case 'names'
@@ -1024,10 +1026,12 @@ switch ieParamFormat(param)  % lower case, no spaces
             end
             return;
         end
-
+        
+        %{
         if ischar(varargin{1})
             varargin{1} = ieParamFormat(varargin{1});
         end
+        %}
         
         switch varargin{1}
             case 'names'

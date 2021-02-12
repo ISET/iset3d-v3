@@ -1,5 +1,4 @@
-function piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
-                                   txtLines, matIdx, varargin)
+function thisR = piFluorescentHalfDivision(thisR, assetInfo, varargin)
 %% Split the orignal area into two parts
 %
 %   piFluorescentHalfDivision
@@ -28,6 +27,83 @@ function piFluorescentHalfDivision(thisR, TR, childGeometryPath,...
 % See also:
 %   t_piFluorescentPattern, piFluorescentPattern.
 
+% 02/11/2021 UPDATE - ZLY
+% Updating pattern generation function with new style
+
+%% Parse input
+varargin = ieParamFormat(varargin);
+
+p = inputParser;
+p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
+p.addRequired('assetInfo', @(x)(ischar(x) || isnumeric(x)));
+p.addParameter('concentration', rand(1), @isnumeric);
+p.addParameter('fluoname', 'protoporphyrin', @ischar);
+p.addParameter('type', 'add', @ischar);
+
+p.parse(thisR, assetInfo, varargin{:});
+thisR = p.Results.thisR;
+assetInfo = p.Results.assetInfo;
+concentration = p.Results.concentration;
+fluoname = p.Results.fluoname;
+type = p.Results.type;
+%% Get material info
+matName = thisR.get('asset',assetInfo, 'material name');
+
+%% Create a new material
+matPattern = thisR.get('material', matName);
+matPattern = piMaterialSet(matPattern,...
+                    'name', sprintf('%s_%s_%s_#2', matName, 'half_divide',  fluoname));
+thisR.set('material', 'add', matPattern);
+eem = piMaterialGenerateEEM(fluoname);
+thisR.set('material', matPattern.name, 'fluorescence val', eem);
+thisR.set('material', matPattern.name, 'concentration val', concentration);
+
+%% Get verticies and points
+asset = thisR.get('assets', assetInfo);
+vertices = piThreeDCreate(asset.shape.integerindices);
+vertices = vertices + 1;
+
+points = piThreeDCreate(asset.shape.pointp);
+
+TR = triangulation(vertices, points);
+
+
+%% Generate verticeOne and verticeTwo
+vertice = TR.ConnectivityList;
+
+numVerticeOne = cast(size(vertice, 1)/2, 'uint32');
+
+% Generate verticeOne
+verticesOne = zeros(numVerticeOne, size(vertice, 2));
+
+for ii = 1:size(verticesOne, 1)
+    verticesOne(ii, :) = vertice(ii, :);
+end
+% Generate verticeTwo
+verticesTwo = zeros(size(vertice, 1) - numVerticeOne, size(vertice, 2));
+
+for ii = numVerticeOne + 1 : size(vertice, 1)
+    verticesTwo(ii - numVerticeOne, :) = vertice(ii, :);
+end
+
+verticesOne = uint64(verticesOne - 1)';
+verticesTwo = uint64(verticesTwo - 1)';
+%% Create a new asset with new vertices
+assetPattern = asset;
+assetPattern.name = sprintf('%s_%s_%s_#2_O',...
+                            asset.name, 'half_divide', fluoname);
+assetPattern.shape.integerindices = verticesTwo(:);
+assetPattern.material.namedmaterial = matPattern.name;
+parentAsset = thisR.get('asset parent', asset.name);
+thisR.set('asset', parentAsset.name, 'add', assetPattern);
+
+asset.shape.integerindices = verticesOne(:);
+thisR.set('asset', asset.name, 'shape', asset.shape);
+
+
+%
+%% old version
+%{
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
@@ -81,4 +157,6 @@ piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
                       matIdx, verticesOne, verticesTwo,type, fluoName,...
                       concentration);
 
+end
+%}
 end

@@ -46,18 +46,42 @@ piWrite(thisR, 'overwritematerials', true);
 %% Now add a blue light
 
 % Change the light to 405 nm light source
-thisR = piLightDelete(thisR, 'all');
-thisR = piLightAdd(thisR,...
-    'type','distant',...
-    'light spectrum','blueLEDFlood',...
-    'spectrumscale', 1,...
-    'camera coordinate', true);
-
+thisR.set('light', 'delete', 'all');
+newDistLight = piLightCreate('fluorescent light',...
+                            'type', 'distant',...
+                            'spd', 'blueLEDFlood',...
+                            'specscale', 1,...
+                            'cameracoordinate', true);
+thisR.set('light', 'add', newDistLight);
 %% Show the region/material options
 piMaterialList(thisR);
 
 %% Assign fluorescent materials on some patches
+concentrationUniform = 0.5;
+thisR.set('material', 'Patch19Material', 'concentration val', concentrationUniform);
+thisR.set('material', 'Patch11Material', 'concentration val', concentrationUniform);
+thisR.set('material', 'Patch06Material', 'concentration val', concentrationUniform);
+thisR.set('material', 'Patch02Material', 'concentration val', concentrationUniform);
+thisR.set('material', 'Patch18Material', 'concentration val', concentrationUniform);
 
+
+wave = 365:5:705;
+
+% Collagen
+eemCollagen = piMaterialGenerateEEM('Collagen');
+thisR.set('material', 'Patch11Material', 'fluorescence val', eemCollagen);
+% Porphyrins
+eemPorphyrins = piMaterialGenerateEEM('Porphyrins');
+thisR.set('material', 'Patch06Material', 'fluorescence val', eemPorphyrins);
+% NADH
+eemNADH = piMaterialGenerateEEM('NADH');
+thisR.set('material', 'Patch02Material', 'fluorescence val', eemNADH);
+% FAD
+eemFAD = piMaterialGenerateEEM('FAD');
+thisR.set('material', 'Patch18Material', 'fluorescence val', eemFAD);
+thisR.set('material', 'Patch19Material', 'fluorescence val', eemFAD);
+
+%{
 concentrationUniform = 0.5;
 thisR.set('fluorophore eem', 'FAD', 'Patch19Material');
 thisR.set('fluorophore eem', 'Collagen', 'Patch11Material');
@@ -87,7 +111,7 @@ thisR.set('concentration', {'Patch06Material', concentrationUniform});
 thisR.set('concentration', {'Patch02Material', concentrationUniform});
 thisR.set('concentration', {'Patch18Material', concentrationUniform});
 %}
-
+%}
 %% Write 
 % Write modified recipe out
 piWrite(thisR, 'overwritematerials', true);
