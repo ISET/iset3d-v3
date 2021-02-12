@@ -105,10 +105,8 @@ plotReflectance(wave,reflectance);
 % Put it in the PBRT spd format.
 spdRef = piMaterialCreateSPD(wave, reflectance);
 
-% Store the reflectance as the diffuse reflectance of the redMatte
-% material
+% Store the reflectance as the diffuse reflectance of the material
 thisR.set('material', matName, 'kd value', spdRef);
-thisR.set('material', matName, 'ks value', spdRef);
 
 % see the change
 piWrite(thisR);
