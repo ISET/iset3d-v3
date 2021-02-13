@@ -1,5 +1,4 @@
-function verticesOne = piFluorescentCoreSpread(thisR, TR, childGeometryPath,...
-                                    txtLines, matIdx, varargin)
+function thisR = piFluorescentUniformSpread(thisR, assetInfo, varargin)
 %% Generate a pattern from single triangle
 %
 %   piFluorescentUniformSpread
@@ -48,6 +47,66 @@ thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
 [scene, result] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'radiance');
 sceneWindow(scene)
 %}
+%%
+varargin = ieParamFormat(varargin);
+
+p = inputParser;
+p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
+p.addRequired('assetInfo', @(x)(ischar(x) || isnumeric(x)));
+p.addParameter('concentration', rand(1), @isnumeric);
+p.addParameter('fluoname', 'protoporphyrin', @ischar);
+p.addParameter('sz', 1, @isnumeric);
+p.addParameter('coretrindex', -1, @isnumeric);
+p.addParameter('type', 'add', @ischar);
+p.addParameter('number', 2, @isnumeric);
+
+p.parse(thisR, assetInfo, varargin{:});
+thisR = p.Results.thisR;
+assetInfo = p.Results.assetInfo;
+concentration = p.Results.concentration;
+fluoname = p.Results.fluoname;
+tp = p.Results.type;
+number = p.Results.number;
+sz = p.Results.sz;
+coreTRIndex = p.Results.coretrindex;
+%% Get material info
+matName = thisR.get('asset',assetInfo, 'material name');
+
+%% Create a new material
+matPattern = thisR.get('material', matName);
+matPattern = piMaterialSet(matPattern,...
+                           'name', sprintf('%s_%s_#%d', matName, fluoname, number));
+matPattern = piMaterialApplyFluorescence(matPattern,...
+                                        'type', tp,...
+                                        'fluoname', fluoname,...
+                                        'concentration', concentration);
+thisR.set('material', 'add', matPattern);
+
+%% Get verticies and points
+asset = thisR.get('assets', assetInfo);
+
+%% Generate new asset with pattern
+[asset, assetPattern] = piAssetGeneratePattern(asset,...
+                                            'algorithm', 'uniform spread',...
+                                            'sz', sz,...
+                                            'coretrindex', coreTRIndex);
+% Update name
+assetPattern.name = sprintf('%s_%s_#%d_O',...
+                    asset.name, fluoname, number);
+% Update material name
+assetPattern.material.namedmaterial = matPattern.name;
+
+% Add new asset
+parentAsset = thisR.get('asset parent', asset.name);
+thisR.set('asset', parentAsset.name, 'add', assetPattern);
+thisR.set('asset', asset.name, 'shape', asset.shape);
+
+
+
+
+
+%% Old version
+%{
 %% Parse the input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
@@ -70,12 +129,13 @@ TR    = p.Results.TR;
 childGeometryPath = p.Results.childGeometryPath;
 txtLines = p.Results.txtLines;
 matIdx = p.Results.matIdx;
-type = p.Results.type;
+tp = p.Results.type;
 fluoName = p.Results.fluoName;
 concentration = p.Results.concentration;
 
 sz = p.Results.sz;
 coreTRIndex = p.Results.coreTRIndex;
+
 %% Parameter initialize
 
 if concentration == -1, concentration = rand(1); end
@@ -166,7 +226,7 @@ end
 
 %% Go edit PBRT files
 piFluorescentPBRTEdit(thisR, childGeometryPath, txtLines,...
-                                matIdx, verticesOne, verticesTwo, type,...
+                                matIdx, verticesOne, verticesTwo, tp,...
                                 fluoName, concentration);
 
 
@@ -185,3 +245,4 @@ function verticesReset(TR)
 hold off
 trimesh(TR)
 end
+%}

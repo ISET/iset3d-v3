@@ -52,14 +52,34 @@ matName = thisR.get('asset',assetInfo, 'material name');
 %% Create a new material
 matPattern = thisR.get('material', matName);
 matPattern = piMaterialSet(matPattern,...
-                    'name', sprintf('%s_%s_%s_#2', matName, 'half_divide',  fluoname));
+                    'name', sprintf('%s_%s_#2', matName, fluoname));
+
+matPattern = piMaterialApplyFluorescence(matPattern,...
+                                        'type', type,...
+                                        'fluoname', fluoname,...
+                                        'concentration', concentration);
+
 thisR.set('material', 'add', matPattern);
-eem = piMaterialGenerateEEM(fluoname);
-thisR.set('material', matPattern.name, 'fluorescence val', eem);
-thisR.set('material', matPattern.name, 'concentration val', concentration);
+
 
 %% Get verticies and points
 asset = thisR.get('assets', assetInfo);
+
+%% Generate new asset with pattern
+[asset, assetPattern] = piAssetGeneratePattern(asset,...
+                                            'algorithm', 'halfsplit');
+% Update name
+assetPattern.name = sprintf('%s_%s_#2_O',...
+                    asset.name, fluoname);
+% Update material name
+assetPattern.material.namedmaterial = matPattern.name;
+
+% Add new asset
+parentAsset = thisR.get('asset parent', asset.name);
+thisR.set('asset', parentAsset.name, 'add', assetPattern);
+thisR.set('asset', asset.name, 'shape', asset.shape);
+
+%{
 vertices = piThreeDCreate(asset.shape.integerindices);
 vertices = vertices + 1;
 
@@ -90,8 +110,8 @@ verticesOne = uint64(verticesOne - 1)';
 verticesTwo = uint64(verticesTwo - 1)';
 %% Create a new asset with new vertices
 assetPattern = asset;
-assetPattern.name = sprintf('%s_%s_%s_#2_O',...
-                            asset.name, 'half_divide', fluoname);
+assetPattern.name = sprintf('%s_%s_#2_O',...
+                            asset.name, fluoname);
 assetPattern.shape.integerindices = verticesTwo(:);
 assetPattern.material.namedmaterial = matPattern.name;
 parentAsset = thisR.get('asset parent', asset.name);
@@ -100,7 +120,7 @@ thisR.set('asset', parentAsset.name, 'add', assetPattern);
 asset.shape.integerindices = verticesOne(:);
 thisR.set('asset', asset.name, 'shape', asset.shape);
 
-
+%}
 %
 %% old version
 %{

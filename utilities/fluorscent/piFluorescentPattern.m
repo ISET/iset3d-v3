@@ -65,7 +65,7 @@ p.addParameter('type', 'add', @ischar);
 p.addParameter('fluoname', 'protoporphyrin', @ischar);
 p.addParameter('concentration', rand(1), @isnumeric);
 p.addParameter('coretrindex', -1, @isnumeric);
-p.addParameter('size', -1, @isnumeric);
+p.addParameter('sz', 1, @isnumeric);
 p.addParameter('maxconcentration', 1, @isnumeric);
 p.addParameter('minconcentration', 0, @isnumeric);
 p.addParameter('maxsize', 1, @isnumeric);
@@ -76,7 +76,7 @@ p.parse(thisR, assetInfo, varargin{:});
 
 thisR  = p.Results.thisR;
 assetInfo = p.Results.assetInfo;
-type = p.Results.type;
+tp = p.Results.type;
 fluoName = p.Results.fluoname;
 algorithm = ieParamFormat(p.Results.algorithm);
 
@@ -87,17 +87,17 @@ switch algorithm
         thisR = piFluorescentHalfDivision(thisR, assetInfo,...
                                           'concentration', concentration,...
                                           'fluoname', fluoName,...
-                                          'type', type);
-    case 'corespread'
+                                          'type', tp);
+    case 'uniformspread'
         concentration = p.Results.concentration;
         coreTRIndex   = p.Results.coretrindex;
-        size          = p.Results.size;
-        thisR = piFluorescentCoreSpread(thisR, assetInfo,...
+        sz          = p.Results.sz;
+        thisR = piFluorescentUniformSpread(thisR, assetInfo,...
                                         'concentration', concentration,...
                                         'fluoname', fluoName,...
-                                        'size', size,...
+                                        'sz', sz,...
                                         'coretrindex', coreTRIndex,...
-                                        'type', type);
+                                        'type', tp);
     case 'multicore'
         maxConcentration = p.Results.maxconcentration;
         minConcentration = p.Results.minconcentration;
@@ -111,7 +111,7 @@ switch algorithm
                                        'min size', minSize,...
                                        'fluoname', fluoName,...
                                        'core num', coreNum,...
-                                       'type', type);
+                                       'type', tp);
     otherwise
         error('Unknown algorithm: %s, maybe implement it in the future. \n', algorithm);
 end
