@@ -7,7 +7,7 @@ function camera = piCameraCreate(cameraType,varargin)
 %  
 % The camera lens type
 %
-%    {'pinhole']   - Default is pinhole camera, also called 'perspective'
+%    {'pinhole'}   - Default is pinhole camera, also called 'perspective'
 %           
 %    'realistic'   - allows chromatic aberration, diffraction and a lens file
 %    'light field' - microlens array in front of the sensor 
