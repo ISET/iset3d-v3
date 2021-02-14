@@ -1,0 +1,4 @@
+MakeNamedMaterial "ground" "string type" "uber" "float index" [1.333] "rgb Kd" [0.933106841824 0.933106841824 0.933106841824] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "10 - Default" "string type" "uber" "float index" [1.333] "rgb Kd" [0.304987341999 0.304987341999 0.304987341999] "rgb Ks" [173.656021049 173.656021049 173.656021049] "rgb Kr" [173.656021049 173.656021049 173.656021049] "float roughness" [0.0]
+MakeNamedMaterial "08 - Default" "string type" "uber" "float index" [1.333] "rgb Kd" [0.00151763497145 0.000910581040539 0.000303527001499] "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]
+MakeNamedMaterial "09 - Default" "string type" "uber" "float index" [1.333] "rgb Kd" [0.304987341999 0.304987341999 0.304987341999] "rgb Ks" [173.656021049 173.656021049 173.656021049] "rgb Kr" [173.656021049 173.656021049 173.656021049] "float roughness" [0.0]

@@ -56,6 +56,8 @@ rotz = rotz*180/pi;
 % Set up rotation matrix in pbrt format
 rotation = [rotz, roty, rotx; fliplr(eye(3))];
 
+% TODO: Deal with flip
+
 % Compute scale matrix using rotation matrix and transformation matrix
 S = R\T;
 

@@ -29,9 +29,16 @@ sceneName = 'sphere';
 thisR = piRecipeDefault('scene name',sceneName);
 % thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
 
+distLight = piLightCreate('new dist light',...
+                            'type', 'distant',...
+                            'spd', [9000 0.001],...
+                            'cameracoordinate', true);
+thisR.set('light', 'add', distLight);
+%{
 thisR = piLightAdd(thisR, 'type', 'distant', ...
     'light spectrum', [9000 0.001],...
     'camera coordinate', true);
+%}
 
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',32);
@@ -91,14 +98,23 @@ scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
 sceneSet(scene,'render flag','hdr');
 
+
+%%
+rmLight = piLightCreate('room light', 'type', 'infinite',...
+                          'mapname', 'room.exr');
+rmLight = piLightSet(rmLight, 'rotation val', {[0 0 1 0], [-90 1 0 0]});
 %% Make the sphere glass
 
-% Add an environmental light so we can see the glass or mirro
+% Add an environmental light so we can see the glass or mirror
+%{
 assetName = 'Sphere_O';
 thisR.set('asset',assetName,'scale',[0.5 0.5 0.5]);
 fileLight = fullfile(piRootPath,'data','lights','roomLight.mat');
 load('roomLight','roomLight')
 thisR.lights{1} = roomLight;
+%}
+thisR.set('light', 'delete', 'all');
+thisR.set('light', 'add', rmLight);
 
 % Check that the exr file is in the directory.  Should not be needed in the
 % future.

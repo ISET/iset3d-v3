@@ -158,7 +158,7 @@ if isfield(lght, pName)
         lght.(pName).value = val;
         
         % Changing property type if the user doesn't specify it.
-        if isequal(pName, 'spectrum') || isequal(pName, 'scale')
+        if isequal(pName, 'spd') || isequal(pName, 'scale')
             if numel(val) == 3 && ~ischar(val)
                 lght.(pName).type = 'rgb';
             elseif numel(val) == 2 && ~ischar(val)
