@@ -273,5 +273,6 @@ if writefile
             fprintf(fid, '%s \n',lightSourceText{ii}.line{jj});
         end
     end
+    fclose(fid);
 end
 end
