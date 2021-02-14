@@ -36,7 +36,7 @@ distLight = piLightCreate('new dist light',...
                             'cameracoordinate', true);
 thisR.set('light', 'add', distLight);
 
-thisR.set('film resolution',[200 150]);
+thisR.set('film resolution',[200 150]*2);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5);
