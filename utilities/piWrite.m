@@ -157,7 +157,7 @@ end
 
 % Input must exist
 inputDir   = thisR.get('input dir');
-if ~exist(inputDir,'dir'), warning('Could not find %s\n',inputDir); end
+if ~exist(inputDir,'dir'), warning('Could not find inputDir: %s\n',inputDir); end
 
 % Make working dir if it does not already exist
 workingDir = thisR.get('output dir');

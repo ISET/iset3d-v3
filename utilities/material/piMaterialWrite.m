@@ -154,58 +154,29 @@ val = val_name;
 val_string = sprintf(' "string type" "%s" ',medium.type);
 val = strcat(val, val_string);
 
-if ~isempty(medium.absFile) || ~isempty(medium.vsfFile)
-    resDir = fullfile(fullfile(workDir,'spds'));
-    if ~exist(resDir,'dir')
-        mkdir(resDir);
-    end
-    
-    if ~isempty(medium.absFile)
-        fid = fopen(fullfile(resDir,sprintf('%s_abs.spd',medium.name)),'w');
-        fprintf(fid,'%s',medium.absFile);
-        fclose(fid);
-    
-        val_floatindex = sprintf(' "string absFile" "spds/%s_abs.spd"',medium.name);
-        val = strcat(val, val_floatindex);
-    end
-    
-    if ~isempty(medium.vsfFile)
-        fid = fopen(fullfile(resDir,sprintf('%s_vsf.spd',medium.name)),'w');
-        fprintf(fid,'%s',medium.vsfFile);
-        fclose(fid);
-    
-        val_floatindex = sprintf(' "string vsfFile" "spds/%s_vsf.spd"',medium.name);
-        val = strcat(val, val_floatindex);
-    end
-    
-else
-
-    if ~isempty(medium.cPlankton)
-        val_floatindex = sprintf(' "float cPlankton" %f ',medium.cPlankton);
-        val = strcat(val, val_floatindex);
-    end
-
-    if ~isempty(medium.aCDOM440)
-        val_texturekd = sprintf(' "float aCDOM440" %f ',medium.aCDOM440);
-        val = strcat(val, val_texturekd);
-    end
-
-    if ~isempty(medium.aNAP400)
-        val_texturekr = sprintf(' "float aNAP400" %f ',medium.aNAP400);
-        val = strcat(val, val_texturekr);
-    end
-
-    if ~isempty(medium.cSmall)
-        val_textureks = sprintf(' "float cSmall" %f ',medium.cSmall);
-        val = strcat(val, val_textureks);
-    end
-
-    if ~isempty(medium.cLarge)
-        val_textureks = sprintf(' "float cLarge" %f ',medium.cLarge);
-        val = strcat(val, val_textureks);
-    end
-
+resDir = fullfile(fullfile(workDir,'spds'));
+if ~exist(resDir,'dir')
+    mkdir(resDir);
 end
+
+if ~isempty(medium.absFile)
+    fid = fopen(fullfile(resDir,sprintf('%s_abs.spd',medium.name)),'w');
+    fprintf(fid,'%s',medium.absFile);
+    fclose(fid);
+
+    val_floatindex = sprintf(' "string absFile" "spds/%s_abs.spd"',medium.name);
+    val = strcat(val, val_floatindex);
+end
+
+if ~isempty(medium.vsfFile)
+    fid = fopen(fullfile(resDir,sprintf('%s_vsf.spd',medium.name)),'w');
+    fprintf(fid,'%s',medium.vsfFile);
+    fclose(fid);
+
+    val_floatindex = sprintf(' "string vsfFile" "spds/%s_vsf.spd"',medium.name);
+    val = strcat(val, val_floatindex);
+end
+    
 
 end
 
