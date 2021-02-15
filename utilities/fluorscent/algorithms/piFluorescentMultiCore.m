@@ -1,5 +1,4 @@
-function [verticeHis, TR] = piFluorescentMultiCore(thisR, TR, childGeometryPath,...
-                                    txtLines, matIdx, varargin)
+function thisR = piFluorescentMultiCore(thisR, assetInfo, varargin)
 %% Generate multiple uniformly spreaded pattern on target location
 %
 %   piFluorescentMultiUniform
@@ -52,6 +51,48 @@ thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
 [scene, result] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'radiance');
 sceneWindow(scene)
 %}
+%%
+varargin = ieParamFormat(varargin);
+
+p = inputParser;
+p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
+p.addRequired('assetInfo', @(x)(ischar(x) || isnumeric(x)));
+p.addParameter('fluoname', 'protoporphyrin', @ischar);
+p.addParameter('maxconcentration', 1, @isnumeric);
+p.addParameter('minconcentration', 1, @isnumeric);
+p.addParameter('maxsize', 1, @isnumeric);
+p.addParameter('minsize', 1, @isnumeric);
+p.addParameter('corenum', 3, @isnumeric);
+p.addParameter('type', 'add', @ischar);
+
+p.parse(thisR, assetInfo, varargin{:});
+thisR = p.Results.thisR;
+assetInfo = p.Results.assetInfo;
+fluoName = p.Results.fluoname;
+maxConcentration = p.Results.maxconcentration;
+minConcentration = p.Results.minconcentration;
+maxSize = p.Results.maxsize;
+minSize = p.Results.minsize;
+coreNum = p.Results.corenum;
+tp = p.Results.type;
+
+%%
+
+for ii=1:coreNum
+    thisConcentration = (maxConcentration - minConcentration) * rand(1) + minConcentration;
+    thisSz = uint64((maxSize - minSize) * rand(1) + minSize);
+    
+    thisR = piFluorescentUniformSpread(thisR, assetInfo,...
+                                      'concentration', thisConcentration,...
+                                      'fluoname', fluoName,...
+                                      'sz', thisSz,...
+                                      'type', tp,...
+                                      'number', ii);
+end
+
+
+%% Old version
+%{
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
@@ -131,3 +172,4 @@ function verticesReset(TR)
 hold off
 trimesh(TR)
 end
+%}

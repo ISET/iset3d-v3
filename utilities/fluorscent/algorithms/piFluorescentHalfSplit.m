@@ -1,4 +1,4 @@
-function thisR = piFluorescentHalfDivision(thisR, assetInfo, varargin)
+function thisR = piFluorescentHalfSplit(thisR, assetInfo, varargin)
 %% Split the orignal area into two parts
 %
 %   piFluorescentHalfDivision
