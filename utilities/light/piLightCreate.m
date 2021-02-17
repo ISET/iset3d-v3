@@ -54,20 +54,14 @@ lght.name = 'Default light';
 lght.spectrumscale = 1;
 lght.lightspectrum = lightSpectrum;
 lght.type = type;
-% Take care of area light and infinite light
-if ~isequal(type, 'area')
-    lght.cameracoordinate = false;
-end
 
-if ~isequal(type,'infinite') && ~isequal(type, 'area')
-    lght.from = [0 0 0];
-    if ~isequal(type,'point')
-        lght.to = [0 0 1];
-    end
-end
-
-%% Deal with cone angle stuff in these cases
 switch type
+    case 'infinite'
+        lght.from = [0 0 0];
+        lght.to = [0 0 1];
+    case 'point'
+        lght.from = [0 0 0];
+    
     case 'spot'
         lght.coneangle = 30;
         lght.conedeltaangle = 5;
@@ -83,6 +77,7 @@ switch type
         lght.shape = [];
         lght.booltwosided = false;
         lght.integersamples = 1;
+        lght.cameracoordinate = false;
     otherwise
         % Do nothing
 end

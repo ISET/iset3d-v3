@@ -158,7 +158,7 @@ if inputs.wallOnly == false
 
         m = piMediumCreate;
         m.name = "Seawater";
-        m.type = "water";
+        m.type = "uber";
         m.absFile = absFile;
         m.vsfFile = vsfFile;
 

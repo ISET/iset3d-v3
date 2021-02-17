@@ -47,30 +47,4 @@ val = val_name;
 val_string = sprintf(' "string type" "%s" ',medium.type);
 val = strcat(val, val_string);
 
-if ~isempty(medium.cPlankton)
-    val_floatindex = sprintf(' "float cPlankton" %f ',medium.cPlankton);
-    val = strcat(val, val_floatindex);
-end
-
-if ~isempty(medium.aCDOM440)
-    val_texturekd = sprintf(' "float aCDOM440" %f ',medium.aCDOM440);
-    val = strcat(val, val_texturekd);
-end
-
-if ~isempty(medium.aNAP400)
-    val_texturekr = sprintf(' "float aNAP400" %f ',medium.aNAP400);
-    val = strcat(val, val_texturekr);
-end
-
-if ~isempty(medium.cSmall)
-    val_textureks = sprintf(' "float cSmall" %f ',medium.cSmall);
-    val = strcat(val, val_textureks);
-end
-
-if ~isempty(medium.cLarge)
-    val_textureks = sprintf(' "float cLarge" %f ',medium.cLarge);
-    val = strcat(val, val_textureks);
-end
-
-
 end

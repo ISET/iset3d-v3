@@ -34,6 +34,7 @@ p = inputParser;
 p.addOptional('width',1);
 p.addOptional('height',1);
 p.addOptional('depth',1);
+p.addOptional('defaultLight',true);
 p.parse(varargin{:});
 inputs = p.Results;
 
@@ -152,6 +153,14 @@ for x=1:6
          
     end
 end
+
+if inputs.defaultLight
+
+    piLightAdd(macbethRecipe,'name','Default','type','infinite',...
+                         'from',[0 100 1], 'to', [0 0 0]);
+
+end
+
 macbethRecipe.materials.txtLines = {};
 
 outputName = 'MacbethChart';
@@ -159,9 +168,9 @@ outputName = 'MacbethChart';
 macbethRecipe.set('outputfile',fullfile(piRootPath,'local','MacbethChart',sprintf('%s.pbrt',outputName)));
 
 world{1} = 'WorldBegin';
-world{2} = 'LightSource "distant" "point from" [1 1 1] "point to" [0 0 0]';
-world{3} = sprintf('Include "%s_materials.pbrt"',outputName);
-world{4} = sprintf('Include "%s_geometry.pbrt"',outputName);
+world{2} = sprintf('Include "%s_materials.pbrt"',outputName);
+world{3} = sprintf('Include "%s_geometry.pbrt"',outputName);
+world{4} = sprintf('Include "%s_lights.pbrt"',outputName);
 world{5} = 'WorldEnd';
 
 macbethRecipe.world = world;
