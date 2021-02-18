@@ -42,7 +42,7 @@ nBasis = 3;
 
 %% Generate a matrix tranasformation for wgts to lrgb conversion
 
-% We should çreate a test of the method.
+% We should create a test of the method.
 mwgts2lrgb = wgts2lrgb(mccBasis, wave, 'disp name', 'LCD-Apple',...
     'light source', 'D65');
 

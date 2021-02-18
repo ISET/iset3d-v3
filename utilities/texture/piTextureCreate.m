@@ -121,6 +121,20 @@ switch tp
         texture.gamma.type = 'bool';
         texture.gamma.value = [];
         
+        % Basis features
+        texture.basis.type = 'string';
+        texture.basis.value = '';
+        
+        texture.basisone.type = 'spectrum';
+        texture.basisone.value = [];
+        
+        texture.basistwo.type = 'spectrum';
+        texture.basistwo.value = [];
+        
+        texture.basisthree.type = 'spectrum';
+        texture.basisthree.value = [];
+        
+        
         % Common property for 2D texture
         texture.mapping.type = 'string';
         texture.mapping.value = '';

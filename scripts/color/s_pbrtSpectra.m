@@ -27,6 +27,62 @@ for ii=1:nSamples
     reflectance(:,ii) = pbrtRGB2Reflectance(RGB(ii,:),'wave',wave);
 end
 
+%%
+nBasis = 3;
+[Basis, wgts] = basisAnalysis(reflectance, wave, 'vis', true, 'nBasis', nBasis);
+
+%% What is the relationship between the wgts and RGB?
+%  wgts = L*RGB'
+
+L = wgts*pinv(RGB');
+
+% If we start with RGB and we want to make a reflectance function that is
+% (a) within the 3-dimensional representation that PBRT uses, and (b)
+% converts the RGB into the right set of weights, then we would do this
+
+% Start with the RGB and apply L to get the eWgts
+eWgts = L*RGB';
+
+% This is how close they would match
+plot(eWgts(:),wgts(:),'.');
+identityLine; grid on
+
+%% If you were starting with RGB, you would do this
+
+eReflectance = (Basis(:,1:3)*L)*RGB';
+
+ieNewGraphWin;
+mesh(1:nSamples,wave,eReflectance); 
+xlabel('RGB'); ylabel('wave')
+colormap(jet); title('3D Approx and linear weight approx')
+
+ieNewGraphWin;
+plot(wave,Basis(:,1:3)*L); xaxisLine;
+grid on
+xlabel('Wave'); 
+
+%% Save basis functions (but clipped at zero)
+
+pbrtBasis = Basis(:,1:3)*L;
+pbrtBasis = max(0,pbrtBasis);
+ieNewGraphWin;
+plot(wave,pbrtBasis,'linewidth',2); xaxisLine;
+grid on
+xlabel('Wave'); ylabel('Reflectance')
+
+%% Generate a matrix tranasformation for wgts to lrgb conversion
+
+mwgts2lrgb = wgts2lrgb(pbrtBasis, wave, 'disp name', 'LCD-Apple',...
+    'light source', 'D65');
+
+%% Save basis functions, wgts, and wgts2lrgb matrix
+
+comment = 'pbrt reflection basis functions';
+commentStruct = struct('comment', comment, 'mWgts2lrgb', mwgts2lrgb);
+fname = fullfile(piRootPath,'data','basisFunctions','pbrtReflectance2');
+ieSaveMultiSpectralImage(fname, wgts, pbrtBasis, commentStruct,[], wave, 0);
+%% Older code 
+% {
 %%  These are the spectra as we cycle through RGB
 
 ieNewGraphWin;
@@ -106,6 +162,6 @@ fname = fullfile(piRootPath,'data','basisFunctions','pbrtReflectance');
 ieSaveSpectralFile(wave,pbrtBasis,...
     'Estimated PBRT rgb 2 reflectance from s_pbrtSpectra',...
     fname);
-
+%}
 %% END
     

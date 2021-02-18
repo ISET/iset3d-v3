@@ -16,6 +16,7 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
 
 %% Check and remove all lights
+thisR.set('light', 'delete', 'all');
 thisR.get('light')
 
 newDistLight = piLightCreate('new dist light',...
@@ -24,6 +25,7 @@ newDistLight = piLightCreate('new dist light',...
                             'spd', 'equalEnergy');
 thisR.set('light', 'add', newDistLight);                        
 
+thisR.get('light print');
 %% Write the recipe
 piWrite(thisR, 'overwritematerials', true);
 

@@ -737,7 +737,7 @@ switch param
         % Get index and texture struct from the texture list
         % Search by name or index
         if isnumeric(val) && val <= numel(thisR.textures.list)
-            % User sent in an index.  That's how we get the material
+            % User sent in an index.  That's how we get the texture
             textureIdx = val;
             thisTexture = thisR.textures.list{val};
         elseif isstruct(val)
@@ -749,10 +749,10 @@ switch param
                 error('Bad struct.');
             end
         elseif ischar(val)
-            % It is either a special command or the material name            
+            % It is either a special command or the texture name            
             switch val
                 case {'add'}
-                    % thisR.set('textures', 'add', material struct);
+                    % thisR.set('textures', 'add', texture struct);
                     % Could use 'end + 1'
                     nTexture = thisR.get('n texture');
                     thisR.textures.list{nTexture + 1} = varargin{1};
@@ -770,6 +770,17 @@ switch param
                     % thisR.set('texture','replace', idxORname-1, newtexture-2)
                     idx = piTextureFind(thisR.textures.list, 'name', varargin{1});
                     thisR.textures.list{idx} = varargin{2};
+                    return;
+                case {'basis'}
+                    % thisR.set('texture', 'basis', tName, wave, basisfunctions)
+                    % basisfunctions need to have size of 3 x numel(wave)
+                    idx = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                    if isequal(thisR.textures.list{idx}.type, 'imagemap')
+                        wave = varargin{2};
+                        piTextureSetBasis(thisR, idx, wave, 'basis functions', varargin{3});
+                    else
+                        warning('Basis function only applies to image map.')
+                    end
                     return;
                 otherwise
                     % Probably the material name.

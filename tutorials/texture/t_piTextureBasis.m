@@ -16,11 +16,15 @@ thisR.set('filmresolution', [360, 320])
 thisR.sampler.pixelsamples.value = 16;
 thisR.integrator.maxdepth.value = 1;
 %% Check and remove all lights
-piLightGet(thisR); % Should be nothing
+thisR.get('lights') % Should be nothing
 
-% Add a new equalEnergy light
-thisR = piLightAdd(thisR, 'type', 'distant', 'camera coordinate', true,...
-                    'light spectrum', 'equalEnergy');
+newDistLight = piLightCreate('new dist light', 'type', 'distant',...
+                                               'cameracoordinate', true,...
+                                               'spd', 'equalEnergy');
+thisR.set('light', 'add', newDistLight);
+
+thisR.get('lights print');
+
                 
 %% Write the recipe
 piWrite(thisR, 'overwritematerials', true);
@@ -34,13 +38,13 @@ scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
 
 %% Check texture list
+thisR.get('texture print');
 
-piTextureList(thisR);
 %% Now set the basis function 
 
-basisFunctions = 'pbrtReflectance.mat';
-textureIdx = 1;
-piTextureSetBasis(thisR, textureIdx, wave, 'basis functions', basisFunctions);
+basisFunctions = 'pbrtReflectance2.mat';
+tName = 'reflectanceChart_color';
+thisR.set('texture', 'basis', tName, wave, basisFunctions);
 
 %% Write the recipe again
 piWrite(thisR, 'overwritematerials', true);
@@ -48,7 +52,7 @@ piWrite(thisR, 'overwritematerials', true);
 %% Render the scene
 thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
 wave = 365:5:705;
-[scene, ~] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'illuminant');
+[scene, result] = piRender(thisR, 'dockerimagename', thisDocker,'wave', wave, 'render type', 'illuminant');
 sceneName = 'SVD processed basis';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);

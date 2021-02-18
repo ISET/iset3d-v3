@@ -64,7 +64,6 @@ thisR.set('material', 'Patch06Material', 'concentration val', concentrationUnifo
 thisR.set('material', 'Patch02Material', 'concentration val', concentrationUniform);
 thisR.set('material', 'Patch18Material', 'concentration val', concentrationUniform);
 
-
 wave = 365:5:705;
 
 % Collagen

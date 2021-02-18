@@ -9,7 +9,7 @@ varargin = ieParamFormat(varargin);
 p = inputParser;
 
 p.addRequired('thisR');
-p.addRequired('textureIdx', @isnumeric);
+p.addRequired('textureIdx', @(x)(isnumeric(x) || ischar(x)));
 p.addRequired('wave');
 p.addParameter('basisfunctions',zeros(3, numel(wave)));
 
@@ -18,15 +18,25 @@ thisR = p.Results.thisR;
 textureIdx = p.Results.textureIdx;
 wave = p.Results.wave;
 basisFunctions = p.Results.basisfunctions;
-%%
 
+%%
+if ~isequal(thisR.textures.list{textureIdx}.type, 'imagemap')
+    warning('Basis function only applies to image map.')
+    return;
+end
+%%
+thisR.set('texture', textureIdx, 'basisone val', 'spds/basis/basisone.spd');
+thisR.set('texture', textureIdx, 'basistwo val', 'spds/basis/basistwo.spd');
+thisR.set('texture', textureIdx, 'basisthree val', 'spds/basis/basisthree.spd');
+
+%{
 thisR.textures.list{textureIdx}.spectrumbasisone = ...
                             'spds/basis/basisone.spd';
 thisR.textures.list{textureIdx}.spectrumbasistwo = ...
                             'spds/basis/basistwo.spd';           
 thisR.textures.list{textureIdx}.spectrumbasisthree = ...
                             'spds/basis/basisthree.spd';     
-
+%}
 %%
 %{
 txtLines = thisR.materials.txtLines;
@@ -78,8 +88,12 @@ if isnumeric(basisFunctions)
 elseif exist(basisFunctions, 'file') % basis functions are stored in a file
     load(basisFunctions, 'basis');
     load(basisFunctions, 'illuminant');
-    basisWave = illuminant.wave;
-    basis = interp1(basisWave, basis, wave(:), 'linear'); %#ok
+    if isstruct(illuminant)
+        basisWave = illuminant.wave;
+    else
+        basisWave = illuminant;
+    end
+    basis = interp1(basisWave, basis, wave(:), 'linear', 'extrap'); %#ok
 else
     error('Unable to assign this set basis functions.');
 end
