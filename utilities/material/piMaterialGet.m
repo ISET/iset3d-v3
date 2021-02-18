@@ -70,5 +70,4 @@ else
             param, material.type);
 end
 
-%}
 end

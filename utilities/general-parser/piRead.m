@@ -175,7 +175,7 @@ if any(piContains(world,'Include')) && ...
     materialLinesFormatted = piFormatConvert(materialLines);
     
     % Read material and texture
-    [materialLists, materialtxtLines, texureList, textxtLines] = parseMaterialTexture(materialLinesFormatted);
+    [materialLists, texureList] = parseMaterialTexture(materialLinesFormatted);
     fprintf('Read %d materials.\n', numel(materialLists));
     fprintf('Read %d textures.\n', numel(texureList));
     
@@ -198,7 +198,7 @@ if any(piContains(world,'Include')) && ...
 else
     inputFile_materials = [];
     % Read material & texture
-    [materialLists, materialtxtLines, texureList, textxtLines] = parseMaterialTexture(thisR.world);
+    [materialLists, texureList] = parseMaterialTexture(thisR.world);
     fprintf('Read %d materials.\n', numel(materialLists));
     fprintf('Read %d textures.\n', numel(texureList));
     % Read geometry
@@ -211,14 +211,12 @@ else
 end
 
 thisR.materials.list = materialLists;
-thisR.materials.txtlines = materialtxtLines;
 thisR.materials.inputFile_materials = inputFile_materials;
 
 % Call material lib
 thisR.materials.lib = piMateriallib;
 
 thisR.textures.list = texureList;
-thisR.textures.txtLines = textxtLines;
 thisR.textures.inputFile_textures = inputFile_materials;
 
 if ~isempty(trees)
@@ -522,7 +520,7 @@ end
 end
 
 %% Determine the properties of the materials and textures
-function [materialList, materialLines, texureList, textureLines]=parseMaterialTexture(txtLines)
+function [materialList, texureList]=parseMaterialTexture(txtLines)
 % Parse the txtLines to specify the parameters of the materials and
 % textures
 %
@@ -531,8 +529,9 @@ function [materialList, materialLines, texureList, textureLines]=parseMaterialTe
 
 texureList    = [];
 materialList  = [];
-materialLines = [];
-textureLines  = [];
+% Commenting this out, in the future we don't need the lines anymore.
+% materialLines = [];
+% textureLines  = [];
 
 % Counters for the textures and materials
 t_index = 0;
@@ -546,14 +545,14 @@ for ii = 1:numel(txtLines)
     
     if strncmp(thisLine,'Texture',length('Texture'))
         t_index = t_index+1;
-        texureList{t_index}   = parseBlockTexture(thisLine,ii); 
-        textureLines{t_index} = thisLine;
+        texureList{t_index}   = parseBlockTexture(thisLine); 
+        % textureLines{t_index} = thisLine;
         
     elseif strncmp(thisLine,'MakeNamedMaterial',length('MakeNamedMaterial')) ||...
             strncmp(thisLine,'Material',length('Material'))
         m_index = m_index+1;
         materialList{m_index}  = parseBlockMaterial(thisLine);
-        materialLines{m_index} = thisLine; 
+       % materialLines{m_index} = thisLine; 
         
     end
 end

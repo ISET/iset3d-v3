@@ -4,7 +4,7 @@ thisLine = strrep(thisLine,']','');
 if iscell(thisLine)
     thisLine = thisLine{1};
 end
-thisLine = strsplit(thisLine, {' "', '" ', '"', '→→'});
+thisLine = strsplit(thisLine, {' "', '" ', '"', '  '});
 switch thisLine{1}
     case 'Material'
         matName = '';

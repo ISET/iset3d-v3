@@ -1,4 +1,4 @@
-function tList = piTextureFind(thisR, field, val)
+function [tIdx, tCollection] = piTextureFind(tList, param, val, varargin)
 %% Find textures in the list such that the field equals a value
 %
 % Synopsis
@@ -38,6 +38,41 @@ function tList = piTextureFind(thisR, field, val)
     idx = piTextureFind(thisR,'name','checks')
     idx = piTextureFind(thisR,'name','reflectanceChart_color')
 %}
+%% parse input
+p = inputParser;
+p.addRequired('tList', @iscell);
+p.addRequired('param', @ischar)
+p.parse(tList, param, varargin{:});
+
+%% Format 
+param = ieParamFormat(param);
+
+%%
+
+tIdx = [];
+tCollection = {};
+cnt = 0;
+for ii = 1:numel(tList)
+    if isfield(tList{ii}, param)
+        if isequal(param, 'name') || isequal(param, 'type')
+            curVal = tList{ii}.(param);
+        else
+            curVal = tList{ii}.(param).value;
+        end
+        
+        if isequal(curVal, val)
+            cnt = cnt + 1;
+            tIdx(cnt) = ii; %#ok<AGROW>
+            tCollection{cnt} = tList{ii}; %#ok<AGROW>
+        end
+    end
+end
+
+if cnt == 1
+    tCollection = tCollection{1};
+end
+%%
+%{
 %% Format 
 field = ieParamFormat(field);
 
@@ -77,5 +112,5 @@ elseif iscell(thisR.textures.list)
 else
     error('Bad recipe textures list.');
 end
-
+%}
 end

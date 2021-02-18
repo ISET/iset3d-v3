@@ -55,7 +55,7 @@ p.addParameter('type', 'matte', @ischar);
 p.KeepUnmatched = true;
 p.parse(name, varargin{:});
 
-type = ieParamFormat(p.Results.type);
+tp = ieParamFormat(p.Results.type);
 %% Construct material struct
 material.name = name;
 
@@ -66,7 +66,7 @@ material.fluorescence.value = [];
 material.concentration.type = 'float';
 material.concentration.value = [];
 
-switch type
+switch tp
     % Different materials have different properties
     case 'disney'
         material.type = 'disney';
@@ -366,7 +366,7 @@ switch type
         material.remaproughness.type = 'bool';
         material.remaproughness.value = [];
     otherwise
-        warning('Material type: %s does not exist', type)
+        warning('Material type: %s does not exist', tp)
         return;
 end
 

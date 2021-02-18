@@ -965,6 +965,79 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'materialsoutputfile'}
         % Unclear why this is still here.  Probably deprecated.
         val = thisR.materials.outputfile;
+        
+        % Getting ready for textures
+    case{'texture', 'textures'}
+        % thisR.get('texture', textureName, property)
+        
+        % thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
+        % textures = thisR.get('texture');
+        % thisTexture = thisR.get('texture', 'reflectanceChart_color');
+        % thisName = thisR.get('texture', 'reflectanceChart_color', 'name');
+        % filename = thisR.get('texture', 'reflectanceChart_color', 'filename');
+        % filenameVal = thisR.get('texture', 'reflectanceChart_color', 'filename val');
+        
+        if isempty(varargin)
+            % Return the whole texture list
+            if isfield(thisR.textures, 'list')
+                val = thisR.textures.list;
+            else
+                % Should this be just empty, or an empty cell?
+                warning('No material in this recipe')
+                val = {};
+            end
+            return;        
+        end
+        
+        switch varargin{1}
+            % Special cases
+            case 'names'
+                % thisR.get('texture', 'names');
+                n = numel(thisR.textures.list);
+                val = cell(1, n);
+                for ii=1:n
+                    val{ii} = thisR.textures.list{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the texture name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.textures.list)
+                    % Search by index.  Get the textures directly.
+                    textureIdx = varargin{1};
+                    thisTexture = thisR.textures.list{textureIdx};
+                elseif isstruct(varargin{1})
+                    thisTexture = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisTexture] = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                    val = thisTexture;
+                end
+                
+                if isempty(thisTexture)
+                    warning('Could not find material. Return.')
+                    return;
+                end
+                if numel(varargin) >= 2
+                    % Return the texture property
+                    % thisR.get('texture', texture/idx/name, property)
+                    % Return the texture property
+                    val = piTextureGet(thisTexture, varargin{2});
+                end                
+        end
+        
+    case {'ntexture', 'ntextures', 'texturenumber', 'texturesnumber'}
+        % thisR.get('n textures')
+        % Number of textures in this scene
+        if isfield(thisR.textures, 'list')
+            val = numel(thisR.textures.list);
+        else
+            val = 0;
+        end
+    case {'texturesprint', 'printmtextures', 'textureprint', 'printtexture'}
+        % thisR.get('textures print')
+        %
+        piTextureList(thisR);
     case {'objectmaterial','materialobject'}
         % val = thisR.get('object material');
         %
@@ -1007,13 +1080,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             val{ii} = names{ids(ii)};
         end
         
-        % Getting ready for textures
-    case{'texture'}
-        if isfield(thisR.textures, 'list')
-            val = thisR.textures.list;
-        else
-            val = {};
-        end
+
         
         % Getting read for lights
     case{'light', 'lights'}
@@ -1062,7 +1129,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 end
                 
                 if isempty(thisLight)
-                    warning('Could not find material. Return.')
+                    warning('Could not find light. Return.')
                     return;
                 end
                 if numel(varargin) >= 2
