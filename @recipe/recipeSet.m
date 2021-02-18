@@ -723,6 +723,74 @@ switch param
         % Deprecated?
         thisR.materials.outputfile = val;
 
+    case {'textures', 'texture'}
+        % thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
+        
+        if isempty(varargin)
+            if iscell(val)
+                thisR.textures.list = val;
+            else
+                warning('Please provide a list of textures in cell array')
+            end
+            return;
+        end
+        % Get index and texture struct from the texture list
+        % Search by name or index
+        if isnumeric(val) && val <= numel(thisR.textures.list)
+            % User sent in an index.  That's how we get the material
+            textureIdx = val;
+            thisTexture = thisR.textures.list{val};
+        elseif isstruct(val)
+            % They sent in a struct
+            if isfield(val,'name'), matName = val.name;
+                % It has a name slot.
+                [textureIdx, thisTexture] = piTextureFind(thisR.textures.list, 'name', matName);
+            else
+                error('Bad struct.');
+            end
+        elseif ischar(val)
+            % It is either a special command or the material name            
+            switch val
+                case {'add'}
+                    % thisR.set('textures', 'add', material struct);
+                    % Could use 'end + 1'
+                    nTexture = thisR.get('n texture');
+                    thisR.textures.list{nTexture + 1} = varargin{1};
+                    return;
+                case {'delete', 'remove'}
+                    % thisR.set('texture', 'delete', idxORname);
+                    if isnumeric(varargin{1})
+                        thisR.textures.list(varargin{1}) = [];
+                    else
+                        [textureIdx, ~] = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                        thisR.textures.list(textureIdx) = [];
+                    end
+                    return;
+                case {'replace'}
+                    % thisR.set('texture','replace', idxORname-1, newtexture-2)
+                    idx = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                    thisR.textures.list{idx} = varargin{2};
+                    return;
+                otherwise
+                    % Probably the material name.
+                    textureName = val;
+                    [textureIdx, thisTexture] = piTextureFind(thisR.textures.list, 'name', textureName);
+            end
+        end
+        
+        % At this point we have the material.
+        if numel(varargin{1}) == 1
+            % A material struct was sent in as the only argument.  We
+            % should check it, make sure its name is unique, and then set
+            % it.
+            thisR.textures.list{textureIdx} = varargin{1};
+        else
+            % A material name and property was sent in.  We set the
+            % property and then update the material in the list.
+            thisTexture = piTextureSet(thisTexture, varargin{1}, varargin{2});
+            thisR.set('textures', textureIdx, thisTexture);
+        end        
+        
     case {'light', 'lights'}
         % Examples
         % thisR.set('light', lightList);
