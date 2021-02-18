@@ -47,16 +47,19 @@ piTextureCreate(thisR, 'name', 'checks',...
 %}
 
 % This will be the second texture in thisR.textures.list
-newTexture = piTextureCreate('checks',...
+newTextureName = 'checks';
+newTexture = piTextureCreate(newTextureName,...
                        'format', 'spectrum',...
                        'type', 'checkerboard',...
                        'float uscale', 24,...
                        'float vscale', 24);
                    
-                   
+thisR.set('texture', 'add', newTexture);   
+
+thisR.get('texture print');
 %% Display material list
 
-piMaterialList(thisR);
+thisR.get('material print');
 %{
 % These scitran functions may be useful some day
  tList = stPrint(thisR.textures.list,'name');
@@ -67,8 +70,12 @@ piMaterialList(thisR);
 
 % The name of the material is Mat.  We are going to use the texture to
 % describe the diffuse reflectance of the material.
+thisR.set('material', 'Mat', 'kd val', newTextureName);
+thisR.get('material', 'Mat', 'kd')
+%{
 idx = piTextureFind(thisR,'name','checks');
 piTextureAssignToMaterial(thisR, 'Mat', 'texturekd', idx);
+%}
 
 %% Write the recipe
 piWrite(thisR, 'overwritematerials', true);
@@ -80,6 +87,7 @@ sceneName = 'Checks';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
 
+%{
 %%
 % The name of the material is Mat.  We are going to use the texture to
 % describe the diffuse reflectance of the material.
@@ -90,5 +98,6 @@ piWrite(thisR, 'overwritematerials', true);
 sceneName = 'Color repeat';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
+%}
 
 %% END
