@@ -1,9 +1,21 @@
 function piTextureSetBasis(thisR, textureIdx, wave, varargin)
-% This is a temporary function to add basis function
-% Currently only allows basis function stored in .spd file
+% Set basis functions to an imagemap texture
 %
+% Synopsis:
+%   piTextureSetBasis(thisR, textureIdx, wave, varargin)
 %
+% Inputs:
+%   thisR      - recipe
+%   textureIdx - index or name of a texture
+%   wave       - wavelength samples
 %
+% Optional:
+%   basisFunctions - basis functions with dimension of 3 x numel(wave)
+%
+% Outputs:
+%   N/A
+%
+% ZLY, 2020, 2021
 %% Parse 
 varargin = ieParamFormat(varargin);
 p = inputParser;

@@ -1,5 +1,15 @@
 function val = piTextureText(texture, varargin)
-
+% Compose text for textures
+%
+% Input:
+%   texture - texture struct
+%
+% Outputs:
+%   val     - text
+%
+% ZLY, 2021
+% 
+% See also
 
 %% Parse input
 p = inputParser;

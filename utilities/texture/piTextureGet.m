@@ -1,19 +1,22 @@
 function val = piTextureGet(texture, param, varargin)
 % Read a texture struct in the recipe
 %
-% Inputs
-%   thisR:  Recipe
+% Synopsis:
+%   val = piTextureGet(texture, param, varargin)
 %
-% Optional key/val pairs
-%   idx:    Index of the texture to address
-%   param: Parameter of the indexed texture to return
-%   print: Print out the list of textures
+% Inputs
+%   texture - texture struct
+%   param   - parameter name 
+%
+% Description:
+%   Param can be with format of 'PROPERTYNAME', 'PROPERTYNAME TYPE' or
+%   'PROPERTYNAME VAL'. In the case of 'PROPERTYNAME', both type and value
+%   of the property will be returned. Otherwise either type or value will be
+%   returned.
 %
 % Returns
-%   val: Depending on the input arguments
-%       - Cell array of texture structures (idx and param both empty)
-%       - One of textures (param empty)
-%       - A parameter of one of the textures (idx and param both set)
+%   val: value of the parameter
+%       
 %
 % ZLY, SCIEN, 2020, 2021
 % See also

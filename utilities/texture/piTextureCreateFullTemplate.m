@@ -1,4 +1,5 @@
 function texture = piTextureCreateFullTemplate
+% Old script to be deprecated
 % Template for the texture structure.
 %
 %

@@ -3,6 +3,17 @@ function texture = piTextureCreate(name, varargin)
 %
 % Synopsis
 %   texture = piTextureCreate(thisR);
+%
+% Inputs:
+%   name    - name of a texture
+%   
+% Outputs:
+%   texture - new texture with parameters
+%
+% ZLY, 2021
+% 
+% Updates：
+%   02/2021 - rewrite the texture structure
 
 % Examples
 %{

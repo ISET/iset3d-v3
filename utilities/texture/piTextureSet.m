@@ -2,16 +2,18 @@ function texture = piTextureSet(texture, param, val, varargin)
 % Set the parameter of a texture (idx)
 %
 % Inputs
-%   thisR
-%   textureIdx
-%   param
-%   val
+%   texture - texture struct
+%   param   - parameter name 
+%   val     - value
 %
-% Optional key/val
+% Optional key/val:
+%   N/A
 %
 % Returns
-%   thisR
-% 
+%   texture
+%
+%
+% ZLY, 2020, 2021
 %
 % See also
 
