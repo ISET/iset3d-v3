@@ -153,6 +153,10 @@ if isfield(lght, pName)
         return;
     end
     
+    if isequal(pName, 'from') || isequal(pName, 'to')
+        lght.cameracoordinate = false;
+    end
+    
     % Set parameter value
     if isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
         lght.(pName).value = val;

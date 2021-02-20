@@ -215,9 +215,14 @@ for ii = 1:numel(thisR.lights)
             end
 
             % mapname
-            [~, mapnameTxt] = piLightGet(thisLight, 'mapname val', 'pbrt text', true);
+            [mapName, mapnameTxt] = piLightGet(thisLight, 'mapname val', 'pbrt text', true);
             if ~isempty(mapnameTxt)
                 lghtDef = strcat(lghtDef, mapnameTxt);
+                
+                if ~exist(fullfile(thisR.get('output dir'),mapName),'file')
+                    mapFile = which(mapName);
+                    copyfile(mapFile,thisR.get('output dir'))
+                end
             end
 
             lightSourceText{ii}.line = [lightSourceText{ii}.line lghtDef];

@@ -855,6 +855,7 @@ switch param
                     thisR.lights{idx} = varargin{2};
                     return;
                 case {'rotate', 'rotation'}
+                    % Rotate the direction, angle in degrees
                     % thisR.set('light', 'rotate', lghtName, [XROT, YROT, ZROT], ORDER)
                     % See piLightRotate
                     [lgtIdx, lght] = piLightFind(thisR.lights, 'name', varargin{1});
@@ -894,13 +895,23 @@ switch param
                         fromto = 'both';
                     end
                     up = thisR.get('up');
+                    
+                    % If the light is at the same position of camera
+                    if lght.cameracoordinate 
+                        if isfield(lght, 'from')
+                            lght = piLightSet(lght, 'from val', thisR.get('from'));
+                        end
+                        if isfield(lght, 'to')
+                            lght = piLightSet(lght, 'to val', thisR.get('to'));
+                        end
+                    end
                     lght = piLightTranslate(lght, 'xshift', xSft,...
                            'yshift', ySft,...
                            'zshift', zSft,...
                            'fromto', fromto,...
                            'up', up);
-                    
                     thisR.set('light', lgtIdx, lght);
+                    
                     return;
                 otherwise
                     % Probably the light name.

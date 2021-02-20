@@ -61,13 +61,13 @@ switch type
     case 'distant'
         lght.type = 'distant';
         
-        lght.cameracoordinate = false;
+        lght.cameracoordinate = true;
 
         lght.from.type = 'point';
-        lght.from.value = [0 0 0];
+        lght.from.value = [];
         
         lght.to.type = 'to';
-        lght.to.value = [0 0 1];
+        lght.to.value = [];
         
         % Potentially has rotationation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
@@ -112,10 +112,10 @@ switch type
     case 'point'
         lght.type = 'point';
                 
-        lght.cameracoordinate = false;
+        lght.cameracoordinate = true;
 
         lght.from.type = 'point';
-        lght.from.value = [0 0 0];
+        lght.from.value = [];
         
         % Potentially has rotation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
@@ -142,13 +142,13 @@ switch type
     case {'spot', 'spotlight'}
         lght.type = 'spot';
         
-        lght.cameracoordinate = false;
+        lght.cameracoordinate = true;
 
         lght.from.type = 'point';
-        lght.from.value = [0 0 0];
+        lght.from.value = [];
         
         lght.to.type = 'to';
-        lght.to.value = [0 0 1];
+        lght.to.value = [];
         
         lght.coneangle.type = 'float';
         lght.coneangle.value = [];
