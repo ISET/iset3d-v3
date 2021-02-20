@@ -43,16 +43,6 @@ thisR.set('filmresolution', [640, 360]);
 
 piWrite(thisR, 'overwritematerials', true);
 
-%% Now add a blue light
-
-% Change the light to 405 nm light source
-thisR.set('light', 'delete', 'all');
-newDistLight = piLightCreate('fluorescent light',...
-                            'type', 'distant',...
-                            'spd', 'blueLEDFlood',...
-                            'specscale', 1,...
-                            'cameracoordinate', true);
-thisR.set('light', 'add', newDistLight);
 %% Show the region/material options
 piMaterialList(thisR);
 
@@ -80,37 +70,14 @@ eemFAD = piMaterialGenerateEEM('FAD');
 thisR.set('material', 'Patch18Material', 'fluorescence val', eemFAD);
 thisR.set('material', 'Patch19Material', 'fluorescence val', eemFAD);
 
-%{
-concentrationUniform = 0.5;
-thisR.set('fluorophore eem', 'FAD', 'Patch19Material');
-thisR.set('fluorophore eem', 'Collagen', 'Patch11Material');
-thisR.set('fluorophore eem', 'Porphyrins', 'Patch06Material');
-thisR.set('fluorophore eem', 'NADH', 'Patch02Material');
-thisR.set('fluorophore eem', 'FAD', 'Patch18Material');
-
-% Set the donaldson matrix based on the type of the materials
-%{
-thisR.set('eem', {'Patch19Material', 'FAD'});
-thisR.set('eem', {'Patch11Material', 'Collagen'});
-thisR.set('eem', {'Patch06Material', 'Porphyrins'});
-thisR.set('eem', {'Patch02Material', 'NADH'});
-thisR.set('eem', {'Patch18Material', 'FAD'});
-%}
-thisR.set('fluorophore concentration', 'FAD', 'Patch19Material');
-thisR.set('fluorophore concentration', 'Collagen', 'Patch11Material');
-thisR.set('fluorophore concentration', 'Porphyrins', 'Patch06Material');
-thisR.set('fluorophore concentration', 'NADH', 'Patch02Material');
-thisR.set('fluorophore concentration', 'FAD', 'Patch18Material');
-
-% Give a concentration (scaling factor) to the fluophores
-%{
-thisR.set('concentration', {'Patch19Material', concentrationUniform});
-thisR.set('concentration', {'Patch11Material', concentrationUniform});
-thisR.set('concentration', {'Patch06Material', concentrationUniform});
-thisR.set('concentration', {'Patch02Material', concentrationUniform});
-thisR.set('concentration', {'Patch18Material', concentrationUniform});
-%}
-%}
+%% First use a normal light
+thisR.set('light', 'delete', 'all');
+d65Light = piLightCreate('D65 light',...
+                            'type', 'distant',...
+                            'spd', 'D65',...
+                            'specscale', 1,...
+                            'cameracoordinate', true);
+thisR.set('light', 'add', d65Light);
 %% Write 
 % Write modified recipe out
 piWrite(thisR, 'overwritematerials', true);
@@ -121,8 +88,34 @@ piWrite(thisR, 'overwritematerials', true);
 % container.  We will promote to the default after we test it more.
 
 thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
-[scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'illuminant');
+[scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'radiance');
 scene = sceneSet(scene,'wavelength', wave);
+scene = sceneSet(scene, 'name', 'D65 illuminant');
+sceneWindow(scene);
+
+
+%% Second use a blue LED light
+thisR.set('light', 'delete', 'all');
+fluoLight = piLightCreate('Blue light',...
+                            'type', 'distant',...
+                            'spd', 'blueLEDFlood.mat',...
+                            'specscale', 1,...
+                            'cameracoordinate', true);
+thisR.set('light', 'add', fluoLight);
+
+%% Write 
+% Write modified recipe out
+piWrite(thisR, 'overwritematerials', true);
+
+%% Render - At some point we will make this the default (latest)
+
+% If you want to use the fluorescent modeling, specify this docker
+% container.  We will promote to the default after we test it more.
+
+thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
+[scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'radiance');
+scene = sceneSet(scene,'wavelength', wave);
+scene = sceneSet(scene, 'name', 'Blue LED illuminant');
 sceneWindow(scene);
 
 %%

@@ -15,6 +15,7 @@ if ~piDockerExists, piDockerConfig; end
 %% Read the recipe
 thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
 
+thisR.get('texture print');
 %% Check and remove all lights
 thisR.set('light', 'delete', 'all');
 thisR.get('light')
@@ -101,5 +102,47 @@ sceneName = 'Color repeat';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
 %}
+
+%%
+newDotsName = 'dots';
+newDotTexture = piTextureCreate(newDotsName,...
+                       'format', 'spectrum',...
+                       'type', 'dots',...
+                       'float uscale', 8,...
+                       'float vscale', 8);
+thisR.set('texture', 'add', newDotTexture);   
+thisR.set('material', 'Mat', 'kd val', newDotsName);
+
+thisR.get('material', 'Mat', 'kd')                   
+thisR.get('texture print');
+
+%% Write the recipe
+piWrite(thisR, 'overwritematerials', true);
+
+%% Render the scene radiance
+
+[scene, ~] = piRender(thisR, 'render type', 'radiance');
+sceneName = 'dots';
+scene = sceneSet(scene, 'scene name', sceneName);
+sceneWindow(scene);
+
+%%
+newImgName = 'room';
+newImgTexture = piTextureCreate(newImgName,...
+                       'format', 'spectrum',...
+                       'type', 'imagemap',...
+                       'filename', 'room.exr');
+thisR.set('texture', 'replace', 'dots', newImgTexture);
+thisR.get('texture print');
+thisR.set('material', 'Mat', 'kd val', newImgName);
+%% Write the recipe
+piWrite(thisR, 'overwritematerials', true);
+
+%% Render the scene radiance
+
+[scene, result] = piRender(thisR, 'render type', 'radiance');
+sceneName = 'room';
+scene = sceneSet(scene, 'scene name', sceneName);
+sceneWindow(scene);
 
 %% END

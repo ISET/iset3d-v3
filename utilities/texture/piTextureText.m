@@ -1,4 +1,4 @@
-function val = piTextureText(texture, varargin)
+function val = piTextureText(texture, thisR, varargin)
 % Compose text for textures
 %
 % Input:
@@ -14,8 +14,8 @@ function val = piTextureText(texture, varargin)
 %% Parse input
 p = inputParser;
 p.addRequired('texture', @isstruct);
-
-p.parse(texture, varargin{:});
+p.addRequired('thisR', @(x)(isa(x,'recipe')));
+p.parse(texture, thisR, varargin{:});
 
 %% Concatenate string
 % Name
@@ -58,7 +58,13 @@ for ii=1:numel(textureParams)
          end
 
          val = strcat(val, thisText);
-        
+         
+         if isequal(textureParams{ii}, 'filename')
+            if ~exist(fullfile(thisR.get('output dir'),thisVal),'file')
+                imgFile = which(thisVal);
+                copyfile(imgFile,thisR.get('output dir'))
+            end
+         end
     end
 end
 %% Old version
