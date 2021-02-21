@@ -2,23 +2,23 @@ function [val, txt] = piLightGet(lght, param, varargin)
 % Read a light source struct in the recipe
 %
 % Inputs
-%   thisR:  Recipe
+%   lght  - light struct
+%   param - parameter name   
 %
-% Optional key/val pairs
-%   idx:     Index of the light to address
-%   param:   Parameter of the indexed light to return
-%   print:   Printout the list of lights
+% Optional:
+%   pbrttext - flag of whether parse text for light
 %
-% Returns
-%   val:  Depending on the input arguments
-%      - Cell array of light source structures (idx and param both empty)
-%      - One of the light sources  (param empty)
-%      - A parameter of one of the light sources  (idx and param both set)
+% Returns:
+%   val - Depending on the input arguments
+%      - value of the parameter
+%      - type of the value
+%      - both
+%   txt - light text for pbrt files
 %
 % ZLY, SCIEN, 2020
 %
 % See also
-%   piLightDelete, piLightAdd, piLightSet
+%   piLightSet
 
 % Examples:
 %{

@@ -2,18 +2,13 @@ function lght = piLightSet(lght, param, val, varargin)
 % Set a light source parameter
 %
 % Synopsis
-%  thisR = piLightSet(thisR, lightIdx, param, val, varargin)
+%  lght = piLightSet(lght, param, val, varargin)
 %
 % Inputs
-%   obj:    Recipe containing a lightSource cell array / A light struct
-%   lightIdx: Index into which light in the cell array / [] if obj is a
-%             light struct
+%   lght:    light struct
 %   param:    The parameter to set
 %   val:      The new value
 %
-% Optional key/val pairs
-%   print:   - Printout the list of lights
-%  'update'  - update an existing light source.
 %
 % The list of settable light parameters is determined by the light
 % parameters in PBRT. That is defined on this web-page
@@ -48,67 +43,19 @@ function lght = piLightSet(lght, param, val, varargin)
 %
 % ieExamplesPrint('piLightSet');
 %
-% Zheng,BW, SCIEN, 2020
+% Zheng,BW, SCIEN, 2020 - 2021
 %
 % See also
-%   piLightCreate, piLightDelete, piLightAdd, piLightGet
+%   piLightCreate, piLightGet
 %
 
 % Examples:
-%{
-    thisR = piRecipeDefault;
-    thisR = piLightDelete(thisR, 'all');
-    thisR = piLightAdd(thisR, 'type', 'spot', 'cameracoordinate', true);
-    
-    piLightGet(thisR);
-    lightNumber = 1;
-    thisR = piLightSet(thisR, lightNumber, 'light spectrum', 'D50')
-    thisR = piLightSet(thisR, lightNumber, 'coneAngle', 5);
-
-    thisR = piLightAdd(thisR, 'type', 'spot',...
-                        'light spectrum', 'blueLEDFlood',...
-                        'spectrumscale', 10000,...
-                        'cameracoordinate', true);
-    lightNumber = 2;
-    thisR = piLightSet(thisR, lightNumber, 'coneAngle', 20);
-    piWrite(thisR, 'overwritematerials', true);
-
-    % Render
-    [scene, result] = piRender(thisR, 'render type','radiance');
-    sceneWindow(scene);
-%}
-%{
-    % Apply translation and rotation on light
-    thisR = piRecipeDefault;
-    thisR = piLightDelete(thisR, 'all');
-    thisR = piLightAdd(thisR, 'type', 'spot', 'cameracoordinate', true);
-    
-    piLightGet(thisR);
-    lightNumber = 1;
-    piLightSet(thisR, lightNumber, 'light spectrum', 'D50')
-    piLightSet(thisR, lightNumber, 'coneAngle', 10);
-    thisR = piLightRotate(thisR, lightNumber, 'x rot', 7);
-    thisR = piLightTranslate(thisR, lightNumber, 'x shift', 1.2);
-
-    thisR = piLightAdd(thisR, 'type', 'spot',...
-                        'light spectrum', 'blueLEDFlood',...
-                        'spectrumscale', 10000,...
-                        'cameracoordinate', true);
-    lightNumber = 2;
-    thisR = piLightSet(thisR, lightNumber, 'coneAngle', 20);
-
-    piWrite(thisR, 'overwritematerials', true);
-
-    % Render
-    [scene, result] = piRender(thisR, 'render type','radiance');
-    sceneWindow(scene);
-%}
-
 %{
     light = piLightCreate('new light');
     light = piLightSet(light, 'spectrum val', 'D50');
     light = piLightSet(light, 'from val', [10 10 10]);
 %}
+
 
 %% Parse inputs
 
