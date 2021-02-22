@@ -23,12 +23,18 @@ function texture = piTextureSet(texture, param, val, varargin)
 nameTypeVal = strsplit(param, ' ');
 pName    = lower(nameTypeVal{1});
 
-% Whether it is specified to set a type or a value.
-if numel(nameTypeVal) > 1
-    pTypeVal = nameTypeVal{2};
-else
-    % Set a whole struct
+if isstruct(val)
+    % The user sent in a struct, we will loop through the entries and set
+    % them all.
     pTypeVal = '';
+else
+    % Otherwise, we assume we are setting a specific val
+    pTypeVal = 'val';
+    
+    % But we do allow the user to override the 'val'
+    if numel(nameTypeVal) > 1
+        pTypeVal = nameTypeVal{2};
+    end
 end
 
 p = inputParser;

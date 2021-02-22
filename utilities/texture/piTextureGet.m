@@ -38,10 +38,10 @@ function val = piTextureGet(texture, param, varargin)
 % check the parameter name and type/val flag
 nameTypeVal = strsplit(param, ' ');
 pName    = nameTypeVal{1};
+
+pTypeVal = 'val';
 if numel(nameTypeVal) > 1
     pTypeVal = nameTypeVal{2};
-else
-    pTypeVal = '';
 end
 
 p = inputParser;
@@ -59,15 +59,13 @@ if isfield(texture, pName)
         val = texture.(pName);
         return;
     end
-    
-    % If type and val are both empty, return the parameter struct.  We
-    % should expand this out to list the individual parameters that are
-    % legitimate.  The textures have lots of parameters not accessible
-    % this way (BW).
+
     if isempty(pTypeVal)
         val = texture.(pName);
     elseif isequal(pTypeVal, 'type')
         val = texture.(pName).type;
+    elseif isequal(pTypeVal, 'struct')
+        val = texture.(pName);
     elseif isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
         val = texture.(pName).value;
     end    
