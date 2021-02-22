@@ -1,26 +1,24 @@
-function lght = piLightCreate(name, varargin)
-%%
-% Create a light source struct for a recipe
+function lght = piLightCreate(lightName, varargin)
+%% Create a light source struct for a recipe
 %
 % Synopsis:
-%   light = piLightCreate(thisR,varargin)
+%   lght = piLightCreate(lightName,varargin)
 %
 % Inputs:
-%   name                    - name of the light
+%   lightName   - name of the light (use 'help' to see a list of light
+%                 types).
 %
 % Optional key/val pairs
-%   type                    - light type (e.g., point, spot,
-%                               distant). Default is point light
-%   other light properties  - depending on light types. Default values can
-%                             be found on PBRT website.
+%   type   - light type. Default is point light other light
+%       properties. The specific properties depend on the light  type.
+%       Default values can  be found on PBRT website.
 %
 % Description:
-%   The light properties should be given in key/val pairs. For keys. it
-%   should follow the format of 'TYPE KEYNAME'. It's easier for us to
-%   extract type and parameter name using space.
+%   In addition to creating a light struct, various light properties can be
+%   specified in key/val pairs.
 %
 % Returns
-%   lght                    - created light
+%   lght   - light struct
 %
 %
 % See also
@@ -29,26 +27,46 @@ function lght = piLightCreate(name, varargin)
 
 % Examples
 %{
-   lgt = piLightCreate('new light', '')
+ lgt = piLightCreate('point light 1')
 %}
-%%
-% Replace the space in potential parameters. For example, 'rgb I' won't
-% pass parse with the space, but we need the two parts in the string apart
-% to extract type and key. So we replace space with '_' and use '_' as
-% key word.
+%{
+ lgt = piLightCreate('spot light 1', 'type','spot','rgb spd',[1 1 1])
+%}
+%{
+ lightList = piLightCreate('help');
+%}
+
+
+%% Parse inputs
+
+% We replace spaces in the varargin parameter with an underscore. For
+% example, 'rgb I' becomes 'rgb_I'. For an explanation, see the code at the
+% end of this function.
 for ii=1:2:numel(varargin)
     varargin{ii} = strrep(varargin{ii}, ' ', '_');
 end
-%% Parse inputs
-p = inputParser;
-p.addRequired('name', @ischar);
-p.addParameter('type','point',@ischar);
-p.KeepUnmatched = true;
-p.parse(name, varargin{:});
 
-type = ieParamFormat(p.Results.type);
+p = inputParser;
+p.addRequired('lightName', @ischar);
+
+validLights = {'help','distant','point','goniometric','infinite','spot','area'};
+p.addParameter('type','point',@(x)(ismember(x,validLights)));
+p.KeepUnmatched = true;
+p.parse(lightName, varargin{:});
+
+% User just wants a lit of valid lights
+if isequal(lightName,'help')
+    fprintf('---------\nValid light types\n---------\n');
+    for ii=2:numel(validLights)
+        fprintf('  %s \n',validLights{ii});
+    end
+    lght = validLights;
+    return;
+end
+
 %% Construct light struct
-lght.name = name;
+lght.type = p.Results.type;
+lght.name = p.Results.lightName;
 
 % PBRT allows wavelength by wavelength adjustment - would enable that
 % someday.
@@ -57,10 +75,8 @@ lght.specscale.value = 1;
 
 lght.spd.type = 'spectrum';
 lght.spd.value = [];
-switch type
-    case 'distant'
-        lght.type = 'distant';
-        
+switch ieParamFormat(lght.type)
+    case 'distant'        
         lght.cameracoordinate = true;
 
         lght.from.type = 'point';
@@ -82,15 +98,11 @@ switch type
         lght.scale.type = 'scale';
         lght.scale.value = [];        
         
-    case 'goniometric'
-        lght.type = 'goniometric'; 
-        
+    case 'goniometric'        
         lght.mapname.type = 'string';
         lght.mapname.value = '';
         
-    case 'infinite'
-        lght.type = 'infinite';
-        
+    case 'infinite'        
         lght.nsamples.type = 'integer';
         lght.nsamples.value = [];
         
@@ -109,9 +121,7 @@ switch type
         
         lght.scale.type = 'scale';
         lght.scale.value = [];  
-    case 'point'
-        lght.type = 'point';
-                
+    case 'point'                
         lght.cameracoordinate = true;
 
         lght.from.type = 'point';
@@ -130,18 +140,14 @@ switch type
         lght.scale.type = 'scale';
         lght.scale.value = [];        
         
-    case 'projection'
-        lght.type = 'projection';
-        
+    case 'projection'        
         lght.fov.type = 'float';
         lght.fov.value = [];
         
         lght.mapname.type = 'string';
         lght.mapname.value = '';
         
-    case {'spot', 'spotlight'}
-        lght.type = 'spot';
-        
+    case {'spot', 'spotlight'}        
         lght.cameracoordinate = true;
 
         lght.from.type = 'point';
@@ -169,9 +175,7 @@ switch type
         lght.scale.type = 'scale';
         lght.scale.value = [];
         
-    case {'area', 'arealight'}
-        lght.type = 'area';
-        
+    case {'area', 'arealight'}        
         lght.twosided.type = 'bool';
         lght.twosided.value = [];
         
@@ -196,7 +200,27 @@ switch type
 end
 
 
-%% Put in key/val
+%% Set additional key/val pairs
+
+% We can set some, but not all, of the light properties on creation. We use
+% a method that does not require us to individually list and set every
+% possible property for every possible light.
+%
+% This code, however, is not complete.  It works for many cases, but it can
+% fail.  Here is why.
+%
+% PBRT uses strings to represent properties, such as
+%
+%    'rgb spd', or 'cone angle'
+%
+% ISET3d initializes the light this way
+%
+%   piLightCreate(lightName, 'type','spot','rgb spd',[1 1 1])
+%   piLightCreate(lightName, 'type','spot','float coneangle',10)
+%
+% We parse the parameter values, such as 'rgb spd', so that we can
+% set the struct entries properly.  We do this by 
+% 
 
 for ii=1:2:numel(varargin)
     thisKey = varargin{ii};
@@ -207,79 +231,30 @@ for ii=1:2:numel(varargin)
         continue;
     end
     
+    % This is the new key value we are stting.  Generally, it is the part
+    % before the 'underscore'
     keyTypeName = strsplit(thisKey, '_');
     
-    % keyName is the property name. If it follows 'TYPE_NAME', we need
-    % later, otherwise we need the first one.
+    % But if  the first parameter is 'TYPE_NAME', we need the second value.
+    % 
     if piLightISParamType(keyTypeName{1})
         keyName = ieParamFormat(keyTypeName{2});
     else
         keyName = ieParamFormat(keyTypeName{1});
     end
     
+    % Now we run the lightSet.  We see whether this light structure has a
+    % slot that matches the keyName.  
     if isfield(lght, keyName)
+        % If the slot exists, we set it and we are good.
         lght = piLightSet(lght, sprintf('%s value', keyName),...
                               thisVal);
     else
+        % If the slot does not exist, we tell the user, but do not
+        % throw an error.
         warning('Parameter %s does not exist in light %s',...
                     keyName, lght.type)
     end
 end
 
-%% Old version
-%{
-%%
-lightSpectrum = p.Results.lightspectrum;
-if ischar(lightSpectrum)
-    % User sent a char, so this must be a file on the path.  In fact, it
-    % has to be a mat-file.  Usually we keep files in isetcam/data/lights
-    % (or in isetbio same place).
-    [thisP,n,~] = fileparts(lightSpectrum);
-    lightSpectrum = fullfile(thisP, n);
-    if ~exist([lightSpectrum, '.mat'],'file')
-        warning('Could not find an exact match to %s on the path\n',lightSpectrum);
-    end
-end
-type = p.Results.type;
-
-%% Construct a lightsource structure
-% Different types of lights that we know how to add.
-
-lght.name = 'Default light';
-lght.spectrumscale = 1;
-lght.lightspectrum = lightSpectrum;
-lght.type = type;
-% Take care of area light and infinite light
-if ~isequal(type, 'area')
-    lght.cameracoordinate = false;
-end
-
-if ~isequal(type,'infinite') && ~isequal(type, 'area')
-    lght.from = [0 0 0];
-    if ~isequal(type,'point')
-        lght.to = [0 0 1];
-    end
-end
-
-%% Deal with cone angle stuff in these cases
-switch type
-    case 'spot'
-        lght.coneangle = 30;
-        lght.conedeltaangle = 5;
-    case 'laser'       
-        lght.coneangle = 5;
-        lght.conedeltaangle = 1;
-    case 'area'
-        lght.rotationate = [0 0 0;
-              0 0 1;
-              0 1 0;
-              1 0 0];
-        lght.translationition = [0 0 0];
-        lght.shape = [];
-        lght.booltwosided = false;
-        lght.integersamples = 1;
-    otherwise
-        % Do nothing
-end
-%}
 end

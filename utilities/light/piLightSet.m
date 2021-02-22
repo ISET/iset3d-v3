@@ -51,9 +51,18 @@ function lght = piLightSet(lght, param, val, varargin)
 
 % Examples:
 %{
-    light = piLightCreate('new light');
-    light = piLightSet(light, 'spectrum val', 'D50');
-    light = piLightSet(light, 'from val', [10 10 10]);
+    lgt = piLightCreate('new light');
+    lgt
+    lgt = piLightSet(lgt, 'spd', 'D50');
+    lgt.spd
+    lgt = piLightSet(lgt, 'from', [10 10 10]);
+    lgt.from
+
+    val.value = 'D50';
+    val.type  = 'spectrum';
+    lgt = piLightSet(lgt, 'spd', val);
+    lgt.spd
+
 %}
 
 
@@ -61,14 +70,20 @@ function lght = piLightSet(lght, param, val, varargin)
 
 % check the parameter name and type/val flag
 nameTypeVal = strsplit(param, ' ');
-pName = nameTypeVal{1};
+pName       = nameTypeVal{1};
 
-% Whether it is specified to set a type or a value.
-if numel(nameTypeVal) > 1
-    pTypeVal = nameTypeVal{2};
-else
-    % Set a whole struct
+if isstruct(val)
+    % The user sent in a struct, we will loop through the entries and set
+    % them all.
     pTypeVal = '';
+else
+    % Otherwise, we assume we are setting a specific val
+    pTypeVal = 'val';
+    
+    % But we do allow the user to override the 'val'
+    if numel(nameTypeVal) > 1
+        pTypeVal = nameTypeVal{2};
+    end
 end
 
 p = inputParser;
@@ -124,34 +139,5 @@ else
     warning('Parameter: %s does not exist in light type: %s',...
                 pName, lght.type);
 end
-%% Old version
-%{
-%% Parse inputs
-param = ieParamFormat(param);
-varargin = ieParamFormat(varargin);
 
-p  = inputParser;
-p.addRequired('recipe', @(x)(isa(x, 'recipe') || isa(x, 'struct')));
-p.addRequired('lightIdx', @isnumeric);
-p.addRequired('param', @ischar);
-p.addRequired('val');
-
-p.parse(obj, lightIdx, param, val, varargin{:});
-idx = p.Results.lightIdx;
-
-if isa(obj, 'recipe')
-    obj.lights{idx} = piLightSet(obj.lights{idx}, [], param, val);
-
-elseif isa(obj, 'struct')
-    if isfield(obj, param)
-        if isnumeric(val) && isequal(size(val), [3 1])
-            val = val';
-        end
-        obj.(param) = val;
-    else
-        obj.(param) = val;
-        warning('Parameters: "%s" not in current fields of light type: "%s". Adding', param, obj.type)
-    end
 end
-%}
-%%
