@@ -32,7 +32,8 @@ wave = p.Results.wave;
 basisFunctions = p.Results.basisfunctions;
 
 %%
-if ~isequal(thisR.textures.list{textureIdx}.type, 'imagemap')
+
+if ~isequal(thisR.get('texture', textureIdx, 'type'), 'imagemap')
     warning('Basis function only applies to image map.')
     return;
 end
