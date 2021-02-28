@@ -825,15 +825,35 @@ for ii = 1:numbeginLines
         % assign a default material here (gray matte)
         Mline = '"matte" "float sigma" [0] "rgb Kd" [.9 .9 .9]';    
     end
-    
     % Assign material name (Blender files are not exported with
     % material names) based on the object name assigned above
     materialname = append(objectname,'_material');
-    
     % Reformat the material line for this object's materials text
     Materialline = append('MakeNamedMaterial "',materialname,'" "string type" ',Mline);
-    materials{find(cellfun(@isempty,materials),1)} = Materialline;
     
+    % Get texture parameters
+    Tlineidx = piContains(objectLines,'Texture');
+    if any(Tlineidx)
+        Textureline = objectLines{Tlineidx};
+       
+        % Replace "color" with "spectrum" to match C4D format
+        Textureline = strrep(Textureline,"color","spectrum");
+        
+        % The pbrt file exported from Blender refers to texture files in a
+        % 'textures' folder, but any texture files were moved directly into
+        % the scene folder for use in iset3d, so we need to remove any
+        % references to a 'textures' folder
+        Textureline = strrep(Textureline,"[""textures/","""");
+        Textureline = strrep(Textureline,".exr""]",".exr""");
+        
+        % Add the texture line to this object's materials text
+        materials{find(cellfun(@isempty,materials),1)} = Textureline;
+    end
+    
+    % Add the material line to this object's materials text (it is added
+    % after this object's texture line, if this object has a texture)
+    materials{find(cellfun(@isempty,materials),1)} = Materialline;
+
     % Create a material line for this object's geometry text
     GMaterialline = append('NamedMaterial "',materialname,'"');
     geometryobj{find(cellfun(@isempty,geometryobj),1)} = GMaterialline;
