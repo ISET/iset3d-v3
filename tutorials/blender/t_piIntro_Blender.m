@@ -3,21 +3,14 @@
 % Description:
 %    A tutorial for making simple modifications (translate/rotate/scale an
 %    object, change material/color of an object, add texture to an object)
-%    to an image exported from Blender with the Blender-to-pbrt exporter
-%    (https://github.com/stig-atle/io_scene_pbrt).
+%    to an image exported from Blender with a Blender-to-pbrt exporter.
 %
-%    A tutorial on how to use the Blender exporter can be found here: 
+%    Instructions on how to use the Blender exporter can be found here: 
 %    https://github.com/ISET/iset3d/wiki/Blender
 %
-%    The current tutorial uses an image that was exported from Blender and 
-%    which is included in the iset3d repository.
-%
-%    To use your own output from the Blender-to-pbrt exporter:
-%    Put the output (a pbrt file and a 'meshes' folder) into a new folder 
-%    within your iset3d installation: 
-%    ~/iset3d/local/scenes/[your new folder]. This folder will be ignored 
-%    by github, so it won't be synced up with the repository. You will be 
-%    able to point to your new folder and your pbrt file below. 
+%    This tutorial uses an image that is included in the iset3d repository. 
+%    The image was exported from Blender following the instructions in the 
+%    wiki described above.
 %
 %    This tutorial works very similarly to tutorials that operate on scenes
 %    exported from Cinema 4D, but to parse and work with the Blender
@@ -41,7 +34,8 @@ if ~piDockerExists, piDockerConfig; end
 %% Set the input folder name
 %
 % This is currently set to a folder included in the iset3d repository
-% but you can change it to your new folder (as described in heading above).
+% but you can change it to your own folder (see the wiki link in the 
+% header for instructions on using your own Blender scene).
 sceneName = 'BlenderScene';
 
 %% Set name of pbrt file exported from Blender
