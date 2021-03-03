@@ -75,39 +75,52 @@ switch type
     case 'disney'
         material.type = 'disney';
         
+        % base color of material
         material.color.type = 'spectrum';
         material.color.value = [];
         
+        % degree of anisotropy in specular highlight
         material.anisotropic.type = 'float';
         material.anisotropic.value = [];
         
+        % contribution of clearcoat, gives isotropic specular highlight 
         material.clearcoat.type = 'float';
         material.clearcoat.value = [];
         
+        % glossiness of clearcoat
         material.clearcoatgloss.type = 'float';
         material.clearcoatgloss.value = [];
         
+        % object's index of refraction
         material.eta.type = 'float';
         material.eta.value = [];
         
+        % controls how "metal" the object appear
         material.metallic.type = 'float';
         material.metallic.value = [];
         
+        % material's roughness affecting specular reflection & transmission
         material.roughness.type = 'float';
         material.roughness.value = [];
         
+        % distance light travels in object before scattering
         material.scatterdistance.type = 'spectrum';
         material.scatterdistance.value = [];
         
+        % adds retro-reflection at object edges (useful for cloth)
         material.sheen.type = 'float';
         material.sheen.value = [];
         
+        % how much of the sheen term's color is tinted by base color
         material.sheentint.type = 'float';
         material.sheentint.value = [];
         
+        % glossy specular transmission
         material.spectrans.type = 'float';
         material.spectrans.value = [];
         
+        % how much of the specular highlight's color is tinted by base
+        % color
         material.speculartint.type = 'float';
         material.speculartint.value = [];
         
@@ -115,9 +128,11 @@ switch type
         material.thin.type = 'bool';
         material.thin.value = [];
         
+        % amount of diffuse scattering reflected vs transmitted
         material.difftrans.type = 'spectrum';
         material.difftrans.value = [];
         
+        % base color of material
         material.flatness.type = 'spectrum';
         material.flatness.value = [];
         
@@ -126,26 +141,37 @@ switch type
         
         material.bsdffile.type = 'string';
         material.bsdffile.value = '';
+        
     case 'glass'
         material.type = 'glass';
         
+        % reflectivity of surface
         material.kr.type = 'spectrum';
         material.kr.value = [];
         
+        % transmissivity of surface
         material.kt.type = 'spectrum';
         material.kt.value = [];
         
+        % index of refraction of the inside of object
         material.eta.type = 'float';
         material.eta.value = [];
         
+        % microfacet roughness in the u direction ( =0 for perfect specular
+        % reflection)
         material.uroughness.type = 'float';
         material.uroughness.value = [];
         
+        % same as uroughness but in v direction
         material.vroughness.type = 'float';
         material.vroughness.value = [];
         
+        % = true if roughness values are in range [0,1]
+        % otherwise, values are used as alpha parameters of microfacet
+        % function
         material.remaproughness.type = 'bool';
         material.remaproughness.value = [];
+        
     case 'hair'
         % If "sigma_a" is specified, then all other parameters related to 
         % hair color are ignored, if present. Otherwise, if "color" is 
@@ -208,9 +234,12 @@ switch type
     case 'matte'
         material.type = 'matte';
         
+        % diffuse reflectivity of surface
         material.kd.type = 'spectrum';
         material.kd.value = [];
         
+        % sigma parameter of Oren-Nayar model (diffuse reflectivity of
+        % rough surface)
         material.sigma.type = 'spectrum';
         material.sigma.value = [];
         
@@ -253,17 +282,24 @@ switch type
     case 'plastic'
         material.type = 'plastic';
         
+        % diffuse reflectivity of surface
         material.kd.type = 'spectrum';
         material.kd.value = [];
         
+        % specular reflectivity of surface
         material.ks.type = 'spectrum';
         material.ks.value = [];
         
+        % roughness of surface
         material.roughness.type = 'float';
         material.roughness.value = [];
         
+        % = true, roughness values are [0,1] anremapped to microfacet 
+        % distribution function parameters
+        % otherwise, they are used directly for the alpha parameters 
         material.remaproughness.type = 'bool';
         material.remaproughness.value = [];
+        
     case 'substrate'
         material.type = 'substrate';
         
@@ -340,33 +376,45 @@ switch type
         material.type = 'uber';
         
         % Will be removed in PBRTv4
+        % coefficient of diffuse reflection
         material.kd.type = 'spectrum';
         material.kd.value = [];
         
+        % coefficient of glossy reflection
         material.ks.type = 'spectrum';
         material.ks.value = [];
         
+        % coefficient of specular reflection
         material.kr.type = 'spectrum';
         material.kr.value = [];
         
+        % coefficient of specular transmission
         material.kt.type = 'spectrum';
         material.kt.value = [];
         
+        % roughness of surface
         material.roughness.type = 'float';
         material.roughness.value = [];
         
+        % microfacet roughness in u direction
         material.uroughness.type = 'float';
         material.uroughness.value = [];
         
+        % microfacet roughness in v direction
         material.vroughness.type = 'float';
         material.vroughness.value = [];
         
+        % index of refraction of surface
         material.eta.type = 'float';
         material.eta.value = [];
         
+        % opacity of surface
         material.opacity.type = 'spectrum';
         material.opacity.value = [];
         
+        % = true, roughness values are [0,1] anremapped to microfacet 
+        % distribution function parameters
+        % otherwise, they are used directly for the alpha parameters 
         material.remaproughness.type = 'bool';
         material.remaproughness.value = [];
     otherwise
