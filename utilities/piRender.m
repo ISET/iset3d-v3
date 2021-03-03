@@ -275,7 +275,7 @@ for ii = 1:length(filesToRender)
         outF = strcat('renderings/',currName,'.dat');
         renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, '.pbrt'));
 
-        folderBreak = split(outputFolder, '\');
+        folderBreak = split(outputFolder, filesep());
         shortOut = strcat('/', char(folderBreak(end)));
 
         if ~isempty(outputFolder)
