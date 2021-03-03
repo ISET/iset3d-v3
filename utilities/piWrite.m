@@ -581,6 +581,8 @@ function piIncludeLines(thisR,fileID, creatematerials,overwritegeometry)
 
 % We may have created new materials in ISET3d. We insert 'Include' for
 % materials, geometry, and lights.
+lightsWritten = false;
+
 if creatematerials
 
     for ii = 1:length(thisR.world)
@@ -600,7 +602,13 @@ if creatematerials
             end
         end
         
-        if piContains(currLine, 'WorldEnd')
+        if piContains(currLine,'lights.pbrt')
+            [~,n] = fileparts(thisR.outputFile);
+            currLine = sprintf('Include "%s_lights.pbrt"',n);
+            lightsWritten = true;
+        end
+        
+        if piContains(currLine, 'WorldEnd') && lightsWritten == false
             % We also insert a *_lights.pbrt include because we also write
             % out the lights file.  This file might be empty, but it will
             % also exist.
@@ -627,7 +635,13 @@ else
             end
         end
         
-        if piContains(currLine, 'WorldEnd')
+        if piContains(currLine,'lights.pbrt')
+            [~,n] = fileparts(thisR.outputFile);
+            currLine = sprintf('Include "%s_lights.pbrt"',n);
+            lightsWritten = true;
+        end
+        
+        if piContains(currLine, 'WorldEnd')  && lightsWritten == false
             % We also insert a *_lights.pbrt include because we also write
             % out the lights file.  This file might be empty, but it will
             % also exist.

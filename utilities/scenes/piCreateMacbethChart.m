@@ -156,8 +156,9 @@ end
 
 if inputs.defaultLight
 
-    piLightAdd(macbethRecipe,'name','Default','type','infinite',...
-                         'from',[0 100 1], 'to', [0 0 0]);
+    piLightAdd(macbethRecipe,'name','Default','type','distant',...
+                             'from',[0 100 1], 'to', [0 0 0], ...
+                             'camera coordinate', false);
 
 end
 
