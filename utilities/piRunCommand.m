@@ -50,7 +50,7 @@ try
         %        pause(20);
         command = strrep(command,"-ti","-i");
         command = strrep(command,"-it", "-i");
-        [status, result] = system(command,'-echo');
+        [status, result] = system(command); % don't display? ,'-echo');
     else
         [status, result] = system(command);
     end
