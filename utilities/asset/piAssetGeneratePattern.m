@@ -44,8 +44,8 @@ switch algorithm
        
     case 'uniformspread'
         %%
-        if sz == -1, sz = randi([1, uint64((max(TR.Points(:))))]); end
-        if sz > max(TR.Points(:)), sz = max(TR.Points(:)); end
+        if sz == -1, sz = randi([1, uint64((max(size(TR.Points(:)))))]); end
+        if sz > max(size(TR.Points(:))), sz = max(size(TR.Points(:))); end
         edgesNum = size(TR.ConnectivityList, 1);
         % Randomly pick one triangle as start if sTriangleIndex is not defined (-1)
         if coreTRIndex == -1, coreTRIndex = randi(edgesNum); end

@@ -3,7 +3,7 @@ function val = piMaterialMixEEM(nameList, ccList, varargin)
 varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addRequired('nameList', @iscell);
-p.addRequired('ccList', @iscell);
+p.addRequired('ccList', @isnumeric);
 p.addParameter('wave', 365:5:705, @isnumeric);
 p.addParameter('form', 'vec', @ischar);
 
@@ -22,7 +22,7 @@ val = zeros(numel(wave));
 for ii=1:numel(nameList)
     thisEEM = piMaterialGenerateEEM(nameList{ii}, 'wave', wave,...
                                                   'form', 'mat');
-    val = val + thisEEM * ccList{ii};                                          
+    val = val + thisEEM * ccList(ii);                                          
 end
 
 switch form

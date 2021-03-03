@@ -72,9 +72,10 @@ function lght = piLightSet(lght, param, val, varargin)
 nameTypeVal = strsplit(param, ' ');
 pName       = nameTypeVal{1};
 
-if isstruct(val)
+if isstruct(val) && ~isequal(pName, 'shape')
     % The user sent in a struct, we will loop through the entries and set
-    % them all.
+    % them all. Shape is an exception, because it has to be stored as
+    % struct
     pTypeVal = '';
 else
     % Otherwise, we assume we are setting a specific val
