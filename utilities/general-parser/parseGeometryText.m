@@ -154,8 +154,31 @@ while i <= length(txt)
                 % resChildren = createGeometryObject();
                 resObject = piAssetCreate('type', 'object');
                 if exist('name','var')
-                    % resObject.name = sprintf('%d_%d_%s',i, numel(subtrees)+1, name);
-                    resObject.name = sprintf('%s_O', name);
+                    % If we parse a valid name already, do this. 
+                    if ~isempty(name)
+                        
+                        % resObject.name = sprintf('%d_%d_%s',i, numel(subtrees)+1, name);
+                        resObject.name = sprintf('%s_O', name);
+                        
+                    % Otherwise we set the role of assigning object name in
+                    % with priority:
+                    %   (1) Check if ply file exists
+                    %   (2) Check if named material exists
+                    %   (3) (Worst case) Only material type exists
+                    else
+                        if ~isempty(shape.filename)
+                            [~, n, ~] = fileparts(shape.filename);
+                            resObject.name = sprintf('%s_O', n);
+                        elseif ~isempty(mat)
+                            if ~isempty(mat.name)
+                                warning('An object has been created with its material name: %s', mat.name)
+                                resObject.name = sprintf('%s_O', mat.name);
+                            else
+                                warning('An object has been created with its material type: %s', mat.type)
+                                resObject.name = sprintf('%s_O', mat.type);
+                            end
+                        end
+                    end
                 end
                 
                 if exist('shape','var')
@@ -193,6 +216,7 @@ while i <= length(txt)
                 %}
                 trees = tree(resCurrent);
                 for ii = 1:numel(subtrees)
+                    % TODO: solve the empty node name problem here
                     trees = trees.graft(1, subtrees(ii));
                 end
             end
