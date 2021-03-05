@@ -95,10 +95,12 @@ varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addParameter('scenename','MacBethChecker',@ischar);
 p.addParameter('write',false,@islogical);
+p.addParameter('verbose', 2, @isnumeric);
 p.parse(varargin{:});
 
 sceneName = p.Results.scenename;
 write     = p.Results.write;
+verbosity = p.Results.verbose;
 
 %%  To read the file,the upper/lower case must be right
 
@@ -521,7 +523,7 @@ end
 % Parse the file contents into the ISET3d recipe and identify the type of
 % parser.  C4D has special status.  In other cases, such as the scenes from
 % the PBRT and Benedikt sites, we just copy the files into ISET3d/local.
-thisR = piRead(fname);
+thisR = piRead(fname, 'verbose', verbosity);
 thisR.set('exporter',exporter);
 
 % By default, do the rendering and mounting from ISET3d/local.  That

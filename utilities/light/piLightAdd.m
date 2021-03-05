@@ -136,9 +136,10 @@ end
 
 
 %% Tell the user the status.  We might turn this off some day.
-
-if idxL, fprintf('Existing lights updated.\n');
-else,    fprintf('New light added.\n');
-end
+% I can't see why we need to tell the user that the function worked via a
+% debug message...
+%if idxL, fprintf('Existing lights updated.\n');
+%else,    fprintf('New light added.\n');
+%end
 
 end

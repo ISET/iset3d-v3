@@ -138,7 +138,7 @@ end
 fclose(fileID);
 
 [~,n,e] = fileparts(output);
-fprintf('Material file %s written successfully.\n', [n,e]);
+%fprintf('Material file %s written successfully.\n', [n,e]);
 
 end
 

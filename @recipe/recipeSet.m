@@ -95,6 +95,9 @@ function [thisR, out] = recipeSet(thisR, param, val, varargin)
 %    'fluorophore concentration'
 %    'fluorophore eem'
 %    'concentration'
+%
+%  Programming related
+%    'verbose'
 % ---
 
 %  ISETAuto special:
@@ -136,9 +139,11 @@ p.addRequired('param',@ischar);
 p.addRequired('val');
 
 p.addParameter('lensfile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
+p.addParameter('verbose', thisR.verbose, @isnumeric);
 
 p.parse(thisR, param, val);
 param = ieParamFormat(p.Results.param);
+verbosity = p.Results.verbose;
 
 %% Act
 
@@ -158,7 +163,9 @@ switch param
         
         newDir     = fileparts(val);
         if ~exist(newDir,'dir')
-            fprintf('Creating output folder %s\n',newDir);
+            if verbosity > 1
+                fprintf('Creating output folder %s\n',newDir);
+            end
             mkdir(newDir);
         end
         thisR.outputFile = val;
@@ -168,6 +175,8 @@ switch param
         val = which(val);
         thisR.inputFile = val;
         if ~exist(val,'file'), warning('No input file found yet'); end
+    case {'verbose'}
+        thisR.verbose = val;
     case {'exporter'}
         % thisR.set('exporter',val);
         % a string that identifies how the PBRT file was build

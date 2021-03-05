@@ -66,7 +66,8 @@ lvl = 0;
 recursiveWriteAttributes(fid_obj, obj, rootID, lvl, thisR.outputFile);
 
 fclose(fid_obj);
-fprintf('%s is written out \n', fname_obj);
+% Not sure we want this most of the time, can un-comment as needed
+%fprintf('%s is written out \n', fname_obj);
 
 end
 

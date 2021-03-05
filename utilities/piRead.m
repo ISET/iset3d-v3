@@ -72,12 +72,14 @@ p = inputParser;
 
 p.addRequired('fname',@(x)(exist(fname,'file')));
 p.addParameter('readmaterials', true,@islogical);
+p.addParameter('verbose', 2, @isnumeric);
 
 p.parse(fname,varargin{:});
 
 thisR = recipe;
 thisR.inputFile = fname;
 readmaterials   = p.Results.readmaterials;
+verbosity = p.Results.verbose;
 
 % summary = sprintf('Read summary %s\n',fname);
 
@@ -86,6 +88,7 @@ readmaterials   = p.Results.readmaterials;
 outFilepath      = fullfile(piRootPath,'local',scene_fname);
 outputFile       = fullfile(outFilepath,[scene_fname,'.pbrt']);
 thisR.set('outputFile',outputFile);
+thisR.set('verbose', verbosity); % can only set one arameter at a time, so call again
 
 %% Read the text and header from the PBRT file
 [txtLines, header] = piReadText(fname);
@@ -165,9 +168,13 @@ end
 if readmaterials
     piReadMaterials(thisR); 
 elseif isequal(thisR.exporter,'Copy')
-    fprintf('Copying materials.\n');
+    if verbosity > 1
+        fprintf('Copying materials.\n');
+    end
 else 
-    fprintf('Skipping materials and texture read.\n');
+    if verbosity > 1
+        fprintf('Skipping materials and texture read.\n');
+    end
 end
 
 %% Read geometry.pbrt file if pbrt file is exported by C4D
