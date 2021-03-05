@@ -48,6 +48,12 @@ function [ieObject, result] = piRender(thisR,varargin)
 %  reuse      - Boolean. Indicate whether to use an existing file if one of
 %               the correct size exists (default is false)
 %
+%  verbose    - Level of desired output:
+%               0 Silent
+%               1 Minimal
+%               2 Legacy -- for compatibility
+%               3 Verbose -- includes pbrt output, at least on Windows
+%
 % RETURN
 %   ieObject - an ISET scene, oi, or a metadata image
 %   result   - PBRT output from the terminal.  This can be vital for
@@ -118,6 +124,7 @@ p.addParameter('reuse',false,@islogical);
 p.addParameter('reflectancerender', false, @islogical);
 p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:latest',@ischar);
 p.addParameter('wave', 400:10:700, @isnumeric); % This is the past to piDat2ISET, which is where we do the construction.
+p.addParameter('verbose', 2, @isnumeric);
 
 p.parse(thisR,varargin{:});
 renderType       = ieParamFormat(p.Results.rendertype);
@@ -126,7 +133,11 @@ dockerImageName  = p.Results.dockerimagename;
 scalePupilArea = p.Results.scalepupilarea;
 meanLuminance    = p.Results.meanluminance;
 wave             = p.Results.wave;
-fprintf('Docker container %s\n',dockerImageName);
+verbosity        = p.Results.verbose;
+
+if verbosity > 1
+    fprintf('Docker container %s\n',dockerImageName);
+end
 
 % Different containers expect different wavelength ranges.
 dockerWave = 400:10:700;
@@ -209,7 +220,8 @@ if ((~strcmp(renderType,'radiance')))
             'overwritelensfile', false, ...
             'overwriteresources', false,...
             'creatematerials',creatematerials,...
-            'overwritegeometry',overwritegeometry);
+            'overwritegeometry',overwritegeometry, ...
+            'verbose', verbosity);
         
         metadataFile{ii} = metadataRecipe.outputFile; %#ok<AGROW>
     end

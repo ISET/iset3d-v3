@@ -35,6 +35,8 @@ function workingDir = piWrite(thisR,varargin)
 %   lightsFlag         
 %   thistrafficflow   
 %
+%   verbose -- how chatty we are
+%
 % Return
 %    workingDir - path to the output directory mounted by the Docker
 %                 container.  This is not necessary, however, because we
@@ -122,6 +124,8 @@ p.addParameter('thistrafficflow',[]);
 % Store JSON recipe for the traffic scenes
 p.addParameter('overwritejson',true,@islogical);
 
+p.addParameter('verbose', 2, @isnumeric);
+
 p.parse(thisR,varargin{:});
 
 overwriteresources  = p.Results.overwriteresources;
@@ -133,6 +137,7 @@ creatematerials     = p.Results.creatematerials;
 lightsFlag          = p.Results.lightsflag;
 thistrafficflow     = p.Results.thistrafficflow;
 overwritejson       = p.Results.overwritejson;
+verbosity           = p.Results.verbose;
 
 %% Check exporter condition
 
@@ -172,7 +177,7 @@ if ~exist(renderDir,'dir'), mkdir(renderDir); end
 
 %% Selectively copy data from the input to the output directory.  
 
-piWriteCopy(thisR,overwriteresources,overwritepbrtfile)
+piWriteCopy(thisR,overwriteresources,overwritepbrtfile, verbosity)
 
 %% If the optics type is lens, copy the lens file to a lens sub-directory
 
@@ -235,7 +240,7 @@ end
 
 %% Copy the input resources to the output directory
 
-function piWriteCopy(thisR,overwriteresources,overwritepbrtfile)
+function piWriteCopy(thisR,overwriteresources,overwritepbrtfile, verbosity)
 % Copy files from the input to output dir
 %
 % In some cases we are looping over many renderings.  In that case we may
@@ -262,7 +267,9 @@ if overwriteresources && ~isempty(inputDir)
             [~, ~, extension] = fileparts(sources(i).name);
             if ~(piContains(extension,'pbrt') || piContains(extension,'zip') || piContains(extension,'json'))
                 thisFile = fullfile(sources(i).folder, sources(i).name);
-                fprintf('Copying %s\n',thisFile)
+                if verbosity > 1
+                    fprintf('Copying %s\n',thisFile)
+                end
                 status = status && copyfile(thisFile, fullfile(outputDir,sources(i).name));
             end
         end
@@ -271,10 +278,12 @@ if overwriteresources && ~isempty(inputDir)
     if(~status)
         error('Failed to copy input directory to docker working directory.');
     else
-        fprintf('Copied resources from:\n');
-        fprintf('%s \n',inputDir);
-        fprintf('to \n');
-        fprintf('%s \n \n',outputDir);
+        if verbosity > 1
+            fprintf('Copied resources from:\n');
+            fprintf('%s \n',inputDir);
+            fprintf('to \n');
+            fprintf('%s \n \n',outputDir);
+        end
     end
 end
 
