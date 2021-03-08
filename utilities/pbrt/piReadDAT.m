@@ -36,16 +36,20 @@ function [imageData, imageSize, lens] = piReadDAT(filename, varargin)
 %%
 parser = inputParser();
 parser.addRequired('filename', @ischar);
+parser.addParameter('verbose', 2, @isnumeric);
 
 parser.parse(filename, varargin{:});
 filename = parser.Results.filename;
+verbosity = parser.Results.verbose;
 
 % imageData = [];
 % imageSize = [];
 lens = [];
 
 %% Open the file.
-% fprintf('Opening file "%s".\n', filename);
+if verbosity > 2
+    fprintf('Opening file "%s".\n', filename);
+end
 [fid, message] = fopen(filename, 'r');
 if fid < 0,  error(message); end
 
@@ -63,8 +67,10 @@ hSize = imageSize(2);
 nPlanes = imageSize(3);
 imageSize = [hSize, wSize, nPlanes];
 
-fprintf('  Reading image h=%d x w=%d x %d spectral planes.\n', ...
+if verbosity > 1
+    fprintf('  Reading image h=%d x w=%d x %d spectral planes.\n', ...
     hSize, wSize, nPlanes);
+end
 
 %% Optional second header line might contain realistic lens info.
 pbrtVer = 2; % By default, we assume this is a version 2 file

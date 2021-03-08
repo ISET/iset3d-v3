@@ -54,7 +54,11 @@ try
         %        pause(20);
         command = strrep(command,"-ti","-i");
         command = strrep(command,"-it", "-i");
-        [status, result] = system(command); % don't display? ,'-echo');
+        if verbosity > 2
+            [status, result] = system(command,'-echo');
+        else
+            [status, result] = system(command); % don't display pbrt output
+        end
     else
         [status, result] = system(command);
     end
