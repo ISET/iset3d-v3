@@ -77,10 +77,12 @@ coreNum = p.Results.corenum;
 tp = p.Results.type;
 
 %%
-
+sfConHigh = 1; sfConLow = 0.5;
+sfSzHigh = 0.3; sfSzLow = 0.1;
 for ii=1:coreNum
-    thisConcentration = (maxConcentration - minConcentration) * rand(1) + minConcentration;
-    thisSz = uint64((maxSize - minSize) * rand(1) + minSize);
+    thisConcentration = (maxConcentration - minConcentration) * ((sfConHigh - sfConLow) * rand(1) + sfConLow)...
+                            + minConcentration;
+    thisSz = uint64((maxSize - minSize) * ((sfSzHigh - sfSzLow) * rand(1) + sfSzLow) + minSize);
     
     thisR = piFluorescentUniformSpread(thisR, assetInfo,...
                                       'concentration', thisConcentration,...
@@ -88,6 +90,17 @@ for ii=1:coreNum
                                       'sz', thisSz,...
                                       'type', tp,...
                                       'number', ii);
+    % Gradually decrease max concentration
+    if ii > 0.1 * coreNum
+        sfConHigh = 0.5; sfConLow = 0.25;
+        sfSzHigh = 0.5; sfSzLow = 0.3;
+    elseif ii > 0.5 * coreNum
+        sfConHigh = 0.25; sfConLow = 0.125;
+        sfSzHigh = 0.7; sfSzLow = 0.5;
+    elseif ii > 0.8 * coreNum
+        sfConHigh = 0.125; sfConLow = 0.0626;
+        sfSzHigh = 1; sfSzLow = 0.7;
+    end
 end
 
 
