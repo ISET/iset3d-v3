@@ -22,6 +22,12 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name', 'sphere');
 thisR.set('light', 'delete', 'all');
 
+% A low resolution rendering for speed
+thisR.set('film resolution',[200 150]);
+thisR.set('rays per pixel',48);
+thisR.set('fov',45);
+thisR.set('nbounces',5); 
+
 % Distant Light
 distLight = piLightCreate('new dist',...
                            'type', 'distant', ...
@@ -30,8 +36,8 @@ distLight = piLightCreate('new dist',...
                            'cameracoordinate', true);
 thisR.set('light', 'add', distLight);                       
 
-% Environmental Light
-% An environmental light starts from an image, in this case pngExample.png
+% Environment Light
+% An environment light starts from an image, in this case pngExample.png
 % The image is then mapped on the inside surface of a sphere. So if you
 % were standing inside this sphere, you would see a stretched out version
 % of the image all around you. Every point in this space is a pixel, so we
@@ -45,17 +51,47 @@ exampleEnvLight = piLightSet(exampleEnvLight, 'rotation val', {[0 0 1 0], [-90 1
 thisR.set('lights', 'add', exampleEnvLight); 
 thisR.get('lights print');
 
-% A low resolution rendering for speed
-thisR.set('film resolution',[200 150]);
-thisR.set('rays per pixel',48);
-thisR.set('fov',60);
-thisR.set('nbounces',5); 
+%% Understanding the environment light
+% To better visualize what the environment map does, we change the matte
+% sphere to a mirror sphere
+% Creating mirror material
+mirrorName = 'mirror';
+mirror = piMaterialCreate(mirrorName, 'type', 'mirror');
+thisR.set('material', 'add', mirror);
+
+% Assigning mirror to sphere
+assetName = '005ID_Sphere_O';
+thisR.set('asset', assetName, 'material name', mirrorName);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene, 'name', 'reference scene');
+scene = sceneSet(scene, 'name', 'mirror scene');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'rgb');
+
+% Flip camera to confirm mirror is reflecting the scene 
+thisR.set('to', [0 0 -501]);
+thisR.set('fov', 100);
+piWrite(thisR);
+scene = piRender(thisR, 'render type', 'radiance');
+scene = sceneSet(scene, 'name', 'flipped mirror scene');
+sceneWindow(scene);
+
+%% Return to reference scene to explore properties
+% Before we begin exploring properties, we must set up our reference scene
+
+thisR.set('asset', assetName, 'material name', 'white');
+thisR.set('to', [0 0 -499]);
+thisR.set('fov', 60);
+
+piWrite(thisR);
+scene = piRender(thisR, 'render type', 'radiance','meanluminance', -1);
+scene = sceneSet(scene, 'name', 'reference scene');
+%normalize scene luminance
+meanlum = sceneGet(scene, 'meanluminance');
+scale = 100/meanlum;
+scene = sceneSet(scene, 'meanluminance', meanlum*scale);
+sceneWindow(scene);
 
 %% Change Matte properties
 % The material type 'matte' has two main properties: the diffuse
@@ -67,11 +103,13 @@ matte_kd_orig = thisR.get('material', 'white', 'kd value');
 % Change value of kd to reflect a green color using RGB values
 thisR.set('material', 'white', 'kd value', [0 0.4 0]);
 
-% Set value of signma to 0, surface will have pure Lambertian reflection
+% Set value of sigma to 0, surface will have pure Lambertian reflection
 thisR.set('material', 'white', 'sigma value', 0);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance', 'meanluminance', -1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Matte: kd = green, sigma=0');
 sceneWindow(scene);
 
@@ -79,14 +117,16 @@ sceneWindow(scene);
 % Center section
 % [~,rect_1] = ieROISelect(scene);
 % roi_1 = uint64(rect_1.Position);
-roi_1 = [94,71,14,13];
+roi_1 = [88,66,22,21];
 roiMean_1 = sceneGet(scene, 'roimeanenergy', roi_1);
 
 % Fringe (outer) section
 % [~, rect_2] = ieROISelect(scene);
 % roi_2 = uint64(rect_2.Position);
-roi_2 = [50,74,6,10];
+roi_2 = [50,74,3,9];
 roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
+
+wave = 400:10:700;
 
 ieNewGraphWin;
 hold on;
@@ -102,7 +142,11 @@ thisR.set('material', 'white', 'sigma value', 100);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance', 'meanluminance', -1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Matte: kd = green, sigma=100');
+meanlum = sceneGet(scene, 'meanluminance');
+
 sceneWindow(scene);
 
 % Plot the inner and outer regions
@@ -111,13 +155,12 @@ roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
 
 ieNewGraphWin; hold on; grid on;
 plot(wave, roiMean_1); plot(wave, roiMean_2);
-title('Matte - Sigma = 100'); ylim([0, 70]);
+title('Matte - Sigma = 100'); ylim([0 1.5*10^-3])
 legend('Center', 'Fringe'); hold off;
 
 
 %% Set sphere to Uber
 % Now we'll explore the properties of uber. 
-% Run this section 4 times, each time uncommenting the next block of code 
 
 % Creating the uber material
 uberName = 'uber';
@@ -125,18 +168,18 @@ uber = piMaterialCreate(uberName, 'type', 'uber');
 thisR.set('material', 'add', uber);
 
 % Assigning the uber material to the sphere
-assetName = '005ID_Sphere_O';
 thisR.set('asset', assetName, 'material name', uberName);
 
 %% Uber properties: Diffuse reflectivity 
-wave = 400:10:700;
-reflectance = 0.1*ones(1,length(wave));
-reflectance(11:end)=0;
-spd = piMaterialCreateSPD(wave, reflectance);
+kd_val = 0.1*ones(1,length(wave));
+kd_val(wave>500)=0;
+spd = piMaterialCreateSPD(wave, kd_val);
 thisR.set('material', uberName, 'kd value', spd);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance','meanluminance',-1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Uber - kd');
 sceneWindow(scene);
 
@@ -145,19 +188,21 @@ roiMean_1 = sceneGet(scene, 'roimeanenergy', roi_1);
 roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
 ieNewGraphWin; hold on; grid on;
 plot(wave, roiMean_1); plot(wave, roiMean_2);
-title('Uber - kd'); ylim([0 20]);
+title('Uber - kd'); 
 legend('Center', 'Fringe'); hold off;
 
-%% Uber Properties: Glossy Reflection
-% midway between kd and kr, distribution at angle
-ref_pass = zeros(1, length(wave));
-ref_pass(wave>500 & wave<600) = 1;
-spd = piMaterialCreateSPD(wave, ref_pass);
-thisR.set('material', uberName, 'ks value', spd);
+%% Uber Properties: Specular Reflection
+% like mirror reflection
+kr_val = zeros(1, length(wave));
+kr_val(wave>500 & wave<600) = 1;
+spd = piMaterialCreateSPD(wave, kr_val);
+thisR.set('material', uberName, 'kr value', spd);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance','meanluminance',-1);
-scene = sceneSet(scene, 'name', 'Uber - kd,ks');
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
+scene = sceneSet(scene, 'name', 'sphere to uber - kd,kr');
 sceneWindow(scene);
 
 % Plot the inner and outer regions
@@ -165,32 +210,36 @@ roiMean_1 = sceneGet(scene, 'roimeanenergy', roi_1);
 roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
 ieNewGraphWin; hold on; grid on;
 plot(wave, roiMean_1); plot(wave, roiMean_2);
-title('Uber - kd, ks'); ylim([0 20]);
+title('Uber - kd,kr'); 
+legend('Center', 'Fringe'); hold off;
+
+%% Uber Properties: Glossy Reflection
+% midway between kd and kr, distribution at angle
+ks_val = ones(1, length(wave));
+ks_val(wave<600) = 0;
+spd = piMaterialCreateSPD(wave, ks_val);
+thisR.set('material', uberName, 'ks value', spd);
+
+piWrite(thisR);
+scene = piRender(thisR, 'render type', 'radiance','meanluminance',-1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
+scene = sceneSet(scene, 'name', 'Uber - kd,kr,ks');
+sceneWindow(scene);
+
+% Plot the inner and outer regions
+roiMean_1 = sceneGet(scene, 'roimeanenergy', roi_1);
+roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
+ieNewGraphWin; hold on; grid on;
+plot(wave, roiMean_1); plot(wave, roiMean_2);
+title('Uber - kd,kr,ks');
 legend('Center', 'Fringe'); hold off;
 
 % Roughness Parameter: run this line 2 times, once with the value =0 and
 % once with the value =0.01
 %thisR.set('material', uberName, 'roughness value', []);
 
-%% Uber Properties: Specular Reflection
-% like mirror reflection
-ref_kr = zeros(1, length(wave));
-ref_kr(wave>600) = 1;
-spd = piMaterialCreateSPD(wave, ref_kr);
-thisR.set('material', uberName, 'kr value', spd);
 
-piWrite(thisR);
-scene = piRender(thisR, 'render type', 'radiance','meanluminance',-1);
-scene = sceneSet(scene, 'name', 'sphere to uber - kd');
-sceneWindow(scene);
-
-% Plot the inner and outer regions
-roiMean_1 = sceneGet(scene, 'roimeanenergy', roi_1);
-roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
-ieNewGraphWin; hold on; grid on;
-plot(wave, roiMean_1); plot(wave, roiMean_2);
-title('Uber - kd,ks,kr'); ylim([0 20]);
-legend('Center', 'Fringe'); hold off;
 
 %% Set sphere to plastic
 % 'plastic' materials have 2 spectral properties: diffuse reflectivity
@@ -201,6 +250,7 @@ plasticName = 'plastic';
 plastic = piMaterialCreate(plasticName, 'type', 'plastic');
 thisR.set('material', 'add', plastic);
 thisR.set('asset', assetName, 'material name', plasticName);
+
 
 %% Plastic Properties: diffuse relectivity
 
@@ -219,6 +269,8 @@ title('Tongue data');
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance', 'meanluminance',-1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Plastic - kd');
 sceneWindow(scene);
 
@@ -227,14 +279,20 @@ roiMean_1 = sceneGet(scene, 'roimeanenergy', roi_1);
 roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
 ieNewGraphWin; hold on; grid on;
 plot(wave, roiMean_1); plot(wave, roiMean_2);
-title('Plastic - kd'); ylim([0 70]);
-legend('Center', 'Fringe'); hold off;
+title('Plastic - kd'); ylim([0 16]*10^-4);
+legend('Center', 'Fringe', 'Location', 'SouthEast'); hold off;
 
 %% Plastic Properties: Spectral Reflectance
 % Change ks value by making own spectral array to get green-blue color
-reflectance = ones(size(wave));
-reflectance(wave>550) = 0;
-spdRef = piMaterialCreateSPD(wave, reflectance);
+ks_val = linspace(1, 0, size(wave,2));
+spdRef = piMaterialCreateSPD(wave, ks_val);
+
+% Plot SPD
+ieNewGraphWin; hold on; grid on;
+plot(wave, ks_val); 
+title('Plastic - ks SPD'); 
+hold off;
+
 
 % Store the reflectance as the specular reflectance of the material
 thisR.set('material', plasticName, 'ks value', spdRef);
@@ -242,6 +300,8 @@ thisR.set('material', plasticName, 'ks value', spdRef);
 % see the change
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance', 'meanluminance',-1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Plastic - kd,ks');
 sceneWindow(scene);
 
@@ -250,8 +310,8 @@ roiMean_1 = sceneGet(scene, 'roimeanenergy', roi_1);
 roiMean_2 = sceneGet(scene, 'roimeanenergy', roi_2);
 ieNewGraphWin; hold on; grid on;
 plot(wave, roiMean_1); plot(wave, roiMean_2);
-title('Plastic - kd,ks'); ylim([0 70]);
-legend('Center', 'Fringe'); hold off;
+title('Plastic - kd,ks'); ylim([0 16]*10^-4);
+legend('Center', 'Fringe','Location','SouthEast'); hold off;
 
 
 %% Glass 
@@ -268,23 +328,26 @@ thisR.set('asset', assetName, 'material name', glassName);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance', 'meanluminance', -1);
-scene = sceneSet(scene, 'name', 'Glass - kt,kr');
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
+scene = sceneSet(scene, 'name', 'Glass');
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'rgb');
 
 wave = 400:10:700;
-reflectance = 0.8*ones(1,length(wave));
-reflectance(wave<500)=0;
-spd = piMaterialCreateSPD(wave, reflectance);
+kd_val = 0.8*ones(1,length(wave));
+kd_val(wave<500)=0;
+spd = piMaterialCreateSPD(wave, kd_val);
 thisR.set('material', glassName, 'kt value', spd);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance', 'meanluminance', -1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Glass - kt');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'rgb');
 
-ref_2 = 1-reflectance;
+ref_2 = 1-kd_val;
 % ref_2 = zeros(1, length(wave));
 % ref_2(wave<500) = 1;
 spd = piMaterialCreateSPD(wave, ref_2);
@@ -292,25 +355,10 @@ thisR.set('material', glassName, 'kr value', spd);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance', 'meanluminance', -1);
+meanlum = sceneGet(scene, 'meanluminance');
+scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Glass - kt,kr');
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'rgb');
-
-%% Mirror
-mirrorName = 'mirror';
-mirror = piMaterialCreate(mirrorName, 'type', 'mirror');
-thisR.set('material', 'add', mirror);
-thisR.set('asset', assetName, 'material name', mirrorName);
-
-piWrite(thisR);
-scene = piRender(thisR, 'render type', 'radiance', 'meanluminance', -1);
-scene = sceneSet(scene, 'name', 'Mirror');
-sceneWindow(scene);
-sceneSet(scene, 'render flag', 'rgb');
-
-thisR.get('to')
-thisR.set('to',[0 0 500])
-
 
 %% Add a matte sphere
 
@@ -324,7 +372,10 @@ thisR.assets.print;
 
 % change material of second sphere
 thisR.set('asset', newAsset2.name, 'material name', 'white');
+% thisR.set('material', 'white', 'kd value', matte_kd_orig);
+% thisR.set('material', 'white', 'sigma', 0);
 
+thisR.set('material', glassName, 'kr value', []);
 % change fov to see both spheres
 thisR.set('fov',90);
 
@@ -332,7 +383,7 @@ thisR.set('fov',90);
 % translate translates from object space, if rotate sphere the xyz axis
 % change; world translate makes the new branch higher so when a rotation is
 % added, the translation is taken into account
-[~,translateBranch] = thisR.set('asset', thisAsset.name, 'world translate', [-300, 0, 0]); % top left
+[~,translateBranch] = thisR.set('asset', thisAsset.name, 'world translate', [-150, 0, -150]); 
 [~,translateBranch] = thisR.set('asset', newAsset2.name, 'world translate', [300, 0, 0]);
 
 thisR.assets.print;
