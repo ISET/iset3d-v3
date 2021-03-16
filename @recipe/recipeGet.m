@@ -1171,6 +1171,10 @@ switch ieParamFormat(param)  % lower case, no spaces
                 case 'subtree'
                     % thisR.get('asset', assetName, 'subtree');
                     val = thisR.assets.subtree(id);
+                    %{
+                    % This is not true. We should let users determine
+                    % whether to put it under root or not. Otherwise it
+                    % causes like MCC in CB.
                     % We always assume the subtree is at (0 0 0) of the
                     % scene.
                     if isequal(val.Node{1}.type, 'branch')
@@ -1178,6 +1182,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                         rNode.translation = [0 0 0]';
                         val = val.set(1, rNode);
                     end
+                    %}
                 case {'nodetoroot','pathtoroot'}
                     % thisR.get('asset',assetName,'leaf to root');
                     % Sequence of ids from the leaf to root

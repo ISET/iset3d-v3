@@ -28,6 +28,16 @@ thisR.set('from', newFrom);
 newTo = newFrom + [0 0 1]; % The camera is horizontal
 thisR.set('to', newTo);
 
+%% Add MCC
+assetTreeName = 'mccCB';
+[~, rootST1] = thisR.set('asset', 'root', 'graft with materials', assetTreeName);
+thisR.set('asset', rootST1.name, 'world rotate', [0 0 2]);
+T1 = thisR.set('asset', rootST1.name, 'world translate', [0.012 0.003 0.125]);
+
+%% Add bunny
+assetTreeName = 'bunny';
+[~, rootST2] = thisR.set('asset', 'root', 'graft with materials', assetTreeName);
+
 %% Build a lens
 % List existing lens models
 lensList;
