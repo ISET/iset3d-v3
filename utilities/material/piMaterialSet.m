@@ -26,6 +26,7 @@ function material = piMaterialSet(material, param, val, varargin)
 %{
     mat = piMaterialCreate('new material', 'kd', [400 1 800 1]);
     mat = piMaterialSet(mat, 'kd val', [1 1 1]);
+    mat = piMaterialSet(mat, 'kd', [0.5 0.5 0.5]);
 %}
 
 %% Parse inputs
@@ -37,9 +38,12 @@ pName    = lower(nameTypeVal{1});
 % Whether it is specified to set a type or a value.
 if numel(nameTypeVal) > 1
     pTypeVal = nameTypeVal{2};
-else
+elseif isstruct(val)
     % Set a whole struct
     pTypeVal = '';
+elseif ischar(nameTypeVal{1})
+    % If nameTypeVal has only one part and it is a name of a field
+    pTypeVal = 'val';
 end
 
 p = inputParser;

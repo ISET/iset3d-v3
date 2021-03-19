@@ -997,6 +997,16 @@ switch param
                 % space.
                 rotDeg = piTransformRotM2Degs(newRotM);
                 out = thisR.set('asset', assetName, 'rotate', rotDeg);
+            case {'worldposition'}
+                % thisR.set('asset', assetName, 'world position', [1 2 3]);
+                % First get the position
+                pos = thisR.get('asset', assetName, 'world position');
+                
+                % Set a translation to (1) cancel the current translation
+                % and (2) move the object to the target position
+                newTrans = -pos + varargin{2}(:)';
+                
+                [~, out] = thisR.set('asset', assetName, 'world translation', newTrans);
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}

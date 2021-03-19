@@ -128,4 +128,16 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
+%% Here is a new way of setting object in world position!
+newSpherePos = [1 2 3];
+
+thisR.set('asset','Sphere_O','world position', newSpherePos);
+
+% thisR.get('asset', 'Sphere_O', 'world position')
+% Render
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
 %%

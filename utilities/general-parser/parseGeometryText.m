@@ -154,6 +154,12 @@ while i <= length(txt)
                 % resChildren = createGeometryObject();
                 resObject = piAssetCreate('type', 'object');
                 if exist('name','var')
+                    resObject.name = sprintf('%s_O', name);
+                    %{
+                    %% This was prepared for empty object name case.
+                    However our users prefer to have an empty name with
+                    just ID, so commenting this part out.
+                    
                     % If we parse a valid name already, do this. 
                     if ~isempty(name)
                         
@@ -179,6 +185,7 @@ while i <= length(txt)
                             end
                         end
                     end
+                    %}
                 end
                 
                 if exist('shape','var')
