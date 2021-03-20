@@ -13,7 +13,7 @@ function val = recipeGet(thisR, param, varargin)
 %
 % Parameters
 %
-%   % Data management
+%    % Data management
 %    % The input files are the original PBRT files
 %     'input file'        - full path to original scene pbrt file
 %     'input basename'    - just base name of input file
@@ -903,11 +903,10 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
-        %{
-        if ischar(varargin{1})
-            varargin{1} = ieParamFormat(varargin{1});
-        end
-        %}
+        % Here we list the material names or find a material by its name.
+        % If there is a material name (varargin{1}) and then a material
+        % property (varargin{2}) we call piMaterialGet.  See piMaterialGet
+        % for the list of material properties you can get.
         switch varargin{1}
             % Special cases
             case 'names'

@@ -8,16 +8,21 @@ function material = piMaterialCreate(name, varargin)
 %   Create material with parameters.
 %
 % Inputs:
-%   name                      - name of the material
+%   name  - name of the material
 %
 % Optional key/val:
-%   type                      - material type. Default is matte
-%   other material properties - depending on material types. Default values
-%                               can be found on PBRT website.
-%                               https://pbrt.org/fileformat-v3.html#materials
+%   type  - material type. Default is matte
+%     The special case of piMaterialCreate('list available types') returns
+%     the available material types.
 %
-% Description:
-%   The material properties should be given in key/val pairs. For keys. it
+%     The PBRT default properties of any material type can be found on PBRT
+%     website: web('https://pbrt.org/fileformat-v3.html#materials')
+%
+%   Other key/val pairs depend on the material.  To see the properties of
+%   any specific material use
+%            piMaterialProperties('materialType')
+%
+%   The material properties are set by key/val pairs. For keys. it
 %   should follow the format of 'TYPE KEYNAME'. It's easier for us to
 %   extract type and parameter name using space.
 %   Syntax is: 
@@ -40,11 +45,21 @@ function material = piMaterialCreate(name, varargin)
     material = piMaterialCreate('new material', 'type', 'uber',...
                                 'spectrum kd', [400 1 800 1]);
 %}
-%%
-% Replace the space in potential parameters. For example, 'rgb kd' won't
-% pass parse with the space, but we need the two parts in the string apart
-% to extract type and key. So we replace space with '_' and use '_' as
-% key word.
+
+
+%% Special case
+if isequal(ieParamFormat(name),'listavailabletypes')
+    material = {'matte','uber','plastic','metal','mirror','glass', ...
+       'translucent','hair','kdsubsurface','disney','fourier', ...
+       'mix','substrate','subsurface'};
+    return;
+end
+
+%% Replace the space in parameters. 
+
+% For example, 'rgb kd' won't pass parse with the space, but we need the
+% two parts in the string apart to extract type and key. So we replace
+% space with '_' and use '_' as key word.
 for ii=1:2:numel(varargin)
     varargin{ii} = strrep(varargin{ii}, ' ', '_');
 end
