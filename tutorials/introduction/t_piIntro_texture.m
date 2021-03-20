@@ -114,12 +114,12 @@ sceneWindow(scene);
 
 %%  For more complex textures, we can sample images.
 
-% This is an EXR file that is part of the distribution.
+% This is an PNG file that is part of the distribution.
 newImgName = 'room';
 newImgTexture = piTextureCreate(newImgName,...
     'format', 'spectrum',...
     'type', 'imagemap',...
-    'filename', 'room.exr');
+    'filename', 'pngExample.png');
 thisR.set('texture', 'replace', 'dots', newImgTexture);
 thisR.get('texture print');
 thisR.set('material', 'Mat', 'kd val', newImgName);
@@ -131,6 +131,7 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneName = 'room';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
+sceneSet(scene,'render flag','hdr');
 
 %{ 
 TODO

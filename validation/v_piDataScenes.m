@@ -1,10 +1,12 @@
 %% This is the second in a series of scripts introducing iset3d calculations
 %
-% Brief description:
+% Brief description
+%
+%   Read and render the ChessSet scene. 
 % 
 % Dependencies
 %
-%    ISET3d, ISETCam or ISETBio, JSONio, RemoteDataToolbox
+%    ISET3d, ISETCam or ISETBio, JSONio
 %
 %  Check that you have the updated docker image by running
 %

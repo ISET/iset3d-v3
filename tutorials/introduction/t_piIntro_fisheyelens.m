@@ -94,7 +94,7 @@ thisR.set('nbounces',1);
 piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','radiance');
 oiWindow(oi);
-oiSet(oi,'gamma',0.6);
+oi = oiSet(oi,'render flag','hdr');
 
 %% END
 
