@@ -75,4 +75,7 @@ t_piIntro_meshLabel
 disp('t_skymapDaylight')
 t_skymapDaylight
 
+%% Textures
+disp('t_piIntro_texture')
+t_piIntro_texture
 %% END
