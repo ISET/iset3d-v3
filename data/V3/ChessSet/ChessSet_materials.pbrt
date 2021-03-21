@@ -1,0 +1,57 @@
+Texture "cadyou.com_Sapeli_color" "spectrum" "imagemap" 
+        "float gamma" [ 2.20000005 ] 
+        "string filename" [ "cadyou.com_Sapeli.exr" ] 
+MakeNamedMaterial "Lyse_brikker_008" 
+        "string type" [ "plastic" ] 
+        "texture Kd" [ "cadyou.com_Sapeli_color" ] 
+Texture "Dark_Mahony_color" "spectrum" "imagemap" 
+        "float gamma" [ 2.20000005 ] 
+        "string filename" [ "Dark_Mahony.exr" ] 
+MakeNamedMaterial "Mrke_brikker_004" 
+        "string type" [ "plastic" ] 
+        "texture Kd" [ "Dark_Mahony_color" ] 
+MakeNamedMaterial "Filt_004" 
+        "float index" [ 1.33299994 ] 
+        "float roughness" [ 0.800000012 ] 
+        "string type" [ "uber" ] 
+        "rgb Kd" [ 0 0 0 ] 
+        "rgb Ks" [ 0 0 0 ] 
+        "rgb Kr" [ 0 0 0 ] 
+MakeNamedMaterial "Mtl" 
+        "float index" [ 1.33299994 ] 
+        "float roughness" [ 0.0242860001 ] 
+        "string type" [ "uber" ] 
+        "rgb Kd" [ 0.554616988 0.551731288 0.549075305 ] 
+        "rgb Ks" [ 0.0924361646 0.0919552222 0.0915125608 ] 
+        "rgb Kr" [ 0.0462180823 0.0459776111 0.0457562804 ] 
+MakeNamedMaterial "Mtl8" 
+        "float index" [ 1.33299994 ] 
+        "float roughness" [ 0.100000001 ] 
+        "string type" [ "uber" ] 
+        "rgb Kd" [ 0 0 0 ] 
+        "rgb Ks" [ 0 0 0 ] 
+        "rgb Kr" [ 0 0 0 ] 
+Texture "beigemarble_color" "spectrum" "imagemap" 
+        "float gamma" [ 2.20000005 ] 
+        "string filename" [ "beigeMarble.exr" ] 
+MakeNamedMaterial "GroundMaterial" 
+        "float index" [ 1.33299994 ] 
+        "float roughness" [ 0.673578739 ] 
+        "string type" [ "uber" ] 
+        "texture Kd" [ "beigemarble_color" ] 
+        "rgb Ks" [ 0.0470279083 0.0467832163 0.046558015 ] 
+        "rgb Kr" [ 0.0470279083 0.0467832163 0.046558015 ] 
+MakeNamedMaterial "planeTan" 
+        "float index" [ 1.33299994 ] 
+        "float roughness" [ 0.00999999978 ] 
+        "string type" [ "uber" ] 
+        "texture Kd" [ "cadyou.com_Sapeli_color" ] 
+        "rgb Ks" [ 0.462180823 0.459776014 0.457562715 ] 
+        "rgb Kr" [ 0.184872329 0.183910444 0.183025122 ] 
+MakeNamedMaterial "planeBrown" 
+        "float index" [ 1.33299994 ] 
+        "float roughness" [ 0.00999999978 ] 
+        "string type" [ "uber" ] 
+        "texture Kd" [ "Dark_Mahony_color" ] 
+        "rgb Ks" [ 0.462180823 0.459776014 0.457562715 ] 
+        "rgb Kr" [ 0.184872329 0.183910444 0.183025122 ] 

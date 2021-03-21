@@ -63,8 +63,16 @@ if find(piContains(keyWords, 'Shape '))
                 %                 shape.pointp = keyWords{find(piContains(keyWords, 'point P')) + 1};
             end
             if find(piContains(keyWords, 'float uv'))
-                shape.floatuv = piParameterGet(txt, 'float uv');
-                %                 shape.floatuv = keyWords{find(piContains(keyWords, 'float uv')) + 1};
+                % If file extension is ply, don't do this. 
+                ext = '';
+                if ~isempty(shape.filename)
+                    [~, ~, ext] = fileparts(shape.filename);
+                end
+                if isequal(ext, '.ply')
+                else
+                    shape.floatuv = piParameterGet(txt, 'float uv');
+                    % shape.floatuv = keyWords{find(piContains(keyWords, 'float uv')) + 1};
+                end
             end
             
             if find(piContains(keyWords, 'normal N'))

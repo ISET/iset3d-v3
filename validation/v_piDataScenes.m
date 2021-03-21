@@ -35,8 +35,9 @@ thisR.set('rays per pixel',96);
 thisR.set('n bounces',1); % Number of bounces
 
 %% Render
+tic
 piWrite(thisR);
-
+toc
 %%  Create the scene
 [scene, result] = piRender(thisR);
 
