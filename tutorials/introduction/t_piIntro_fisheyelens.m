@@ -21,7 +21,7 @@
 %  10/28/20  dhb  Comment tuning.
 
 %% Initialize ISET and Docker
-clear; close all; ieInit;
+ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the PBRT input scene
