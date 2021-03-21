@@ -525,7 +525,7 @@ end
 % Parse the file contents into the ISET3d recipe and identify the type of
 % parser.  C4D has special status.  In other cases, such as the scenes from
 % the PBRT and Benedikt sites, we just copy the files into ISET3d/local.
-thisR = piRead(fname, 'verbose', verbosity);
+thisR = piRead(fname);
 thisR.set('exporter',exporter);
 
 % By default, do the rendering and mounting from ISET3d/local.  That
