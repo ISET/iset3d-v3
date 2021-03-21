@@ -68,7 +68,7 @@ basecmd = 'docker run -ti --name %s --volume="%s":"%s" %s /bin/bash -c "pbrt --t
 % Which docker image we run
 dockerimage = 'vistalab/pbrt-v3-spectral:latest';
 % Give a name to docker container
-dockercontainerName = ['ISET3d-',thisName,'-',num2str(randi(100))];
+dockercontainerName = ['ISET3d-',thisName,'-',num2str(randi(200))];
 %% Build the command
 dockercmd = sprintf(basecmd, dockercontainerName, volume, volume, dockerimage, fname, [thisName, ext]);
 
@@ -111,9 +111,10 @@ end
 
 % Status is good.  So do stuff
 % find out how many ply mesh files are generated.
-PLYmeshFiles = strsplit(result, '\t');
+PLYmeshFiles = textscan(result, '%s');
+PLYmeshFiles = PLYmeshFiles{1};
 for ii = 1:numel(PLYmeshFiles)
-    cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/mesh_%05d.ply %s',dockercontainerName, ii, outputDir);
+    cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/%s %s',dockercontainerName, PLYmeshFiles{ii}, outputDir);
     [status_copy, ~ ] = system(cpcmd);
     if status_copy
         % If it fails we assume that is because there is no corresponding
