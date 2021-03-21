@@ -1,10 +1,12 @@
 %% This is the second in a series of scripts introducing iset3d calculations
 %
-% Brief description:
+% Brief description
+%
+%   Read and render the ChessSet scene. 
 % 
 % Dependencies
 %
-%    ISET3d, ISETCam or ISETBio, JSONio, RemoteDataToolbox
+%    ISET3d, ISETCam or ISETBio, JSONio
 %
 %  Check that you have the updated docker image by running
 %
@@ -33,8 +35,9 @@ thisR.set('rays per pixel',96);
 thisR.set('n bounces',1); % Number of bounces
 
 %% Render
+tic
 piWrite(thisR);
-
+toc
 %%  Create the scene
 [scene, result] = piRender(thisR);
 

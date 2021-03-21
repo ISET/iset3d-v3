@@ -14,17 +14,6 @@
 % See also
 %   v_piCloud
 
-
-%% TODO - 
-%{
-% Read and see what needs to be fixed
-
-t_piTextureSwitch
-
-% piTextureAssignToMaterial % needs fixing by ZLy
-
-%}
-
 %% Basic
 
 disp('t_piIntro_macbeth')
@@ -74,5 +63,10 @@ t_piIntro_meshLabel
 
 disp('t_skymapDaylight')
 t_skymapDaylight
+
+%% Textures
+
+disp('t_piIntro_texture')
+t_piIntro_texture
 
 %% END

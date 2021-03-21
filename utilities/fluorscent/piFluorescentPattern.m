@@ -1,4 +1,4 @@
-function thisR = piFluorescentPattern(thisR, varargin)
+function thisR = piFluorescentPattern(thisR, assetInfo, varargin)
 %% Apply pattern generation algorithms and change pbrt files for the pattern
 % 
 %   piFluorescentPattern
@@ -35,16 +35,92 @@ function thisR = piFluorescentPattern(thisR, varargin)
 %   Half split:
 %   
 
+% 02/11/2021 Update:
+% ZLY: Come to this round of updating: (1) creating patterns on assets
+% makes more sense since we have the tree assets structure. (2) The pattern
+% should be generated within recipe - creating new objects and then write
+% them out along with the old assets.
+
+%%
+
 % Examples
 %{
 thisR = piRecipeDefault('scene name', 'slantedbar');
-piMaterialList(thisR);
-piWrite(thisR);
-scene = piRender(thisR);
-sceneWindow(scene);
-thisIdx = 2;
-piFluorescentPattern(thisR, thisIdx, 'algorithm', 'half split');
+assetName = 'WhitePlane_O';
+piFluorescentPattern(thisR, assetName, 'algorithm', 'half split');
 %}
+
+%% Parse parameters
+
+varargin = ieParamFormat(varargin);
+
+p = inputParser;
+
+p.KeepUnmatched = true;
+vFunc = @(x)(isequal(class(x),'recipe'));
+p.addRequired('thisR',vFunc);
+p.addRequired('assetInfo', @(x)(ischar(x) || isnumeric(x)));
+p.addParameter('algorithm','halfsplit',@ischar);
+p.addParameter('type', 'add', @ischar);
+p.addParameter('fluoname', 'protoporphyrin', @ischar);
+p.addParameter('concentration', rand(1), @isnumeric);
+p.addParameter('coretrindex', -1, @isnumeric);
+p.addParameter('sz', 1, @isnumeric);
+p.addParameter('maxconcentration', 1, @isnumeric);
+p.addParameter('minconcentration', 0, @isnumeric);
+p.addParameter('maxsize', 1, @isnumeric);
+p.addParameter('minsize', 1, @isnumeric);
+p.addParameter('corenum', 1, @isnumeric);
+
+p.parse(thisR, assetInfo, varargin{:});
+
+thisR  = p.Results.thisR;
+assetInfo = p.Results.assetInfo;
+tp = p.Results.type;
+fluoName = p.Results.fluoname;
+algorithm = ieParamFormat(p.Results.algorithm);
+
+%% Set parameter values
+switch algorithm
+    case 'halfsplit'
+        concentration = p.Results.concentration;
+        thisR = piFluorescentHalfSplit(thisR, assetInfo,...
+                                          'concentration', concentration,...
+                                          'fluoname', fluoName,...
+                                          'type', tp);
+    case 'uniformspread'
+        concentration = p.Results.concentration;
+        coreTRIndex   = p.Results.coretrindex;
+        sz          = p.Results.sz;
+        thisR = piFluorescentUniformSpread(thisR, assetInfo,...
+                                        'concentration', concentration,...
+                                        'fluoname', fluoName,...
+                                        'sz', sz,...
+                                        'coretrindex', coreTRIndex,...
+                                        'type', tp);
+    case 'multicore'
+        maxConcentration = p.Results.maxconcentration;
+        minConcentration = p.Results.minconcentration;
+        maxSize = p.Results.maxsize;
+        minSize = p.Results.minsize;
+        coreNum = p.Results.corenum;
+        thisR = piFluorescentMultiCore(thisR, assetInfo,...
+                                       'max concentration', maxConcentration,...
+                                       'min concentration', minConcentration,...
+                                       'max size', maxSize,...
+                                       'min size', minSize,...
+                                       'fluoname', fluoName,...
+                                       'core num', coreNum,...
+                                       'type', tp);
+    otherwise
+        error('Unknown algorithm: %s, maybe implement it in the future. \n', algorithm);
+end
+
+
+
+%%
+%{
+%% Old version
 %% Parse parameters
 
 p = inputParser;
@@ -56,6 +132,7 @@ p.addRequired('matIdx', @(x)(ischar(x) || isnumeric(x)));
 p.addParameter('algorithm','halfsplit',@ischar);
 p.addParameter('type', 'add', @ischar);
 p.addParameter('fluoName', 'protoporphyrin', @ischar);
+
 p.parse(thisR, varargin{:});
 
 thisR  = p.Results.thisR;
@@ -286,4 +363,6 @@ function points = threeDCreate(pointsStr)
         end
         points = [points; pointList];
     end
+end
+%}
 end

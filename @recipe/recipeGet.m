@@ -13,7 +13,7 @@ function val = recipeGet(thisR, param, varargin)
 %
 % Parameters
 %
-%   % Data management
+%    % Data management
 %    % The input files are the original PBRT files
 %     'input file'        - full path to original scene pbrt file
 %     'input basename'    - just base name of input file
@@ -903,7 +903,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
-        switch ieParamFormat(varargin{1})
+        % Here we list the material names or find a material by its name.
+        % If there is a material name (varargin{1}) and then a material
+        % property (varargin{2}) we call piMaterialGet.  See piMaterialGet
+        % for the list of material properties you can get.
+        switch varargin{1}
             % Special cases
             case 'names'
                 % thisR.get('material','names');
@@ -960,6 +964,79 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'materialsoutputfile'}
         % Unclear why this is still here.  Probably deprecated.
         val = thisR.materials.outputfile;
+        
+        % Getting ready for textures
+    case{'texture', 'textures'}
+        % thisR.get('texture', textureName, property)
+        
+        % thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
+        % textures = thisR.get('texture');
+        % thisTexture = thisR.get('texture', 'reflectanceChart_color');
+        % thisName = thisR.get('texture', 'reflectanceChart_color', 'name');
+        % filename = thisR.get('texture', 'reflectanceChart_color', 'filename');
+        % filenameVal = thisR.get('texture', 'reflectanceChart_color', 'filename val');
+        
+        if isempty(varargin)
+            % Return the whole texture list
+            if isfield(thisR.textures, 'list')
+                val = thisR.textures.list;
+            else
+                % Should this be just empty, or an empty cell?
+                warning('No material in this recipe')
+                val = {};
+            end
+            return;        
+        end
+        
+        switch varargin{1}
+            % Special cases
+            case 'names'
+                % thisR.get('texture', 'names');
+                n = numel(thisR.textures.list);
+                val = cell(1, n);
+                for ii=1:n
+                    val{ii} = thisR.textures.list{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the texture name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.textures.list)
+                    % Search by index.  Get the textures directly.
+                    textureIdx = varargin{1};
+                    thisTexture = thisR.textures.list{textureIdx};
+                elseif isstruct(varargin{1})
+                    thisTexture = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisTexture] = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                    val = thisTexture;
+                end
+                
+                if isempty(thisTexture)
+                    warning('Could not find material. Return.')
+                    return;
+                end
+                if numel(varargin) >= 2
+                    % Return the texture property
+                    % thisR.get('texture', texture/idx/name, property)
+                    % Return the texture property
+                    val = piTextureGet(thisTexture, varargin{2});
+                end                
+        end
+        
+    case {'ntexture', 'ntextures', 'texturenumber', 'texturesnumber'}
+        % thisR.get('n textures')
+        % Number of textures in this scene
+        if isfield(thisR.textures, 'list')
+            val = numel(thisR.textures.list);
+        else
+            val = 0;
+        end
+    case {'texturesprint', 'printmtextures', 'textureprint', 'printtexture'}
+        % thisR.get('textures print')
+        %
+        piTextureList(thisR);
     case {'objectmaterial','materialobject'}
         % val = thisR.get('object material');
         %
@@ -1002,18 +1079,76 @@ switch ieParamFormat(param)  % lower case, no spaces
             val{ii} = names{ids(ii)};
         end
         
-        % Getting ready for textures
-    case{'texture'}
-        if isfield(thisR.textures, 'list')
-            val = thisR.textures.list;
-        else
-            val = {};
-        end
+
         
         % Getting read for lights
-    case{'light'}
-        val = thisR.light;
-                    
+    case{'light', 'lights'}
+        if isempty(varargin)
+            if isprop(thisR, 'lights')
+                val = thisR.lights;
+            else
+                warning('No lights in this recipe')
+                val = {};
+            end
+            return;
+        end
+        
+        %{
+        if ischar(varargin{1})
+            varargin{1} = ieParamFormat(varargin{1});
+        end
+        %}
+        
+        switch varargin{1}
+            case 'names'
+                n = numel(thisR.lights.list);
+                val = cell(1, n);
+                for ii=1:n
+                    val{ii} = thisR.lights.list{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the material name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.lights)
+                    % Search by index.  Get the material directly.
+                    lgtIdx = varargin{1};
+                    thisLight = thisR.lights{lgtIdx};
+                    val = thisLight;
+                elseif isstruct(varargin{1})
+                    % The user sent in the material.  We hope.
+                    % We should have a slot in material that identifies itself as a
+                    % material.  Maybe a test like "material.type ismember valid
+                    % materials."
+                    thisLight = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisLight] = piLightFind(thisR.lights, 'name', varargin{1});
+                    val = thisLight;
+                end
+                
+                if isempty(thisLight)
+                    warning('Could not find light. Return.')
+                    return;
+                end
+                if numel(varargin) >= 2
+                    % Return the material property
+                    % thisR.get('material', material/idx/name, property)
+                    % Return the material property
+                    val = piLightGet(thisLight, varargin{2});
+                end
+        end
+    case {'nlight', 'nlights', 'light number', 'lights number'}
+        % thisR.get('n lights')
+        % Number of lights in this scene.
+        if isprop(thisR, 'lights')
+            val = numel(thisR.lights);
+        else
+            val = 0;
+        end                    
+    case {'lightsprint', 'printlights', 'lightprint', 'printlight'}
+        % thisR.get('lights print');
+        piLightList(thisR);
     % Asset specific gets - more work needed here.
     case {'asset', 'assets'}
         % thisR.get('asset',assetName or ID);  % Returns the asset
@@ -1035,6 +1170,18 @@ switch ieParamFormat(param)  % lower case, no spaces
                 case 'subtree'
                     % thisR.get('asset', assetName, 'subtree');
                     val = thisR.assets.subtree(id);
+                    %{
+                    % This is not true. We should let users determine
+                    % whether to put it under root or not. Otherwise it
+                    % causes like MCC in CB.
+                    % We always assume the subtree is at (0 0 0) of the
+                    % scene.
+                    if isequal(val.Node{1}.type, 'branch')
+                        rNode = val.get(1);
+                        rNode.translation = [0 0 0]';
+                        val = val.set(1, rNode);
+                    end
+                    %}
                 case {'nodetoroot','pathtoroot'}
                     % thisR.get('asset',assetName,'leaf to root');
                     % Sequence of ids from the leaf to root

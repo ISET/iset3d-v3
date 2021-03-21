@@ -35,7 +35,7 @@ if isfield(thisR.textures,'list') && ~isempty(thisR.textures.list)
     textureTxt = cell(1, textureNum);
 
     for ii = 1:numel(textureTxt)
-        textureTxt{ii} = piTextureText(thisR.textures.list{ii});
+        textureTxt{ii} = piTextureText(thisR.textures.list{ii}, thisR);
     end
 else
     textureTxt = {};
@@ -78,6 +78,7 @@ if isfield(thisR.materials, 'list') && ~isempty(thisR.materials.list)
 
     for ii=1:length(materialTxt)
         % Converts the material struct to text
+ 
         materialTxt{ii} = piMaterialText(thisR.materials.list{ii});
     end
 else

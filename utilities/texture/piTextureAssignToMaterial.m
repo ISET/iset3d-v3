@@ -1,4 +1,6 @@
 function thisR = piTextureAssignToMaterial(thisR, materialidx, materialparam, textureidx, varargin)
+%% Deprecated since ZLY implemented a new material/texture structure.
+
 %Place a value about a texture into a material
 %
 % Synopsis

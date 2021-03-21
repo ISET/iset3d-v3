@@ -11,14 +11,25 @@ function val = piMaterialGet(material, param, varargin)
 %   material    - material struct.
 %   param       - property name.
 %
-%
 % Returns:
 %   val         - property value.
+%
+% Description
+%   The different types of materials have different types of properties.
+%   The PBRT book describes the material properties.  To see the properties
+%   of any specific type of material, you can execute this code:
+%
+%      piMaterialProperties(materialType)
+%
+%   The struct that is returned lists the properties available for that
+%   material type.  To see a list of material types, use
+%
+%      piMaterialCreate('list available types')
 %
 % ZLY, SCIEN, 2020
 %
 % See also
-%
+%   piMaterialProperties, piMaterialCreate
 
 % Examples:
 %{
@@ -70,5 +81,4 @@ else
             param, material.type);
 end
 
-%}
 end

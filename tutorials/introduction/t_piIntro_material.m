@@ -27,13 +27,16 @@ if ~piDockerExists, piDockerConfig; end
 
 sceneName = 'sphere';
 thisR = piRecipeDefault('scene name',sceneName);
-% thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
 
-thisR = piLightAdd(thisR, 'type', 'distant', ...
-    'light spectrum', [9000 0.001],...
-    'camera coordinate', true);
+% Create an environmental light source (distant light) that is a 9K
+% blackbody radiator.
+distLight = piLightCreate('new dist light',...
+                            'type', 'distant',...
+                            'spd', [9000 0.001],...
+                            'cameracoordinate', true);
+thisR.set('light', 'add', distLight);
 
-thisR.set('film resolution',[200 150]);
+thisR.set('film resolution',[200 150]*3);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5);
@@ -82,7 +85,6 @@ thisR.set('asset',assetName,'material name',redMatte.name);
 
 % Show that we set it
 thisR.get('object material')
-% thisR.assets.show;
 
 %% Let's have a look
 piWrite(thisR);
@@ -91,17 +93,24 @@ scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
 sceneSet(scene,'render flag','hdr');
 
+%%  Now change an environmental light
+
+rmLight = piLightCreate('room light', ...
+    'type', 'infinite',...
+    'mapname', 'room.exr');
+rmLight = piLightSet(rmLight, 'rotation val', {[0 0 1 0], [-90 1 0 0]});
 %% Make the sphere glass
 
-% Add an environmental light so we can see the glass or mirro
+% Make the sphere a little smaller
 assetName = 'Sphere_O';
 thisR.set('asset',assetName,'scale',[0.5 0.5 0.5]);
-fileLight = fullfile(piRootPath,'data','lights','roomLight.mat');
-load('roomLight','roomLight')
-thisR.lights{1} = roomLight;
 
-% Check that the exr file is in the directory.  Should not be needed in the
-% future.
+% Add an environmental light so we can see the glass or mirror
+thisR.set('light', 'delete', 'all');
+thisR.set('light', 'add', rmLight);
+
+% Check that the room.exr file is in the directory.  Should not be needed
+% in the future.
 %
 % We want something like
 %
@@ -112,14 +121,15 @@ if ~exist(fullfile(thisR.get('output dir'),'room.exr'),'file')
     copyfile(exrFile,thisR.get('output dir'))
 end
 
-% Here is the environment
+% Write and render
 piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
 sceneSet(scene,'render flag','hdr')
 
-%% Make the sphere glass 
+%% Make the sphere glass
+
 glassName = 'glass';
 glass = piMaterialCreate(glassName, 'type', 'glass');
 thisR.set('material', 'add', glass);

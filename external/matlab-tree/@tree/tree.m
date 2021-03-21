@@ -298,7 +298,7 @@ classdef tree
             
         end
         
-        function T = showUI(obj)
+        function t = showUI(obj)
             % Bring up a uifigure with collapsible tree
             fig = uifigure('Name','Assets Collection');
             t = uitree(fig,'Position',[80 10 400 400],'SelectionChangedFcn',@getNodeData);

@@ -1,0 +1,13 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [-0.528732543418 0.399995773785 0.748628932439 0  2.77555756156e-17 0.881997038055 -0.471254946778 0  -0.8487884881 -0.249167826608 -0.466340537217 0  -8.63639596363 11.6182711584 298.773691753 1]
+Camera "perspective" "float fov" [31.417275658] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["glasses.exr"] "integer xresolution" [1280] "integer yresolution" [720]
+Integrator "path" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	LightSource "distant" "rgb L" [1 1 1] "point from" [0 0 0] "point to" [0.586273972315 -0.45519731147 -0.670132944186]
+	Include "glasses_materials.pbrt"
+	Include "glasses_geometry.pbrt"
+WorldEnd

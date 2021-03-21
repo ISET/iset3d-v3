@@ -7,7 +7,7 @@ function camera = piCameraCreate(cameraType,varargin)
 %  
 % The camera lens type
 %
-%    {'pinhole']   - Default is pinhole camera, also called 'perspective'
+%    {'pinhole'}   - Default is pinhole camera, also called 'perspective'
 %           
 %    'realistic'   - allows chromatic aberration, diffraction and a lens file
 %    'light field' - microlens array in front of the sensor 
@@ -125,7 +125,7 @@ switch ieParamFormat(cameraType)
         camera.focusdistance.value    = 10; % mm
         
     case {'omni'}
-        [~,~,e] = fileparts(lensFile);
+        [~,name,e] = fileparts(lensFile);
         if(~strcmp(e,'.json'))
             error('Omni camera needs *.json lens file.');
         end
@@ -133,7 +133,16 @@ switch ieParamFormat(cameraType)
         camera.type = 'Camera';
         camera.subtype = 'omni';
         camera.lensfile.type = 'string';
-        camera.lensfile.value = which(lensFile);
+        % check if lensFile exist
+        if isempty(which(lensFile))
+            % The lensFile is not included in iset3d lens folder.
+            % So we move the file into the lens folder.
+            copyfile(lensFile, fullfile(piRootPath,'data/lens'));
+            camera.lensfile.value = [name, '.json'];
+        else
+            % lensFile in matlab path
+            camera.lensfile.value = which(lensFile);
+        end
         camera.aperturediameter.type = 'float';
         camera.aperturediameter.value = 5;    % mm
         camera.focusdistance.type = 'float';

@@ -1,0 +1,28 @@
+Transform [1.0 0.0 1.94707189038e-07 0  -0.0 1.0 0.0 0  -1.94707189038e-07 -0.0 1.0 0  -9.73535870917e-08 -0.0699999952316 0.499999961853 1]
+
+Camera "perspective"
+ "float fov" [30]
+
+Sampler "halton"
+ "integer pixelsamples" [32]
+
+Film "image"
+ "integer xresolution" [800]
+ "integer yresolution" [800]
+
+Integrator "path"
+ "integer maxdepth" [5]
+
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	Include "chessSet_materials.pbrt"
+	Include "chessSet_geometry.pbrt"
+
+	# Add an environment light
+    Rotate -90 1 0 0 
+    Rotate 180 0 0 1
+	LightSource "infinite" 
+      "string mapname" "20060807_wells6_hd.exr"
+
+WorldEnd

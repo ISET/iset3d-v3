@@ -139,24 +139,6 @@ thistrafficflow     = p.Results.thistrafficflow;
 overwritejson       = p.Results.overwritejson;
 verbosity           = p.Results.verbose;
 
-%% Check exporter condition
-
-% What we read and copy depends on how we got the PBRT files in the first
-% place.  The exporter string identifies whether it is a C4D set of files,
-% the most common for us, or another source that we are simply copying
-% ('Copy') or just 'Unknown'.  We impose some constraints on the
-% over-writing flags if the exporter is 'Copy'.
-exporter = thisR.get('exporter');
-switch exporter
-    case 'Copy'
-        creatematerials = false;
-        overwritegeometry = false;
-        overwritematerials = false;
-        overwritejson = false;
-    otherwise
-        % In most cases, we accept whatever the user set.  The other cases
-        % at present are 'C4D' and 'Unknown'
-end
 
 %% Check the input and output directories
 
@@ -184,8 +166,10 @@ piWriteCopy(thisR,overwriteresources,overwritepbrtfile, verbosity)
 if isequal(thisR.get('optics type'),'lens')
     % realisticEye has a lens file slot but it is empty. So we check
     % whether there is a lens file or not.
+    
     if ~isempty(thisR.get('lensfile'))
         piWriteLens(thisR,overwritelensfile);
+        
     end
 end
 
@@ -523,37 +507,40 @@ for ofns = outerFields'
                 % file. Perhaps we should have a better test here, say an
                 % exist() test. (BW).
                 [~,name,ext] = fileparts(currValue);
-
-                if(~isempty(ext))
-                    % This looks like a file with an extension. If it is a
-                    % lens file or an iorX.spd file, indicate that it is in
-                    % the lens/ directory. Otherwise, copy the file to the
-                    % working directory.
-                    
-                    fileName = strcat(name,ext);
-                    if strcmp(ifn,'specfile') || strcmp(ifn,'lensfile')
-                        % It is a lens, so just update the name.  It
-                        % was already copied
-                        % This should work.
-                        % currValue = strcat('lens',[filesep, strcat(name,ext)]);
-                        if ispc()
-                            currValue = strcat('lens/',strcat(name,ext));
+                % only if the file is in lens folder
+                if ~isempty(which(currValue))
+                    if(~isempty(ext))
+                        % This looks like a file with an extension. If it is a
+                        % lens file or an iorX.spd file, indicate that it is in
+                        % the lens/ directory. Otherwise, copy the file to the
+                        % working directory.
+                        
+                        fileName = strcat(name,ext);
+                        if strcmp(ifn,'specfile') || strcmp(ifn,'lensfile')
+                            % It is a lens, so just update the name.  It
+                            % was already copied
+                            % This should work.
+                            % currValue = strcat('lens',[filesep, strcat(name,ext)]);
+                            if ispc()
+                                currValue = strcat('lens/',strcat(name,ext));
+                            else
+                                currValue = fullfile('lens',strcat(name,ext));
+                            end
+                        elseif piContains(ifn,'ior')
+                            % The the innerfield name contains the ior string,
+                            % then we change it to this
+                            currValue = strcat('lens',[filesep, strcat(name,ext)]);
                         else
-                            currValue = fullfile('lens',strcat(name,ext));
+                            [success,~,id]  = copyfile(currValue,workingDir);
+                            if ~success && ~strcmp(id,'MATLAB:COPYFILE:SourceAndDestinationSame')
+                                warning('Problem copying %s\n',currValue);
+                            end
+                            % Update the file for the relative path
+                            currValue = fileName;
                         end
-                    elseif piContains(ifn,'ior')
-                        % The the innerfield name contains the ior string,
-                        % then we change it to this
-                        currValue = strcat('lens',[filesep, strcat(name,ext)]);
-                    else
-                        [success,~,id]  = copyfile(currValue,workingDir);
-                        if ~success && ~strcmp(id,'MATLAB:COPYFILE:SourceAndDestinationSame')
-                            warning('Problem copying %s\n',currValue);
-                        end
-                        % Update the file for the relative path
-                        currValue = fileName;
                     end
                 end
+                   
                                 
             elseif(strcmp(currType,'spectrum') && ~ischar(currValue))
                 % A spectrum of type [wave1 wave2 value1 value2]. TODO:
@@ -590,6 +577,20 @@ function piIncludeLines(thisR,fileID, creatematerials,overwritegeometry)
 
 % We may have created new materials in ISET3d. We insert 'Include' for
 % materials, geometry, and lights.
+if ~(numel(find(contains(thisR.world, {'_materials.pbrt', 'Include'}),2))==2)
+    if ~isempty(thisR.materials.list)
+        [~,n] = fileparts(thisR.outputFile);
+        thisR.world{end}= sprintf('Include "%s_materials.pbrt" \n', n);
+        thisR.world{end+1} = 'WorldEnd';
+    end
+end
+if ~(numel(find(contains(thisR.world, {'_geometry.pbrt', 'Include'}),2))==2)
+    if ~isempty(thisR.assets)
+        [~,n] = fileparts(thisR.outputFile);
+        thisR.world{end} = sprintf('Include "%s_geometry.pbrt" \n', n);
+        thisR.world{end+1} = 'WorldEnd';
+    end
+end
 if creatematerials
 
     for ii = 1:length(thisR.world)
@@ -602,10 +603,11 @@ if creatematerials
            
         if overwritegeometry
             % We get here if we generated the geometry file from the
-            % recipe.
+            % recipe, even though we did not make any changes to the
+            % materials.
             if piContains(currLine, 'geometry.pbrt')
-                [~,n] = fileparts(thisR.outputFile);
-                currLine = sprintf('Include "%s_geometry.pbrt"',n);
+                    [~,n] = fileparts(thisR.outputFile);
+                    currLine =  sprintf('Include "%s_geometry.pbrt"', n);
             end
         end
         
@@ -632,7 +634,7 @@ else
             % materials.
             if piContains(currLine, 'geometry.pbrt')
                 [~,n] = fileparts(thisR.outputFile);
-                currLine = sprintf('Include "%s_geometry.pbrt"',n);
+                currLine =  sprintf('Include "%s_geometry.pbrt" \n', n);
             end
         end
         
@@ -652,47 +654,30 @@ end
 function piWriteMaterials(thisR,creatematerials,overwritematerials)
 % Write both materials and textures files into the output directory
 
-inDir      = thisR.get('input dir');
 outputDir  = thisR.get('output dir');
-basename   = thisR.get('input basename');
 
-if piContains(thisR.exporter, 'C4D')
-    % If the scene is from Cinema 4D, 
-    if ~creatematerials
-        % We overwrite from the input directory, but we do not create
-        % any new material files beyond what is already in the input
-        if overwritematerials
-            [~,n] = fileparts(thisR.inputFile);
-            fname_materials = sprintf('%s_materials.pbrt',n);
-            % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
-            thisR.set('materials output file',fullfile(outputDir,fname_materials));
-            piMaterialWrite(thisR);
-        end
-    else
-        % Create new material files that could come from somewhere
-        % other than the input directory.
-        [~,n] = fileparts(thisR.outputFile);
+% If the scene is from Cinema 4D,
+if ~creatematerials
+    % We overwrite from the input directory, but we do not create
+    % any new material files beyond what is already in the input
+    if overwritematerials
+        [~,n] = fileparts(thisR.inputFile);
         fname_materials = sprintf('%s_materials.pbrt',n);
-        thisR.set('materials output file',fullfile(outputDir,fname_materials));
-
         % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
+        thisR.set('materials output file',fullfile(outputDir,fname_materials));
         piMaterialWrite(thisR);
     end
-elseif piContains(thisR.exporter,'Copy')
-    % Copy the materials and geometry file
-    
-    mFileIn  = fullfile(inDir,sprintf('%s_materials.pbrt',basename));
-    mFileOut = fullfile(outputDir,sprintf('%s_materials.pbrt',basename));
-    if exist(mFileIn,'file')
-        copyfile(mFileIn,mFileOut);
-    else
-        % no materials file to copy
-    end
-        
 else
-    % Other case.
-    fprintf('Skip the materials\n');
+    % Create new material files that could come from somewhere
+    % other than the input directory.
+    [~,n] = fileparts(thisR.outputFile);
+    fname_materials = sprintf('%s_materials.pbrt',n);
+    thisR.set('materials output file',fullfile(outputDir,fname_materials));
+    
+    % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
+    piMaterialWrite(thisR);
 end
+
 
 end
 
@@ -700,30 +685,8 @@ end
 function piWriteGeometry(thisR,overwritegeometry,lightsFlag,thistrafficflow)
 % Write the geometry file into the output dir
 %
-
-inDir    = thisR.get('input dir');
-outDir   = thisR.get('output dir');
-exporter = thisR.get('exporter');
-basename = thisR.get('output basename');  % The scene's
-
-if piContains(exporter, 'C4D')
-    if overwritegeometry
-        piGeometryWrite(thisR,'lightsFlag',lightsFlag, ...
-            'thistrafficflow',thistrafficflow);
-    end
-elseif piContains(exporter,'Copy')
-    
-    gFileIn  = fullfile(inDir,sprintf('%s_geometry.pbrt',basename));
-    gFileOut = fullfile(outDir,sprintf('%s_geometry.pbrt',basename));
-    
-    if exist(gFileIn,'file')
-        copyfile(gFileIn,gFileOut);
-    else
-        % no geometry file to copy
-    end
-    
-else
-    fprintf('Skip the geometry\n');
+if overwritegeometry
+    piGeometryWrite(thisR,'lightsFlag',lightsFlag, ...
+        'thistrafficflow',thistrafficflow);
 end
-
 end

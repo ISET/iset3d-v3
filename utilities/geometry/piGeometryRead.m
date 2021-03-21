@@ -34,16 +34,10 @@ end
 
 %% give a geometry.pbrt
 
-% Best practice is to initalize the ouputFile.  Sometimes people
+% Best practice is to initalize the ouputFile.  Sometimes peopleF
 % don't.  So we do this as the default behavior.
 [inFilepath, scene_fname] = fileparts(thisR.inputFile);
 inputFile = fullfile(inFilepath,sprintf('%s_geometry.pbrt',scene_fname));
-
-% Save the JSON file at AssetInfo
-% outputFile  = renderRecipe.outputFile;
-outFilepath = fileparts(thisR.outputFile);
-AssetInfo   = fullfile(outFilepath,sprintf('%s.json',scene_fname));
-
 %% Open the geometry file
 
 % Read all the text in the file.  Read this way the text indents are
@@ -56,23 +50,22 @@ fclose(fileID);
 %% Check whether the geometry have already been converted from C4D
 
 % If it was converted into ISET3d format, we don't need to do much work.
-if piContains(txtLines(1),'# PBRT geometry file converted from C4D exporter output')
-    convertedflag = true;
-else
-    convertedflag = false;
-end
 
-if ~convertedflag
-    % It was not converted, so we go to work.
-    thisR.assets = parseGeometryText(thisR, txtLines,'');
+% It was not converted, so we go to work.
+thisR.assets = parseGeometryText(thisR, txtLines,'');
 
-    % jsonwrite(AssetInfo,renderRecipe);
-    % fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
-    
-else
+% jsonwrite(AssetInfo,renderRecipe);
+% fprintf('piGeometryRead done.\nSaving render recipe as a JSON file %s.\n',AssetInfo);
+
+
+%{
     % The converted flag is true, so AssetInfo is already stored in a
     % JSON file with the recipe information.  We just copy it isnto the
     % recipe.
+    % Save the JSON file at AssetInfo
+    % outputFile  = renderRecipe.outputFile;
+    outFilepath = fileparts(thisR.outputFile);
+    AssetInfo   = fullfile(outFilepath,sprintf('%s.json',scene_fname));
     renderRecipe_tmp = jsonread(AssetInfo);
     
     % There may be a utility that accomplishes this.  We should find
@@ -84,8 +77,8 @@ else
     for dd = 1:length(fds)
         thisR.(fds{dd})= renderRecipe_tmp.(fds{dd});
     end
-    
-end
+%}
+
 
 
 %% Make the node name unique
@@ -166,7 +159,7 @@ while i <= length(txt)
         [name, sz] = piParseObjectName(currentLine);
         
     elseif piContains(currentLine,'ConcatTransform')
-        [rot, translation] = piParseConcatTransform(currentLine);
+        [rot, translation, ctform] = piParseConcatTransform(currentLine);
         
     elseif piContains(currentLine,'MediumInterface')
         % MediumInterface could be water or other scattering media.
@@ -174,6 +167,10 @@ while i <= length(txt)
         
     elseif piContains(currentLine,'NamedMaterial')
         mat = piParseGeometryMaterial(currentLine);
+        
+    elseif piContains(currentLine,'Matieral') 
+        % in case there is no NamedMaterial
+        mat = parseBlockMaterial(currentLine);
         
     elseif piContains(currentLine,'AreaLightSource')
         areaLight = currentLine;
@@ -191,6 +188,7 @@ while i <= length(txt)
         
     elseif piContains(currentLine,'Shape')
         shape = piParseShape(currentLine);
+        
     elseif strcmp(currentLine,'AttributeEnd')
         
         % Assemble all the read attributes into either a groub object, or a
@@ -225,6 +223,10 @@ while i <= length(txt)
                     resLight.lght{1}.rotate = rot;
                 end
                 
+                if exist('ctform', 'var')
+                    resLight.lght{1}.concattransform = ctform;
+                end
+                
                 if exist('translation', 'var')
                     resLight.lght{1}.translation = translation;
                 end
@@ -246,6 +248,7 @@ while i <= length(txt)
             if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end
             if exist('sz','var'), resCurrent.size = sz; end
             if exist('rot','var'), resCurrent.rotation = rot; end
+            if exist('ctform','var'), resCurrent.concattransform = ctform; end
             if exist('translation','var'), resCurrent.translation = translation; end
             
             %{

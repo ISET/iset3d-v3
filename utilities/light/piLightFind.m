@@ -1,5 +1,5 @@
-function lList = piLightFind(thisR, field, val)
-%% Find materials in the list such that the field equals a value
+function [lIdx, lCollection] = piLightFind(lList, param, val, varargin)
+%% Find light in the list such that the field equals a value
 %
 % Synopsis
 %   mList = piMaterialFind(thisR, field, val)
@@ -26,8 +26,40 @@ function lList = piLightFind(thisR, field, val)
 %
 % See also
 %  piMaterial*
+%% parse input
+p = inputParser;
+p.addRequired('lList', @iscell);
+p.addRequired('param', @ischar)
+p.parse(lList, param, varargin{:});
 
+%% Format 
+param = ieParamFormat(param);
 
+%%
+lIdx = [];
+lCollection = {};
+cnt = 0;
+for ii = 1:numel(lList)
+    if isfield(lList{ii}, param)
+        if isequal(param, 'name') || isequal(param, 'type')
+            curVal = lList{ii}.(param);
+        else
+            curVal = lList{ii}.(param).value;
+        end
+
+        if isequal(curVal, val)
+            cnt = cnt + 1;
+            lIdx(cnt) = ii; %#ok<AGROW>
+            lCollection{cnt} = lList{ii}; %#ok<AGROW>
+        end
+    end
+end
+
+if cnt == 1
+    lCollection = lCollection{1};
+end
+%% old version
+%{
 %% Format 
 field = ieParamFormat(field);
 
@@ -67,5 +99,5 @@ elseif iscell(thisR.lights)
 else
     error('Bad recipe lights list.');
 end
-
+%}
 end

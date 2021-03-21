@@ -21,7 +21,7 @@
 %  10/28/20  dhb  Comment tuning.
 
 %% Initialize ISET and Docker
-clear; close all; ieInit;
+ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the PBRT input scene
@@ -94,7 +94,7 @@ thisR.set('nbounces',1);
 piWrite(thisR,'creatematerials',true);
 oi = piRender(thisR,'render type','radiance');
 oiWindow(oi);
-oiSet(oi,'gamma',0.6);
+oi = oiSet(oi,'render flag','hdr');
 
 %% END
 

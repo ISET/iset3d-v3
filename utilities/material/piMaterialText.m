@@ -17,17 +17,21 @@ p.parse(material, varargin{:});
 % material structs in the scenes?
 %
 % BUG:  ZLY and BW to address.
-valName = sprintf('MakeNamedMaterial "%s" ',material.name);
-if isfield(material,'type')
-    valType = sprintf(' "string type" "%s" ',material.type);
-elseif isfield(material,'stringtype')
-    valType = sprintf(' "string type" "%s" ',material.stringtype);
+if ~strcmp(material.name, '')
+    valName = sprintf('MakeNamedMaterial "%s" ',material.name);
+    if isfield(material,'type')
+        valType = sprintf(' "string type" "%s" ',material.type);
+    elseif isfield(material,'stringtype')
+        valType = sprintf(' "string type" "%s" ',material.stringtype);
+    else
+        error('Bad material structure. %s.', material.name)
+    end
+    
+    val = strcat(valName, valType);
 else
-    error('Bad material structure. %s.', material.name)
+    % For material which is not named.
+    val = sprintf('Material "%s" ',material.type);
 end
-
-val = strcat(valName, valType);
-
 %% For each field that is not empty, concatenate it to the text line
 matParams = fieldnames(material);
 

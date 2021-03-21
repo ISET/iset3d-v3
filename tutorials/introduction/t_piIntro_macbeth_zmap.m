@@ -42,19 +42,19 @@ thisR = piRecipeDefault('write',false);
 
 % There is a default point light.  We delete that.
 %{
-    lightSources = piLightGet(thisR)
+    thisR.get('light print');
 %}
-thisR = piLightDelete(thisR, 'all');
+thisR.set('light', 'delete', 'all');
 
 % Add an equal energy distant light
-spectrumScale = 1;
+lName = 'new dist light';
 lightSpectrum = 'equalEnergy';
-thisR = piLightAdd(thisR,...
-    'type','distant',...
-    'light spectrum',lightSpectrum,...
-    'spectrumscale', spectrumScale,...
-    'cameracoordinate', true);
 
+newDistLight = piLightCreate(lName,...
+                            'type', 'distant',...
+                            'spd', lightSpectrum,...
+                            'cameracoordinate', true);
+thisR.set('light', 'add', newDistLight);                        
 %% Set rendering parameters 
 
 thisR.set('integrator subtype','path');
