@@ -2,29 +2,52 @@ function texture = piTextureCreate(name, varargin)
 % Initialize a texture with specific parameters
 %
 % Synopsis
-%   texture = piTextureCreate(thisR);
+%   texture = piTextureCreate(name,varargin);
 %
 % Inputs:
 %   name    - name of a texture
-%   
+%
+% Optional key/val pairs
+%
+%   The key/val options depend on the type of texture.  Use
+%
+%       piTextureProperties(textureType) 
+%
+%   to see the properties that you can set for each texture type.
+%
 % Outputs:
 %   texture - new texture with parameters
 %
 % ZLY, 2021
 % 
-% Updates：
-%   02/2021 - rewrite the texture structure
+% See also
+%
 
 % Examples
 %{
-    texture = piTextureCreate('checkerboard_texture',...
-                              'type', 'checkerboard',...
-                              'uscale', 8,...
-                              'vscale', 8,...
-                              'tex1', [.01 .01 .01],...
-                              'tex2', [.99 .99 .99]);
+  piTextureCreate('list available types')
 %}
-%%
+%{
+  texture = piTextureCreate('checkerboard_texture',...
+        'type', 'checkerboard',...
+        'uscale', 8,...
+        'vscale', 8,...
+        'tex1', [.01 .01 .01],...
+        'tex2', [.99 .99 .99]);
+%}
+
+%% List availble type
+
+validTextures = {'constant','scale','mix','bilerp','imagemap',...
+    'checkerboard','dots','fbm','wrinkled','marble','windy'};
+
+if isequal(ieParamFormat(name),'listavailabletypes')
+    texture = validTextures;
+    return;
+end
+
+%% Needed rather than ieParamFormat because of PBRT syntax issues
+
 for ii=1:2:numel(varargin)
     varargin{ii} = strrep(varargin{ii}, ' ', '_');
 end
@@ -37,17 +60,17 @@ p.addParameter('format', 'spectrum', @ischar);
 p.KeepUnmatched = true;
 p.parse(name, varargin{:});
 
-tp = ieParamFormat(p.Results.type);
+tp   = ieParamFormat(p.Results.type);
 form = ieParamFormat(p.Results.format);
+
 %% Construct material struct
 texture.name = name;
 texture.format = form;
 
-%
 switch tp
     % Any-D
     % Constant, Scale, Mix
-    case 'Constant'
+    case 'constant'
         texture.type = 'constant';
         
         texture.value.type = 'float';

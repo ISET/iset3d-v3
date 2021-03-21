@@ -5,13 +5,19 @@ function lght = piLightCreate(lightName, varargin)
 %   lght = piLightCreate(lightName,varargin)
 %
 % Inputs:
-%   lightName   - name of the light (use 'help' to see a list of light
-%                 types).
+%   lightName   - name of the light
 %
 % Optional key/val pairs
-%   type   - light type. Default is point light other light
-%       properties. The specific properties depend on the light  type.
-%       Default values can  be found on PBRT website.
+%   type   - light type. Default is point light.  The light specific
+%    properties depend on the light type. To see the light types use
+%   
+%      lightTypes = piLightCreate('list available types');
+%
+%    Properties for each light type can be found
+%
+%        piLightProperties(lightTypes{3})
+%
+%    Look here for the PBRT website information about lights.
 %
 % Description:
 %   In addition to creating a light struct, various light properties can be
@@ -20,22 +26,29 @@ function lght = piLightCreate(lightName, varargin)
 % Returns
 %   lght   - light struct
 %
-%
 % See also
-%   piLightSet, piLightGet
+%   piLightSet, piLightGet, piLightProperties
 %
 
 % Examples
+%{
+  piLightCreate('list available types')
+%}
 %{
  lgt = piLightCreate('point light 1')
 %}
 %{
  lgt = piLightCreate('spot light 1', 'type','spot','rgb spd',[1 1 1])
 %}
-%{
- lightList = piLightCreate('help');
-%}
 
+%% Check if the person just wants the light types
+
+validLights = {'distant','goniometric','infinite','point','area','projection','spot'};
+
+if isequal(ieParamFormat(lightName),'listavailabletypes')
+    lght = validLights;
+    return;
+end
 
 %% Parse inputs
 
@@ -49,20 +62,9 @@ end
 p = inputParser;
 p.addRequired('lightName', @ischar);
 
-validLights = {'help','distant','point','goniometric','infinite','spot','area'};
 p.addParameter('type','point',@(x)(ismember(x,validLights)));
 p.KeepUnmatched = true;
 p.parse(lightName, varargin{:});
-
-% User just wants a lit of valid lights
-if isequal(lightName,'help')
-    fprintf('---------\nValid light types\n---------\n');
-    for ii=2:numel(validLights)
-        fprintf('  %s \n',validLights{ii});
-    end
-    lght = validLights;
-    return;
-end
 
 %% Construct light struct
 lght.type = p.Results.type;
