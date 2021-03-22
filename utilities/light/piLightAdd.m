@@ -1,4 +1,6 @@
 function thisR = piLightAdd(thisR, varargin)
+% Deprecated
+%
 % Add different types of light sources to a scene
 %
 % Syntax
@@ -71,6 +73,9 @@ function thisR = piLightAdd(thisR, varargin)
   thisR = piLightAdd(thisR, 'type', 'point');
   thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
 %}
+
+%%
+error('piLightAdd has been deprecated.  Use thisR.set(light, ...)');
 
 %% Parse inputs
 varargin = ieParamFormat(varargin);  % Allow spaces and capitalization

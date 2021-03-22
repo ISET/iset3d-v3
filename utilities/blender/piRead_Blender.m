@@ -301,7 +301,12 @@ end
 % light is added here
 
 % Add an infinite light corresponding to mid-day sunlight
-thisR = piLightAdd(thisR,'type','infinite','light spectrum','D65');
+% Hi Amy.  This is ZL and BW.  We are fixing this for you.
+%
+infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
+thisR.set('light','add',infiniteLight);
+% thisR = piLightAdd(thisR,'type','infinite','light spectrum','D65');
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

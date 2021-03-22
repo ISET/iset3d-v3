@@ -74,7 +74,9 @@ for ii = 7%1:numel(namelist)
     thisR.set('fov',30);
     thisR.set('nbounces',5);
     if ii ==1
-        thisR = piLightAdd(thisR,'type','infinite','light spectrum','D65');
+        infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
+        thisR.set('light','add',infiniteLight);
+        % thisR = piLightAdd(thisR,'type','infinite','light spectrum','D65');
     end
     %%
     piWrite(thisR);

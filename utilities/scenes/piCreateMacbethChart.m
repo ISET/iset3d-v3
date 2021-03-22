@@ -156,8 +156,19 @@ end
 
 if inputs.defaultLight
 
-    piLightAdd(macbethRecipe,'name','Default','type','infinite',...
-                         'from',[0 100 1], 'to', [0 0 0]);
+    infiniteLight = piLightCreate('infiniteLight',...
+        'type','infinite');
+    
+    mabethRecipe.set('light','add',infiniteLight);
+    macbethRecipe.set('from',[0 100 1]);
+    macbethRecipe.set('to',[0 0 0]);
+    
+    % to HB:  If you are here, we do not think 'from' and 'to' are part of
+    % the light.  Maybe they are supposed to be the direction of the
+    % infinite light?
+    %
+    % piLightAdd(macbethRecipe,'name','Default','type','infinite',...
+    %                     'from',[0 100 1], 'to', [0 0 0]);
 
 end
 
