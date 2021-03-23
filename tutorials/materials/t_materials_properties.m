@@ -101,7 +101,7 @@ scale = 100/meanlum;
 scene = sceneSet(scene, 'meanluminance', meanlum*scale);
 sceneWindow(scene);
 
-%% Change Matte properties
+%% Matte properties: Setting kd using RGB values
 % The material type 'matte' has two main properties: the diffuse
 % reflectivity (kd) and the sigma parameter (sigma) of the Oren-Nayar model
 
@@ -121,16 +121,24 @@ scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Matte: kd = green, sigma=0');
 sceneWindow(scene);
 
-% Get the radiance of an inner and outer section
-% Center section
+% To get the radiance of the sphere, either choose your own rectangles or
+% use the saved coordinates below.
+
 % Draw rectangle in scene window and save location first in center and
 % second in outer region.
 [loc_1,rect_1] = ieROISelect(scene);
+centerROI = loc_1;
 [loc_2,rect_2] = ieROISelect(scene);
+fringeROI = loc_2;
+
+% or use these saved positions
+% centerROI = [88 65 25 22];
+% fringeROI = [92 25 19 4];
+
 
 % Plot mean radiance in ROI
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy',centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy',fringeROI);
 
 wave = 400:10:700;
 ieNewGraphWin; hold on; grid on;
@@ -141,6 +149,8 @@ xlabel(xlab); ylabel(ylab);
 title('Matte - using RGB values'); 
 legend('Center', 'Fringe'); ylim([0 2*10^-3]);
 hold off;
+
+%% Matte properties: setting kd using spectral reflectance values
 
 % Change value of kd value to reflect a green color using spectral
 % reflectance values
@@ -157,8 +167,8 @@ scene = sceneSet(scene, 'name', 'Matte, spectral ref val');
 sceneWindow(scene);
 
 % Get the radiance of an inner and outer section
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
@@ -167,7 +177,9 @@ title('Matte - using Spectral Reflectance values');
 legend('Center', 'Fringe');
 hold off;
 
-% Set value of signma to 100, surface will have pure Lambertian reflection
+%% Matte Properties: Sigma value
+
+% Set value of signma to 100, making the surface rougher
 thisR.set('material', 'white', 'sigma value', 100);
 
 piWrite(thisR);
@@ -180,8 +192,8 @@ meanlum = sceneGet(scene, 'meanluminance');
 sceneWindow(scene);
 
 % Plot the inner and outer regions
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
@@ -217,8 +229,8 @@ scene = sceneSet(scene, 'name', 'Uber - kd');
 sceneWindow(scene);
 
 % Plot the inner and outer regions
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
@@ -242,8 +254,8 @@ scene = sceneSet(scene, 'name', 'sphere to uber - kd,kr');
 sceneWindow(scene);
 
 % Plot the inner and outer regions
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
 xlabel(xlab); ylabel(ylab);
@@ -265,8 +277,8 @@ scene = sceneSet(scene, 'name', 'Uber - kd,kr,ks');
 sceneWindow(scene);
 
 % Plot the inner and outer regions
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
 xlabel(xlab); ylabel(ylab);
@@ -308,8 +320,8 @@ scene = sceneSet(scene, 'name', 'Plastic - kd');
 sceneWindow(scene);
 
 % Plot the inner and outer regions
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
 xlabel(xlab); ylabel(ylab); ylim([0 16*10^-4]);
@@ -339,8 +351,8 @@ scene = sceneSet(scene, 'name', 'Plastic - kd,ks');
 sceneWindow(scene);
 
 % Plot the inner and outer regions
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
 xlabel(xlab); ylabel(ylab); ylim([0 16*10^-4]);
@@ -383,8 +395,8 @@ scene = sceneSet(scene, 'name', 'Glass - kt');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'rgb');
 
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
 xlabel(xlab); ylabel(ylab); ylim([0 1.4*10^-4]);
@@ -404,12 +416,47 @@ scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Glass - kt,kr');
 sceneWindow(scene);
 
-radMean_1 = sceneGet(scene, 'roimeanenergy', loc_1);
-radMean_2 = sceneGet(scene, 'roimeanenergy', loc_2);
+radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 ieNewGraphWin; hold on; grid on;
 plot(wave, radMean_1); plot(wave, radMean_2);
 xlabel(xlab); ylabel(ylab);
 title('Glass - kt & kr'); 
 legend('Center', 'Fringe','Location','SouthEast'); hold off;
+
+%% Comparing the reflections with the surrounding
+% To compare the sphere's reflections with its surroundings, we'll draw 4
+% rectangles: 1) in the top region of the sphere, 2) in the sky, 3) in the
+% bottom region of the sphere, and 4) on the ground
+
+[topROI,rect_top] = ieROISelect(scene);
+[skyROI,rect_sky] = ieROISelect(scene);
+[botROI,rect_bot] = ieROISelect(scene);
+[gndROI,rect_gnd] = ieROISelect(scene);
+
+% topROI = [95 25 17 2];
+% skyROI = [94 6 19 5];
+% botROI = [124 103 12 11];
+% gndROI = [148 133 14 12];
+
+rad_top = sceneGet(scene, 'roimeanenergy', topROI);
+rad_sky = sceneGet(scene, 'roimeanenergy', skyROI);
+
+ieNewGraphWin; hold on; grid on;
+plot(wave, radMean_1); plot(wave, rad_top); plot(wave, rad_sky);
+xlabel(xlab); ylabel(ylab);
+title('Glass - Sky reflections'); 
+legend('No Reflections','Top','Sky','Location','SouthEast'); 
+hold off;
+
+rad_bot = sceneGet(scene, 'roimeanenergy', botROI);
+rad_gnd = sceneGet(scene, 'roimeanenergy', gndROI);
+
+ieNewGraphWin; hold on; grid on;
+plot(wave, radMean_1); plot(wave, rad_bot); plot(wave, rad_gnd);
+xlabel(xlab); ylabel(ylab);
+title('Glass - Ground reflections'); 
+legend('No Reflections', 'Bottom','Ground','Location','SouthEast'); 
+hold off;
 
 % END
