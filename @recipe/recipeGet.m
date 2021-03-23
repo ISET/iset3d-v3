@@ -130,13 +130,12 @@ function val = recipeGet(thisR, param, varargin)
 %    % Asset information
 %       'assets'      - This struct includes the objects and their
 %                       properties in the World
-%       'asset names' - The names in groupobjs.name
-%       'group names'
-%       'group index'
-%       'group obj'
-%       'child'
-%       'children names'
-%       'children index'
+%       'asset names' 
+%       'asset id'
+%       'asset root'
+%       'asset names'
+%       'asset parent id'
+%       'assetparent'
 %
 %    % Material information
 %      'materials'
@@ -153,11 +152,18 @@ function val = recipeGet(thisR, param, varargin)
 
 % Examples
 %{
-  val = thisR.get('working directory');
-  val = thisR.get('object distance');
-  val = thisR.get('focal distance');
-  val = thisR.get('camera type');
-  val = thisR.get('lens file');
+  thisR = piRecipeDefault('scene name','SimpleScene');
+  thisR.get('working directory')
+  thisR.get('object distance')
+  thisR.get('focal distance')
+  thisR.get('camera type')
+  thisR.get('lens file')
+
+  thisR.get('asset names')       % The call should be the same!
+  thisR.get('materials','names');
+  thisR.get('textures','names')  
+  thisR.get('light','names')      
+
 %}
 
 % Programming todo
@@ -1078,10 +1084,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         for ii = 1:numel(ids)
             val{ii} = names{ids(ii)};
         end
-        
-
-        
-        % Getting read for lights
+                
+        % Lights
     case{'light', 'lights'}
         if isempty(varargin)
             if isprop(thisR, 'lights')
@@ -1101,10 +1105,10 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         switch varargin{1}
             case 'names'
-                n = numel(thisR.lights.list);
+                n = numel(thisR.lights);
                 val = cell(1, n);
                 for ii=1:n
-                    val{ii} = thisR.lights.list{ii}.name;
+                    val{ii} = thisR.lights{ii}.name;
                 end
             otherwise
                 % The first argument indicates the material name and there
@@ -1278,65 +1282,6 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = thisR.assets.Node{parentNode};   
 
         % Delete this stuff when we get ready to merge.
-        %{
-    case {'groupnames'}
-        % Cell array (2D) of the groupobj names
-        % val{level}{idx}
-        val = piAssetNames(thisR);
-    case {'groupindex'}
-        % thisR.get('groupindex',groupName)
-        % gnames = thisR.get('group names')
-        %
-        % gnames{idx(1)}{dx(2)}
-        if isempty(varargin), error('group name required'); end
-        val = piAssetNames(thisR,'group find',varargin{1});
-    case {'groupobj'}
-        % groupobj = thisR.get('groupobj',idx);
-        % idx from group index
-        %
-        % idx = piAssetNames(thisR,'group find','figure_3m');
-        thisG = thisR.assets;
-        % Work through the levels
-        for level = 1:idx(1)
-            thisG = thisG.groupobjs;
-        end
-        % Select the group
-        val = thisG(idx(2));
-        
-    case {'childrennames'}
-        % cnames = thisR.get('children names')
-        % Cell array (2D) of the children names
-        %
-        [~,val] = piAssetNames(thisR);
-        
-    case {'childrenindex'}
-        % idx = thisR.get('children index',childName)
-        % cnames = thisR.get('children names')
-        %
-        % These are 3-vectors (level, group, idx)
-        %
-        % cnames{idx(1)}{dx(2)}
-        %
-        if isempty(varargin), error('child name required'); end
-        val = piAssetNames(thisR,'children find',varargin{1});
-    case {'child'}
-        % child = thisR.get('child',idx);
-        %
-        % idx from child index is a 3 vector. There can be multiple
-        % groupobjs at this level and we need to know which one has the
-        % specific child.  So we need
-        %
-        %   [level, groupidx, childidx]
-        %
-        % idx = piAssetNames(thisR,'children find','3_1_Moon Light');
-        thisG = thisR.assets;
-        for level = 1:idx(1)
-            % Work through the levels
-            thisG = thisG.groupobjs;
-        end
-        % Find the group and child
-        val = thisG(idx(2)).children(idx(3));
-        %}
 
     otherwise
         error('Unknown parameter %s\n',param);

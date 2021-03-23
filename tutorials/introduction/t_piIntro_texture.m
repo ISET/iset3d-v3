@@ -1,13 +1,14 @@
 % t_piIntro_texture
 %
-% Illustrates texture management with some simple objects.
+%   Illustrates texture management.  
 %
-% Textures are assigned to a material.  We create some textures and attach
-% them to the material in a simple scene.
+% Textures are created and assigned to a flat surface material in the first
+% few examples.  Then we assign the textures to individual assets in the
+% SimpleScene.
 %
 %
 % See also
-%
+%  t_piIntro_light, tls_assets.mlx
 
 %% Init
 ieInit;
@@ -58,8 +59,8 @@ thisR.get('material', 'Mat', 'kd val')
 % Textures are attached to a material.
 
 % Here are some black and white checks.
-newTextureName = 'checks';
-newTexture = piTextureCreate(newTextureName,...
+checksName = 'checks';
+checksTexture = piTextureCreate(checksName,...
     'type', 'checkerboard',...
     'format', 'spectrum',...
     'uscale', 24,...
@@ -67,7 +68,7 @@ newTexture = piTextureCreate(newTextureName,...
     'spectrum tex1', [.05 .05 .05],...
     'spectrum tex2', [.95 .95 .95]);
 
-thisR.set('texture', 'add', newTexture);
+thisR.set('texture', 'add', checksTexture);
 thisR.get('texture print');
 
 %% Display material list
@@ -76,7 +77,7 @@ thisR.get('texture print');
 % by placing the texture in the diffuse reflectance (kd) field.
 %
 % material-name, diffuse reflectance value, texture-name
-thisR.set('material', 'Mat', 'kd val', newTextureName);
+thisR.set('material', 'Mat', 'kd val', checksName);
 
 % The material has been modified so that its 'val' is now the texture name.
 % PBRT figures out what to do.
@@ -112,17 +113,35 @@ sceneName = 'dots';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
 
+%% Now we change the texture of a material in a more complex scene
+
+thisR = piRecipeDefault('scene name', 'SimpleScene');
+thisR.get('asset names')
+planeMaterial = thisR.get('asset','Plane_O','material');
+thisR.set('texture', 'add', newDotTexture);
+thisR.set('material',planeMaterial.name,'kd val',newDotsName);
+
+piWrite(thisR, 'overwritematerials', true);
+[scene, ~] = piRender(thisR, 'render type', 'radiance');
+sceneName = 'simpleDots';
+scene = sceneSet(scene, 'scene name', sceneName);
+sceneWindow(scene);
+sceneSet(scene,'render flag','hdr');
+drawnow;
+
 %%  For more complex textures, we can sample images.
 
 % This is an PNG file that is part of the distribution.
-newImgName = 'room';
-newImgTexture = piTextureCreate(newImgName,...
+roomName = 'room';
+roomTexture = piTextureCreate(roomName,...
     'format', 'spectrum',...
     'type', 'imagemap',...
     'filename', 'pngExample.png');
-thisR.set('texture', 'replace', 'dots', newImgTexture);
 thisR.get('texture print');
-thisR.set('material', 'Mat', 'kd val', newImgName);
+
+mirrorMaterial = thisR.get('asset','mirror_O','material');
+thisR.set('texture', 'add', roomTexture);
+thisR.set('material', mirrorMaterial.name, 'kd val', roomName);
 
 % Write and render
 piWrite(thisR, 'overwritematerials', true);
@@ -133,61 +152,17 @@ scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
 sceneSet(scene,'render flag','hdr');
 
-%{ 
-TODO
-%% We think we can change the specularity by assigning a monochrome image
+%% Let's change the texture of a the sphere to checkerboard
 
-thisR.set('light','delete','all');
+figureMaterial = thisR.get('asset','Sphere_O','material');
+thisR.set('material',figureMaterial.name,'kd val',checksName);
 
-% Specularity will be more apparent for a point source
-thisR.get('light')
-pointLight = piLightCreate('Point 1',...
-    'type', 'point',...
-    'cameracoordinate', false,...
-    'spd', 'equalEnergy');
-thisR.set('light','add',pointLight);
-
-cameraFrom = thisR.get('from');
-lightFrom = cameraFrom + [5 5 -300];
-thisR.set('light',pointLight.name,'from',lightFrom);
-
-% thisR.set('light', 'replace', 'Distant 1',pointLight);
-thisR.get('light print');
-
-%% Add the face texture image in the specular channel
-
-% We also turn down the diffuse reflectance (kd).
-newImgName = 'face';
-newImgTexture = piTextureCreate(newImgName,...
-    'format', 'spectrum',...
-    'type', 'imagemap',...
-    'filename', 'monochromeFace.png');
-thisR.set('texture', 'add', newImgTexture);
-thisR.get('texture print');
-
-% We create a specular material.
-newMaterial = 'Uber specular';
-uberSpecular = piMaterialCreate(newMaterial, 'type','uber');
-uberSpecular = piMaterialSet(uberSpecular,'ks val',newImgName);
-uberSpecular = piMaterialSet(uberSpecular,'kd val',[0.5 0.5 0.5]);
-
-% thisR.set('material','replace',newMaterial,uberSpecular);
-thisR.set('material','add',uberSpecular);
-
-% We were using the Mat material
-thisR.get('assets','Cube_O','material name')
-
-% We change to the specular uber material
-thisR.set('assets','Cube_O','material name',newMaterial);
-thisR.get('assets','Cube_O','material name')
-
-%% Write and render
 piWrite(thisR, 'overwritematerials', true);
-
-[scene, result] = piRender(thisR, 'render type', 'radiance');
-sceneName = 'point light';
+[scene, ~] = piRender(thisR, 'render type', 'radiance');
+sceneName = 'simpleFigChecks';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
-%}
+sceneSet(scene,'render flag','hdr');
+drawnow;
 
 %% END
