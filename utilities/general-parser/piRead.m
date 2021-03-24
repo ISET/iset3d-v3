@@ -499,10 +499,10 @@ while ii<=nline
                 % Convert value depending on type
                 if(isempty(valueType))
                     continue;
-                elseif(strcmp(valueType,'string')) || strcmp(valueType,'bool')
+                elseif(strcmp(valueType,'string')) || strcmp(valueType,'bool') || strcmp(valueType,'spectrum')
                     % Do nothing.
                 elseif(strcmp(valueType,'float') || strcmp(valueType,'integer'))
-                    value = str2double(value);
+                    value = str2double(value);                    
                 else
                     error('Did not recognize value type, %s, when parsing PBRT file!',valueType);
                 end
