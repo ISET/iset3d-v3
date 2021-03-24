@@ -1,0 +1,84 @@
+# Flip handedness
+Scale -1 1 1
+
+# camera default orientation
+LookAt 0 0 0 0 1 0 0 0 1
+
+# 1_Camera
+Camera "realisticEye" 
+  "string specfile" "navarroAccomodated_5.00.dat" 
+  "float retinaDistance" [16.320000] 
+  "float retinaRadius" [12] 
+  "float pupilDiameter" [4] 
+  "float retinaSemiDiam" [6] 
+  "spectrum ior1" "ior1_5.00dp.spd" 
+  "spectrum ior2" "ior2_5.00dp.spd" 
+  "spectrum ior3" "ior3_5.00dp.spd" 
+  "spectrum ior4" "ior4_5.00dp.spd" 
+
+# integrator
+SurfaceIntegrator "path" 
+  "integer maxdepth" [1] 
+
+# sampler
+Sampler "lowdiscrepancy" 
+  "integer pixelsamples" [256] 
+
+# filter
+PixelFilter "gaussian" 
+  "float alpha" [2] 
+  "float xwidth" [2] 
+  "float ywidth" [2] 
+
+# film
+Film "image" 
+  "integer xresolution" [128] 
+  "integer yresolution" [128] 
+
+WorldBegin
+
+# 1_DefaultMaterial
+MakeNamedMaterial "1_DefaultMaterial" "string type" "uber" 
+  "rgb Kd" [0.600000 0.600000 0.600000] 
+  "rgb Ks" [0 0 0] 
+  "spectrum Kr" [300 0 800 0] 
+  "float roughness" [0] 
+  "float index" [1] 
+  "rgb opacity" [1 1 1] 
+
+# 2_LightMaterial
+MakeNamedMaterial "2_LightMaterial" "string type" "uber" 
+  "rgb Kd" [0.640000 0.640000 0.640000] 
+  "rgb Ks" [0.500000 0.500000 0.500000] 
+  "spectrum Kr" [300 0 800 0] 
+  "float roughness" [0.010625] 
+  "float index" [1] 
+  "rgb opacity" [1 1 1] 
+
+# checkerboard_spectrum
+Texture "checkerboard_spectrum" "spectrum" "imagemap" 
+  "string filename" "resources/checkerboard.exr" 
+
+# 3_PlaneMaterial
+MakeNamedMaterial "3_PlaneMaterial" "string type" "uber" 
+  "texture Kd" "checkerboard_spectrum" 
+  "rgb Ks" [0 0 0] 
+  "spectrum Kr" [300 0 800 0] 
+  "float roughness" [0.010625] 
+  "float index" [1] 
+  "rgb opacity" [1 1 1] 
+
+# 4_Red
+MakeNamedMaterial "4_Red" "string type" "uber" 
+  "rgb Kd" [0.400000 0.000000 0.000000] 
+  "rgb Ks" [0.500000 0.500000 0.500000] 
+  "spectrum Kr" [300 0 800 0] 
+  "float roughness" [0.010625] 
+  "float index" [1] 
+  "rgb opacity" [1 1 1] 
+
+
+Include "numbersAtDepth_geometry.pbrt"
+
+WorldEnd
+
