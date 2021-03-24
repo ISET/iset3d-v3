@@ -150,6 +150,9 @@ sceneWindow(scene);
 % Now tell PBRT to use the lens
 thisSE.set('use optics',true);
 
+% Set the units in mm (?) - default is true in PBRT realisticEye
+thisSE.set('mmUnits', true);
+
 % Set the scene to focus on the numbers at 200 mm
 thisSE.set('accommodation',1/0.2);   % Diopters
 
