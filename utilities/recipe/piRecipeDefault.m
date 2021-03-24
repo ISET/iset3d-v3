@@ -366,7 +366,7 @@ switch ieParamFormat(sceneName)
             ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
             if ~exist(fname, 'file'), error('File not found'); end
         end
-        exporter = 'C4D';
+        exporter = 'Copy';
     case 'lettersatdepth'
         sceneName = 'lettersAtDepth';
         % Local
@@ -525,7 +525,7 @@ end
 % Parse the file contents into the ISET3d recipe and identify the type of
 % parser.  C4D has special status.  In other cases, such as the scenes from
 % the PBRT and Benedikt sites, we just copy the files into ISET3d/local.
-thisR = piRead(fname);
+thisR = piRead(fname, 'exporter', exporter);
 thisR.set('exporter',exporter);
 
 % By default, do the rendering and mounting from ISET3d/local.  That
