@@ -21,12 +21,14 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name', 'sphere');
 thisR.set('light', 'delete', 'all');
 
+%% Set the render quality
 % A low resolution rendering for speed
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',48);
-thisR.set('fov',45);
 thisR.set('nbounces',5); 
+thisR.set('fov',45);
 
+%% Add in lights
 % Distant Light
 distLight = piLightCreate('new dist',...
                            'type', 'distant', ...
@@ -44,6 +46,7 @@ thisR.set('light', 'add', distLight);
 % pixel. Then when an object is placed inside of the image map, pbrt knows
 % how the light from the image map affects the object.
 fileName = 'pngExample.png';
+imshow(fileName); % show image map
 exampleEnvLight = piLightCreate('field light','type', 'infinite',...
     'mapname', fileName);
 exampleEnvLight = piLightSet(exampleEnvLight, 'rotation val', {[0 0 1 0], [-90 1 0 0]});
@@ -187,7 +190,7 @@ scene = piRender(thisR, 'render type', 'radiance', 'meanluminance', -1);
 meanlum = sceneGet(scene, 'meanluminance');
 scene = sceneSet(scene, 'meanluminance',meanlum*scale);
 scene = sceneSet(scene, 'name', 'Matte: kd = green, sigma=100');
-meanlum = sceneGet(scene, 'meanluminance');
+
 
 sceneWindow(scene);
 
@@ -307,7 +310,7 @@ thisRef = tongueRefs(:, 7);
 spdRef = piMaterialCreateSPD(wave, thisRef);
 thisR.set('material', plasticName, 'kd value', spdRef);
 
-% Plot the radiance of the tongue data to compare to our results
+% Plot the reflectance of the tongue data to compare to our results
 ieNewGraphWin;
 plotReflectance(wave,thisRef);
 title('Tongue data');
@@ -329,7 +332,7 @@ legend('Center', 'Fringe', 'Location', 'SouthEast');
 title('Plastic - kd'); hold off;
 
 %% Plastic Properties: Glossy Spectral Reflectance
-% Change ks value by making own spectral array to get green-blue color
+% Change ks value by making own reflectance array to get green-blue color
 ks_val = linspace(1, 0, size(wave,2));
 spdRef = piMaterialCreateSPD(wave, ks_val);
 
@@ -395,10 +398,10 @@ scene = sceneSet(scene, 'name', 'Glass - kt');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'rgb');
 
-radMean_1 = sceneGet(scene, 'roimeanenergy', centerROI);
-radMean_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
+radT_1 = sceneGet(scene, 'roimeanenergy', centerROI);
+radT_2 = sceneGet(scene, 'roimeanenergy', fringeROI);
 ieNewGraphWin; hold on; grid on;
-plot(wave, radMean_1); plot(wave, radMean_2);
+plot(wave, radT_1); plot(wave, radT_2);
 xlabel(xlab); ylabel(ylab); ylim([0 1.4*10^-4]);
 title('Glass - kt'); 
 legend('Center', 'Fringe','Location','NorthWest'); hold off;
@@ -443,20 +446,20 @@ rad_top = sceneGet(scene, 'roimeanenergy', topROI);
 rad_sky = sceneGet(scene, 'roimeanenergy', skyROI);
 
 ieNewGraphWin; hold on; grid on;
-plot(wave, radMean_1); plot(wave, rad_top); plot(wave, rad_sky);
+plot(wave, rad_sky); plot(wave, rad_top); plot(wave, radT_1); 
 xlabel(xlab); ylabel(ylab);
 title('Glass - Sky reflections'); 
-legend('No Reflections','Top','Sky','Location','SouthEast'); 
+legend('Sky','Top','No Reflections','Location','SouthEast'); 
 hold off;
 
 rad_bot = sceneGet(scene, 'roimeanenergy', botROI);
 rad_gnd = sceneGet(scene, 'roimeanenergy', gndROI);
 
 ieNewGraphWin; hold on; grid on;
-plot(wave, radMean_1); plot(wave, rad_bot); plot(wave, rad_gnd);
+plot(wave, rad_gnd); plot(wave, rad_bot); plot(wave, radT_1);
 xlabel(xlab); ylabel(ylab);
 title('Glass - Ground reflections'); 
-legend('No Reflections', 'Bottom','Ground','Location','SouthEast'); 
+legend('Ground','Bottom','No Reflections','Location','SouthEast'); 
 hold off;
 
 % END
