@@ -1,4 +1,4 @@
-%% This is the second in a series of scripts introducing iset3d calculations
+%% Illustrate how to read a PBRT file and render
 %
 % Brief description
 %

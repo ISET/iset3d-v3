@@ -70,12 +70,13 @@ varargin =ieParamFormat(varargin);
 p = inputParser;
 
 p.addRequired('fname', @(x)(exist(fname,'file')));
-
+p.addParameter('exporter', 'C4D', @ischar);
 p.parse(fname,varargin{:});
 thisR = recipe;
 [~, inputname, ~]=fileparts(fname);
 thisR.inputFile =fname;
 % summary = sprintf('Read summary %s\n',fname);
+exporter = p.Results.exporter;
 
 %% Set the default output directory
 outFilepath      = fullfile(piRootPath,'local',inputname);
@@ -136,8 +137,11 @@ if(flip)
     thisR.scale = [-1 1 1];
 end
 
+% If recipe is not Copy type, do it. Otherwise don't do anything
+if ~isequal(exporter, 'Copy')
 % Read the light sources and delete them in world
 thisR = piLightRead(thisR);
+end
 % Read Scale, if it exists
 
 % Because PBRT is a LHS and many object models are exported with a RHS,
@@ -499,10 +503,10 @@ while ii<=nline
                 % Convert value depending on type
                 if(isempty(valueType))
                     continue;
-                elseif(strcmp(valueType,'string')) || strcmp(valueType,'bool')
+                elseif(strcmp(valueType,'string')) || strcmp(valueType,'bool') || strcmp(valueType,'spectrum')
                     % Do nothing.
                 elseif(strcmp(valueType,'float') || strcmp(valueType,'integer'))
-                    value = str2double(value);
+                    value = str2double(value);                    
                 else
                     error('Did not recognize value type, %s, when parsing PBRT file!',valueType);
                 end

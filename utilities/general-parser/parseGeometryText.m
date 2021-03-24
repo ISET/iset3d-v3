@@ -43,6 +43,13 @@ i = 1;
 while i <= length(txt)
     
     currentLine = txt{i};
+    % ZLY: an emergent patch up for Brian's presentation tomorrow
+    % If we found ObjectBegin, that means we won't parse anything
+    if piContains(currentLine, 'ObjectBegin')
+        trees = {};
+        parsedUntil = i;
+        return;
+    end
     
     % Return if we've reached the end of current attribute
     

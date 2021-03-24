@@ -157,8 +157,7 @@ if ~exist(geometryDir, 'dir'), mkdir(geometryDir); end
 renderDir = thisR.get('rendered dir'); 
 if ~exist(renderDir,'dir'), mkdir(renderDir); end
 
-%% Selectively copy data from the input to the output directory.  
-
+%% Selectively copy data from the input to the output directory.
 piWriteCopy(thisR,overwriteresources,overwritepbrtfile, verbosity)
 
 %% If the optics type is lens, copy the lens file to a lens sub-directory
@@ -190,6 +189,14 @@ piWriteTransformTimes(thisR, fileID);
 %% Write all other blocks that we have field names for
 piWriteBlocks(thisR,fileID);
 
+%% Add 'Include' lines for materials, geometry and lights into the scene PBRT file
+piIncludeLines(thisR,fileID, creatematerials,overwritegeometry);
+
+%% We won't do anything below this if the exporter is copy
+if isequal(thisR.exporter, 'Copy')
+%     for ii=1:numel(thisR.world)
+    return;
+end
 %% Write out the lights
 piLightWrite(thisR);
 
@@ -198,9 +205,6 @@ piLightWrite(thisR);
  % Check if we removed all lights
  piLightGetFromWorld(thisR)
 %}
-
-%% Add 'Include' lines for materials, geometry and lights into the scene PBRT file
-piIncludeLines(thisR,fileID, creatematerials,overwritegeometry);
 
 %% Close the main PBRT scene file
 fclose(fileID);
