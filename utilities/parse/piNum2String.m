@@ -1,17 +1,17 @@
 function string = piNum2String(num)
 string='';
 
-persistent perf;
-if isempty(perf)
-    perf = getpref('ISET','fast_num2string', false);
-end
+% by default we use the older, slower code, since I can't prove
+% that the newer, faster code doesn't break anything -- DJC
+perf = getpref('ISET','fast_num2string', false);
 
 if perf
     if isinteger(num)
         string = int2str(num);
     else
+        % using %.5f is much slower than simply asking for precision
         %formatSpec = '%.5f ';
-        formatSpec = 6;
+        formatSpec = 7;
         string = num2str(num, formatSpec);
     end
 else
