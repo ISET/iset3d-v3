@@ -135,7 +135,7 @@ disp(thisSE.get('recipe'))
 thisSE.set('use pinhole',true);
 
 % We can tell PBRT the field of view of the scene.
-thisSE.set('fov',33);
+thisSE.set('fov',40);
 
 % Render it this way.   By default, the depth map is calculated, too.
 % Notice that the rendering calls docker (twice).  The radiance and depth

@@ -21,32 +21,35 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Load a scene and set an eye model
 
-thisEye = sceneEye('slantedbar');
-thisEye.summary;
+% thisEye = sceneEye('slantedbar');
+% thisEye.summary;
 
 % There are a number of PBRT scenes stored in piRootPath/data/V3.  This is
 % one of them.  To read in the recipe for this scene, we use this command.
-thisEye = sceneEye('chesssetscaled');
+thisEye = sceneEye('chessset');
+% thisEye.set('mmUnits',true);
 thisEye.summary;
 
-thisR = piRecipeDefault('scene name','sanmiguel');
+% thisR = piRecipeDefault('scene name','sanmiguel');
 
-%%
+%%  The original scene
 oi = thisEye.render;
 oiWindow(oi);
 
+%% Narrow the FOV and move the camera
 thisEye.set('fov',2);
 thisEye.set('rays per pixel',384);
 
+% Move the camera in the negative direction (away from the scene)
 thisFrom = thisEye.get('from');
-thisEye.set('from',thisFrom + [0 0 -2]);
+thisEye.set('from',thisFrom + [0 0 -3]);
 oDist = thisEye.get('object distance','m');
 
 thisEye.set('focal distance',oDist);
 oi = thisEye.render;
 oiWindow(oi);
 
-
+%%
 
 thisEye.get('fov')
 thisEye.get('retina semidiam','mm')
