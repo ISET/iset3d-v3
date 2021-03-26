@@ -283,16 +283,20 @@ for ii = 1:length(filesToRender)
     
     outFile = fullfile(outputFolder,'renderings',[currName,'.dat']);
     
-    % Experiment with calling a native version of pbrt
-    % It "works" but so far I only have a Windows .exe with the
-    % base pbrt-v3, not the Vistalab version
-    native_pbrt = false;
+    % Experiment with calling a native version of pbrt on Windows
+    % As of March, 2021 doesn't seem to make a difference on my test
+    % machines, but it does work as long as you use the spectral version
+    % of pbrt. So I've set the default to false.
+    native_pbrt =   false;
     if ispc  % Windows
         
         if native_pbrt
+            % For now spectral pbrt changes data on write by 0a->0d0a
+            % so for this case we do a dos2unix conversion later
+            % Filepath to pbrt.exe goes here
+            pbrtBinary = 'pbrt.exe';
             outF = fullfile(outputFolder, strcat('renderings/',currName,'.dat'));
             % Hack, for testing. 
-            pbrtBinary = 'B:\Users\David\pbrt\pbrt-v3\bin\Release\pbrt.exe';
             renderCommand = sprintf('%s --outfile %s %s', pbrtBinary, outF, currFile);
             command = renderCommand;
         else
@@ -360,7 +364,9 @@ for ii = 1:length(filesToRender)
             else
                 [status, result] = system(command); % don't display pbrt output
             end
-            
+            if ~status
+                unix2dos(outFile, true);
+            end
         else
             [status, result] = piRunCommand(cmd, 'verbose', verbosity);
         end            
