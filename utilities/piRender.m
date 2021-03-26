@@ -34,13 +34,13 @@ function [ieObject, result] = piRender(thisR,varargin)
 %      'mesh'        - label for the mesh identity at each pixel
 %
 %       N.B. If thisR is a fullpath to a file, then we only renderType
-%       is forced to be 'radiance'.  
+%       is forced to be 'radiance'.
 %
 %  version    - PBRT version, 2 or 3.   Default is 3.  2 will be
 %               deprecated.
 %  mean luminance -  If a scene, this mean luminance. If set to a negative
 %                    value values returned by the renderer are used.
-%                    (default 100 cd/m2) 
+%                    (default 100 cd/m2)
 %  mean illuminance per mm2 - default is 5 lux
 %  scalePupilArea
 %             - if true, scale the mean illuminance by the pupil
@@ -65,7 +65,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 % TL SCIEN Stanford, 2017
 % JNM 03/19 Add reuse feature for renderings
 %
-% See also 
+% See also
 %   s_piReadRender*.m, piRenderResult
 
 % Examples
@@ -96,7 +96,7 @@ function [ieObject, result] = piRender(thisR,varargin)
   % Calculate the (x,y,z) coordinates of every surface point in the
   % scene.  If there is no surface a zero is returned.  This should
   % probably either a Inf or a NaN when there is no surface.  We might
-  % replace those with a black color or something.   
+  % replace those with a black color or something.
   thisR = piRecipeDefault; piWrite(thisR);
   [coords, result] = piRender(thisR, 'render type','coordinates');
   ieNewGraphWin; imagesc(coords(:,:,1));
@@ -185,7 +185,7 @@ pbrtFile = thisR.outputFile;
 
 % Set up any metadata render.
 % If radiance, no metadata
-if ((~strcmp(renderType,'radiance')))  
+if ((~strcmp(renderType,'radiance')))
     
     % Do some checks for the renderType.
     if((thisR.version ~= 3) && strcmp(renderType,'coordinates'))
@@ -199,7 +199,7 @@ if ((~strcmp(renderType,'radiance')))
             metadataType{1} = 'depth';
             metadataType{2} = 'illuminant';
         otherwise
-             metadataType{1} = renderType;
+            metadataType{1} = renderType;
     end
     
     for ii=1:numel(metadataType)
@@ -225,7 +225,7 @@ if ((~strcmp(renderType,'radiance')))
         
         metadataFile{ii} = metadataRecipe.outputFile; %#ok<AGROW>
     end
-
+    
 end
 
 %% Set up files we will render
@@ -270,51 +270,67 @@ end
 for ii = 1:length(filesToRender)
     skipDocker = false;
     currFile = filesToRender{ii};
-
+    
     %% Build the docker command
     dockerCommand   = 'docker run -ti --rm';
-
+    
     [~,currName,~] = fileparts(currFile);
-
+    
     % Make sure renderings folder exists
     if(~exist(fullfile(outputFolder,'renderings'),'dir'))
         mkdir(fullfile(outputFolder,'renderings'));
     end
-
+    
     outFile = fullfile(outputFolder,'renderings',[currName,'.dat']);
-
+    
+    % Experiment with calling a native version of pbrt on Windows
+    % As of March, 2021 doesn't seem to make a difference on my test
+    % machines, but it does work as long as you use the spectral version
+    % of pbrt. So I've set the default to false.
+    native_pbrt =   false;
     if ispc  % Windows
-        outF = strcat('renderings/',currName,'.dat');
-        renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, '.pbrt'));
-
-        folderBreak = split(outputFolder, filesep());
-        shortOut = strcat('/', char(folderBreak(end)));
-
-        if ~isempty(outputFolder)
-            if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
-            dockerCommand = sprintf('%s -w %s', dockerCommand, shortOut);
-        end
-
-        %fix for non - C drives
-        %linuxOut = strcat('/c', strrep(erase(outputFolder, 'C:'), '\', '/'));
-        linuxOut = char(join(folderBreak,"/"));
         
-        dockerCommand = sprintf('%s -v %s:%s', dockerCommand, linuxOut, shortOut);
-
-        cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
+        if native_pbrt
+            % For now spectral pbrt changes data on write by 0a->0d0a
+            % so for this case we do a dos2unix conversion later
+            % Filepath to pbrt.exe goes here
+            pbrtBinary = 'pbrt.exe';
+            outF = fullfile(outputFolder, strcat('renderings/',currName,'.dat'));
+            % Hack, for testing. 
+            renderCommand = sprintf('%s --outfile %s %s', pbrtBinary, outF, currFile);
+            command = renderCommand;
+        else
+            outF = strcat('renderings/',currName,'.dat');
+            renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, '.pbrt'));
+            folderBreak = split(outputFolder, filesep());
+            shortOut = strcat('/', char(folderBreak(end)));
+            
+            if ~isempty(outputFolder)
+                if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
+                dockerCommand = sprintf('%s -w %s', dockerCommand, shortOut);
+            end
+            
+            %fix for non - C drives
+            %linuxOut = strcat('/c', strrep(erase(outputFolder, 'C:'), '\', '/'));
+            linuxOut = char(join(folderBreak,"/"));
+            
+            dockerCommand = sprintf('%s -v %s:%s', dockerCommand, linuxOut, shortOut);
+            
+            cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
+        end
     else  % Linux & Mac
         renderCommand = sprintf('pbrt --outfile %s %s', outFile, currFile);
-
+        
         if ~isempty(outputFolder)
             if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
             dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
         end
-
+        
         dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
-
+        
         cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
     end
-
+    
     %% Determine if prefer to use existing files, and if they exist.
     if p.Results.reuse
         [fid, message] = fopen(outFile, 'r');
@@ -335,18 +351,29 @@ for ii = 1:length(filesToRender)
             end
         end
     end
-
+    
     % When do we use this case?
     if skipDocker
         result = '';
     else
-        %% Invoke the Docker command
+        %% Invoke the Docker/pbrt command
         tic
-        [status, result] = piRunCommand(cmd, 'verbose', verbosity);
+        if native_pbrt
+            if verbosity > 2
+                [status, result] = system(command,'-echo');
+            else
+                [status, result] = system(command); % don't display pbrt output
+            end
+            if ~status
+                unix2dos(outFile, true);
+            end
+        else
+            [status, result] = piRunCommand(cmd, 'verbose', verbosity);
+        end            
         elapsedTime = toc;
         % disp(result)
         %% Check the return
-
+        
         if status
             warning('Docker did not run correctly');
             % The status may contain a useful error message that we should
@@ -355,12 +382,12 @@ for ii = 1:length(filesToRender)
             fprintf('Result:\n'); disp(result)
             pause;
         end
-
+        
         fprintf('*** Rendering time for %s:  %.1f sec ***\n\n',currName,elapsedTime);
     end
-
+    
     %% Convert the returned data to an ieObject
-
+    
     % The cases that return the radiance (both, radiance, illuminant)
     % should set the mean luminance or mean illuminance.
     switch label{ii}
@@ -402,7 +429,7 @@ for ii = 1:length(filesToRender)
                 'verbose', verbosity);
             if ~isempty(ieObject) && isstruct(ieObject)
                 ieObject = sceneSet(ieObject, 'illuminant photons', illuminantPhotons);
-            end            
+            end
         case {'illuminantonly'}
             ieObject = piDat2ISET(outFile,...
                 'label', 'illuminantonly', ...
@@ -411,7 +438,7 @@ for ii = 1:length(filesToRender)
                 'meanluminance', meanLuminance, ...
                 'verbose', verbosity);
     end
-
+    
 end
 
 %% We used to name here, but apparently not needed any more
@@ -431,10 +458,10 @@ if isstruct(ieObject)
             % names = strsplit(fileparts(thisR.inputFile),'/');
             % ieObject = oiSet(ieObject,'name',names{end});
             curWave = oiGet(ieObject,'wave');
-            if ~isequal(curWave(:),wave(:)) 
+            if ~isequal(curWave(:),wave(:))
                 ieObject = oiSet(ieObject,'wave',wave);
             end
-                        
+            
         otherwise
             error('Unknown struct type %s\n',ieObject.type);
     end
