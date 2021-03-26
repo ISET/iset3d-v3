@@ -40,7 +40,7 @@ toC = [ 0.1458     0.0100     1.6667];
 % This is rendered using a pinhole so the rendering is fast.  It has
 % infinite depth of field (no focal distance).
 thisSE = sceneEye('letters at depth','human eye','legrand');
-thisSE.summary;
+% thisSE.summary;
 
 % Position the eye off to the side so we can see the 3D easily
 from = [0.25,0.3,-1.3];

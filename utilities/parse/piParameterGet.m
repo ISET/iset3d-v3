@@ -39,6 +39,16 @@ elseif piContains(thisLine, '.spd')
         n=n-1;
     end
     value = thisLine(start_toc+1: end_toc-1);
+    
+    % If it is a spd file, load in the data as a vector
+    if exist(value, 'file')
+        fid = fopen(value, 'r');
+        spd = textscan(fid, '%d %f');
+        fclose(fid);
+        value = piMaterialCreateSPD(spd{1}, spd{2});
+    else
+        error('SPD file: %s does not exist.', value)
+    end
 else
     matchIndex = regexp(thisLine, match);
     if isempty(matchIndex), return;end

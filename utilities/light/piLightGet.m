@@ -98,7 +98,17 @@ if pbrtText && ~isempty(val) &&...
         case 'spd'
             spectrumScale = lght.specscale.value;
             if ischar(lght.spd.value)
-                lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', lght.spd.value, spectrumScale);
+                [~, ~, ext] = fileparts(lght.spd.value);
+                if ~isequal(ext, '.spd')
+                    % If the extension is not .spd, it indicates the
+                    % spectrum is written out from isetcam, which is
+                    % supposed to be in spds/lights. Otherwise, the spd
+                    % file exists from the input folder already, it should
+                    % be copied in the target directory.
+                    lightSpectrum = sprintf('"spds/lights/%s_%f.spd"', lght.spd.value, spectrumScale);
+                else
+                    lightSpectrum = sprintf('"%s"', lght.spd.value);
+                end
             elseif isnumeric(lght.spd.value)
                 lightSpectrum = ['[' ,piNum2String(lght.spd.value * spectrumScale),']'];
             end
