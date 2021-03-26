@@ -61,6 +61,16 @@ else
     end
     % get rid of squre brackets
     value = newline(1: end_toc(1));
-    value = str2num(value);
+    % value = str2num(value);
+    value = strrep(strrep(value, '[', ''), ']', '');
+    value = strsplit(value, ' ');
+    idx = cellfun(@isempty, value);
+    value(idx) = [];
+    value = str2double(value);
+    %{
+    if isequal(value, round(value))
+        value = int32(value);
+    end
+    %}
 end
 end

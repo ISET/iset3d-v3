@@ -1,9 +1,24 @@
 function string = piNum2String(num)
-string='';
 
+% Convert a number to a string
+if isinteger(num)
+    string = int2str(num);
+else
+    % using %.5f is much slower than simply asking for precision
+    %formatSpec = '%.5f ';
+    formatSpec = 7; % 7 significant digits
+    string = num2str(num, formatSpec);
+end
+%{
+% Comment this out for reference. If the faster code is correct, we will 
+% delete this.    
+
+string='';
+  
 % by default we use the older, slower code, since I can't prove
 % that the newer, faster code doesn't break anything -- DJC
 perf = getpref('ISET','fast_num2string', false);
+
 
 if perf
     if isinteger(num)
@@ -25,4 +40,5 @@ else
         end
     end
 end
+%}
 end

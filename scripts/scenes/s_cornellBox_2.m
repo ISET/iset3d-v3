@@ -50,7 +50,9 @@ thisR.set('focus distance', 0.5);
 thisR.set('film diagonal', 7.04); % mm
 
 %% Write and render
+tic
 piWrite(thisR);
+toc
 % Render 
 [oi, result] = piRender(thisR, 'render type', 'radiance');
 oiName = 'CBLens';
