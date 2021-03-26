@@ -1,5 +1,23 @@
 function val = piMaterialGenerateEEM(fluoname, varargin)
-%%
+%% Return an excitation-emission matrix for a fluorophore
+%
+% Synopsis
+%  val = piMaterialGenerateEEM(fluoname, varargin)
+%
+% Input
+%   fluoname
+%
+% Optional key/val pairs
+%   wave - wavelength samples
+%   form - return as a vector or a matrix, as needed.  PBRT takes the data
+%          as a vector
+% 
+% Output
+%   eem - Excitation emission matrix
+%
+% See also
+%   isetfluorescence repository is required
+
 varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addRequired('fluoname', @ischar);

@@ -91,8 +91,9 @@ piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr');
-
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else,        sceneSet(scene,'gamma',0.6);
+end
 %%  Now change an environmental light
 
 rmLight = piLightCreate('room light', ...
@@ -126,8 +127,9 @@ piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr')
-
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else,        sceneSet(scene,'gamma',0.6);
+end
 %% Make the sphere glass
 
 glassName = 'glass';
@@ -141,8 +143,9 @@ piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change sphere to glass');
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr');
-
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else,        sceneSet(scene,'gamma',0.6);
+end
 %% One more camera position
 
 % Where is the sphere ...
@@ -157,8 +160,9 @@ piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change sphere to glass');
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr');
-
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else,        sceneSet(scene,'gamma',0.6);
+end
 %% Change the sphere to a mirror in the future.  
 mirrorName = 'mirror2';
 mirror = piMaterialCreate(mirrorName, 'type', 'mirror');
@@ -171,6 +175,8 @@ piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Change sphere to glass');
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr');
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else,        sceneSet(scene,'gamma',0.6);
+end
 
 %% END

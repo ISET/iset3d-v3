@@ -58,7 +58,7 @@ for ii = 1:numel(thisR.lights)
                 % Read the mat file.  Should have a mat extension.
                 % This is the wavelength hardcoded in PBRT
                 wavelength = 365:5:705;
-                if isequal('ext','.mat') || isempty(ext)
+                if isequal(ext,'.mat') || isempty(ext)
                     data = ieReadSpectra(specVal, wavelength, 0);
                 else
                     error('Light extension seems wrong: %s\n',ext);

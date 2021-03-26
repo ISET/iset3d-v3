@@ -66,7 +66,7 @@ thisR.set('material', 'Patch06Material', 'fluorescence val', eemPorphyrins);
 eemNADH = piMaterialGenerateEEM('NADH');
 thisR.set('material', 'Patch02Material', 'fluorescence val', eemNADH);
 % FAD
-eemFAD = piMaterialGenerateEEM('FAD');
+eemFAD = piMaterialGenerateEEM('FAD_webfluor');
 thisR.set('material', 'Patch18Material', 'fluorescence val', eemFAD);
 thisR.set('material', 'Patch19Material', 'fluorescence val', eemFAD);
 
