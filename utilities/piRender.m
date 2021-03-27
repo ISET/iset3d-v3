@@ -20,7 +20,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %    Spectral data
 %      'all'      - radiance, depth, illuminant
 %      'both'     - radiance and depth
-%      'radiance' - spectral radiance (or irradiance of an oi)
+%      'radiance' - spectral radiance (or irradiance if an oi)
 %      'illuminant'  - radiance and illuminant data
 %      'illuminant only'- The materials are set to matte white and
 %                         rendered.  The spatial-spectral energy is
@@ -114,7 +114,7 @@ p.addRequired('recipe',@(x)(isequal(class(x),'recipe') || ischar(x)));
 
 varargin = ieParamFormat(varargin);
 
-rTypes = {'radiance','depth','both','all','coordinates','material','mesh', 'illuminant','illuminantonly'};
+rTypes = {'radiance','irradiance','depth','both','all','coordinates','material','mesh', 'illuminant','illuminantonly'};
 p.addParameter('rendertype','both',@(x)(ismember(ieParamFormat(x),rTypes)));
 p.addParameter('version',3,@(x)isnumeric(x));
 p.addParameter('meanluminance',100,@isnumeric);
@@ -134,6 +134,9 @@ scalePupilArea = p.Results.scalepupilarea;
 meanLuminance    = p.Results.meanluminance;
 wave             = p.Results.wave;
 verbosity        = p.Results.verbose;
+
+% For programming simplicity, we convert irradiance to radiance.
+if strcmpi(renderType,'irradiance'), renderType = 'radiance'; end
 
 if verbosity > 1
     fprintf('Docker container %s\n',dockerImageName);

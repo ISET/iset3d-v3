@@ -471,6 +471,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 % Everything is in focus for a pinhole camera.  For
                 % pinholes and perspect this is focaldistance.  But not for
                 % realistic or omni.
+                disp('No true focal distance for pinhole. This value is arbitrary');
                 if isfield(thisR.camera,'focaldistance')
                     val = thisR.camera.focaldistance.value;
                 end
@@ -523,16 +524,21 @@ switch ieParamFormat(param)  % lower case, no spaces
             case {'pinhole','perspective'}
                 % Calculate this from the fov, if it is not already stored.
                 if isfield(thisR.camera,'filmdistance')
+                    % Worried about the units.  mm or m?  Assuming meters.
                     val = thisR.camera.filmdistance.value;
                 else
                     % Compute the distance to achieve the diagonal fov.  We
                     % might have to make this match the smaller size (x or
                     % y) because of PBRT conventions.  Some day.  For now
                     % we use the diagonal.
-                    fov = thisR.get('fov');
-                    filmDiag = thisR.get('film diagonal');
-                    val = (filmDiag/2)/atan(fov);
+                    fov = thisR.get('fov');  % Degrees
+                    filmDiag = thisR.get('film diagonal','m');  % m
+                    
+                    %   tand(fov) = opp/adj; adjacent is distance
+                    val = (filmDiag/2)/tand(fov);               % m
+                    
                 end
+                
             case 'lens'
                 if exist('lensFocus','file')
                     opticsType = thisR.get('optics type');
@@ -804,12 +810,13 @@ switch ieParamFormat(param)  % lower case, no spaces
         val(2) = thisR.camera.subpixels_w;
         val(1) = thisR.camera.subpixels_h;
         
-        % Film
+        % Film (because of PBRT.  ISETCam it would be sensor).
     case {'spatialsamples','filmresolution','spatialresolution'}
         % thisR.get('spatial samples');
         %
         % When using ISETBio, we usually call it spatial samples or spatial
-        % resolution.  For ISETCam, it is usually film resolution.
+        % resolution.  For ISET3d, it is usually film resolution because of
+        % the PBRT notation.
         try
             val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
         catch
@@ -818,24 +825,40 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         
     case 'filmxresolution'
-        % An integer
+        % An integer specifying number of samples
         val = thisR.film.xresolution.value;
     case 'filmyresolution'
-        % An integer
+        % An integer specifying number of samples
         val = [thisR.film.yresolution.value];
+        
     case 'aperturediameter'
-        % Needs to be checked.
+        % Needs to be checked.  Default units are meters or millimeters?
         if isfield(thisR.camera, 'aperturediameter') ||...
                 isfield(thisR.camera, 'aperture_diameter')
             val = thisR.camera.aperturediameter.value;
         else
-            val = nan;
+            val = NaN;
+        end
+        
+        % Need to check on the units!
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1});
         end
         
     case {'filmdiagonal','filmdiag'}
         % recipe.get('film diagonal');  in mm
         if isfield(thisR.film,'diagonal')
             val = thisR.film.diagonal.value;
+        else
+            warning('Setting film diagonal to 10 mm. Previously unspecified');
+            thisR.set('film diagonal',10);
+            val = 10;
+        end
+        
+        % By default the film is stored in mm, unfortunately.  So we scale
+        % to meters and then apply unit scale factor
+        if isempty(varargin), return;
+        else, val = val*1e-3*ieUnitScaleFactor(varargin{1});
         end
         
     case 'filmsubtype'
