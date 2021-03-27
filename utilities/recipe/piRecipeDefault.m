@@ -404,6 +404,16 @@ switch ieParamFormat(sceneName)
             if ~exist(fname, 'file'), error('File not found'); end
         end
         exporter = 'Copy';
+    case 'veach-ajar'
+        sceneName = 'scene';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3','veach-ajar');
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'Copy';        
     case 'villalights'
         sceneName = 'villaLights';
         % Local
