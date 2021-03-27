@@ -202,7 +202,7 @@ switch ieParamFormat(sceneName)
         FilePath = fullfile(piRootPath,'data','V3','teapot');
         fname = fullfile(FilePath,'teapot-area-light.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
-        exporter = 'Unknown';
+        exporter = 'Copy';
     case 'slantedbar'
         % In sceneEye cases we were using piCreateSlantedBarScene.  But
         % going forward we will use the Cinema 4D model so we can use the
@@ -405,7 +405,7 @@ switch ieParamFormat(sceneName)
         end
         exporter = 'Copy';
     case 'veach-ajar'
-        sceneName = 'scene';
+        sceneName = 'veach-ajar';
         % Local
         FilePath = fullfile(piRootPath,'data','V3','veach-ajar');
         fname = fullfile(FilePath,['scene','.pbrt']);

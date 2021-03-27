@@ -139,11 +139,15 @@ if(flip)
     thisR.scale = [-1 1 1];
 end
 
-% If recipe is not Copy type, do it. Otherwise don't do anything
-if ~isequal(exporter, 'Copy')
-    % Read the light sources and delete them in world
-    thisR = piLightRead(thisR);
+% If exporter is Copy, don't parse.
+if isequal(exporter, 'Copy')
+    disp('Scene will not be parsed.');
+    thisR.world = world;
+    return;
 end
+
+% Read the light sources and delete them in world
+thisR = piLightRead(thisR);
 
 % Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
@@ -240,7 +244,6 @@ disp('***Scene parsed.')
 % remove this line after we become more sure that we can deal with scenes
 % which are not exported by C4D.
 thisR.exporter = 'C4D';
-
 end
 
 %% Helper functions

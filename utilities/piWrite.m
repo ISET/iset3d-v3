@@ -194,7 +194,6 @@ piIncludeLines(thisR,fileID, creatematerials,overwritegeometry);
 
 %% We won't do anything below this if the exporter is copy
 if isequal(thisR.exporter, 'Copy')
-%     for ii=1:numel(thisR.world)
     return;
 end
 %% Write out the lights
@@ -579,6 +578,12 @@ function piIncludeLines(thisR,fileID, creatematerials,overwritegeometry)
 % lights into the main scene file 
 %
 
+if isequal(thisR.exporter, 'Copy')
+    for ii = 1:numel(thisR.world)
+        fprintf(fileID,'%s \n',thisR.world{ii});
+    end
+    return;
+end
 % We may have created new materials in ISET3d. We insert 'Include' for
 % materials, geometry, and lights.
 if ~(numel(find(contains(thisR.world, {'_materials.pbrt', 'Include'}),2))==2)
