@@ -12,7 +12,7 @@ function outputFull = piPBRTReformat(fname,varargin)
 %    to ply format, and writes out the results.
 %
 % Input
-%   fname: The file name of the PBRT scene file.
+%   fname: The full path to the filename of the PBRT scene file.
 %
 % Key/val options
 %   outputFull:  The full path to the PBRT scene file that we output

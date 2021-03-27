@@ -66,16 +66,18 @@ function thisR = piRead(fname,varargin)
 %}
 
 %% Parse the inputs
+
 varargin =ieParamFormat(varargin);
 p = inputParser;
 
 p.addRequired('fname', @(x)(exist(fname,'file')));
 p.addParameter('exporter', 'C4D', @ischar);
 p.parse(fname,varargin{:});
+
 thisR = recipe;
-[~, inputname, ~]=fileparts(fname);
-thisR.inputFile =fname;
-% summary = sprintf('Read summary %s\n',fname);
+[~, inputname, ~] = fileparts(fname);
+thisR.inputFile = fname;
+
 exporter = p.Results.exporter;
 
 %% Set the default output directory
@@ -139,11 +141,11 @@ end
 
 % If recipe is not Copy type, do it. Otherwise don't do anything
 if ~isequal(exporter, 'Copy')
-% Read the light sources and delete them in world
-thisR = piLightRead(thisR);
+    % Read the light sources and delete them in world
+    thisR = piLightRead(thisR);
 end
-% Read Scale, if it exists
 
+% Read Scale, if it exists
 % Because PBRT is a LHS and many object models are exported with a RHS,
 % sometimes we stick in a Scale -1 1 1 to flip the x-axis. If this scaling
 % is already in the PBRT file, we want to keep it around.
