@@ -146,6 +146,15 @@ switch ieParamFormat(sceneName)
             if ~exist(fname, 'file'), error('File not found'); end
         end
         exporter = 'C4D'; 
+    case 'whiteboard'
+        sceneName = 'WhiteBoard';
+        FilePath = fullfile(piRootPath,'data','V3', 'WhiteBoard');
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'C4D';         
     case 'simplescene'
         sceneName = 'SimpleScene';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);

@@ -2,7 +2,8 @@ function string = piNum2String(num)
 
 % Convert a number to a string
 if isinteger(num)
-    string = int2str(num);
+    % Adding num(:)' to avoid dimension mismatch
+    string = int2str(num(:)');
 else
     % using %.5f is much slower than simply asking for precision
     %formatSpec = '%.5f ';
