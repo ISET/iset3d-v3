@@ -23,16 +23,23 @@ p = inputParser;
 p.addRequired('fluoname', @ischar);
 p.addParameter('wave', 365:5:705, @isnumeric);
 p.addParameter('form', 'vec', @ischar);
+p.addParameter('normal', true, @islogical);
 
 p.parse(fluoname, varargin{:});
 fluoname = p.Results.fluoname;
 wave = p.Results.wave;
 form = p.Results.form;
+normal = p.Results.normal;
 
 %%
 val = [];
 fluorophore = fluorophoreRead(fluoname, 'wave', wave);
-eem = fluorophoreGet(fluorophore, 'eem energy');
+if normal
+    eem = fluorophoreGet(fluorophore, 'eem energy normalize');
+else
+    eem = fluorophoreGet(fluorophore, 'eem energy');
+end
+
 
 if isempty(eem)
     warning('Cannot find fluorophore: %s', fluoname);
