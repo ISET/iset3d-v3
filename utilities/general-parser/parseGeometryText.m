@@ -129,10 +129,10 @@ while i <= length(txt)
             if exist('lght','var')
                 % Wrap the light text into attribute section
                 lghtWrap = [{'AttributeBegin'}, lght(:)', {'AttributeEnd'}];
-                resLight.lght = piLightGetFromText(thisR, lghtWrap, 'print', false);
+                resLight.lght = piLightGetFromText(lghtWrap, 'print', false);
             end
             if exist('areaLight','var')
-                resLight.lght = piLightGetFromText(thisR, {areaLight}, 'print', false);
+                resLight.lght = piLightGetFromText({areaLight}, 'print', false);
                 
                 if exist('shape', 'var')
                     resLight.lght{1}.shape = shape;

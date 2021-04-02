@@ -29,7 +29,7 @@ p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
 p.parse(thisR)
 
 %% Get light from world
-[thisR.lights, lightTextRanges] = piLightGetFromText(thisR, thisR.world, 'printinfo', false);
+[thisR.lights, lightTextRanges] = piLightGetFromText(thisR.world, 'printinfo', false);
 
 % Remove the light from the world as we already stored them in thisR.lights
 % do not deal with world block any more
@@ -44,7 +44,7 @@ if isempty(thisR.lights)
     if exist(inputFile_lights,'file')
         fileID = fopen(inputFile_lights);
         txt = textscan(fileID,'%s','Delimiter','\n');
-        newLights = piLightGetFromText(thisR, txt{1}, 'print', false);
+        newLights = piLightGetFromText(txt{1}, 'print', false);
         if ~isempty(newLights)
             thisR.lights{end+1:end+numel(newLights)} = newLights{:};
         else

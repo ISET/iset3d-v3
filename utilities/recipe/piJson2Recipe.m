@@ -1,4 +1,4 @@
-function thisR = piJson2Recipe(JsonFile, varargin)
+function thisRV2 = piJson2Recipe(JsonFile, varargin)
 % Convert a json format of a recipe to the recipe class
 %
 % Syntax
@@ -34,18 +34,19 @@ p.parse(JsonFile, varargin{:});
 
 JsonFile = p.Results.JsonFile;
 update   = p.Results.update;
+
 %% Read the file
 thisR_tmp = jsonread(JsonFile);
 
 %% Loop through the fields and assign them
 fds = fieldnames(thisR_tmp);
-thisR = recipe;
+thisRV2 = recipe;
 
 % Assign the struct to a recipe class.  Some times we store extra fields in
 % the JSON files.  So we use try/catch rather than force the assignment.
 for dd = 1:length(fds)
     try
-        thisR.(fds{dd})= thisR_tmp.(fds{dd});
+        thisRV2.(fds{dd})= thisR_tmp.(fds{dd});
     catch
         warning('Unrecognized field %s\n',fds{dd});
     end
@@ -53,17 +54,20 @@ end
 
 if update
     %% Change the path to the lens file
-    if isfield(thisR.camera, 'lensfile')
-        [~,lensName, extend] = fileparts(thisR.camera.lensfile.value);
+    if isfield(thisRV2.camera, 'lensfile')
+        [~,lensName, extend] = fileparts(thisRV2.camera.lensfile.value);
         if ~isempty(which(strcat(lensName, extend)))
-            thisR.camera.lensfile.value = which(strcat(lensName, extend));
+            thisRV2.camera.lensfile.value = which(strcat(lensName, extend));
         end
     end
-    %%
-    % piUpdateRecipe - convert the old version of recipe to newer one
-    % where texture is a separate slot.
-    if isempty(thisR.textures)
-        thisR = piUpdateRecipe(thisR);
+    
+    %% piUpdateRecipe - 
+    % convert the old material, lights and asset formats    
+    
+    % thisRV2 is a hybrid at this point.  It is a V2 class recipe, but in
+    % fact, key fields have not been properly updated.  We do that here.
+    if isempty(thisRV2.textures)
+        thisRV2 = piRecipeUpdate(thisRV2);
     end
 end
 end
