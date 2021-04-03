@@ -51,6 +51,7 @@
 %   12/27/20 dhb  Started on this, although mostly just produced questions
 %                 about things I don't understand.
 %   12/29/20 dhb  Convert to work on blobbie image.
+%   04/02/21 amb  Adapted for general parser and assets/materials updates.
 
 %% Initialize ISET and Docker
 %
@@ -59,7 +60,7 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Get scene to render
-whichScene = 'simpleScene';
+whichScene = 'blobbie';
 switch (whichScene)
     case 'simpleScene'
         % Initialize ISET and Docker
@@ -87,37 +88,42 @@ switch (whichScene)
         thisR.set('outputFile',outFile);
     case 'blobbie'
         % Set the input folder name
-        %
-        % This is currently set to a folder included in the iset3d repository
-        % but you can change it to your new folder (as described in heading above).
         sceneName = 'BlenderSceneBlobs';
         
-        % Set name of pbrt file exported from Blender
-        %
-        % This is currently set to a pbrt file included in the iset3d repository
-        % but you can change it to the pbrt file you exported from Blender.
+        % Set name of pbrt file
         pbrtName = 'BlenderSceneBlobs';
         
         % Set pbrt file path
-        %
-        % This is currently set to the file included in the iset3d repository
-        % but you can change it to the file path for your exported file.
-        filePath = fullfile(piRootPath,'local','scenes',sceneName);
+        filePath = fullfile(piRootPath,'data','blender',sceneName);
         fname = fullfile(filePath,[pbrtName,'.pbrt']);
         if ~exist(fname,'file')
             error('File not found - see tutorial header for instructions');
         end
         
         % Read scene
-        %
-        % piRead_Blender.m is an edited version of piRead.m
-        % that can read pbrt files exported from Blender.
-        exporter = 'Blender';
-        thisR = piRead_Blender(fname,'exporter',exporter);
+        thisR = piRead(fname);
         
-        % Change render quality
-        %
-        % Decrease the resolution to decrease rendering time.
+        % This scene was exported without a light, so add an infinite light.
+        infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
+        thisR.set('light','add',infiniteLight);
+        
+        % This scene was exported without materials, so add a matte material
+        % of a random color to each object in the scene.
+        for ii = 1:length(thisR.assets.Node)
+            if isfield(thisR.assets.Node{ii},'name')
+                assetName = thisR.assets.Node{ii}.name;
+                % Only act on the leaf of an object (not on any branches).
+                if ~contains(assetName,'_B')
+                    materialName = append(assetName,'_Material');
+                    newMaterial = piMaterialCreate(materialName,'type','matte');
+                    thisR.set('material','add',newMaterial);
+                    thisR.set('material',materialName,'kd value',[rand rand rand]);
+                    thisR.set('asset',ii,'material name',materialName);
+                end
+            end
+        end
+        
+        % Decrease the resolution and rays/pixel to decrease rendering time.
         raysperpixel = thisR.get('rays per pixel');
         filmresolution = thisR.get('film resolution');
         thisR.set('rays per pixel', raysperpixel/2);
@@ -127,17 +133,10 @@ switch (whichScene)
 end
 
 %% Save the recipe information
-%
-% piWrite_Blender.m is an edited version of piWrite.m
-% that understands the exporter being set to 'Blender'.
-piWrite_Blender(thisR);
+piWrite(thisR);
 
 %% Render and display radiance image
-%
-% piRender_Blender.m is an edited version of piRender.m
-% that understands the exporter being set to 'Blender'.
-theScene = piRender_Blender(thisR,'render type','radiance');
-theScene = sceneSet(theScene,'name','Blender export');
+theScene = piRender(thisR,'render type','radiance');
 sceneWindow(theScene);
 sceneSet(theScene,'gamma',0.5);
 
