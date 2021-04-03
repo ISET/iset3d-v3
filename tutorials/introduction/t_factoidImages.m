@@ -112,8 +112,8 @@ switch (whichScene)
         for ii = 1:length(thisR.assets.Node)
             if isfield(thisR.assets.Node{ii},'name')
                 assetName = thisR.assets.Node{ii}.name;
-                % Only act on the leaf of an object (not on any branches).
-                if ~contains(assetName,'_B')
+                % Only act on the object's materials.
+                if contains(assetName,'_O')
                     materialName = append(assetName,'_Material');
                     newMaterial = piMaterialCreate(materialName,'type','matte');
                     thisR.set('material','add',newMaterial);
