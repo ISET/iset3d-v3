@@ -147,7 +147,12 @@ for ii = 1:numel(children)
             if ~isempty(thisNode.shape.filename)
                 % If the shape has ply info, do this
                 % Convert shape struct to text
-                fprintf(fid, '%s \n',shapeText);
+                [~, ~, e] = fileparts(thisNode.shape.filename);
+                if isequal(e, '.ply')
+                    fprintf(fid, '%s \n',shapeText);
+                else
+                    fprintf(fid, 'Include "%s" \n', thisNode.shape.filename);
+                end
             else
                 % If it does not have plt file, do this
                 % There is a shape slot we also open the

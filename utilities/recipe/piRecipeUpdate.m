@@ -105,7 +105,9 @@ function node = parseV1Assets(thisAsset)
         node.name = strcat(thisAsset.name, '_M');
         node.translation = thisAsset.position(:)';
         node.rotation = thisAsset.rotate;
-        node.motion = thisAsset.motion;
+        if isfield(thisAsset, 'motion')
+            node.motion = thisAsset.motion;
+        end
     else
         % A branch node
         node = piAssetCreate('type', 'branch');
@@ -115,7 +117,9 @@ function node = parseV1Assets(thisAsset)
         node.name = strcat(thisAsset.name, '_B');
         node.translation = thisAsset.position(:)';
         node.rotation = thisAsset.rotate;
-        node.motion = thisAsset.motion;
+        if isfield(thisAsset, 'motion')
+            node.motion = thisAsset.motion;
+        end
     end
 end
     
