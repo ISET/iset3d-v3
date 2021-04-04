@@ -66,6 +66,8 @@ switch ieParamFormat(type)
         obj.mediumInterface = [];
         obj.material = [];
         obj.shape = [];
+        % Different parts can be part of the same object, not clear.
+        obj.index = [];
     case 'light'
         obj.name = 'light';
         obj.lght = [];

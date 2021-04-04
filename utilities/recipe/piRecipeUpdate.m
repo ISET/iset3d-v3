@@ -19,6 +19,12 @@ function thisRV2 = piRecipeUpdate(thisRV2)
 %
 %
 % Zheng Lyu, 2020
+
+% Examples:
+%{
+fname = 'city4_9_30_v0.0_f40.00front_o270.00_201952151746.json';
+thisR = piJson2Recipe(fname);
+%}
 %% Parse input
 
 p = inputParser;
@@ -41,53 +47,76 @@ thisRV2 = piRecipeUpdateAssets(thisRV2);
 end
 
 function thisRV2 = piRecipeUpdateLights(thisRV2)
-thisRV2.lights = piLightGetFromText(thisRV2.world);
+thisRV2.lights = piLightGetFromText(thisRV2.world, 'print info', false);
 end
 
 function thisRV2 = piRecipeUpdateAssets(thisRV2)
 % Update the asset format
 
-
-% Each asset will become a node.
+% Each asset will become a node, these are the nodes at first level.
 nAssets = numel(thisRV2.assets);
-assets.Node   = cell(nAssets,1);
-assets.Parent = cell(nAssets,1);
-
-if isfield(thisRV2.assets(1)
-
+% Initialize the tree.
+assetsTree = tree('root');
 
 for ii=1:nAssets
    thisAsset = thisRV2.assets(ii);
    
-   % Figure out which type of asset
-   % Create a node of that type and assign it to assets.Node{ii} using
-   % piAssetCreate.
-   % Copy the parameters in the V1 recipe to proper slots in the version 2
-   % recipe
-   % Figure the parent and copy that node number
+   % The V1 assets are a cell array and each entry can have multiple
+   % children. But children do not have children. We attach the first level
+   % to the root, and the children to the entry in the first level. 
    
-   % Rules:
-   %   If children is empty and material does not exist, it is a marker
-   %                        and material exists,         it is an object
-   %
-   %   If children is not empty it is a branch. Version 1 has not slot for
-   %   lights.
-   %      
-   [assets.Node{ii}, assets.Parent{ii}] = parse(thisAsset);
+   % For every asset we figure out its node type  
+   thisNode = parseV1Assets(thisAsset);
+   [assetsTree, id] = assetsTree.addnode(1, thisNode);
+   % Check the children
+   if isfield(thisAsset, 'children') && ~isempty(thisAsset.children)
+       for jj=1:numel(thisAsset.children)
+           childNode = parseV1Assets(thisAsset.children(jj));
+           assetsTree = assetsTree.addnode(id, childNode);
+       end
+   end
+end
+% Make the name unique
+thisRV2.assets = assetsTree.uniqueNames;
 end
 
-
-% Each node will have a parent
-
-% Convert each node's format to the V2 format given its V1 format
-
-
-%{
-if isprop(thisR, 'assets') && ~isfield(thisR.assets, 'groupobjs')
-    thisRV2 = piAssetsRebuild(thisRV1);
-end
-%}
-
+function node = parseV1Assets(thisAsset)
+    % Rules:
+    %   If children is empty and material does not exist, it is a marker
+    %                        and material exists,         it is an object
+    %
+    %   If children is not empty it is a branch. Version 1 has no slot for
+    %   lights.
+    %      
+    
+    if isfield(thisAsset, 'material') && ~isfield(thisAsset, 'children')
+        % An object
+        node = piAssetCreate('type', 'object');
+        node.name = strcat(thisAsset.name, '_O');
+        node.material = piParseGeometryMaterial(thisAsset.material);
+        node.index = thisAsset.index; % Not clear
+        node.shape.filename = thisAsset.output;
+    elseif isfield(thisAsset, 'children') && isempty(thisAsset.children)
+        % A marker
+        node = piAssetCreate('type', 'marker');
+        node.size = thisAsset.size;
+        node.size.pmin = node.size.pmin(:)';
+        node.size.pmax = node.size.pmax(:)';
+        node.name = strcat(thisAsset.name, '_M');
+        node.translation = thisAsset.position(:)';
+        node.rotation = thisAsset.rotate;
+        node.motion = thisAsset.motion;
+    else
+        % A branch node
+        node = piAssetCreate('type', 'branch');
+        node.size = thisAsset.size;
+        node.size.pmin = node.size.pmin(:)';
+        node.size.pmax = node.size.pmax(:)';
+        node.name = strcat(thisAsset.name, '_B');
+        node.translation = thisAsset.position(:)';
+        node.rotation = thisAsset.rotate;
+        node.motion = thisAsset.motion;
+    end
 end
     
 function thisRV2 = piRecipeUpdateMaterials(thisRV2)
