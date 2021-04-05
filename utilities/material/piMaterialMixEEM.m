@@ -28,6 +28,12 @@ for ii=1:numel(nameList)
     val = val + thisEEM * ccList(ii);                                          
 end
 
+if any(val(:) > 1)
+    warning('Entry of mixed EEM is larger than 1, scaling to 1')
+    maxVal = max(val(:));
+    val = val / maxVal;
+end
+
 switch form
     case {'vec', 'vector'}
         val = piEEM2Vec(wave, val);
