@@ -25,6 +25,9 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Read the pbrt files
 
+sceneName = 'ChessSet';
+thisR = piRecipeDefault('scene name',sceneName);
+%{
 sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
 
 inFolder = fullfile(piRootPath,'local','scenes');
@@ -43,6 +46,7 @@ end
 
 % This is the PBRT scene file inside the output directory
 thisR  = piRead(inFile);
+%}
 
 %% Set render quality
 
