@@ -31,7 +31,7 @@ thisR = piRecipeDefault('scene name','chessSet');
 
 % This is a quick rendering of the PBRT scene through a pinhole optics
 piWrite(thisR);
-scene = piRender(thisR,'render type','radiance');
+[scene, result] = piRender(thisR,'render type','radiance');
 
 % Have a look
 sceneWindow(scene);
