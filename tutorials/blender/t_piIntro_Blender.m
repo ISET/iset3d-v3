@@ -1,36 +1,27 @@
 %% Render a pbrt image exported from Blender
 %
 % Description:
-%    A tutorial for making simple modifications (translate/rotate/scale an
-%    object, change material/color of an object, add texture to an object)
-%    to an image exported from Blender with the Blender-to-pbrt exporter
-%    (https://github.com/stig-atle/io_scene_pbrt).
-%
-%    A tutorial on how to use the Blender exporter can be found here: 
+%    This tutorial demonstrates how you can use iset3d to render and modify
+%    a scene that was created in Blender.
+% 
+%    This tutorial uses an image that was exported from Blender and which 
+%    is included in the iset3d repository, but you can use your own Blender
+%    scene by following the instructions found here: 
 %    https://github.com/ISET/iset3d/wiki/Blender
+
+%    The wiki page above will show you some Blender basics, how to export
+%    your Blender scene as a pbrt file, and how to set up a folder in
+%    iset3d that contains your scene. You will then need to follow the
+%    comments in the tutorial below to modify this script for your scene.
 %
-%    The current tutorial uses an image that was exported from Blender and 
-%    which is included in the iset3d repository.
-%
-%    To use your own output from the Blender-to-pbrt exporter:
-%    Put the output (a pbrt file and a 'meshes' folder) into a new folder 
-%    within your iset3d installation: 
-%    ~/iset3d/local/scenes/[your new folder]. This folder will be ignored 
-%    by github, so it won't be synced up with the repository. You will be 
-%    able to point to your new folder and your pbrt file below. 
-%
-%    This tutorial works very similarly to tutorials that operate on scenes
-%    exported from Cinema 4D, but to parse and work with the Blender
-%    exported pbrt files you need to call functions with _Blender as part
-%    of their name.  These functions were written to understand the dialect
-%    of pbrt created by the Blender exporter.
+%    For a demonstration of how you can add materials to Blender scenes 
+%    exported without materials, see:
+%    ~/iset3d/tutorials/introduction/t_factoidImages
 %
 % History:
 %   11/27/20  amn  Wrote it, adapted from t_piIntro_scenefromweb.m.
 %   11/29/20  dhb  Edited it.
-%   12/03/20  amn  Added color change section.
-%   12/07/20  amn  Updated the Blender scene, added texture sections.
-%   12/10/20  amn  Added a new texture section, added wiki link.
+%   04/01/21  amn  Adapted for general parser and assets/materials updates.
 
 %% Initialize ISET and Docker
 %
@@ -41,19 +32,21 @@ if ~piDockerExists, piDockerConfig; end
 %% Set the input folder name
 %
 % This is currently set to a folder included in the iset3d repository
-% but you can change it to your new folder (as described in heading above).
+% but you can change the name to the name of your own folder, which you 
+% can set up as described at: https://github.com/ISET/iset3d/wiki/Blender
 sceneName = 'BlenderScene';
 
 %% Set name of pbrt file exported from Blender
 %
 % This is currently set to a pbrt file included in the iset3d repository
-% but you can change it to the pbrt file you exported from Blender.
+% but you can change the file name to the name of your own scene.
 pbrtName = 'BlenderScene'; 
 
 %% Set pbrt file path
 %
 % This is currently set to the file included in the iset3d repository
-% but you can change it to the file path for your exported file.
+% (which is located in ~/iset3d/data/blender/BlenderScene) but you can
+% change it to the file path for your scene.
 filePath = fullfile(piRootPath,'data','blender',sceneName);
 fname = fullfile(filePath,[pbrtName,'.pbrt']);
 if ~exist(fname,'file')
@@ -62,316 +55,80 @@ end
 
 %% Read scene
 %
-% piRead_Blender.m is an edited version of piRead.m
-% that can read pbrt files exported from Blender.
-exporter = 'Blender';
-thisR = piRead_Blender(fname,'exporter',exporter);
+% Read and parse the pbrt file exported from Blender, and return a
+% rendering recipe with the parsed scene information.
+thisR = piRead(fname);
+
+%% Add light
+% 
+% This scene was exported without a light, so create and add an infinite light.
+infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
+thisR.set('light','add',infiniteLight);
 
 %% Change render quality
 %
-% Decrease the resolution to decrease rendering time.
+% Decrease the resolution and rays/pixel to decrease rendering time.
 raysperpixel = thisR.get('rays per pixel');
 filmresolution = thisR.get('film resolution');
 thisR.set('rays per pixel', raysperpixel/2);
 thisR.set('film resolution',filmresolution/2);
 
-%% Save the recipe information
-%
-% piWrite_Blender.m is an edited version of piWrite.m
-% that understands the exporter being set to 'Blender'.
-piWrite_Blender(thisR);
+%% Write scene
+% 
+% Save the recipe information in a pbrt scene file. 
+piWrite(thisR);
 
 %% Render and display
 %
-% piRender_Blender.m is an edited version of piRender.m
-% that understands the exporter being set to 'Blender'.
-scene = piRender_Blender(thisR,'render type','radiance');
+% Render the scene, specifiying the 'radiance' render type only.
+scene = piRender(thisR,'render type','radiance');
 
 % Name this render and display it.
 scene = sceneSet(scene,'name','Blender export');
 sceneWindow(scene);
+
+% Change the gamma for improved visibility.
 sceneSet(scene,'gamma',0.5);
 
-%% How to perform basic functions with images exported from Blender
+%% Modify the scene
 %
-% The next part of this tutorial is adapted from intro tutorials
-% (t_piIntro_simpletransforms.m, t_piIntro_material.m) to demonstrate how 
-% to perform some basic functions with images exported from Blender
-% (see iset3d/tutorials/introduction for all of the intro tutorials).
+% Next, we will demonstrate how you can modify a Blender scene in iset3d by
+% performing one simple modification. See the other iset3d tutorials for 
+% detailed instructions on making various modifications.
 
-%% List the names of the objects in this recipe
+%% Get the names of the objects in the scene
 %
-% You will need to know the names of the objects in your scene to work with
-% them below. See the tutorial referenced in the header (on how to use the
-% Blender-to-pbrt exporter) for notes on naming your objects in Blender.
-fprintf('\nThis recipe contains objects:\n');
-for ii = 1:length(thisR.assets.groupobjs)
-    fprintf('%s\n',thisR.assets.groupobjs(ii).name);
-end
-fprintf('\n');
-  
-%% Translate an object
-%
-% Move the mirror 50 cm along the negative x-axis.
-% Note that this will move the mirror in world coordinates. In the Blender
-% scene included in this tutorial, the camera was aligned to the world
-% coordinates. See the tutorial referenced in the header (on how to use the
-% Blender-to-pbrt exporter) for how to set up your camera in Blender.
-for ii = 1:length(thisR.assets.groupobjs)
-    
-    % As you can see in the object name list displayed above, all of the
-    % objects that make up the mirror contain the string 'Mirror'
-    % so you can translate all of the objects that contain that string.
-    if piContains(thisR.assets.groupobjs(ii).name,'Mirror')
-        
-        % Translate along the x-axis by adjusting the 1st position
-        % parameter.
-        thisR.assets.groupobjs(ii).position(1) = ...
-        thisR.assets.groupobjs(ii).position(1) - .5;
-    end
-end
+% Print the asset tree structure in the command window.
+thisR.assets.print;
 
-% Write and render.
-piWrite_Blender(thisR);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Translated mirror');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Rotate an object
-%
-% Rotate the monkey head 45 degrees along its y-axis.
-for ii = 1:length(thisR.assets.groupobjs)
-    if strcmp(thisR.assets.groupobjs(ii).name,'Monkey')
-        % The rotation is stored in angle-axis format, along the columns.
-        thisR.assets.groupobjs(ii).rotate(1,2) = ...
-        thisR.assets.groupobjs(ii).rotate(1,2) - 45;
-    end
-end
-
-% Write and render.
-piWrite_Blender(thisR);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Rotated monkey');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Scale an object
-%
-% Scale the table top along its x-axis.
-for ii = 1:length(thisR.assets.groupobjs)
-    % Only the table top (and not the table legs, which are separate 
-    % objects) will be scaled
-    if strcmp(thisR.assets.groupobjs(ii).name,'Table')
-        thisR.assets.groupobjs(ii).scale(1) = ...
-        thisR.assets.groupobjs(ii).scale(1) * 1.5;
-    end
-end
-
-% Write and render.
-piWrite_Blender(thisR);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Scaled table top');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Just for fun, put it all together
-%
-% Make a happy robot.
-for ii = 1:length(thisR.assets.groupobjs)
-    % Move all robot-related objects 70 cm up, along the y-axis.
-    if piContains(thisR.assets.groupobjs(ii).name,'Robot')
-        thisR.assets.groupobjs(ii).position(2) = ...
-        thisR.assets.groupobjs(ii).position(2) + .7;
-    
-        % Translate, rotate, and scale one of the robot's arms.
-        if strcmp(thisR.assets.groupobjs(ii).name,'RobotArmLeft')
-            % Translate along the y-axis.
-            thisR.assets.groupobjs(ii).position(2) = ...
-            thisR.assets.groupobjs(ii).position(2) + .2;
-            % Rotate along its x-axis.
-            thisR.assets.groupobjs(ii).rotate(1,1) = ...
-            thisR.assets.groupobjs(ii).rotate(1,1) + 50;
-            % Scale along its y-axis.
-            thisR.assets.groupobjs(ii).scale(2) = ...
-            thisR.assets.groupobjs(ii).scale(2) * 1.5;
-        
-        % Scale the robot's eyes and mouth.
-        elseif piContains(thisR.assets.groupobjs(ii).name,'RobotEye') || ...
-                   strcmp(thisR.assets.groupobjs(ii).name,'RobotMouth')
-            % Scale along the object's y-axis.
-            thisR.assets.groupobjs(ii).scale(2) = ...
-            thisR.assets.groupobjs(ii).scale(2) * 2;
-        end
-    end 
-end
-
-% Write and render.
-piWrite_Blender(thisR);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Made a happy robot');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Change the material of an object
-%
-% Change the material of the top sphere to 'matte'.
-
-% Get the material list and select the material of the chosen object.
-materialList = piMaterialList(thisR);
-objectMaterialName = 'SphereTop_material';
-
-% Get the 'matte' material from the library.
-%
-% The library is always part of any recipe.
-% Each field in the library struct is a material.
-%
-% You can look at the list of available materials in variable
-% 'theMaterials' below, and try changing to others as well.
-desiredMaterial = 'matte';
-theMaterials = fieldnames(thisR.materials.lib);
-targetMaterial = [];
-for ii = 1:length('theMaterials')
-    if (strcmp(theMaterials{ii},desiredMaterial))
-        eval(['targetMaterial = thisR.materials.lib.' desiredMaterial ';']);
-        break;
-    end
-end
-if (~isempty(targetMaterial))
-    % Assign the top sphere the 'matte' material.
-    fprintf('Changing material to %s\n',desiredMaterial);
-    piMaterialAssign(thisR,objectMaterialName,targetMaterial);
-else
-    fprintf('Cannot find desired material %s, leaving alone\n',desiredMaterial);
-end
-
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed top sphere material to matte');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Change the color of an object
+%% Select an object to modify
 % 
-% Change the color of the top sphere to cyan.
-% This section depends on variables defined in the section above.
+% The objects were assigned names based on their order (e.g., 002ID__B).
+% Naming based on the object names in Blender is pending. For now, we will
+% look at the pbrt file itself to find that the Monkey is the 13th object
+% listed in the pbrt file. Each object in this scene was assigned a branch
+% (its position, orientation, and size) and a leaf (its shape and 
+% material). The naming began with '002' and a name was given to each 
+% branch (for example, the first object's branch name is 002ID__B) and each
+% leaf (for example, the first object's leaf name is 003ID__O). Therefore,
+% the name of the Monkey object's branch (its position, orientation, and 
+% size) is: 026ID__B
+assetName = '026ID__B';
 
-% Add a cyan diffuse component to the 'targetMaterial' defined above 
-% (the 'matte' material).
-targetMaterial.rgbkd = [0 1 1];
-
-% Assign the top sphere the revised material.
-piMaterialAssign(thisR,objectMaterialName,targetMaterial);
-
-% Set the 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed top sphere color to cyan');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% How to add textures
+%% Move the Monkey object
 %
-% The next part of this tutorial demonstrates how to add textures to images
-% exported from Blender, because the Blender exporter does not export 
-% textures.
+% Here we translate the Monkey object's position 1 meter in the negative x
+% direction.
+[~,translateBranch] = thisR.set('asset', assetName, 'translate', [-1, 0, 0]);
 
-%% Add a 3D pbrt texture
+%% Write, render, and display
 % 
-% Add the 'wrinkled' texture, which is included in pbrt, to the table
-% (other 3D pbrt textures to try below instead of 'wrinkled' are 'fbm', 
-% 'marble', and 'windy', among others).
+% Write the scene.
+piWrite(thisR);
 
-% You will be creating a new texture. Select a name for this texture.
-texturename = 'Wrinkled';
-
-% Assign this new texture to the material of each table object (the table
-% top and the table legs).
-for ii = 1:length(thisR.materials.list)
-    if piContains(thisR.assets.groupobjs(ii).name,'Table')
-        thisR.materials.list{ii}.stringtype = 'matte';
-        thisR.materials.list{ii}.texturekd = texturename;
-    end
-end
-
-% Set up this new texture in the recipe.
-tidx = length(thisR.textures.list);
-tidx = tidx + 1;
-thisR.textures.list{tidx,1}.name = texturename;
-thisR.textures.list{tidx,1}.linenumber = tidx;
-thisR.textures.list{tidx,1}.format = 'spectrum';
-
-% The 'wrinkled' texture is included in pbrt (substitute in other 3D pbrt
-% textures below).
-thisR.textures.list{tidx,1}.type = 'wrinkled';
-
-% Set the 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed table texture');
+% Render and display.
+scene = piRender(thisR,'render type','radiance');
+scene = sceneSet(scene,'name','Translated monkey');
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Add a 2D pbrt texture
-% 
-% Add the 'checkerboard' texture, which is included in pbrt, to the floor
-% (another 2D pbrt texture to try below instead of 'checkerboard' is 'uv').
-
-% You will be creating a new texture. Select a name for this texture.
-texturename = 'Checks';
-
-% Assign this new texture to the material of the floor.
-for ii = 1:length(thisR.materials.list)
-    if strcmp(thisR.assets.groupobjs(ii).name,'Floor')
-        thisR.materials.list{ii}.stringtype = 'matte';
-        thisR.materials.list{ii}.texturekd = texturename;
-    end
-end
-
-% Set up this new texture in the recipe.
-tidx = length(thisR.textures.list);
-tidx = tidx + 1;
-thisR.textures.list{tidx,1}.name = texturename;
-thisR.textures.list{tidx,1}.linenumber = tidx;
-thisR.textures.list{tidx,1}.format = 'spectrum';
-
-% The 'checkerboard' texture is included in pbrt (substitute in other 2D
-% pbrt textures below).
-thisR.textures.list{tidx,1}.type = 'checkerboard';
-
-% You can specify the texture scaling factors for 2D textures.
-thisR.textures.list{tidx,1}.floatuscale = 8;
-thisR.textures.list{tidx,1}.floatvscale = 8;
-
-% Set the 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed floor texture');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
-
-%% Modify a texture that is already in the recipe
-%
-% In the above section, you added a texture to the recipe. You also
-% assigned this texture to the material of the floor. Now, you can modify
-% that existing texture.
-
-% Modify the 'Checks' texture.
-for ii = 1:length(thisR.textures.list)
-    if strcmp(thisR.textures.list{ii}.name,'Checks')
-        % Specify larger texture scaling factors.
-        thisR.textures.list{ii}.floatuscale = 35.1;
-        thisR.textures.list{ii}.floatvscale = 35.1;
-    end
-end
-
-% Set the 'creatematerials' argument to true.
-piWrite_Blender(thisR,'creatematerials',true);
-scene = piRender_Blender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Changed existing floor texture');
-sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
 
 %% End
