@@ -1,5 +1,8 @@
 function thisRV2 = piRecipeUpdate(thisRV2)
-% Convert recipe from V1 structure to V2 structure. 
+% Convert a render recipe from V1 structure to V2 structure. 
+%
+% Synopsis
+%   thisRV2 = piRecipeUpdate(thisRV2)
 %
 % The change(s) are:
 %
@@ -20,11 +23,6 @@ function thisRV2 = piRecipeUpdate(thisRV2)
 %
 % Zheng Lyu, 2020
 
-% Examples:
-%{
-fname = 'city4_9_30_v0.0_f40.00front_o270.00_201952151746.json';
-thisR = piJson2Recipe(fname);
-%}
 %% Parse input
 
 p = inputParser;

@@ -1,32 +1,43 @@
 function thisRV2 = piJson2Recipe(JsonFile, varargin)
-% Convert a json format of a recipe to the recipe class
+% Convert a json format recipe to the ISET3d recipe class
 %
 % Syntax
 %   thisR = piJson2Recipe(JsonFile, update)
 %
 % Brief Description
-%   We often store recipes as JSON files.  When we read them back in
-%   Matlab treats them as a struct.  We want them to be @recipe.  Here
-%   we create an @recipe object and copy the struct into the recipe.
+%   On Flywheel we often store recipes as JSON files.  When we read them
+%   into Matlab they are structs. We convert them to the @recipe class
+%   here. 
+%
+%   The conversion will run with both V1 and V2 JSON recipe data.  It calls
+%   piRecipeUpdate to flip from V1 to V2.
 %
 % Input
 %   JsonFile:  File name of the json file containing the scene recipe
-%   update:  Disable update if set to be false (Default is true).   
+%   update:    Disable update if set to be false (Default is true).   
 % 
 % Output
-%   thisR:     Scene recipe object
+%   thisR:     @recipe object
 %
 % Description:
-%   Over time we may make changes to the format of the recipe.  If we
-%   do, then adjustments for the older formats happen in here through
-%   the piUpdateRecipe call.
+%   Over time we may make changes to the @recipe format.  If we do, then
+%   adjustments for the older formats happen in here through the
+%   piUpdateRecipe call.  The version of the recipe is stored in the
+%   variable @recipe.recipeVer, though for Version 1 this slot is missing.
 %
-% Authors: ZL, Zheng Lyu maybe
+%   We test the update from V1 to V2 using the script
 %
 % See also
-%   recipe, jsonread, jsonwrite
+%   piRecipeUpdate, @recipe, jsonread, jsonwrite
 
-%%
+% Examples:
+%{
+fname = 'city4_9_30_v0.0_f40.00front_o270.00_201952151746.json';
+thisR = piJson2Recipe(fname);
+%}
+
+%% Parse parameters
+
 p = inputParser;
 p.addRequired('JsonFile');
 p.addParameter('update', true, @islogical);
@@ -39,7 +50,17 @@ update   = p.Results.update;
 thisR_tmp = jsonread(JsonFile);
 
 %% Loop through the fields and assign them
+
+% Find the field names in the json file recipe
 fds = fieldnames(thisR_tmp);
+if any(~ieContains(fds,'recipeVer')) || ~isequal(thisR_tmp.recipeVer,2)
+    disp('Version 1 recipe read in');
+    thisVersion = 1;
+else
+    thisVersion = 2;
+end
+
+% Create a V2 recipe class 
 thisRV2 = recipe;
 
 % Assign the struct to a recipe class.  Some times we store extra fields in
@@ -69,5 +90,8 @@ if update
     if isempty(thisRV2.textures)
         thisRV2 = piRecipeUpdate(thisRV2);
     end
+elseif thisVersion == 1
+    disp('update not set.  Returning a Version 1 recipe.');
 end
+    
 end
