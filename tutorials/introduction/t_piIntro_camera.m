@@ -1,5 +1,10 @@
 %% Camera types
 %
+% Describe the ISETCam camera types.  There are four:
+%   perspective (also called 'pinhole' in the documentation)
+%   realistic
+%   realisticEye (special case for the sceneEye in ISETBio)
+% omni.
 
 %%
 ieInit;

@@ -25,7 +25,7 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the PBRT input scene
-%
+
 % Input the scene and store its parameters in a recipe
 thisR = piRecipeDefault('scene name','chessSet');
 
