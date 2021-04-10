@@ -1,7 +1,10 @@
 %% s_slantedBarExample
-
+%
+% REQUIRES UPDATING FOR NEW ASSETS
+%
 % Render a slanted bar with the two sides at two different depths.
-
+%
+% 
 % TL SCIEN 2017
 
 %% Initialize ISET and Docker
