@@ -151,6 +151,8 @@ for ii = 1:numel(children)
                 if isequal(e, '.ply')
                     fprintf(fid, '%s \n',shapeText);
                 else
+                    % In this case it is a .pbrt file, we will write it
+                    % out.
                     fprintf(fid, 'Include "%s" \n', thisNode.shape.filename);
                 end
             else
@@ -167,31 +169,11 @@ for ii = 1:numel(children)
         
         fprintf(fid, 'ObjectEnd\n\n');
         
-    elseif isequal(thisNode.type, 'light')
-        % Seems this is the source of warning.
-        %{
-        fprintf(fid, 'ObjectBegin "%s"\n', thisNode.name);
-        name = thisNode.name;
-        
-        % Create a tmp recipe
-        tmpR = recipe;
-        tmpR.outputFile = outFilePath;
-        tmpR.lights = thisNode.lght;
-        lightText = piLightWrite(tmpR, 'writefile', false);
-        
-        lightFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
-        for jj = 1:numel(lightText)
-            for kk = 1:numel(lightText{jj}.line)
-                fprintf(lightFile,'%s\n',lightText{jj}.line{kk});
-            end
-        end
-        fclose(lightFile);
-        fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
-        
-        fprintf(fid, 'ObjectEnd\n\n');        
-        %}
+    elseif isequal(thisNode.type, 'light') || isequal(thisNode.type, 'marker')
+        % That's okay but do nothing.
     else
         % Something must be wrong if we get here.
+        warning('Unknown node type: %s', thisNode.type)
     end
 end
 
