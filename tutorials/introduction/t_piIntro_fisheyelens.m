@@ -67,9 +67,6 @@ thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 % map, but it is close.
 thisR.set('focus distance',0.45);
 
-% The FOV is not used for the 'realistic' camera.
-% The FOV is determined by the lens. 
-
 % This is the size of the film/sensor in millimeters
 thisR.set('film diagonal',10);
 

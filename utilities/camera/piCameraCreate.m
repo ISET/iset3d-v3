@@ -7,13 +7,11 @@ function camera = piCameraCreate(cameraType,varargin)
 %  
 % The camera lens type
 %
-%    {'pinhole'}   - Default is pinhole camera, also called 'perspective'
-%           
-%    'realistic'   - allows chromatic aberration, diffraction and a lens file
+%    {'pinhole'} - A pinhole camera.  Also called 'perspective' in some
+%                  places
 %    'light field' - microlens array in front of the sensor 
-%    'human eye'   - T. Lian human eye model parameters
-%    'omni'        - M. Mara implementation that subsumes the others.
-%                    This may become our only form once we test enough.
+%    'human eye'   - T. Lian human eye model parameters (realisticEye)
+%    'omni'        - M. Mara implementation that subsumes former realistic.
 %
 % Optional parameter/values
 %
@@ -80,6 +78,9 @@ p.addParameter('lensfile',lensDefault, @ischar);
 
 p.parse(cameraType,varargin{:});
 
+% Use pinhole instead of perspective, for clarity.
+if isequal(cameraType,'perspective'), cameraType = 'pinhole'; end
+
 lensFile      = p.Results.lensfile;
 if ~exist(lensFile,'file') && (strcmp(cameraType,'omni') || strcmp(cameraType,'realistic'))
     % This warning could be eliminated after some time.  It arises when we
@@ -90,8 +91,9 @@ end
 
 %% Initialize the default camera type
 switch ieParamFormat(cameraType)
-    case {'pinhole','perspective'}
-        % A perspective camera with zero aperture is a pinhole camera. 
+    case {'pinhole'}
+        % A pinhole camera is also called 'perspective'.  I am trying to
+        % get rid of that terminology in the code (BW).
         camera.type      = 'Camera';
         camera.subtype   = 'perspective';
         camera.fov.type  = 'float';
@@ -101,6 +103,7 @@ switch ieParamFormat(cameraType)
 
     case {'realistic'}
         % Check for lens .dat file
+        warning('realistic will be deprecated for omni');
         [~,~,e] = fileparts(lensFile);
         if(~strcmp(e,'.dat'))
             % Sometimes we are sent in the json file
@@ -150,8 +153,9 @@ switch ieParamFormat(cameraType)
         
     case {'lightfield'}
         % Use to allow 'microlens' and'plenoptic'
+        % Was realisticDiffraction subtype
         camera.type = 'Camera';
-        camera.subtype = 'realisticDiffraction';
+        camera.subtype = 'omni'; 
         camera.specfile.type = 'string';
         camera.specfile.value = which(lensFile);
         camera.filmdistance.type = 'float';

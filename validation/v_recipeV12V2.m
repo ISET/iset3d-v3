@@ -10,7 +10,7 @@
 
 tmp = piRecipeDefault('scene name','SimpleScene');
 piWrite(tmp);
-scene = piRender(tmp);
+[scene, result] = piRender(tmp,'render type','radiance');
 sceneWindow(scene);
 
 %% Adjust the other PBRT file locations

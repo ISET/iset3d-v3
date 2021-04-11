@@ -363,13 +363,13 @@ switch ieParamFormat(param)  % lower case, no spaces
     case 'opticstype'
         % val = thisR.get('optics type');
         %
-        % perspective means pinhole.
-        % not sure I understand environment
-        % Others include a lens and so we return the val as 'lens'.
-        % Note that for realisticEye we have different types of human eye
-        % models.  See realistic eye model to figure out how to get the
-        % specific eye model.
-        
+        % perspective means pinhole.  I am trying to get rid of perspective
+        % as a subtype (BW).
+        %
+        % Other subtypes include a lens and so we return the val as 'lens'.
+        % For realisticEye we have different types of human eye models.
+        % See the wiki page and t_eye* scripts for more information.
+        % And look below at 'realsticeyemodel' for options.
         val = thisR.camera.subtype;
         if isequal(val,'perspective'), val = 'pinhole';
         elseif isequal(val,'environment'), val = 'environment';
