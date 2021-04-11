@@ -43,7 +43,7 @@ thisR.set('nbounces',5);
 
 % Render
 piWrite(thisR);
-scene = piRender(thisR);
+scene = piRender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
 
@@ -80,7 +80,7 @@ spdRef = piMaterialCreateSPD(wave, reflectance);
 thisR.set('material', redMatte, 'kd value', spdRef);
 
 %% Set the material 
-assetName = 'Sphere_O';
+assetName = '0005ID_Sphere_O';
 thisR.set('asset',assetName,'material name',redMatte.name);
 
 % Show that we set it
@@ -88,7 +88,7 @@ thisR.get('object material')
 
 %% Let's have a look
 piWrite(thisR);
-scene = piRender(thisR);
+scene = piRender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
 if piCamBio, sceneSet(scene,'render flag','hdr');
@@ -100,20 +100,20 @@ rmLight = piLightCreate('room light', ...
     'type', 'infinite',...
     'mapname', 'room.exr');
 rmLight = piLightSet(rmLight, 'rotation val', {[0 0 1 0], [-90 1 0 0]});
-%% Make the sphere glass
+%% Put the sphere in an environment
 
 % Make the sphere a little smaller
-assetName = 'Sphere_O';
+assetName = '0005ID_Sphere_O';
 thisR.set('asset',assetName,'scale',[0.5 0.5 0.5]);
 
-% Add an environmental light so we can see the glass or mirror
+% Add an environmental light
 thisR.set('light', 'delete', 'all');
 thisR.set('light', 'add', rmLight);
 
-% Check that the room.exr file is in the directory.  Should not be needed
-% in the future.
+% Check that the room.exr file is in the directory.
+% In time, we will be using piRenderValidate()
 %
-% We want something like
+% For standard environment lights, we want something like
 %
 %   thisR.set('skymap',filename); 
 %
@@ -122,9 +122,9 @@ if ~exist(fullfile(thisR.get('output dir'),'room.exr'),'file')
     copyfile(exrFile,thisR.get('output dir'))
 end
 
-% Write and render
+%% Write and render
 piWrite(thisR);
-scene = piRender(thisR);
+scene = piRender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name',sprintf('Red %s',sceneName));
 sceneWindow(scene);
 if piCamBio, sceneSet(scene,'render flag','hdr');
@@ -146,7 +146,7 @@ sceneWindow(scene);
 if piCamBio, sceneSet(scene,'render flag','hdr');
 else,        sceneSet(scene,'gamma',0.6);
 end
-%% One more camera position
+%% Change the camera position
 
 % Where is the sphere ...
 assetPosition = thisR.get('asset',assetName,'world position');
@@ -164,6 +164,7 @@ if piCamBio, sceneSet(scene,'render flag','hdr');
 else,        sceneSet(scene,'gamma',0.6);
 end
 %% Change the sphere to a mirror in the future.  
+
 mirrorName = 'mirror2';
 mirror = piMaterialCreate(mirrorName, 'type', 'mirror');
 thisR.set('material', 'add', mirror);

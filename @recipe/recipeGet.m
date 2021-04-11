@@ -290,6 +290,10 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isfield(thisR.camera,'subtype')
             val = thisR.camera.subtype;
         end
+        
+        % Trying to change from perspective to pinhole (BW)
+        if isequal(val,'perspective'), val = 'pinhole'; end
+        
     case 'lookat'
         val = thisR.lookAt;
     case 'from'
@@ -467,10 +471,9 @@ switch ieParamFormat(param)  % lower case, no spaces
         %
         opticsType = thisR.get('optics type');
         switch opticsType
-            case {'pinhole','perspective'}
+            case {'pinhole'}
                 % Everything is in focus for a pinhole camera.  For
-                % pinholes and perspect this is focaldistance.  But not for
-                % realistic or omni.
+                % pinholes this is focaldistance.  But not for omni.
                 disp('No true focal distance for pinhole. This value is arbitrary');
                 if isfield(thisR.camera,'focaldistance')
                     val = thisR.camera.focaldistance.value;
@@ -521,7 +524,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         %
         opticsType = thisR.get('optics type');
         switch opticsType
-            case {'pinhole','perspective'}
+            case {'pinhole'}
                 % Calculate this from the fov, if it is not already stored.
                 if isfield(thisR.camera,'filmdistance')
                     % Worried about the units.  mm or m?  Assuming meters.

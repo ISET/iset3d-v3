@@ -43,7 +43,7 @@ thisR = piWorldFindAndReplace(thisR,'dummyTexture.exr',imageName);
 
 %% Attach a lens
 
-thisR.set('camera','realistic');
+thisR.set('camera','omni');
 thisR.set('aperture',2);  % The number of rays should go up with the aperture 
 thisR.set('film resolution',128);
 thisR.set('rays per pixel',128);
@@ -57,20 +57,20 @@ thisR.outputFile = fullfile(workingDir,[n,e]);
 
 piWrite(thisR);
 
-[oi, results] = piRender(thisR);
+oi = piRender(thisR);
 oi = oiSet(oi,'name','noCA');
 
 % Show it in ISET
-ieAddObject(oi); oiWindow;  
+oiWindow(oi);  
 
 %% Turn on chromatic aberration and render
 
-thisR.set('chromaticaberration','true');
+thisR.set('chromatic aberration','true');
 
 piWrite(thisR);
 
-[oiCA, results] = piRender(thisR);
+oiCA = piRender(thisR);
 oiCA = oiSet(oiCA,'name','CA');
 
 % Show it in ISET
-ieAddObject(oiCA); oiWindow;   
+oiWindow(oiCA);  

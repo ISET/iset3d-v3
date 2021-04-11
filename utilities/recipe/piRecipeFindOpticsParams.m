@@ -26,21 +26,10 @@ focalLength = [];
 fNumber     = [];
 metadata    = false;
 
-% filmDiag = [];
-% fov = [];
-% success = 0;
-
-switch recipe.version
-    case 2
-        if(~isfield(recipe.camera,'specfile'))
-            warning('Recipe does not contain a lens file. Therefore, optics parameters cannot be found.')
-            return;
-        end
-    case 3
-        if(~isfield(recipe.camera,'lensfile'))
-            warning('Recipe does not contain a lens file. Therefore, optics parameters cannot be found.')
-            return;
-        end
+% Should check for pinhole
+if(~isfield(recipe.camera,'lensfile'))
+    warning('Recipe does not contain a lens file. Therefore, optics parameters cannot be found.')
+    return;
 end
 
 % Now returns with the extension (json or dat)
