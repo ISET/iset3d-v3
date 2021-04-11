@@ -24,6 +24,10 @@ thisR.set('output File',tmp.outputFile);
 %% Render
 
 piWrite(thisR);
+[assetList, missingAssets,...
+    textureList, missingTextures,...
+    lightList, missingLights] = piRenderValidate(thisR);
+
 [scene, result]= piRender(thisR,'render type','radiance');
 sceneWindow(scene);
 
