@@ -250,9 +250,9 @@ classdef tree
                 newNames = obj.Node{id};
             end
             
-            while numel(newNames) >= 7 &&...
-                    isequal(newNames(4:5), 'ID')
-                newNames = newNames(7:end);
+            while numel(newNames) >= 8 &&...
+                    isequal(newNames(5:6), 'ID')
+                newNames = newNames(8:end);
             end
             
         end
