@@ -151,6 +151,8 @@ if numel(dockerSplit) == 2
             dockerWave = 400:10:700;
         case 'basisfunction'
             dockerWave = 365:5:705;
+        case 'basisfunctionfull'
+            dockerWave = 350:5:900;
     end
 end
 
