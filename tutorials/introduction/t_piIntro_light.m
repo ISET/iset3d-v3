@@ -24,7 +24,7 @@
 clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-thisR = piRecipeDefault('scene name','MacBethChecker');
+thisR = piRecipeDefault('scene name','checkerboard');
 
 %% Check the light list that came with the scene
 
@@ -90,6 +90,7 @@ thisR.get('light print');
 piCameraTranslate(thisR,'z shift',1); 
 
 piWrite(thisR);
+%%
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Equal energy (spot)');
 sceneWindow(scene);

@@ -74,10 +74,10 @@ thisR.assets.show;
 assetName = 'root';
 [~,addedSubtree1] = thisR.set('asset', assetName, 'graft', coordSubtree);
 
-% Also graft it under the blue guy node of the simple scene
-assetName = 'figure_3m_B';
-[~,addedSubtree2] = thisR.set('asset', assetName, 'graft', coordSubtree);
-thisR.assets.show;
+% % Also graft it under the blue guy node of the simple scene
+% assetName = 'figure_3m_B';
+% [~,addedSubtree2] = thisR.set('asset', assetName, 'graft', coordSubtree);
+% thisR.assets.show;
 
 %% Check the world position
 %

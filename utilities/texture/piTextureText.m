@@ -62,10 +62,11 @@ for ii=1:numel(textureParams)
          if isequal(textureParams{ii}, 'filename')
             if ~exist(fullfile(thisR.get('output dir'),thisVal),'file')
                 imgFile = which(thisVal);
-                if isempty(imgFile)
-                    warning('Texture %s not found!', thisVal)
+                if isempty(imgFile)||isequal(imgFile,'')
+                    warning('Texture %s not found!', thisVal);
+                else
+                    copyfile(imgFile,thisR.get('output dir'));
                 end
-                copyfile(imgFile,thisR.get('output dir'))
             end
          end
     end

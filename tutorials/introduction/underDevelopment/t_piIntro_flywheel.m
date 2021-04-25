@@ -36,34 +36,35 @@ if ~piDockerExists, piDockerConfig; end
 if ~piScitranExists, error('scitran installation required'); end
 
 %% Read pbrt files
-sceneName = 'checkerboard';
-FilePath = fullfile(piRootPath,'data','V3',sceneName);
-fname = fullfile(FilePath,[sceneName,'.pbrt']);
+sceneName = 'plane';
+% FilePath = fullfile(piRootPath,'data','V3',sceneName);
+fname = '/Users/zhenyi/Desktop/plane/plane.pbrt';
 if ~exist(fname,'file'), error('File not found'); end
 
-thisR = piRead(fname);
+scene = piRead(fname);
 
-
+scene.set('fov',45);
+outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
+scene.set('outputFile',outFile);
 %% get a random car and a random person from flywheel
 % take some time, maybe you dont want to run this everytime when you debug
 % assets = piFWAssetCreate('ncars',1, 'nped',1);
 st = scitran('stanfordlabs');
-subject = st.lookup('wandell/Graphics auto/assets');
-session = subject.sessions.findOne('label=car');
-inputs.ncars = 1;
-assetRecipe = piAssetDownload(session,inputs.ncars,'acquisition label','Car_085');
-
-%%
-asset.car   = piAssetAssign(assetRecipe,'label','car');
+acq = st.fw.lookup('wandell/Graphics auto/assets/car/Car_085');
+assetRecipe = piFWRecipeDownload(acq);
+asset.car = assetRecipe;
+dstDir = fullfile(iaRootPath, 'local','Car_085');
+assetRecipe.set('outputFile', fullfile(dstDir,'Car_085.pbrt'));
+% download assets
+piFWResourceDownload(acq, dstDir)
 
 %% add downloaded asset information to Render recipe.
-thisR = piAssetAddBatch(thisR, asset);
-
+scene = iaAddObject(scene, assetRecipe);
 %% Set render quality
 
 % This is a low resolution for speed.
-thisR.set('film resolution',[400 300]);
-thisR.set('pixel samples',64);
+scene.set('film resolution',[400 300]);
+scene.set('pixel samples',64);
 
 
 %% Get a sky map from Flywheel, and use it in the scene
@@ -71,7 +72,7 @@ thisTime = '16:30';
 % We will put a skymap in the local directory so people without
 % Flywheel can see the output
 if piScitranExists
-    [~, skymapInfo] = piSkymapAdd(thisR,thisTime);
+    [~, skymapInfo] = piSkymapAdd(scene,thisTime);
     
     % The skymapInfo is structured according to python rules.  We convert
     % to Matlab format here. The first cell is the acquisition ID
@@ -79,7 +80,7 @@ if piScitranExists
     s = split(skymapInfo,' ');
     
     % The destination of the skymap file
-    skyMapFile = fullfile(fileparts(thisR.outputFile),s{2});
+    skyMapFile = fullfile(fileparts(scene.outputFile),s{2});
     
     % If it exists, move on. Otherwise open up Flywheel and
     % download the skypmap file.
@@ -92,44 +93,33 @@ if piScitranExists
     end
 end
 
-% This value determines the number of ray bounces.  The scene has
-% glass we need to have at least 2 or more.  We start with only 1
-% bounce, so it will not appear like glass or mirror.
-thisR.integrator.maxdepth.value = 10;
+scene.set('max depth',10);
 
 %% This adds materials to all assets in this scene
-thisR.materials.lib=piMateriallib;
-piMaterialGroupAssign(thisR);   % We like the glass better this way.
 
-%
-colorkd = piColorPick('red');
+piAutoMaterialGroupAssign(scene);  
+
+%%
+colorkd = piColorPick('black');
 name = 'HDM_06_002_carbody_black';
-material = thisR.materials.list.(name);    % A string labeling the material
-target = thisR.materials.lib.carpaint;  % This is the assignment
-piMaterialAssign(thisR,material.name,target,'colorkd',colorkd);
-
+% material = scene.materials.list.(name);    % A string labeling the material
+% target = scene.materials.lib.carpaint;  % This is the assignment
+% piMaterialAssign(scene,material.name,target,'colorkd',colorkd);
+scene.set('material',name,'kd value',colorkd);
 % Assign a nice position.
-thisR.assets.groupobjs(end).position = [3.5 0 -2]';
+scene.set('asset','0004ID_HDM_06_002_B','translation',[3.5 0 -2]);
+%% Write out the pbrt scene file, based on scene.
 
-%% Write out the pbrt scene file, based on thisR.
 
-thisR.set('fov',45);
-thisR.film.diagonal.value = 10;
-thisR.film.diagonal.type  = 'float';
-thisR.integrator.subtype = 'bdpt';  
-thisR.sampler.subtype = 'sobol';
-% Changing the name!!!!  Important to comment and explain!!! ZL, BW
-outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
-thisR.set('outputFile',outFile);
 
-piWrite(thisR,'creatematerials',true);
+piWrite(scene,'creatematerials',true);
 
 %% Render.
 
 % Maybe we should speed this up by only returning radiance.
-[scene, result] = piRender(thisR,'render type','radiance');
+[renderingScene, result] = piRender(scene,'render type','radiance');
 
-scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
-sceneWindow(scene);
-sceneSet(scene,'display mode','hdr');         
+renderingScene = sceneSet(renderingScene,'name',sprintf('Time: %s',thisTime));
+sceneWindow(renderingScene);
+sceneSet(renderingScene,'display mode','hdr');         
 %% END

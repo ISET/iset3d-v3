@@ -21,7 +21,7 @@ for ii = 1:chs
     img_sp(:,:,3) = img_sp(:,:,1);
     writePFM(img_sp, outputTmp);
     cmd  = [oidn_pth, '/denoise -hdr ', outputTmp, ' -o ',DNImg_pth];
-    system(cmd);
+    [status, results]=system(cmd);
     DNImg = readPFM(DNImg_pth);
     NewEnergy(:,:,ii) = DNImg(:,:,1).* max2(energy(:,:,ii));
     fprintf('Denoise: Spectral Plane: %d \n', 400+(ii-1)*10);

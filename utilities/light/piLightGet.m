@@ -79,9 +79,11 @@ if isfield(lght, pName)
     elseif isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
         val = lght.(pName).value;
     end
+elseif strcmpi(lght.type, 'infinite')
+    % do nothing
 else
     warning('Parameter: %s does not exist in light type: %s',...
-        param, light.type);
+        param, lght.type);
 end
 
 %% compose pbrt text
@@ -158,12 +160,21 @@ if pbrtText && ~isempty(val) &&...
             %}
             txt = {}; % Change to cells
             
-            for ii=1:numel(val)
+            if iscell(val)
                 curRot = val{ii};
-                curRot = curRot(:)';
-                txt{end + 1} = sprintf('Rotate %.3f %d %d %d', curRot(1),...
-                    curRot(2), curRot(3), curRot(4));
+            else
+                curRot = val;
             end
+            [rows, cols] = size(curRot);
+            if rows>cols
+                curRot = curRot';
+            end
+            for rr = 1:3
+                thisRot = curRot(rr,:);
+                txt{end + 1} = sprintf('Rotate %.3f %d %d %d', thisRot(1),...
+                    thisRot(2), thisRot(3), thisRot(4));
+            end
+            
         case 'ctform'
             for ii=1:numel(val)
                 txt{end + 1} = sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', val{ii}(:));
