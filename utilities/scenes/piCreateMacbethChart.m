@@ -41,7 +41,7 @@ inputs = p.Results;
 
 macbethRecipe = recipe();
 
-camera = piCameraCreate('perspective');
+camera = piCameraCreate('pinhole');
 macbethRecipe.recipeSet('camera',camera);
 macbethRecipe.set('fov',45);
 
