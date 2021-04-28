@@ -28,8 +28,8 @@ function workingDir = piWrite(thisR,varargin)
 %   overwrite pbrtfile  - If scene PBRT file exists,    overwrite (default true)
 %   overwrite resources - If the resources files exist, overwrite (default true) 
 %   overwrite lensfile  - Logical. Default true  
-%   overwrite materials - Logical. Default true
-%   overwrite geometry  - Logical. Default true
+%   Deprecated overwrite materials - Logical. Default true
+%   Deprecated overwrite geometry  - Logical. Default true
 %   overwrite json      - Logical. Default true
 %   creatematerials     - Logical. Default false
 %   lightsFlag         
@@ -107,10 +107,10 @@ p.addParameter('overwritelensfile',true,@islogical);
 p.addParameter('overwritematerials',true,@islogical);
 
 % Overwrite geometry.pbrt
-p.addParameter('overwritegeometry',true,@islogical);
+% p.addParameter('overwritegeometry',true,@islogical);
 
 % Create a new materials.pbrt
-p.addParameter('creatematerials',false,@islogical);
+% p.addParameter('creatematerials',false,@islogical);
 
 % control lighting in geomtery.pbrt
 p.addParameter('lightsflag',false,@islogical);
@@ -132,8 +132,8 @@ overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
-overwritegeometry   = p.Results.overwritegeometry;
-creatematerials     = p.Results.creatematerials;
+% overwritegeometry   = p.Results.overwritegeometry;
+% creatematerials     = p.Results.creatematerials;
 lightsFlag          = p.Results.lightsflag;
 thistrafficflow     = p.Results.thistrafficflow;
 overwritejson       = p.Results.overwritejson;
@@ -573,7 +573,7 @@ end
 end
 
 %%
-function piIncludeLines(thisR,fileID, creatematerials,overwritegeometry)
+function piIncludeLines(thisR,fileID) % , creatematerials,overwritegeometry)
 % Insert the 'Include scene_materials.pbrt' and similarly for geometry and
 % lights into the main scene file 
 %
@@ -584,8 +584,17 @@ if isequal(thisR.exporter, 'Copy')
     end
     return;
 end
+
+% See if there is an Include geometry.
+% If there is no geometry file, add a geometry file.
+%
+% Find the index of the Include geometry file.  Add the materials above the
+% geometry.
+%
+% Add the lights at the end.
+
 % We may have created new materials in ISET3d. We insert 'Include' for
-% materials, geometry, and lights.
+% materials, geometry, and lights in that order.
 if ~(numel(find(contains(thisR.world, {'_materials.pbrt', 'Include'}),2))==2)
     if ~isempty(thisR.materials.list)
         [~,n] = fileparts(thisR.outputFile);
@@ -593,6 +602,8 @@ if ~(numel(find(contains(thisR.world, {'_materials.pbrt', 'Include'}),2))==2)
         thisR.world{end+1} = 'WorldEnd';
     end
 end
+
+% Geometry will also be included after materials, which is good
 if ~(numel(find(contains(thisR.world, {'_geometry.pbrt', 'Include'}),2))==2)
     if ~isempty(thisR.assets)
         [~,n] = fileparts(thisR.outputFile);
@@ -600,6 +611,21 @@ if ~(numel(find(contains(thisR.world, {'_geometry.pbrt', 'Include'}),2))==2)
         thisR.world{end+1} = 'WorldEnd';
     end
 end
+
+% Put the lights in one line before the WorldEnd
+for ii = 1:length(thisR.world)
+    currLine = thisR.world{ii};
+    if piContains(currLine, 'WorldEnd')
+        % We also insert a *_lights.pbrt include because we also write
+        % out the lights file.  This file might be empty, but it will
+        % also exist.
+        [~,n] = fileparts(thisR.outputFile);
+        fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
+    end
+    fprintf(fileID,'%s \n',currLine);
+end
+
+%{
 if creatematerials
 
     for ii = 1:length(thisR.world)
@@ -657,6 +683,7 @@ else
         fprintf(fileID,'%s \n',currLine);
     end
 end
+%}
 end
 
 %%
