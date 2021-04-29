@@ -107,7 +107,7 @@ p.addParameter('overwritelensfile',true,@islogical);
 p.addParameter('overwritematerials',true,@islogical);
 
 % Overwrite geometry.pbrt
-% p.addParameter('overwritegeometry',true,@islogical);
+p.addParameter('overwritegeometry',true,@islogical);
 
 % Create a new materials.pbrt
 % p.addParameter('creatematerials',false,@islogical);
@@ -132,7 +132,7 @@ overwriteresources  = p.Results.overwriteresources;
 overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
-% overwritegeometry   = p.Results.overwritegeometry;
+overwritegeometry   = p.Results.overwritegeometry;
 % creatematerials     = p.Results.creatematerials;
 lightsFlag          = p.Results.lightsflag;
 thistrafficflow     = p.Results.thistrafficflow;
@@ -190,7 +190,7 @@ piWriteTransformTimes(thisR, fileID);
 piWriteBlocks(thisR,fileID);
 
 %% Add 'Include' lines for materials, geometry and lights into the scene PBRT file
-piIncludeLines(thisR,fileID, creatematerials,overwritegeometry);
+piIncludeLines(thisR,fileID);
 
 %% We won't do anything below this if the exporter is copy
 if isequal(thisR.exporter, 'Copy')
@@ -209,7 +209,7 @@ piLightWrite(thisR);
 fclose(fileID);
 
 %% Write scene_materials.pbrt
-piWriteMaterials(thisR,creatematerials,overwritematerials);
+piWriteMaterials(thisR,overwritematerials);
 
 %% Overwrite geometry.pbrt
 piWriteGeometry(thisR,overwritegeometry,lightsFlag,thistrafficflow)
@@ -588,34 +588,54 @@ end
 % See if there is an Include geometry.
 % If there is no geometry file, add a geometry file.
 %
-% Find the index of the Include geometry file.  Add the materials above the
+% Find the index of the Include geometry file.  
+if ~(numel(find(contains(thisR.world, {'_geometry.pbrt'}),2))==1)
+    if ~isempty(thisR.assets)
+        [~,n] = fileparts(thisR.outputFile);
+        thisR.world{end} = sprintf('Include "%s_geometry.pbrt"', n);
+        thisR.world{end+1} = 'WorldEnd';
+    end
+end
+% Add the materials above the
 % geometry.
 %
 % Add the lights at the end.
 
 % We may have created new materials in ISET3d. We insert 'Include' for
 % materials, geometry, and lights in that order.
-if ~(numel(find(contains(thisR.world, {'_materials.pbrt', 'Include'}),2))==2)
-    if ~isempty(thisR.materials.list)
+% if ~(numel(find(contains(thisR.world, {'_materials.pbrt', 'Include'}),2))==2)
+%     if ~isempty(thisR.materials.list)
+%         [~,n] = fileparts(thisR.outputFile);
+%         thisR.world{end}= sprintf('Include "%s_materials.pbrt" \n', n);
+%         thisR.world{end+1} = 'WorldEnd';
+%     end
+% end
+% Put the materials in one line before the geometry
+nlines_world =length(thisR.world);
+for ii = 1:nlines_world
+    currLine = thisR.world{ii};
+    if (numel(find(contains(currLine, {'_geometry.pbrt'}),2))==1) && ...
+            ~(numel(find(contains(thisR.world, {'_materials.pbrt'}),2))==1)
+        % We also insert a *_lights.pbrt include because we also write
+        % out the lights file.  This file might be empty, but it will
+        % also exist.
         [~,n] = fileparts(thisR.outputFile);
-        thisR.world{end}= sprintf('Include "%s_materials.pbrt" \n', n);
-        thisR.world{end+1} = 'WorldEnd';
+        tmpWorld(1:ii-1,:) = thisR.world(1:ii-1,:);
+        % insert material line
+        tmpWorld{ii} = sprintf('Include "%s_materials.pbrt"', n);
+        % copy rest of the world
+        tmpWorld(ii+1:nlines_world+1,:) = thisR.world(ii:nlines_world,:);
+        thisR.world = tmpWorld;
+        break;
     end
 end
-
 % Geometry will also be included after materials, which is good
-if ~(numel(find(contains(thisR.world, {'_geometry.pbrt', 'Include'}),2))==2)
-    if ~isempty(thisR.assets)
-        [~,n] = fileparts(thisR.outputFile);
-        thisR.world{end} = sprintf('Include "%s_geometry.pbrt" \n', n);
-        thisR.world{end+1} = 'WorldEnd';
-    end
-end
 
 % Put the lights in one line before the WorldEnd
 for ii = 1:length(thisR.world)
     currLine = thisR.world{ii};
-    if piContains(currLine, 'WorldEnd')
+    if piContains(currLine, 'WorldEnd') && ...
+            ~(numel(find(contains(thisR.world, {'_lights.pbrt'}),2))==1)
         % We also insert a *_lights.pbrt include because we also write
         % out the lights file.  This file might be empty, but it will
         % also exist.
@@ -687,32 +707,32 @@ end
 end
 
 %%
-function piWriteMaterials(thisR,creatematerials,overwritematerials)
+function piWriteMaterials(thisR,overwritematerials)
 % Write both materials and textures files into the output directory
 
 outputDir  = thisR.get('output dir');
 
 % If the scene is from Cinema 4D,
-if ~creatematerials
-    % We overwrite from the input directory, but we do not create
-    % any new material files beyond what is already in the input
-    if overwritematerials
-        [~,n] = fileparts(thisR.inputFile);
-        fname_materials = sprintf('%s_materials.pbrt',n);
-        % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
-        thisR.set('materials output file',fullfile(outputDir,fname_materials));
-        piMaterialWrite(thisR);
-    end
-else
-    % Create new material files that could come from somewhere
-    % other than the input directory.
-    [~,n] = fileparts(thisR.outputFile);
+% if ~creatematerials
+% We overwrite from the input directory, but we do not create
+% any new material files beyond what is already in the input
+if overwritematerials
+    [~,n] = fileparts(thisR.inputFile);
     fname_materials = sprintf('%s_materials.pbrt',n);
-    thisR.set('materials output file',fullfile(outputDir,fname_materials));
-    
     % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
+    thisR.set('materials output file',fullfile(outputDir,fname_materials));
     piMaterialWrite(thisR);
 end
+% else
+%     % Create new material files that could come from somewhere
+%     % other than the input directory.
+%     [~,n] = fileparts(thisR.outputFile);
+%     fname_materials = sprintf('%s_materials.pbrt',n);
+%     thisR.set('materials output file',fullfile(outputDir,fname_materials));
+%
+%     % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
+%     piMaterialWrite(thisR);
+% end
 
 
 end
