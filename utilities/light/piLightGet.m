@@ -150,29 +150,23 @@ if pbrtText && ~isempty(val) &&...
                     val{ii}(3));
             end
         case 'rotation'
-            % Copying from Zhenyi's code, Which does not account for multiple
-            % rotations I think
-            %{
-                % might remove this;
-                if iscell(rotate)
-                    rotate = rotate{1};
-                end
-            %}
-            txt = {}; % Change to cells
+            % piLightGet(lgt,'rotation')
             
             if iscell(val)
+            else, val = {val};
+            end
+            txt = cell(1,numel(val));
+
+            for ii=1:numel(val)
                 curRot = val{ii};
-            else
-                curRot = val;
-            end
-            [rows, cols] = size(curRot);
-            if rows>cols
-                curRot = curRot';
-            end
-            for rr = 1:3
-                thisRot = curRot(rr,:);
-                txt{end + 1} = sprintf('Rotate %.3f %d %d %d', thisRot(1),...
-                    thisRot(2), thisRot(3), thisRot(4));
+                
+                [rows, cols] = size(curRot);
+                if rows>cols
+                    curRot = curRot';
+                end
+                txt{ii} = sprintf('Rotate %.3f %d %d %d', curRot(1),...
+                    curRot(2), curRot(3), curRot(4));
+                
             end
             
         case 'ctform'

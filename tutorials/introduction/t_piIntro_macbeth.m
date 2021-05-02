@@ -65,7 +65,7 @@ thisR.set('filmresolution', [640, 360]);
 %
 % Write modified recipe out.  We changed the materials, so we overwrite the
 % material file.
-piWrite(thisR, 'overwritematerials', true);
+piWrite(thisR);
 
 %% Render and display.
 %

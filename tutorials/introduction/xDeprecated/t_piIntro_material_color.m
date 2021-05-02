@@ -36,7 +36,7 @@ thisR.set('fov',45);
 thisR.set('film diagonal',10);
 thisR.set('integrator subtype','bdpt');
 thisR.set('sampler subtype','sobol');
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render
 scene = piRender(thisR);
@@ -84,7 +84,7 @@ piMaterialAssign(thisR,partName,target);
 
 % Because we changed the material assignment, we need to set the
 % 'creatematerials' argument to true
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render
 scene = piRender(thisR);
@@ -105,7 +105,7 @@ target.rgbkd = [0 1 1]; %cyan color
 piMaterialAssign(thisR,personName,target);
 
 % Write and render
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('Changed front person to have cyan plastic material'));
 sceneWindow(scene);

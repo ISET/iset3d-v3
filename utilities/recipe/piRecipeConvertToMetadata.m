@@ -26,7 +26,16 @@ metadataRecipe = copy(recipe);
 %% Adjust the recipe values
 
 if strcmp(metadata, 'illuminant') || strcmp(metadata, 'illuminantonly')
+    % To estimate the illuminant, we write a new materials with a
+    % white, matte surface.
     fprintf('Creating matte white surface version of the scene.\n');
+
+    % Change the file name so we do not overwite the radiance materials
+    % file.  The illuminant case sets all the materials to matte white.
+    oFile = metadataRecipe.get('output basename');
+    oDir  = metadataRecipe.get('output dir');
+    metadataRecipe.set('output file',fullfile(oDir,[oFile,'_illuminant.pbrt']));
+
     totalReflection = metadataRecipe.materials.lib.totalreflect;
     
     % piMaterialTotalAssign(thisR)
@@ -37,7 +46,8 @@ if strcmp(metadata, 'illuminant') || strcmp(metadata, 'illuminantonly')
         metadataRecipe.materials.list{ii} = totalReflection;
     end
     
-else
+    
+else % mesh or depth will come this way
 
     % Assign metadata integrator
     if(recipe.version == 3)

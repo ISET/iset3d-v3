@@ -49,7 +49,7 @@ thisR.set('fov',45);
 % piMaterialGroupAssign(thisR);
 
 %% Write out the pbrt scene file, based on thisR.
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render the scene with no camera motion
 %
@@ -81,7 +81,7 @@ thisR.set('camera motion translate end',endPos);
 thisR.set('camera motion rotate end',piRotationMatrix);
 
 % Write and render
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: Translation');
 sceneWindow(scene);
@@ -100,7 +100,7 @@ thisR.set('camera motion translate end',endPos);
 thisR.set('camera motion rotate end',endRotation);
 
 %% Write an render
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','Camera Motionblur: rotation');
 sceneWindow(scene);

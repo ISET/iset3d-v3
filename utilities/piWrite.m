@@ -90,10 +90,6 @@ p = inputParser;
 
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 
-% % JNM -- Why format variables twice?
-% % Format the parameters by removing spaces and forcing lower case.
-% if ~isempty(varargin), varargin = ieParamFormat(varargin); end
-
 % Copy over the whole directory
 p.addParameter('overwriteresources', true,@islogical);
 
@@ -118,9 +114,6 @@ p.addParameter('lightsflag',false,@islogical);
 % Read trafficflow variable
 p.addParameter('thistrafficflow',[]);
 
-% Second rendering for reflectance calculation
-% p.addParameter('reflectancerender',false,@islogical);
-
 % Store JSON recipe for the traffic scenes
 p.addParameter('overwritejson',true,@islogical);
 
@@ -133,7 +126,9 @@ overwritepbrtfile   = p.Results.overwritepbrtfile;
 overwritelensfile   = p.Results.overwritelensfile;
 overwritematerials  = p.Results.overwritematerials;
 overwritegeometry   = p.Results.overwritegeometry;
+
 % creatematerials     = p.Results.creatematerials;
+
 lightsFlag          = p.Results.lightsflag;
 thistrafficflow     = p.Results.thistrafficflow;
 overwritejson       = p.Results.overwritejson;
@@ -456,7 +451,8 @@ for ofns = outerFields'
                     currentMedium = thisR.media.list;
                 end
            end           
-           fprintf(fileID,'MakeNamedMedium "%s" "string type" "water" "string absFile" "spds/%s_abs.spd" "string vsfFile" "spds/%s_vsf.spd"\n',currentMedium.name,...
+           fprintf(fileID,'MakeNamedMedium "%s" "string type" "water" "string absFile" "spds/%s_abs.spd" "string vsfFile" "spds/%s_vsf.spd"\n', ...
+               currentMedium.name,...
                currentMedium.name,currentMedium.name);
            fprintf(fileID,'MediumInterface "" "%s"\n',currentMedium.name);
        end
@@ -513,10 +509,10 @@ for ofns = outerFields'
                 % only if the file is in lens folder
                 if ~isempty(which(currValue))
                     if(~isempty(ext))
-                        % This looks like a file with an extension. If it is a
-                        % lens file or an iorX.spd file, indicate that it is in
-                        % the lens/ directory. Otherwise, copy the file to the
-                        % working directory.
+                        % This looks like a file with an extension. If it
+                        % is a lens file or an iorX.spd file, indicate that
+                        % it is in the lens/ directory. Otherwise, copy the
+                        % file to the working directory.
                         
                         fileName = strcat(name,ext);
                         if strcmp(ifn,'specfile') || strcmp(ifn,'lensfile')
@@ -573,11 +569,14 @@ end
 end
 
 %%
-function piIncludeLines(thisR,fileID) % , creatematerials,overwritegeometry)
+function piIncludeLines(thisR,fileID) 
 % Insert the 'Include scene_materials.pbrt' and similarly for geometry and
 % lights into the main scene file 
 %
+% We must add the materials before the geometry.
+% We add the lights at the end.
 
+% For the Copy case, we just copy the world.
 if isequal(thisR.exporter, 'Copy')
     for ii = 1:numel(thisR.world)
         fprintf(fileID,'%s \n',thisR.world{ii});
@@ -585,155 +584,119 @@ if isequal(thisR.exporter, 'Copy')
     return;
 end
 
-% See if there is an Include geometry.
-% If there is no geometry file, add a geometry file.
-%
-% Find the index of the Include geometry file.  
-if ~(numel(find(contains(thisR.world, {'_geometry.pbrt'}),2))==1)
-    if ~isempty(thisR.assets)
-        [~,n] = fileparts(thisR.outputFile);
-        thisR.world{end} = sprintf('Include "%s_geometry.pbrt"', n);
-        thisR.world{end+1} = 'WorldEnd';
-    end
-end
-% Add the materials above the
-% geometry.
-%
-% Add the lights at the end.
+%% Delete any World lines with _geometry, _materials, _lights
 
-% We may have created new materials in ISET3d. We insert 'Include' for
-% materials, geometry, and lights in that order.
-% if ~(numel(find(contains(thisR.world, {'_materials.pbrt', 'Include'}),2))==2)
-%     if ~isempty(thisR.materials.list)
-%         [~,n] = fileparts(thisR.outputFile);
-%         thisR.world{end}= sprintf('Include "%s_materials.pbrt" \n', n);
-%         thisR.world{end+1} = 'WorldEnd';
-%     end
-% end
-% Put the materials in one line before the geometry
+% We are being aggressive about the Include files.  We want to name them
+% ourselves.  First we see whether we have Includes for these at all
+lineMaterials = find(contains(thisR.world, {'_materials.pbrt'}));
+lineGeometry  = find(contains(thisR.world, {'_geometry.pbrt'}));
+lineLights    = find(contains(thisR.world, {'_lights.pbrt'}));
+
+basename = thisR.get('output basename');
+
+% If we have  geometry Include, we overwrite it with the name we want.
+if ~isempty(lineGeometry)
+    thisR.world{lineGeometry} = sprintf('Include "%s_geometry.pbrt" \n', basename);
+end
+
+% If we have materials Include, we overwrite it.
+% end.
+if ~isempty(lineMaterials)
+    thisR.world{lineMaterials} = sprintf('Include "%s_materials.pbrt" \n',basename);        
+end
+
+% We think nobody except us has these lights files.  So this will never get
+% executed.
+if ~isempty(lineLights)
+    thisR.world(lineLights) = sprintf('Include "%s_lights.pbrt" \n', basename);
+end
+
+%% Insert the _materials, _geometry, _lights Includes just prior to WorldEnd 
+
+% This what we used to do.
+
+%{
+% See if there is an Include geometry. If not, add an Include geometry
+% file. How many _geometry.pbrt references?
+basename = thisR.get('output basename');
+nGeometry = numel(find(contains(thisR.world, {[basename,'_geometry.pbrt']})));
+switch nGeometry
+    case 0
+        if ~isempty(thisR.assets)
+            basename = thisR.get('output basename');
+            thisR.world{end} = sprintf('Include "%s_geometry.pbrt"', basename);
+            thisR.world{end+1} = 'WorldEnd';
+        end
+    case 1
+        % That's good.  One Include xxx_geometry.pbrt
+    otherwise
+        error('More than one _geometry.pbrt in the World Section');
+end
+
+% We walk through each of the lines in the world.  When we get to the line
+% that has the Include xxx_geometry, and the World does not also include
+% xxx_materials.pbrt, we insert a Include xxx_materials line.
 nlines_world =length(thisR.world);
 for ii = 1:nlines_world
     currLine = thisR.world{ii};
-    if (numel(find(contains(currLine, {'_geometry.pbrt'}),2))==1) && ...
-            ~(numel(find(contains(thisR.world, {'_materials.pbrt'}),2))==1)
-        % We also insert a *_lights.pbrt include because we also write
-        % out the lights file.  This file might be empty, but it will
-        % also exist.
-        [~,n] = fileparts(thisR.outputFile);
+
+    % If the current line contains the geometry include, and there is no
+    % xxx_materials.pbrt anywhere in the world, we add the Include of the
+    % xxx_materials.pbrt file.  We are careful to place the materials
+    % include earlier than the geometry file.
+    if (numel(find(contains(currLine, {[basename,'_geometry.pbrt']})))==1) && ...
+            ~(numel(find(contains(thisR.world, {[basename,'_materials.pbrt']})))==1)
+        
+        % Find the name of the output file
+        % [~,n] = fileparts(thisR.outputFile);
+        % Save the world lines prior to this geometry.pbrt line
         tmpWorld(1:ii-1,:) = thisR.world(1:ii-1,:);
-        % insert material line
-        tmpWorld{ii} = sprintf('Include "%s_materials.pbrt"', n);
-        % copy rest of the world
+        
+        % Add the material include line
+        tmpWorld{ii} = sprintf('Include "%s_materials.pbrt"', basename); %#ok<AGROW>
+        
+        % Copy rest of the world, including this currLine, and put the
+        % whole thing back into thisR.world.
         tmpWorld(ii+1:nlines_world+1,:) = thisR.world(ii:nlines_world,:);
         thisR.world = tmpWorld;
         break;
     end
 end
-% Geometry will also be included after materials, which is good
+%}
 
-% Put the lights in one line before the WorldEnd
+% We write out the World information. 
+% We insert the Include lines as the last three before  WorldEnd. 
 for ii = 1:length(thisR.world)
-    currLine = thisR.world{ii};
-    if piContains(currLine, 'WorldEnd') && ...
-            ~(numel(find(contains(thisR.world, {'_lights.pbrt'}),2))==1)
-        % We also insert a *_lights.pbrt include because we also write
-        % out the lights file.  This file might be empty, but it will
-        % also exist.
-        [~,n] = fileparts(thisR.outputFile);
-        fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
-    end
-    fprintf(fileID,'%s \n',currLine);
-end
-
-%{
-if creatematerials
-
-    for ii = 1:length(thisR.world)
-        currLine = thisR.world{ii};
-        
-        if piContains(currLine, 'materials.pbrt')
-            [~,n] = fileparts(thisR.outputFile);
-            currLine = sprintf('Include "%s_materials.pbrt"',n);
-        end
-           
-        if overwritegeometry
-            % We get here if we generated the geometry file from the
-            % recipe, even though we did not make any changes to the
-            % materials.
-            if piContains(currLine, 'geometry.pbrt')
-                    [~,n] = fileparts(thisR.outputFile);
-                    currLine =  sprintf('Include "%s_geometry.pbrt"', n);
-            end
-        end
-        
-        if piContains(currLine, 'WorldEnd')
-            % We also insert a *_lights.pbrt include because we also write
-            % out the lights file.  This file might be empty, but it will
-            % also exist.
-            [~,n] = fileparts(thisR.outputFile);
-            fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
-        end
-        fprintf(fileID,'%s \n',currLine);
+    currLine = thisR.world{ii};    
+    if piContains(currLine, 'WorldEnd') && isempty(lineLights)
+        % Insert the lights file.
+        fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', basename));
     end
     
-else
-    % No materials were created by ISET3d.
-    % So we skip the 'Include *_materials.pbrt.  But we still insert the
-    % geometry and light Includes
-    for ii = 1:length(thisR.world)
-        currLine = thisR.world{ii};
-        
-        if overwritegeometry
-            % We get here if we generated the geometry file from the
-            % recipe, even though we did not make any changes to the
-            % materials.
-            if piContains(currLine, 'geometry.pbrt')
-                [~,n] = fileparts(thisR.outputFile);
-                currLine =  sprintf('Include "%s_geometry.pbrt" \n', n);
-            end
-        end
-        
-        if piContains(currLine, 'WorldEnd')
-            % We also insert a *_lights.pbrt include because we also write
-            % out the lights file.  This file might be empty, but it will
-            % also exist.
-            [~,n] = fileparts(thisR.outputFile);
-            fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', n));
-        end
-        fprintf(fileID,'%s \n',currLine);
+    fprintf(fileID,'%s \n',currLine);
+    
+    if piContains(currLine,'WorldBegin') && isempty(lineMaterials)
+        % Insert the materials file
+        fprintf(fileID,'%s \n',sprintf('Include "%s_materials.pbrt" \n', basename));
     end
 end
-%}
+
 end
 
 %%
 function piWriteMaterials(thisR,overwritematerials)
 % Write both materials and textures files into the output directory
 
-outputDir  = thisR.get('output dir');
-
-% If the scene is from Cinema 4D,
-% if ~creatematerials
-% We overwrite from the input directory, but we do not create
-% any new material files beyond what is already in the input
+% We create the materials file.  Its name is the same as the output pbrt
+% file, but it has an _materials inserted.
 if overwritematerials
-    [~,n] = fileparts(thisR.inputFile);
-    fname_materials = sprintf('%s_materials.pbrt',n);
-    % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
+    outputDir  = thisR.get('output dir');
+    basename   = thisR.get('output basename');
+    % [~,n] = fileparts(thisR.inputFile);
+    fname_materials = sprintf('%s_materials.pbrt',basename);
     thisR.set('materials output file',fullfile(outputDir,fname_materials));
     piMaterialWrite(thisR);
 end
-% else
-%     % Create new material files that could come from somewhere
-%     % other than the input directory.
-%     [~,n] = fileparts(thisR.outputFile);
-%     fname_materials = sprintf('%s_materials.pbrt',n);
-%     thisR.set('materials output file',fullfile(outputDir,fname_materials));
-%
-%     % thisR.materials.outputFile_materials = fullfile(outputDir,fname_materials);
-%     piMaterialWrite(thisR);
-% end
-
 
 end
 

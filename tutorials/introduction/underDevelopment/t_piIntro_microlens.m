@@ -141,7 +141,7 @@ thisR.summarize('all');
 %% Render and display
 
 % Change this for depth of field effects.
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 [oi, result] = piRender(thisR,'render type','radiance');
 

@@ -91,7 +91,7 @@ thisR.set('aperture diameter',2);   % thisR.summarize('all');
 %% Render and display
 
 % Change this for depth of field effects.
-piWrite(thisR,'creatematerials',true,'overwritejson',false);
+piWrite(thisR,'overwritejson',false);
 
 %%
 oi = piRender(thisR,'render type','radiance');

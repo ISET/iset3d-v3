@@ -88,7 +88,7 @@ thisR.set('nbounces',1);
 %% Write the recipe with the lens and render.
 %
 % The output is an optical image.
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 oi = piRender(thisR,'render type','radiance');
 oiWindow(oi);
 oiSet(oi,'gamma',0.5);
