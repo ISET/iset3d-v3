@@ -151,24 +151,27 @@ if pbrtText && ~isempty(val) &&...
             end
         case 'rotation'
             % piLightGet(lgt,'rotation')
-            
-            if iscell(val)
-            else, val = {val};
-            end
-            txt = cell(1,numel(val));
 
-            for ii=1:numel(val)
-                curRot = val{ii};
-                
+            % val can be a cell array
+            if ~iscell(val)
+                val = {val};
+            end
+            for ii = 1:numel(val)
+
+                    curRot = val{ii};
+
+                end
                 [rows, cols] = size(curRot);
                 if rows>cols
                     curRot = curRot';
+                    rows = cols;
                 end
-                txt{ii} = sprintf('Rotate %.3f %d %d %d', curRot(1),...
-                    curRot(2), curRot(3), curRot(4));
-                
+                for rr = 1:rows
+                    thisRot = curRot(rr,:);
+                    txt{end + 1} = sprintf('Rotate %.3f %d %d %d', thisRot(1),...
+                        thisRot(2), thisRot(3), thisRot(4));
+                end
             end
-            
         case 'ctform'
             for ii=1:numel(val)
                 txt{end + 1} = sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', val{ii}(:));
