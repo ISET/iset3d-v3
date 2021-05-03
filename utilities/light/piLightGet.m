@@ -157,10 +157,7 @@ if pbrtText && ~isempty(val) &&...
                 val = {val};
             end
             for ii = 1:numel(val)
-
-                    curRot = val{ii};
-
-                end
+                curRot = val{ii};
                 [rows, cols] = size(curRot);
                 if rows>cols
                     curRot = curRot';

@@ -51,7 +51,7 @@ for ii = 1:chs
     [status, results]=system(cmd);
     DNImg = readPFM(DNImg_pth);
     NewEnergy(:,:,ii) = DNImg(:,:,1).* max2(energy(:,:,ii));
-    waitbar(ii/chs, h,sprintf('Denoise Spectral Plane: %d \n', 400+(ii-1)*10));
+    waitbar(ii/chs, h,sprintf('Denoise Spectral Plane: %d nm \n', 400+(ii-1)*10));
 end
 
 close(h);
