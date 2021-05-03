@@ -1,6 +1,6 @@
-%% Render using a lens plus a microlens - a lightfield camera
+%% Render using a lightfield camera - lens and microlens array
 %
-% Set up to work with the Chess Set scene.
+%   Set up to work with the Chess Set scene.
 %
 % Dependencies:
 %    ISET3d, ISETCam, JSONio, isetlens
@@ -9,24 +9,21 @@
 %
 %    docker pull vistalab/pbrt-v3-spectral
 %
+% This script uses the docker container in two ways.  Once to build the
+% lens file and a second way to render radiance and depth. 
+%
 % ZL, BW SCIEN 2018
 %
 % See also
 %   t_piIntro_*
-
-%% Problem (11/01/20, DHB): This won't run if isetbio is on the path before
-%                           isetcam, because RGB.mat isn't available and
-%                           the sensorCreate needs it.  I could fix that,
-%                           and indeed did temporarily, but it still broke
-%                           because some call to sensorSet from
-%                           sensorLightfield tried to set an unknown
-%                           parameter.
 
 %% Initialize ISET and Docker
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 if isempty(which('lensC')), error('You must add the isetlens repository to your path'); end
+
+if ~piCamBio, error('Requires ISETCam, not ISETBio'); end
 
 % Run this from the local directorys
 chdir(fullfile(piRootPath,'local'))
