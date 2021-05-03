@@ -125,7 +125,7 @@ thisR.set('from', lookAt.from + [1;0;0]);
 % <name>_stereo_geometry.pbrt.  This will be part of the new
 % information we upload along with the new recipe file.
 %
-piWrite(thisR,'creatematerials',true,...
+piWrite(thisR,...
    'overwriteresources',false,'lightsFlag',false);
 
 %% Upload the information to Flywheel

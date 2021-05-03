@@ -139,7 +139,7 @@ for ii = 1:length(subject.sessions())
             % There is a new camera position that is stored in the
             % <sceneName_position>.pbrt file.  Everything including
             % the lens file should get stored with this piWrite.
-            piWrite(tmpRecipe,'creatematerials',true,...
+            piWrite(tmpRecipe,...
                 'overwriteresources',false,'lightsFlag',false);
 
             % Upload the information to Flywheel

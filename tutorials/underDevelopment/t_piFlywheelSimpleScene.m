@@ -56,7 +56,7 @@ renderSubject = 'simple test';
 renderSession = 'checkerboard';
 
 %% Write out the recipe for cgresources
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %{
 %% Upload the assets to FW for fwInfoList
@@ -150,7 +150,7 @@ for pp = 1:size(deltaPosition,1)
     thisR.set('to', lookAt.to + deltaPosition(pp,:));
     % There is a new camera position that is stored in the
     % <sceneName_position>.pbrt file.
-    piWrite(thisR,'creatematerials',true,...
+    piWrite(thisR,...
         'overwriteresources',false,'lightsFlag',false);
     
     % Upload the information to Flywheel

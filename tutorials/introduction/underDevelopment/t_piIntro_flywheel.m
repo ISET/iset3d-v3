@@ -108,13 +108,10 @@ name = 'HDM_06_002_carbody_black';
 scene.set('material',name,'kd value',colorkd);
 % Assign a nice position.
 scene.set('asset','0004ID_HDM_06_002_B','translation',[3.5 0 -2]);
-%% Write out the pbrt scene file, based on scene.
 
+%% Write out the pbrt scene file, based on scene, and render
 
-
-piWrite(scene,'creatematerials',true);
-
-%% Render.
+piWrite(scene);
 
 % Maybe we should speed this up by only returning radiance.
 [renderingScene, result] = piRender(scene,'render type','radiance');

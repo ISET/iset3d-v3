@@ -94,7 +94,7 @@ piMaterialList(thisR);
 thisR.set('outputFile',fullfile(piRootPath,'local','StopExport',[n,e]));
 
 % material.pbrt is supposed to overwrite itself.
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render
 %tic, oi = piRender(thisR); toc

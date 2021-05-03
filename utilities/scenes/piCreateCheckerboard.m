@@ -51,7 +51,7 @@ P = [-cornerX, -cornerY, 0;
     -cornerX, cornerY, 0]';
 
 %%
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Update geometry
 

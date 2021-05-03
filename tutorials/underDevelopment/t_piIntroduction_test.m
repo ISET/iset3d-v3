@@ -96,7 +96,7 @@ sceneName = 'simpleTest';
 outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s_scene.pbrt',thisR.integrator.subtype));
 thisR.set('outputFile',outFile);
 
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render.  
 
@@ -108,7 +108,7 @@ ieAddObject(scene); sceneWindow;
 %% Now remove a person
 fprintf('****remove %s****\n',thisR.assets(3).name);
 thisR.assets(3) = [];
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 %% Render again.  
 
 [scene, result] = piRender(thisR,'render type','radiance');
@@ -120,7 +120,7 @@ fprintf('****move %s to the right side****\n',thisR.assets(3).name);
 % position is saved as x,y,z; z represents depth. x represents
 % horizontal position.
 thisR.assets(3).position(1) = 2;
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 %% Render again.  
 
 [scene, result] = piRender(thisR,'render type','radiance');

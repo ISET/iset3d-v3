@@ -54,7 +54,7 @@ outFile = fullfile(piRootPath,'local',sceneName,sprintf('%s.pbrt',sceneName));
 thisR.set('outputFile',outFile);
 
 % The first time, we create the materials folder.
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render.  
 %
@@ -104,7 +104,7 @@ thisR.assets.groupobjs(whichAsset).motion.rotate   = thisR.assets.groupobjs(whic
 thisR.assets.groupobjs(whichAsset).motion.position(1) = thisR.assets.groupobjs(whichAsset).position(1) + 0.1;
 
 %% Render the motion blur
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Translation');
 sceneWindow(scene);
@@ -135,7 +135,7 @@ thisR.assets.groupobjs(whichAsset).motion.position = thisR.assets.groupobjs(whic
 thisR.assets.groupobjs(whichAsset).motion.rotate(1,1) = 30;
 
 %% Write and render the motion blur
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Rotation');
 sceneWindow(scene);

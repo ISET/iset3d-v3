@@ -188,7 +188,7 @@ for jj = whichAcquisitions
         % There is a new camera position that is stored in the
         % <sceneName_position>.pbrt file.  Everything including
         % the lens file should get stored with this piWrite.
-        piWrite(tmpRecipe,'creatematerials',true,...
+        piWrite(tmpRecipe,...
             'overwriteresources',false,'lightsFlag',false);
         
         % Name the acquisition based on the camera position change

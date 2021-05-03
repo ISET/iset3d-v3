@@ -31,7 +31,6 @@ function workingDir = piWrite(thisR,varargin)
 %   Deprecated overwrite materials - Logical. Default true
 %   Deprecated overwrite geometry  - Logical. Default true
 %   overwrite json      - Logical. Default true
-%   creatematerials     - Logical. Default false
 %   lightsFlag         
 %   thistrafficflow   
 %
@@ -71,7 +70,7 @@ thisR.integrator.subtype = 'path';
 thisR.sampler.subtype = 'sobol';
 thisR.set('aperture diameter',3);
 
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 oi = piRender(thisR,'render type','radiance');
 oiWindow(oi);
 %}

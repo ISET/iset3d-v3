@@ -82,8 +82,6 @@ target.kd.value = [1 0 0]; % red color
 % Assign the 'mirror' object the 'plastic' material with the new color (red)
 piMaterialAssign(thisR,partName,target);
 
-% Because we changed the material assignment, we need to set the
-% 'creatematerials' argument to true
 piWrite(thisR);
 
 %% Render

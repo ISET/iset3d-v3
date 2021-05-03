@@ -88,7 +88,7 @@ sceneWindow(scene);
 
 [~,R1] = thisR.set('asset', thisAssetName, 'motion', 'rotation', [0, 0, 30]);
 
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Rotation');
 sceneWindow(scene);

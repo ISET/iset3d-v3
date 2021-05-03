@@ -70,7 +70,6 @@ thisR.integrator.subtype ='directlighting';
 %% Write and render
 
 piWrite(thisR);
-% piWrite(thisR, 'creatematerials', true);
 
 scene = piRender(thisR, 'rendertype', 'radiance');
 
@@ -98,7 +97,7 @@ thisR.set('light','add',distantLight);
 % spd = piLightGet(thisR,'idx',2,'param','spd');
 % ieNewGraphWin; plot(spd)
 
-piWrite(thisR, 'creatematerials', true);
+piWrite(thisR);
 [scene, result] = piRender(thisR, 'rendertype', 'radiance');
 
 sceneWindow(scene);

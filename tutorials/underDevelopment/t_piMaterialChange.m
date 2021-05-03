@@ -111,7 +111,7 @@ piMaterialAssign(thisR, 'GLASS', target,'rgbkd',rgbkd,'rgbkr',rgbkr);
 % the output name.
 [~,sceneName,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local',sceneName,[sceneName,'1',e]));
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render again
 

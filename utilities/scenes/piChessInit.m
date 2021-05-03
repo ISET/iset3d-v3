@@ -75,7 +75,7 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',2);   % thisR.summarize('all');
 
 %% Save.  I think you may need to run piWrite() whenever you change thisR
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %%
 thisR.summarize;
