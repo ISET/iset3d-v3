@@ -35,7 +35,7 @@ thisR  = piRecipeDefault('scene name','chessSet');
 %% Set render quality
 
 % Set resolution for speed or quality.
-thisR.set('film resolution',round([600 600]*0.25));  % 2 is high res. 0.25 for speed
+thisR.set('film resolution',round([600 600]*0.5));  % 2 is high res. 0.25 for speed
 thisR.set('rays per pixel',64);                      % 128 for high quality
 
 %% To determine the range of object depths in the scene
@@ -91,11 +91,16 @@ thisR.set('aperture diameter',2);   % thisR.summarize('all');
 %% Render and display
 
 % Change this for depth of field effects.
-piWrite(thisR,'overwritejson',false);
+piWrite(thisR);
 
 %%
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('chessSet-%dmm',thisR.get('aperture diameter')));
+oiWindow(oi);
+
+%% Image look noisy?  Try this
+
+oi = piAIdenoise(oi);
 oiWindow(oi);
 
 %% END
