@@ -27,4 +27,25 @@ thisR.get('fov')
 % distance from the pinhole to the film is called the focal distance
 thisR.get('film diagonal','mm')
 
-%% 
+%% We are going to put a lens in the camera
+
+lensfile  = 'dgauss.22deg.6.0mm.json';    % 30 38 18 10
+fprintf('Using lens: %s\n',lensfile);
+thisR.camera = piCameraCreate('omni','lensFile',lensfile);
+
+%% Make sure the film and field of view make sense
+
+thisR.set('film diagonal',5,'mm');
+
+thisR.get('fov')
+
+% Remember that pinhole cameras has an infinite depth of field.  The
+% distance from the pinhole to the film is called the focal distance
+
+piWrite(thisR);
+oi = piRender(thisR);
+
+oi = piAIdenoise(oi);  % Denoising is not necessary, but it looks nice
+oiWindow(oi);
+
+%% END

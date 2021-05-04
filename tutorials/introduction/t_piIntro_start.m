@@ -34,12 +34,13 @@
 %   10/18/20  dhb  Cleaned up comments a bit.
 
 %% Initialize ISET and Docker
-%
-% We start up ISET and check that the user is configured for docker
+
+% Start up ISET and check that docker is configured 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read the file
+%% Read the recipe
+
 thisR = piRecipeDefault('scene name','sphere');
 
 % Add a point light, needed by this scene.
@@ -64,19 +65,16 @@ thisR.set('film resolution',[192 192]);
 thisR.set('rays per pixel',128);
 thisR.set('n bounces',1); % Number of bounces
 
-%% Save the recipe information
+%% Save the recipe and render
 piWrite(thisR);
 
-%% Render 
-%
 % There is no lens, just a pinhole.  In that case, we are rendering a
 % scene. If we had a lens, we would be rendering an optical image.
 [scene, result] = piRender(thisR);
 sceneWindow(scene);
 
-%% We also computed the depth map
-%
-%
+%% By default, we also compute the depth map
+
 scenePlot(scene,'depth map');
 
-%%
+%% END
