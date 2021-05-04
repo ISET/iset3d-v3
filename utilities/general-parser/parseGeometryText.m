@@ -162,10 +162,8 @@ while i <= length(txt)
                 resObject = piAssetCreate('type', 'object');
                 if exist('name','var')
                     resObject.name = sprintf('%s_O', name);
-                    %{
-                    %% This was prepared for empty object name case.
-                    However our users prefer to have an empty name with
-                    just ID, so commenting this part out.
+                    
+                    % This was prepared for empty object name case.
                     
                     % If we parse a valid name already, do this. 
                     if ~isempty(name)
@@ -181,6 +179,13 @@ while i <= length(txt)
                     else
                         if ~isempty(shape.filename)
                             [~, n, ~] = fileparts(shape.filename);
+                            
+                            % If there was a '_mat0' added to the object 
+                            % name, remove it.
+                            if contains(n,'_mat0')
+                                n = erase(n,'_mat0');
+                            end
+                            
                             resObject.name = sprintf('%s_O', n);
                         elseif ~isempty(mat)
                             if ~isempty(mat.name)
@@ -192,7 +197,7 @@ while i <= length(txt)
                             end
                         end
                     end
-                    %}
+
                 end
                 
                 if exist('shape','var')

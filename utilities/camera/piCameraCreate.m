@@ -1,24 +1,34 @@
 function camera = piCameraCreate(cameraType,varargin)
-%PICAMERACREATE Return a camera structure to be placed in a recipe. 
+% Create a camera structure to be placed in a ISET3d recipe 
 %
+% Synopsis
 %   camera = piCameraCreate(cameraType, lensFile, ..)
 %
 % Input parameters
 %  
-% The camera lens type
+%   cameraType:
 %
-%    {'pinhole'} - A pinhole camera.  Also called 'perspective' in some
-%                  places
-%    'light field' - microlens array in front of the sensor 
-%    'human eye'   - T. Lian human eye model parameters (realisticEye)
-%    'omni'        - M. Mara implementation that subsumes former realistic.
+%    'pinhole'     - Default is pinhole camera, also called 'perspective'
+%    'omni'        - Standard lens, including potential microlens array
+%
+%    'human eye'   - T. Lian human eye model that works with ISETBio and
+%                    sceneEye.  It includes specification of the index of
+%                    refraction for the cornea, lens and such (ior1-4).
+%  Deprecated
+%    'light field' - microlens array in front of the sensor for a light
+%                    field camera
+%    'realisticDiffraction' - Not sure what that sub type is doing in
+%                                  light field
+%    'realistic'   - This seems to be superseded completely by omni, except
+%                    for some old car scene generation cases that have not
+%                    been updated. 
 %
 % Optional parameter/values
 %
 % Output
 %   camera - Camera structure for placement in a recipe
 %
-% TL, BW SCIEN STANFORD 2017 
+% TL,BW SCIEN STANFORD 2017 
 %
 % See also
 %    recipe
@@ -59,6 +69,10 @@ c = piCameraCreate('human eye','lens file',lensname);
 varargin = ieParamFormat(varargin);
 
 p = inputParser;
+% pinhole and perspective are synonyms
+% omni is the most general type in current use
+% realistic should be replaced by omni in the future.  Not sure what we are
+% waiting for, but there is some feature ... (BW)
 validCameraTypes = {'pinhole','perspective','realistic','omni', 'humaneye','lightfield'};
 p.addRequired('cameraType',@(x)(ismember(ieParamFormat(x),validCameraTypes)));
 
@@ -152,8 +166,10 @@ switch ieParamFormat(cameraType)
         camera.focusdistance.value = 10; % mm
         
     case {'lightfield'}
-        % Use to allow 'microlens' and'plenoptic'
-        % Was realisticDiffraction subtype
+        % This may no longer be used.  The 'omni' type incorporates the
+        % light field microlens method and is more modern.
+        error('Use ''omni'' and add a microlens array');
+        %{
         camera.type = 'Camera';
         camera.subtype = 'omni'; 
         camera.specfile.type = 'string';
@@ -176,9 +192,14 @@ switch ieParamFormat(cameraType)
         camera.num_pinholes_w.value = 8;
         camera.num_pinholes_h.type = 'float';
         camera.num_pinholes_h.value = 8;
-        
+        %}
     case {'humaneye'}
-        % Human eye model used with sceneEye calculations in ISETBio. 
+        % Human eye model used with sceneEye calculations in ISETBio.
+        % The subtype 'realisticEye' is historical and sent to PBRT. It is
+        % intended to refer to the human eye model.
+        if piCamBio
+            warning('human eye camera type is for use with ISETBio')
+        end
         camera.type           = 'Camera';
         camera.subtype        = 'realisticEye';
         camera.lensfile.type  = 'string';

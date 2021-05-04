@@ -543,24 +543,32 @@ switch ieParamFormat(param)  % lower case, no spaces
                 end
                 
             case 'lens'
+                % We should deal with the spatial units correctly here.
+                % This is a mess. (BW).
                 if exist('lensFocus','file')
                     opticsType = thisR.get('optics type');
                     if strcmp(opticsType,'lens')
-                        lensFile = thisR.get('lens file');
-                        if exist('lensFocus','file')
-                            % If isetlens is on the path, we convert the
-                            % distance to the focal plane into millimeters
-                            % and see whether there is a film distance so
-                            % that the plane is in focus.
-                            %
-                            % But we return the value in meters
-                            val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
+                        if strcmp(thisR.get('camera subtype'),'realisticEye')
+                            % For the human eye model ... returned in
+                            % millimeters.
+                            val = thisR.get('retinaDistance');
                         else
-                            % No lensFocus, so tell the user about isetlens
-                            warning('Add isetlens to your path if you want the film distance estimate')
-                        end
-                        if ~isempty(val) && val < 0
-                            warning('%s lens cannot focus an object at this distance.', lensFile);
+                            lensFile = thisR.get('lens file');
+                            if exist('lensFocus','file')
+                                % If isetlens is on the path, we convert the
+                                % distance to the focal plane into millimeters
+                                % and see whether there is a film distance so
+                                % that the plane is in focus.
+                                %
+                                % But we return the value in meters
+                                val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
+                            else
+                                % No lensFocus, so tell the user about isetlens
+                                warning('Add isetlens to your path if you want the film distance estimate')
+                            end
+                            if ~isempty(val) && val < 0
+                                warning('%s lens cannot focus an object at this distance.', lensFile);
+                            end
                         end
                     end
                 end

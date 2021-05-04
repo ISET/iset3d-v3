@@ -1,4 +1,13 @@
-%% Camera types
+%% Camera introduction
+%
+%  Describes camera types, setting and getting some basic properties of the
+%  film (sensor), and explains how to introduce some camera motion during
+%  the rendering.
+%
+%  Camera lens properties are introduced in a separate script.
+%
+%  See also
+%   t_piIntro_lens
 %
 % Describe the ISETCam camera types.  There are four:
 %   perspective (also called 'pinhole' in the documentation)
@@ -15,8 +24,8 @@ if ~piDockerExists, piDockerConfig; end
 % This the MCC scene
 thisR = piRecipeDefault('scene name','SimpleScene');
 
-% By default, the camera type is a 'perspective', which means a pinhole
-% camera.
+% By default, the camera type for this scene is a 'perspective', which
+% means a pinhole camera.
 thisR.get('camera')
 
 % The pinhole (perspective) camera has some simple properties such as a

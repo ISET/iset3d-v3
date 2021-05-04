@@ -1,7 +1,10 @@
 %% t_piIntro_macbeth_fluorescent
 %
-% Render a MacBeth color checker.  Then make an illuminant image to
-% return a spatio-spectral illuminant.
+% Illustrates fluorescence calculations in PBRT.
+%
+% The base imiage is a MacBeth color checker.  First it is illuminated with
+% a broadband light. Then the illuminant is switched to a short wavelength
+% light, which reveals the fluorescence.
 % 
 % Index numbers for MacBeth color checker:
 %          ---- ---- ---- ---- ---- ----
@@ -25,7 +28,7 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 if isempty(which('fiToolboxRootPath'))
-    disp('No fluorescence toolbox.  Skipping');
+    disp('Fluorescence toolbox required.  Skipping this script.');
     return;
 end
 
@@ -88,7 +91,7 @@ piWrite(thisR, 'overwritematerials', true);
 % container.  We will promote to the default after we test it more.
 
 thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
-[scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'radiance');
+scene = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'radiance');
 scene = sceneSet(scene,'wavelength', wave);
 scene = sceneSet(scene, 'name', 'D65 illuminant');
 sceneWindow(scene);
@@ -103,19 +106,25 @@ fluoLight = piLightCreate('Blue light',...
                             'cameracoordinate', true);
 thisR.set('light', 'add', fluoLight);
 
-%% Write 
-% Write modified recipe out
-piWrite(thisR, 'overwritematerials', true);
+%% Write and render
 
-%% Render - At some point we will make this the default (latest)
+piWrite(thisR, 'overwritematerials', true);
 
 % If you want to use the fluorescent modeling, specify this docker
 % container.  We will promote to the default after we test it more.
-
 thisDocker = 'vistalab/pbrt-v3-spectral:basisfunction';
+
+% You can sample different wavelengths, if you like.  For example,
+%
+%   wave = 365:550;
+%
+% This works by running PBRT at 5 nm sampling and then interpolating the
+% returned data to the sampling in wave.
+%
+% The data size is large if you use 1 nm samples!!!
 [scene, result] = piRender(thisR, 'docker image name', thisDocker,'wave',wave, 'render type', 'radiance');
 scene = sceneSet(scene,'wavelength', wave);
 scene = sceneSet(scene, 'name', 'Blue LED illuminant');
 sceneWindow(scene);
 
-%%
+%%  END

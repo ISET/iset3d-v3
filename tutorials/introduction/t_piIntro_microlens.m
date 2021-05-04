@@ -21,7 +21,13 @@
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-if isempty(which('lensC')), error('You must add the isetlens repository to your path'); end
+if ~piCamBio
+    warning('Script requires ISETCam.  Returning');
+    return;
+end
+if isempty(which('lensC')) 
+    error('You must add the isetlens repository to your path'); 
+end
 
 if ~piCamBio, error('Requires ISETCam, not ISETBio'); end
 
