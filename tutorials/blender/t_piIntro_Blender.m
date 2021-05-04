@@ -22,6 +22,7 @@
 %   11/27/20  amn  Wrote it, adapted from t_piIntro_scenefromweb.m.
 %   11/29/20  dhb  Edited it.
 %   04/01/21  amn  Adapted for general parser and assets/materials updates.
+%   04/29/21  amn  Adapted for object naming based on object's .ply file name.
 
 %% Initialize ISET and Docker
 %
@@ -96,30 +97,50 @@ sceneSet(scene,'gamma',0.5);
 % performing one simple modification. See the other iset3d tutorials for 
 % detailed instructions on making various modifications.
 
-%% Get the names of the objects in the scene
+%% See asset tree
 %
 % Print the asset tree structure in the command window.
 thisR.assets.print;
 
+%% Get the names of the objects in the scene
+%
+% List the object names. You will need to know the names of the objects in
+%the scene to modify them.
+fprintf('\nThis recipe contains objects:\n');
+for ii = 1:length(thisR.assets.Node)
+    if isfield(thisR.assets.Node{ii},'name')
+        assetName = thisR.assets.Node{ii}.name;
+        
+        % The object name (from Blender) was assigned to the object's leaf
+        % (see the section below for more details on the object's leaf and
+        % branch).
+        if contains(assetName,'_O')
+            fprintf('%s\n',assetName);
+        end 
+    end
+end
+fprintf('\n');
+
 %% Select an object to modify
 % 
-% The objects were assigned names based on their order (e.g., 002ID__B).
-% Naming based on the object names in Blender is pending. For now, we will
-% look at the pbrt file itself to find that the Monkey is the 13th object
-% listed in the pbrt file. Each object in this scene was assigned a branch
-% (its position, orientation, and size) and a leaf (its shape and 
-% material). The naming began with '002' and a name was given to each 
-% branch (for example, the first object's branch name is 002ID__B) and each
-% leaf (for example, the first object's leaf name is 003ID__O). Therefore,
-% the name of the Monkey object's branch (its position, orientation, and 
-% size) is: 026ID__B
-assetName = '026ID__B';
+% Each object in this scene was assigned a branch (its position,
+% orientation, and size) and a leaf (its shape and material).
+% First, select an object leaf name from the list that was just
+% printed in the command window. 
+% In this example, we select the object leaf named '027ID_Monkey_O'.
+leafName = '027ID_Monkey_O';
+
+% The leaf of the object contains its shape and material information.
+% We need to get the ID of the branch of the object to manipulate the 
+% object's position, orientation, or size.
+% The branch node is just above the leaf.
+branchID = thisR.get('asset parent id',leafName);
 
 %% Move the Monkey object
 %
 % Here we translate the Monkey object's position 1 meter in the negative x
 % direction.
-[~,translateBranch] = thisR.set('asset', assetName, 'translate', [-1, 0, 0]);
+[~,translateBranch] = thisR.set('asset', branchID, 'translate', [-1, 0, 0]);
 
 %% Write, render, and display
 % 
@@ -128,7 +149,7 @@ piWrite(thisR);
 
 % Render and display.
 scene = piRender(thisR,'render type','radiance');
-scene = sceneSet(scene,'name','Translated monkey');
+scene = sceneSet(scene,'name','Translated Monkey');
 sceneWindow(scene);
 
 %% End
