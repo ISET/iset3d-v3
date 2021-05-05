@@ -93,7 +93,6 @@ thisR.set('aperture diameter',2);   % thisR.summarize('all');
 % Change this for depth of field effects.
 piWrite(thisR);
 
-%%
 oi = piRender(thisR,'render type','radiance');
 oi = oiSet(oi,'name',sprintf('chessSet-%dmm',thisR.get('aperture diameter')));
 oiWindow(oi);

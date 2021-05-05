@@ -163,7 +163,8 @@ sceneWindow(scene);
 if piCamBio, sceneSet(scene,'render flag','hdr');
 else,        sceneSet(scene,'gamma',0.6);
 end
-%% Change the sphere to a mirror in the future.  
+
+%% Change the sphere to a mirror 
 
 mirrorName = 'mirror2';
 mirror = piMaterialCreate(mirrorName, 'type', 'mirror');

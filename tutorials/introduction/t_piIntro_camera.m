@@ -6,15 +6,16 @@
 %
 %  Camera lens properties are introduced in a separate script.
 %
-%  See also
-%   t_piIntro_lens
-%
+
 % Describe the ISETCam camera types.  There are four:
 %   perspective (also called 'pinhole' in the documentation)
 %   realistic
 %   realisticEye (special case for the sceneEye in ISETBio)
 % omni.
-
+%
+%  See also
+%   t_piIntro_lens
+%
 %%
 ieInit;
 if ~piDockerExists, piDockerConfig; end
@@ -42,19 +43,19 @@ lensfile  = 'dgauss.22deg.6.0mm.json';    % 30 38 18 10
 fprintf('Using lens: %s\n',lensfile);
 thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
-%% Make sure the film and field of view make sense
+% Set the film so that the field of view makes sense
 
 thisR.set('film diagonal',5,'mm');
-
 thisR.get('fov')
 
-% Remember that pinhole cameras has an infinite depth of field.  The
-% distance from the pinhole to the film is called the focal distance
+%% Write, render and denoise
 
 piWrite(thisR);
 oi = piRender(thisR);
 
 oi = piAIdenoise(oi);  % Denoising is not necessary, but it looks nice
+
 oiWindow(oi);
+oiSet(oi,'render flag','hdr');
 
 %% END

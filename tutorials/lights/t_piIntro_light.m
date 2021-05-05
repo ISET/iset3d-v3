@@ -1,6 +1,5 @@
 %% Illustrate how to control properties of scene lights
 %
-% Brief:
 %  The light structure has a large number of parameters that control its
 %  properties.  We will be controlling the properties with commands of sthis
 %  type:
