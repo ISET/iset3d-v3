@@ -26,18 +26,22 @@ function thisR = piDeleteWorldText(thisR, indices)
 % Zhenyi, TL, SCIEN, 2019
 % Zheng Lyu, 2021
 %
-% see also: piLightGet, piLightsAdd
-%%
+% see also: 
+%   piLightGet, piLightsAdd
+
+%% Parse
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
 p.addRequired('indices', @iscell);
 p.parse(thisR, indices);
 
-%%
+%% Get the text in the world
 
 world = thisR.world;
 
-for ii=1:numel(indices)
+% Delete the lines from the highest range to the lowest. That way  we don't
+% change the line number by the deletion
+for ii=numel(indices):-1:1
     if numel(indices{ii})>1
         world(indices{ii}(1):indices{ii}(2)) = [];
     else
@@ -47,37 +51,4 @@ end
 
 thisR.world = world;
 
-%%
-%{
-%% Get list of light sources
-
-lightSource = thisR.lights;
-world = thisR.world;
-
-%%
-if ischar(indices) && strcmp(indices, 'all')
-    
-    lightSourceLine = [];
-    for ii = 1:length(lightSource)
-        
-        if length(lightSource{ii}.range)>1
-            lightSourceLine = horzcat(lightSourceLine, lightSource{ii}.range(1):lightSource{ii}.range(2));
-        else
-            lightSourceLine = horzcat(lightSourceLine, lightSource{ii}.range);
-        end
-    end
-    
-    world(lightSourceLine) = [];
-    thisR.world = world;
-
-else
-    if length(lightSource{index}.range)>1
-        world(lightSource{index}.range(1):lightSource{index}.range(2)) = [];
-    else
-        world(lightSource{index}.range) = [];
-    end
-    
-    thisR.world = world; 
-end
-%}
 end

@@ -42,90 +42,102 @@ if ~piDockerExists, piDockerConfig; end
 %% Set scene
 % 
 % We know about
-%    'cornell-box'
+%    'cornell_box'
 %    'veach-ajar'
-sceneName = 'veach-ajar';
+%    'kitchen'
+sceneName = 'kitchen';
 
 %% Read scene.
 %
 % As noted in the header comments above, you need to download the scene
 % first and put it into the right place.
-pbrtName = 'scene';
-FilePath = fullfile(piRootPath,'local','scenes',sceneName);
-fname = fullfile(FilePath,[pbrtName,'.pbrt']);
-if ~exist(fname,'file')
-ieWebGet2();
-end
-exporter = 'C4D';
-thisR = piRead(fname);
-thisR.set('exporter',exporter);
 
-%% Output directory
-%
-% By default, do the rendering into iset3d/local.  That
-% directory is not part of the git upload area.
-[~,n,e] = fileparts(fname);
-outFile = fullfile(piRootPath,'local',sceneName,[n,e]);
-thisR.set('outputfile',outFile);
+FilePath = fullfile(piRootPath,'data','V3','web',sceneName);
+
+if ~exist(FilePath,'dir')
+  ieWebGet2('resourcename', sceneName, ...
+      'resourcetype', 'pbrt',...
+      'ask first',false);
+end
+
+%%  Initialize recipe
+switch (sceneName)
+    case {'veach-ajar','kitchen'}
+        pbrtName = 'scene';
+        exporter = 'Copy';
+    case 'cornell_box'
+        exporter = 'C4D';
+        pbrtName = 'cornell_box';
+    otherwise
+        error('Unknown scene %s\n',sceneName);
+end
+
+fname = fullfile(FilePath,[pbrtName,'.pbrt']);
+thisR = piRead(fname);
+% exporter = 'C4D';
+% thisR.set('exporter',exporter);
 
 %% Camera
-% If no camera was included, add a pinhole by default.
+
+% If no camera was included in the scene, add a pinhole by default.
 if isempty(thisR.get('camera'))
+    disp('Adding pinhole camera')
     theCamera = piCameraCreate('pinhole');
+    thisR.set('camera',theCamera);
 end
 
-% Add a light
-% thisR = piLightDelete(thisR, 'all');
-% thisR = piLightAdd(thisR,... 
-%     'type','point',...
-%     'light spectrum','Tungsten',...
-%     'spectrumscale', 1000,...
-%     'cameracoordinate', true);
-
 %% Set up scene specific parameters.
-%
+
 % The tricky part is to figure out where to put the camera so you can see
 % the scene. I did this just by trying a lot of possibilities, and hoping
 % that some point in the scene was near [0 0 0].
 switch (sceneName)
-    case 'cornell-box'
+    case 'cornell_box'
         % Resolution settings
-        thisR.set('pixelsamples', 32);
-        thisR.set('filmresolution', [320, 320]);
+        thisR.set('film resolution', [320, 320]);
         thisR.set('rays per pixel',128);
         thisR.set('n bounces',2);
 
         % Camera settings
-        theCamera.fov.value = 45;
+        thisR.set('fov',45);
         thisR.set('to',[0 0 0]);
         thisR.set('from',[0 1.5 3]);
         thisR.set('up',[0 1 0]);
-    case 'veach-ajar'
+        
+    case {'veach-ajar'}
         % Resolution settings
-        thisR.set('pixelsamples', 64);
-        thisR.set('filmresolution', [320, 320]);
-        thisR.set('rays per pixel',128);
-        thisR.set('n bounces',2);
+        thisR.set('film resolution', [320, 320]);
+        thisR.set('rays per pixel',256);
+        thisR.set('n bounces',5);
 
         % Camera settings
-        theCamera.fov.value = 90;
+        thisR.set('fov',60);
         thisR.set('to',[-4.5 0 -3]);
         thisR.set('from',[10 3 -2]);
         thisR.set('up',[0 1 0]);
+        thisR.set('object distance',6);
+    case {'kitchen'}
+        % Resolution settings
+        thisR.set('film resolution', [320, 320]);
+        thisR.set('rays per pixel',256);
+        thisR.set('n bounces',5);
+        
+        % Camera settings
+        thisR.set('fov',60);
+        % thisR.set('to',[-4.5 0 -3]);
+        % thisR.set('from',[10 3 -2]);
+        % thisR.set('up',[0 1 0]);
         thisR.set('object distance',6);
     otherwise
         error('Unknown scene specified');
 end
 
-%% Set the camera
-thisR.set('camera',theCamera);
-
 %% Save the recipe information
-piWrite(thisR);
 
-%% Render and display
+piWrite(thisR);
 [scene, result] = piRender(thisR,'render type','radiance');
+
+% scene = piAIdenoise(scene);
 sceneWindow(scene);
-sceneSet(scene,'gamma',0.5);
 
 %% END
