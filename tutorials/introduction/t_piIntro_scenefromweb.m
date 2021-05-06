@@ -53,7 +53,9 @@ sceneName = 'veach-ajar';
 pbrtName = 'scene';
 FilePath = fullfile(piRootPath,'local','scenes',sceneName);
 fname = fullfile(FilePath,[pbrtName,'.pbrt']);
-if ~exist(fname,'file'), error('File not found'); end
+if ~exist(fname,'file')
+ieWebGet2();
+end
 exporter = 'C4D';
 thisR = piRead(fname);
 thisR.set('exporter',exporter);
