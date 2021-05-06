@@ -1,21 +1,20 @@
-%% Chop and graft a subtree
+%% Assets: chop and graft a subtree
 %
-% Assets are stored as trees.  We can add and remove subtrees, say taking
-% one subtree for scene1 and moving it into scene2.
+% Assets are stored as trees.  We can add (graft) and remove (chop)
+% subtrees, say taking one subtree for scene1 and moving it into scene2.
 % 
 % ZLY/BW
 %
-% See also tls_assets.mlx
+% See also 
+%   tls_assets.mlx
 %
-
-%% History
-%    01/09/21  dhb  Added comments and a little cleaning.
 
 %% Initialize
 clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Simple base scene
+
 sceneName = 'simple scene';
 thisR = piRecipeDefault('scene name', sceneName);
 thisR.set('film resolution',[200 150]);
@@ -33,6 +32,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Select a subtree
 %
 % Show the tree
+thisR.assets.showUI;
 thisR.assets.show;
 
 % Get the subtree under the black mirror branch
@@ -44,7 +44,7 @@ id = thisR.get('asset', thisAssetName, 'id');
 mirrorSubtree = thisR.assets.subtree(id);
 [~, mirrorSubtree] = mirrorSubtree.stripID([], true);
 
-% You can look at the subtree, it's just another
+% The subtree is just another
 % tree.
 mirrorSubtree.names
 mirrorSubtree.show;

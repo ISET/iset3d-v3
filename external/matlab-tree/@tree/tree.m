@@ -269,16 +269,20 @@ classdef tree
         end
         
         % Print the tree or a node of the tree
-        function T = show(obj)
-            % Bring up a window with the tree.  Returns the text object
-            % that you can use to reset the 
+        function show(obj)
+            % Bring up a window representing the tree.  
             %
-            % Maybe this should rely on tree.plot, which has an example
-            % that I don't yet understand.
+            % This uses tree.plot when there are 50 nodes or less.
+            % If there are more than 50 nodes, we call showUI, the special
+            % purpose routine that Zhenyi built for larger scenes
+            %
+            % This is an odd example, based on the tree documentation.  See
+            % the tutorials for more examples specific to ISET3d.
             %{
               [ lineage duration ] = tree.example; % 1st one is made of strings only, 2nd one of integers
               slin = lineage.subtree(19); % Work on a subset
               sdur = duration.subtree(19);
+              ieNewGraphWin();
               [vlh hlh tlh] = slin.plot(sdur, 'YLabel', {'Division time' '(min)'});
               rcolor = [ 0.6 0.2 0.2 ];
               aboveTreshold = sdur > 10; % true if longer than 10 minutes
@@ -294,8 +298,11 @@ classdef tree
             newTree.Parent = obj.Parent;
             
             % Plot
-            newTree.plot([],'font size',14);
-            
+            if newTree.nnodes > 50
+                newTree.showUI;
+            else
+                newTree.plot([],'font size',14);
+            end
         end
         
         function t = showUI(obj)
