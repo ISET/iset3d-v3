@@ -138,9 +138,13 @@ switch (sceneName)
 end
 
 %% Save the recipe information
-% piCameraRotate(thisR,'x rot',45);
-% piCameraRotate(thisR,'y rot',25);
-% piCameraRotate(thisR,'y rot',-35);
+
+% 1. Check for lights
+% 2. Check for different directions
+%
+%  piCameraRotate(thisR,'x rot',45);
+%  piCameraRotate(thisR,'y rot',25);
+%  piCameraRotate(thisR,'y rot',-35);
 
 piWrite(thisR);
 [scene, result] = piRender(thisR,'render type','radiance');
@@ -150,7 +154,7 @@ sceneWindow(scene);
 sceneSet(scene,'render flag','hdr');
 
 %% Change the color of one of the materials
-
+%{
 thisR.get('materials','Walls','kd')
 
 thisR.set('materials','Walls','kd',[1 0 0]);
@@ -166,6 +170,7 @@ ambientLight = piLightCreate('ambient',...
     'mapname','room.exr');
 thisR.set('light','add',ambientLight);
 
+%}
 
 %%
 
