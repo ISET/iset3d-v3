@@ -1,4 +1,4 @@
-%% Render some scenes available at https://benedikt-bitterli.me/resources/
+%% Render some scenes available
 %
 % Description:
 %    Show how to render a scene downloaded from
@@ -61,6 +61,7 @@ if ~exist(FilePath,'dir')
 end
 
 %%  Initialize recipe
+
 switch (sceneName)
     case {'veach-ajar','kitchen'}
         pbrtName = 'scene';
@@ -73,8 +74,7 @@ switch (sceneName)
 end
 
 fname = fullfile(FilePath,[pbrtName,'.pbrt']);
-thisR = piRead(fname);
-% exporter = 'C4D';
+thisR = piRead(fname,'exporter',exporter);
 % thisR.set('exporter',exporter);
 
 %% Camera
@@ -119,25 +119,55 @@ switch (sceneName)
     case {'kitchen'}
         % Resolution settings
         thisR.set('film resolution', [320, 320]);
-        thisR.set('rays per pixel',256);
-        thisR.set('n bounces',5);
+        thisR.set('rays per pixel',64);
+        thisR.set('n bounces',3);
         
         % Camera settings
-        thisR.set('fov',60);
-        % thisR.set('to',[-4.5 0 -3]);
-        % thisR.set('from',[10 3 -2]);
-        % thisR.set('up',[0 1 0]);
-        thisR.set('object distance',6);
+        thisR.set('fov',50);
+        %{ 
+            Original values
+            from: [1.2110    1.8047    3.8524]
+            to: [-0.7729   -1.7631   -2.9544]
+            up: [-0.0183 0.9991 -0.0375]
+        %}
+        thisR.set('to',[-0.7729 0 -2.9544]);
+        thisR.set('from',[1.2110    1.5    3.8524]);
+        % thisR.set('object distance',6);
     otherwise
         error('Unknown scene specified');
 end
 
 %% Save the recipe information
+% piCameraRotate(thisR,'x rot',45);
+% piCameraRotate(thisR,'y rot',25);
+% piCameraRotate(thisR,'y rot',-35);
 
 piWrite(thisR);
 [scene, result] = piRender(thisR,'render type','radiance');
 
 % scene = piAIdenoise(scene);
 sceneWindow(scene);
+sceneSet(scene,'render flag','hdr');
+
+%% Change the color of one of the materials
+
+thisR.get('materials','Walls','kd')
+
+thisR.set('materials','Walls','kd',[1 0 0]);
+
+thisR.set('materials','CupboardUnits','kd',[0.7 0.7 0.2])
+
+%%  Messing around
+
+thisR.set('light','delete','all');
+
+ambientLight = piLightCreate('ambient',...
+    'type','infinite',...
+    'mapname','room.exr');
+thisR.set('light','add',ambientLight);
+
+
+%%
+
 
 %% END

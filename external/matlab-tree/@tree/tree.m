@@ -135,8 +135,10 @@ classdef tree
         end
         
         function val = nodetoroot(obj, id)
+            % Path from a node to the root
             val = [];
             while ~obj.isRoot(id)
+                % We only add the id if it is not the root
                 val = [val id];
                 id = obj.getparent(id);
             end
@@ -221,10 +223,15 @@ classdef tree
         end
         
         function [newNames,obj] = stripID(obj, id, replace)
-            % Returns the names with stripped ID.  But it does not appear
-            % to strip the names in this tree.
+            % Returns the names with stripped ID.  
+            %
+            % If an id is provided, then just that node.  If id is empty,
+            % then all the nodes.
+            
+            % Replace the names in this tree.
             if notDefined('replace'), replace = false; end
             if notDefined('id')
+                % All of the nodes
                 newNames = cell(1, obj.nnodes);
                 for ii=1:obj.nnodes
                     newNames{ii} = obj.stripID(ii);
@@ -232,11 +239,18 @@ classdef tree
                 
                 % We have the new names and user said replace them all
                 if replace
-                    disp('Replacing names')
+                    disp('Replacing names.')
                     for jj=1:obj.nnodes
-                        if ischar(obj.Node{jj}), obj.Node{jj} = strrep(newNames{jj},'_','|');
+                        if ischar(obj.Node{jj})
+                            % Probably a legacy condition
+                            obj.Node{jj} = strrep(newNames{jj},'_','|');
                         else
-                            obj.Node{jj}.name = strrep(newNames{jj},'_',' ');
+                            % Not sure why we are removing the underscore.
+                            % BW deleted for testing. 2021-05-06
+                            %
+                            % obj.Node{jj}.name = strrep(newNames{jj},'_',' ');
+                            obj.Node{jj}.name = newNames{jj};
+
                         end
                     end
                 end
@@ -269,12 +283,13 @@ classdef tree
         end
         
         % Print the tree or a node of the tree
-        function show(obj)
+        function show(obj,nodeLimit)
             % Bring up a window representing the tree.  
             %
-            % This uses tree.plot when there are 50 nodes or less.
-            % If there are more than 50 nodes, we call showUI, the special
-            % purpose routine that Zhenyi built for larger scenes
+            % This uses tree.plot when there are nodeLimit (50) nodes or
+            % less. If there are more than nodeLimit nodes, we call showUI,
+            % the special purpose routine that Zhenyi built for larger
+            % scenes.
             %
             % This is an odd example, based on the tree documentation.  See
             % the tutorials for more examples specific to ISET3d.
@@ -284,23 +299,21 @@ classdef tree
               sdur = duration.subtree(19);
               ieNewGraphWin();
               [vlh hlh tlh] = slin.plot(sdur, 'YLabel', {'Division time' '(min)'});
-              rcolor = [ 0.6 0.2 0.2 ];
-              aboveTreshold = sdur > 10; % true if longer than 10 minutes
             %}
             
-            % Open the plotting window
-            ieNewGraphWin([],'wide');
-
-            % Remove the IDs from the names and create a new tree
-            newTree = tree;
-            newNames = obj.stripID;
-            newTree.Node = newNames';
-            newTree.Parent = obj.Parent;
+            if ieNotDefined('nodeLimit'), nodeLimit = 50; end
             
-            % Plot
-            if newTree.nnodes > 50
-                newTree.showUI;
+            % Call showUI if there are a lot of nodes.
+            if obj.nnodes > nodeLimit
+                obj.showUI;
             else
+                % Plot an image if there are few nodes
+                ieNewGraphWin([],'wide');
+                % Remove the IDs from the names and create a new tree
+                newTree = tree;
+                newNames = obj.stripID;
+                newTree.Node = newNames';
+                newTree.Parent = obj.Parent;
                 newTree.plot([],'font size',14);
             end
         end

@@ -1207,23 +1207,20 @@ switch ieParamFormat(param)  % lower case, no spaces
                     val = id;
                 case 'subtree'
                     % thisR.get('asset', assetName, 'subtree');
+                    % The id is retrieved above.
                     val = thisR.assets.subtree(id);
-                    %{
-                    % This is not true. We should let users determine
-                    % whether to put it under root or not. Otherwise it
-                    % causes like MCC in CB.
-                    % We always assume the subtree is at (0 0 0) of the
-                    % scene.
-                    if isequal(val.Node{1}.type, 'branch')
-                        rNode = val.get(1);
-                        rNode.translation = [0 0 0]';
-                        val = val.set(1, rNode);
-                    end
-                    %}
+
+                    % The current IDs only make sense as part of the whole
+                    % tree.  So we strip them and replace the names in the
+                    % current structure.
+                    replace = true;
+                    [~, val] = val.stripID([],replace);
+
                 case {'nodetoroot','pathtoroot'}
-                    % thisR.get('asset',assetName,'leaf to root');
-                    % Sequence of ids from the leaf to root
-                    % We should check that id is a leaf??? (BW)
+                    % thisR.get('asset',assetName,'node to root');
+                    %
+                    % Returns the sequence of ids from this node id to
+                    % root of the tree.
                     val = thisR.assets.nodetoroot(id);
                     
                     % Get material properties from this asset
@@ -1236,42 +1233,23 @@ switch ieParamFormat(param)  % lower case, no spaces
                     val = material.type;
                     % Leafs (objects) in the tree.
                 
-                    % World position and orientation properties.
+                    % World position and orientation properties.  These
+                    % need more explanation.
                 case 'worldrotationmatrix'
-                    %{
-                    % Should allow branch node as well.
-                    if ~thisR.assets.isleaf(id)
-                        warning('Only leaves have rotations')
-                    else
-                    %}
-                    % Deleted a lot of code comments from here 12/24 (BW).
                     nodeToRoot = thisR.assets.nodetoroot(id);
                     [val, ~] = piTransformWorld2Obj(thisR, nodeToRoot);
-                    %{
-                    % Can we delete?
-                    rotY = -atan2d(curXYZ(3, 1), curXYZ(1, 1)); % az
-                    rotZ = atan2d(curXYZ(2, 1), sqrt(curXYZ(1, 1)^2+curXYZ(3, 1)^2)); % el
-                    rotX = -atan2d(curXYZ(2, 3), sqrt(curXYZ(1, 3)^2 + curXYZ(3, 3)^2)); % az
-                    a = 1;
-                    %}
                 case 'worldrotationangle'
                     rotM = thisR.get('asset', id, 'world rotation matrix');
                     val = piTransformRotM2Degs(rotM);
                 case {'worldtranslation', 'worldtranslationmatrix'}
-                    %{
-                    % Should allow branch node as well.
-                    if ~thisR.assets.isleaf(id)
-                        warning('Only leaves have positions')
-                    else
-                    %}
-                        % Deleted a lot of code comments from here 12/24 (BW).
-                        nodeToRoot = thisR.assets.nodetoroot(id);                        
-                        [~, val] = piTransformWorld2Obj(thisR, nodeToRoot);
-                    
+                    nodeToRoot = thisR.assets.nodetoroot(id);
+                    [~, val] = piTransformWorld2Obj(thisR, nodeToRoot);
                 case 'worldposition'
                     % thisR.get('asset',idOrName,'world position')
                     val = thisR.get('asset', id, 'world translation');
                     val = val(1:3, 4)';
+                    
+                    % These are local values, not world
                 case 'translation'
                     % Translation is always in the branch, not in the
                     % leaf.

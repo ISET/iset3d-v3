@@ -1,7 +1,8 @@
 %% Assets: chop and graft a subtree
 %
 % Assets are stored as trees.  We can add (graft) and remove (chop)
-% subtrees, say taking one subtree for scene1 and moving it into scene2.
+% subtrees. This script chops a subtree and restores it.  It also copies a
+% lighting tree from the SimpleScene to a sphere scene.  
 % 
 % ZLY/BW
 %
@@ -23,6 +24,7 @@ thisR.set('fov',45);
 thisR.set('nbounces',5); 
 
 %% Render
+
 piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
@@ -30,43 +32,39 @@ sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
 %% Select a subtree
-%
-% Show the tree
-thisR.assets.showUI;
+
+% Show the whole tree
 thisR.assets.show;
 
-% Get the subtree under the black mirror branch
-%
-% This sequence might eventually become
-%   thisR.get('asset',thisAssetName,'subtree');
-thisAssetName = 'mirror_B';
-id = thisR.get('asset', thisAssetName, 'id');
-mirrorSubtree = thisR.assets.subtree(id);
-[~, mirrorSubtree] = mirrorSubtree.stripID([], true);
+% Get the subtree under the black mirror
+assetName = 'mirror_B';
+mirrorSubtree = thisR.get('asset',assetName,'subtree');
 
-% The subtree is just another
-% tree.
+% The subtree is just another tree.
 mirrorSubtree.names
-mirrorSubtree.show;
 
-%% Chop off a subtree, deleting the black mirror
+%% Chop off the black mirror subtree
+
+id = thisR.get('assets',assetName,'id');
 thisR.assets = thisR.assets.chop(id);
+
+% Notice that the mirror_B is now gone.
 thisR.assets.show;
 
-% Render without the black mirror
+%% Render without the black mirror
+
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name',sprintf('%s - mirror removed',sceneName));
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
-%% Graft the subtree back onto the root
-% 
+%% Graft the subtree back onto the root and render
+
 % We can do this because we snagged it before chopping
 assetName = 'root';
 thisR.set('asset', assetName, 'graft', mirrorSubtree);
 
-% Render
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name',sprintf('%s - mirror restored',sceneName));
@@ -74,56 +72,39 @@ sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
 %% Extract the lighting subtree
-id = thisR.get('asset', 'sky_B', 'id');
-[lightingSubtree, index] = thisR.assets.subtree(id);
-[~, lightingSubtree] = lightingSubtree.stripID([], true);
+
+assetName = 'sky_B';
+lightingSubtree = thisR.get('assets',assetName,'subtree');
 lightingSubtree.names
 lightingSubtree.show;
 
 %% Render another scene
+
 sceneName = 'sphere';
 thisR = piRecipeDefault('scene name',sceneName);
-thisR = piLightAdd(thisR, 'type', 'distant', ...
-    'light spectrum', [9000 0.001],...
-    'camera coordinate', true);
+blueLight = piLightCreate('blueLight','type', 'distant', ...
+    'spd', [9000 0.001],...
+    'cameracoordinate', true);
+thisR.set('light','add',blueLight);
+
 thisR.assets.show;
 
-% Render
 piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('%s',sceneName));
 sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
 
-%% Add first scene lighting to second
-%
-% Adding works, but we don't fully understand the rendering itself.
-%
-% Needs a little more thought and explanation.
+%% Add first scene lighting to the sphere scene
+
 assetName = 'root';
 thisR.set('asset', assetName, 'graft', lightingSubtree); 
 thisR.assets.show;
 
-% Render
 piWrite(thisR);
 scene = piRender(thisR);
 scene = sceneSet(scene,'name',sprintf('%s - light added',sceneName));
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
-%% Add the mirror to the sphere scene
-%
-% Adding works, but the mirror isn't visible. Maybe not in the FOV?
-%
-% Needs a little more thought and explanation.
-assetName = 'root';
-thisR.set('asset', assetName, 'graft', mirrorSubtree); 
-thisR.assets.show;
-
-% Render
-piWrite(thisR);
-scene = piRender(thisR);
-scene = sceneSet(scene,'name',sprintf('%s - mirror added',sceneName));
-sceneWindow(scene);
-sceneSet(scene, 'render flag', 'hdr');
+%% END
 

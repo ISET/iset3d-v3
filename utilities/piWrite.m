@@ -186,36 +186,34 @@ piWriteBlocks(thisR,fileID);
 %% Add 'Include' lines for materials, geometry and lights into the scene PBRT file
 piIncludeLines(thisR,fileID);
 
-%% We won't do anything below this if the exporter is copy
-if isequal(thisR.exporter, 'Copy')
-    return;
-end
 %% Write out the lights
 piLightWrite(thisR);
-
-%{
- renderRecipe = piLightDeleteWorld(thisR, 'all');
- % Check if we removed all lights
- piLightGetFromWorld(thisR)
-%}
 
 %% Close the main PBRT scene file
 fclose(fileID);
 
 %% Write scene_materials.pbrt
+
+% Even when copying, we extract the materials and textures
 piWriteMaterials(thisR,overwritematerials);
+
+%% If the exporter is copy, we do not write out the geometry
+if isequal(thisR.exporter, 'Copy')
+    return;
+end
 
 %% Overwrite geometry.pbrt
 piWriteGeometry(thisR,overwritegeometry,lightsFlag,thistrafficflow)
 
-%% Overwrite xxx.json
+%% Overwrite xxx.json - For traffic scenes
+
 if overwritejson
     [~,scene_fname,~] = fileparts(thisR.outputFile);
     jsonFile = fullfile(workingDir,sprintf('%s.json',scene_fname));
     jsonwrite(jsonFile,thisR);
 end
 
-end
+end   % End of piWrite 
 
 %% Helper functions
 
@@ -574,24 +572,35 @@ function piIncludeLines(thisR,fileID)
 %
 % We must add the materials before the geometry.
 % We add the lights at the end.
+% 
 
-% For the Copy case, we just copy the world.
+basename = thisR.get('output basename');
+
+% For the Copy case, we just copy the world and Include the lights.
 if isequal(thisR.exporter, 'Copy')
-    for ii = 1:numel(thisR.world)
+    for ii = 1:numel(thisR.world)        
+        if ii == numel(thisR.world)
+            % Lights at the end
+            fprintf(fileID,'Include "%s_lights.pbrt" \n', basename);
+        end
+        
         fprintf(fileID,'%s \n',thisR.world{ii});
+        
+        if ii == 1
+            % Materials at the beginning
+            fprintf(fileID,'Include "%s_materials.pbrt" \n', basename);
+        end
     end
     return;
 end
 
-%% Delete any World lines with _geometry, _materials, _lights
+%% Find the World lines with _geometry, _materials, _lights
 
 % We are being aggressive about the Include files.  We want to name them
 % ourselves.  First we see whether we have Includes for these at all
 lineMaterials = find(contains(thisR.world, {'_materials.pbrt'}));
 lineGeometry  = find(contains(thisR.world, {'_geometry.pbrt'}));
 lineLights    = find(contains(thisR.world, {'_lights.pbrt'}));
-
-basename = thisR.get('output basename');
 
 % If we have  geometry Include, we overwrite it with the name we want.
 if ~isempty(lineGeometry)
@@ -610,61 +619,9 @@ if ~isempty(lineLights)
     thisR.world(lineLights) = sprintf('Include "%s_lights.pbrt" \n', basename);
 end
 
-%% Insert the _materials, _geometry, _lights Includes just prior to WorldEnd 
+%% Write out the World information.
 
-% This what we used to do.
-
-%{
-% See if there is an Include geometry. If not, add an Include geometry
-% file. How many _geometry.pbrt references?
-basename = thisR.get('output basename');
-nGeometry = numel(find(contains(thisR.world, {[basename,'_geometry.pbrt']})));
-switch nGeometry
-    case 0
-        if ~isempty(thisR.assets)
-            basename = thisR.get('output basename');
-            thisR.world{end} = sprintf('Include "%s_geometry.pbrt"', basename);
-            thisR.world{end+1} = 'WorldEnd';
-        end
-    case 1
-        % That's good.  One Include xxx_geometry.pbrt
-    otherwise
-        error('More than one _geometry.pbrt in the World Section');
-end
-
-% We walk through each of the lines in the world.  When we get to the line
-% that has the Include xxx_geometry, and the World does not also include
-% xxx_materials.pbrt, we insert a Include xxx_materials line.
-nlines_world =length(thisR.world);
-for ii = 1:nlines_world
-    currLine = thisR.world{ii};
-
-    % If the current line contains the geometry include, and there is no
-    % xxx_materials.pbrt anywhere in the world, we add the Include of the
-    % xxx_materials.pbrt file.  We are careful to place the materials
-    % include earlier than the geometry file.
-    if (numel(find(contains(currLine, {[basename,'_geometry.pbrt']})))==1) && ...
-            ~(numel(find(contains(thisR.world, {[basename,'_materials.pbrt']})))==1)
-        
-        % Find the name of the output file
-        % [~,n] = fileparts(thisR.outputFile);
-        % Save the world lines prior to this geometry.pbrt line
-        tmpWorld(1:ii-1,:) = thisR.world(1:ii-1,:);
-        
-        % Add the material include line
-        tmpWorld{ii} = sprintf('Include "%s_materials.pbrt"', basename); %#ok<AGROW>
-        
-        % Copy rest of the world, including this currLine, and put the
-        % whole thing back into thisR.world.
-        tmpWorld(ii+1:nlines_world+1,:) = thisR.world(ii:nlines_world,:);
-        thisR.world = tmpWorld;
-        break;
-    end
-end
-%}
-
-% We write out the World information. 
-% We insert the Include lines as the last three before  WorldEnd. 
+% Insert the Include lines as the last three before  WorldEnd. 
 for ii = 1:length(thisR.world)
     currLine = thisR.world{ii};    
     if piContains(currLine, 'WorldEnd') && isempty(lineLights)

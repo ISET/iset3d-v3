@@ -851,7 +851,7 @@ switch param
                 case {'delete', 'remove'}
                     % thisR.set('light', 'delete', idxORname);
                     if isnumeric(varargin{1})
-                        thisR.lights{varargin{1}} = [];
+                        thisR.lights(varargin{1}) = [];
                     elseif isequal(varargin{1}, 'all')
                         thisR.lights = {};
                     else

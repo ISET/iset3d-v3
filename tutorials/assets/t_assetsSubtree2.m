@@ -30,33 +30,44 @@ sceneWindow(scene);
 %}
 %%
 
-fname = fullfile(piRootPath,'data', 'V3',...
-    'glasses','glasses.pbrt');
+% ieWebGet2('browse')
+sceneName = ieWebGet2('op','fetch','resourcename','glasses');
 
-thisR = piRead(fname);
-
-% assetName = '003ID_Guitar_B';
-assetName = '074_B';
-%{
-%% 
+thisR = piRead(fullfile(sceneName,'glasses.pbrt'));
 thisR.set('film resolution',[300 200]*1.5);
-thisR.set('rays per pixel',32);
+thisR.set('rays per pixel',128);
 thisR.set('fov',45);
-thisR.set('nbounces',1);
+thisR.set('nbounces',3);
 
 piWrite(thisR);
-%%
-disp('*** Rendering...')
-[scene,result] = piRender(thisR,'render type','radiance');
+scene = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
-%}
-%%
+
+%% Make the glass glass
+
+piMaterialList(thisR)
 matName = '10 - Default';
 glass = piMaterialCreate(matName, 'type', 'glass');
 thisR.set('material', matName, glass);
 
+piWrite(thisR);
+scene = piRender(thisR,'render type','radiance');
+sceneWindow(scene);
+
+thisR.assets.show;
+
+% We might try deleting some of these branches (subtrees)
+% 
+% thisR.set('assets','Group001_B','delete');
+
 %% Save the asset
-thisR.set('asset', assetName, 'scale', 0.005);
+assetName = '074_B';
+thisR.set('asset', assetName, 'scale', 2);
+piWrite(thisR);
+scene = piRender(thisR,'render type','radiance');
+sceneWindow(scene);
+
+%%
 subTree = thisR.get('asset', assetName, 'subtree');
 matList = thisR.get('materials');
 txtList = thisR.textures.list;
