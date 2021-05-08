@@ -828,12 +828,22 @@ switch ieParamFormat(param)  % lower case, no spaces
         % When using ISETBio, we usually call it spatial samples or spatial
         % resolution.  For ISET3d, it is usually film resolution because of
         % the PBRT notation.
+        % 
+        % We also have some matters to consider for light field cameras.
         try
             val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
         catch
             warning('Film resolution not specified');
             val = [];
         end
+        %{
+        % For a lightfield camera, if film resolution is not defined, we
+          could do this. This would be an omni camera that has microlenses.
+          
+          nMicrolens = thisR.get('n microlens');
+          nSubpixels = thisR.get('n subpixels');
+          thisR.set('film resolution', nMicrolens .* nSubpixels);
+        %}
         
     case 'filmxresolution'
         % An integer specifying number of samples

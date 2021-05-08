@@ -30,10 +30,14 @@ sceneWindow(scene);
 %}
 %%
 
-% ieWebGet2('browse')
-sceneName = ieWebGet2('op','fetch','resourcename','glasses');
+sceneFile = fullfile(sceneName,'glasses.pbrt');
 
-thisR = piRead(fullfile(sceneName,'glasses.pbrt'));
+if ~exist(sceneFile,'file')
+    % ieWebGet2('browse')
+    sceneName = ieWebGet2('op','fetch','resourcename','glasses');
+end
+
+thisR = piRead(sceneFile);
 thisR.set('film resolution',[300 200]*1.5);
 thisR.set('rays per pixel',128);
 thisR.set('fov',45);

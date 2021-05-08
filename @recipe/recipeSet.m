@@ -585,9 +585,12 @@ switch param
         thisR.camera.num_pinholes_w.type = 'float';
     case 'lightfieldfilmresolution'
         % This is printed out in the pbrt scene file
+        % It should only be a get, not a set.
+        %{
         nMicrolens = thisR.get('n microlens');
         nSubpixels = thisR.get('n subpixels');
         thisR.set('film resolution', nMicrolens .* nSubpixels);
+        %}
     case 'nsubpixels'
         % How many pixels behind each microlens/pinhole
         % The type is not included because this is not passed to pbrt.  It

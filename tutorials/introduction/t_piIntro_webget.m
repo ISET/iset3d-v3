@@ -147,13 +147,13 @@ end
 %  piCameraRotate(thisR,'y rot',-35);
 
 piWrite(thisR);
-[scene, result] = piRender(thisR,'render type','radiance');
+[scene, result] = piRender(thisR,'render type','both');
 
 % scene = piAIdenoise(scene);
 sceneWindow(scene);
 sceneSet(scene,'render flag','hdr');
 
-%% Change the color of one of the materials
+%% Change the color of one of the materials in the kitchen scene
 %{
 thisR.get('materials','Walls','kd')
 
@@ -170,6 +170,23 @@ ambientLight = piLightCreate('ambient',...
     'mapname','room.exr');
 thisR.set('light','add',ambientLight);
 
+%}
+%{
+  % Turn camera to the right and move towards the stove
+  thisR = piCameraRotate(thisR,'y rot',25);
+  saveFrom = [1.2110    1.5    3.8524];
+  thisR.set('from',saveFrom + [0 0 -5]);
+  
+  thisR.set('film resolution', [320, 320]*2);
+  thisR.set('rays per pixel',256);
+  thisR.set('n bounces',5);
+        
+  piWrite(thisR);
+  [scene, result] = piRender(thisR,'render type','both');
+
+  scene = piAIdenoise(scene);
+  sceneWindow(scene);
+  sceneSet(scene,'render flag','hdr');
 %}
 
 %%
