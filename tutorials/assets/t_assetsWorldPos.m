@@ -140,4 +140,4 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 sceneSet(scene, 'render flag', 'hdr');
 
-%%
+%% END
