@@ -1,7 +1,7 @@
 %% Move an asset during the rendering to simulate motion
 %
-% We can translate the object or rotate the object.  Both are illustrated
-% below.
+%  We can translate or rotate the object during the rendering.  Both are
+%  illustrated.
 %
 % See also
 %   t_piIntro_*
@@ -15,17 +15,17 @@ if ~piDockerExists, piDockerConfig; end
 
 thisR = piRecipeDefault('scene name','SimpleScene');
 
-% This is a low resolution for speed.
+% This is low resolution and only radiance for speed.
 thisR.set('film resolution',[200 150]);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5); 
 
-% Speed up by only returning radiance.
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 sceneSet(scene,'render flag','hdr');
+drawnow;
 
 %% Introduce asset (object) motion blur (not camera motion)
 
@@ -48,9 +48,6 @@ thisR.set('camera exposure', 0.5);
 % This sets the motion translation.  Make it return the T1!!!
 [~,T1] = thisR.set('asset', thisAssetName, 'motion', 'translation', [0.1, 0.1, 0]);
 
-% Make this work!!!
-% thisR.get('asset',thisAssetName,'motion','translation')
-
 % Render the motion blur
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
@@ -59,21 +56,23 @@ sceneWindow(scene);
 
 %% Delete the motion translation
 
+% We illustrate the change in the asset three before and after deleting the
+% branch
 thisR.assets.show([],2);
-
 thisR.set('asset',T1.name,'delete');
-
 thisR.assets.show([],2);
 
+% This illustrates that we have deleted the translation correctly.
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Translation');
 sceneWindow(scene);
 
-%% Add some rotation to the motion
+%% Add a rotation to the motion
 
 [~,R1] = thisR.set('asset', thisAssetName, 'motion', 'rotation', [0, 0, 30]);
 
+% Show that it worked
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Rotation');
