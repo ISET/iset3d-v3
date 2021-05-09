@@ -1,7 +1,7 @@
 function thisR = piCameraTranslate(thisR, varargin)
 % Create a vector displacement for the camera
 %
-% Syntax:
+% Synopsis:
 %  thisR = piCameraShift(recipe,'x shift',x,...
 %                               'y shift',y,...
 %                               'z shift',z);
@@ -9,7 +9,7 @@ function thisR = piCameraTranslate(thisR, varargin)
 % Brief description:
 %  Calculate a new camera position given by the specified shift in camera space
 %
-% Inputs:
+% Inputs
 %  recipe  - The recipe of the scene
 %
 % Optional key/val pairs:
@@ -34,29 +34,28 @@ function thisR = piCameraTranslate(thisR, varargin)
 %  current lookAt to shift the camera position in the x, y and z
 %  directions. The lookAt in the recipe is updated and returned.
 %
-
-
-%}
+% Calculation notes:
+%
 %  Suppose the world coordinates of the scene are (x,y,z) space.
-%  The viewing direction is 'direction'
-%  In the camera space, 'direction' is the z-axis, call this the z'
-%  direction.
+%  The viewing direction is 'direction'.  This is "to - from". We call this
+%  the z' direction in the camera space to distinguish it from the
+%  z-direction in the world. 
 %
 %  We need to define the x',y' dimensions in the camera space.
-%  We know that these are perpendicular to z'.  We make the x' axis
-%  perpendicular to (y,z') and the y' axis perpendicular to (x',z').
-%  We identify these directions using the cross product.
+%  We know that these are perpendicular to z'.  
 %
-%  And we would like y' to be in the plane defined by (y,z')
-%  Then x' is perpendicular to z' and y'
+%  We make the x' axis perpendicular to [0,1,0] and z'. Then we make y'
+%  axis perpendicular to (x',z'). 
 %
-%     x' = cross(direction,y) and y' = cross(direction,x)
-%  or
-%     y' = nullspace(x',z')
+%     x' = cross([0,1,0],direction) and y' = cross(direction,x')
 %
+% (there is a way to use the nullspace method to do this calculation, too).
 %
-%  See also
-%   piCameraRotate
+%  Finally, we want the positive y' to be in the same direction as 'up'. So
+%  we check the inner product of 'up' and y', and we make it positive. 
+%
+% See also
+%    piCameraRotate
 
 % Examples:
 %{
@@ -122,10 +121,12 @@ direction = direction/norm(direction);
 % The three should follow the 'left hand rule' for the axis
 cameraX = cross([0 1 0],direction); cameraX = cameraX/norm(cameraX);
 cameraY = cross(cameraX,direction); cameraY = cameraY/norm(cameraY);
+
 % We want cameraY to be pointing in the same direction as lookAt.up
 up = thisR.get('up');
 if dot(cameraY,up) < 0, cameraY = -1*cameraY; end
-cameraX = reshape(cameraX, size(direction)); cameraY = reshape(cameraY, size(direction));
+cameraX = reshape(cameraX, size(direction)); 
+cameraY = reshape(cameraY, size(direction));
 
 %{
  ieNewGraphWin;

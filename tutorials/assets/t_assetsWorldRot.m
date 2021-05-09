@@ -48,33 +48,42 @@ sceneWindow(scene);
 
 %% Check if we can use the rotation angle to reproduce the rotation.
 
+% Notice the rotation of the figure_3m
+thisR.assets.show; pause(2); close;
+
 % Delete the rotation we applied above
 thisR.set('asset', R1.name, 'delete');
+
+% Now it is gone
+thisR.assets.show; pause(2); close;
 
 % Apply the rotation angle
 thisR.set('asset', assetName, 'rotation', rotAng);
 
-% Render
-piWrite(thisR)
-scene = piRender(thisR, 'render type', 'radiance');
-sceneWindow(scene);
+% Now we put it back, but a different way
+thisR.assets.show; pause(2); close;
 
-%% Now rotate two assets, specified in world space
+%% Rotate two assets, specified in world space and move the camera
 
 thisR = piRecipeDefault('scene name', 'simple scene');
+saveFrom = thisR.get('from');
 
-thisR.set('film resolution',[200 150]);
-thisR.set('rays per pixel',64);  % A few more rays
-
-% Zoom a bit
-thisR.set('fov',25);
+thisR.set('film resolution',[320 320]);
+thisR.set('rays per pixel',32);
+thisR.set('fov',45);
 thisR.set('nbounces',5); 
 
 thisR.set('asset', 'figure_3m_O', 'world rotate', [0 0 90]);
 thisR.set('asset', 'figure_6m_O', 'world rotate', [0 0 90]);
 
+% Move the camera for a better look
+oDist = thisR.get('object distance');
+piCameraTranslate(thisR,'z shift',0.3*oDist,'fromto','both');
+piCameraTranslate(thisR,'y shift',0.8*oDist,'fromto','both');
+piCameraTranslate(thisR,'x shift',0.2*oDist,'fromto','to');
+
 piWrite(thisR)
-scene = piRender(thisR, 'render type', 'radiance');
+[scene,result] = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
 
 %% END

@@ -1,4 +1,4 @@
-%% How to get positions and rotations in World coordinates
+%% Calculating positions and rotations in World coordinates
 %
 % Many of the rotations and translations in graphics are specified with
 % respect to the asset coordinate frame, or relative to the current
@@ -9,7 +9,6 @@
 % way back up the asset tree, collecting the rotations and translations
 % along the way, to specify where the asset is in the 'world', which is to
 % say the whole frame.
-%
 %
 % Author:  ZLy, BW
 %
@@ -31,7 +30,7 @@ thisR.set('nbounces',5);
 
 % thisR.assets.show;
 
-%% Render 
+% Render 
 piWrite(thisR)
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
@@ -48,8 +47,10 @@ transM1 = thisR.get('asset', assetName, 'world translation');
 
 pos1    = thisR.get('asset', assetName, 'world position');
 
-%% Add two rotations and render
+%% Rotate the figure. 
 
+% This rotation means that the y-direction of the object and the world are
+% no longer aligned.
 [~,R1] = thisR.set('asset', assetName, 'rotation', [0 0 45]);
 [~,R2] = thisR.set('asset', assetName, 'rotation', [0 45 0]);
 
@@ -61,7 +62,8 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %% Translate along y axis in world space
 
-% This moves the object up in the screen
+% This moves the object up in the screen.  The asset branch that defines
+% the translation is returned in T1.
 [~,T1] = thisR.set('asset', assetName, 'world translation', [0 0.5 0]);
 
 % Check rotation matrix and position
@@ -77,13 +79,29 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %% Compare with standard translation
 
-% Delete the world translation
+% Delete the world translation we just exected.
 thisR.set('asset',T1.name,'delete');
 
-% Insert the standard translation
-thisR.set('asset', assetName, 'translation', [0 0.5 0]);
+% Render
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%% Insert a standard translation, with respect to the asset's coordinates
+
+[~,A1] = thisR.set('asset', assetName, 'translation', [0 0.5 0]);
 
 % Render and note that the y-direction is w.r.t. the stick figure
+piWrite(thisR)
+scene = piRender(thisR, 'render type', 'radiance');
+sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
+
+%% Delete the translation, putting him back
+
+thisR.set('asset',A1.name,'delete');
+
 piWrite(thisR)
 scene = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
