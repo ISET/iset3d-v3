@@ -1,28 +1,10 @@
-%% Add asset motion blur to the scene
+%% Move an asset during the rendering to simulate motion
 %
-% Brief description:
-%   This script shows how to add motion blur to individual objects in a
-%   scene.
-%
-% Dependencies:
-%    ISET3d, ISETCam 
-%
-% Check that you have the updated docker image by running
-%
-%    docker pull vistalab/pbrt-v3-spectral
-%
-% Authors:
-%   Zhenyi SCIEN 2019
+% We can translate the object or rotate the object.  Both are illustrated
+% below.
 %
 % See also
 %   t_piIntro_*
-
-% History:
-%   10/28/20  dhb    Removed block of commented out code about point clouds,
-%                    which didn't seem to belong here at all (as the comment
-%                    indicated.  Added some comments.
-%
-%   12/13/20  ZLY/BW Updated the code with new asset style.
 
 %% Initialize ISET and Docker
 
@@ -61,7 +43,7 @@ fprintf('Object position: \n    x: %.1f, y: %0.1f, depth: %.1f \n',...
 
 % To add a motion blur we define the shutter exposure duration to the
 % camera. This simulates how long the shutter is open (seconds).
-thisR.set('cameraexposure', 0.5);
+thisR.set('camera exposure', 0.5);
 
 % This sets the motion translation.  Make it return the T1!!!
 [~,T1] = thisR.set('asset', thisAssetName, 'motion', 'translation', [0.1, 0.1, 0]);
@@ -69,7 +51,7 @@ thisR.set('cameraexposure', 0.5);
 % Make this work!!!
 % thisR.get('asset',thisAssetName,'motion','translation')
 
-%% Render the motion blur
+% Render the motion blur
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene,'name','motionblur: Translation');
@@ -77,7 +59,11 @@ sceneWindow(scene);
 
 %% Delete the motion translation
 
+thisR.assets.show([],2);
+
 thisR.set('asset',T1.name,'delete');
+
+thisR.assets.show([],2);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');

@@ -283,8 +283,11 @@ classdef tree
         end
         
         % Print the tree or a node of the tree
-        function show(obj,nodeLimit)
-            % Bring up a window representing the tree.  
+        function show(obj,nodeLimit,duration)
+            % Bring up a window representing the tree. 
+            %
+            %  nodeLimit - If more than this amount, use showUI
+            %  duration  - Delete the image after duration seconds
             %
             % This uses tree.plot when there are nodeLimit (50) nodes or
             % less. If there are more than nodeLimit nodes, we call showUI,
@@ -302,6 +305,7 @@ classdef tree
             %}
             
             if ieNotDefined('nodeLimit'), nodeLimit = 50; end
+            if ieNotDefined('duration'), duration = []; end
             
             % Call showUI if there are a lot of nodes.
             if obj.nnodes > nodeLimit
@@ -315,6 +319,10 @@ classdef tree
                 newTree.Node = newNames';
                 newTree.Parent = obj.Parent;
                 newTree.plot([],'font size',14);
+            end
+            
+            if isempty(duration), return;
+            else, pause(duration), close; 
             end
         end
         
