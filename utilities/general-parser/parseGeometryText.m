@@ -1,14 +1,13 @@
 function [trees, parsedUntil] = parseGeometryText(thisR, txt, name)
 %
 % Inputs:
-%
+%   thisR       - a scene recipe
 %   txt         - remaining text to parse
 %   name        - current object name
 %
 % Outputs:
-%   res         - struct of results
-%   children    - Attributes under the current object
-%   parsedUntil - line number of the parsing end
+%   trees       - struct of results
+%   parsedUntil - line number where the parsing ends
 %
 % Description:
 %

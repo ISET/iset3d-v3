@@ -116,7 +116,7 @@ p.addParameter('thistrafficflow',[]);
 % Store JSON recipe for the traffic scenes
 p.addParameter('overwritejson',true,@islogical);
 
-p.addParameter('verbose', 2, @isnumeric);
+p.addParameter('verbose', 0, @isnumeric);
 
 p.parse(thisR,varargin{:});
 

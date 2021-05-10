@@ -172,7 +172,7 @@ switch ieParamFormat(sceneName)
             ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
             if ~exist(fname, 'file'), error('File not found'); end
         end
-        exporter = 'C4D';
+        exporter = 'Copy';
     case 'chesssetpieces'
         sceneName = 'ChessSetPieces';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
