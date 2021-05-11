@@ -66,7 +66,7 @@ function val = recipeGet(thisR, param, varargin)
 %     'object distance'  - The magnitude ||(from - to)|| of the difference
 %                          between from and to.  Units are from the scene,
 %                          typically in meters.
-%     'object direction' - Unit length vector of from and to
+%     'lookat direction' - Unit length vector of from and to
 %     'look at'          - Struct with four components
 %        'from'           - Camera location
 %        'to'             - Camera points at
@@ -270,8 +270,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             val = val*ieUnitScaleFactor(varargin{1});
         end
         
-    case 'objectdirection'
+    case {'lookatdirection','objectdirection'}
         % A unit vector in the lookAt direction
+        % At some point we called this the object direction to indicate
+        % that we are looking at an object in this direction.  Though the
+        % reality is we may just be looking at the sky - no object.
         val = thisR.lookAt.from - thisR.lookAt.to;
         val = val/norm(val);
         
