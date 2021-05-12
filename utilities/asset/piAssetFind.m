@@ -38,7 +38,10 @@ if isnumeric(val), val = assets.get(val).name; end
 nodeList = 0; % 0 is always the index for root node
 
 curIdx = 1; %
- 
+
+id = [];
+thisAsset = {};
+
 while curIdx <= numel(nodeList)
     IDs = assets.getchildren(nodeList(curIdx));
     for ii = 1:numel(IDs)
@@ -48,18 +51,18 @@ while curIdx <= numel(nodeList)
             % case. 
             if isequal(val, assets.stripID(IDs(ii))) || ...
                     isequal(val, assets.names(IDs(ii)))
-                id = IDs(ii);
-                if nargout > 1, thisAsset = assets.get(IDs(ii)); end
-                return;
+                id = [id IDs(ii)];
+                if nargout > 1, thisAsset{end + 1} = assets.get(IDs(ii)); end
+                % return;
             end
         else
             % Another parameter must match.  Returns the first instance of
             % the match.  Maybe it should return all the instances?
             if IDs(ii) > 1
-                thisAsset = assets.get(IDs(ii));
+                thisAsset{end + 1} = assets.get(IDs(ii));
                 if isequal(val, piAssetGet(thisAsset, param))
-                    id = IDs(ii);
-                    return;
+                    id = [id IDs(ii)];
+                    % return;
                 end
             end
         end
@@ -69,7 +72,6 @@ while curIdx <= numel(nodeList)
     curIdx = curIdx + 1;
 end
 
-id = [];
-thisAsset = [];
+
 
 end
