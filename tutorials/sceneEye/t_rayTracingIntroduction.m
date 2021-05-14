@@ -116,7 +116,7 @@ disp(theScene.get('recipe'))
 theScene.set('use pinhole',true);
 theScene.set('fov',33);
 
-scene = theScene.render;
+[scene,renderInfo] = theScene.render('render type','radiance');
 sceneWindow(scene);
 
 %% Rendering the PBRT scene

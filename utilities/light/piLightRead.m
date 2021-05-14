@@ -1,12 +1,15 @@
 function thisR = piLightRead(thisR)
-% Read light information from both world text and file
+% Read light information from world text or from a file
 %
 % Synopsis:
+%   thisR = piLightRead(thisR)
 % 
 % Description:
+%   We create the lights slot in the recipe from text in the World or
+%   from a file.
 %
-%
-%
+% See also
+%   piRead
 
 % Examples
 %{
