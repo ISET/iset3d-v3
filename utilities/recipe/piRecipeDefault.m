@@ -103,7 +103,6 @@ sceneName = p.Results.scenename;
 write     = p.Results.write;
 verbosity = p.Results.verbose;
 
-
 %%  To read the file,the upper/lower case must be right
 
 % We check based on all lower case, but get the capitalization right by
@@ -384,6 +383,7 @@ switch ieParamFormat(sceneName)
             ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
             if ~exist(fname, 'file'), error('File not found'); end
         end
+        % mmUnits = true;
         exporter = 'Copy';
     case 'lettersatdepth'
         sceneName = 'lettersAtDepth';

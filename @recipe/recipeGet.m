@@ -874,7 +874,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         if isfield(thisR.film,'diagonal')
             val = thisR.film.diagonal.value;
         else
-            warning('Setting film diagonal to 10 mm. Previously unspecified');
+            % warning('Setting film diagonal to 10 mm. Previously unspecified');
             thisR.set('film diagonal',10);
             val = 10;
         end

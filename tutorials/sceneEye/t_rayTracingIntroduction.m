@@ -89,6 +89,10 @@ if ~piDockerExists, piDockerConfig; end
 % You can select a scene as follows:
 theScene = sceneEye('Numbers at depth');
 
+% Some scenes, but not most, use mm as spatial units.  This scene does.
+% This parameter is part of the camera definition.
+theScene.set('mm units',true);
+
 % ISETBIO requires a "working directory." If one is not specified when
 % creating a scene, the default is in isetbioRootPath/local. All data
 % needed to render a specific scene will be copied to the working folder
@@ -114,9 +118,9 @@ disp(theScene.get('recipe'))
 % Setting the pinhole to true means we have no optics.  The result is a
 % scene, rather than a spectral irradiance at the retina.
 theScene.set('use pinhole',true);
-theScene.set('fov',33);
+theScene.set('fov',45);
 
-[scene,renderInfo] = theScene.render('render type','radiance');
+[scene,renderInfo] = theScene.render;
 sceneWindow(scene);
 
 %% Rendering the PBRT scene
@@ -124,8 +128,8 @@ sceneWindow(scene);
 % Now tell PBRT to use the lens
 theScene.set('use optics',true);
 
-% Focus on the numbers at 200 mm
-theScene.set('accommodation',1/0.2);   % Diopters
+% Focus on the numbers at 300 mm
+theScene.set('accommodation',1/.3);   % Diopters
 
 % The lens rendering benefits from adding a few more rays per pixel
 theScene.set('rays per pixel',192);
@@ -135,7 +139,7 @@ theScene.summary;
 
 % Render and show.  We use 'oi' to refer to optical image, the spectral
 % irradiance at the retina (also retinal irradiance).
-oi = theScene.render;
+oi = theScene.render('render type','radiance');
 oiWindow(oi);
 
 %% Set the accomodation to the 100 mm target
@@ -143,9 +147,9 @@ oiWindow(oi);
 % Change the focal distance.  You can set this in diopters or 'focal
 % distance'.  Your choice.
 theScene.set('accommodation',1/0.1);   % Diopters
-theScene.summary;
+% theScene.summary;
 
-oi = theScene.render;
+oi = theScene.render('render type','radiance');
 oiWindow(oi);
 
 %% Adjust the lens pigment density

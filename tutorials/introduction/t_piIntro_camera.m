@@ -56,6 +56,8 @@ oi = piRender(thisR);
 oi = piAIdenoise(oi);  % Denoising is not necessary, but it looks nice
 
 oiWindow(oi);
-oiSet(oi,'render flag','hdr');
+
+% If you are running with ISETBio, there is no render flag.  Yet.
+if piCamBio, oiSet(oi,'render flag','hdr'); end
 
 %% END
