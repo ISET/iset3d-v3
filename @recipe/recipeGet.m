@@ -1206,6 +1206,10 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('asset',assetName,param);  % Returns the param val
         
         [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
+        % If only one asset matches, turn it from cell to struct.
+        if numel(thisAsset) == 1
+            thisAsset = thisAsset{1};
+        end
         if isempty(id), error('Could not find asset %s\n',varargin{1}); end
         if length(varargin) == 1
             val = thisAsset;

@@ -41,7 +41,7 @@ p.parse(intext, varargin{:});
 
 AttBegin  =  find(piContains(intext,'AttributeBegin'));
 AttEnd    =  find(piContains(intext,'AttributeEnd'));
-arealight =  piContains(intext,'AreaLightSource');
+% arealight =  piContains(intext,'AreaLightSource');
 light     =  piContains(intext,'LightSource');
 lightIdx  =  find(light);   % Find which lines have LightSource on them.
 
@@ -52,6 +52,25 @@ lightTextRanges = cell(1, nLights);
 for ii = 1:nLights
     % Find the attributes sections of the input text from the World.
     %    
+    
+    % Check if the light line falls in any range of AttBegin-AttEnd.
+    % If yes, process the whole section. Otherwise, process that line. 
+    % This can lead to problems for the file having a lot of transforms
+    % without grouping them by AttributeBegin/End.
+    
+    for jj = 1:numel(AttBegin)
+        if lightIdx(ii) > AttBegin(jj) &&...
+                lightIdx(ii) < AttEnd(jj)
+            lightLines  = intext(AttBegin(jj):AttEnd(jj));
+            lightTextRanges{ii} = [AttBegin(jj), AttEnd(jj)];
+        end
+    end
+    if isempty(lightTextRanges{ii})
+        lightLines  = intext(lightIdx(ii));
+        lightTextRanges{ii} = lightIdx(ii);
+    end
+    
+    %{
     if length(AttBegin) >= ii &&...
             lightIdx(ii) > AttBegin(ii) &&...
             lightIdx(ii) < AttEnd(ii)
@@ -65,7 +84,8 @@ for ii = 1:nLights
         light(arealight) = 0;
         lightLines  = intext(lightIdx(ii));
         lightTextRanges{ii} = lightIdx(ii);
-    end    
+    end 
+    %}
     
     % The txt below is derived from the intext stored in the
     % lightSources.line slot.
@@ -74,11 +94,11 @@ for ii = 1:nLights
         thisLightSource = piLightCreate(lightName, 'type', 'area');
 
         thisLine = lightLines{piContains(lightLines, 'AreaLightSource')};
-        
+
         % Spectrum
         spec = piParameterGet(thisLine, 'L');
         thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
-        
+
         % Twosided
         twoside = piParameterGet(thisLine, 'bool twosided');
         if twoside
@@ -88,7 +108,7 @@ for ii = 1:nLights
                 thisLightSource = piLightSet(thisLightSource, 'twosided val', true);
             end
         end
-        
+
         % n samples
         nSamples = piParameterGet(thisLine, 'integer nsamples');
         thisLightSource = piLightSet(thisLightSource, 'nsamples val', nSamples);
@@ -99,74 +119,74 @@ for ii = 1:nLights
         lightType = lightType{2}(2:end-1); % Remove the quote mark
         lightName = sprintf('#%d_Light_type:%s', ii, lightType);
         thisLightSource = piLightCreate(lightName, 'type', lightType);
-        
+
         if any(piContains(lightLines, 'CoordSysTransform "camera"'))
             thisLightSource = piLightSet(thisLightSource, 'cameracoordinate', true);
         end
-        
+
         thisLine = lightLines{piContains(lightLines, 'LightSource')};
         switch lightType
             case 'infinite'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'L');
                 thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
-                
+
                 % n samples
                 nsamples = piParameterGet(thisLine, 'integer nsamples');
                 thisLightSource = piLightSet(thisLightSource, 'nsamples val', nsamples);
-                
+
                 % mapname
                 mapname = piParameterGet(thisLine, 'string mapname');
                 thisLightSource = piLightSet(thisLightSource, 'mapname val', mapname);
-                
+
             case 'spot'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'I');
                 thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
-                
+
                 % from
                 from = piParameterGet(thisLine, 'point from');
                 thisLightSource = piLightSet(thisLightSource, 'from val', from);
-                
+
                 % to
                 to = piParameterGet(thisLine, 'point to');
                 thisLightSource = piLightSet(thisLightSource, 'to val', to);
-                
+
                 % cone angle
                 coneangle = piParameterGet(thisLine, 'float coneangle');
                 thisLightSource = piLightSet(thisLightSource, 'coneangle val', coneangle);
-                
+
                 % conedeltaangle
                 conedeltaangle = piParameterGet(thisLine, 'float conedelataangle');
                 thisLightSource = piLightSet(thisLightSource, 'conedeltaangle val', conedeltaangle);
-                
+
             case 'point'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'I');
                 thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
-                
+
                 % from
                 from = piParameterGet(thisLine, 'point from');
                 thisLightSource = piLightSet(thisLightSource, 'from val', from);
-                
+
             case 'goniometric'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'I');
                 thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
-                
+
                 % mapname
                 mapname = piParameterGet(thisLine, 'string mapname');
                 thisLightSource = piLightSet(thisLightSource, 'mapname val', mapname);
-                
+
             case 'distant'
                 % Spectrum
                 spec = piParameterGet(thisLine, 'L');
                 thisLightSource = piLightSet(thisLightSource, 'spd val', spec);
-                
+
                 % from
                 from = piParameterGet(thisLine, 'point from');
                 thisLightSource = piLightSet(thisLightSource, 'from val', from);
-                
+
                 % to
                 to = piParameterGet(thisLine, 'point to');
                 thisLightSource = piLightSet(thisLightSource, 'to val', to);               
@@ -179,60 +199,107 @@ for ii = 1:nLights
                 % FOV
                 fov = piParameterGet(thisLine, 'float fov');
                 thisLightSource = piLightSet(thisLightSource, 'fov val', fov);
-               
+
                 % mapname
                 mapname = piParameterGet(thisLine, 'string mapname');
                 thisLightSource = piLightSet(thisLightSource, 'mapname val', mapname);
         end
     end
     
-    % Zheng: To check with Zhenyi - do we need all rot, position and
-    % ctform?
-    % Parse ConcatTransform
-    concatTrans = find(piContains(lightLines, 'ConcatTransform'));
-    if concatTrans
-        [rotation, position, ctform] = piParseConcatTransform(lightLines{concatTrans});
-        thisLightSource = piLightSet(thisLightSource, 'rotation val', rotation);
-        thisLightSource = piLightSet(thisLightSource, 'position val', position);
-        thisLightSource = piLightSet(thisLightSource, 'ctform val', ctform);
-    end
-    
-    % Parse rotation
-    rot = find(piContains(lightLines, 'Rotate'));
-    if rot
-        [~, rotation] = piParseVector(lightLines(rot));
-        thisLightSource = piLightSet(thisLightSource, 'rotation val', rotation);
-    end
-    
-    % Look up translation
-    trans = find(piContains(lightLines, 'Translate'));
-    if trans
-        [~, position] = piParseVector(lightLines(trans));
-        thisLightSource = piLightSet(thisLightSource, 'position val', position);
-    end
-    
-    % Parse shape
-    shp = find(piContains(lightLines, 'Shape'));
-    if shp
-        shape = piParseShape(lightLines{shp});
-        thisLightSource = piLightSet(thisLightSource, 'shape val', shape);
-    end
-    
-    % Look up scale
-    scl = find(piContains(lightLines, 'Scale'));
-    if scl
-        [~, scle] = piParseVector(lightLines(scl));
-        thisLightSource = piLightSet(thisLightSource, 'scale val', scle);
-    end
-    
-    %{
-        % Look up Material (ZLY: why do we want to have it here?)
-        scl = find(piContains(lightSources{ii}.line, 'Material'));
-        if scl
-            materiallist = piBlockExtract_gp(lightSources{ii}.line, 'blockName','Material');
-            lightSources{ii}.material = materiallist;
+    for kk = 2:numel(lightLines)-1
+        thisLine = lightLines{kk};
+        
+        % Zheng: To check with Zhenyi - do we need all rot, position and
+        % ctform?
+        % Parse ConcatTransform
+        concatTrans = find(piContains(thisLine, 'ConcatTransform'));
+        if concatTrans
+            [rotation, translation, ctform] = piParseConcatTransform(thisLine);
+            curRotation = piLightGet(thisLightSource, 'rotation val');
+            curRotation{end + 1} = rotation;
+            curTrans = piLightGet(thisLightSource, 'translation val');
+            curTrans{end + 1} = translation;
+            thisLightSource = piLightSet(thisLightSource, 'rotation val', curRotation);
+            thisLightSource = piLightSet(thisLightSource, 'translation val', curTrans);
+            % thisLightSource = piLightSet(thisLightSource, 'ctform val', ctform);
         end
-    %}
+
+        % Parse rotation
+        rot = find(piContains(thisLine, 'Rotate'));
+        if rot
+            [~, rotation] = piParseVector(thisLine);
+            curRotation = piLightGet(thisLightSource, 'rotation val');
+            curRotation{end + 1} = rotation;
+            thisLightSource = piLightSet(thisLightSource, 'rotation val', curRotation);
+        end
+
+        % Look up translation
+        tran = find(piContains(thisLine, 'Translate'));
+        if tran
+            [~, translation] = piParseVector(thisLine);
+            curTrans = piLightGet(thisLightSource, 'translation val');
+            curTrans{end + 1} = translation;
+            thisLightSource = piLightSet(thisLightSource, 'translation val', curTrans);
+        end
+
+        % Parse shape. Two possible cases: geometry is defined inline or
+        % included in another file
+        shp = find(piContains(thisLine, 'Shape'));
+        if shp
+            shape = piParseShape(thisLine);
+            thisLightSource = piLightSet(thisLightSource, 'shape val', shape);
+        end
+        % Look up Include geometry line
+        geo = find(piContains(thisLine, 'Include'));
+        if geo
+            geometryFname = erase(thisLine,{'Include "','"'});
+            [~, n, ~] = fileparts(geometryFname);
+            fname = which([n, '.pbrt']);
+            if exist(fname, 'file')
+                fileID = fopen(fname);
+                tmp = textscan(fileID,'%s','Delimiter','\n');
+                geometryLines = tmp{1};
+                fclose(fileID);
+                
+                % convert geometryLines into from the standard block indented format in
+                % to the single line format.
+                geometryLinesFormatted = piFormatConvert(geometryLines);
+                
+                % There should be only one line for the actual geometry,
+                % others might be comments.
+                for gg = 1:numel(geometryLinesFormatted)
+                    if ~isequal(geometryLinesFormatted{gg}(1), '#')
+                        shape = piParseShape(geometryLinesFormatted{gg});
+                    end
+                end
+                thisLightSource = piLightSet(thisLightSource, 'shape val', shape);
+            else
+                error('Geometry file: %s does not exist or is not added in path', [n, '.pbrt'])
+            end
+        end
+
+
+        % Look up scale
+        scl = find(piContains(thisLine, 'Scale'));
+        if scl
+            [~, scle] = piParseVector(thisLine);
+            curScale = piLightGet(thisLightSource, 'scale val');
+            curScale{end + 1} = scle;
+            thisLightSource = piLightSet(thisLightSource, 'scale val', curScale);
+        end
+
+        %{
+            % Look up Material (ZLY: why do we want to have it here?)
+            scl = find(piContains(lightSources{ii}.line, 'Material'));
+            if scl
+                materiallist = piBlockExtract_gp(lightSources{ii}.line, 'blockName','Material');
+                lightSources{ii}.material = materiallist;
+            end
+        %}
+        
+
+
+    end
     
     lightSources{ii} = thisLightSource;
 end

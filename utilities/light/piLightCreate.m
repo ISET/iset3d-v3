@@ -89,16 +89,16 @@ switch ieParamFormat(lght.type)
         
         % Potentially has rotationation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
-        lght.rotation.value = [];
+        lght.rotation.value = {};
         
         lght.translation.type = 'translation';
-        lght.translation.value = [];
+        lght.translation.value = {};
         
         lght.ctform.type = 'ctform';
-        lght.ctform.value = [];
+        lght.ctform.value = {};
         
         lght.scale.type = 'scale';
-        lght.scale.value = [];        
+        lght.scale.value = {};        
         
     case 'goniometric'        
         lght.mapname.type = 'string';
@@ -113,16 +113,16 @@ switch ieParamFormat(lght.type)
         
         % Potentially has rotation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
-        lght.rotation.value = [];
+        lght.rotation.value = {};
         
         lght.translation.type = 'translation';
-        lght.translation.value = [];
+        lght.translation.value = {};
         
         lght.ctform.type = 'ctform';
         lght.ctform.value = [];
         
         lght.scale.type = 'scale';
-        lght.scale.value = [];  
+        lght.scale.value = {};  
     case 'point'                
         lght.cameracoordinate = true;
 
@@ -131,16 +131,16 @@ switch ieParamFormat(lght.type)
         
         % Potentially has rotation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
-        lght.rotation.value = [];
+        lght.rotation.value = {};
         
         lght.translation.type = 'translation';
-        lght.translation.value = [];
+        lght.translation.value = {};
         
         lght.ctform.type = 'ctform';
-        lght.ctform.value = [];
+        lght.ctform.value = {};
         
         lght.scale.type = 'scale';
-        lght.scale.value = [];        
+        lght.scale.value = {};        
         
     case 'projection'        
         lght.fov.type = 'float';
@@ -166,16 +166,16 @@ switch ieParamFormat(lght.type)
         
         % Potentially has rotation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
-        lght.rotation.value = [];
+        lght.rotation.value = {};
         
         lght.translation.type = 'translation';
-        lght.translation.value = [];
+        lght.translation.value = {};
         
         lght.ctform.type = 'ctform';
-        lght.ctform.value = [];
+        lght.ctform.value = {};
         
         lght.scale.type = 'scale';
-        lght.scale.value = [];
+        lght.scale.value = {};
         
     case {'area', 'arealight'}        
         lght.twosided.type = 'bool';
@@ -189,16 +189,16 @@ switch ieParamFormat(lght.type)
         
         % Potentially has rotationation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
-        lght.rotation.value = [];
+        lght.rotation.value = {};
         
         lght.translation.type = 'translation';
-        lght.translation.value = [];
+        lght.translation.value = {};
         
         lght.ctform.type = 'ctform';
-        lght.ctform.value = [];
+        lght.ctform.value = {};
         
         lght.scale.type = 'scale';
-        lght.scale.value = [];
+        lght.scale.value = {};
 end
 
 
