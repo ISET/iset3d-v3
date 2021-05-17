@@ -271,6 +271,7 @@ switch renderType
         error('Cannot recognize render type.');
 end
 
+
 %% Call the Docker for rendering
 for ii = 1:length(filesToRender)
     skipDocker = false;
@@ -301,10 +302,32 @@ for ii = 1:length(filesToRender)
             % Filepath to pbrt.exe goes here
             pbrtBinary = 'pbrt.exe';
             outF = fullfile(outputFolder, strcat('renderings/',currName,'.dat'));
-            % Hack, for testing. 
+            % Hack, for testing.
             renderCommand = sprintf('%s --outfile %s %s', pbrtBinary, outF, currFile);
             command = renderCommand;
         else
+            
+            % Hack to reverse \ to / for _depth files, for compatibility
+            % with Linux-based Docker pbrt container
+            pFile = fopen(currFile,'rt');
+            tFileName = tempname;
+            tFile = fopen(tFileName,'wt');
+            while true
+                thisline = fgets(pFile);
+                if ~ischar(thisline); break; end  %end of file
+                if contains(thisline, "C:\")
+                    thisline = strrep(thisline, piRootPath, '');
+                    thisline = strrep(thisline, '\local', '');
+                    thisline = strrep(thisline, '\', '/');
+                end
+                fprintf(tFile,  '%s', thisline);
+            end
+            fclose(pFile);
+            fclose(tFile);
+            copyfile(tFileName, currFile);
+            delete(tFileName);
+        
+            
             outF = strcat('renderings/',currName,'.dat');
             renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, '.pbrt'));
             folderBreak = split(outputFolder, filesep());
@@ -374,14 +397,13 @@ for ii = 1:length(filesToRender)
             end
         else
             [status, result] = piRunCommand(cmd, 'verbose', verbosity);
-        end            
+        end
         elapsedTime = toc;
         % disp(result)
         %% Check the return
         
-        if status
-            warning('Docker did not run correctly');
-            % The status may contain a useful error message that we should
+        if status            
+            warning('Docker did not run correctly');            % The status may contain a useful error message that we should
             % look up.  The ones we understand should offer help here.
             fprintf('Status:\n'); disp(status)
             fprintf('Result:\n'); disp(result)
