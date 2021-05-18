@@ -1223,14 +1223,18 @@ switch ieParamFormat(param)  % lower case, no spaces
                 case 'id'
                     val = id;
                 case 'subtree'
-                    % thisR.get('asset', assetName, 'subtree');
+                    % thisR.get('asset', assetName, 'subtree', ['replace', false]);
                     % The id is retrieved above.
                     val = thisR.assets.subtree(id);
 
                     % The current IDs only make sense as part of the whole
                     % tree.  So we strip them and replace the names in the
                     % current structure.
-                    replace = true;
+                    if numel(varargin) >= 4
+                        replace = varargin{4};
+                    else
+                        replace = true;
+                    end
                     [~, val] = val.stripID([],replace);
 
                 case {'nodetoroot','pathtoroot'}

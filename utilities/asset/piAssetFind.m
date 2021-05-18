@@ -32,8 +32,12 @@ if isa(assets,'recipe')
 end
 if ~isa(assets,'tree'), error('Assets must be a tree.'); end
 
-% If the input is a node id (number), replace val with the name.
-if isnumeric(val), val = assets.get(val).name; end
+% If the input is a node id (number), return the node
+if isscalar(val)
+    id = val;
+    thisAsset = {assets.get(val)};
+    return;
+end
 %%
 nodeList = 0; % 0 is always the index for root node
 
