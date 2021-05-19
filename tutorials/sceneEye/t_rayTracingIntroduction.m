@@ -56,11 +56,11 @@
 % PBRT is not Matlab, and thus we needed to develop a method for using it
 % smoothly with ISETBio (and ISETCam).
 %
-% What we have done is place the PBRT code inside of a Docker container
-% that can be called from within Matlab.  We have written a large number of
-% Matlab tools that permit us to set up the PBRT scenes and the parameters
-% of the physiological optics that transform the 3D scene into the retinal
-% image.
+% What we have done is place the PBRT code inside of a Docker
+% container that can be called from within Matlab.  We have written a
+% large number of Matlab tools in this toolbox, ISET3d, that permit us
+% to set up the PBRT scenes and the parameters of the physiological
+% optics that transform the 3D scene into the retinal image.
 %
 % With this approach, you do not need to compile or install the source code
 % in order to render images. You must only have docker installed and
