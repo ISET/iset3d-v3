@@ -30,7 +30,7 @@ drawnow;
 %% Introduce asset (object) motion blur (not camera motion)
 
 % Move this asset
-thisAssetName = 'figure_3m_O';
+thisAssetName = '001_figure_3m_O';
 fprintf('Translating asset : %s\n',thisAssetName);
 assetPos = thisR.get('asset', thisAssetName, 'world position');
 

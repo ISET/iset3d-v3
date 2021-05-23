@@ -57,7 +57,12 @@ while curIdx <= numel(nodeList)
                     isequal(val, assets.names(IDs(ii)))
                 id = [id IDs(ii)];
                 if nargout > 1, thisAsset{end + 1} = assets.get(IDs(ii)); end
-                % return;
+                if strcmp(val, 'root')
+                    % for some scene, there are a large number of assets,
+                    % so we do not want to loop all the assets if we are
+                    % looking for the 'root'.
+                 return;
+                end
             end
         else
             % Another parameter must match.  Returns the first instance of

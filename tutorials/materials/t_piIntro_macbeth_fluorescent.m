@@ -47,7 +47,7 @@ thisR.set('filmresolution', [640, 360]);
 piWrite(thisR, 'overwritematerials', true);
 
 %% Show the region/material options
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 
 %% Assign fluorescent materials on some patches
 concentrationUniform = 0.5;

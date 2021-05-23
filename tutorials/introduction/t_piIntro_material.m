@@ -55,7 +55,7 @@ thisR.get('materials print');
 % We have additional materials in an ISET3d library.  In the future, we
 % will be creating the material library in a directory within ISET3d, and
 % expanding on them.
-piMaterialList;
+piMaterialPrint(thisR);
 
 %% Add a red matte surface
 
@@ -80,7 +80,7 @@ spdRef = piMaterialCreateSPD(wave, reflectance);
 thisR.set('material', redMatte, 'kd value', spdRef);
 
 %% Set the material 
-assetName = '0005ID_Sphere_O';
+assetName = '001_Sphere_O';
 thisR.set('asset',assetName,'material name',redMatte.name);
 
 % Show that we set it
@@ -103,7 +103,7 @@ rmLight = piLightSet(rmLight, 'rotation val', {[0 0 1 0], [-90 1 0 0]});
 %% Put the sphere in an environment
 
 % Make the sphere a little smaller
-assetName = '0005ID_Sphere_O';
+assetName = '001_Sphere_O';
 thisR.set('asset',assetName,'scale',[0.5 0.5 0.5]);
 
 % Add an environmental light

@@ -136,6 +136,7 @@ function val = recipeGet(thisR, param, varargin)
 %       'asset names'
 %       'asset parent id'
 %       'assetparent'
+%       'asset list'  - a list of branches.
 %
 %    % Material information
 %      'materials'
@@ -964,20 +965,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             % Special cases
             case 'names'
                 % thisR.get('material','names');
-                n = numel(thisR.materials.list);
-                val = cell(1,n);
-                for ii=1:n
-                    val{ii} = thisR.materials.list{ii}.name;
-                end
+                val = keys(thisR.materials.list);
             otherwise
                 % The first argument indicates the material name and there
                 % must be a second argument for the property
-                if isnumeric(varargin{1}) && ...
-                        varargin{1} <= numel(thisR.materials.list)
-                    % Search by index.  Get the material directly.
-                    matIdx = varargin{1};
-                    thisMat = thisR.materials.list{matIdx};
-                elseif isstruct(varargin{1})
+                if isstruct(varargin{1})
                     % The user sent in the material.  We hope.
                     % We should have a slot in material that identifies itself as a
                     % material.  Maybe a test like "material.type ismember valid
@@ -985,7 +977,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     thisMat = varargin{1};
                 elseif ischar(varargin{1})
                     % Search by name, find the index
-                    [~, thisMat] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
+                    thisMat = thisR.materials.list(varargin{1});
                     val = thisMat;
                 end
                 
@@ -1004,16 +996,12 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'nmaterial', 'nmaterials', 'materialnumber', 'materialsnumber'}
         % thisR.get('n materials')
         % Number of materials in this scene.
-        if isfield(thisR.materials, 'list')
-            val = numel(thisR.materials.list);
-        else
-            val = 0;
-        end        
+        val = thisR.materials.list.Count;
     case {'materialsprint','printmaterials', 'materialprint', 'printmaterial'}
         % thisR.get('materials print');
         %
         % These are the materials that are named in the tree hierarchy.        
-        piMaterialList(thisR);
+        piMaterialPrint(thisR);
     case {'materialsoutputfile'}
         % Unclear why this is still here.  Probably deprecated.
         val = thisR.materials.outputfile;
@@ -1045,20 +1033,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             % Special cases
             case 'names'
                 % thisR.get('texture', 'names');
-                n = numel(thisR.textures.list);
-                val = cell(1, n);
-                for ii=1:n
-                    val{ii} = thisR.textures.list{ii}.name;
-                end
+                val = keys(thisR.textures.list);
             otherwise
                 % The first argument indicates the texture name and there
                 % must be a second argument for the property
-                if isnumeric(varargin{1}) && ...
-                        varargin{1} <= numel(thisR.textures.list)
-                    % Search by index.  Get the textures directly.
-                    textureIdx = varargin{1};
-                    thisTexture = thisR.textures.list{textureIdx};
-                elseif isstruct(varargin{1})
+                if isstruct(varargin{1})
                     thisTexture = varargin{1};
                 elseif ischar(varargin{1})
                     % Search by name, find the index
@@ -1082,14 +1061,14 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('n textures')
         % Number of textures in this scene
         if isfield(thisR.textures, 'list')
-            val = numel(thisR.textures.list);
+            val = thisR.textures.list.Count;
         else
             val = 0;
         end
     case {'texturesprint', 'printmtextures', 'textureprint', 'printtexture'}
         % thisR.get('textures print')
         %
-        piTextureList(thisR);
+        piTexturePrint(thisR);
     case {'objectmaterial','materialobject'}
         % val = thisR.get('object material');
         %
@@ -1216,8 +1195,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         else 
             if strncmp(varargin{2},'material',8)
-                [~,material] = piMaterialFind(thisR.materials.list,...
-                    'name',thisAsset.material.namedmaterial);
+                material = thisR.materials.list(thisAsset.material.namedmaterial);
             end
             switch ieParamFormat(varargin{2})
                 case 'id'
@@ -1315,7 +1293,22 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = thisR.assets.Node{parentNode};   
 
         % Delete this stuff when we get ready to merge.
-
+    case {'assetlist'}
+        assetNames = thisR.get('asset names');
+        nn = 1;
+        for ii = 1:numel(assetNames)
+            % we have several branch here, we only need the main branch
+            % which contains size information
+            if piContains(assetNames{ii},'_B') && ...
+                    ~piContains(assetNames{ii},'_T') && ...
+                    ~piContains(assetNames{ii},'_S') && ...
+                    ~piContains(assetNames{ii},'_R')
+                
+                val{nn} = thisR.get('assets',assetNames{ii});
+                nn=nn+1;
+            end
+        end
+        
     otherwise
         error('Unknown parameter %s\n',param);
 end

@@ -54,9 +54,9 @@ matList = {};
 for ii=1:numel(ids)
     if isequal(assetTree.Node{ids(ii)}.type, 'object')
         matName = piAssetGet(assetTree.Node{ids(ii)}, 'material name');
-        thisIdx = piMaterialFind(matInRecipe, 'name', matName);
+        [thisIdx, thisMat] = piMaterialFind(matInRecipe, 'name', matName);
         if ~isempty(thisIdx)
-            matList{end + 1} = matInRecipe{thisIdx};
+            matList(thisMat.name) = thisMat; 
         end
     end
 end

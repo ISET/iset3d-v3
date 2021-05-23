@@ -1,8 +1,8 @@
-function [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
+function [mKeys, mCollection] = piMaterialFind(mList, param, val, n)
 % Find materials in the list with a parameter that matches a value
 %
 % Synopsis
-%   [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
+%   [mIdx, mCollection] = piMaterialFind(mList, param, val, n)
 %
 % Brief
 %   Return the index of material(s) whose parameter matches val.
@@ -11,6 +11,7 @@ function [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
 %   mList   - material list cell array (thisR.materials.list)
 %   param   - parameter name
 %   val     - value to match
+%   n       - return first n indices
 %
 % Return
 %   mIdx  - Index to the List of materials that have a field with a specific name and
@@ -44,39 +45,54 @@ function [mIdx, mCollection] = piMaterialFind(mList, param, val, varargin)
 
 %% parse input
 p = inputParser;
-p.addRequired('mList', @iscell);
-p.addRequired('param', @ischar)
-p.parse(mList, param, varargin{:});
+% p.addRequired('mList', @iscell);
+p.addRequired('mList', @(x)isequal(class(mList), 'containers.Map'));
+p.addRequired('param', @ischar);
+% p.parse(mList, param, varargin{:}); % seems varargin is not being used
+p.parse(mList, param);
 
 %% Format 
 param = ieParamFormat(param);
 
 %%
 
-mIdx = [];
+mKeys = [];
 mCollection = {};
 cnt = 0;
-for ii = 1:numel(mList)
-    if isfield(mList{ii}, param)
-        if isequal(param, 'name') || isequal(param, 'type')
-            curVal = mList{ii}.(param);
-        else
-            % All parameters beside 'name' and 'type'
-            % This is really not great because there are properties within
-            % these properties.  So we need to improve this (BW).
-            curVal = mList{ii}.(param).value;
-        end
-        
-        if isequal(curVal, val)
-            cnt = cnt + 1;
-            mIdx(cnt) = ii; %#ok<AGROW>
-            mCollection{cnt} = mList{ii}; %#ok<AGROW>
+if strcmp(param, 'name')
+    mKeys{1} = val;
+    mCollection = mList(val);
+    return
+else
+    matNamesList = keys(mList);
+    % if user not specified number of elements, return all
+    if ~exist('n', 'var')
+        n = numel(matNamesList);
+    end
+    for ii = 1:numel(matNamesList)
+        if cnt<n
+            thisMaterial = mList(matNamesList{ii});
+            if isfield(thisMaterial, param)
+                if isequal(param, 'type')
+                    curVal = thisMaterial.(param);
+                else
+                    % All parameters beside 'name' and 'type'
+                    % This is really not great because there are properties within
+                    % these properties.  So we need to improve this (BW).
+                    curVal = thisMaterial.(param).value;
+                end
+                
+                if isequal(curVal, val)
+                    cnt = cnt + 1;
+                    mKeys{cnt} = matNamesList{ii}; %#ok<AGROW>
+                    mCollection{cnt} = thisMaterial; %#ok<AGROW>
+                end
+            end
         end
     end
+    
+    if cnt == 1
+        mCollection = mCollection{1};
+    end
 end
-
-if cnt == 1
-    mCollection = mCollection{1};
-end
-
 end

@@ -107,11 +107,11 @@ p.addParameter('overwritegeometry',true,@islogical);
 % Create a new materials.pbrt
 % p.addParameter('creatematerials',false,@islogical);
 
-% control lighting in geomtery.pbrt
-p.addParameter('lightsflag',false,@islogical);
-
-% Read trafficflow variable
-p.addParameter('thistrafficflow',[]);
+% % control lighting in geomtery.pbrt
+% p.addParameter('lightsflag',false,@islogical);
+% 
+% % Read trafficflow variable
+% p.addParameter('thistrafficflow',[]);
 
 % Store JSON recipe for the traffic scenes
 p.addParameter('overwritejson',true,@islogical);
@@ -128,8 +128,8 @@ overwritegeometry   = p.Results.overwritegeometry;
 
 % creatematerials     = p.Results.creatematerials;
 
-lightsFlag          = p.Results.lightsflag;
-thistrafficflow     = p.Results.thistrafficflow;
+% lightsFlag          = p.Results.lightsflag;
+% thistrafficflow     = p.Results.thistrafficflow;
 overwritejson       = p.Results.overwritejson;
 verbosity           = p.Results.verbose;
 
@@ -203,7 +203,7 @@ if isequal(thisR.exporter, 'Copy')
 end
 
 %% Overwrite geometry.pbrt
-piWriteGeometry(thisR,overwritegeometry,lightsFlag,thistrafficflow)
+piWriteGeometry(thisR,overwritegeometry);
 
 %% Overwrite xxx.json - For traffic scenes
 
@@ -226,7 +226,7 @@ function piWriteCopy(thisR,overwriteresources,overwritepbrtfile, verbosity)
 % turn off the repeated copies by setting overwriteresources to false.  
 
 inputDir   = thisR.get('input dir');
-outputDir = thisR.get('output dir');
+outputDir  = thisR.get('output dir');
 
 % We check for the overwrite here and we make sure there is also an input
 % directory to copy from.
@@ -234,7 +234,7 @@ if overwriteresources && ~isempty(inputDir)
     
     sources = dir(inputDir);
     status  = true;
-    for i=1:length(sources)
+    for i = 1:length(sources)
         if startsWith(sources(i).name(1),'.')
             % Skip dot-files
             continue;
@@ -244,7 +244,10 @@ if overwriteresources && ~isempty(inputDir)
         else
             % Selectively copy the files in the scene root folder
             [~, ~, extension] = fileparts(sources(i).name);
-            if ~(piContains(extension,'pbrt') || piContains(extension,'zip') || piContains(extension,'json'))
+            % ChessSet needs input geometry because we can not parse it
+            % yet. --zhenyi
+%             if ~(piContains(extension,'pbrt') || piContains(extension,'zip') || piContains(extension,'json'))
+            if ~(piContains(extension,'zip') || piContains(extension,'json'))
                 thisFile = fullfile(sources(i).folder, sources(i).name);
                 if verbosity > 1
                     fprintf('Copying %s\n',thisFile)
@@ -657,11 +660,10 @@ end
 end
 
 %%
-function piWriteGeometry(thisR,overwritegeometry,lightsFlag,thistrafficflow)
+function piWriteGeometry(thisR,overwritegeometry)
 % Write the geometry file into the output dir
 %
 if overwritegeometry
-    piGeometryWrite(thisR,'lightsFlag',lightsFlag, ...
-        'thistrafficflow',thistrafficflow);
+    piGeometryWrite(thisR);
 end
 end

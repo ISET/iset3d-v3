@@ -54,7 +54,7 @@ thisR_tmp = jsonread(JsonFile);
 % Find the field names in the json file recipe
 fds = fieldnames(thisR_tmp);
 if any(~ieContains(fds,'recipeVer')) || ~isequal(thisR_tmp.recipeVer,2)
-    disp('Version 1 recipe read in');
+%     disp('Version 1 recipe read in'); % silence the function
     thisVersion = 1;
 else
     thisVersion = 2;

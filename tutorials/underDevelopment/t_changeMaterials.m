@@ -14,9 +14,8 @@ thisR = piLightAdd(thisR,...
                     'cone angle', 50,...
                     'camera coordinate', true);
 %% 
-piMaterialList(thisR)
-idx = piMaterialFind(thisR, 'name', 'InnerLeft');
-piMaterialSet(thisR, idx, 'spectrumkd', 'spds/macbeth-4.spd');
+piMaterialPrint(thisR)
+piMaterialSet(thisR, 'InnerLeft', 'spectrumkd', 'spds/macbeth-4.spd');
 piMaterialSet(thisR, idx, 'stringtype', 'matte');
 tmp = piMaterialGet(thisR, 'idx', idx, 'param', 'name');
 

@@ -59,7 +59,7 @@ thisR = piCameraTranslate(thisR, 'z shift', -5);  % meters
 thisR.get('lookat')
 
 piWrite(thisR);
-scene = piRender(thisR);
+[scene,result] = piRender(thisR);
 sceneWindow(scene);
 
 %% Move back, slide to the right, rotate

@@ -208,7 +208,7 @@ classdef tree
         
         % Return all the asset names or just the name of asset number id
         function n = names(obj,id)
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 n = cell(1, numel(obj.Node));
                 for ii=1:numel(obj.Node)
                     if isstruct(obj.Node{ii}), n{ii} = obj.Node{ii}.name;
@@ -229,8 +229,8 @@ classdef tree
             % then all the nodes.
             
             % Replace the names in this tree.
-            if notDefined('replace'), replace = false; end
-            if notDefined('id')
+            if ~exist('replace','var'), replace = false; end
+            if ~exist('id','var') || isempty(id)
                 % All of the nodes
                 newNames = cell(1, obj.nnodes);
                 for ii=1:obj.nnodes
@@ -239,7 +239,9 @@ classdef tree
                 
                 % We have the new names and user said replace them all
                 if replace
-                    disp('Replacing names.')
+                    % Seems it's a very common function, so we might turn
+                    % off the msg here.
+                    % disp('Replacing names.') 
                     for jj=1:obj.nnodes
                         if ischar(obj.Node{jj})
                             % Probably a legacy condition
@@ -257,13 +259,11 @@ classdef tree
                 
                 return;
             end
-            
             if isstruct(obj.Node{id})
                 newNames = obj.Node{id}.name;
             elseif ischar(obj.Node{id})
                 newNames = obj.Node{id};
             end
-            
             while numel(newNames) >= 8 &&...
                     isequal(newNames(5:6), 'ID')
                 newNames = newNames(8:end);
@@ -273,7 +273,7 @@ classdef tree
         
         % Print the tree or a node of the tree
         function str = print(obj, id)
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 str = obj.tostring;
                 disp(str)
             else
@@ -328,7 +328,11 @@ classdef tree
         
         function t = showUI(obj)
             % Bring up a uifigure with collapsible tree
-            fig = uifigure('Name','Assets Collection');
+            % If a UI figure is opened, update it.
+            fig = findall(0,'Type','figure','tag','assetsUI');
+            if isempty(fig)
+                fig = uifigure('Name','Assets Collection', 'Tag','assetsUI');
+            end
             t = uitree(fig,'Position',[80 10 400 400],'SelectionChangedFcn',@getNodeData);
             
             % First level nodes
@@ -336,7 +340,8 @@ classdef tree
             root = 1;
             createAssetsTree(assets, obj, 1);
             
-            expand(t,'all');
+            % collapse by default
+%             expand(t,'all');
             % User data is saved at t.UserData;
             thisAsset = t.UserData;
             %%
@@ -373,7 +378,7 @@ classdef tree
             % index for that node. 
             
             % If id is not passed, we check all nodes
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 % Checking all the nodes.
                 for ii=1:numel(obj.nnodes)
                     if ~obj.hasID(ii)
@@ -420,7 +425,7 @@ classdef tree
             % tree. 
             
             % Update all nodes
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 % Some nodes may already have an ID.  So we strip the ID
                 % from all the nodes.
                 stripNames = obj.stripID;

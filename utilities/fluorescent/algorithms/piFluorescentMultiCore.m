@@ -30,7 +30,7 @@ function thisR = piFluorescentMultiCore(thisR, assetInfo, varargin)
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name', 'sphere');
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 piLightDelete(thisR, 'all');
 thisR = piLightAdd(thisR,...
     'type','distant',...

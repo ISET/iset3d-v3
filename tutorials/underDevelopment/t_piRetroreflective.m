@@ -77,7 +77,7 @@ ieAddObject(oi_uber); oiWindow;
 %% Assign Retroreflective Materials.
 
 % it's helpful to check what current material properties are.
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 
 % target = thisR.materials.lib.retroreflective;      
 
@@ -85,7 +85,7 @@ piMaterialAssign(thisR,'Stop',thisR.materials.lib.retroreflective);
 piMaterialAssign(thisR,'Allway',thisR.materials.lib.retroreflective);
 piMaterialAssign(thisR,'Background',thisR.materials.lib.matte);
 % it's helpful to check what current material properties are.
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 
 %% Write thisR to *_material.pbrt
 

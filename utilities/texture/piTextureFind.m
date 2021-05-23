@@ -1,4 +1,4 @@
-function [tIdx, tCollection] = piTextureFind(tList, param, val, varargin)
+function [tKeys, tCollection] = piTextureFind(tList, param, val, varargin)
 %% Find textures in the list such that the field equals a value
 %
 % Synopsis
@@ -40,40 +40,46 @@ function [tIdx, tCollection] = piTextureFind(tList, param, val, varargin)
 %}
 %% parse input
 p = inputParser;
-p.addRequired('tList', @iscell);
+p.addRequired('tList', @(x)isa(tList, 'containers.Map'));
 p.addRequired('param', @ischar)
 p.parse(tList, param, varargin{:});
 
-%% Format 
+%% Format
 param = ieParamFormat(param);
 
 %%
 
-tIdx = [];
+tKeys = [];
 tCollection = {};
 cnt = 0;
-for ii = 1:numel(tList)
-    if isfield(tList{ii}, param)
-        if isequal(param, 'name') || isequal(param, 'type')
-            curVal = tList{ii}.(param);
-        else
-            curVal = tList{ii}.(param).value;
-        end
-        
-        if isequal(curVal, val)
-            cnt = cnt + 1;
-            tIdx(cnt) = ii; %#ok<AGROW>
-            tCollection{cnt} = tList{ii}; %#ok<AGROW>
+if strcmp(param, 'name')
+    tKeys{1} = val;
+    tCollection = tList(val);
+    return
+else
+    for ii = 1:numel(tList)
+        if isfield(tList{ii}, param)
+            if isequal(param, 'type')
+                curVal = tList{ii}.(param);
+            else
+                curVal = tList{ii}.(param).value;
+            end
+            
+            if isequal(curVal, val)
+                cnt = cnt + 1;
+                tKeys(cnt) = ii; %#ok<AGROW>
+                tCollection{cnt} = tList{ii}; %#ok<AGROW>
+            end
         end
     end
-end
-
-if cnt == 1
-    tCollection = tCollection{1};
+    
+    if cnt == 1
+        tCollection = tCollection{1};
+    end
 end
 %%
 %{
-%% Format 
+%% Format
 field = ieParamFormat(field);
 
 %%

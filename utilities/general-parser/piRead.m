@@ -182,9 +182,9 @@ if any(piContains(world,'Include')) && ...
     materialLinesFormatted = piFormatConvert(materialLines);
     
     % Read material and texture
-    [materialLists, texureList] = parseMaterialTexture(materialLinesFormatted);
+    [materialLists, textureList] = parseMaterialTexture(materialLinesFormatted);
     fprintf('Read %d materials.\n', numel(materialLists));
-    fprintf('Read %d textures.\n', numel(texureList));
+    fprintf('Read %d textures.\n', numel(textureList));
     
     % If exporter is Copy, don't parse the geometry.
     if isequal(exporter, 'Copy')
@@ -220,10 +220,10 @@ else
     inputFile_materials = [];
     
     % Read material & texture
-    [materialLists, texureList, newWorld] = parseMaterialTexture(thisR.world);
+    [materialLists, textureList, newWorld] = parseMaterialTexture(thisR.world);
     thisR.world = newWorld;
-    fprintf('Read %d materials.\n', numel(materialLists));
-    fprintf('Read %d textures.\n', numel(texureList));
+    fprintf('Read %d materials.\n', materialLists.Count);
+    fprintf('Read %d textures.\n', textureList.Count);
     
     % If exporter is Copy, don't parse.
     if isequal(exporter, 'Copy')
@@ -246,7 +246,7 @@ thisR.materials.inputFile_materials = inputFile_materials;
 % Call material lib
 thisR.materials.lib = piMateriallib;
 
-thisR.textures.list = texureList;
+thisR.textures.list = textureList;
 thisR.textures.inputFile_textures = inputFile_materials;
 
 if exist('trees','var') && ~isempty(trees)

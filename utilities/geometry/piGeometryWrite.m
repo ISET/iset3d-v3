@@ -29,8 +29,8 @@ p = inputParser;
 
 p.addRequired('thisR',@(x)isequal(class(x),'recipe'));
 % default is flase, will turn on for night scene
-p.addParameter('lightsFlag',false,@islogical);
-p.addParameter('thistrafficflow',[]);
+% p.addParameter('lightsFlag',false,@islogical);
+% p.addParameter('thistrafficflow',[]);
 
 p.parse(thisR,varargin{:});
 
@@ -53,7 +53,7 @@ fname_obj = fullfile(Filepath,sprintf('%s%s',n,e));
 
 % Open and write out the objects
 fid_obj = fopen(fname_obj,'w');
-fprintf(fid_obj,'# Exported by piMaterialWrite on %i/%i/%i %i:%i:%f \n  \n',clock);
+fprintf(fid_obj,'# Exported by piGeometryWrite on %i/%i/%i %i:%i:%f \n  \n',clock);
 
 % Traverse the tree from root
 rootID = 1;
@@ -101,11 +101,20 @@ nodeList = [];
 for ii = 1:numel(children)
     thisNode = obj.get(children(ii));
     % If node, put id in the nodeList
-    if isequal(thisNode.type, 'branch')
-        nodeList = [nodeList children(ii)];
+    if isequal(thisNode.type, 'branch') 
+        if ~strcmp(thisNode.name(end-1:end), '_I')
+            % do not write object instance repeatedly
+            nodeList = [nodeList children(ii)];
+        else
+            continue;
+        end
     
     % Define object node
     elseif isequal(thisNode.type, 'object')
+        while numel(thisNode.name) >= 8 &&...
+                isequal(thisNode.name(5:6), 'ID')
+            thisNode.name = thisNode.name(8:end);
+        end
         fprintf(fid, 'ObjectBegin "%s"\n', thisNode.name);
         
         % Write out mediumInterface
@@ -117,13 +126,11 @@ for ii = 1:numel(children)
         if ~isempty(thisNode.material)
             %{
             % From dev branch
-<<<<<<< HEAD
             if strcmp(thisNode.material,'none')
                 fprintf(fid, strcat("Material ", '"none"', '\n'));
             else
                 fprintf(fid, strcat("NamedMaterial ", '"',...
                             thisNode.material.namedmaterial, '"', '\n'));
-=======
             %}
             try
                 fprintf(fid, strcat("NamedMaterial ", '"',...
@@ -208,7 +215,12 @@ for ii = 1:numel(children)
     thisNode = obj.get(children(ii));
     fprintf(fid, strcat(spacing, 'AttributeBegin\n'));
     
-    if isequal(thisNode.type, 'branch')        
+    if isequal(thisNode.type, 'branch')       
+        % get stripID for this Node
+        while numel(thisNode.name) >= 8 &&...
+                isequal(thisNode.name(5:6), 'ID')
+            thisNode.name = thisNode.name(8:end);
+        end
         % Write info
         fprintf(fid, strcat(spacing, indentSpacing,...
             sprintf('#ObjectName %s:Vector(%.5f, %.5f, %.5f)',thisNode.name,...
@@ -278,6 +290,10 @@ for ii = 1:numel(children)
         recursiveWriteAttributes(fid, obj, children(ii), lvl + 1, outFilePath);
             
     elseif isequal(thisNode.type, 'object')
+        while numel(thisNode.name) >= 8 &&...
+                isequal(thisNode.name(5:6), 'ID')
+            thisNode.name = thisNode.name(8:end);
+        end
         fprintf(fid, strcat(spacing, indentSpacing, ...
                          sprintf('ObjectInstance "%s"', thisNode.name), '\n'));
     elseif isequal(thisNode.type, 'light')

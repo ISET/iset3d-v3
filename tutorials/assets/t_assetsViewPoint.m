@@ -36,7 +36,7 @@ drawnow;
 
 %%  Move the blue asset to the left and look at it
 
-assetName = 'figure_3m_O';
+assetName = '001_figure_3m_O';
 [~,T1] = thisR.set('asset', assetName, 'translation', [-0.5 0 0]);
 bluePos = thisR.get('asset', assetName, 'world position');
 
@@ -51,7 +51,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %%  Look from the yellow guy to the blue guy
 
 % We are still looking at the blue guy (from behind)
-yellowAssetName = 'figure_6m_O';
+yellowAssetName = '001_figure_6m_O';
 yellowPos = thisR.get('asset', yellowAssetName, 'world position');
 
 % Just outside of the yellow guy's position
@@ -75,7 +75,7 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %% Finally, from the direction of red sphere towards the blue guy
 
-sphereAssetName = 'Sphere_O';
+sphereAssetName = '001_Sphere_O';
 spherePos = thisR.get('asset', sphereAssetName, 'world position');
 
 % Start at the sphere and change the from in the direction of the blue guy

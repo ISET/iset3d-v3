@@ -59,7 +59,8 @@ thisR.set('light', 'add', newDistant);
 % This is pretty high resolution given the nature of the target.
 thisR.set('integrator subtype','path');
 thisR.set('rays per pixel', 16);
-thisR.set('filmresolution', [640, 360]);
+thisR.set('fov', 30);
+thisR.set('filmresolution', [640, 360]*2);
 
 %% Write the scene
 %

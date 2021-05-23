@@ -1,8 +1,8 @@
-function list = piMaterialList(thisR)
+function piMaterialPrint(thisR)
 % List materials type in this PBRT scene
 %
 % Syntax:
-%   list = piMaterialList(thisR)
+%   piMaterialPrint(thisR)
 %
 % Brief description
 %   Prints out a list of the materials in this recipe (thisR).  The
@@ -20,17 +20,16 @@ function list = piMaterialList(thisR)
 %   N/A
 %
 % ZL, SCIEN Stanford, 2018
+% Zhenyi, updated, 2021
 %
 % See also:
 %   piMaterial*
-%   piMateriallib - Lists all the possible materials in our library
 %
 
 % Examples:
 %{
-% List the material types
- mTypes = piMateriallib;
- disp(mTypes)
+% Print the material types
+ piMaterialPrint(thisR)
 %}
 
 %% Whole library
@@ -44,21 +43,18 @@ end
 
 %% Just the materials of this scene
 
-nMaterials = thisR.get('n material');
+MatNames = thisR.get('material', 'names');
 
 [~,sceneName] = fileparts(thisR.inputFile);
 fprintf('\nScene materials: %s\n',sceneName);
 fprintf('-------------------------------\n');
-
-fprintf('  Name  \t [Type]\n');
-fprintf('-------------------------------\n');
-
-for ii =1:nMaterials
-    fprintf('%d: %s: \t [ %s ]\n', ii, ...
-        thisR.materials.list{ii}.name, ...
-        thisR.materials.list{ii}.type);
+for ii =1:numel(MatNames)
+    rows{ii, :} = num2str(ii);
+    names{ii,:} = MatNames{ii};
+    types{ii,:} = thisR.materials.list(MatNames{ii}).type;
 end
-
+T = table(categorical(names), categorical(types),'VariableNames',{'name','type'}, 'RowNames',rows);
+disp(T);
 fprintf('-------------------------------\n');
 
 end

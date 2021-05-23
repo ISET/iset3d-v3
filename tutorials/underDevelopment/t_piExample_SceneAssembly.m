@@ -46,14 +46,14 @@ thisR = piSkymapAdd(thisR,'noon');
 
 % The recipe already includes materials.  This prints out the ones
 % that are in the recipe.
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 
 % Assign from the material names to the numerical material properties.
 % These are placed in the recipe.
 piMaterialGroupAssign(thisR);
 
 % Print again just to check.
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 
 %% Read a geometry file exported by C4d and extract asset information
 

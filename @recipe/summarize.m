@@ -134,8 +134,7 @@ switch str
         fprintf('\nMaterials\n-----------\n');
         if isempty(thisR.materials), return; end
         out = thisR.materials;
-        % namelist = sort(unique(fieldnames(thisR.materials.list)));
-        fprintf('Number:\t%d\n',numel(thisR.materials.list));
+        fprintf('Number:\t%d\n',thisR.materials.list.Count);
         [~,filename,ext] = fileparts(thisR.materials.inputFile_materials);
         fprintf('File:\t%s\n',[filename,ext])
         % fprintf('\n');

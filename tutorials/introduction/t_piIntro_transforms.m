@@ -38,7 +38,7 @@ sceneSet(scene, 'render flag', 'hdr');
 % colors.  They have IDs that end with an _O that means they are objects
 % (leafs of the tree).  There is a branch node above the collection of
 % these objects.  This node is a branch.
-assetName = '0003ID_Cube_B'; 
+assetName = 'Cube_B'; 
 
 % We get the branch node here.
 thisAsset = thisR.get('asset',assetName);

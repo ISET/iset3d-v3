@@ -70,6 +70,8 @@ for ii=1:nAssets
    if isfield(thisAsset, 'children') && ~isempty(thisAsset.children)
        for jj=1:numel(thisAsset.children)
            childNode = parseV1Assets(thisAsset.children(jj));
+           % Add object index: index_objectname_O
+           childNode.name = sprintf('%03d_%s',jj,childNode.name);
            assetsTree = assetsTree.addnode(id, childNode);
        end
    end

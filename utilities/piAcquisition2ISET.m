@@ -97,7 +97,7 @@ for f=1:length(files)
         [~, pbrtFile, ~] = fileparts(localName);
         recipeName = sprintf('%s.json',pbrtFile);
         
-        energy = piReadDAT(localName, 'maxPlanes', nWave);
+        energy = piReadDAT(localName);
         photons = Energy2Quanta(wave,energy);
     end
      

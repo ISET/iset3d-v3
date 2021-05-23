@@ -39,7 +39,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Get information
 
 % The blue stick figure
-assetName = 'figure_3m_O';
+assetName = '001_figure_3m_O';
 
 rotM1   = thisR.get('asset', assetName, 'world rotation matrix');
 
@@ -134,11 +134,11 @@ disp(pos3)
 
 %% Put the red sphere at the world origin
 
-spherePos = thisR.get('asset','Sphere_O','world position');
+spherePos = thisR.get('asset','001_Sphere_O','world position');
 
 % place it at the origin
 
-thisR.set('asset','Sphere_O','translate',-spherePos);
+thisR.set('asset','001_Sphere_O','translate',-spherePos);
 
 % Render
 piWrite(thisR)
@@ -149,7 +149,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Here is a new way of setting object in world position!
 newSpherePos = [1 2 3];
 
-thisR.set('asset','Sphere_O','world position', newSpherePos);
+thisR.set('asset','001_Sphere_O','world position', newSpherePos);
 
 % thisR.get('asset', 'Sphere_O', 'world position')
 % Render

@@ -73,7 +73,7 @@ end
 %% List material library
 
 % It's helpful to check what current material properties are.
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 piMaterialGroupAssign(thisR);
 fprintf('A library of materials\n\n');  % Needs a nicer print method
 disp(thisR.materials.lib)

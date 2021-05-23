@@ -53,8 +53,8 @@ ieNewGraphWin; imagesc(depthmap); axis image
 %}
 
 thisR.summarize;
-
-scene = piRender(thisR);
+piWrite(thisR);
+[scene,result] = piRender(thisR);
 scene = sceneSet(scene,'name','far both');
 sceneWindow(scene);
 

@@ -66,7 +66,7 @@ thisR.set('asset', assetName_6, 'material name', glassName);
 thisR.get('object material')
 
 % Change the cube's scale to better see
-assetName = '003ID_Cube_B';
+assetName = '001_Cube_B';
 thisR.set('asset',assetName, 'scale', [2 2 2]);
 
 % Add an environmental light for more interesting spectral responses

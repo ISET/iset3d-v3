@@ -78,7 +78,7 @@ textureIdx = 1;
 piTextureSet(thisR, textureIdx, 'bool gamma', 'false');
 piTextureSet(thisR, textureIdx, 'stringwrap', 'absolute');
 %% Check texture list
-piTextureList(thisR);
+piTexturePrint(thisR);
 
 %% Set the basis function 
 basisFunctionsFileName = 'mccReflectance.mat';

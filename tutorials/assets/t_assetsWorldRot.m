@@ -29,7 +29,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Setting a rotation for this asset
 
 % This is the blue stick figure at 3 meters distance
-assetName = 'figure_3m_O';
+assetName = '001_figure_3m_O';
 
 initialAng = thisR.get('asset', assetName, 'world rotation angle');
 disp(initialAng)
@@ -73,8 +73,8 @@ thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5); 
 
-thisR.set('asset', 'figure_3m_O', 'world rotate', [0 0 90]);
-thisR.set('asset', 'figure_6m_O', 'world rotate', [0 0 90]);
+thisR.set('asset', '001_figure_3m_O', 'world rotate', [0 0 90]);
+thisR.set('asset', '001_figure_6m_O', 'world rotate', [0 0 90]);
 
 % Move the camera for a better look
 oDist = thisR.get('object distance');

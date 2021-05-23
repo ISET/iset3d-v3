@@ -1,16 +1,16 @@
-function [materialList, texureList, txtLines] = parseMaterialTexture(txtLines)
+function [materialMap, textureMap, txtLines] = parseMaterialTexture(txtLines)
 % Parse the txtLines to specify the materials and textures
 %
 % Synopsis
 %
-%   [materialList, texureList, txtLines] = parseMaterialTexture(txtLines)
+%   [materialMap, textureMap, txtLines] = parseMaterialTexture(txtLines)
 %
 % Input
 %   txtLines - Usually thisR.world text
 %
 % Outputs
-%   materialList - The material txtLines
-%   textureList  - The texture txtLines
+%   materialMap - The material key-value pairs map
+%   textureMap  - The texture key-value pairs map
 %   txtLines     -  The txtLines that are NOT material or textures
 %
 % ZL and ZYL
@@ -20,13 +20,15 @@ function [materialList, texureList, txtLines] = parseMaterialTexture(txtLines)
 
 %% Initialize the parameters we return
 
-texureList    = [];
+textureList    = [];
 materialList  = [];
 
 % Counters for the textures and materials
 t_index = 0;
 m_index = 0;
-
+% map for textures and materials
+textureMap  = containers.Map;
+materialMap = containers.Map;
 %% Loop over each line
 for ii = numel(txtLines):-1:1
     % From the end to the beginning so we don't screw up line ordering.
@@ -36,13 +38,15 @@ for ii = numel(txtLines):-1:1
     
     if strncmp(thisLine,'Texture',length('Texture'))
         t_index = t_index+1;
-        texureList{t_index}   = parseBlockTexture(thisLine);  %#ok<AGROW>
+        textureList{t_index}   = parseBlockTexture(thisLine);  %#ok<AGROW>'
+        textureMap(textureList{t_index}.name) = textureList{t_index};
         txtLines(ii) = [];
         
     elseif strncmp(thisLine,'MakeNamedMaterial',length('MakeNamedMaterial')) ||...
             strncmp(thisLine,'Material',length('Material'))
         m_index = m_index+1;
         materialList{m_index}  = parseBlockMaterial(thisLine); %#ok<AGROW>
+        materialMap(materialList{m_index}.name) = materialList{m_index};
         txtLines(ii) = [];
 
     end
