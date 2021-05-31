@@ -18,7 +18,7 @@
 % ZL, BW SCIEN 2018
 %
 % See also
-%   t_piIntroduction01, t_piIntroduction02
+%   t_piIntro_simpleCar
 
 %% Initialize ISET and Docker
 
@@ -45,6 +45,7 @@ sceneR.set('up',[0 1 0]);
 % scale and rotate checkerboard
 sceneR.set('assets','0002ID_Checkerboard_B','scale',[10 10 1]);
 sceneR.set('asset','Checkerboard_B','world rotation',[90 30 0]);
+
 %% Get a car from Flywheel
 
 % Open the connection

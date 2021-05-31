@@ -328,11 +328,8 @@ classdef tree
         
         function t = showUI(obj)
             % Bring up a uifigure with collapsible tree
-            % If a UI figure is opened, update it.
-            fig = findall(0,'Type','figure','tag','assetsUI');
-            if isempty(fig)
-                fig = uifigure('Name','Assets Collection', 'Tag','assetsUI');
-            end
+            windowName = strcat('Assets Collection',':', datestr(datetime('now')));
+            fig = uifigure('Name',windowName, 'Tag','assetsUI');
             t = uitree(fig,'Position',[80 10 400 400],'SelectionChangedFcn',@getNodeData);
             
             % First level nodes
@@ -353,10 +350,21 @@ classdef tree
                         case 'branch'
                             branch = uitreenode(assets,'Text',thisNode.name);
                             branch.UserData = thisNode;
+                            branch.Icon = fullfile(piRootPath,'external/matlab-tree/branch.png');
                             createAssetsTree(branch, obj, Ids(ii));
-                        otherwise
+                        case 'marker'
+                            branch = uitreenode(assets,'Text',thisNode.name);
+                            branch.UserData = thisNode;
+                            branch.Icon = fullfile(piRootPath,'external/matlab-tree/marker.png');
+                            createAssetsTree(branch, obj, Ids(ii));
+                        case 'instance'
                             node = uitreenode(assets,'Text',thisNode.name);
                             node.UserData = thisNode;
+                            node.Icon = fullfile(piRootPath,'external/matlab-tree/instance.png');
+                        case 'object'
+                            node = uitreenode(assets,'Text',thisNode.name);
+                            node.UserData = thisNode;
+                            node.Icon = fullfile(piRootPath,'external/matlab-tree/object.png');
                     end
                 end
             end

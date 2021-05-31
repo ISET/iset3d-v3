@@ -15,7 +15,7 @@ function  piGeometryWrite(thisR,varargin)
 %
 % Description
 %   We need a better description of objects and groups here.  Definitions
-%   of 'assets'.   
+%   of 'assets'.
 %
 % Zhenyi, 2018
 %
@@ -77,14 +77,14 @@ fclose(fid_obj);
 end
 
 function recursiveWriteNode(fid, obj, nodeID, rootPath, outFilePath)
-% Define each object in geometry.pbrt file. This section writes out 
+% Define each object in geometry.pbrt file. This section writes out
 % (1) Material for every object
-% (2) path to each children geometry files which store the shape and other 
+% (2) path to each children geometry files which store the shape and other
 %     geometry info.
-% 
+%
 % The process will be:
 %   (1) Get the children of this node
-%   (2) For each child, check if it is an 'object' or 'light' node. If so, 
+%   (2) For each child, check if it is an 'object' or 'light' node. If so,
 %   write it out.
 %   (3) If the child is a 'branch' node, put it in a list which will be
 %   recursively checked in next level.
@@ -101,15 +101,11 @@ nodeList = [];
 for ii = 1:numel(children)
     thisNode = obj.get(children(ii));
     % If node, put id in the nodeList
-    if isequal(thisNode.type, 'branch') 
-        if ~strcmp(thisNode.name(end-1:end), '_I')
-            % do not write object instance repeatedly
-            nodeList = [nodeList children(ii)];
-        else
-            continue;
-        end
-    
-    % Define object node
+    if isequal(thisNode.type, 'branch')
+        % do not write object instance repeatedly
+        nodeList = [nodeList children(ii)];
+          
+        % Define object node
     elseif isequal(thisNode.type, 'object')
         while numel(thisNode.name) >= 8 &&...
                 isequal(thisNode.name(5:6), 'ID')
@@ -145,10 +141,10 @@ for ii = 1:numel(children)
             if ~isempty(thisNode.output)
                 % There is an output slot
                 [~,output] = fileparts(thisNode.output);
-                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output); 
+                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output);
         %}
         if ~isempty(thisNode.shape)
-
+            
             shapeText = piShape2Text(thisNode.shape);
             
             if ~isempty(thisNode.shape.filename)
@@ -176,7 +172,7 @@ for ii = 1:numel(children)
         
         fprintf(fid, 'ObjectEnd\n\n');
         
-    elseif isequal(thisNode.type, 'light') || isequal(thisNode.type, 'marker')
+    elseif isequal(thisNode.type, 'light') || isequal(thisNode.type, 'marker') || isequal(thisNode.type, 'instance')
         % That's okay but do nothing.
     else
         % Something must be wrong if we get here.
@@ -210,12 +206,11 @@ end
 indentSpacing = "    ";
 
 
-
 for ii = 1:numel(children)
     thisNode = obj.get(children(ii));
     fprintf(fid, strcat(spacing, 'AttributeBegin\n'));
     
-    if isequal(thisNode.type, 'branch')       
+    if isequal(thisNode.type, 'branch')
         % get stripID for this Node
         while numel(thisNode.name) >= 8 &&...
                 isequal(thisNode.name(5:6), 'ID')
@@ -224,14 +219,14 @@ for ii = 1:numel(children)
         % Write info
         fprintf(fid, strcat(spacing, indentSpacing,...
             sprintf('#ObjectName %s:Vector(%.5f, %.5f, %.5f)',thisNode.name,...
-                                                        thisNode.size.l,...
-                                                        thisNode.size.w,...
-                                                        thisNode.size.h), '\n'));
+            thisNode.size.l,...
+            thisNode.size.w,...
+            thisNode.size.h), '\n'));
         % If a motion exists in the current object, prepare to write it out by
-        % having an additional line below.                                                  
+        % having an additional line below.
         if ~isempty(thisNode.motion)
             fprintf(fid, strcat(spacing, indentSpacing,...
-                            'ActiveTransform StartTime \n'));
+                'ActiveTransform StartTime \n'));
         end
         
         % Translation
@@ -240,37 +235,37 @@ for ii = 1:numel(children)
         if ~isempty(thisNode.rotation)
             fprintf(fid, strcat(spacing, indentSpacing,...
                 sprintf('Translate %.5f %.5f %.5f', thisNode.translation(1),...
-                                                      thisNode.translation(2),...
-                                                      thisNode.translation(3)), '\n'));
+                thisNode.translation(2),...
+                thisNode.translation(3)), '\n'));
             fprintf(fid, strcat(spacing, indentSpacing,...
-                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 1)), '\n'));
+                sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 1)), '\n'));
             fprintf(fid, strcat(spacing, indentSpacing,...
-                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 2)), '\n'));
+                sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 2)), '\n'));
             fprintf(fid, strcat(spacing, indentSpacing,...
-                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 3)), '\n'));
+                sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 3)), '\n'));
         else
             thisNode.concattransform(13:15) = thisNode.translation(:);
             fprintf(fid, strcat(spacing, indentSpacing,...
-                    sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', thisNode.concattransform(:)), '\n'));
+                sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', thisNode.concattransform(:)), '\n'));
         end
         % Scale
         fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Scale %.5f %.5f %.5f', thisNode.scale), '\n'));
-            
+            sprintf('Scale %.5f %.5f %.5f', thisNode.scale), '\n'));
+        
         % Write out motion
         if ~isempty(thisNode.motion)
             for jj = 1:size(thisNode.translation, 1)
                 fprintf(fid, strcat(spacing, indentSpacing,...
-                                'ActiveTransform EndTime \n'));
+                    'ActiveTransform EndTime \n'));
                 if isempty(thisNode.motion.translation(jj, :))
                     fprintf(fid, strcat(spacing, indentSpacing,...
-                                'Translate 0 0 0\n'));
+                        'Translate 0 0 0\n'));
                 else
                     pos = thisNode.motion.translation(jj,:);
                     fprintf(fid, strcat(spacing, indentSpacing,...
-                             sprintf('Translate %f %f %f', pos(1),...
-                                                              pos(2),...
-                                                              pos(3)), '\n'));
+                        sprintf('Translate %f %f %f', pos(1),...
+                        pos(2),...
+                        pos(3)), '\n'));
                 end
                 
                 if isfield(thisNode.motion, 'rotation') && ~isempty(thisNode.motion.rotation)
@@ -278,24 +273,32 @@ for ii = 1:numel(children)
                     
                     % Write out rotation
                     fprintf(fid, strcat(spacing, indentSpacing,...
-                                 sprintf('Rotate %f %f %f %f',rot(:,jj*3-2)), '\n')); % Z
+                        sprintf('Rotate %f %f %f %f',rot(:,jj*3-2)), '\n')); % Z
                     fprintf(fid, strcat(spacing, indentSpacing,...
-                                 sprintf('Rotate %f %f %f %f',rot(:,jj*3-1)),'\n')); % Y
+                        sprintf('Rotate %f %f %f %f',rot(:,jj*3-1)),'\n')); % Y
                     fprintf(fid, strcat(spacing, indentSpacing,...
-                                 sprintf('Rotate %f %f %f %f',rot(:,jj*3)), '\n'));   % X
+                        sprintf('Rotate %f %f %f %f',rot(:,jj*3)), '\n'));   % X
                 end
             end
         end
         
         recursiveWriteAttributes(fid, obj, children(ii), lvl + 1, outFilePath);
-            
-    elseif isequal(thisNode.type, 'object')
+        
+    elseif isequal(thisNode.type, 'object') || isequal(thisNode.type, 'instance')
         while numel(thisNode.name) >= 8 &&...
                 isequal(thisNode.name(5:6), 'ID')
-            thisNode.name = thisNode.name(8:end);
+            % remove instance suffix
+            endIndex = strfind(thisNode.name, '_I');
+            if ~isempty(endIndex)
+                endIndex =endIndex-1;
+            else
+                endIndex = numel(thisNode.name);
+            end
+            thisNode.name = thisNode.name(8:endIndex);
         end
         fprintf(fid, strcat(spacing, indentSpacing, ...
-                         sprintf('ObjectInstance "%s"', thisNode.name), '\n'));
+            sprintf('ObjectInstance "%s"', thisNode.name), '\n'));
+
     elseif isequal(thisNode.type, 'light')
         % Create a tmp recipe
         tmpR = recipe;
@@ -305,15 +308,15 @@ for ii = 1:numel(children)
         
         for jj = 1:numel(lightText)
             for kk = 1:numel(lightText{jj}.line)
-                fprintf(fid,sprintf('%s%s%s\n',spacing, indentSpacing,... 
-                        sprintf('%s',lightText{jj}.line{kk})));
+                fprintf(fid,sprintf('%s%s%s\n',spacing, indentSpacing,...
+                    sprintf('%s',lightText{jj}.line{kk})));
             end
         end
     else
         % Hopefully we will never get here.
     end
     
-
+    
     fprintf(fid, strcat(spacing, 'AttributeEnd\n'));
 end
 
