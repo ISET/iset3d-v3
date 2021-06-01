@@ -313,14 +313,13 @@ for ii = 1:numel(children)
             end
         end
     else
-        % Hopefully we will never get here.
+        % Hopefully we never get here.
+        warning('Unknown node type %s\n',thisNode.type);
     end
     
     
     fprintf(fid, strcat(spacing, 'AttributeEnd\n'));
 end
-
-% fprintf(fid,'\n');
 
 end
 

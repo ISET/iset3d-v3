@@ -799,7 +799,9 @@ switch param
         % thisR.set('light', lightName, newLight);
         % thisR.set('light', 'add', newLight);
         % thisR.set('light', 'delete', lightName);
-        % thisR.set('light', lightName, 'PARAM TYPE', VAL);
+        % thisR.set('light', 'rotate', lghtName, [XROT, YROT, ZROT], ORDER)
+        % thisR.set('light', 'translate', lghtName, [XSFT, YSFT, ZSFT], FROMTO)
+        % thisR.set('light', 'scale', lightName, VAL);
         
         % This is the case where we replace the light list
         if isempty(varargin)
@@ -903,6 +905,12 @@ switch param
                            'up', up);
                     thisR.set('light', lgtIdx, lght);
                     
+                    return;
+                case 'scale'
+                    % Scale the light intensity.
+                    [lgtIdx, lght] = piLightFind(thisR.lights, 'name', varargin{1});
+                    lght.specscale.value = val;
+                    thisR.set('light',lgtIdx,lght);
                     return;
                 otherwise
                     % Probably the light name.

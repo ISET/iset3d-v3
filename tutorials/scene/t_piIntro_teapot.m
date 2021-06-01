@@ -28,10 +28,19 @@ if ~piDockerExists, piDockerConfig; end
 
 % This is the teapot scene
 thisR = piRecipeDefault('scene name','teapot');
+
 % Set up the render quality
 thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
 thisR.set('max depth',1); % Number of bounces
+
+% Get rid of the area light
+% thisR.set('light','delete','all');
+
+% Add a light at the front
+pointLight = piLightCreate('point','type','point','cameracoordinate', true);
+thisR.set('light','add',pointLight);
+thisR.set('light','scale','point',10);
 
 %% Write out recipe and render. Then show.
 piWrite(thisR);

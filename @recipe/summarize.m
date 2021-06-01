@@ -120,24 +120,20 @@ switch str
         % fprintf('\n');
         
     case 'assets'
-        if isempty(thisR.assets), return; end
-        nAssets = thisR.assets.nnodes;
-        fprintf('\nAssets (%d)\n-----------\n',nAssets);
-        namelist = thisR.assets.names;
-        namelist = sort(unique(namelist));
-        for ii=1:nAssets
-            fprintf(' %s \n',namelist{ii});
-        end
-        fprintf('-----------\n\n');
+        if isempty(thisR.assets)
+            fprintf('\nNo assets \n-----------\n');
+            return;
+        else
+            piAssetPrint(thisR);
+        end        
         
     case 'materials'
-        fprintf('\nMaterials\n-----------\n');
-        if isempty(thisR.materials), return; end
-        out = thisR.materials;
-        fprintf('Number:\t%d\n',thisR.materials.list.Count);
-        [~,filename,ext] = fileparts(thisR.materials.inputFile_materials);
-        fprintf('File:\t%s\n',[filename,ext])
-        % fprintf('\n');
+        if isempty(thisR.materials)
+            fprintf('\nNo materials \n-----------\n');
+            return;
+        else
+            piMaterialPrint(thisR);
+        end
         
     case 'metadata'
 
