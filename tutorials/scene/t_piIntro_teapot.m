@@ -38,9 +38,13 @@ thisR.set('max depth',1); % Number of bounces
 % thisR.set('light','delete','all');
 
 % Add a light at the front
-pointLight = piLightCreate('point','type','point','cameracoordinate', true);
+pointLight = piLightCreate('point',...
+    'type','point',...
+    'cameracoordinate', true);
 thisR.set('light','add',pointLight);
-thisR.set('light','scale','point',10);
+thisR.set('light','point','specscale',1e3);
+
+lgt = thisR.get('light','point');
 
 %% Write out recipe and render. Then show.
 piWrite(thisR);

@@ -153,6 +153,8 @@ switch param
     case {'outputfile'}
         % thisR.set('outputfile',fullfilepath);
         %
+        
+        %{
         % The outputfile has a default initial string.  When we set,
         % we check that the new directory exists. If not, we make it.
         % If there were files in the previous directory we copy them
@@ -168,6 +170,12 @@ switch param
             end
             mkdir(newDir);
         end
+        %}
+        newDir     = fileparts(val);
+        if ~exist(newDir,'dir')
+            warning('output directory does not exist yet');
+        end
+        
         thisR.outputFile = val;
         
     case {'inputfile'}
@@ -905,12 +913,6 @@ switch param
                            'up', up);
                     thisR.set('light', lgtIdx, lght);
                     
-                    return;
-                case 'scale'
-                    % Scale the light intensity.
-                    [lgtIdx, lght] = piLightFind(thisR.lights, 'name', varargin{1});
-                    lght.specscale.value = val;
-                    thisR.set('light',lgtIdx,lght);
                     return;
                 otherwise
                     % Probably the light name.

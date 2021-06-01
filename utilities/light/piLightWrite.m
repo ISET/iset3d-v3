@@ -136,9 +136,7 @@ for ii = 1:numel(thisR.lights)
             end
             
             lightSourceText{ii}.line = [lightSourceText{ii}.line lghtDef];
-            
-            
-            
+                        
         case 'distant'
             % Whether coordinate at camera pos
             if thisLight.cameracoordinate
