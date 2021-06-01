@@ -21,7 +21,7 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault;
 
 %% Add one equal energy light
-thisR.set('light', 'delete', 'all');
+thisR.set('light', 'delete', 'both');
 
 % Add an equal energy distant light
 lName = 'new dist light';
@@ -35,7 +35,7 @@ thisR.set('light', 'add', newDistLight);
 
 %% Used for scene
 piWrite(thisR);
-scene = piRender(thisR, 'render type', 'all');
+scene = piRender(thisR, 'render type', 'both');
 sceneWindow(scene);
 
 %% Translate the camera away by 5 meters

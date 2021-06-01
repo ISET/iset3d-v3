@@ -26,11 +26,13 @@ ieInit;
 if ~piDockerExists, piDockerConfig; end
 if ~piScitranExists, error('scitran installation required'); end
 
-%% We are going place some cars on a plane
+%% Render cars on a planar surface
+
 % Initialize a planar surface with a checkerboard texture pattern
 sceneName = 'simpleCarScene';
 sceneR = piRecipeDefault('scene name','checkerboard');
 sceneR.set('outputFile',fullfile(piRootPath, 'local', sceneName,[sceneName,'.pbrt']));
+
 % render quality
 sceneR.set('film resolution',[1280 600]/1.5);
 sceneR.set('pixel samples',16);
@@ -42,11 +44,12 @@ sceneR.set('from', [0 1.5 7]);   % from was 5
 sceneR.set('to',[0 0.5 0]);
 sceneR.set('up',[0 1 0]);
 
-% scale and rotate checkerboard
+% scale and rotate planar checkerboard
 sceneR.set('assets','0002ID_Checkerboard_B','scale',[10 10 1]);
 sceneR.set('asset','Checkerboard_B','world rotation',[90 30 0]);
 
-%% 
+%% Read in the car model and reformat it 
+
 car_fname = fullfile(piRootPath, 'data/V3','car','car.pbrt');
 car_formatted_fname = fullfile(piRootPath,'local','formatted','car/car.pbrt');
 if ~exist(car_formatted_fname,'file')
