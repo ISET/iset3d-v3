@@ -24,7 +24,7 @@
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-if ~piScitranExists, error('scitran installation required'); end
+% if ~piScitranExists, error('scitran installation required'); end
 
 %% Render cars on a planar surface
 
