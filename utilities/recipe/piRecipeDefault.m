@@ -418,38 +418,34 @@ switch ieParamFormat(sceneName)
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file')
-            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
-            if ~exist(fname, 'file'), error('File not found'); end
+            fname = ieSceneWebTest(sceneName);
         end
         exporter = 'Copy';
     case 'veach-ajar'
         sceneName = 'veach-ajar';
         % Local
-        FilePath = fullfile(piRootPath,'data','V3','veach-ajar');
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file')
-            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
-            if ~exist(fname, 'file'), error('File not found'); end
+            fname = ieSceneWebTest(sceneName);
         end
-        exporter = 'Copy';        
+        exporter = 'Copy';    
     case 'villalights'
         sceneName = 'villaLights';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
-        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file')
-            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
-            if ~exist(fname, 'file'), error('File not found'); end
+            fname = ieSceneWebTest(sceneName);
         end
         exporter = 'Copy';
     case 'plantsdusk'
         sceneName = 'plantsDusk';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
-        fname = fullfile(FilePath,['plantsDusk','.pbrt']);
+        fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file')
-            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
-            if ~exist(fname, 'file'), error('File not found'); end
+            fname = ieSceneWebTest(sceneName);
         end
         exporter = 'Copy';
     case 'livingroom'
@@ -458,18 +454,15 @@ switch ieParamFormat(sceneName)
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file')
-            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
-            if ~exist(fname, 'file'), error('File not found'); end
+            fname = ieSceneWebTest(sceneName);
         end
         exporter = 'Copy';
     case 'yeahright'
-        sceneName = 'yeahright';
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
-        fname = fullfile(FilePath,['yeahright','.pbrt']);
+        fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file')
-            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
-            if ~exist(fname, 'file'), error('File not found'); end
+            fname = ieSceneWebTest(sceneName);
         end
         exporter = 'Copy';
     case 'sanmiguel'
@@ -496,8 +489,7 @@ switch ieParamFormat(sceneName)
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
         if ~exist(fname,'file')
-            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
-            if ~exist(fname, 'file'), error('File not found'); end
+            fname = ieSceneWebTest(sceneName);
         end
         exporter = 'Copy';
     case 'bedroom'
@@ -583,4 +575,21 @@ end
 
 end
 
+function fname = ieSceneWebTest(sceneName)
+% Check for a web scene
+
+% See if the scene is already in data/V3/web
+FilePath = fullfile(piRootPath,'data','V3','web',sceneName);
+fname = fullfile(FilePath,['scene','.pbrt']);
+
+% Download the file to data/V3/web
+if ~exist(fname,'file')
+    % Download and confirm.
+    ieWebGet2('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+    if ~exist(fname, 'file'), error('File not found'); end
+else
+    fprintf('File found %s in data/V3/web.\n',sceneName)
+end
+
+end
 
