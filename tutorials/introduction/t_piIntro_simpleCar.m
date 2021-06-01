@@ -105,7 +105,7 @@ piWrite(sceneR);   % We get a warning.  Ignore
 % Maybe we should speed this up by only returning radiance.
 [scene, result] = piRender(sceneR,'render type','radiance');
 
-%%  Show the scene in a window
+%  Show the scene in a window
 
 % scene = sceneSet(scene,'name',sprintf('Time: %s',thisTime));
 % denoise scene

@@ -288,7 +288,7 @@ for ii = 1:numel(children)
         while numel(thisNode.name) >= 8 &&...
                 isequal(thisNode.name(5:6), 'ID')
             % remove instance suffix
-            endIndex = strfind(thisNode.name, '_I');
+            endIndex = strfind(thisNode.name, '_I_');
             if ~isempty(endIndex)
                 endIndex =endIndex-1;
             else
