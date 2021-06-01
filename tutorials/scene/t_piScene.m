@@ -35,6 +35,7 @@ thisR.set('film resolution',[512 512]);
 thisR.set('pixel samples',256);
 thisR.set('max depth',5); % Number of bounces
 
+piWrite(thisR);
 scene = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
 scene = piAIdenoise(scene);

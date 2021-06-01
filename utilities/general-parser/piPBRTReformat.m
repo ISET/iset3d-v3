@@ -137,7 +137,6 @@ end
 % Try to get rid of the return from this system command.
 rmCmd = sprintf('docker rm %s',dockercontainerName);
 system(rmCmd);
-disp('Docker container is deleted.')
 %%
 % In case there are extra materials and geometry files
 % format scene_materials.pbrt and scene_geometry.pbrt, then save them at the

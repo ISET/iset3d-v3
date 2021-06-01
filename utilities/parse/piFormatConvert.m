@@ -2,6 +2,7 @@ function [newlines] = piFormatConvert(txtLines)
 % Format txtlines into a standard format.
 nn=1;
 nLines = numel(txtLines);
+newlines = cell(nLines, 1);
 
 ii=1;
 tokenlist = {'A', 'C' , 'F', 'I', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T'};
@@ -22,7 +23,7 @@ while ii <= nLines
                 end
                 for jj=(ii+1):nLines+1
                     if jj==nLines+1 || isempty(txtLines{jj}) || ~isequal(txtLines{jj}(1),'"')
-                        if jj==nLines+1 || isempty(txtLines{jj}) || isempty(str2num(txtLines{jj}(1:2))) ||...
+                        if jj==nLines+1 || isempty(txtLines{jj}) || isempty(sscanf(txtLines{jj}(1:2), '%f')) ||...
                                 any(strncmp(txtLines{jj}, tokenlist, 1))
                             blockEnd = jj;
                             blockLines = txtLines(blockBegin:(blockEnd-1));
@@ -49,4 +50,5 @@ while ii <= nLines
     ii=ii+1;
 end
 newlines(piContains(newlines,'Warning'))=[];
+newlines = newlines(~cellfun('isempty', newlines));
 end

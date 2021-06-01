@@ -481,7 +481,9 @@ switch ieParamFormat(sceneName)
         % Local
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
         fname = fullfile(FilePath,['scene','.pbrt']);
-        if ~exist(fname,'file'), error('File not found'); end
+        if ~exist(fname,'file')
+            fname = ieSceneWebTest(sceneName); 
+        end
         exporter = 'Copy';
     case {'whiteroom', 'white-room'}
         sceneName = 'white-room';

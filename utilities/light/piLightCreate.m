@@ -75,8 +75,8 @@ lght.name = p.Results.lightName;
 lght.specscale.type = 'float';
 lght.specscale.value = 1;
 
-lght.spd.type = 'spectrum';
-lght.spd.value = [];
+lght.spd.type = 'rgb';
+lght.spd.value = [1 1 1];
 switch ieParamFormat(lght.type)
     case 'distant'        
         lght.cameracoordinate = true;
