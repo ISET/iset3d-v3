@@ -56,7 +56,7 @@ if ~exist(car_formatted_fname,'file')
     car_formatted_fname = piPBRTReformat(car_fname, 'outputfull', car_formatted_fname);
 end
 objectR = piRead(car_formatted_fname);
-piWrite(objectR);
+% piWrite(objectR);
 %% add downloaded asset information to Render recipe.
 sceneR = piRecipeMerge(sceneR, objectR);
 
@@ -126,6 +126,8 @@ sceneWindow(sceneDenoise);
 %% Create object instances
 % Add one object instance
 sceneR   = piObjectInstance(sceneR, 'AudiSportsCar01_B', 'position', [3.5 0 0]);
+sceneR.assets = sceneR.assets.uniqueNames;
+
 piWrite(sceneR);  
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'Add a car instance');
@@ -136,35 +138,33 @@ sceneWindow(scene);
 %}
 rotation = piRotationMatrix('yrot',75);
 sceneR   = piObjectInstance(sceneR, 'AudiSportsCar01_B', 'position', [-1 0 3], 'rotation',rotation);
-%%
+%
 sceneR.assets = sceneR.assets.uniqueNames;
 sceneR.set('from', [0 1.5 7]);
 %%
-piWrite(sceneR);   % We get a warning.  Ignore
+piWrite(sceneR);   
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'With 2 more identical cars at different postions');
 sceneWindow(scene);
 %%
 % add new material
 matName = 'newCarbody';
-rgbkd = piColorPick('red');
+rgbkd = piColorPick('white');
 rgbks = [0.15 0.15 0.15];
+
 newMat = piMaterialCreate(matName, ...
     'type','substrate',...
     'kd value',rgbkd,...
     'ks value',rgbks,...
     'uroughness value', 0.0005,...
     'vroughness value', 0.0005);
+
 sceneR.set('material','add', newMat);
 piMaterialPrint(sceneR);
 %% Change material of the object(carbody) of a car instance 
-[idx, thisAsset]= piAssetFind(sceneR.assets, 'name','0070ID_001_AudiSportsCar01_O_I_2');
-thisAsset{1}.material.namedmaterial = matName;
-thisAsset{1}.type = 'object';
-thisAsset{1}.name = '001_AudiSportsCar01_newMaterial_O';
-sceneR.assets = sceneR.assets.set(idx, thisAsset{1});
+sceneR   = piObjectInstance(sceneR, '0070ID_001_AudiSportsCar01_O_I_2', 'material', matName);
 sceneR.assets = sceneR.assets.uniqueNames;
-piWrite(sceneR);   % We get a warning.  Ignore
+piWrite(sceneR);   
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'change material of a car instance');
 sceneWindow(scene);

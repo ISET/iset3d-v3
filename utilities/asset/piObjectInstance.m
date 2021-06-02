@@ -13,8 +13,12 @@ function thisR = piObjectInstance(thisR, assetname, varargin)
 %
 % Inputs:
 %   thisR     - scene recipe
-%   assetname - assetname, only branch is supported
-%
+%   nodetype  - type of asset node
+%   position  - 1x3 position
+%   rotatoin  - 3x4 rotation
+%   motion    - motion struct which contains animated position and rotation
+%   material  - material name for (object type) asset
+%   
 % Output:
 %   thisR     - scene recipe
 %
@@ -27,6 +31,8 @@ p.addParameter('nodetype','branch',@(x)(ismember(ieParamFormat(x),{'branch','obj
 p.addParameter('position',[]);
 p.addParameter('rotation',[]);
 p.addParameter('motion',[],@(x)isstruct);
+p.addParameter('material',@ischar); 
+
 
 p.parse(thisR, varargin{:});
 
@@ -35,13 +41,16 @@ nodeType = p.Results.nodetype;
 position = p.Results.position;
 rotation = p.Results.rotation;
 motion   = p.Results.motion;
-
+material = p.Results.material;
 %%
 [idx,asset] = piAssetFind(thisR, 'name', assetname);
 % if ~strcmp(asset{1}.type, 'branch')
 %     warning('Only branch name is supported.');
 %     return;
 % end
+if ~strcmp(asset{1}.type,'branch')
+    nodeType = 'object';
+end
 switch nodeType
     case 'branch'
         OBJsubtree = thisR.get('asset', idx, 'subtree','false');
@@ -63,14 +72,14 @@ switch nodeType
             OBJsubtree_branch.motion.position = motion.position;
             OBJsubtree_branch.motion.rotation = motion.rotation;
         end
-        for ii = 1:numel(OBJsubtree.Node) 
-                thisNode      = OBJsubtree.Node{ii};
-                thisNode.name = strcat(OBJsubtree.Node{ii}.name, InstanceSuffix);
+        for ii = 1:numel(OBJsubtree.Node)
+            thisNode      = OBJsubtree.Node{ii};
+            thisNode.name = strcat(OBJsubtree.Node{ii}.name, InstanceSuffix);
             if strcmp(OBJsubtree.Node{ii}.type,'object')
                 thisNode.type = 'instance';
                 thisNode.referenceObject = OBJsubtree.Node{ii}.name;
             end
-                OBJsubtree = OBJsubtree.set(ii, thisNode);
+            OBJsubtree = OBJsubtree.set(ii, thisNode);
         end
         OBJsubtree_branch.name = strcat(OBJsubtree_branch.name, InstanceSuffix);
         % replace branch
@@ -78,7 +87,16 @@ switch nodeType
         % graft object tree to scene tree
         thisR.assets = thisR.assets.graft(1, OBJsubtree);
     case 'object'
+        asset{1}.material.namedmaterial = material;
+        asset{1}.type = 'object';
+        strIdx = strfind(asset{1}.name, '_O_');
+        if numel(asset{1}.name) >= 8 && isequal(asset{1}.name(5:6), 'ID')
+            asset{1}.name = asset{1}.name(8:strIdx-1);
+        else
+            asset{1}.name = asset{1}.name(1:strIdx-1);
+        end
+        asset{1}.name = strcat(asset{1}.name,'_',ieParamFormat(material),'_O');
+        thisR.assets = thisR.assets.set(idx, asset{1});
         % to add
 end
-thisR.assets = thisR.assets.uniqueNames;
 end
