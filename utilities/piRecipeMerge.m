@@ -23,7 +23,7 @@ p.addParameter('asset',true);
 
 p.parse(sceneR, varargin{:});
 
-sceneR        = p.Results.sceneR;
+sceneR       = p.Results.sceneR;
 materialFlag = p.Results.material;
 textureFlag  = p.Results.texture;
 assetFlag    = p.Results.asset;

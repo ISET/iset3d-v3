@@ -16,6 +16,7 @@
 %    docker pull vistalab/pbrt-v3-spectral
 %
 % ZL, BW SCIEN 2018
+% updated, 2021
 %
 % See also
 %   t_piIntroduction01, t_piIntroduction02
@@ -34,9 +35,9 @@ sceneR = piRecipeDefault('scene name','checkerboard');
 sceneR.set('outputFile',fullfile(piRootPath, 'local', sceneName,[sceneName,'.pbrt']));
 
 % render quality
-sceneR.set('film resolution',[1280 600]/1.5);
-sceneR.set('pixel samples',16);
-sceneR.set('max depth',10);
+sceneR.set('film resolution',[1280 600]/2);
+sceneR.set('pixel samples',8);
+sceneR.set('max depth',3);
 
 % camera properties
 sceneR.set('fov',45);
@@ -52,6 +53,7 @@ sceneR.set('asset','Checkerboard_B','world rotation',[90 30 0]);
 
 car_fname = fullfile(piRootPath, 'data/V3','car','car.pbrt');
 car_formatted_fname = fullfile(piRootPath,'local','formatted','car/car.pbrt');
+
 if ~exist(car_formatted_fname,'file')
     car_formatted_fname = piPBRTReformat(car_fname, 'outputfull', car_formatted_fname);
 end
@@ -125,7 +127,7 @@ sceneWindow(sceneDenoise);
 %}
 %% Create object instances
 % Add one object instance
-sceneR   = piObjectInstance(sceneR, 'AudiSportsCar01_B', 'position', [3.5 0 0]);
+sceneR   = piObjectInstanceCreate(sceneR, 'AudiSportsCar01_B', 'position', [3.5 0 0]);
 sceneR.assets = sceneR.assets.uniqueNames;
 
 piWrite(sceneR);  
@@ -137,7 +139,7 @@ sceneWindow(scene);
 
 %}
 rotation = piRotationMatrix('yrot',75);
-sceneR   = piObjectInstance(sceneR, 'AudiSportsCar01_B', 'position', [-1 0 3], 'rotation',rotation);
+sceneR   = piObjectInstanceCreate(sceneR, 'AudiSportsCar01_B', 'position', [-1 0 3], 'rotation',rotation);
 %
 sceneR.assets = sceneR.assets.uniqueNames;
 sceneR.set('from', [0 1.5 7]);
@@ -162,11 +164,38 @@ newMat = piMaterialCreate(matName, ...
 sceneR.set('material','add', newMat);
 piMaterialPrint(sceneR);
 %% Change material of the object(carbody) of a car instance 
-sceneR   = piObjectInstance(sceneR, '0070ID_001_AudiSportsCar01_O_I_2', 'material', matName);
+[idx,asset] = piAssetFind(sceneR, 'name', '0070ID_001_AudiSportsCar01_O_I_2');
+% set asset material name
+asset{1}.material.namedmaterial = matName;
+% change asset type from instance to object
+asset{1}.type = 'object';
+% give it a new name
+asset{1}.name = '001_AudiSportsCar01_newCarbody_O';
+sceneR.assets = sceneR.assets.set(idx, asset{1});
 sceneR.assets = sceneR.assets.uniqueNames;
+%%
 piWrite(sceneR);   
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'change material of a car instance');
+sceneWindow(scene);
+%% delete an instance
+% remove '0036ID_AudiSportsCar01_B_I_1'
+sceneR = piObjectInstanceRemove(sceneR,'0036ID_AudiSportsCar01_B_I_1');
+sceneR.assets = sceneR.assets.uniqueNames;
+% only instance No.2 is remained.
+piWrite(sceneR);  
+[scene, result] = piRender(sceneR,'render type','radiance');
+scene = sceneSet(scene,'name', 'remove a car instance');
+sceneWindow(scene);
+% add again
+sceneR = piObjectInstanceCreate(sceneR, 'AudiSportsCar01_B', 'position', [4 0 0]);
+sceneR.assets = sceneR.assets.uniqueNames;
+
+% now you should see the added instance using a index equals to 1
+
+piWrite(sceneR);  
+[scene, result] = piRender(sceneR,'render type','radiance');
+scene = sceneSet(scene,'name', 'Add a car instance back');
 sceneWindow(scene);
 
 
