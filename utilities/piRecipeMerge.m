@@ -1,54 +1,85 @@
 function sceneR = piRecipeMerge(sceneR, objectRs, varargin)
-% Add objects information to scene recipe
+% Add multiple object recipes into a base scene recipe
 %
 % Synopsis:
 %   sceneR = piRecipeMerge(sceneR, objects, varargin)
 % 
 % Brief description:
-%   Add objects information (material, texture, assets) to a scene recipe.
+%   Merges objects information (material, texture, assets) from two recipes
+%   into one. 
 %
 % Inputs:
-%   sceneR   - scene recipe
-%   objectRs  - object recipe/ recipe list
+%   sceneR    - scene recipe
+%   objectRs  - a single object recipe or a cell array of object recipes
 %   
-% Returns:
-%   sceneR   - scene recipe with added objects.
+% Optional key/val pairs
+%   material -  The user can decide to NOT add materials.  Default is true
+%   texture  -  Same
+%   asset    -  Same
 %
+% Returns:
+%   sceneR   - scene recipe with added objects
+%
+% See also
+%
+
 %% Parse input
 p = inputParser;
 p.addRequired('sceneR', @(x)isequal(class(x),'recipe'));
+p.addRequired('objectRs', @(x)isequal(class(x),'recipe') || iscell);
+
+% So far, we add materials, textures, and assets.  We have not yet
+% addressed lights.  The user can 
 p.addParameter('material',true);
 p.addParameter('texture',true);
 p.addParameter('asset',true);
 
-p.parse(sceneR, varargin{:});
+p.parse(sceneR, objectRs, varargin{:});
 
-sceneR        = p.Results.sceneR;
+sceneR       = p.Results.sceneR;
 materialFlag = p.Results.material;
 textureFlag  = p.Results.texture;
 assetFlag    = p.Results.asset;
 
-%%
+%%  The objects can be a cell or a recipe
+
 if ~iscell(objectRs)
+    % Make it a cell
     recipelist{1} = objectRs;
 else
+    % A cell array of recipes
     recipelist = objectRs;
 end
+
+%% For each object recipe, add the object to the scene
+
 for ii = 1:length(recipelist)
     thisR = recipelist{ii};
+    
     if assetFlag
-        names = thisR.get('assetnames');
-        thisOBJsubtree = thisR.get('asset', names{2}, 'subtree');
-        [~,addedSubtree1] = sceneR.set('asset', 'root', 'graft', thisOBJsubtree);
         
-        % copy meshes from objects folder to scene folder here?
-        [sourceDir, ~, ~]=fileparts(thisR.outputFile);
-        [dstDir, ~, ~]=fileparts(sceneR.outputFile);
+        % Get the asset names in the object
+        names = thisR.get('assetnames');
+        
+        % Get the subtree starting just below the root
+        thisOBJsubtree = thisR.get('asset', names{2}, 'subtree');
+        
+        % Graft the asset three into the scene.  We graft it onto the root
+        % of the main scene.
+        sceneR.set('asset', 'root', 'graft', thisOBJsubtree);
+        
+        % Copy meshes from objects folder to scene folder here
+        sourceDir = thisR.get('output dir');
+        dstDir    = sceneR.get('output dir');
+        
+        % Copy the assets from source to destination
         sourceAssets = fullfile(sourceDir, 'scene/PBRT/pbrt-geometry');
         dstAssets    = fullfile(dstDir,    'scene/PBRT/pbrt-geometry');
         copyfile(sourceAssets, dstAssets);
         
-        % copy the ply files potentially in local folder
+        % Copy ply files that are in the root of the local folder. These
+        % can be created by the reformatting and they are Included in the
+        % main scene file.
         plyFiles = dir(fullfile(sourceDir, '*.ply'));
         for jj = 1:numel(plyFiles)
             copyfile(fullfile(plyFiles(jj).folder, plyFiles(jj).name),dstDir);
@@ -56,6 +87,7 @@ for ii = 1:length(recipelist)
     end
     
     if materialFlag
+        % Combines the material lists in the two recipes
         if ~isempty(sceneR.materials)
             sceneR.materials.list = [sceneR.materials.list; thisR.materials.list];
         else
@@ -64,18 +96,22 @@ for ii = 1:length(recipelist)
     end
     
     if textureFlag
+        % Combines the lists in the recipes, and then the files
         if ~isempty(sceneR.textures)
             sceneR.textures.list = [sceneR.textures.list; thisR.textures.list];
         else
             sceneR.textures = thisR.textures;
         end
-        [sourceDir, ~, ~]=fileparts(thisR.outputFile);
-        [dstDir, ~, ~]=fileparts(sceneR.outputFile);
-        sourceTextures = fullfile(sourceDir, 'textures');
+        
+        % Copy texture files
+        sourceDir = thisR.get('output dir');
+        dstDir    = sceneR.get('output dir');        
+        sourceTextures = fullfile(sourceDir, 'textures');        
         if exist(sourceTextures, 'dir')
             copyfile(sourceTextures, dstDir);
         end
     end
 end
+
 end
 

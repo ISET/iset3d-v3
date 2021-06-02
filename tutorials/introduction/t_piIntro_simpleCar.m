@@ -51,15 +51,24 @@ sceneR.set('asset','Checkerboard_B','world rotation',[90 30 0]);
 
 %% Read in the car model and reformat it 
 
-car_fname = fullfile(piRootPath, 'data/V3','car','car.pbrt');
-car_formatted_fname = fullfile(piRootPath,'local','formatted','car/car.pbrt');
+% The scene starts in data/V3 and it is reformatted into
+% local/formatted/car.
+car_fname = fullfile(piRootPath, 'data','V3','car','car.pbrt');
+car_formatted_fname = fullfile(piRootPath,'local','formatted','car','car.pbrt');
 
 if ~exist(car_formatted_fname,'file')
     car_formatted_fname = piPBRTReformat(car_fname, 'outputfull', car_formatted_fname);
 end
+
+% Read the reformatted car recipe
 objectR = piRead(car_formatted_fname);
-% piWrite(objectR);
-%% add downloaded asset information to Render recipe.
+
+%% Merge the background scene and the car object
+
+% To merge, the files must exist on disk.  The base scene already exists,
+% but we haven't written out the object recipe.  We write it out, which
+% also reorganizes the PBRT files.
+piWrite(objectR);
 sceneR = piRecipeMerge(sceneR, objectR);
 
 %% Add a light to the merged scene
@@ -80,16 +89,20 @@ skymap = piLightCreate('new skymap', ...
 sceneR.set('light', 'add', skymap);
 disp('*** Skymap added');
 %% This adds predefined sceneauto materials to the assets in this scene
+
 % print material
-piMaterialPrint(sceneR);
+sceneR.show('materials');
+
 % assign material
 iaAutoMaterialGroupAssign(sceneR); 
  
 % check again after material assign
-piMaterialPrint(sceneR);
+sceneR.show('materials');
 
 % show corresponding material name for each asset
-piAssetMaterialPrint(sceneR);
+% piAssetMaterialPrint(sceneR);
+sceneR.show('assets materials');
+
 %% Set the car body to a new color.
 
 colorkd = piColorPick('blue');
@@ -118,6 +131,7 @@ piWrite(sceneR);   % We get a warning.  Ignore
 scene = sceneSet(scene,'name', 'normal');
 sceneWindow(scene);
 sceneSet(scene,'display mode','hdr'); 
+
 % denoise
 %{
 sceneDenoise = piAIdenoise(scene);
@@ -134,16 +148,16 @@ piWrite(sceneR);
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'Add a car instance');
 sceneWindow(scene);
-%%
-%{
+%%  Add a rotated version of the car
 
-%}
 rotation = piRotationMatrix('yrot',75);
 sceneR   = piObjectInstanceCreate(sceneR, 'AudiSportsCar01_B', 'position', [-1 0 3], 'rotation',rotation);
-%
+
 sceneR.assets = sceneR.assets.uniqueNames;
-sceneR.set('from', [0 1.5 7]);
-%%
+
+% 'from' is a camera specification.  We are moving it closer??
+% sceneR.set('from', [0 1.5 7]);
+
 piWrite(sceneR);   
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'With 2 more identical cars at different postions');
@@ -164,42 +178,49 @@ newMat = piMaterialCreate(matName, ...
 sceneR.set('material','add', newMat);
 piMaterialPrint(sceneR);
 %% Change material of the object(carbody) of a car instance 
+
 [idx,asset] = piAssetFind(sceneR, 'name', '0070ID_001_AudiSportsCar01_O_I_2');
+
 % set asset material name
 asset{1}.material.namedmaterial = matName;
+
 % change asset type from instance to object
 asset{1}.type = 'object';
+
 % give it a new name
 asset{1}.name = '001_AudiSportsCar01_newCarbody_O';
 sceneR.assets = sceneR.assets.set(idx, asset{1});
 sceneR.assets = sceneR.assets.uniqueNames;
-%%
+
 piWrite(sceneR);   
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'change material of a car instance');
 sceneWindow(scene);
-%% delete an instance
+%% Delete an instance
+
 % remove '0036ID_AudiSportsCar01_B_I_1'
+% only instance No.2 remains
 sceneR = piObjectInstanceRemove(sceneR,'0036ID_AudiSportsCar01_B_I_1');
 sceneR.assets = sceneR.assets.uniqueNames;
-% only instance No.2 is remained.
 piWrite(sceneR);  
+
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'remove a car instance');
 sceneWindow(scene);
-% add again
-sceneR = piObjectInstanceCreate(sceneR, 'AudiSportsCar01_B', 'position', [4 0 0]);
-sceneR.assets = sceneR.assets.uniqueNames;
+
+%% Add the instance again
 
 % now you should see the added instance using a index equals to 1
 
+sceneR = piObjectInstanceCreate(sceneR, 'AudiSportsCar01_B', 'position', [4 0 0]);
+sceneR.assets = sceneR.assets.uniqueNames;
 piWrite(sceneR);  
+
 [scene, result] = piRender(sceneR,'render type','radiance');
 scene = sceneSet(scene,'name', 'Add a car instance back');
 sceneWindow(scene);
 
-
-
+%% END
 
 
 
