@@ -43,13 +43,17 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name','sphere');
 
 % Add a point light, needed by this scene.
-thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
+pointLight = piLightCreate('point','type','point','cameracoordinate', true);
+thisR.set('light','add',pointLight);
 
+%{
 % You can also try this light if you like, which is more blue and distant
-% 
-% Just comment the line above and uncomment this one
-% thisR = piLightAdd(thisR, 'type', 'distant', 'light spectrum', [9000 0.001],...
-%                         'camera coordinate', true);
+distantLight = piLightCreate('distant','type','distant',...
+    'spd', [9000 0.001], ...
+    'cameracoordinate', true);
+thisR.set('light','delete',pointLight.name);
+thisR.set('light','add',distantLight);
+%}
 
 %% Set up the render quality
 %

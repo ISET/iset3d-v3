@@ -1,0 +1,2660 @@
+Film "image" "integer xresolution" [1366] "integer yresolution" [768] "string filename" "output00001.exr"
+PixelFilter "box" "float xwidth" [0.5] "float ywidth" [0.5] 
+Accelerator "bvh" 
+"string splitmethod" "sah"
+"integer maxnodeprims" [4]
+Sampler "halton"
+"integer pixelsamples" [100]
+"bool samplepixelcenter" "false"
+Integrator "path"
+"integer maxdepth" [10]
+Scale -1 1 1 #avoid the 'flipped image' bug..
+LookAt	0.0 -85.0 19.0
+	0.0 -84.0 19.0
+	0.0 -1.6292068494294654e-07 1.0
+
+Camera "perspective"
+"float fov" [18.919451983985912]
+WorldBegin
+
+	AttributeBegin
+		Transform [25.000000 0.000000 0.000000 0.000000 0.000000 19.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 -19.000000 -1.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floor_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [24.999998 0.000000 0.000000 0.000000 0.000000 -0.000004 25.000000 0.000000 0.000000 -1.000000 -0.000000 0.000000 0.000000 -1.000000 25.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/backWall_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.000002 0.000000 -25.000000 0.000000 0.000000 18.999998 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 -24.000000 -19.000000 25.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/leftWall_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [0.000002 0.000000 25.000000 0.000000 0.000000 18.999998 0.000000 0.000000 -1.000000 0.000000 0.000000 0.000000 24.000000 -19.000000 25.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/rightWall_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [24.999998 0.000000 0.000000 0.000000 0.000000 -0.000004 -25.000000 0.000000 0.000000 1.000000 -0.000000 0.000000 0.000000 -37.000000 25.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/frontWall_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [25.000000 0.000000 0.000000 0.000000 0.000000 -19.000000 0.000003 0.000000 0.000000 -0.000000 -1.000000 0.000000 0.000000 -19.000000 49.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/ceiling_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -1.931129 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -2.447181 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -1.787759 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -1.956210 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -2.434708 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -2.435974 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -1.898424 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -2.085627 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -1.945307 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -2.118227 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -23.000000 -1.903854 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt1-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -1.912415 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -1.998679 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -2.301290 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -1.913596 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -2.111675 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -2.446146 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -2.366854 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -2.444508 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -2.028765 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -1.959067 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -21.000000 -1.827027 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt2-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -1.837029 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -1.769928 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -1.775911 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -2.357520 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -1.789705 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -2.183143 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -1.908155 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -2.042770 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -2.020543 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -2.254856 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -19.000000 -1.826960 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt3-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.220161 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.235015 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.133388 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.208198 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.165196 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.007916 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -1.877777 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -1.883118 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -1.936697 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.014603 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -17.000000 -2.405429 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt4-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.446615 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -1.991153 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -1.982752 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.378792 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -1.799510 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.141720 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.089695 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.282231 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.181697 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.110905 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -15.000000 -2.439796 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt5-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.278318 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -1.915354 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.436211 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.211588 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.091783 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.382927 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -1.927093 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.418717 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.332156 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -2.356946 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -13.000000 -1.810452 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt6-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -2.087775 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -2.101925 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -1.822003 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -2.439442 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -1.778971 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -2.427135 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -2.127490 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -1.912435 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -2.269816 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -1.958312 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -11.000000 -2.313009 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt7-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -1.835654 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -2.007905 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -1.922161 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -1.871664 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -2.380704 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -1.785245 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -1.987164 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -2.202525 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -2.283381 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -1.923945 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -9.000000 -2.137478 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt8-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -1.872802 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -2.321010 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -1.754639 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -1.870303 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -2.201677 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -2.092489 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -1.951367 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -2.412846 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -1.913133 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -2.036484 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -7.000000 -2.297480 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt9-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -2.150126 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -1.798638 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -1.791063 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -2.288521 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -2.048269 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -2.384567 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -2.391669 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -2.063960 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -2.193709 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -1.954695 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -5.000000 -1.923127 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt10-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -1.770307 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -2.177886 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -2.269450 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -2.274473 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -2.303199 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -1.768831 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -2.345196 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -2.274525 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -2.088501 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -1.980274 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -3.000000 -1.971489 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt11-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.201579 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.387908 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -1.790411 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.191282 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.089587 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.057596 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.143429 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.334876 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -1.979922 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -2.094868 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 -1.000000 -1.877671 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt12-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -1.947344 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -1.972919 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.134505 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.240208 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.127316 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -1.759312 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.154676 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.448535 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.148489 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.122188 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 1.000000 -2.443407 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt13-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -1.772225 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.328640 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.275857 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.201507 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.305076 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.031131 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -1.770055 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -1.930056 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.031342 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.155881 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 3.000000 -2.137787 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt14-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -1.940576 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.197225 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.053695 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -1.992298 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.002929 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.347279 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -1.917845 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.047895 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.194659 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.291605 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 5.000000 -2.173531 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt15-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -1.791715 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -2.365473 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -1.960195 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -2.110048 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -2.445656 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -1.872980 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -2.391371 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -2.217056 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -2.232859 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -1.824876 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 7.000000 -2.061048 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt16-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -1.872503 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -1.789724 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -2.272658 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -2.207218 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -2.443959 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -2.425150 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -1.893696 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -2.018849 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -2.076142 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -1.764967 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 9.000000 -1.844089 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt17-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -2.148076 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -1.802027 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -2.391013 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -1.843770 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -1.813400 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -2.393254 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -1.930702 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -2.099893 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -1.763646 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -1.977346 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 11.000000 -1.943255 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt18-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -1.775279 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -2.003698 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -2.182047 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -1.995454 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -1.828372 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -2.194118 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -2.000680 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -1.898043 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -1.943451 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -2.336830 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 13.000000 -2.205233 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt19-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -2.207739 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -2.119046 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -2.090782 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -1.851795 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -2.324171 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -2.288436 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -1.983335 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -2.217819 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -2.358327 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -1.984263 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 15.000000 -1.962388 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt20-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -1.816634 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -1.790834 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -2.169483 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -2.435795 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -2.175875 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -1.886177 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -1.920419 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -2.205764 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -2.420276 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -2.137182 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 17.000000 -1.783919 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt21-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -1.988125 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -2.313651 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -1.755237 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -2.172799 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -1.905072 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -2.138315 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -2.359208 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -2.374214 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -2.322628 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -2.315529 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 19.000000 -1.961274 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt22-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.247267 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.221856 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -1.966536 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.186157 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -1.969421 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -1.774096 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.408087 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.403850 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.095778 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.315644 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 21.000000 -2.411174 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt23-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.176345 12.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.350031 14.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.414668 16.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.040033 18.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.428475 20.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.449975 22.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -1.879422 24.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -1.973845 26.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.263928 28.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.164926 30.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.000000 0.000000 0.000000 0.000000 0.000000 0.150000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 23.000000 -2.146518 32.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/tileAt24-16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [22.500000 0.000000 0.000000 0.000000 0.000000 17.100000 0.000000 0.000000 0.000000 0.000000 0.250000 0.000000 0.000000 -18.000000 11.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorPedestal_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -24.000000 -34.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt0-0_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -24.000000 -26.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt0-2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -24.000000 -18.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt0-4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -24.000000 -10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt0-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -24.000000 -2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt0-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -24.000000 6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt0-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -24.000000 14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt0-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -20.000000 -30.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt1-1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -20.000000 -22.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt1-3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -20.000000 -14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt1-5_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -20.000000 -6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt1-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -20.000000 2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt1-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -20.000000 10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt1-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -16.000000 -34.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt2-0_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -16.000000 -26.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt2-2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -16.000000 -18.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt2-4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -16.000000 -10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt2-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -16.000000 -2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt2-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -16.000000 6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt2-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -16.000000 14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt2-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -12.000000 -30.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt3-1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -12.000000 -22.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt3-3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -12.000000 -14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt3-5_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -12.000000 -6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt3-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -12.000000 2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt3-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -12.000000 10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt3-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -8.000000 -34.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt4-0_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -8.000000 -26.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt4-2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -8.000000 -18.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt4-4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -8.000000 -10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt4-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -8.000000 -2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt4-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -8.000000 6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt4-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -8.000000 14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt4-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -4.000000 -30.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt5-1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -4.000000 -22.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt5-3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -4.000000 -14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt5-5_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -4.000000 -6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt5-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -4.000000 2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt5-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 -4.000000 10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt5-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 0.000000 -34.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt6-0_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 0.000000 -26.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt6-2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 0.000000 -18.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt6-4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 0.000000 -10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt6-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 0.000000 -2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt6-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 0.000000 6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt6-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 0.000000 14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt6-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 4.000000 -30.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt7-1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 4.000000 -22.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt7-3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 4.000000 -14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt7-5_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 4.000000 -6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt7-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 4.000000 2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt7-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 4.000000 10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt7-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 8.000000 -34.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt8-0_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 8.000000 -26.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt8-2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 8.000000 -18.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt8-4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 8.000000 -10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt8-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 8.000000 -2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt8-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 8.000000 6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt8-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 8.000000 14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt8-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 12.000000 -30.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt9-1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 12.000000 -22.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt9-3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 12.000000 -14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt9-5_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 12.000000 -6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt9-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 12.000000 2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt9-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 12.000000 10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt9-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 16.000000 -34.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt10-0_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 16.000000 -26.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt10-2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 16.000000 -18.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt10-4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 16.000000 -10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt10-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 16.000000 -2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt10-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 16.000000 6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt10-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 16.000000 14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt10-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 20.000000 -30.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt11-1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 20.000000 -22.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt11-3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 20.000000 -14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt11-5_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 20.000000 -6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt11-7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 20.000000 2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt11-9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 20.000000 10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt11-11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 24.000000 -34.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt12-0_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 24.000000 -26.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt12-2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 24.000000 -18.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt12-4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 24.000000 -10.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt12-6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 24.000000 -2.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt12-8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 24.000000 6.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt12-10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [2.000000 0.000000 0.000000 0.000000 0.000000 -0.000000 0.150000 0.000000 0.000000 -2.000000 -0.000000 0.000000 24.000000 14.000000 11.175000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/floorTileAt12-12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [8.999999 0.000000 0.000000 0.000000 0.000000 -0.000001 9.000000 0.000000 0.000000 -0.250000 -0.000000 0.000000 0.000000 -3.000000 19.000000 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/backWallPedestal_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 1.859391 -35.495331 14.569300 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie1_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -4.676658 -34.679100 12.614059 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie2_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 3.554377 -30.686359 14.774739 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie3_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -1.540084 -31.329020 15.503210 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie4_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -3.815688 -30.565109 19.170040 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie5_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -1.857834 -27.453190 14.329350 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie6_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 6.931802 -26.880409 21.624170 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie7_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -8.511189 -27.382410 16.483540 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie8_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 2.833731 -26.794420 16.245369 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie9_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 1.669446 -27.349470 12.772779 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie10_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -8.626597 -27.466290 12.676730 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie11_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 7.673283 -27.207600 16.501720 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie12_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.005191 -27.403820 21.693220 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie13_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -4.006962 -23.386379 13.241429 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie14_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -9.922311 -22.704950 24.717690 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie15_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 2.285516 -22.889149 18.010920 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie16_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.534222 -22.749039 23.677910 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie17_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 8.094159 -23.401739 15.595150 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie18_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 4.575694 -22.565010 24.029509 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie19_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -10.159510 -22.605930 13.387199 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie20_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -6.830509 -22.743410 19.123220 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie21_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -10.186319 -23.476479 19.553150 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie22_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 9.210396 -19.034380 24.367489 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie23_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 6.750686 -19.461380 13.879450 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie24_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 11.375020 -19.181690 19.236689 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie25_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -6.896441 -19.235529 25.293959 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie26_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -9.741658 -19.346180 18.822250 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie27_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -10.982969 -19.334700 27.168070 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie28_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -8.231794 -18.506750 15.279409 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie29_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.715339 -19.123650 26.323679 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie30_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 4.070873 -18.949350 20.177240 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie31_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -4.031557 -19.222879 13.246030 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie32_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 11.686419 -18.667580 13.720070 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie33_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -0.561299 -15.027610 21.787289 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie34_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -11.388730 -15.408810 13.945729 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie35_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 5.778530 -14.763120 24.265388 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie36_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -4.885589 -14.968579 28.338209 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie37_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -2.393903 -14.911910 14.368839 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie38_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 13.000250 -15.200190 13.353100 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie39_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 7.403300 -15.259530 29.878889 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie40_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -11.674880 -14.787470 19.396099 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie41_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 2.006146 -14.779429 16.397490 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie42_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -10.498240 -14.753830 29.873949 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie43_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 9.179848 -15.232630 16.992239 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie44_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -1.053501 -15.188430 29.603970 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie45_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -6.121520 -14.961650 23.180189 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie46_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 13.352340 -14.785600 29.545170 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie47_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 2.199978 -15.074050 12.838090 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie48_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -15.063009 -10.519660 23.639910 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie49_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -13.007470 -11.463460 28.864969 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie50_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -1.198725 -10.912940 30.057570 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie51_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -6.766635 -11.045680 12.778379 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie53_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 7.316002 -10.960000 24.603769 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie54_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 12.859710 -11.420799 19.014059 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie55_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -0.085025 -11.038549 23.706450 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie56_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 14.165680 -11.202640 26.704090 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie57_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -8.710471 -11.368800 19.980570 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie58_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -4.905891 -11.334720 24.688639 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie59_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -2.912076 -10.508110 16.575010 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie60_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 14.530080 -10.694759 13.450160 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie61_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 6.435001 -11.313910 20.140139 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie63_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 1.556223 -11.429379 12.964940 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie64_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -13.622430 -11.291960 14.248819 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie65_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 7.328938 -10.868130 14.611629 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie66_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -3.541453 -6.863033 23.363600 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie67_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -3.718076 -7.340269 17.479679 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie68_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -9.377588 -7.337160 19.984650 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie69_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 7.536327 -7.368427 30.709478 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie70_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -7.556293 -7.199014 27.956490 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie72_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -2.172193 -6.898552 28.389050 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie73_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 3.566179 -7.441675 14.335810 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie74_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -15.795859 -6.539373 25.739109 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie75_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 14.164630 -6.863784 23.494169 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie76_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -8.306186 -7.251369 14.081650 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie78_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 2.621629 -6.547025 23.657719 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie80_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 2.531339 -7.030918 28.246279 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie81_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 14.093220 -6.637573 15.170950 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie82_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -16.910189 -6.586246 19.544989 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie83_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 9.548472 -7.238966 16.159590 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie84_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 16.271959 -7.058569 29.458460 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie85_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 7.965659 -7.404888 26.223549 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie86_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -16.374369 -7.231494 15.626499 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie87_mat0.ply"]
+	AttributeEnd
+	
+
+	AttributeBegin
+		Transform [1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 0.000000 0.000000 0.000000 1.300000 0.000000 -14.900140 -6.806295 30.058899 1.000000 ]
+		Shape "plymesh" "string filename" ["meshes/00001/blobbie88_mat0.ply"]
+	AttributeEnd
+	
+
+WorldEnd

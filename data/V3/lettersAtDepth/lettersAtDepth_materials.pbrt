@@ -1,0 +1,7 @@
+MakeNamedMaterial "White" "string type" "uber" "float index" [1.333] "rgb Kd" [1.0 1.0 1.0] "rgb Ks" [0 0 0] "rgb Kr" [0 0 0] "float roughness" [0.673578740297]
+Texture "checker_1" "spectrum" "checkerboard" "rgb tex1" [0.3 0.3 0.3] "rgb tex2" [0 0 0] "float uscale" [64] "float vscale" [64]
+MakeNamedMaterial "WallMaterial" "string type" "uber" "float index" [1.33300] "texture Kd" "checker_1" "rgb Kr" [0 0 0] "rgb Ks" [0 0 0] "float roughness" [0.50000]
+MakeNamedMaterial "GroundMaterial" "string type" "uber" "float index" [1.33300] "texture Kd" "checker_1" "rgb Kr" [0 0 0] "rgb Ks" [0 0 0] "float roughness" [0.50000]
+
+# Texture "checkerboard_color" "spectrum" "imagemap" "string filename" "checkerboard.png"
+# MakeNamedMaterial "PlaneMaterial" "string type" "uber" "float index" [1.333] "texture Kd" "checkerboard_color" "rgb Ks" [0.0 0.0 0.0] "rgb Kr" [0.0 0.0 0.0] "float roughness" [0.1]

@@ -13,7 +13,7 @@ function val = recipeGet(thisR, param, varargin)
 %
 % Parameters
 %
-%   % Data management
+%    % Data management
 %    % The input files are the original PBRT files
 %     'input file'        - full path to original scene pbrt file
 %     'input basename'    - just base name of input file
@@ -130,13 +130,12 @@ function val = recipeGet(thisR, param, varargin)
 %    % Asset information
 %       'assets'      - This struct includes the objects and their
 %                       properties in the World
-%       'asset names' - The names in groupobjs.name
-%       'group names'
-%       'group index'
-%       'group obj'
-%       'child'
-%       'children names'
-%       'children index'
+%       'asset names' 
+%       'asset id'
+%       'asset root'
+%       'asset names'
+%       'asset parent id'
+%       'assetparent'
 %
 %    % Material information
 %      'materials'
@@ -153,11 +152,18 @@ function val = recipeGet(thisR, param, varargin)
 
 % Examples
 %{
-  val = thisR.get('working directory');
-  val = thisR.get('object distance');
-  val = thisR.get('focal distance');
-  val = thisR.get('camera type');
-  val = thisR.get('lens file');
+  thisR = piRecipeDefault('scene name','SimpleScene');
+  thisR.get('working directory')
+  thisR.get('object distance')
+  thisR.get('focal distance')
+  thisR.get('camera type')
+  thisR.get('lens file')
+
+  thisR.get('asset names')       % The call should be the same!
+  thisR.get('materials','names');
+  thisR.get('textures','names')  
+  thisR.get('light','names')      
+
 %}
 
 % Programming todo
@@ -465,6 +471,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 % Everything is in focus for a pinhole camera.  For
                 % pinholes and perspect this is focaldistance.  But not for
                 % realistic or omni.
+                disp('No true focal distance for pinhole. This value is arbitrary');
                 if isfield(thisR.camera,'focaldistance')
                     val = thisR.camera.focaldistance.value;
                 end
@@ -517,35 +524,48 @@ switch ieParamFormat(param)  % lower case, no spaces
             case {'pinhole','perspective'}
                 % Calculate this from the fov, if it is not already stored.
                 if isfield(thisR.camera,'filmdistance')
+                    % Worried about the units.  mm or m?  Assuming meters.
                     val = thisR.camera.filmdistance.value;
                 else
                     % Compute the distance to achieve the diagonal fov.  We
                     % might have to make this match the smaller size (x or
                     % y) because of PBRT conventions.  Some day.  For now
                     % we use the diagonal.
-                    fov = thisR.get('fov');
-                    filmDiag = thisR.get('film diagonal');
-                    val = (filmDiag/2)/atan(fov);
+                    fov = thisR.get('fov');  % Degrees
+                    filmDiag = thisR.get('film diagonal','m');  % m
+                    
+                    %   tand(fov) = opp/adj; adjacent is distance
+                    val = (filmDiag/2)/tand(fov);               % m
+                    
                 end
+                
             case 'lens'
+                % We should deal with the spatial units correctly here.
+                % This is a mess. (BW).
                 if exist('lensFocus','file')
                     opticsType = thisR.get('optics type');
                     if strcmp(opticsType,'lens')
-                        lensFile = thisR.get('lens file');
-                        if exist('lensFocus','file')
-                            % If isetlens is on the path, we convert the
-                            % distance to the focal plane into millimeters
-                            % and see whether there is a film distance so
-                            % that the plane is in focus.
-                            %
-                            % But we return the value in meters
-                            val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
+                        if strcmp(thisR.get('camera subtype'),'realisticEye')
+                            % For the human eye model ... returned in
+                            % millimeters.
+                            val = thisR.get('retinaDistance');
                         else
-                            % No lensFocus, so tell the user about isetlens
-                            warning('Add isetlens to your path if you want the film distance estimate')
-                        end
-                        if ~isempty(val) && val < 0
-                            warning('%s lens cannot focus an object at this distance.', lensFile);
+                            lensFile = thisR.get('lens file');
+                            if exist('lensFocus','file')
+                                % If isetlens is on the path, we convert the
+                                % distance to the focal plane into millimeters
+                                % and see whether there is a film distance so
+                                % that the plane is in focus.
+                                %
+                                % But we return the value in meters
+                                val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
+                            else
+                                % No lensFocus, so tell the user about isetlens
+                                warning('Add isetlens to your path if you want the film distance estimate')
+                            end
+                            if ~isempty(val) && val < 0
+                                warning('%s lens cannot focus an object at this distance.', lensFile);
+                            end
                         end
                     end
                 end
@@ -798,12 +818,13 @@ switch ieParamFormat(param)  % lower case, no spaces
         val(2) = thisR.camera.subpixels_w;
         val(1) = thisR.camera.subpixels_h;
         
-        % Film
+        % Film (because of PBRT.  ISETCam it would be sensor).
     case {'spatialsamples','filmresolution','spatialresolution'}
         % thisR.get('spatial samples');
         %
         % When using ISETBio, we usually call it spatial samples or spatial
-        % resolution.  For ISETCam, it is usually film resolution.
+        % resolution.  For ISET3d, it is usually film resolution because of
+        % the PBRT notation.
         try
             val = [thisR.film.xresolution.value,thisR.film.yresolution.value];
         catch
@@ -812,24 +833,40 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         
     case 'filmxresolution'
-        % An integer
+        % An integer specifying number of samples
         val = thisR.film.xresolution.value;
     case 'filmyresolution'
-        % An integer
+        % An integer specifying number of samples
         val = [thisR.film.yresolution.value];
+        
     case 'aperturediameter'
-        % Needs to be checked.
+        % Needs to be checked.  Default units are meters or millimeters?
         if isfield(thisR.camera, 'aperturediameter') ||...
                 isfield(thisR.camera, 'aperture_diameter')
             val = thisR.camera.aperturediameter.value;
         else
-            val = nan;
+            val = NaN;
+        end
+        
+        % Need to check on the units!
+        if isempty(varargin), return;
+        else, val = val*ieUnitScaleFactor(varargin{1});
         end
         
     case {'filmdiagonal','filmdiag'}
         % recipe.get('film diagonal');  in mm
         if isfield(thisR.film,'diagonal')
             val = thisR.film.diagonal.value;
+        else
+            warning('Setting film diagonal to 10 mm. Previously unspecified');
+            thisR.set('film diagonal',10);
+            val = 10;
+        end
+        
+        % By default the film is stored in mm, unfortunately.  So we scale
+        % to meters and then apply unit scale factor
+        if isempty(varargin), return;
+        else, val = val*1e-3*ieUnitScaleFactor(varargin{1});
         end
         
     case 'filmsubtype'
@@ -903,7 +940,11 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
-        switch ieParamFormat(varargin{1})
+        % Here we list the material names or find a material by its name.
+        % If there is a material name (varargin{1}) and then a material
+        % property (varargin{2}) we call piMaterialGet.  See piMaterialGet
+        % for the list of material properties you can get.
+        switch varargin{1}
             % Special cases
             case 'names'
                 % thisR.get('material','names');
@@ -960,6 +1001,79 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'materialsoutputfile'}
         % Unclear why this is still here.  Probably deprecated.
         val = thisR.materials.outputfile;
+        
+        % Getting ready for textures
+    case{'texture', 'textures'}
+        % thisR.get('texture', textureName, property)
+        
+        % thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
+        % textures = thisR.get('texture');
+        % thisTexture = thisR.get('texture', 'reflectanceChart_color');
+        % thisName = thisR.get('texture', 'reflectanceChart_color', 'name');
+        % filename = thisR.get('texture', 'reflectanceChart_color', 'filename');
+        % filenameVal = thisR.get('texture', 'reflectanceChart_color', 'filename val');
+        
+        if isempty(varargin)
+            % Return the whole texture list
+            if isfield(thisR.textures, 'list')
+                val = thisR.textures.list;
+            else
+                % Should this be just empty, or an empty cell?
+                warning('No material in this recipe')
+                val = {};
+            end
+            return;        
+        end
+        
+        switch varargin{1}
+            % Special cases
+            case 'names'
+                % thisR.get('texture', 'names');
+                n = numel(thisR.textures.list);
+                val = cell(1, n);
+                for ii=1:n
+                    val{ii} = thisR.textures.list{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the texture name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.textures.list)
+                    % Search by index.  Get the textures directly.
+                    textureIdx = varargin{1};
+                    thisTexture = thisR.textures.list{textureIdx};
+                elseif isstruct(varargin{1})
+                    thisTexture = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisTexture] = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                    val = thisTexture;
+                end
+                
+                if isempty(thisTexture)
+                    warning('Could not find material. Return.')
+                    return;
+                end
+                if numel(varargin) >= 2
+                    % Return the texture property
+                    % thisR.get('texture', texture/idx/name, property)
+                    % Return the texture property
+                    val = piTextureGet(thisTexture, varargin{2});
+                end                
+        end
+        
+    case {'ntexture', 'ntextures', 'texturenumber', 'texturesnumber'}
+        % thisR.get('n textures')
+        % Number of textures in this scene
+        if isfield(thisR.textures, 'list')
+            val = numel(thisR.textures.list);
+        else
+            val = 0;
+        end
+    case {'texturesprint', 'printmtextures', 'textureprint', 'printtexture'}
+        % thisR.get('textures print')
+        %
+        piTextureList(thisR);
     case {'objectmaterial','materialobject'}
         % val = thisR.get('object material');
         %
@@ -1001,19 +1115,75 @@ switch ieParamFormat(param)  % lower case, no spaces
         for ii = 1:numel(ids)
             val{ii} = names{ids(ii)};
         end
-        
-        % Getting ready for textures
-    case{'texture'}
-        if isfield(thisR.textures, 'list')
-            val = thisR.textures.list;
-        else
-            val = {};
+                
+        % Lights
+    case{'light', 'lights'}
+        if isempty(varargin)
+            if isprop(thisR, 'lights')
+                val = thisR.lights;
+            else
+                warning('No lights in this recipe')
+                val = {};
+            end
+            return;
         end
         
-        % Getting read for lights
-    case{'light'}
-        val = thisR.light;
-                    
+        %{
+        if ischar(varargin{1})
+            varargin{1} = ieParamFormat(varargin{1});
+        end
+        %}
+        
+        switch varargin{1}
+            case 'names'
+                n = numel(thisR.lights);
+                val = cell(1, n);
+                for ii=1:n
+                    val{ii} = thisR.lights{ii}.name;
+                end
+            otherwise
+                % The first argument indicates the material name and there
+                % must be a second argument for the property
+                if isnumeric(varargin{1}) && ...
+                        varargin{1} <= numel(thisR.lights)
+                    % Search by index.  Get the material directly.
+                    lgtIdx = varargin{1};
+                    thisLight = thisR.lights{lgtIdx};
+                    val = thisLight;
+                elseif isstruct(varargin{1})
+                    % The user sent in the material.  We hope.
+                    % We should have a slot in material that identifies itself as a
+                    % material.  Maybe a test like "material.type ismember valid
+                    % materials."
+                    thisLight = varargin{1};
+                elseif ischar(varargin{1})
+                    % Search by name, find the index
+                    [~, thisLight] = piLightFind(thisR.lights, 'name', varargin{1});
+                    val = thisLight;
+                end
+                
+                if isempty(thisLight)
+                    warning('Could not find light. Return.')
+                    return;
+                end
+                if numel(varargin) >= 2
+                    % Return the material property
+                    % thisR.get('material', material/idx/name, property)
+                    % Return the material property
+                    val = piLightGet(thisLight, varargin{2});
+                end
+        end
+    case {'nlight', 'nlights', 'light number', 'lights number'}
+        % thisR.get('n lights')
+        % Number of lights in this scene.
+        if isprop(thisR, 'lights')
+            val = numel(thisR.lights);
+        else
+            val = 0;
+        end                    
+    case {'lightsprint', 'printlights', 'lightprint', 'printlight'}
+        % thisR.get('lights print');
+        piLightList(thisR);
     % Asset specific gets - more work needed here.
     case {'asset', 'assets'}
         % thisR.get('asset',assetName or ID);  % Returns the asset
@@ -1035,6 +1205,18 @@ switch ieParamFormat(param)  % lower case, no spaces
                 case 'subtree'
                     % thisR.get('asset', assetName, 'subtree');
                     val = thisR.assets.subtree(id);
+                    %{
+                    % This is not true. We should let users determine
+                    % whether to put it under root or not. Otherwise it
+                    % causes like MCC in CB.
+                    % We always assume the subtree is at (0 0 0) of the
+                    % scene.
+                    if isequal(val.Node{1}.type, 'branch')
+                        rNode = val.get(1);
+                        rNode.translation = [0 0 0]';
+                        val = val.set(1, rNode);
+                    end
+                    %}
                 case {'nodetoroot','pathtoroot'}
                     % thisR.get('asset',assetName,'leaf to root');
                     % Sequence of ids from the leaf to root
@@ -1131,65 +1313,6 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = thisR.assets.Node{parentNode};   
 
         % Delete this stuff when we get ready to merge.
-        %{
-    case {'groupnames'}
-        % Cell array (2D) of the groupobj names
-        % val{level}{idx}
-        val = piAssetNames(thisR);
-    case {'groupindex'}
-        % thisR.get('groupindex',groupName)
-        % gnames = thisR.get('group names')
-        %
-        % gnames{idx(1)}{dx(2)}
-        if isempty(varargin), error('group name required'); end
-        val = piAssetNames(thisR,'group find',varargin{1});
-    case {'groupobj'}
-        % groupobj = thisR.get('groupobj',idx);
-        % idx from group index
-        %
-        % idx = piAssetNames(thisR,'group find','figure_3m');
-        thisG = thisR.assets;
-        % Work through the levels
-        for level = 1:idx(1)
-            thisG = thisG.groupobjs;
-        end
-        % Select the group
-        val = thisG(idx(2));
-        
-    case {'childrennames'}
-        % cnames = thisR.get('children names')
-        % Cell array (2D) of the children names
-        %
-        [~,val] = piAssetNames(thisR);
-        
-    case {'childrenindex'}
-        % idx = thisR.get('children index',childName)
-        % cnames = thisR.get('children names')
-        %
-        % These are 3-vectors (level, group, idx)
-        %
-        % cnames{idx(1)}{dx(2)}
-        %
-        if isempty(varargin), error('child name required'); end
-        val = piAssetNames(thisR,'children find',varargin{1});
-    case {'child'}
-        % child = thisR.get('child',idx);
-        %
-        % idx from child index is a 3 vector. There can be multiple
-        % groupobjs at this level and we need to know which one has the
-        % specific child.  So we need
-        %
-        %   [level, groupidx, childidx]
-        %
-        % idx = piAssetNames(thisR,'children find','3_1_Moon Light');
-        thisG = thisR.assets;
-        for level = 1:idx(1)
-            % Work through the levels
-            thisG = thisG.groupobjs;
-        end
-        % Find the group and child
-        val = thisG(idx(2)).children(idx(3));
-        %}
 
     otherwise
         error('Unknown parameter %s\n',param);

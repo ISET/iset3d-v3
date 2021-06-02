@@ -23,8 +23,14 @@ thisR.integrator.maxdepth.value = 5;
 piLightGet(thisR); % Should be nothing
 
 % Add a new equalEnergy light
-thisR = piLightAdd(thisR, 'type', 'distant', 'camera coordinate', true,...
-                    'light spectrum', 'equalEnergy');
+distantLight = piLightCreate('distantLight', ...
+    'type','distant',...
+    'spd','equalEnergy',...
+    'cameracoordinate', true);
+thisR.set('light','add',distantLight);
+
+% thisR = piLightAdd(thisR, 'type', 'distant', 'camera coordinate', true,...
+%                     'light spectrum', 'equalEnergy');
 %% Check texture list
 
 piTextureList(thisR);

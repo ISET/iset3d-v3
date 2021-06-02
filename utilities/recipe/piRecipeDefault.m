@@ -95,10 +95,14 @@ varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addParameter('scenename','MacBethChecker',@ischar);
 p.addParameter('write',false,@islogical);
+p.addParameter('verbose', 2, @isnumeric);
+
 p.parse(varargin{:});
 
 sceneName = p.Results.scenename;
 write     = p.Results.write;
+verbosity = p.Results.verbose;
+
 
 %%  To read the file,the upper/lower case must be right
 
@@ -142,6 +146,15 @@ switch ieParamFormat(sceneName)
             if ~exist(fname, 'file'), error('File not found'); end
         end
         exporter = 'C4D'; 
+    case 'whiteboard'
+        sceneName = 'WhiteBoard';
+        FilePath = fullfile(piRootPath,'data','V3', 'WhiteBoard');
+        fname = fullfile(FilePath,[sceneName,'.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'C4D';         
     case 'simplescene'
         sceneName = 'SimpleScene';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
@@ -159,7 +172,16 @@ switch ieParamFormat(sceneName)
             ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
             if ~exist(fname, 'file'), error('File not found'); end
         end
-        exporter = 'Copy';
+        exporter = 'C4D';
+    case 'chesssetpieces'
+        sceneName = 'ChessSetPieces';
+        FilePath = fullfile(piRootPath,'data','V3',sceneName);
+        fname = fullfile(FilePath,['ChessSet','.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'C4D';
     case 'chessset_2'
         sceneName = 'ChessSet_2';
         FilePath = fullfile(piRootPath,'data','V3',sceneName);
@@ -198,7 +220,7 @@ switch ieParamFormat(sceneName)
         FilePath = fullfile(piRootPath,'data','V3','teapot');
         fname = fullfile(FilePath,'teapot-area-light.pbrt');
         if ~exist(fname,'file'), error('File not found'); end
-        exporter = 'Unknown';
+        exporter = 'Copy';
     case 'slantedbar'
         % In sceneEye cases we were using piCreateSlantedBarScene.  But
         % going forward we will use the Cinema 4D model so we can use the
@@ -362,7 +384,7 @@ switch ieParamFormat(sceneName)
             ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
             if ~exist(fname, 'file'), error('File not found'); end
         end
-        exporter = 'C4D';
+        exporter = 'Copy';
     case 'lettersatdepth'
         sceneName = 'lettersAtDepth';
         % Local
@@ -400,6 +422,16 @@ switch ieParamFormat(sceneName)
             if ~exist(fname, 'file'), error('File not found'); end
         end
         exporter = 'Copy';
+    case 'veach-ajar'
+        sceneName = 'veach-ajar';
+        % Local
+        FilePath = fullfile(piRootPath,'data','V3','veach-ajar');
+        fname = fullfile(FilePath,['scene','.pbrt']);
+        if ~exist(fname,'file')
+            ieWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+            if ~exist(fname, 'file'), error('File not found'); end
+        end
+        exporter = 'Copy';        
     case 'villalights'
         sceneName = 'villaLights';
         % Local
@@ -521,7 +553,7 @@ end
 % Parse the file contents into the ISET3d recipe and identify the type of
 % parser.  C4D has special status.  In other cases, such as the scenes from
 % the PBRT and Benedikt sites, we just copy the files into ISET3d/local.
-thisR = piRead(fname);
+thisR = piRead(fname, 'exporter', exporter);
 thisR.set('exporter',exporter);
 
 % By default, do the rendering and mounting from ISET3d/local.  That

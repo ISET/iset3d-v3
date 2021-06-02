@@ -54,9 +54,13 @@ p.addParameter('scalepupilarea',true,@islogical);
 % For the pinhole case
 p.addParameter('meanluminance',100,@isnumeric);
 
+% determine how chatty we should be
+p.addParameter('verbose', 2, @isnumeric);
+
 p.parse(inputFile,varargin{:});
 label       = p.Results.label;
 thisR       = p.Results.recipe;
+verbosity   = p.Results.verbose;
 
 meanIlluminancepermm2 = p.Results.meanilluminancepermm2;
 scalePupilArea        = p.Results.scalepupilarea;
@@ -70,7 +74,7 @@ if(strcmp(label,'radiance') || strcmp(label, 'illuminant') || strcmp(label, 'ill
     
     % The PBRT output is in energy units.  Scenes and OIs data are
     % represented in photons
-    energy = piReadDAT(inputFile);
+    energy = piReadDAT(inputFile, 'verbose', verbosity);
     photons = Energy2Quanta(wave,energy);
     
     if strcmp(label, 'illuminant') || strcmp(label, 'illuminantonly')
@@ -78,13 +82,13 @@ if(strcmp(label,'radiance') || strcmp(label, 'illuminant') || strcmp(label, 'ill
         return;
     end
 elseif(strcmp(label,'depth') || strcmp(label,'mesh')||strcmp(label,'material') )
-    tmp = piReadDAT(inputFile);
+    tmp = piReadDAT(inputFile, 'verbose', verbosity);
     metadataMap = tmp(:,:,1); clear tmp;
     ieObject = metadataMap;
     return;
 elseif(strcmp(label,'coordinates'))
     % Not sure what this is.  Maybe the 3D coordinates of each point?
-    tmp = piReadDAT(inputFile);
+    tmp = piReadDAT(inputFile, 'verbose', verbosity);
     coordMap = tmp(:,:,1:3); clear tmp;
     ieObject = coordMap;
     return;

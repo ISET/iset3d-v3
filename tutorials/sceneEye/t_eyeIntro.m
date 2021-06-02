@@ -135,7 +135,7 @@ disp(thisSE.get('recipe'))
 thisSE.set('use pinhole',true);
 
 % We can tell PBRT the field of view of the scene.
-thisSE.set('fov',33);
+thisSE.set('fov',40);
 
 % Render it this way.   By default, the depth map is calculated, too.
 % Notice that the rendering calls docker (twice).  The radiance and depth
@@ -149,6 +149,9 @@ sceneWindow(scene);
 
 % Now tell PBRT to use the lens
 thisSE.set('use optics',true);
+
+% Set the units in mm (?) - default is true in PBRT realisticEye
+thisSE.set('mmUnits', true);
 
 % Set the scene to focus on the numbers at 200 mm
 thisSE.set('accommodation',1/0.2);   % Diopters

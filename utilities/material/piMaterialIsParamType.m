@@ -1,7 +1,7 @@
 function val = piMaterialIsParamType(str)
 %%
 % Synopsis:
-%   val = piMaterialIsType(str)
+%   val = piMaterialIsParamType(str)
 %
 % Brief description:
 %   Check if a string is material property type

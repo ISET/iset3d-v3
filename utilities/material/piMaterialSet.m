@@ -26,33 +26,37 @@ function material = piMaterialSet(material, param, val, varargin)
 %{
     mat = piMaterialCreate('new material', 'kd', [400 1 800 1]);
     mat = piMaterialSet(mat, 'kd val', [1 1 1]);
+    mat = piMaterialSet(mat, 'kd', [0.5 0.5 0.5]);
 %}
 
 %% Parse inputs
 
 % check the parameter name and type/val flag
 nameTypeVal = strsplit(param, ' ');
-pName    = nameTypeVal{1};
+pName    = lower(nameTypeVal{1});
 
 % Whether it is specified to set a type or a value.
 if numel(nameTypeVal) > 1
     pTypeVal = nameTypeVal{2};
-else
+elseif isstruct(val)
     % Set a whole struct
     pTypeVal = '';
+elseif ischar(nameTypeVal{1})
+    % If nameTypeVal has only one part and it is a name of a field
+    pTypeVal = 'val';
 end
 
 p = inputParser;
 p.addRequired('material', @(x)(isstruct(x)));
 p.addRequired('param', @ischar);
-p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || isbool));
+p.addRequired('val', @(x)(ischar(x) || isstruct(x) || isnumeric(x) || islogical(x)));
 
 p.parse(material, param, val, varargin{:});
 
 %% if obj is a material struct
 % materialInfo has no meaning
-
-if isfield(material, pName)
+% isfield(material, pName)
+if true
     % Set name or type
     if isequal(pName, 'name') || isequal(pName, 'type')
         material.(pName) = val;
@@ -85,6 +89,9 @@ if isfield(material, pName)
                 else
                     material.(pName).type = 'spectrum';
                 end
+            else
+                % if not a rgb or specrum type, it's a single float.
+                material.(pName).type = 'float';
             end
         elseif ischar(val)
             % It is a file name, so the type has to be spectrum or texture,
@@ -95,7 +102,7 @@ if isfield(material, pName)
             else
                 material.(pName).type = 'texture';
             end
-        elseif isbool(val)
+        elseif islogical(val)
             material.(pName).type = 'bool';
         end
     end

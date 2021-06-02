@@ -14,19 +14,17 @@
 % See also
 %   t_piIntro_*
 
-%% Problem (11/01/20, DHB): This won't run if isetbio is on the path before
-%                           isetcam, because RGB.mat isn't available and
-%                           the sensorCreate needs it.  I could fix that,
-%                           and indeed did temporarily, but it still broke
-%                           because some call to sensorSet from
-%                           sensorLightfield tried to set an unknown
-%                           parameter.
-
 %% Initialize ISET and Docker
 
 ieInit;
 if ~piDockerExists, piDockerConfig; end
-if isempty(which('lensC')), error('You must add the isetlens repository to your path'); end
+if ~piCamBio
+    warning('Script requires ISETCam.  Returning');
+    return;
+end
+if isempty(which('lensC')) 
+    error('You must add the isetlens repository to your path'); 
+end
 
 % Run this from the local directorys
 chdir(fullfile(piRootPath,'local'))

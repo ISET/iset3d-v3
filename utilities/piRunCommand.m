@@ -23,9 +23,11 @@ function [status, result, exception] = piRunCommand(command, varargin)
 %%
 parser = inputParser();
 parser.addRequired('command', @ischar);
+parser.addParameter('verbose', 2, @isnumeric);
 parser.parse(command, varargin{:});
 
 command = parser.Results.command;
+verbosity = parser.Results.verbose;
 
 % Default returns.  Empty is good.
 status    = [];
@@ -33,7 +35,9 @@ result    = '';
 exception = [];
 
 %%
-fprintf('Docker command\n\t%s\n', command);
+if verbosity > 1
+    fprintf('Docker command\n\t%s\n', command);
+end
 
 % Capture the status and results
 try
@@ -50,7 +54,11 @@ try
         %        pause(20);
         command = strrep(command,"-ti","-i");
         command = strrep(command,"-it", "-i");
-        [status, result] = system(command,'-echo');
+        if verbosity > 2
+            [status, result] = system(command,'-echo');
+        else
+            [status, result] = system(command); % don't display pbrt output
+        end
     else
         [status, result] = system(command);
     end

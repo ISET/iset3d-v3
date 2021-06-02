@@ -27,7 +27,7 @@ thisR = piRecipeDefault('scene name','coloredCube');
 %% Render the original scene first    
 thisR.set('outputfile',fullfile(piRootPath,'local','coloredCube','coloredCube.pbrt'));
 piWrite(thisR);
-[scene, ~] = piRender(thisR, 'render type', 'radiance');
+[scene, results] = piRender(thisR, 'render type', 'radiance');
 scene = sceneSet(scene, 'name', 'Original');
 sceneWindow(scene);
 

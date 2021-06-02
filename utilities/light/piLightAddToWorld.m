@@ -1,4 +1,5 @@
 function lightSources = piLightAddToWorld(thisR, varargin)
+%% This function is going to be deprecated
 % Add different types of light sources to world struct
 %
 % Syntax

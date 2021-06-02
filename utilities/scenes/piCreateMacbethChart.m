@@ -41,7 +41,7 @@ inputs = p.Results;
 
 macbethRecipe = recipe();
 
-camera = piCameraCreate('perspective');
+camera = piCameraCreate('pinhole');
 macbethRecipe.recipeSet('camera',camera);
 macbethRecipe.set('fov',45);
 
@@ -156,10 +156,11 @@ end
 
 if inputs.defaultLight
 
-    piLightAdd(macbethRecipe,'name','Default','type','distant',...
-                             'from',[0 100 1], 'to', [0 0 0], ...
-                             'camera coordinate', false);
-
+    infiniteLight = piLightCreate('infiniteLight',...
+        'type','infinite');
+    mabethRecipe.set('light','add',infiniteLight);
+    macbethRecipe.set('from',[0 100 1]);
+    macbethRecipe.set('to',[0 0 0]);    
 end
 
 macbethRecipe.materials.txtLines = {};

@@ -51,6 +51,8 @@ classdef recipe < matlab.mixin.Copyable
         media;           % Volumetric rendering media.
         metadata;
         recipeVer = 2;
+        
+        verbose = 2;    % default for how much debugging output to emit.
     end
     
     properties (Dependent)

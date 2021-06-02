@@ -53,20 +53,26 @@ fname_obj = fullfile(Filepath,sprintf('%s%s',n,e));
 
 % Open and write out the objects
 fid_obj = fopen(fname_obj,'w');
-fprintf(fid_obj,'# PBRT geometry file converted from C4D exporter output on %i/%i/%i %i:%i:%f \n  \n',clock);
+fprintf(fid_obj,'# Exported by piMaterialWrite on %i/%i/%i %i:%i:%f \n  \n',clock);
 
 % Traverse the tree from root
 rootID = 1;
 % Write object and light definition in main geoemtry and children geometry
 % file
-recursiveWriteNode(fid_obj, obj, rootID, Filepath, thisR.outputFile);
-
-% Write tree structure in main geometry file
-lvl = 0;
-recursiveWriteAttributes(fid_obj, obj, rootID, lvl, thisR.outputFile);
-
+if ~isempty(obj)
+    recursiveWriteNode(fid_obj, obj, rootID, Filepath, thisR.outputFile);
+    
+    % Write tree structure in main geometry file
+    lvl = 0;
+    recursiveWriteAttributes(fid_obj, obj, rootID, lvl, thisR.outputFile);
+else
+    for ii = numel(thisR.world)
+        fprintf(fid_obj, thisR.world{ii});
+    end
+end
 fclose(fid_obj);
-fprintf('%s is written out \n', fname_obj);
+% Not sure we want this most of the time, can un-comment as needed
+%fprintf('%s is written out \n', fname_obj);
 
 end
 
@@ -109,11 +115,22 @@ for ii = 1:numel(children)
         
         % Write out material
         if ~isempty(thisNode.material)
+            %{
+            % From dev branch
+<<<<<<< HEAD
             if strcmp(thisNode.material,'none')
                 fprintf(fid, strcat("Material ", '"none"', '\n'));
             else
                 fprintf(fid, strcat("NamedMaterial ", '"',...
                             thisNode.material.namedmaterial, '"', '\n'));
+=======
+            %}
+            try
+                fprintf(fid, strcat("NamedMaterial ", '"',...
+                    thisNode.material.namedmaterial, '"', '\n'));
+            catch
+                materialTxt = piMaterialText(thisNode.material);
+                fprintf(fid, strcat(materialTxt, '\n'));
             end
         end
         %{
@@ -124,16 +141,23 @@ for ii = 1:numel(children)
                 fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', output); 
         %}
         if ~isempty(thisNode.shape)
-            % There is a shape slot we also open the
-            % geometry file.
-            name = thisNode.name;
-            
-            % Convert shape struct to text
+
             shapeText = piShape2Text(thisNode.shape);
-            geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
-            fprintf(geometryFile,'%s',shapeText);
-            fclose(geometryFile);
-            fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
+            
+            if ~isempty(thisNode.shape.filename)
+                % If the shape has ply info, do this
+                % Convert shape struct to text
+                fprintf(fid, '%s \n',shapeText);
+            else
+                % If it does not have plt file, do this
+                % There is a shape slot we also open the
+                % geometry file.
+                name = thisNode.name;
+                geometryFile = fopen(fullfile(rootPath,'scene','PBRT','pbrt-geometry',sprintf('%s.pbrt',name)),'w');
+                fprintf(geometryFile,'%s',shapeText);
+                fclose(geometryFile);
+                fprintf(fid, 'Include "scene/PBRT/pbrt-geometry/%s.pbrt" \n', name);
+            end
         end
         
         fprintf(fid, 'ObjectEnd\n\n');
@@ -200,7 +224,7 @@ for ii = 1:numel(children)
     if isequal(thisNode.type, 'branch')        
         % Write info
         fprintf(fid, strcat(spacing, indentSpacing,...
-            sprintf('#ObjectName %s:Vector(%.3f, %.3f, %.3f)',thisNode.name,...
+            sprintf('#ObjectName %s:Vector(%.5f, %.5f, %.5f)',thisNode.name,...
                                                         thisNode.size.l,...
                                                         thisNode.size.w,...
                                                         thisNode.size.h), '\n'));
@@ -212,21 +236,27 @@ for ii = 1:numel(children)
         end
         
         % Translation
-        fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Translate %.3f %.3f %.3f', thisNode.translation(1),...
+        
+        % Rotation
+        if ~isempty(thisNode.rotation)
+            fprintf(fid, strcat(spacing, indentSpacing,...
+                sprintf('Translate %.5f %.5f %.5f', thisNode.translation(1),...
                                                       thisNode.translation(2),...
                                                       thisNode.translation(3)), '\n'));
-        % Rotation
-        fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotation(:, 1)), '\n'));
-        fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotation(:, 2)), '\n'));
-        fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Rotate %.3f %.3f %.3f %.3f', thisNode.rotation(:, 3)), '\n'));
-        
+            fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 1)), '\n'));
+            fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 2)), '\n'));
+            fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation(:, 3)), '\n'));
+        else
+            thisNode.concattransform(13:15) = thisNode.translation(:);
+            fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', thisNode.concattransform(:)), '\n'));
+        end
         % Scale
         fprintf(fid, strcat(spacing, indentSpacing,...
-                sprintf('Scale %.3f %.3f %.3f', thisNode.scale), '\n'));
+                sprintf('Scale %.5f %.5f %.5f', thisNode.scale), '\n'));
             
         % Write out motion
         if ~isempty(thisNode.motion)
@@ -272,8 +302,8 @@ for ii = 1:numel(children)
         
         for jj = 1:numel(lightText)
             for kk = 1:numel(lightText{jj}.line)
-                fprintf(fid,strcat(spacing, indentSpacing,... 
-                        sprintf('%s\n',lightText{jj}.line{kk})));
+                fprintf(fid,sprintf('%s%s%s\n',spacing, indentSpacing,... 
+                        sprintf('%s',lightText{jj}.line{kk})));
             end
         end
     else

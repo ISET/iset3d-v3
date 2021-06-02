@@ -95,6 +95,9 @@ function [thisR, out] = recipeSet(thisR, param, val, varargin)
 %    'fluorophore concentration'
 %    'fluorophore eem'
 %    'concentration'
+%
+%  Programming related
+%    'verbose'
 % ---
 
 %  ISETAuto special:
@@ -136,9 +139,11 @@ p.addRequired('param',@ischar);
 p.addRequired('val');
 
 p.addParameter('lensfile','dgauss.22deg.12.5mm.dat',@(x)(exist(x,'file')));
+p.addParameter('verbose', thisR.verbose, @isnumeric);
 
 p.parse(thisR, param, val);
 param = ieParamFormat(p.Results.param);
+verbosity = p.Results.verbose;
 
 %% Act
 
@@ -158,7 +163,9 @@ switch param
         
         newDir     = fileparts(val);
         if ~exist(newDir,'dir')
-            fprintf('Creating output folder %s\n',newDir);
+            if verbosity > 1
+                fprintf('Creating output folder %s\n',newDir);
+            end
             mkdir(newDir);
         end
         thisR.outputFile = val;
@@ -168,6 +175,8 @@ switch param
         val = which(val);
         thisR.inputFile = val;
         if ~exist(val,'file'), warning('No input file found yet'); end
+    case {'verbose'}
+        thisR.verbose = val;
     case {'exporter'}
         % thisR.set('exporter',val);
         % a string that identifies how the PBRT file was build
@@ -688,7 +697,7 @@ switch param
                 case {'delete', 'remove'}
                     % thisR.set('material', 'delete', idxORname);
                     if isnumeric(varargin{1})
-                        thisR.materials.list{varargin{1}} = {};
+                        thisR.materials.list(varargin{1}) = [];
                     else
                         [matIdx, ~] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
                         thisR.materials.list(matIdx) = [];
@@ -722,6 +731,216 @@ switch param
     case {'materialsoutputfile'}
         % Deprecated?
         thisR.materials.outputfile = val;
+
+    case {'textures', 'texture'}
+        % thisR = piRecipeDefault('scene name', 'flatSurfaceRandomTexture');
+        
+        if isempty(varargin)
+            if iscell(val)
+                thisR.textures.list = val;
+            else
+                warning('Please provide a list of textures in cell array')
+            end
+            return;
+        end
+        % Get index and texture struct from the texture list
+        % Search by name or index
+        if isnumeric(val) && val <= numel(thisR.textures.list)
+            % User sent in an index.  That's how we get the texture
+            textureIdx = val;
+            thisTexture = thisR.textures.list{val};
+        elseif isstruct(val)
+            % They sent in a struct
+            if isfield(val,'name'), matName = val.name;
+                % It has a name slot.
+                [textureIdx, thisTexture] = piTextureFind(thisR.textures.list, 'name', matName);
+            else
+                error('Bad struct.');
+            end
+        elseif ischar(val)
+            % It is either a special command or the texture name            
+            switch val
+                case {'add'}
+                    % thisR.set('textures', 'add', texture struct);
+                    % Could use 'end + 1'
+                    nTexture = thisR.get('n texture');
+                    thisR.textures.list{nTexture + 1} = varargin{1};
+                    return;
+                case {'delete', 'remove'}
+                    % thisR.set('texture', 'delete', idxORname);
+                    if isnumeric(varargin{1})
+                        thisR.textures.list(varargin{1}) = [];
+                    else
+                        [textureIdx, ~] = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                        thisR.textures.list(textureIdx) = [];
+                    end
+                    return;
+                case {'replace'}
+                    % thisR.set('texture','replace', idxORname-1, newtexture-2)
+                    idx = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                    thisR.textures.list{idx} = varargin{2};
+                    return;
+                case {'basis'}
+                    % thisR.set('texture', 'basis', tName, wave, basisfunctions)
+                    % basisfunctions need to have size of 3 x numel(wave)
+                    idx = piTextureFind(thisR.textures.list, 'name', varargin{1});
+                    if isequal(thisR.textures.list{idx}.type, 'imagemap')
+                        wave = varargin{2};
+                        piTextureSetBasis(thisR, idx, wave, 'basis functions', varargin{3});
+                    else
+                        warning('Basis function only applies to image map.')
+                    end
+                    return;
+                otherwise
+                    % Probably the material name.
+                    textureName = val;
+                    [textureIdx, thisTexture] = piTextureFind(thisR.textures.list, 'name', textureName);
+            end
+        end
+        
+        % At this point we have the material.
+        if numel(varargin{1}) == 1
+            % A material struct was sent in as the only argument.  We
+            % should check it, make sure its name is unique, and then set
+            % it.
+            thisR.textures.list{textureIdx} = varargin{1};
+        else
+            % A material name and property was sent in.  We set the
+            % property and then update the material in the list.
+            thisTexture = piTextureSet(thisTexture, varargin{1}, varargin{2});
+            thisR.set('textures', textureIdx, thisTexture);
+        end        
+        
+    case {'light', 'lights'}
+        % Examples
+        % thisR.set('light', lightList);
+        % thisR.set('light', lightName, newLight);
+        % thisR.set('light', 'add', newLight);
+        % thisR.set('light', 'delete', lightName);
+        % thisR.set('light', lightName, 'PARAM TYPE', VAL);
+        
+        % This is the case where we replace the light list
+        if isempty(varargin)
+            if iscell(val)
+                thisR.lights = val;
+            else
+                warning('Please provide a list of lights in cell array')
+            end
+            return;
+        end
+
+        % Get index and light struct from light list
+        % Search by name or index
+        if isnumeric(val) && val <= numel(thisR.lights)
+            lgtIdx = val;
+            thisLight = thisR.lights{val};
+        elseif isstruct(val)
+            % Sent in a struct
+            if isfield(val, 'name'), lgtName = val.name;
+                [lgtIdx, thisLight] = piLightFind(thisR.lights, 'name', lgtName);
+            else
+                error('Bad struct.');
+            end
+        elseif ischar(val)
+            % It is either a special command or the light name
+            switch val
+                case {'add'}
+                    nLight = thisR.get('n light');
+                    thisR.lights{nLight + 1} = varargin{1};
+                    return;
+                case {'delete', 'remove'}
+                    % thisR.set('light', 'delete', idxORname);
+                    if isnumeric(varargin{1})
+                        thisR.lights{varargin{1}} = [];
+                    elseif isequal(varargin{1}, 'all')
+                        thisR.lights = {};
+                    else
+                        [lgtIdx, ~] = piLightFind(thisR.lights, 'name', varargin{1});
+                        thisR.lights(lgtIdx) = [];
+                    end
+                    return;
+                case {'replace'}
+                    idx = piLightFind(thisR.lights, 'name', varargin{1});
+                    thisR.lights{idx} = varargin{2};
+                    return;
+                case {'rotate', 'rotation'}
+                    % Rotate the direction, angle in degrees
+                    % thisR.set('light', 'rotate', lghtName, [XROT, YROT, ZROT], ORDER)
+                    % See piLightRotate
+                    [lgtIdx, lght] = piLightFind(thisR.lights, 'name', varargin{1});
+
+                    if numel(varargin) == 2
+                        xRot = varargin{2}(1);
+                        yRot = varargin{2}(2);
+                        zRot = varargin{2}(3);
+                    end
+                    if numel(varargin) == 3
+                        order = varargin{3};
+                    else
+                        order = ['x', 'y', 'z'];
+                    end
+
+                    lght = piLightRotate(lght, 'xrot', xRot,...
+                                                'yrot', yRot,...
+                                                'zrot', zRot,...
+                                                'order', order);
+                    thisR.set('light', lgtIdx, lght);
+                    return;
+
+                case {'translate', 'translation'}
+                    % thisR.set('light', 'translate', lghtName, [XSFT, YSFT, ZSFT], FROMTO)
+                    % See piLightRotate
+                    [lgtIdx, lght] = piLightFind(thisR.lights, 'name', varargin{1});
+
+                    if numel(varargin) == 2
+                        xSft = varargin{2}(1);
+                        ySft = varargin{2}(2);
+                        zSft = varargin{2}(3);
+
+                    end
+                    if numel(varargin) == 3
+                        fromto = varargin{3};
+                    else
+                        fromto = 'both';
+                    end
+                    up = thisR.get('up');
+                    
+                    % If the light is at the same position of camera
+                    if lght.cameracoordinate 
+                        if isfield(lght, 'from')
+                            lght = piLightSet(lght, 'from val', thisR.get('from'));
+                        end
+                        if isfield(lght, 'to')
+                            lght = piLightSet(lght, 'to val', thisR.get('to'));
+                        end
+                    end
+                    lght = piLightTranslate(lght, 'xshift', xSft,...
+                           'yshift', ySft,...
+                           'zshift', zSft,...
+                           'fromto', fromto,...
+                           'up', up);
+                    thisR.set('light', lgtIdx, lght);
+                    
+                    return;
+                otherwise
+                    % Probably the light name.
+                    lgtName = val;
+                    [lgtIdx, thisLight] = piLightFind(thisR.lights, 'name', lgtName);
+            end
+        end
+        
+        % At this point we have the light.
+        if numel(varargin{1}) == 1
+            % A light struct was sent in as the only argument.  We
+            % should check it, make sure its name is unique, and then set
+            % it.
+            thisR.lights{lgtIdx} = varargin{1};
+        else
+            % A light name and property was sent in.  We set the
+            % property and then update the material in the list.
+            thisLight = piLightSet(thisLight, varargin{1}, varargin{2});
+            thisR.set('light', lgtIdx, thisLight);
+        end
         
     case {'asset', 'assets'}
         % Typical:    thisR.set(param,val) 
@@ -787,6 +1006,16 @@ switch param
                 % space.
                 rotDeg = piTransformRotM2Degs(newRotM);
                 out = thisR.set('asset', assetName, 'rotate', rotDeg);
+            case {'worldposition'}
+                % thisR.set('asset', assetName, 'world position', [1 2 3]);
+                % First get the position
+                pos = thisR.get('asset', assetName, 'world position');
+                
+                % Set a translation to (1) cancel the current translation
+                % and (2) move the object to the target position
+                newTrans = -pos + varargin{2}(:)';
+                
+                [~, out] = thisR.set('asset', assetName, 'world translation', newTrans);
             case {'scale'}
                 out = piAssetScale(thisR,assetName,val);
             case {'move', 'motion'}

@@ -1,0 +1,117 @@
+# 1_300
+ObjectBegin "1_300"
+  NamedMaterial "4_Red"   
+  Include "scenes/PBRT/pbrt-geometry/1_300.pbrt"   
+ObjectEnd
+
+# 2_Ground
+ObjectBegin "2_Ground"
+  NamedMaterial "3_PlaneMaterial"   
+  Include "scenes/PBRT/pbrt-geometry/2_Ground.pbrt"   
+ObjectEnd
+
+# 3_100_1
+ObjectBegin "3_100_1"
+  NamedMaterial "4_Red"   
+  Include "scenes/PBRT/pbrt-geometry/3_100_1.pbrt"   
+ObjectEnd
+
+# 4_Wall
+ObjectBegin "4_Wall"
+  NamedMaterial "3_PlaneMaterial"   
+  Include "scenes/PBRT/pbrt-geometry/4_Wall.pbrt"   
+ObjectEnd
+
+# 5_200
+ObjectBegin "5_200"
+  NamedMaterial "4_Red"   
+  Include "scenes/PBRT/pbrt-geometry/5_200.pbrt"   
+ObjectEnd
+
+# 7_175
+ObjectBegin "7_175"
+  NamedMaterial "4_Red"   
+  Include "scenes/PBRT/pbrt-geometry/7_175.pbrt"   
+ObjectEnd
+
+# 8_150
+ObjectBegin "8_150"
+  NamedMaterial "4_Red"   
+  Include "scenes/PBRT/pbrt-geometry/8_150.pbrt"   
+ObjectEnd
+
+# 9_125
+ObjectBegin "9_125"
+  NamedMaterial "4_Red"   
+  Include "scenes/PBRT/pbrt-geometry/9_125.pbrt"   
+ObjectEnd
+
+# 1_300
+# from node 1_300
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "1_300"   
+AttributeEnd
+
+# 2_Ground
+# from node 2_Ground
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "2_Ground"   
+AttributeEnd
+
+# 3_100_1
+# from node 3_100_1
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "3_100_1"   
+AttributeEnd
+
+# 4_Wall
+# from node 4_Wall
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "4_Wall"   
+AttributeEnd
+
+# 5_200
+# from node 5_200
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "5_200"   
+AttributeEnd
+
+# 6_AreaLight
+# from node 6_AreaLight
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  # 6_AreaLight
+  AreaLightSource "diffuse"   
+    "spectrum L" "D65.spd" 
+    "integer nsamples" [8] 
+  NamedMaterial "2_LightMaterial"   
+  Include "scenes/PBRT/pbrt-geometry/6_AreaLight.pbrt"   
+AttributeEnd
+
+# 7_175
+# from node 7_175
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "7_175"   
+AttributeEnd
+
+# 8_150
+# from node 8_150
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "8_150"   
+AttributeEnd
+
+# 9_125
+# from node 9_125
+AttributeBegin
+  ConcatTransform [1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1]   
+  ObjectInstance "9_125"   
+AttributeEnd
+
+

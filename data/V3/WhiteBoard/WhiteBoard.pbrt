@@ -1,0 +1,13 @@
+# Exported by PBRT exporter for Cinema 4D 
+Transform [1.0 0.0 0.0 0  0.0 1.0 0.0 0  0.0 0.0 1.0 0  0.0 -0.05 4.0 1]
+Camera "perspective" "float fov" [35.9833977714] "float focaldistance" [2000.0] "float lensradius" [0]
+Sampler "halton" "integer pixelsamples" [32]
+Film "image" "string filename" ["MacBethChecker.exr"] "integer xresolution" [1280] "integer yresolution" [720]
+Integrator "path" "integer maxdepth" [5] "string strategy" "all"
+WorldBegin
+	# Default Material
+	Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]
+	LightSource "distant" "rgb L" [1 1 1] "point from" [0 0 0] "point to" [0.258819 0.0 0.9659258]
+	Include "WhiteBoard_materials.pbrt"
+	Include "WhiteBoard_geometry.pbrt"
+WorldEnd

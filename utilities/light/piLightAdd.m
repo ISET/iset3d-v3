@@ -1,4 +1,6 @@
 function thisR = piLightAdd(thisR, varargin)
+% Deprecated
+%
 % Add different types of light sources to a scene
 %
 % Syntax
@@ -72,6 +74,9 @@ function thisR = piLightAdd(thisR, varargin)
   thisR = piLightAdd(thisR, 'type', 'point', 'camera coordinate', true);
 %}
 
+%%
+error('piLightAdd has been deprecated.  Use thisR.set(light, ...)');
+
 %% Parse inputs
 varargin = ieParamFormat(varargin);  % Allow spaces and capitalization
 
@@ -136,9 +141,10 @@ end
 
 
 %% Tell the user the status.  We might turn this off some day.
-
-if idxL, fprintf('Existing lights updated.\n');
-else,    fprintf('New light added.\n');
-end
+% I can't see why we need to tell the user that the function worked via a
+% debug message...
+%if idxL, fprintf('Existing lights updated.\n');
+%else,    fprintf('New light added.\n');
+%end
 
 end
