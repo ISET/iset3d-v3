@@ -53,10 +53,10 @@ sceneR.set('asset','Checkerboard_B','world rotation',[90 30 0]);
 car_fname = fullfile(piRootPath, 'data/V3','car','car.pbrt');
 car_formatted_fname = fullfile(piRootPath,'local','formatted','car/car.pbrt');
 if ~exist(car_formatted_fname,'file')
-    car_formatted_fname = piPBRTReformat(car_fname);
+    car_formatted_fname = piPBRTReformat(car_fname, 'outputfull', car_formatted_fname);
 end
 objectR = piRead(car_formatted_fname);
-
+piWrite(objectR);
 %% add downloaded asset information to Render recipe.
 sceneR = piRecipeMerge(sceneR, objectR);
 
