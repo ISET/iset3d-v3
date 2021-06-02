@@ -33,6 +33,7 @@ thisR = piRecipeDefault('scene name','teapot');
 thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
 thisR.set('max depth',1); % Number of bounces
+thisR = piCameraTranslate(thisR, 'x shift', -1);  % meters
 
 %% Write out recipe and render. Then show.
 piWrite(thisR);

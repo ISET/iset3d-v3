@@ -1,4 +1,4 @@
-LookAt -7 10 3 0 0 0 0 0 1
+LookAt -6 10 3 0 0 1 0 0 1 
 
 Camera "perspective"
  "float fov" [45.000000 ] 
@@ -31,7 +31,7 @@ AttributeBegin
 AttributeEnd
 
 AttributeBegin 
-    LightSource "spot" "rgb I" [1000          1000          1000] 
+    LightSource "spot" "rgb I" [5000          5000          6000] 
     CoordSysTransform "camera" 
 AttributeEnd 
 
