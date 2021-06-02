@@ -61,7 +61,7 @@ dstDir = fullfile(piRootPath, 'local','Car_085');
 objectR = piFWAssetCreate(object_acq, 'resources', true, 'dstDir', dstDir);
 
 % This tells the iaRecipeMerge where to look for the resources
-objectR.set('outputFile', fullfile(dstDir,'Car_085.pbrt'));
+objectR.inputFile =  fullfile(dstDir,'Car_085.pbrt');
 
 %% add downloaded asset information to Render recipe.
 sceneR = piRecipeMerge(sceneR, objectR);
@@ -151,22 +151,7 @@ scene = sceneSet(scene,'name', 'denoised');
 sceneWindow(sceneDenoise);
 % sceneSet(scene,'display mode','hdr');   
 %}
-%% Create object instances
-% Add one object instance
-sceneR   = piObjectInstance(sceneR, 'HDM_06_002_B', 'position', [3.5 0 0]);
 
-% Add another one
-rotation = piRotationMatrix('yrot',75);
-sceneR   = piObjectInstance(sceneR, 'HDM_06_002_B', 'position', [-1 0 3], 'rotation',rotation);
-
-sceneR.assets = sceneR.assets.uniqueNames;
-
-sceneR.set('from', [0 1.5 7]);
-
-piWrite(sceneR);   % We get a warning.  Ignore
-[scene, result] = piRender(sceneR,'render type','radiance');
-scene = sceneSet(scene,'name', 'With 2 more identical cars at different postions');
-sceneWindow(scene);
 
 
 
