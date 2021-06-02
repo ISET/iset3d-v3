@@ -23,17 +23,39 @@ piWrite(thisR);
 scene = piRender(thisR);
 sceneWindow(scene);
 
-scene = sceneSet(scene,'gamma',0.7);
+%% By default we also computed the depth map.
 
-%% Notice that we also computed the depth map.
-% This is the default for piRender.
 scenePlot(scene,'depth map');
+
+%% Simple scene
+
+thisR = piRecipeDefault('scene name','simple scene');
+thisR.set('film resolution',[192 192]);
+thisR.set('pixel samples',32);
+thisR.set('max depth',3); % Number of bounces
+
+piWrite(thisR);
+scene = piRender(thisR,'render type','radiance');
+sceneWindow(scene);
+
+thisR.show;
+
+%% Chess set
+
+thisR = piRecipeDefault('scene name','chess set');
+thisR.set('film resolution',[192 192]);
+thisR.set('pixel samples',32);
+thisR.set('max depth',3); % Number of bounces
+
+piWrite(thisR);
+scene = piRender(thisR,'render type','radiance');
+sceneWindow(scene);
 
 %% Kitchen scene
 
 thisR = piRecipeDefault('scene name','kitchen');
-thisR.set('film resolution',[512 512]);
-thisR.set('pixel samples',64);
+thisR.set('film resolution',[192 192]);
+thisR.set('pixel samples',32);
 thisR.set('max depth',3); % Number of bounces
 
 piWrite(thisR);

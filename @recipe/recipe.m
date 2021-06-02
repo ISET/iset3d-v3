@@ -76,6 +76,24 @@ classdef recipe < matlab.mixin.Copyable
             [obj, val] = recipeSet(obj,varargin{:});
         end
         
+        function show(obj,varargin)
+            % Will become thisR.show('assets'), thisR.show('materials'),
+            % thisR.show('lights'), and so forth.
+            % 
+            if isempty(varargin), showType = 'assets';
+            else,                 showType = varargin{1};
+            end
+            
+            switch showType
+                case 'assets'
+                    if isempty(obj.assets), disp('No assets in this recipe');
+                    else, obj.assets.show;
+                    end
+                otherwise
+                    error('Unknown show %s\n',varargin{1});
+            end
+            
+        end
     end
     
 end
