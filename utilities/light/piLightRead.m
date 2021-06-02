@@ -11,7 +11,7 @@ function thisR = piLightRead(thisR)
 % See also
 %   piRead
 
-% Examples
+% Examples:
 %{
 thisR = piRecipeDefault('scene name', 'SimpleSceneLight');
 piWrite(thisR);
@@ -26,6 +26,7 @@ piWrite(thisR);
 scene = piRender(thisR);
 sceneWindow(scene);
 %}
+
 %% Parse input
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x), 'recipe'));
@@ -34,16 +35,18 @@ p.parse(thisR)
 %% Get light from world
 [thisR.lights, lightTextRanges] = piLightGetFromText(thisR.world, 'printinfo', false);
 
-% Remove the light from the world as we already stored them in thisR.lights
-% do not deal with world block any more
+% Remove the light from the world because we stored them in thisR.lights
+% We do not deal with world block any more
 thisR = piDeleteWorldText(thisR, lightTextRanges);
 
 % do we need this every time?
 if isempty(thisR.lights)
-    %% Get light from scene_lights.pbrt file
+    
+    % Get light from scene_lights.pbrt file
     [p,n,~] = fileparts(thisR.inputFile);
     fname_lights = sprintf('%s_lights.pbrt',n);
     inputFile_lights=fullfile(p,fname_lights);
+    
     if exist(inputFile_lights,'file')
         fileID = fopen(inputFile_lights);
         txt = textscan(fileID,'%s','Delimiter','\n');
@@ -54,6 +57,7 @@ if isempty(thisR.lights)
             warning('%s exists but no light found. \n', inputFile_lights);
         end
     end
+    
 end
 
 end

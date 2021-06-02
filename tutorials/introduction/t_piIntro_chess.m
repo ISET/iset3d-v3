@@ -46,7 +46,7 @@ thisR = piRecipeDefault('scene name','chessset');
 % script, so we do a minimal number of parameters.  Much of what is
 % described in other scripts expands on this section.
 thisR.set('film resolution',[256 256]);
-thisR.set('rays per pixel',128);
+thisR.set('rays per pixel',64);
 thisR.set('n bounces',3); % Number of bounces
 
 %% Save the recipe and render

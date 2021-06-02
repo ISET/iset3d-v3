@@ -29,10 +29,11 @@ AttributeBegin
     Rotate -120.000000 1.000000 0.000000 0.000000
     Shape "disk" "float height" 0.000000 "float radius" 2.000000 
 AttributeEnd
-AttributeBegin
-CoordSysTransform "camera"
-LightSource "point" "color I" [ 50 50 50 ]
-AttributeEnd
+
+AttributeBegin 
+    LightSource "spot" "rgb I" [1000          1000          1000] 
+    CoordSysTransform "camera" 
+AttributeEnd 
 
 Material "plastic" "color Kd" [.5 .3 .8] "color Ks" [.2 .2 .2] "float roughness" [.1]
 Shape "trianglemesh"  "integer indices" [0 2 1 0 3 2 ] "point P" [-4.000000 -1.333330 0.000000 -2.666670 -1.333330 0.000000 -2.666670 -2.666670 0.000000 -4.000000 -2.666670 0.000000 ] 

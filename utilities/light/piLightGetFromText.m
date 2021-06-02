@@ -41,7 +41,7 @@ p.parse(intext, varargin{:});
 
 AttBegin  =  find(piContains(intext,'AttributeBegin'));
 AttEnd    =  find(piContains(intext,'AttributeEnd'));
-% arealight =  piContains(intext,'AreaLightSource');
+
 light     =  piContains(intext,'LightSource');
 lightIdx  =  find(light);   % Find which lines have LightSource on them.
 
@@ -69,23 +69,6 @@ for ii = 1:nLights
         lightLines  = intext(lightIdx(ii));
         lightTextRanges{ii} = lightIdx(ii);
     end
-    
-    %{
-    if length(AttBegin) >= ii &&...
-            lightIdx(ii) > AttBegin(ii) &&...
-            lightIdx(ii) < AttEnd(ii)
-        lightLines  = intext(AttBegin(ii):AttEnd(ii));
-        lightTextRanges{ii} = [AttBegin(ii), AttEnd(ii)];
-    elseif strncmp(intext(lightIdx(ii)-1),'Transform ',10)
-        light(arealight) = 0;
-        lightLines = intext(lightIdx(ii)-1:lightIdx(ii));
-        lightTextRanges{ii} = [lightIdx(ii)-1 lightIdx(ii)];
-    else
-        light(arealight) = 0;
-        lightLines  = intext(lightIdx(ii));
-        lightTextRanges{ii} = lightIdx(ii);
-    end 
-    %}
     
     % The txt below is derived from the intext stored in the
     % lightSources.line slot.
@@ -124,6 +107,7 @@ for ii = 1:nLights
             thisLightSource = piLightSet(thisLightSource, 'cameracoordinate', true);
         end
 
+        % Find the line that defines the LightSource
         thisLine = lightLines{piContains(lightLines, 'LightSource')};
         switch lightType
             case 'infinite'
@@ -206,6 +190,7 @@ for ii = 1:nLights
         end
     end
     
+    % For the lines after the AttributeBegin
     for kk = 2:numel(lightLines)-1
         thisLine = lightLines{kk};
         
@@ -278,7 +263,6 @@ for ii = 1:nLights
             end
         end
 
-
         % Look up scale
         scl = find(piContains(thisLine, 'Scale'));
         if scl
@@ -288,17 +272,14 @@ for ii = 1:nLights
             thisLightSource = piLightSet(thisLightSource, 'scale val', curScale);
         end
 
-        %{
-            % Look up Material (ZLY: why do we want to have it here?)
-            scl = find(piContains(lightSources{ii}.line, 'Material'));
-            if scl
-                materiallist = piBlockExtract_gp(lightSources{ii}.line, 'blockName','Material');
-                lightSources{ii}.material = materiallist;
+        scl = find(piContains(thisLine, 'CoordSysTransform'));
+        if scl
+            % What should we do?  Perhaps this is not enough.
+            if piContains(thisLine,'camera')
+                thisLightSource = piLightSet(thisLightSource, 'cameracoordinate', true);
             end
-        %}
+        end
         
-
-
     end
     
     lightSources{ii} = thisLightSource;

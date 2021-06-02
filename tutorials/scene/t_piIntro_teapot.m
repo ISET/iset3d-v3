@@ -34,28 +34,16 @@ thisR.set('film resolution',[192 192]);
 thisR.set('pixel samples',128);
 thisR.set('max depth',1); % Number of bounces
 
-% Get rid of the area light
-% thisR.set('light','delete','all');
-
-% Add a light at the front
-pointLight = piLightCreate('point',...
-    'type','point',...
-    'cameracoordinate', true);
-thisR.set('light','add',pointLight);
-thisR.set('light','point','specscale',1e3);
-
-lgt = thisR.get('light','point');
-
 %% Write out recipe and render. Then show.
 piWrite(thisR);
 
 % This is a pinhole case. So we are rendering a scene.
 [scene, result] = piRender(thisR);
 sceneWindow(scene);
-scene = sceneSet(scene,'gamma',0.7);
+% scene = sceneSet(scene,'gamma',0.7);
 
 %% Notice that we also computed the depth map.
 % This is the default for piRender.
-scenePlot(scene,'depth map');
+% scenePlot(scene,'depth map');
 
 %% END
