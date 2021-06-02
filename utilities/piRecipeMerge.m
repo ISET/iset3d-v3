@@ -23,7 +23,7 @@ p.addParameter('asset',true);
 
 p.parse(sceneR, varargin{:});
 
-sceneR       = p.Results.sceneR;
+sceneR        = p.Results.sceneR;
 materialFlag = p.Results.material;
 textureFlag  = p.Results.texture;
 assetFlag    = p.Results.asset;
@@ -39,17 +39,19 @@ for ii = 1:length(recipelist)
     if assetFlag
         names = thisR.get('assetnames');
         thisOBJsubtree = thisR.get('asset', names{2}, 'subtree');
-        sceneR.set('asset', 'root', 'graft', thisOBJsubtree);
-        % copy meshes from objects folder to scene folder here
-        [sourceDir, ~, ~] = fileparts(thisR.inputFile);
-        [dstDir, ~, ~]    = fileparts(sceneR.outputFile);
+        [~,addedSubtree1] = sceneR.set('asset', 'root', 'graft', thisOBJsubtree);
         
+        % copy meshes from objects folder to scene folder here?
+        [sourceDir, ~, ~]=fileparts(thisR.outputFile);
+        [dstDir, ~, ~]=fileparts(sceneR.outputFile);
         sourceAssets = fullfile(sourceDir, 'scene/PBRT/pbrt-geometry');
-        if exist(sourceAssets, 'dir')&& ~isempty(dir(fullfile(sourceAssets,'*.pbrt')))
-            dstAssets = fullfile(dstDir,    'scene/PBRT/pbrt-geometry');
-            copyfile(sourceAssets, dstAssets);
-        else
-            copyfile(sourceDir, dstDir);
+        dstAssets    = fullfile(dstDir,    'scene/PBRT/pbrt-geometry');
+        copyfile(sourceAssets, dstAssets);
+        
+        % copy the ply files potentially in local folder
+        plyFiles = dir(fullfile(sourceDir, '*.ply'));
+        for jj = 1:numel(plyFiles)
+            copyfile(fullfile(plyFiles(jj).folder, plyFiles(jj).name),dstDir);
         end
     end
     
@@ -69,9 +71,9 @@ for ii = 1:length(recipelist)
         end
         [sourceDir, ~, ~]=fileparts(thisR.outputFile);
         [dstDir, ~, ~]=fileparts(sceneR.outputFile);
-        sourceTexures = fullfile(sourceDir, 'textures');
-        if exist(sourceTexures,'dir')
-            copyfile(sourceTexures, dstDir);
+        sourceTextures = fullfile(sourceDir, 'textures');
+        if exist(sourceTextures, 'dir')
+            copyfile(sourceTextures, dstDir);
         end
     end
 end
