@@ -69,20 +69,16 @@ for ii = 1:length(recipelist)
         sceneR.set('asset', 'root', 'graft', thisOBJsubtree);
         
         % Copy meshes from objects folder to scene folder here
-        sourceDir = thisR.get('output dir');
+        sourceDir = thisR.get('input dir');
         dstDir    = sceneR.get('output dir');
         
         % Copy the assets from source to destination
         sourceAssets = fullfile(sourceDir, 'scene/PBRT/pbrt-geometry');
-        dstAssets    = fullfile(dstDir,    'scene/PBRT/pbrt-geometry');
-        copyfile(sourceAssets, dstAssets);
-        
-        % Copy ply files that are in the root of the local folder. These
-        % can be created by the reformatting and they are Included in the
-        % main scene file.
-        plyFiles = dir(fullfile(sourceDir, '*.ply'));
-        for jj = 1:numel(plyFiles)
-            copyfile(fullfile(plyFiles(jj).folder, plyFiles(jj).name),dstDir);
+        if exist(sourceAssets, 'dir')&& ~isempty(dir(fullfile(sourceAssets,'*.pbrt')))
+            dstAssets = fullfile(dstDir,    'scene/PBRT/pbrt-geometry');
+            copyfile(sourceAssets, dstAssets);
+        else
+            copyfile(sourceDir, dstDir);
         end
     end
     

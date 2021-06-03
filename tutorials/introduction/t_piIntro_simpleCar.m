@@ -68,7 +68,7 @@ objectR = piRead(car_formatted_fname);
 % To merge, the files must exist on disk.  The base scene already exists,
 % but we haven't written out the object recipe.  We write it out, which
 % also reorganizes the PBRT files.
-piWrite(objectR);
+% piWrite(objectR);
 sceneR = piRecipeMerge(sceneR, objectR);
 
 %% Add a light to the merged scene
