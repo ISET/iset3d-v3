@@ -42,7 +42,7 @@ toC = [ 0.1458     0.0100     1.6667];
 thisSE = sceneEye('letters at depth');
 
 % Position the eye off to the side so we can see the 3D easily
-from = [0.25,0.3,-1.3];
+from = [0.25,0.3,-0.2];
 thisSE.set('from',from);
 
 % Look at the position with the 'B'.  The values for each of the letters
@@ -53,7 +53,7 @@ thisSE.set('to',toB);
 thisSE.set('use pinhole',true);
 
 % Given the distance from the scene, this FOV captures everything we want
-thisSE.set('fov',15);             % Degrees
+thisSE.set('fov',30);             % Degrees
 
 % Render the scene
 scene = thisSE.render;
@@ -68,7 +68,10 @@ thisSE.summary;
 %% Now use the optics model with chromatic aberration
 
 % Turn off the pinhole.  The model eye (by default) is the Navarro model.
-thisSE.set('use pinhole',false);
+thisSE.set('use optics',true);
+
+% True by default anyway
+thisSE.set('mmUnits', false);
 
 % We turn on chromatic aberration.  That slows down the calculation, but
 % makes it more accurate and interesting.  We often use only 8 spectral
@@ -78,14 +81,19 @@ thisSE.set('use pinhole',false);
 nSpectralBands = 8;
 thisSE.set('chromatic aberration',nSpectralBands);
 
-% Find the distance to the object
-oDist = thisSE.get('object distance');
+% Distance in meters to objects to govern accommodation.
+thisSE.set('to',toA); distA = thisSE.get('object distance');
+thisSE.set('to',toB); distB = thisSE.get('object distance');
+thisSE.set('to',toC); distC = thisSE.get('object distance');
+thisSE.set('to',toB);
 
-% This is the distance to the B and we set our accommodation to that.
-thisSE.set('film distance',oDist);  
+% This is the distance we set our accommodation to that.
+% Try distC + 0.5  and then distA
+%
+thisSE.set('accommodation',1/(distC + 0.5));  
 
-% Reduce the rendering noise by using more rays. 
-thisSE.set('rays per pixel',128);      
+% We reduce the rendering noise by using more rays. This takes a while.
+thisSE.set('rays per pixel',256);      
 
 % Increase the spatial resolution by adding more spatial samples.
 thisSE.set('spatial samples',256);     
