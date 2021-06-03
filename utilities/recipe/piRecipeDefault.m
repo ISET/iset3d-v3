@@ -317,7 +317,7 @@ end
 FilePath = fullfile(piRootPath,'data','V3',sceneDir);
 fname = fullfile(FilePath,sceneFile);
 if ~exist(fname,'file')
-    fname = ieSceneWebTest(sceneDir);
+    fname = piSceneWebTest(sceneDir,sceneFile);
 end
 
 %% If we are here, we found the file.  SO create the recipe.
@@ -355,17 +355,17 @@ end
 
 end
 
-function fname = ieSceneWebTest(sceneDir,sceneFile)
+function fname = piSceneWebTest(sceneName,sceneFile)
 % Check for a web scene
 
 % See if the scene is already in data/V3/web
-FilePath = fullfile(piRootPath,'data','V3','web',sceneDir);
+FilePath = fullfile(piRootPath,'data','V3','web',sceneName);
 fname = fullfile(FilePath,sceneFile);
 
 % Download the file to data/V3/web
 if ~exist(fname,'file')
     % Download and confirm.
-    ieWebGet2('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
+    piWebGet('resourcename', sceneName, 'resourcetype', 'pbrt', 'op', 'fetch', 'unzip', true);
     if ~exist(fname, 'file'), error('File not found'); end
 else
     fprintf('File found %s in data/V3/web.\n',sceneName)

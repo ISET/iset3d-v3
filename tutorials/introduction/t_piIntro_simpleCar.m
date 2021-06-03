@@ -221,11 +221,3 @@ scene = sceneSet(scene,'name', 'Add a car instance back');
 sceneWindow(scene);
 
 %% END
-
-
-
-
-
-
-
-

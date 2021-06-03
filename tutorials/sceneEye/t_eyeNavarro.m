@@ -75,20 +75,20 @@ thisSE.set('use pinhole',false);
 % bands for speed and to get a rought sense. You can use up to 31.  It is
 % slow, but that's what we do here because we are only rendering once. When
 % the GPU work is completed, this will be fast!
-nSpectralBands = 16;
+nSpectralBands = 8;
 thisSE.set('chromatic aberration',nSpectralBands);
 
 % Find the distance to the object
 oDist = thisSE.get('object distance');
 
 % This is the distance to the B and we set our accommodation to that.
-thisSE.set('focal distance',oDist);  
+thisSE.set('film distance',oDist);  
 
 % Reduce the rendering noise by using more rays. 
-thisSE.set('rays per pixel',512);      
+thisSE.set('rays per pixel',128);      
 
 % Increase the spatial resolution by adding more spatial samples.
-thisSE.set('spatial samples',512);     
+thisSE.set('spatial samples',256);     
 
 % This takes longer than the pinhole rendering, so we do not bother with
 % the depth.

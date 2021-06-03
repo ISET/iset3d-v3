@@ -371,15 +371,19 @@ switch ieParamFormat(param)  % lower case, no spaces
     case 'opticstype'
         % val = thisR.get('optics type');
         %
+        % The returns are pinhole, lens, or environment
+        %
         % perspective means pinhole.  I am trying to get rid of perspective
         % as a subtype (BW).
         %
-        % Other subtypes include a lens and so we return the val as 'lens'.
-        % For realisticEye we have different types of human eye models.
-        % See the wiki page and t_eye* scripts for more information.
-        % And look below at 'realsticeyemodel' for options.
+        % realisticEye is a lens type used for human eye models.  You must
+        % check the camera subtype to determine when lens model is omni or
+        % realisticEye
+        %
         val = thisR.camera.subtype;
-        if isequal(val,'perspective'), val = 'pinhole';
+        
+        % Translate
+        if     isequal(val,'perspective'), val = 'pinhole';
         elseif isequal(val,'environment'), val = 'environment';
         elseif ismember(val,{'realisticDiffraction','realisticEye','realistic','omni'})
             val = 'lens';
@@ -526,6 +530,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         % calculating roughly where that will be.  It requires having
         % isetlens on the path, though.
         %
+        % For the realisticEye, this is retina distance in mm.
+        %
         opticsType = thisR.get('optics type');
         switch opticsType
             case {'pinhole'}
@@ -547,43 +553,33 @@ switch ieParamFormat(param)  % lower case, no spaces
                 end
                 
             case 'lens'
-                % We should deal with the spatial units correctly here.
-                % This is a mess. (BW).
-                if exist('lensFocus','file')
-                    opticsType = thisR.get('optics type');
-                    if strcmp(opticsType,'lens')
-                        if strcmp(thisR.get('camera subtype'),'realisticEye')
-                            % For the human eye model ... returned in
-                            % millimeters.
-                            val = thisR.get('retinaDistance');
-                        else
-                            lensFile = thisR.get('lens file');
-                            if exist('lensFocus','file')
-                                % If isetlens is on the path, we convert the
-                                % distance to the focal plane into millimeters
-                                % and see whether there is a film distance so
-                                % that the plane is in focus.
-                                %
-                                % But we return the value in meters
-                                val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
-                            else
-                                % No lensFocus, so tell the user about isetlens
-                                warning('Add isetlens to your path if you want the film distance estimate')
-                            end
-                            if ~isempty(val) && val < 0
-                                warning('%s lens cannot focus an object at this distance.', lensFile);
-                            end
-                        end
+                % We separate out the omni and human realisticEye models
+                if strcmp(thisR.get('camera subtype'),'realisticEye')
+                    % For the human eye model we store the distance to the
+                    % retina in millimeters.
+                    warning('Returning retina distance in m')
+                    val = thisR.get('retina distance','m');
+                else
+                    % We calculate the focal length from the lens file
+                    lensFile = thisR.get('lens file');
+                    if exist('lensFocus','file')
+                        % If isetlens is on the path, we convert the
+                        % distance to the focal plane into millimeters
+                        % and see whether there is a film distance so
+                        % that the plane is in focus.
+                        %
+                        % But we return the value in meters
+                        val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
+                    else
+                        % No lensFocus, so tell the user about isetlens
+                        warning('Add isetlens to your path if you want the film distance estimate')
+                    end
+                    if ~isempty(val) && val < 0
+                        warning('%s lens cannot focus an object at this distance.', lensFile);
                     end
                 end
             case 'environment'
                 % No idea
-            case 'realisticeye'
-                % The back of the lens to the retina is returned for the
-                % realisticEye case
-                warning('Returning retina distance in m')
-                val = thisR.get('retina distance','m');
-                
             otherwise
                 error('Unknown opticsType %s\n',opticsType);
         end
