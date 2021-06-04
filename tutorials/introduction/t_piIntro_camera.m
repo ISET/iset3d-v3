@@ -6,10 +6,16 @@
 %
 %  Camera lens properties are introduced in a separate script.
 %
+
+% Describe the ISETCam camera types.  There are four:
+%   perspective (also called 'pinhole' in the documentation)
+%   realistic
+%   realisticEye (special case for the sceneEye in ISETBio)
+% omni.
+%
 %  See also
 %   t_piIntro_lens
 %
-
 %%
 ieInit;
 if ~piDockerExists, piDockerConfig; end
@@ -31,85 +37,27 @@ thisR.get('fov')
 % distance from the pinhole to the film is called the focal distance
 thisR.get('film diagonal','mm')
 
-%%  You can create different types of cameras
+%% We are going to put a lens in the camera
 
-piCameraCreate
+lensfile  = 'dgauss.22deg.6.0mm.json';    % 30 38 18 10
+fprintf('Using lens: %s\n',lensfile);
+thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 
+% Set the film so that the field of view makes sense
 
-%% 
-%% Set render quality
-%
-% This is a low resolution for speed.
-thisR.set('film resolution',[200 150]);
-thisR.set('rays per pixel',128);
+thisR.set('film diagonal',5,'mm');
+thisR.get('fov')
 
-%% Rendering properites
-%
-% This value determines the number of ray bounces.  The scene has
-% glass so we need to have at least 2 or more.
-thisR.set('bounces',2);
+%% Write, render and denoise
 
-% Field of view
-thisR.set('fov',45);
+piWrite(thisR);
+oi = piRender(thisR);
 
-% This is a convenient routine we use when there are many parts and
-% you are willing to accept ZL's mapping into materials based on
-% automobile parts. 
-% piMaterialGroupAssign(thisR);
+oi = piAIdenoise(oi);  % Denoising is not necessary, but it looks nice
 
-%% Write out the pbrt scene file, based on thisR.
-piWrite(thisR,'creatematerials',true);
+oiWindow(oi);
 
-%% Render the scene with no camera motion
-%
-% Speed up by only returning radiance, and display
-scene = piRender(thisR, 'render type', 'radiance');
-sceneWindow(scene);
-if isequal(piCamBio,'isetcam')
-    sceneSet(scene,'display mode','hdr');
-else
-    sceneSet(scene,'gamma',0.5);
-end
+% If you are running with ISETBio, there is no render flag.  Yet.
+if piCamBio, oiSet(oi,'render flag','hdr'); end
 
-%% Motion blur from camera
-%
-% Specify the initial position and pose (rotation), translate,
-% and then set camera motion end position.
-%
-% Findthe current camera position and rotation
-from = thisR.get('from');
-thisR.set('camera motion translate start',from(:));
-thisR.set('camera motion rotate start',piRotationMatrix);
-
-% Move in the direction camera is looking, but just a small amount.
-fromto = thisR.get('from to');
-endPos = -0.5*fromto(:) + thisR.lookAt.from(:);
-
-% Set camera motion end parameters, no change in rotation yet.
-thisR.set('camera motion translate end',endPos);
-thisR.set('camera motion rotate end',piRotationMatrix);
-
-% Write and render
-piWrite(thisR,'creatematerials',true);
-scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene,'name','Camera Motionblur: Translation');
-sceneWindow(scene);
-
-%%  Now, rotate the camera
-%
-% No translation, end position is where camera is now.
-endPos = thisR.lookAt.from(:);
-
-% The angle specification is piRotationMatrix.  Here the angle is changed
-% by 5 degrees around the z-axis.
-endRotation = piRotationMatrix('zrot',5);
-
-% Set camera motion end parameters.
-thisR.set('camera motion translate end',endPos);
-thisR.set('camera motion rotate end',endRotation);
-
-%% Write an render
-piWrite(thisR,'creatematerials',true);
-scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene,'name','Camera Motionblur: rotation');
-sceneWindow(scene);
+%% END

@@ -63,8 +63,8 @@ checksName = 'checks';
 checksTexture = piTextureCreate(checksName,...
     'type', 'checkerboard',...
     'format', 'spectrum',...
-    'uscale', 24,...
-    'vscale', 24, ...
+    'uscale', 2,...
+    'vscale', 2, ...
     'spectrum tex1', [.05 .05 .05],...
     'spectrum tex2', [.95 .95 .95]);
 
@@ -117,7 +117,7 @@ sceneWindow(scene);
 
 thisR = piRecipeDefault('scene name', 'SimpleScene');
 thisR.get('asset names')
-planeMaterial = thisR.get('asset','Plane_O','material');
+planeMaterial = thisR.get('asset','001_Plane_O','material');
 thisR.set('texture', 'add', newDotTexture);
 thisR.set('material',planeMaterial.name,'kd val',newDotsName);
 
@@ -139,7 +139,7 @@ roomTexture = piTextureCreate(roomName,...
     'filename', 'pngExample.png');
 thisR.get('texture print');
 
-mirrorMaterial = thisR.get('asset','mirror_O','material');
+mirrorMaterial = thisR.get('asset','001_mirror_O','material');
 thisR.set('texture', 'add', roomTexture);
 thisR.set('material', mirrorMaterial.name, 'kd val', roomName);
 
@@ -154,7 +154,7 @@ sceneSet(scene,'render flag','hdr');
 
 %% Let's change the texture of a the sphere to checkerboard
 
-figureMaterial = thisR.get('asset','Sphere_O','material');
+figureMaterial = thisR.get('asset','001_Sphere_O','material');
 thisR.set('material',figureMaterial.name,'kd val',checksName);
 
 piWrite(thisR, 'overwritematerials', true);

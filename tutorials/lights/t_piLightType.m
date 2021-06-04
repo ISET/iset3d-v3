@@ -24,20 +24,22 @@ piLightGet(thisR);
 
 %% Remove all the lights
 thisR    = piLightDelete(thisR, 'all');
-lightList = piLightGet(thisR);
+% not working
+% lightList = piLightGet(thisR);
 
 %% Add one equal energy light
 
 % The cone angle describes how far the spotlight spreads
 % The cone delta angle describes how rapidly the light falls off at the
 % edges
-thisR = piLightAdd(thisR,... 
+spotlight = piLightCreate('new skymap',...
     'type','spot',...
-    'light spectrum','equalEnergy',...
+    'spd','equalEnergy',...
     'spectrum scale', 1,...
-    'cone angle',20,...
+    'coneangle',20,...
     'cameracoordinate', true);
 
+thisR.set('light', 'add', spotlight);
 %% Render
 piWrite(thisR);
 

@@ -2,47 +2,34 @@ function thisR = piChessInit(resolution)
 % Initialize Docker and ChessSet scene
 %
 % Syntax:
-%
 %   thisR = piChessInit(resolution)
+%
+% Inputs
+%   resolution:  A number relative to 1 (600,600) to set the spatial
+%                resolution
 %
 % Brief description
 %   Many tutorial calculations use the Chess Set scene to demonstrate
-%   ISET3d parameters.  Rather than reload the scene each time, we get
-%   the data and recipe set up using this script
+%   ISET3d parameters.  Rather than reload and set scene parameters each
+%   time, we get the data and recipe set up using this script.  It includes
+%   a lens, so the return will be an OI.
+%
+%   This script was probably more useful in the past.  The default chess
+%   set scene seems pretty much OK now.
 %
 % Wandell, 2019
 %
-
-% Maybe we should generalize.
-% sceneName = 'kitchen'; sceneFileName = 'scene.pbrt';
-% sceneName = 'living-room'; sceneFileName = 'scene.pbrt';
-
+% See also
+%   piRecipeDefault
 
 %%
 if notDefined('resolution'), resolution = 0.25; end
-
 if ~piDockerExists, piDockerConfig; end
 
 %% Read the pbrt files
 
-sceneName = 'ChessSet'; sceneFileName = 'ChessSet.pbrt';
-
-inFolder = fullfile(piRootPath,'local','scenes');
-inFile = fullfile(inFolder,sceneName,sceneFileName);
-if ~exist(inFile,'file')
-    if isempty(which('RdtClient'))
-        error('You must have the remote data toolbox on your path');
-    end
-    % Sometimes the user runs this many times and so they already have
-    % the file.  We only fetch the file if it does not exist.
-    fprintf('Downloading %s from RDT',sceneName);
-    piPBRTFetch(sceneName,'pbrtversion',3,...
-        'destinationFolder',inFolder,...
-        'delete zip',true);
-end
-
-% This is the PBRT scene file inside the output directory
-thisR  = piRead(inFile);
+sceneName = 'ChessSet';
+thisR = piRecipeDefault('scene name',sceneName);
 
 %% Set render quality
 
@@ -88,7 +75,7 @@ thisR.sampler.subtype    = 'sobol';
 thisR.set('aperture diameter',2);   % thisR.summarize('all');
 
 %% Save.  I think you may need to run piWrite() whenever you change thisR
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %%
 thisR.summarize;

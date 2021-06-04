@@ -41,7 +41,7 @@ thisR.get('material print');
 
 % This is the black surface at the ceiling.  It is supposed to be a mirror,
 % but it is not.  Let's check its material name and type.
-assetName = 'mirror_O';
+assetName = '001_mirror_O';
 thisR.get('asset',assetName,'material name')
 thisR.get('asset',assetName,'material type')
 

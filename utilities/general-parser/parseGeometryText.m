@@ -1,14 +1,13 @@
 function [trees, parsedUntil] = parseGeometryText(thisR, txt, name)
 %
 % Inputs:
-%
+%   thisR       - a scene recipe
 %   txt         - remaining text to parse
 %   name        - current object name
 %
 % Outputs:
-%   res         - struct of results
-%   children    - Attributes under the current object
-%   parsedUntil - line number of the parsing end
+%   trees       - struct of results
+%   parsedUntil - line number where the parsing ends
 %
 % Description:
 %
@@ -39,7 +38,7 @@ function [trees, parsedUntil] = parseGeometryText(thisR, txt, name)
 % children = [];
 subtrees = {};
 
-i = 1;
+i = 1;         objectIndex = 0;
 while i <= length(txt)
     
     currentLine = txt{i};
@@ -56,7 +55,17 @@ while i <= length(txt)
     if strcmp(currentLine,'AttributeBegin')
         % This is an Attribute inside an Attribute
         [subnodes, retLine] = parseGeometryText(thisR, txt(i+1:end), name);
+        
+        % Add object index: index_objectname_O
+        if strcmp(subnodes.Node{1}.type, 'object')
+            objectIndex = objectIndex+1;
+            thisNode = subnodes.Node{1};
+            thisNode.name = sprintf('%03d_%s',objectIndex, thisNode.name);
+            subnodes = subnodes.set(1, thisNode);
+        end
+        
         subtrees = cat(1, subtrees, subnodes);
+
         %{
         groupobjs = cat(1, groupobjs, subnodes);
         
@@ -129,10 +138,10 @@ while i <= length(txt)
             if exist('lght','var')
                 % Wrap the light text into attribute section
                 lghtWrap = [{'AttributeBegin'}, lght(:)', {'AttributeEnd'}];
-                resLight.lght = piLightGetFromText(thisR, lghtWrap, 'print', false);
+                resLight.lght = piLightGetFromText(lghtWrap, 'print', false);
             end
             if exist('areaLight','var')
-                resLight.lght = piLightGetFromText(thisR, {areaLight}, 'print', false);
+                resLight.lght = piLightGetFromText({areaLight}, 'print', false);
                 
                 if exist('shape', 'var')
                     resLight.lght{1}.shape = shape;

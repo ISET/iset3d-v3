@@ -69,7 +69,7 @@ for dd =87
     [~,n,e] = fileparts(fname);
     thisR.set('outputFile',fullfile(piRootPath,'local',assetname,[n,e]));
     
-    piWrite(thisR,'creatematerials',true);
+    piWrite(thisR);
     %% zip the folder
     folder = fullfile(piRootPath,'local',assetname);
     chdir(folder);

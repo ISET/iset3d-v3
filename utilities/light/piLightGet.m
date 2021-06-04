@@ -79,9 +79,11 @@ if isfield(lght, pName)
     elseif isequal(pTypeVal, 'value') || isequal(pTypeVal, 'val')
         val = lght.(pName).value;
     end
+elseif strcmpi(lght.type, 'infinite')
+    % do nothing
 else
     warning('Parameter: %s does not exist in light type: %s',...
-        param, light.type);
+        param, lght.type);
 end
 
 %% compose pbrt text
@@ -148,21 +150,24 @@ if pbrtText && ~isempty(val) &&...
                     val{ii}(3));
             end
         case 'rotation'
-            % Copying from Zhenyi's code, Which does not account for multiple
-            % rotations I think
-            %{
-                % might remove this;
-                if iscell(rotate)
-                    rotate = rotate{1};
-                end
-            %}
-            txt = {}; % Change to cells
-            
-            for ii=1:numel(val)
+            % piLightGet(lgt,'rotation')
+
+            % val can be a cell array
+            if ~iscell(val)
+                val = {val};
+            end
+            for ii = 1:numel(val)
                 curRot = val{ii};
-                curRot = curRot(:)';
-                txt{end + 1} = sprintf('Rotate %.3f %d %d %d', curRot(1),...
-                    curRot(2), curRot(3), curRot(4));
+                [rows, cols] = size(curRot);
+                if rows>cols
+                    curRot = curRot';
+                    rows = cols;
+                end
+                for rr = 1:rows
+                    thisRot = curRot(rr,:);
+                    txt{end + 1} = sprintf('Rotate %.3f %d %d %d', thisRot(1),...
+                        thisRot(2), thisRot(3), thisRot(4));
+                end
             end
         case 'ctform'
             for ii=1:numel(val)

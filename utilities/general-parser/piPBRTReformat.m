@@ -73,7 +73,7 @@ dockercontainerName = ['ISET3d-',thisName,'-',num2str(randi(200))];
 dockercmd = sprintf(basecmd, dockercontainerName, volume, volume, dockerimage, fname, [thisName, ext]);
 
 % dockercmd = sprintf(basecmd, dockercontainerName, volume, volume, dockerimage, fname, outputFull);
-disp(dockercmd)
+% disp(dockercmd)
 
 %% Run the command
 
@@ -113,6 +113,12 @@ end
 % find out how many ply mesh files are generated.
 PLYmeshFiles = textscan(result, '%s');
 PLYmeshFiles = PLYmeshFiles{1};
+% PLYFolder    = fullfile(outputDir,'scene/PBRT/pbrt-geometry');
+% 
+% if ~exist(PLYFolder,'dir')
+%     mkdir(PLYFolder);
+% end
+
 for ii = 1:numel(PLYmeshFiles)
     cpcmd = sprintf('docker cp %s:/pbrt/pbrt-v3-spectral/build/%s %s',dockercontainerName, PLYmeshFiles{ii}, outputDir);
     [status_copy, ~ ] = system(cpcmd);
@@ -122,9 +128,9 @@ for ii = 1:numel(PLYmeshFiles)
         break;
     end
 end
-fprintf('Formatted file is in %s \n', outputDir);
+% fprintf('Formatted file is in %s \n', outputDir);
 
-    
+
 
 %% Either way, stop the container if it is still running.
 

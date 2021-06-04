@@ -5,7 +5,7 @@ function nLights = piLightList(thisR)
 %   nLights = piLightList(thisR)
 %
 % See also
-%
+%   piMaterialPrint
 
 nLights = thisR.get('n lights');
 if nLights == 0

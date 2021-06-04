@@ -135,8 +135,10 @@ classdef tree
         end
         
         function val = nodetoroot(obj, id)
+            % Path from a node to the root
             val = [];
             while ~obj.isRoot(id)
+                % We only add the id if it is not the root
                 val = [val id];
                 id = obj.getparent(id);
             end
@@ -206,7 +208,7 @@ classdef tree
         
         % Return all the asset names or just the name of asset number id
         function n = names(obj,id)
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 n = cell(1, numel(obj.Node));
                 for ii=1:numel(obj.Node)
                     if isstruct(obj.Node{ii}), n{ii} = obj.Node{ii}.name;
@@ -221,10 +223,15 @@ classdef tree
         end
         
         function [newNames,obj] = stripID(obj, id, replace)
-            % Returns the names with stripped ID.  But it does not appear
-            % to strip the names in this tree.
-            if notDefined('replace'), replace = false; end
-            if notDefined('id')
+            % Returns the names with stripped ID.  
+            %
+            % If an id is provided, then just that node.  If id is empty,
+            % then all the nodes.
+            
+            % Replace the names in this tree.
+            if ~exist('replace','var'), replace = false; end
+            if ~exist('id','var') || isempty(id)
+                % All of the nodes
                 newNames = cell(1, obj.nnodes);
                 for ii=1:obj.nnodes
                     newNames{ii} = obj.stripID(ii);
@@ -232,34 +239,41 @@ classdef tree
                 
                 % We have the new names and user said replace them all
                 if replace
-                    disp('Replacing names')
+                    % Seems it's a very common function, so we might turn
+                    % off the msg here.
+                    % disp('Replacing names.') 
                     for jj=1:obj.nnodes
-                        if ischar(obj.Node{jj}), obj.Node{jj} = strrep(newNames{jj},'_','|');
+                        if ischar(obj.Node{jj})
+                            % Probably a legacy condition
+                            obj.Node{jj} = strrep(newNames{jj},'_','|');
                         else
-                            obj.Node{jj}.name = strrep(newNames{jj},'_',' ');
+                            % Not sure why we are removing the underscore.
+                            % BW deleted for testing. 2021-05-06
+                            %
+                            % obj.Node{jj}.name = strrep(newNames{jj},'_',' ');
+                            obj.Node{jj}.name = newNames{jj};
+
                         end
                     end
                 end
                 
                 return;
             end
-            
             if isstruct(obj.Node{id})
                 newNames = obj.Node{id}.name;
             elseif ischar(obj.Node{id})
                 newNames = obj.Node{id};
             end
-            
-            while numel(newNames) >= 7 &&...
-                    isequal(newNames(4:5), 'ID')
-                newNames = newNames(7:end);
+            while numel(newNames) >= 8 &&...
+                    isequal(newNames(5:6), 'ID')
+                newNames = newNames(8:end);
             end
             
         end
         
         % Print the tree or a node of the tree
         function str = print(obj, id)
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 str = obj.tostring;
                 disp(str)
             else
@@ -268,39 +282,57 @@ classdef tree
             end
         end
         
-        % Print the tree or a node of the tree
-        function T = show(obj)
-            % Bring up a window with the tree.  Returns the text object
-            % that you can use to reset the 
-            %
-            % Maybe this should rely on tree.plot, which has an example
-            % that I don't yet understand.
-            %{
-              [ lineage duration ] = tree.example; % 1st one is made of strings only, 2nd one of integers
-              slin = lineage.subtree(19); % Work on a subset
-              sdur = duration.subtree(19);
-              [vlh hlh tlh] = slin.plot(sdur, 'YLabel', {'Division time' '(min)'});
-              rcolor = [ 0.6 0.2 0.2 ];
-              aboveTreshold = sdur > 10; % true if longer than 10 minutes
-            %}
-            
-            % Open the plotting window
-            ieNewGraphWin([],'wide');
-
-            % Remove the IDs from the names and create a new tree
-            newTree = tree;
-            newNames = obj.stripID;
-            newTree.Node = newNames';
-            newTree.Parent = obj.Parent;
-            
-            % Plot
-            newTree.plot([],'font size',14);
-            
-        end
+        %         % Display a graphic of the tree
+        %         Deprecated.  This plotted an image as a tree.  We use the
+        %         other format (below) now.
+        %
+        %         function show(obj,nodeLimit,duration)
+        %             % Bring up a window representing the tree.
+        %             %
+        %             %  nodeLimit - If more than this amount, use showUI
+        %             %  duration  - Delete the image after duration seconds
+        %             %
+        %             % This uses tree.plot when there are nodeLimit (50) nodes or
+        %             % less. If there are more than nodeLimit nodes, we call showUI,
+        %             % the special purpose routine that Zhenyi built for larger
+        %             % scenes.
+        %             %
+        %             % This is an odd example, based on the tree documentation.  See
+        %             % the tutorials for more examples specific to ISET3d.
+        %             %{
+        %               [ lineage duration ] = tree.example; % 1st one is made of strings only, 2nd one of integers
+        %               slin = lineage.subtree(19); % Work on a subset
+        %               sdur = duration.subtree(19);
+        %               ieNewGraphWin();
+        %               [vlh hlh tlh] = slin.plot(sdur, 'YLabel', {'Division time' '(min)'});
+        %             %}
+        %
+        %             if ieNotDefined('nodeLimit'), nodeLimit = 50; end
+        %             if ieNotDefined('duration'), duration = []; end
+        %
+        %             % Call showUI if there are a lot of nodes.
+        %             if obj.nnodes > nodeLimit
+        %                 obj.showUI;
+        %             else
+        %                 % Plot an image if there are few nodes
+        %                 ieNewGraphWin([],'wide');
+        %                 % Remove the IDs from the names and create a new tree
+        %                 newTree = tree;
+        %                 newNames = obj.stripID;
+        %                 newTree.Node = newNames';
+        %                 newTree.Parent = obj.Parent;
+        %                 newTree.plot([],'font size',14);
+        %             end
+        %
+        %             if isempty(duration), return;
+        %             else, pause(duration), close;
+        %             end
+        %         end
         
-        function t = showUI(obj)
+        function t = show(obj)
             % Bring up a uifigure with collapsible tree
-            fig = uifigure('Name','Assets Collection');
+            windowName = strcat('Assets Collection',':', datestr(datetime('now')));
+            fig = uifigure('Name',windowName, 'Tag','assetsUI');
             t = uitree(fig,'Position',[80 10 400 400],'SelectionChangedFcn',@getNodeData);
             
             % First level nodes
@@ -308,7 +340,8 @@ classdef tree
             root = 1;
             createAssetsTree(assets, obj, 1);
             
-            expand(t,'all');
+            % collapse by default
+            % expand(t,'all');
             % User data is saved at t.UserData;
             thisAsset = t.UserData;
             %%
@@ -320,10 +353,25 @@ classdef tree
                         case 'branch'
                             branch = uitreenode(assets,'Text',thisNode.name);
                             branch.UserData = thisNode;
+                            branch.Icon = fullfile(piRootPath,'external/matlab-tree/branch.png');
                             createAssetsTree(branch, obj, Ids(ii));
-                        otherwise
+                        case 'marker'
+                            branch = uitreenode(assets,'Text',thisNode.name);
+                            branch.UserData = thisNode;
+                            branch.Icon = fullfile(piRootPath,'external/matlab-tree/marker.png');
+                            createAssetsTree(branch, obj, Ids(ii));
+                        case 'instance'
                             node = uitreenode(assets,'Text',thisNode.name);
                             node.UserData = thisNode;
+                            node.Icon = fullfile(piRootPath,'external/matlab-tree/instance.png');
+                        case 'object'
+                            node = uitreenode(assets,'Text',thisNode.name);
+                            node.UserData = thisNode;
+                            node.Icon = fullfile(piRootPath,'external/matlab-tree/object.png');
+                        case 'light'
+                            node = uitreenode(assets,'Text',thisNode.name);
+                            node.UserData = thisNode;
+                            node.Icon = fullfile(piRootPath,'external/matlab-tree/light.png');
                     end
                 end
             end
@@ -345,7 +393,7 @@ classdef tree
             % index for that node. 
             
             % If id is not passed, we check all nodes
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 % Checking all the nodes.
                 for ii=1:numel(obj.nnodes)
                     if ~obj.hasID(ii)
@@ -361,16 +409,16 @@ classdef tree
             % If id is passed, we check if that node starts with XXXID.
             if isstruct(obj.Node{id})
                 % It is real node.
-                if numel(obj.Node{id}.name) >= 7 &&...
-                   isequal(obj.Node{id}.name(1:5), sprintf('%03dID', id))
+                if numel(obj.Node{id}.name) >= 8 &&...
+                   isequal(obj.Node{id}.name(1:6), sprintf('%04dID', id))
                     val = true;
                 else
                     val = false;
                 end
             else
                 % The root node is special.
-                if numel(obj.Node{id}) >= 7 && ...
-                   isequal(obj.Node{id}(1:5), sprintf('%03dID', id))
+                if numel(obj.Node{id}) >= 8 && ...
+                   isequal(obj.Node{id}(1:6), sprintf('%04dID', id))
                     val = true;
                 else
                     val = false;
@@ -392,13 +440,13 @@ classdef tree
             % tree. 
             
             % Update all nodes
-            if notDefined('id')
+            if ~exist('id','var') || isempty(id)
                 % Some nodes may already have an ID.  So we strip the ID
                 % from all the nodes.
                 stripNames = obj.stripID;
                 names = cell(1, numel(stripNames));
-                if obj.nnodes > 999
-                    warning('Number of nodes: %d exceeds 999', obj.nnodes);
+                if obj.nnodes > 9999
+                    warning('Number of nodes: %d exceeds 9999', obj.nnodes);
                 end
                 
                 % Then we do the renaming.  We are considering if we need
@@ -406,10 +454,10 @@ classdef tree
                 % scenes.
                 for ii=1:obj.nnodes
                     if isstruct(obj.Node{ii})
-                        obj.Node{ii}.name = sprintf('%03dID_%s', ii, stripNames{ii});
+                        obj.Node{ii}.name = sprintf('%04dID_%s', ii, stripNames{ii});
                         names{ii} = obj.Node{ii}.name;
                     else
-                        obj.Node{ii} = sprintf('%03dID_%s', ii, stripNames{ii});
+                        obj.Node{ii} = sprintf('%04dID_%s', ii, stripNames{ii});
                         names{ii} = obj.Node{ii};
                     end
                 end
@@ -418,10 +466,10 @@ classdef tree
             
             if ~obj.hasID(id)
                 if isstruct(obj.Node{id})
-                    obj.Node{id}.name = sprintf('%03dID_%s', id, obj.Node{id}.name);
+                    obj.Node{id}.name = sprintf('%04dID_%s', id, obj.Node{id}.name);
                     names = obj.Node{id}.name;
                 else
-                    obj.Node{id} = sprintf('%03dID_%s', id, obj.Node{id});
+                    obj.Node{id} = sprintf('%04dID_%s', id, obj.Node{id});
                     names = obj.Node{id};
                 end
             end

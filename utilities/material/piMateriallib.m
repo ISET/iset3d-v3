@@ -1,5 +1,5 @@
 function [materiallib_updated] = piMateriallib
-% A library of material properties
+% A library of material properties (deprecated)
 %
 % Syntax:
 %  materiallib = piMaterialib;
@@ -50,7 +50,7 @@ function [materiallib_updated] = piMateriallib
 
 materiallib.carpaintmix.paint_mirror.stringtype = 'mirror';
 materiallib.carpaintmix.paint_mirror.rgbkr = [.1 .1 .1];
-materiallib.carpaintmix.paint_base.string='substrate';
+materiallib.carpaintmix.paint_base.stringtype='substrate';
 materiallib.carpaintmix.paint_base.colorkd = piColorPick('random');
 materiallib.carpaintmix.paint_base.colorks =[.1 .1 .1];
 materiallib.carpaintmix.paint_base.floaturoughness=0.01;
@@ -59,6 +59,11 @@ materiallib.carpaintmix.carpaint.stringtype = 'mix';
 materiallib.carpaintmix.carpaint.amount = 0.5;
 materiallib.carpaintmix.carpaint.stringnamedmaterial1 = 'paint_mirror';
 materiallib.carpaintmix.carpaint.stringnamedmaterial2 = 'paint_base';
+
+% materiallib.carpaintmix.paint_mirror=piMaterialCreate('paint_mirror', ...
+%     'type', 'mirror', ...
+%     'kr value', [0.1 0.1 0.1]);
+% materiallib.carpaintmix.paint_base = piMaterialCreate
 %% carpaint
 %
 % Typical car paint without much specularity.  Some people define it

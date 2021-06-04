@@ -1,20 +1,15 @@
 function thisR = piMaterialField2Cell(thisR)
+% Converts the list field in V1 recipe to to a cell field for V2
+% Further changes are necessary in 
 
 %%
 tmp = struct2cell(thisR.materials.list);
 
-for ii=1:numel(tmp)
-%     fNames = fieldnames(tmp{ii});
-%     for ff=1:numel(fNames)
-%         if isempty(tmp{ii}.(fNames{ff}))
-%             tmp{ii} = rmfield(tmp{ii},fNames{ff});
-%         end
-%     end
-    
+for ii=1:numel(tmp)   
     tmp{ii} = ieStructRemoveEmptyField(tmp{ii});
-    stringType = tmp{ii}.string;
+    materialType = tmp{ii}.string;
     tmp{ii} = rmfield(tmp{ii}, 'string');
-    tmp{ii}.stringtype = stringType;
+    tmp{ii}.type = materialType;
 end
 
 thisR.materials.list = tmp;

@@ -94,8 +94,7 @@ sceneWindow(scene);
 %%
 % The name of the material is Mat.  We are going to use the texture to
 % describe the diffuse reflectance of the material.
-idx = piTextureFind(thisR,'name','reflectanceChart_color');
-piTextureAssignToMaterial(thisR, 'Mat', 'texturekd', idx);
+piTextureAssignToMaterial(thisR, 'Mat', 'texturekd', 'reflectanceChart_color');
 piWrite(thisR, 'overwritematerials', true);
 [scene, ~] = piRender(thisR, 'render type', 'radiance');
 sceneName = 'Color repeat';

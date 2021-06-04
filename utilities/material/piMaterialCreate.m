@@ -481,11 +481,11 @@ idx = val + 1;
 
 %% Construct material structure
 material.name = strcat('Default material ', num2str(idx));
-thisR.materials.list{idx} = material;
+thisR.materials.list(material.name) = material;
 
 if isempty(varargin)
     material.stringtype = 'matte';
-    thisR.materials.list{idx} = material;
+    thisR.materials.list(material.name) = material;
 else
     for ii=1:2:length(varargin)
         material.(varargin{ii}) = varargin{ii+1};

@@ -47,6 +47,7 @@ lightSourceText = cell(1, numel(thisR.lights));
 for ii = 1:numel(thisR.lights)
     thisLight = thisR.lights{ii};
     spectrumScale = piLightGet(thisLight, 'specscale val');
+    
     %% Write out lightspectrum to the file if the data is from file
     specVal = piLightGet(thisLight, 'spd val');
     if ~isempty(specVal)
@@ -80,26 +81,12 @@ for ii = 1:numel(thisR.lights)
             end        
         elseif isnumeric(specVal)
             % Numeric.  Do nothing
-            %% Determine the color representation
-            %{
-            % It's in RGB or number defined spectrum
-            if numel(specVal) == 3
-                % Use three numbers for RGB values.
-            elseif numel(specVal) == 2
-                % User present two values for temperature and scale factor.
-            else
-                % User put values in pair with wavelength and value.
-                if mod(numel(specVal), 2) == 0
-                else
-                    error('Bad light spectrum');
-                end
-            end
-            %}
         else
             % Not numeric or char but not empty.  So, something wrong.
             error('Incorrect light spectrum.');
         end
     end
+    
     %% Construct a lightsource structure
     % Different types of lights that we know how to add.
     type = piLightGet(thisLight, 'type');
@@ -136,9 +123,7 @@ for ii = 1:numel(thisR.lights)
             end
             
             lightSourceText{ii}.line = [lightSourceText{ii}.line lghtDef];
-            
-            
-            
+                        
         case 'distant'
             % Whether coordinate at camera pos
             if thisLight.cameracoordinate

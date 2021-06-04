@@ -30,7 +30,7 @@ thisR.set('rays per pixel',16);                      % 128 for high quality
 
 % Some day we might just put the piWrite inside of piRender.
 
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 scene = piRender(thisR, 'render type', 'radiance');
 

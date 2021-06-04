@@ -22,22 +22,38 @@ p.parse(recipe,varargin{:});
 metadata = p.Results.metadata;
 
 metadataRecipe = copy(recipe);
-
+% there is a bug for containers.Map, so we need to create a new one.
+if ~isempty(recipe.materials.list.keys)
+    metadataRecipe.materials.list = containers.Map(recipe.materials.list.keys, recipe.materials.list.values);
+end
+if ~isempty(recipe.textures.list.keys)
+    metadataRecipe.textures.list = containers.Map(recipe.textures.list.keys, recipe.textures.list.values);
+end
 %% Adjust the recipe values
 
 if strcmp(metadata, 'illuminant') || strcmp(metadata, 'illuminantonly')
+    % To estimate the illuminant, we write a new materials with a
+    % white, matte surface.
     fprintf('Creating matte white surface version of the scene.\n');
+
+    % Change the file name so we do not overwite the radiance materials
+    % file.  The illuminant case sets all the materials to matte white.
+    oFile = metadataRecipe.get('output basename');
+    oDir  = metadataRecipe.get('output dir');
+    metadataRecipe.set('output file',fullfile(oDir,[oFile,'_illuminant.pbrt']));
+
     totalReflection = metadataRecipe.materials.lib.totalreflect;
     
     % piMaterialTotalAssign(thisR)
-    mlist = metadataRecipe.materials.list;
-
-    for ii = 1:numel(mlist)
-        totalReflection.name = mlist{ii}.name;
-        metadataRecipe.materials.list{ii} = totalReflection;
+%     mlist = metadataRecipe.materials.list;
+    mlist = keys(metadataRecipe.materials.list);
+    for ii = 1:numel(mlist)        
+        totalReflection.name = mlist{ii};
+        metadataRecipe.materials.list(mlist{ii}) = totalReflection;
     end
     
-else
+    
+else % mesh or depth will come this way
 
     % Assign metadata integrator
     if(recipe.version == 3)

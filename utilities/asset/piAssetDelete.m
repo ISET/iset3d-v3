@@ -27,14 +27,13 @@ p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
 p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
 p.parse(thisR, assetInfo, varargin{:});
 
-thisR     = p.Results.thisR;
-assetInfo = p.Results.assetInfo;
-
+thisR        = p.Results.thisR;
+assetInfo    = p.Results.assetInfo;
 %%
 % If assetInfo is a node name, find the id
 if ischar(assetInfo)
     assetName = assetInfo;
-    assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
+    [assetInfo,thisAsset] = piAssetFind(thisR.assets, 'name', assetInfo);
     if isempty(assetInfo)
         warning('Couldn not find a parent with name %s:', assetName);
         return;
@@ -42,9 +41,9 @@ if ischar(assetInfo)
 end
 %% Remove node 
 if ~isempty(thisR.assets.get(assetInfo))
-    thisR.assets = thisR.assets.removenode(assetInfo);
-    % warning('Removing node might change remaining node ids.')
-    % [thisR.assets, ~] = thisR.assets.uniqueNames;
+        thisR.assets = thisR.assets.removenode(assetInfo);
+        % warning('Removing node might change remaining node ids.')
+        % [thisR.assets, ~] = thisR.assets.uniqueNames;
 else
     warning('Node: %d is not in the tree, returning.', assetInfo);
 end

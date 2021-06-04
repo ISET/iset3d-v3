@@ -72,7 +72,7 @@ if verbosity > 1
     hSize, wSize, nPlanes);
 end
 
-%% Optional second header line might contain realistic lens info.
+%% Optional second header line might contain lens info.
 pbrtVer = 2; % By default, we assume this is a version 2 file
 headerLine = fgetl(fid);
 [lensData, count, err] = lineToMat(headerLine); %#ok<ASGLU>

@@ -61,7 +61,7 @@ set(gca, 'xlim', [400 700]); set(gca, 'ylim', [0 1]);
 legend('Red wall', 'Green wall', 'White wall')
 %}
 %% Load spectral reflectance
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 matList = {'ShieldMat', 'LeftWall', 'RightWall', 'BackWall', 'TopWall',...
             'BottomWall', 'CubeLarge', 'CubeSmall'};
 if isequal(surfaceColor, 'redgreen')

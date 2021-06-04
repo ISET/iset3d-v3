@@ -49,7 +49,7 @@ function thisR = piCameraRotate(thisR, varargin)
                                      'y shift', -0.5,...
                                      'z shift', -0.5);
 
-    piWrite(thisR,'creatematerials',true);
+    piWrite(thisR);
     [scene, result] = piRender(thisR, 'render type','both');
     sceneWindow(scene);
 %}

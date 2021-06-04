@@ -55,7 +55,7 @@ thisR = piLightAdd(thisR,...
 thisR.integrator.subtype = 'path';
 
 %% Show the region/material options
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 
 %% Assign fluorescent materials 
 concentrationUniform = 0.05;

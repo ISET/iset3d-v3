@@ -62,7 +62,7 @@ mirror = piMaterialCreate(mirrorName, 'type', 'mirror');
 thisR.set('material', 'add', mirror);
 
 % Assigning mirror to sphere
-assetName = '005ID_Sphere_O';
+assetName = '001_Sphere_O';
 thisR.set('asset', assetName, 'material name', mirrorName);
 
 % Change the camera coordinate to better see the environmental light's

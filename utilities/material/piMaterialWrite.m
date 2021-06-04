@@ -31,11 +31,10 @@ p.parse(thisR);
 % Texture txt lines creation are moved into piTextureText function.
 
 if isfield(thisR.textures,'list') && ~isempty(thisR.textures.list)
-    textureNum = numel(thisR.textures.list);
-    textureTxt = cell(1, textureNum);
-
-    for ii = 1:numel(textureTxt)
-        textureTxt{ii} = piTextureText(thisR.textures.list{ii}, thisR);
+    textureTxt = cell(1, thisR.textures.list.Count);
+    textureKeys = keys(thisR.textures.list);
+    for ii = 1:numel(textureKeys)
+        textureTxt{ii} = piTextureText(thisR.textures.list(textureKeys{ii}), thisR);
     end
 else
     textureTxt = {};
@@ -73,13 +72,12 @@ end
 
 %% Create txtLines for the material struct array
 if isfield(thisR.materials, 'list') && ~isempty(thisR.materials.list)
-    materialNum =numel(thisR.materials.list);
-    materialTxt = cell(1, materialNum);
-
+    materialTxt = cell(1, thisR.materials.list.Count);
+    materialKeys= keys(thisR.materials.list);
     for ii=1:length(materialTxt)
         % Converts the material struct to text
  
-        materialTxt{ii} = piMaterialText(thisR.materials.list{ii});
+        materialTxt{ii} = piMaterialText(thisR.materials.list(materialKeys{ii}));
     end
 else
     materialTxt{1} = '';

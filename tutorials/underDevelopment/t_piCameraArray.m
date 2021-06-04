@@ -132,7 +132,7 @@ for pp = 1:size(deltaPosition,2)
     
     % There is a new camera position that is stored in the
     % <sceneName_position>.pbrt file.
-    piWrite(thisR,'creatematerials',true,...
+    piWrite(thisR,...
         'overwriteresources',false,'lightsFlag',false);
     
     % Upload the information to Flywheel

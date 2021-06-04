@@ -18,7 +18,7 @@ reflList = ieReadSpectra('MiniatureMacbethChart', wave);
 plotReflectance(wave, reflList);
 %}
 
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 for ii=1:size(reflList, 2)
     thisMatName = sprintf('Patch%02d', ii);
     thisRefl = piMaterialCreateSPD(wave, reflList(:, ii));

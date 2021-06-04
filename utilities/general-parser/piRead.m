@@ -19,7 +19,7 @@ function thisR = piRead(fname,varargin)
 %  programmatically.  The modified recipe is then used to write out the
 %  PBRT file (piWrite).  These PBRT files are rendered using piRender,
 %  which executes the PBRT docker image and return an ISETCam scene or oi
-%  format).  
+%  format).
 %
 %  We also have routines to execute these functions at scale in Google
 %  Cloud (see isetcloud).
@@ -38,12 +38,12 @@ function thisR = piRead(fname,varargin)
 %
 % Assumptions:  piRead assumes that
 %
-%     * There is a block of text before WorldBegin and no more text after 
+%     * There is a block of text before WorldBegin and no more text after
 %     * Comments (indicated by '#' in the first character) and blank lines
 %        are ignored.
 %     * When a block is encountered, the text lines that follow beginning
-%       with a '"' are included in the block. 
-%    
+%       with a '"' are included in the block.
+%
 %  piRead will not work with PBRT files that do not meet these criteria.
 %
 %  Text starting at WorldBegin to the end of the file (not just WorldEnd)
@@ -139,13 +139,6 @@ if(flip)
     thisR.scale = [-1 1 1];
 end
 
-% If exporter is Copy, don't parse.
-if isequal(exporter, 'Copy')
-    disp('Scene will not be parsed.');
-    thisR.world = world;
-    return;
-end
-
 % Read the light sources and delete them in world
 thisR = piLightRead(thisR);
 
@@ -167,6 +160,10 @@ end
 if any(piContains(world,'Include')) && ...
         any(piContains(world,'_materials.pbrt'))
     
+    % In this case we have an Include file for the materials.  The world
+    % should be left alone.  We read the materials file to get the
+    % materials and textures.
+    
     % Find material file
     materialIdx = find(contains(world, '_materials.pbrt'), 1);
     
@@ -185,39 +182,62 @@ if any(piContains(world,'Include')) && ...
     materialLinesFormatted = piFormatConvert(materialLines);
     
     % Read material and texture
-    [materialLists, texureList] = parseMaterialTexture(materialLinesFormatted);
+    [materialLists, textureList] = parseMaterialTexture(materialLinesFormatted);
     fprintf('Read %d materials.\n', numel(materialLists));
-    fprintf('Read %d textures.\n', numel(texureList));
+    fprintf('Read %d textures.\n', numel(textureList));
     
-    % Read the geometry file and do the same.
-    geometryIdx = find(contains(world, '_geometry.pbrt'), 1);
-    geometry_fname = erase(world{geometryIdx},{'Include "','"'});
-    inputFile_geometry = fullfile(inputDir, geometry_fname);
-    if ~exist(inputFile_geometry,'file'), error('File not found'); end
-    % Could this be piReadText too?
-    % we need to read file contents with comments
-    fileID = fopen(inputFile_geometry);
-    tmp = textscan(fileID,'%s','Delimiter','\n');
-    geometryLines = tmp{1};
-    fclose(fileID);
-    
-    % convert geometryLines into from the standard block indented format in
-    % to the single line format.
-    geometryLinesFormatted = piFormatConvert(geometryLines);
-    [trees, ~] = parseGeometryText(thisR, geometryLinesFormatted,'');
-else
-    inputFile_materials = [];
-    % Read material & texture
-    [materialLists, texureList] = parseMaterialTexture(thisR.world);
-    fprintf('Read %d materials.\n', numel(materialLists));
-    fprintf('Read %d textures.\n', numel(texureList));
-    % Read geometry
-    [trees, parsedUntil] = parseGeometryText(thisR, thisR.world,'');
-    if ~isempty(trees)
-        parsedUntil(parsedUntil>numel(thisR.world))=numel(thisR.world);
-        % remove parsed line from world
-        thisR.world(2:parsedUntil-1)=[];
+    % If exporter is Copy, don't parse the geometry.
+    if isequal(exporter, 'Copy')
+        disp('Scene geometry will not be parsed.');
+        thisR.world = world;
+    else        
+        % Read the geometry file and do the same.
+        geometryIdx = find(contains(world, '_geometry.pbrt'), 1);
+        geometry_fname = erase(world{geometryIdx},{'Include "','"'});
+        inputFile_geometry = fullfile(inputDir, geometry_fname);
+        if ~exist(inputFile_geometry,'file'), error('File not found'); end
+        
+        % Could this be piReadText too?
+        % we need to read file contents with comments
+        fileID = fopen(inputFile_geometry);
+        tmp = textscan(fileID,'%s','Delimiter','\n');
+        geometryLines = tmp{1};
+        fclose(fileID);
+        
+        % convert geometryLines into from the standard block indented format in
+        % to the single line format.
+        geometryLinesFormatted = piFormatConvert(geometryLines);
+        [trees, ~] = parseGeometryText(thisR, geometryLinesFormatted,'');
     end
+else
+    
+    % In this case there is no Include file for the materials.  They are
+    % probably defined in the world block. We read the materials and
+    % textures from the world block.  We delete them from the block because
+    % piWrite will create the scene_materials.pbrt file and insert an
+    % Include scene_materials.pbrt line into the world block.
+    
+    inputFile_materials = [];
+    
+    % Read material & texture
+    [materialLists, textureList, newWorld] = parseMaterialTexture(thisR.world);
+    thisR.world = newWorld;
+    fprintf('Read %d materials.\n', materialLists.Count);
+    fprintf('Read %d textures.\n', textureList.Count);
+    
+    % If exporter is Copy, don't parse.
+    if isequal(exporter, 'Copy')
+        disp('Scene geometry will not be parsed.');        
+    else
+        % Read geometry
+        [trees, parsedUntil] = parseGeometryText(thisR, thisR.world,'');
+        if ~isempty(trees)
+            parsedUntil(parsedUntil>numel(thisR.world))=numel(thisR.world);
+            % remove parsed line from world
+            thisR.world(2:parsedUntil-1)=[];
+        end
+    end
+    
 end
 
 thisR.materials.list = materialLists;
@@ -226,10 +246,10 @@ thisR.materials.inputFile_materials = inputFile_materials;
 % Call material lib
 thisR.materials.lib = piMateriallib;
 
-thisR.textures.list = texureList;
+thisR.textures.list = textureList;
 thisR.textures.inputFile_textures = inputFile_materials;
 
-if ~isempty(trees)
+if exist('trees','var') && ~isempty(trees)
     thisR.assets = trees.uniqueNames;
 else
     % needs to add function to read structure like this:
@@ -265,7 +285,7 @@ end
 
 %% Find the text in WorldBegin/End section
 function [options, world] = piReadWorldText(thisR,txtLines)
-% 
+%
 % Finds all the text lines from WorldBegin
 % It puts the world section into the thisR.world.
 % Then it removes the world section from the txtLines
@@ -276,7 +296,7 @@ function [options, world] = piReadWorldText(thisR,txtLines)
 
 % The general parser (toply) writes out the PBRT file in a block format with
 % indentations.  Zheng's Matlab parser (started with Cinema4D), expects the
-% blocks to be in a single line. 
+% blocks to be in a single line.
 %
 % This function converts the blocks to a single line.  This function is
 % used a few places in piRead().
@@ -316,7 +336,7 @@ function [flip,thisR] = piReadLookAt(thisR,txtLines)
 % Interpreting these variables from the text can be more complicated w.r.t.
 % formatting.
 
-% A flag for flipping from a RHS to a LHS. 
+% A flag for flipping from a RHS to a LHS.
 flip = 0;
 
 % Get the block
@@ -327,7 +347,7 @@ if(isempty(lookAtBlock))
     thisR.lookAt = struct('from',[0 0 0],'to',[0 1 0],'up',[0 0 1]);
 else
     % We have values
-%     values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
+    %     values = textscan(lookAtBlock{1}, '%s %f %f %f %f %f %f %f %f %f');
     values = textscan(lookAtBlock, '%s %f %f %f %f %f %f %f %f %f');
     from = [values{2} values{3} values{4}];
     to = [values{5} values{6} values{7}];
@@ -365,94 +385,59 @@ thisR.lookAt = struct('from',from,'to',to,'up',up);
 
 end
 
-function [newlines] = piFormatConvert(txtLines)
-% Format txtlines into a standard format.
-nn=1;
-nLines = numel(txtLines);
+% function [newlines] = piFormatConvert(txtLines)
+% % Format txtlines into a standard format.
+% nn=1;
+% nLines = numel(txtLines);
+% 
+% ii=1;
+% tokenlist = {'A', 'C' , 'F', 'I', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T'};
+% txtLines = regexprep(txtLines, '\t', ' ');
+% while ii <= nLines
+%     thisLine = txtLines{ii};
+%     if ~isempty(thisLine)
+%         if length(thisLine) >= length('Shape')
+%             if any(strncmp(thisLine, tokenlist, 1)) && ...
+%                     ~strncmp(thisLine,'Include', length('Include')) && ...
+%                     ~strncmp(thisLine,'Attribute', length('Attribute'))
+%                 % It does, so this is the start
+%                 blockBegin = ii;
+%                 % Keep adding lines whose first symbol is a double quote (")
+%                 if ii == nLines
+%                     newlines{nn,1}=thisLine;
+%                     break;
+%                 end
+%                 for jj=(ii+1):nLines+1
+%                     if jj==nLines+1 || isempty(txtLines{jj}) || ~isequal(txtLines{jj}(1),'"')
+%                         if jj==nLines+1 || isempty(txtLines{jj}) || isempty(str2num(txtLines{jj}(1:2))) ||...
+%                                 any(strncmp(txtLines{jj}, tokenlist, 1))
+%                             blockEnd = jj;
+%                             blockLines = txtLines(blockBegin:(blockEnd-1));
+%                             texLines=blockLines{1};
+%                             for texI = 2:numel(blockLines)
+%                                 if ~strcmp(texLines(end),' ')&&~strcmp(blockLines{texI}(1),' ')
+%                                     texLines = [texLines,' ',blockLines{texI}];
+%                                 else
+%                                     texLines = [texLines,blockLines{texI}];
+%                                 end
+%                             end
+%                             newlines{nn,1}=texLines;nn=nn+1;
+%                             ii = jj-1;
+%                             break;
+%                         end
+%                     end
+%                     
+%                 end
+%             else
+%                 newlines{nn,1}=thisLine; nn=nn+1;
+%             end
+%         end
+%     end
+%     ii=ii+1;
+% end
+% newlines(piContains(newlines,'Warning'))=[];
+% end
 
-ii=1;
-tokenlist = {'A', 'C' , 'F', 'I', 'L', 'M', 'N', 'O', 'P', 'R', 'S', 'T'};
-txtLines = regexprep(txtLines, '\t', ' ');
-while ii <= nLines
-    thisLine = txtLines{ii};
-    if ~isempty(thisLine)
-        if length(thisLine) >= length('Shape')
-            if any(strncmp(thisLine, tokenlist, 1)) && ...
-                    ~strncmp(thisLine,'Include', length('Include')) && ...
-                    ~strncmp(thisLine,'Attribute', length('Attribute'))
-                % It does, so this is the start
-                blockBegin = ii;
-                % Keep adding lines whose first symbol is a double quote (")
-                if ii == nLines
-                    newlines{nn,1}=thisLine;
-                    break;
-                end
-                for jj=(ii+1):nLines+1
-                    if jj==nLines+1 || isempty(txtLines{jj}) || ~isequal(txtLines{jj}(1),'"')
-                        if jj==nLines+1 || isempty(txtLines{jj}) || isempty(str2num(txtLines{jj}(1:2))) ||...
-                                any(strncmp(txtLines{jj}, tokenlist, 1))
-                            blockEnd = jj;
-                            blockLines = txtLines(blockBegin:(blockEnd-1));
-                            texLines=blockLines{1};
-                            for texI = 2:numel(blockLines)
-                                if ~strcmp(texLines(end),' ')&&~strcmp(blockLines{texI}(1),' ')
-                                    texLines = [texLines,' ',blockLines{texI}];
-                                else
-                                    texLines = [texLines,blockLines{texI}];
-                                end
-                            end
-                            newlines{nn,1}=texLines;nn=nn+1;
-                            ii = jj-1;
-                            break;
-                        end
-                    end
-                    
-                end
-            else
-                newlines{nn,1}=thisLine; nn=nn+1;
-            end
-        end
-    end
-    ii=ii+1;
-end
-newlines(piContains(newlines,'Warning'))=[];
-end
-
-%{
-% Changed to a utility function piCopyFolder
-% Should be deleted after a while.
-%
-function copyFolder(inputDir, outputDir)
-    sources = dir(inputDir);
-    status  = true;
-    for i=1:length(sources)
-        if startsWith(sources(i).name(1),'.')
-            % Skip dot-files
-            continue;
-        elseif sources(i).isdir && (strcmpi(sources(i).name,'spds') || strcmpi(sources(i).name,'textures'))
-            % Copy the spds and textures directory files.
-            status = status && copyfile(fullfile(sources(i).folder, sources(i).name), fullfile(outputDir,sources(i).name));
-        else
-            % Selectively copy the files in the scene root folder
-            [~, ~, extension] = fileparts(sources(i).name);
-            if ~(piContains(extension,'pbrt') || piContains(extension,'zip') || piContains(extension,'json'))
-                thisFile = fullfile(sources(i).folder, sources(i).name);
-                fprintf('Copying %s\n',thisFile)
-                status = status && copyfile(thisFile, fullfile(outputDir,sources(i).name));
-            end
-        end
-    end
-    
-    if(~status)
-        error('Failed to copy input directory to docker working directory.');
-    else
-        fprintf('Copied resources from:\n');
-        fprintf('%s \n',inputDir);
-        fprintf('to \n');
-        fprintf('%s \n \n',outputDir);
-    end
-end
-%}
 
 %% Parse several critical recipe options
 function [s, blockLine] = piParseOptions(txtLines, blockName)
@@ -465,7 +450,7 @@ s = [];ii=1;
 
 while ii<=nline
     blockLine = txtLines{ii};
-    % There is enough stuff to make it worth checking 
+    % There is enough stuff to make it worth checking
     if length(blockLine) >= 5 % length('Shape')
         % If the blockLine matches the BlockName, do something
         if strncmp(blockLine, blockName, length(blockName))
@@ -511,7 +496,7 @@ while ii<=nline
                 elseif(strcmp(valueType,'string')) || strcmp(valueType,'bool') || strcmp(valueType,'spectrum')
                     % Do nothing.
                 elseif(strcmp(valueType,'float') || strcmp(valueType,'integer'))
-                    value = str2double(value);                    
+                    value = str2double(value);
                 else
                     error('Did not recognize value type, %s, when parsing PBRT file!',valueType);
                 end
@@ -528,51 +513,6 @@ end
 
 end
 
-%% Determine the properties of the materials and textures
-function [materialList, texureList]=parseMaterialTexture(txtLines)
-% Parse the txtLines to specify the parameters of the materials and
-% textures
-%
-
-%% Initialize the parameters we return
-
-texureList    = [];
-materialList  = [];
-% Commenting this out, in the future we don't need the lines anymore.
-% materialLines = [];
-% textureLines  = [];
-
-% Counters for the textures and materials
-t_index = 0;
-m_index = 0;
-
-%% Loop over each line
-for ii = 1:numel(txtLines)
-    
-    % Parse this line now
-    thisLine = txtLines{ii};
-    
-    if strncmp(thisLine,'Texture',length('Texture'))
-        t_index = t_index+1;
-        texureList{t_index}   = parseBlockTexture(thisLine); 
-        % textureLines{t_index} = thisLine;
-        
-    elseif strncmp(thisLine,'MakeNamedMaterial',length('MakeNamedMaterial')) ||...
-            strncmp(thisLine,'Material',length('Material'))
-        m_index = m_index+1;
-        materialList{m_index}  = parseBlockMaterial(thisLine);
-       % materialLines{m_index} = thisLine; 
-        
-    end
-end
-
-end
-
-
-
-
-
-
-
+%% END
 
 

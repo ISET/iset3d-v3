@@ -79,7 +79,8 @@ order  = p.Results.order;
 
 %% Rotate the light
 
-if ~isfield(lght, 'to')
+if ~isfield(lght, 'to') && ~strcmpi(lght.type, 'infinite')
+ 
     warning('This light does not have to! Doing nothing.');
 else
     for ii = 1:numel(order)

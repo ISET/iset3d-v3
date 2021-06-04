@@ -73,7 +73,7 @@ end
 %% List material library
 
 % It's helpful to check what current material properties are.
-piMaterialList(thisR);
+piMaterialPrint(thisR);
 piMaterialGroupAssign(thisR);
 fprintf('A library of materials\n\n');  % Needs a nicer print method
 disp(thisR.materials.lib)
@@ -111,7 +111,7 @@ piMaterialAssign(thisR, 'GLASS', target,'rgbkd',rgbkd,'rgbkr',rgbkr);
 % the output name.
 [~,sceneName,e] = fileparts(fname); 
 thisR.set('outputFile',fullfile(piRootPath,'local',sceneName,[sceneName,'1',e]));
-piWrite(thisR,'creatematerials',true);
+piWrite(thisR);
 
 %% Render again
 

@@ -51,7 +51,8 @@ sceneWindow(scene);
 % Summarize what we did
 thisSE.summary;
 
-% For fun, have a look at the depth map (units are meters).
+% For fun, have a look at the depth map (units are meters).  You can see
+% that different chess pieces are at different distances.
 scenePlot(scene,'depth map');  colorbar;
 
 %% Big pupil case.
@@ -60,7 +61,10 @@ scenePlot(scene,'depth map');  colorbar;
 thisSE.set('use optics',true);
 
 % Focus on the rook at the back (1 diopter)
-thisSE.set('accommodation',1);
+thisSE.set('accommodation',1/0.6);
+
+% Focus closer on the bishop
+% thisSE.set('accommodation',1/.3);
 
 % Upgrade the rendering quality.  
 thisSE.set('pupil diameter',5);     
@@ -72,16 +76,20 @@ thisSE.summary;
 % Radiance only for speed
 oi = thisSE.render('render type','radiance');    
 oiWindow(oi);
+%{
+oi = piAIdenoise(oi);
+oiWindow(oi);
+%}
 
-% Yellow because of the lens.  Blurry image of the close chess pieces.
+% The overall image appearance is yellow because of the lens pigment.
 
 %% Reducing the pupil sharpens up the nearer pieces
 
-% Shrink the pupil.  That will increse the depth of field.
+% Shrink the pupil.  That increases the depth of field.
 thisSE.set('pupil diameter',2);   
 
-% Shrinking the pupil adds more rendering noise.  So we increase the number
-% of rays.
+% Shrinking the pupil also adds more rendering noise.  So we increase the
+% number of rays.  This will slow the calculation.
 thisSE.set('rays per pixel',512);
 
 oi = thisSE.render('render type','radiance');    % Radiance and depth
@@ -89,10 +97,16 @@ oiWindow(oi);
 
 thisSE.summary;
 
-% Less blurry for the chess pieces that are close. 
-%
+% Notice that the OI is less blurry for the chess pieces that are close. 
+
 % There is more rendering noise, though. We reduced the pupil area by
 % about a factor of 6 and only doubled the number of rays.  Impatient
 % people out here in California.
+%
+% But we have a denoiser if you want.
+%{
+oi = piAIdenoise(oi);
+oiWindow(oi);
+%}
 
 %% END

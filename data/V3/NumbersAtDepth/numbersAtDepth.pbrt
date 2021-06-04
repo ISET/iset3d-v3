@@ -6,15 +6,16 @@ LookAt 0 0 0 0 1 0 0 0 1
 
 # 1_Camera
 Camera "realisticEye" 
-  "string specfile" "navarroAccomodated_5.00.dat" 
-  "float retinaDistance" [16.320000] 
-  "float retinaRadius" [12] 
-  "float pupilDiameter" [4] 
-  "float retinaSemiDiam" [6] 
-  "spectrum ior1" "ior1_5.00dp.spd" 
-  "spectrum ior2" "ior2_5.00dp.spd" 
-  "spectrum ior3" "ior3_5.00dp.spd" 
-  "spectrum ior4" "ior4_5.00dp.spd" 
+   "string specfile" "navarroAccomodated_5.00.dat" 
+   "float retinaDistance" [16.320000] 
+   "float retinaRadius" [12] 
+   "float pupilDiameter" [4] 
+   "float retinaSemiDiam" [6] 
+   "spectrum ior1" "ior1_5.00dp.spd" 
+   "spectrum ior2" "ior2_5.00dp.spd" 
+   "spectrum ior3" "ior3_5.00dp.spd" 
+   "spectrum ior4" "ior4_5.00dp.spd" 
+
 
 # integrator
 # SurfaceIntegrator "path" 

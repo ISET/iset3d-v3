@@ -153,6 +153,8 @@ switch param
     case {'outputfile'}
         % thisR.set('outputfile',fullfilepath);
         %
+        
+        %{
         % The outputfile has a default initial string.  When we set,
         % we check that the new directory exists. If not, we make it.
         % If there were files in the previous directory we copy them
@@ -168,6 +170,12 @@ switch param
             end
             mkdir(newDir);
         end
+        %}
+        newDir     = fileparts(val);
+        if ~exist(newDir,'dir')
+            warning('output directory does not exist yet');
+        end
+        
         thisR.outputFile = val;
         
     case {'inputfile'}
@@ -585,9 +593,12 @@ switch param
         thisR.camera.num_pinholes_w.type = 'float';
     case 'lightfieldfilmresolution'
         % This is printed out in the pbrt scene file
+        % It should only be a get, not a set.
+        %{
         nMicrolens = thisR.get('n microlens');
         nSubpixels = thisR.get('n subpixels');
         thisR.set('film resolution', nMicrolens .* nSubpixels);
+        %}
     case 'nsubpixels'
         % How many pixels behind each microlens/pinhole
         % The type is not included because this is not passed to pbrt.  It
@@ -664,24 +675,20 @@ switch param
         
         % In this case, we completely replace the material list.
         if isempty(varargin)
-            if iscell(val)
+            if isa(thisR.materials.list, 'containers.Map')
                 thisR.materials.list = val;
             else
-                warning('Please provide a list of materials in cell array')
+                warning('Please provide a list of materials in a containers.Map')
             end
             return;
         end
         % Get index and material struct from the material list
         % Search by name or index
-        if isnumeric(val) && val <= numel(thisR.materials.list)
-            % User sent in an index.  That's how we get the material
-            matIdx = val;
-            thisMat = thisR.materials.list{val};
-        elseif isstruct(val)
+        if isstruct(val)
             % They sent in a struct
             if isfield(val,'name'), matName = val.name;
                 % It has a name slot.
-                [matIdx, thisMat] = piMaterialFind(thisR.materials.list, 'name', matName);
+                thisMat = thisR.materials.list(matName);
             else
                 error('Bad struct.');
             end
@@ -689,29 +696,23 @@ switch param
             % It is either a special command or the material name            
             switch val
                 case {'add'}
-                    % thisR.set('material', 'add', material struct);
-                    % Could use 'end + 1'
-                    nMaterial = thisR.get('n material');
-                    thisR.materials.list{nMaterial + 1} = varargin{1};
+                    newMat = varargin{1};
+                    thisR.materials.list(newMat.name) = newMat;
                     return;
                 case {'delete', 'remove'}
-                    % thisR.set('material', 'delete', idxORname);
                     if isnumeric(varargin{1})
                         thisR.materials.list(varargin{1}) = [];
                     else
-                        [matIdx, ~] = piMaterialFind(thisR.materials.list, 'name', varargin{1});
-                        thisR.materials.list(matIdx) = [];
+                        remove(thisR.materials.list, varargin{1})
                     end
                     return;
                 case {'replace'}
-                    % thisR.set('material','replace', idxORname-1, newmaterial-2)
-                    idx = piMaterialFind(thisR.materials.list, 'name', varargin{1});
-                    thisR.materials.list{idx} = varargin{2};
+                    thisR.materials.list(varargin{1}) = varargin{2};
                     return;
                 otherwise
                     % Probably the material name.
                     matName = val;
-                    [matIdx, thisMat] = piMaterialFind(thisR.materials.list, 'name', matName);
+                    thisMat = thisR.materials.list(val);
             end
         end
         
@@ -720,12 +721,12 @@ switch param
             % A material struct was sent in as the only argument.  We
             % should check it, make sure its name is unique, and then set
             % it.
-            thisR.materials.list{matIdx} = varargin{1};
+            thisR.materials.list(matName) = varargin{1};
         else
             % A material name and property was sent in.  We set the
             % property and then update the material in the list.
             thisMat = piMaterialSet(thisMat, varargin{1}, varargin{2});
-            thisR.set('materials', matIdx, thisMat);
+            thisR.set('materials', matName, thisMat);
         end
         
     case {'materialsoutputfile'}
@@ -745,48 +746,36 @@ switch param
         end
         % Get index and texture struct from the texture list
         % Search by name or index
-        if isnumeric(val) && val <= numel(thisR.textures.list)
-            % User sent in an index.  That's how we get the texture
-            textureIdx = val;
-            thisTexture = thisR.textures.list{val};
-        elseif isstruct(val)
+        if isstruct(val)
             % They sent in a struct
-            if isfield(val,'name'), matName = val.name;
+            if isfield(val,'name'), textureName = val.name;
                 % It has a name slot.
-                [textureIdx, thisTexture] = piTextureFind(thisR.textures.list, 'name', matName);
+                thisTexture = thisR.textures.list(textureName);
             else
                 error('Bad struct.');
             end
         elseif ischar(val)
-            % It is either a special command or the texture name            
+            % It is either a special command or the texture name
+            newTexture = varargin{1};
             switch val
                 case {'add'}
-                    % thisR.set('textures', 'add', texture struct);
-                    % Could use 'end + 1'
-                    nTexture = thisR.get('n texture');
-                    thisR.textures.list{nTexture + 1} = varargin{1};
+                    % thisR.set('textures', 'add', texture struct);                    
+                    thisR.textures.list(newTexture.name) = varargin{1};
                     return;
                 case {'delete', 'remove'}
                     % thisR.set('texture', 'delete', idxORname);
-                    if isnumeric(varargin{1})
-                        thisR.textures.list(varargin{1}) = [];
-                    else
-                        [textureIdx, ~] = piTextureFind(thisR.textures.list, 'name', varargin{1});
-                        thisR.textures.list(textureIdx) = [];
-                    end
+                    remove(thisR.textures.list, varargin{1}.name)
                     return;
                 case {'replace'}
                     % thisR.set('texture','replace', idxORname-1, newtexture-2)
-                    idx = piTextureFind(thisR.textures.list, 'name', varargin{1});
-                    thisR.textures.list{idx} = varargin{2};
+                    thisR.textures.list(varargin{1}) = varargin{2};
                     return;
                 case {'basis'}
                     % thisR.set('texture', 'basis', tName, wave, basisfunctions)
                     % basisfunctions need to have size of 3 x numel(wave)
-                    idx = piTextureFind(thisR.textures.list, 'name', varargin{1});
-                    if isequal(thisR.textures.list{idx}.type, 'imagemap')
+                    if isequal(thisR.textures.list(varargin{1}).type, 'imagemap')
                         wave = varargin{2};
-                        piTextureSetBasis(thisR, idx, wave, 'basis functions', varargin{3});
+                        piTextureSetBasis(thisR, varargin{1}, wave, 'basis functions', varargin{3});
                     else
                         warning('Basis function only applies to image map.')
                     end
@@ -794,7 +783,7 @@ switch param
                 otherwise
                     % Probably the material name.
                     textureName = val;
-                    [textureIdx, thisTexture] = piTextureFind(thisR.textures.list, 'name', textureName);
+                    [textureName, thisTexture] = piTextureFind(thisR.textures.list, 'name', textureName);
             end
         end
         
@@ -803,12 +792,13 @@ switch param
             % A material struct was sent in as the only argument.  We
             % should check it, make sure its name is unique, and then set
             % it.
-            thisR.textures.list{textureIdx} = varargin{1};
+            thisTexture = varargin{1};
+            thisR.textures.list(thisTexture.name) = varargin{1};
         else
             % A material name and property was sent in.  We set the
             % property and then update the material in the list.
             thisTexture = piTextureSet(thisTexture, varargin{1}, varargin{2});
-            thisR.set('textures', textureIdx, thisTexture);
+            thisR.set('textures', textureName, thisTexture);
         end        
         
     case {'light', 'lights'}
@@ -817,7 +807,9 @@ switch param
         % thisR.set('light', lightName, newLight);
         % thisR.set('light', 'add', newLight);
         % thisR.set('light', 'delete', lightName);
-        % thisR.set('light', lightName, 'PARAM TYPE', VAL);
+        % thisR.set('light', 'rotate', lghtName, [XROT, YROT, ZROT], ORDER)
+        % thisR.set('light', 'translate', lghtName, [XSFT, YSFT, ZSFT], FROMTO)
+        % thisR.set('light', 'scale', lightName, VAL);
         
         % This is the case where we replace the light list
         if isempty(varargin)
@@ -851,7 +843,7 @@ switch param
                 case {'delete', 'remove'}
                     % thisR.set('light', 'delete', idxORname);
                     if isnumeric(varargin{1})
-                        thisR.lights{varargin{1}} = [];
+                        thisR.lights(varargin{1}) = [];
                     elseif isequal(varargin{1}, 'all')
                         thisR.lights = {};
                     else
@@ -1043,17 +1035,18 @@ switch param
                 % Set a parameter of an asset to val
                 piAssetSet(thisR, assetName, varargin{1},val);
         end
+        % reassign unique names for delete/chop;
+        thisR.assets = thisR.assets.uniqueNames;
         
         % ZLY added fluorescent sets
     case {'fluorophoreconcentration'}
         % thisR.set('fluorophore concentration',val,idx)
         if isempty(varargin), error('Material name or index required'); end
-        idx = varargin{1};
         
-        % If the user sent a material name convert it to an index
-        if ischar(idx), idx = piMaterialFind(thisR,'name',idx); end
+        % material name
+        materialName = varargin{1};
         
-        matName = val;
+        matName = val; % for older version
         switch thisR.recipeVer
             case 2
                 % A modern recipe. So we set using modern methods.  The
@@ -1061,7 +1054,7 @@ switch param
                 % returns the EEM and sets it.  It uses the wavelength
                 % sampling in the recipe to determine the EEM wavelength
                 % sampling.
-                thisR = piMaterialSet(thisR,idx,'fluorophore concentration',val);
+                thisR = piMaterialSet(thisR,materialName,'fluorophore concentration',val);
                 
             otherwise
                 % This is the original framing, before re-writing the
@@ -1080,10 +1073,9 @@ switch param
         % idx - a numerical index to the material or it can be a string
         % which is the name of the mater
         if isempty(varargin), error('Material name or index required'); end
-        idx = varargin{1};
         
-        % If the user sent a material name convert it to an index
-        if ischar(idx), idx = piMaterialFind(thisR,'name',idx); end
+        % material name
+        materialName = varargin{1};
         
         matName = val;
         switch thisR.recipeVer
@@ -1093,7 +1085,7 @@ switch param
                 % returns the EEM and sets it.  It uses the wavelength
                 % sampling in the recipe to determine the EEM wavelength
                 % sampling.
-                thisR = piMaterialSet(thisR,idx,'fluorophore eem',val);
+                thisR = piMaterialSet(thisR,materialName,'fluorophore eem',val);
                 
             otherwise
                 % This is the original framing, before re-writing the

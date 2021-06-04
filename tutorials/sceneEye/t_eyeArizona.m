@@ -11,6 +11,13 @@
 
 %%
 ieInit
+if piCamBio
+    error('Use ISETBio, not ISETCam');
+end
+
+%
+% piCamBio should be 0.  I think this is an ISETBio thing.
+%
 
 %% Make an oi of the chess set scene using the LeGrand eye model
 

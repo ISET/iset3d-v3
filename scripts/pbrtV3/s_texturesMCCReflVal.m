@@ -33,7 +33,7 @@ thisR.set('light','add',distantLight);
 %                     'light spectrum', 'equalEnergy');
 %% Check texture list
 
-piTextureList(thisR);
+piTexturePrint(thisR);
 %% Set texture not use gamma correction
 % In PBRT when reading a rgb image texture, it assumes the pixel values are
 % sRGB values. So it does a inverse processing and it changes the actual

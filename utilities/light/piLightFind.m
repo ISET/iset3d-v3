@@ -2,7 +2,7 @@ function [lIdx, lCollection] = piLightFind(lList, param, val, varargin)
 %% Find light in the list such that the field equals a value
 %
 % Synopsis
-%   mList = piMaterialFind(thisR, field, val)
+%   [lIdx, lCollection] = piLightFind(lList, param, val, varargin)
 %
 % Inputs
 %   thisR

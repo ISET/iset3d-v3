@@ -102,7 +102,7 @@ thisR.set('light','add',distantLight);
 %     'cameracoordinate', true); 
 piLightGet(thisR);
 %% Check texture list
-piTextureList(thisR);
+piTexturePrint(thisR);
 
 %% Change the texture info
 textureIdx = 3;
