@@ -126,7 +126,8 @@ switch ieParamFormat(sceneDir)
     case 'macbethcheckercb'
         sceneDir = 'mccCB';
         sceneFile = [sceneDir,'.pbrt'];
-        exporter = 'C4D'; 
+        exporter = 'C4D';
+        
     case 'whiteboard'
         sceneDir = 'WhiteBoard';        
         sceneFile = [sceneDir,'.pbrt'];
@@ -151,6 +152,7 @@ switch ieParamFormat(sceneDir)
         sceneDir = 'ChessSetScaled';
         sceneFile = [sceneDir,'.pbrt'];
         exporter = 'Copy';
+        
     case 'checkerboard'
         sceneDir = 'checkerboard';
         sceneFile = [sceneDir,'.pbrt'];
@@ -308,13 +310,22 @@ switch ieParamFormat(sceneDir)
         sceneDir = 'living-room-3-mini';
         sceneFile = [sceneDir,'.pbrt'];
         exporter = 'Copy';
+    case {'blenderscene'}
+        sceneDir = 'BlenderScene';
+        sceneFile = [sceneDir,'.pbrt'];
+        exporter = 'C4D';
     otherwise
         error('Can not identify the scene, %s\n',sceneDir);
 end
 
 %% See if we can find the file
 % Local
-FilePath = fullfile(piRootPath,'data','V3',sceneDir);
+if isequal(sceneDir,'BlenderScene')
+    FilePath = fullfile(piRootPath,'data','blender','BlenderScene');
+else
+    FilePath = fullfile(piRootPath,'data','V3',sceneDir);
+end
+
 fname = fullfile(FilePath,sceneFile);
 if ~exist(fname,'file')
     fname = piSceneWebTest(sceneDir,sceneFile);

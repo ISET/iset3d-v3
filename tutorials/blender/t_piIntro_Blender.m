@@ -100,7 +100,7 @@ sceneSet(scene,'gamma',0.5);
 %% See asset tree
 %
 % Print the asset tree structure in the command window.
-thisR.assets.print;
+thisR.show;
 
 %% Get the names of the objects in the scene
 %
