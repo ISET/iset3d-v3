@@ -126,7 +126,10 @@ piWrite(thisR, 'overwritematerials', true);
 sceneName = 'simpleDots';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr');
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else, sceneSet(scene,'gamma',0.7);
+end
+
 drawnow;
 
 %%  For more complex textures, we can sample images.
@@ -150,8 +153,9 @@ scene = piRender(thisR, 'render type', 'radiance');
 sceneName = 'room';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr');
-
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else, sceneSet(scene,'gamma',0.7);
+end
 %% Let's change the texture of a the sphere to checkerboard
 
 figureMaterial = thisR.get('asset','001_Sphere_O','material');
@@ -162,7 +166,9 @@ piWrite(thisR, 'overwritematerials', true);
 sceneName = 'simpleFigChecks';
 scene = sceneSet(scene, 'scene name', sceneName);
 sceneWindow(scene);
-sceneSet(scene,'render flag','hdr');
+if piCamBio, sceneSet(scene,'render flag','hdr');
+else, sceneSet(scene,'gamma',0.7);
+end
 drawnow;
 
 %% END
