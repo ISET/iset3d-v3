@@ -30,35 +30,11 @@
 clear; close all; ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Set the input folder name
-%
-% This is currently set to a folder included in the iset3d repository
-% but you can change the name to the name of your own folder, which you 
-% can set up as described at: https://github.com/ISET/iset3d/wiki/Blender
-sceneName = 'BlenderScene';
-
-%% Set name of pbrt file exported from Blender
-%
-% This is currently set to a pbrt file included in the iset3d repository
-% but you can change the file name to the name of your own scene.
-pbrtName = 'BlenderScene'; 
-
-%% Set pbrt file path
-%
-% This is currently set to the file included in the iset3d repository
-% (which is located in ~/iset3d/data/blender/BlenderScene) but you can
-% change it to the file path for your scene.
-filePath = fullfile(piRootPath,'data','blender',sceneName);
-fname = fullfile(filePath,[pbrtName,'.pbrt']);
-if ~exist(fname,'file')
-    error('File not found - see tutorial header for instructions'); 
-end
-
 %% Read scene
 %
 % Read and parse the pbrt file exported from Blender, and return a
 % rendering recipe with the parsed scene information.
-thisR = piRead(fname);
+thisR = piRecipeDefault('scene name','blenderscene');
 
 %% Add light
 % 

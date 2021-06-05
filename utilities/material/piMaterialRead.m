@@ -1,5 +1,5 @@
 function materialList = piMaterialRead(thisR, fname,varargin)
-%%
+%% Read and return a list of materials
 %
 % Synopsis:
 %   materialList = piReadMaterial(fname,varargin)

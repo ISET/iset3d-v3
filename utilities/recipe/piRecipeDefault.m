@@ -313,7 +313,7 @@ switch ieParamFormat(sceneDir)
     case {'blenderscene'}
         sceneDir = 'BlenderScene';
         sceneFile = [sceneDir,'.pbrt'];
-        exporter = 'C4D';
+        exporter = 'Blender';   % Blender
     otherwise
         error('Can not identify the scene, %s\n',sceneDir);
 end
@@ -331,12 +331,19 @@ if ~exist(fname,'file')
     fname = piSceneWebTest(sceneDir,sceneFile);
 end
 
-%% If we are here, we found the file.  SO create the recipe.
+%% If we are here, we found the file.  So create the recipe.
 
 % Parse the file contents into the ISET3d recipe and identify the type of
 % parser.  C4D has special status.  In other cases, such as the scenes from
 % the PBRT and Benedikt sites, we just copy the files into ISET3d/local.
-thisR = piRead(fname, 'exporter', exporter);
+switch exporter
+    case {'C4D','Copy'}
+        thisR = piRead(fname, 'exporter', exporter);
+    case 'Blender'
+        thisR = piRead_Blender(fname,'exporter',exporter);
+    otherwise
+        error('Unknown export type %s\n',exporter);
+end
 thisR.set('exporter',exporter);
 
 % By default, do the rendering and mounting from ISET3d/local.  That
