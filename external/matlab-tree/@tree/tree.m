@@ -371,7 +371,7 @@ classdef tree
                         case 'light'
                             node = uitreenode(assets,'Text',thisNode.name);
                             node.UserData = thisNode;
-                            node.Icon = fullfile(piRootPath,'external/matlab-tree/light.png');
+                            node.Icon = fullfile(piRootPath,'external/matlab-tree/light.png');                            
                     end
                 end
             end
