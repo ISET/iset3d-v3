@@ -1106,7 +1106,21 @@ switch ieParamFormat(param)  % lower case, no spaces
         for ii = 1:numel(ids)
             val{ii} = names{ids(ii)};
         end
-                
+    case {'objectcoords','objectcoordinates'}
+        % Returns the coordinates of the objects (leafs of the asset tree)
+        % Units should be meters
+        % coords = thisR.get('object coordinates');
+        %
+        Objects  = thisR.get('objects');
+        nObjects = numel(Objects);
+        
+        % Get their world positions
+        val = zeros(nObjects,3);
+        for ii=1:nObjects
+            thisNode = thisR.get('assets',Objects(ii));
+            val(ii,:) = thisR.get('assets',thisNode.name,'world position');
+        end
+        
         % Lights
     case{'light', 'lights'}
         if isempty(varargin)
