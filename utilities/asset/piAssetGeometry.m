@@ -2,6 +2,7 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR)
 % Find and plot the object coords in the world
 %
 % TODO:  Turn off plotting
+%    Understand why macbethChecker does not work.
 %
 % Synopsis
 %  [coords,lookat,hdl] = piAssetGeometry(thisR)
@@ -21,6 +22,21 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR)
    thisR = piRecipeDefault('scene name','simplescene');
    coords = piAssetGeometry(thisR);
 %}
+%{
+   thisR = piRecipeDefault('scene name','chessset');
+   coords = piAssetGeometry(thisR);
+%}
+%{
+   thisR = piRecipeDefault('scene name','macbethchecker');
+   coords = piAssetGeometry(thisR);
+%}
+
+%%  Check that we have assets
+if isempty(thisR.assets)
+    warning('No assets stored in the recipe');
+    coords = [];
+    return;
+end
 
 %% Find the coordinates of the leafs of the tree (the objects)
 

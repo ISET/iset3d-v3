@@ -71,6 +71,8 @@ objectR = piRead(car_formatted_fname);
 % piWrite(objectR);
 sceneR = piRecipeMerge(sceneR, objectR);
 
+% piAssetGeometry(sceneR);
+
 %% Add a light to the merged scene
 skyname = 'probe_16-30_latlongmap.exr';
 
