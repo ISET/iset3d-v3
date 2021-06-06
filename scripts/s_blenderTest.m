@@ -8,10 +8,8 @@ thisR   = piRead(newName);
 %% Add light
 %
 % This scene was exported without a light, so create and add an infinite light.
-% infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
-infiniteLight = piLightCreate('room light', ...
-    'type', 'infinite',...
-    'mapname', 'room.exr');
+infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
+
 thisR.set('light','add',infiniteLight);
 
 %% Change render quality
