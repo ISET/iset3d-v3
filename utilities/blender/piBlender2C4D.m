@@ -118,14 +118,40 @@ piWriteC4Dformat_handedness(thisR);
 piWriteC4Dformat_vector(thisR);
 
 %% Set thisR.lookAt and determine if we need to flip the image
-flip = piReadLookAt(thisR,txtLines);
+[flip, thisR] = piReadLookAt(thisR,txtLines);
 
 % Sometimes the axis flip is "hidden" in the concatTransform matrix. In
 % this case, the flip flag will be true. When the flip flag is true, we
 % always output Scale -1 1 1.
-if(flip)
-    thisR.scale = [-1 1 1];
+
+% ZLY: when flip is not true, it means there is no need for flipping, we
+% will get rid of the Scale -1 1 1 section
+if ~flip
+    scaleIdx = find(piContains(txtLines, 'Scale -1 1 1'));
+    if ~isempty(scaleIdx)
+        txtLines(scaleIdx) = [];
+    end
 end
+
+% Override the original lookAt block with the look at in the PBRT
+% coordinate.
+lookAtIdx = find(piContains(txtLines, 'LookAt'));
+if ~isempty(lookAtIdx)
+from = thisR.get('from');
+to   = thisR.get('to');
+up   = thisR.get('up');
+
+txtLines{lookAtIdx} = sprintf('LookAt %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f %0.6f \n', ...
+    [from(:); to(:); up(:)]);
+end
+
+% Erase Transform, ConcatTransform since all the transformations are included
+% in lookAt
+transformIdx = find(piContains(txtLines, 'Transform'));
+if ~isempty(transformIdx)
+    txtLines(transformIdx) = [];
+end
+
 
 %% Now we re-write the scene file
 
@@ -287,7 +313,7 @@ flip = 0;
 % NOTE: below changed
 % as above
 
-[~, lookAtBlock] = piBlockExtract_Blender(txtLines,'blockName','LookAt','exporter',thisR.exporter);
+[s, lookAtBlock] = piBlockExtract_Blender(txtLines,'blockName','LookAt','exporter',thisR.exporter);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
