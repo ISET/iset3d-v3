@@ -5,8 +5,8 @@ function [id, thisAsset] = piAssetFind(assets, param, val)
 %   [id, theAsset] = piAssetFind(assets, param, val)
 %
 % Inputs:
-%   assets  - recipe
-%   param   - parameter
+%   assets  - An ISET3d recipe or the assets from a recipe (a tree object)
+%   param   - parameter  (e.g., name)
 %   val     - value to match
 %
 % Returns:
@@ -65,13 +65,12 @@ while curIdx <= numel(nodeList)
                 end
             end
         else
-            % Another parameter must match.  Returns the first instance of
-            % the match.  Maybe it should return all the instances?
+            % Another parameter must match.  Returns all the IDs that
+            % match
             if IDs(ii) > 1
                 thisAsset{end + 1} = assets.get(IDs(ii));
                 if isequal(val, piAssetGet(thisAsset, param))
                     id = [id IDs(ii)];
-                    % return;
                 end
             end
         end
@@ -80,7 +79,5 @@ while curIdx <= numel(nodeList)
     
     curIdx = curIdx + 1;
 end
-
-
 
 end
