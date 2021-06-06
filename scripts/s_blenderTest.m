@@ -9,6 +9,7 @@ thisR   = piRead(newName);
 %
 % This scene was exported without a light, so create and add an infinite light.
 infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
+
 thisR.set('light','add',infiniteLight);
 
 %% Change render quality
@@ -19,10 +20,10 @@ filmresolution = thisR.get('film resolution');
 thisR.set('rays per pixel', raysperpixel/2);
 thisR.set('film resolution',filmresolution/2);
 
-thisR.set('fov',60);
-
 piWrite(thisR);
 [scene,result] = piRender(thisR,'render type','radiance');
 sceneWindow(scene);
 
+% Change the gamma for improved visibility.
+sceneSet(scene,'gamma',0.5);
 %% END
