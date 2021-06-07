@@ -87,22 +87,11 @@ switch (whichScene)
         outFile = fullfile(piRootPath,'local',sceneName,'scene.pbrt');
         thisR.set('outputFile',outFile);
     case 'blobbie'
-        % Set the input folder name
-        sceneName = 'BlenderSceneBlobs';
-        
-        % Set name of pbrt file
-        pbrtName = 'BlenderSceneBlobs';
-        
-        % Set pbrt file path
-        filePath = fullfile(piRootPath,'data','blender',sceneName);
-        fname = fullfile(filePath,[pbrtName,'.pbrt']);
-        if ~exist(fname,'file')
-            error('File not found - see tutorial header for instructions');
-        end
-        
-        % Read scene
-        thisR = piRead(fname);
-        
+        % Read the Blender scene that was exported to PBRT
+        fname = fullfile(piRootPath,'data','blender','BlenderSceneBlobs','BlenderSceneBlobs.pbrt');
+        newName = piBlender2C4D(fname);
+        thisR   = piRead(newName);
+
         % This scene was exported without a light, so add an infinite light.
         infiniteLight = piLightCreate('infiniteLight','type','infinite','spd','D65');
         thisR.set('light','add',infiniteLight);
@@ -138,7 +127,7 @@ piWrite(thisR);
 %% Render and display radiance image
 theScene = piRender(thisR,'render type','radiance');
 sceneWindow(theScene);
-sceneSet(theScene,'gamma',0.5);
+sceneSet(theScene,'gamma',0.7);
 
 %% Render depth map and show.
 %

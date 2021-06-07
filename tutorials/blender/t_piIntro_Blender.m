@@ -9,10 +9,10 @@
 %    scene by following the instructions found here: 
 %    https://github.com/ISET/iset3d/wiki/Blender
 %
-%    The wiki page will show you some Blender basics, how to export your
+%    The wiki page describes some Blender basics, how to export your
 %    Blender scene as a pbrt file, and how to set up a folder in iset3d
-%    that contains your scene. You will then need to follow the comments in
-%    the tutorial below to modify this script for your scene.
+%    that contains your scene. You can then follow the comments in this
+%    tutorial to read, modify and render the scene.
 %
 %    For a demonstration of how you can add materials to Blender scenes 
 %    exported without materials, see:
