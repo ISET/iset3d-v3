@@ -18,9 +18,14 @@ function [id, thisAsset] = piAssetFind(assets, param, val)
 
 % Examples:
 %{
- thisR = piRecipeDefault;
- id = piAssetFind(thisR.assets, 'name', 'Camera');
- [id, theAsset]  = piAssetFind(thisR, 'name', '002ID_Camera');
+ % thisR = piRecipeDefault;
+ thisR = piRecipeDefault('scene name','simple scene');
+ thisR.show('objects materials');
+ thisR.show('node names');
+
+ id = piAssetFind(thisR.assets, 'name', 'root');
+ [id, theAsset]  = piAssetFind(thisR, 'name', 'Camera_B');
+ [id, theAsset]  = piAssetFind(thisR, 'id', 13); theAsset{1}
  id = piAssetFind(thisR.assets, 'scale', [1 1 1]);
 %}
 
@@ -53,10 +58,11 @@ while curIdx <= numel(nodeList)
             % Users are allowed to look for node with the ID prepended or
             % just the base asset name.  That is why 'name' is a special
             % case. 
-            if isequal(val, assets.stripID(IDs(ii))) || ...
+            shortName = assets.stripID(IDs(ii));
+            if isequal(val, shortName )|| ...
                     isequal(val, assets.names(IDs(ii)))
                 id = [id IDs(ii)];
-                if nargout > 1, thisAsset{end + 1} = assets.get(IDs(ii)); end
+                if nargout > 1, thisAsset{end + 1} = assets.get(IDs(ii)); end %#ok<*AGROW>
                 if strcmp(val, 'root')
                     % for some scene, there are a large number of assets,
                     % so we do not want to loop all the assets if we are
@@ -65,16 +71,16 @@ while curIdx <= numel(nodeList)
                 end
             end
         else
-            % Another parameter must match.  Returns all the IDs that
-            % match
+            % A parameter other than 'name' must match.  Returns all the
+            % instances that match.
             if IDs(ii) > 1
                 thisAsset{end + 1} = assets.get(IDs(ii));
-                if isequal(val, piAssetGet(thisAsset, param))
+                if isequal(val, piAssetGet(thisAsset{end}, param))
                     id = [id IDs(ii)];
                 end
             end
         end
-        nodeList = [nodeList IDs(ii)]; %#ok<AGROW>
+        nodeList = [nodeList IDs(ii)]; 
     end
     
     curIdx = curIdx + 1;

@@ -1,44 +1,40 @@
-function piAssetMaterialPrint(thisR)
-% List materials type in this PBRT scene
+function T = piAssetMaterialPrint(thisR)
+% List each asset and its materials type of the ISET3d recipe
 %
 % Syntax:
 %   piAssetMaterialPrint(thisR)
 %
 % Brief description
-%   Prints out a list of the corresponding materials used by each asset. 
-%
+%   Prints out a table of the assets and its corresponding material 
 %
 % Inputs:
-%   thisR:   A recipe.  If missing, the whole library is printed
+%   thisR:   An ISET3d recipe. 
 %
 % Outputs:
-%   N/A
+%   T -   The table of indices, object names, and material name
 %
 % Zhenyi, 2021
 %
 % See also:
-%   
+%   recipe.show(), piMaterialPrint, piLightPrint
 %
 
 % Examples:
 %{
-% Print the material types
- piAssetMaterialPrint(thisR)
+ thisR = piRecipeDefault('scene name','simple scene');
+ T = piAssetMaterialPrint(thisR);
 %}
 
-%% 
+%% Only the objects, not all the nodes, are printed
 
-fprintf('\Assets materials\n');
-fprintf('-------------------------------\n');
-nn = 1;
-for ii =2:numel(thisR.assets.Node)
-    if strcmp(thisR.assets.Node{ii}.type,'object')
-        rows{nn, :} = num2str(nn);
-        names{nn,:} = thisR.assets.Node{ii}.name;
-        materialName{nn,:} = thisR.assets.Node{ii}.material.namedmaterial;
-        nn = nn+1;
-    end
+fprintf('\n');
+ids = thisR.get('objects');
+for ii=1:numel(ids)
+    rows{ii, :} = sprintf('%d',ii); %#ok<*AGROW>
+    names{ii,:} = thisR.assets.Node{ids(ii)}.name;
+    materialName{ii,:} = thisR.assets.Node{ids(ii)}.material.namedmaterial;
 end
+
 T = table(categorical(names), categorical(materialName),'VariableNames',{'assetName','materialName'}, 'RowNames',rows);
 disp(T);
 fprintf('-------------------------------\n');

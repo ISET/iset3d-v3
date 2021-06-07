@@ -25,7 +25,7 @@ piWrite(thisR);
 sceneWindow(scene);
 
 % Change the gamma for improved visibility.
-sceneSet(scene,'gamma',0.5);
+sceneSet(scene,'gamma',0.7);
 
 %% Modify the scene
 %
@@ -45,7 +45,7 @@ thisR.show('assets materials')
 %% Select an object to modify
 
 % Select the object leaf named '027ID_Monkey_O'.
-leafName = '027ID_001_Monkey_O';
+leafName = '001_Monkey_O';
 
 % The leaf of the object contains its shape and material information.
 % We need to get the ID of the branch of the object to manipulate the 

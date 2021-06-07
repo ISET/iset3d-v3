@@ -90,16 +90,29 @@ classdef recipe < matlab.mixin.Copyable
             else,                 showType = varargin{1};
             end
             
+            % We should probably use nodes and objects/assets distinctly
             switch ieParamFormat(showType)
-                case 'assets'
+                case {'assets','nodes'}
+                    % Brings up the window that you can click through
+                    % showing all the nodes.
                     if isempty(obj.assets), disp('No assets in this recipe');
                     else, obj.assets.show;
                     end
-                case 'assetsmaterials'
+                case 'nodenames'
+                    % List all the nodes, not just the objects
+                    names = obj.get('asset names')';
+                    rows = cell(numel(names),1);
+                    for ii=1:numel(names), rows{ii} = sprintf('%d',ii); end
+                    T = table(categorical(names),'VariableNames',{'assetName'}, 'RowNames',rows);
+                    disp(T);
+                case {'objectsmaterials','assetsmaterials'}
+                    % Prints out a table
                     piAssetMaterialPrint(obj);
                 case 'materials'
+                    % Prints a table
                     piMaterialPrint(obj);
                 case 'lights'
+                    % Prints a table
                     piLightPrint(obj);
                 otherwise
                     error('Unknown show %s\n',varargin{1});

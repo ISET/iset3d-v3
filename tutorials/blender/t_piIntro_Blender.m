@@ -8,11 +8,11 @@
 %    is included in the iset3d repository, but you can use your own Blender
 %    scene by following the instructions found here: 
 %    https://github.com/ISET/iset3d/wiki/Blender
-
-%    The wiki page above will show you some Blender basics, how to export
-%    your Blender scene as a pbrt file, and how to set up a folder in
-%    iset3d that contains your scene. You will then need to follow the
-%    comments in the tutorial below to modify this script for your scene.
+%
+%    The wiki page will show you some Blender basics, how to export your
+%    Blender scene as a pbrt file, and how to set up a folder in iset3d
+%    that contains your scene. You will then need to follow the comments in
+%    the tutorial below to modify this script for your scene.
 %
 %    For a demonstration of how you can add materials to Blender scenes 
 %    exported without materials, see:
@@ -23,6 +23,7 @@
 %   11/29/20  dhb  Edited it.
 %   04/01/21  amn  Adapted for general parser and assets/materials updates.
 %   04/29/21  amn  Adapted for object naming based on object's .ply file name.
+%   06/05/21  bw/zly  Were here
 
 %% Initialize ISET and Docker
 %
@@ -34,7 +35,9 @@ if ~piDockerExists, piDockerConfig; end
 %
 % Read and parse the pbrt file exported from Blender, and return a
 % rendering recipe with the parsed scene information.
-thisR = piRecipeDefault('scene name','blenderscene');
+fname = fullfile(piRootPath,'data','blender','BlenderScene','BlenderScene.pbrt');
+newName = piBlender2C4D(fname);
+thisR   = piRead(newName);
 
 %% Add light
 % 
@@ -65,7 +68,7 @@ scene = sceneSet(scene,'name','Blender export');
 sceneWindow(scene);
 
 % Change the gamma for improved visibility.
-sceneSet(scene,'gamma',0.5);
+sceneSet(scene,'gamma',0.7);
 
 %% Modify the scene
 %
@@ -78,24 +81,11 @@ sceneSet(scene,'gamma',0.5);
 % Print the asset tree structure in the command window.
 thisR.show;
 
-%% Get the names of the objects in the scene
-%
-% List the object names. You will need to know the names of the objects in
-%the scene to modify them.
-fprintf('\nThis recipe contains objects:\n');
-for ii = 1:length(thisR.assets.Node)
-    if isfield(thisR.assets.Node{ii},'name')
-        assetName = thisR.assets.Node{ii}.name;
-        
-        % The object name (from Blender) was assigned to the object's leaf
-        % (see the section below for more details on the object's leaf and
-        % branch).
-        if contains(assetName,'_O')
-            fprintf('%s\n',assetName);
-        end 
-    end
-end
-fprintf('\n');
+
+%% List the object names and the materials that are assigned to them.
+
+thisR.show('assets materials')
+
 
 %% Select an object to modify
 % 
@@ -104,7 +94,7 @@ fprintf('\n');
 % First, select an object leaf name from the list that was just
 % printed in the command window. 
 % In this example, we select the object leaf named '027ID_Monkey_O'.
-leafName = '027ID_Monkey_O';
+leafName = '001_Monkey_O';
 
 % The leaf of the object contains its shape and material information.
 % We need to get the ID of the branch of the object to manipulate the 
