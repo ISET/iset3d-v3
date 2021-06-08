@@ -30,9 +30,11 @@ lensname = 'dgauss.22deg.6.0mm.json';
 c = piCameraCreate('omni','lens file',lensname);
 thisR.set('camera',c); 
 
-% More than 200 samples per degree.
-thisR.set('fov',3);
+thisR.set('film diagonal',0.8);
+fov = thisR.get('fov');
+
 thisR.set('spatial samples',[640,640]);
+thisR.get('spatial samples')/fov
 
 % The geometry looks wrong
 % piAssetGeometry(thisR)
@@ -63,6 +65,32 @@ ipWindow(ip);
 
 % But if you want to choose by hand, do this.  The rect needs to be taller
 % than wide.
+[locs,rect] = ieROISelect(ip);
+positions = round(rect.Position);
+
+mtfData = ieISO12233(ip,sensor,'all',positions);
+ieDrawShape(ip,'rectangle',positions);
+
+%% Change the camera position
+
+piAssetGeometry(thisR);
+thisR.get('camera position')
+thisR.set('camera position',[0 0 -100]);
+thisR.get('focal distance','m')
+thisR.set('focal distance',100);
+thisR.get('object distance','m')
+piAssetGeometry(thisR);
+
+%%
+piWrite(thisR);
+oi = piRender(thisR,'render type','radiance');
+oiWindow(oi);
+sensor = sensorCompute(sensor,oi);
+sensorWindow(sensor);
+ip = ipCompute(ip,sensor);
+ipWindow(ip);
+
+%%
 [locs,rect] = ieROISelect(ip);
 positions = round(rect.Position);
 

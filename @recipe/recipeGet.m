@@ -300,7 +300,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         
     case 'lookat'
         val = thisR.lookAt;
-    case 'from'
+    case {'from','cameraposition'}
         val = thisR.lookAt.from;
     case 'to'
         val = thisR.lookAt.to;

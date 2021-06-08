@@ -570,7 +570,7 @@ switch param
         if isstruct(val) &&  isfield(val,'from') && isfield(val,'to')
             thisR.lookAt = val;
         end
-    case 'from'
+    case {'from','cameraposition'}
         thisR.lookAt.from = val;
     case 'to'
         thisR.lookAt.to = val;

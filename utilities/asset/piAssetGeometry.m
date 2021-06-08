@@ -72,7 +72,7 @@ grid on
 bName = thisR.get('input basename');
 oType = thisR.get('optics type');
 title(sprintf('%s (%s)',bName,oType));
-
+legend({'objects','camera','to'})
 end
 
 
