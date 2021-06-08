@@ -50,15 +50,16 @@ curIdx = 1; %
 
 id = [];
 thisAsset = {};
-% Users are allowed to look for node with the ID prepended or
-% just the base asset name.  That is why 'name' is a special
-% case.
+
 shortNameLists = assets.stripID;
 assetNames     = assets.names;
 while curIdx <= numel(nodeList)
     IDs = assets.getchildren(nodeList(curIdx));
     for ii = 1:numel(IDs)
         if isequal(param, 'name')
+            % Users are allowed to look for node with the ID prepended or
+            % just the base asset name.  That is why 'name' is a special
+            % case.
             shortName = shortNameLists{IDs(ii)};
             if isequal(val, shortName )|| ...
                     isequal(val, assetNames{IDs(ii)})
