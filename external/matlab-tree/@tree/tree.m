@@ -346,6 +346,7 @@ classdef tree
             thisAsset = t.UserData;
             %%
             function createAssetsTree(assets, obj, rootId)
+                rootPath = piRootPath;
                 Ids = obj.getchildren(rootId);
                 for ii = 1:length(Ids)
                     thisNode = obj.get(Ids(ii));
@@ -353,25 +354,24 @@ classdef tree
                         case 'branch'
                             branch = uitreenode(assets,'Text',thisNode.name);
                             branch.UserData = thisNode;
-                            branch.Icon = fullfile(piRootPath,'external/matlab-tree/branch.png');
+                            branch.Icon = fullfile(rootPath,'external/matlab-tree/branch.png');
                             createAssetsTree(branch, obj, Ids(ii));
                         case 'marker'
                             branch = uitreenode(assets,'Text',thisNode.name);
                             branch.UserData = thisNode;
-                            branch.Icon = fullfile(piRootPath,'external/matlab-tree/marker.png');
-                            createAssetsTree(branch, obj, Ids(ii));
+                            branch.Icon = fullfile(rootPath,'external/matlab-tree/marker.png');
                         case 'instance'
                             node = uitreenode(assets,'Text',thisNode.name);
                             node.UserData = thisNode;
-                            node.Icon = fullfile(piRootPath,'external/matlab-tree/instance.png');
+                            node.Icon = fullfile(rootPath,'external/matlab-tree/instance.png');
                         case 'object'
                             node = uitreenode(assets,'Text',thisNode.name);
                             node.UserData = thisNode;
-                            node.Icon = fullfile(piRootPath,'external/matlab-tree/object.png');
+                            node.Icon = fullfile(rootPath,'external/matlab-tree/object.png');
                         case 'light'
                             node = uitreenode(assets,'Text',thisNode.name);
                             node.UserData = thisNode;
-                            node.Icon = fullfile(piRootPath,'external/matlab-tree/light.png');                            
+                            node.Icon = fullfile(rootPath,'external/matlab-tree/light.png');                            
                     end
                 end
             end
