@@ -22,6 +22,11 @@ sceneWindow(scene);
 % These are the materials and assets
 thisR.show('assetsmaterials');
 
+% You can set the gray scale of the black material this way
+%
+% thisR.get('material','BlackMaterial','kd')
+% thisR.set('material','BlackMaterial','kd',[0.4 0.4 0.4]);
+
 %%  Add a lens and compute the OI
 
 % Not sure we have the focus set well.  We need to check.  
@@ -69,6 +74,8 @@ ipWindow(ip);
 positions = round(rect.Position);
 
 mtfData = ieISO12233(ip,sensor,'all',positions);
+drawnow;
+
 ieDrawShape(ip,'rectangle',positions);
 
 %% Change the camera position
