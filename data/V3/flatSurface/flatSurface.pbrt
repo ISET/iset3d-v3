@@ -18,6 +18,6 @@ AttributeBegin
 CoordSysTransform "camera" 
 LightSource "point" "spectrum I" "spds/lights/D65.spd" 
 AttributeEnd 
-Include "flatSurface_materials.pbrt"  
-Include "flatSurface_geometry.pbrt"  
+Include "flatSurface_materials.pbrt"
+Include "flatSurface_geometry.pbrt"
 WorldEnd 

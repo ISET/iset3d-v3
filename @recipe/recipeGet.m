@@ -1193,6 +1193,7 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'asset', 'assets'}
         % thisR.get('asset',assetName or ID);  % Returns the asset
         % thisR.get('asset',assetName,param);  % Returns the param val
+        % thisR.get('asset',name or ID,'world position')
         
         [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
         % If only one asset matches, turn it from cell to struct.
