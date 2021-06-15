@@ -55,6 +55,8 @@ for ss = 3:2:numel(thisLine)
             elseif isequal(thisLine{ss + 1}, 'false')
                 thisVal = false;
             end
+        case ''
+            continue
         otherwise
             warning('Could not resolve the parameter type: %s', keyType);
             continue;
