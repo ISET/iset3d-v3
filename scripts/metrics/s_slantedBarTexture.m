@@ -14,7 +14,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %%  Read the scene and add a light
 
-% thisR = piRecipeDefault('scene name','flatSurfaceRandomTexture');
+% thisR = piRecipeDefault('scene name','chessSet');
 thisR = piRecipeDefault('scene name','flatsurface');
 
 % Add a light
@@ -106,4 +106,53 @@ sensor = sensorSet(sensor,'fov',45);
 sensor = sensorCompute(sensor,oi);
 sensorWindow(sensor);
 
+%% Put an image texture on the surface
+
+% thisR = piRecipeDefault('scene name','chessSet pieces');
+% thisR = piRecipeDefault('scene name','chessSet pieces');
+thisR = piRecipeDefault('scene name','flatsurface');
+
+% Add a light
+distantLight = piLightCreate('distant','type','distant',...
+    'spd', [6500 0.001], ...
+    'cameracoordinate', true);
+thisR.set('light','add',distantLight);
+
+%% Aim the camera at the object and bring it closer.
+thisR.set('to',  xyz -   [0,5,0]);
+
+surfaceName = '001_Cube_O';
+xyz = thisR.get('asset',surfaceName,'world position');
+thisR.set('asset',surfaceName,'scale',.2);
+
+% piAssetGeometry(thisR);
+
+%% Create a texture
+
+chartName = 'EIAChart';
+imgFile = 'EIA1956-300dpi-top.png';
+%imgFile = 'pngExample.png';
+
+chartTexture = piTextureCreate(chartName,...
+    'format', 'spectrum',...
+    'type', 'imagemap',...
+    'filename', imgFile);
+thisR.set('spatial samples',[320,320]);
+
+surfaceMaterial = thisR.get('asset',surfaceName,'material');
+thisR.set('texture', 'add', chartTexture);
+
+thisR.get('texture print');
+
+thisR.set('material', surfaceMaterial.name, 'kd val', chartName);
+thisR.show('assetsmaterials');
+
+%%
+thisR.set('assets',surfaceName,'rotate',[30 20 10]);
+
+%% Write and render
+% piWrite(thisR, 'overwritematerials', true);
+piWrite(thisR);
+[scene,results] = piRender(thisR,'render type','radiance');
+sceneWindow(scene);
 %% END
