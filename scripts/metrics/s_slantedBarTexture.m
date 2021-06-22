@@ -14,7 +14,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %%  Read the scene and add a light
 
-% thisR = piRecipeDefault('scene name','chessSet');
+% simpleR = piRecipeDefault('scene name','simple scene');
 thisR = piRecipeDefault('scene name','flatsurface');
 
 % Add a light

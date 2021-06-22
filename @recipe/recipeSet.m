@@ -952,6 +952,7 @@ switch param
         % branch.  Some have been.
         switch ieParamFormat(param)
             case 'add'
+                % thisR.set('asset',parentName,newAsset);
                 out = piAssetAdd(thisR, assetName, val);
             case {'delete', 'remove'}
                 % thisR.set('asset',assetName,'delete');

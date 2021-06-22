@@ -1104,7 +1104,26 @@ switch ieParamFormat(param)  % lower case, no spaces
         names = thisR.assets.names;
         val = cell(1,numel(ids));
         for ii = 1:numel(ids)
+            % Includes ids and everything
             val{ii} = names{ids(ii)};
+        end
+    case 'objectsimplenames'
+        % Names of the objects
+        % We think there is ID_Instance_ObjectName_O.
+        % So we try to delete the first two and the O atthe end.
+        % If there are fewer parts, we delete less.
+        ids = thisR.get('objects');
+        names = thisR.assets.names;
+        val = cell(1,numel(ids));
+        for ii = 1:numel(ids)
+            nameParts = split(names{ids(ii)},'_');
+            if numel(nameParts) > 2
+                val{ii} = join(nameParts(3:(end-1)),'-');
+            elseif numel(nameParts) > 1
+                val{ii} = nameParts{2};
+            else
+                val{ii} = nameParts{1};
+            end
         end
     case {'objectcoords','objectcoordinates'}
         % Returns the coordinates of the objects (leafs of the asset tree)
