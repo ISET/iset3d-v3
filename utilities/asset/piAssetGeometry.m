@@ -1,12 +1,14 @@
-function [coords,lookat,hdl] = piAssetGeometry(thisR)
+function [coords,lookat,hdl] = piAssetGeometry(thisR,varargin)
 % Find and plot the object coords in the world
 %
-% TODO:  Turn off plotting
-%    Understand why macbethChecker does not work.
-%
 % Synopsis
-%  [coords,lookat,hdl] = piAssetGeometry(thisR)
+%  [coords,lookat,hdl] = piAssetGeometry(thisR,vararign)
+%
 % Input
+%
+% Optional key/val
+%   size - Logical, add size to graph (default false)
+%   name - Logical, add name to graph (default true)
 %
 % Outputs
 %    coords
@@ -24,7 +26,7 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR)
 %}
 %{
    thisR = piRecipeDefault('scene name','chessset');
-   coords = piAssetGeometry(thisR);
+   coords = piAssetGeometry(thisR,'size',true);
 %}
 %{
    thisR = piRecipeDefault('scene name','macbethchecker');
@@ -38,15 +40,36 @@ if isempty(thisR.assets)
     return;
 end
 
+%% Parser
+p = inputParser;
+p.addRequired('thisR',@(x)(isa(x,'recipe')));
+p.addParameter('size',false,@islogical);
+p.addParameter('name',true,@islogical);
+p.parse(thisR,varargin{:});
+
 %% Find the coordinates of the leafs of the tree (the objects)
 
 coords = thisR.get('object coordinates');   % World coordinates, meters
 names  = thisR.get('object simple names');  % We might do a better job with this.
 shapesize = thisR.get('object sizes');
 notes = cell(size(names));
-for ii=1:numel(names)
-    notes{ii} = sprintf('%s %.1f %.1f %.1f',names{ii},shapesize(ii,:));
+for ii=1:numel(notes), notes{ii} = ' '; end   % Start them out empty
+
+%% Include names
+if p.Results.name
+    for ii=1:numel(names)
+        notes{ii} = sprintf('%s',names{ii});
+    end
 end
+
+%% Add size
+if p.Results.size
+    for ii=1:numel(names)
+        notes{ii} = sprintf('%s %.1f %.1f %.1f',notes{ii},shapesize(ii,1),shapesize(ii,2),shapesize(ii,3));
+    end
+    
+end
+
 %% Open a figure to plot
 
 % We should have no plot switch
@@ -69,12 +92,12 @@ lookat = thisR.get('lookat');
 plot3(lookat.from(1),lookat.from(2),lookat.from(3),'ro',...
     'Markersize',12,...
     'MarkerFaceColor','r');
-text(lookat.from(1)+sx,lookat.from(2)+sy,lookat.from(3),'from');
+text(lookat.from(1)+sx,lookat.from(2)+sy,lookat.from(3),'from','Color','r');
 
 plot3(lookat.to(1),lookat.to(2),lookat.to(3),'go',...
     'Markersize',12,...
     'MarkerFaceColor','g');
-text(lookat.to(1)+sx,lookat.to(2)+sy,lookat.to(3),'to');
+text(lookat.to(1)+sx,lookat.to(2)+sy,lookat.to(3),'to','Color','g');
 
 line([lookat.from(1),lookat.to(1)],...
     [lookat.from(2),lookat.to(2)],...

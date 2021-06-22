@@ -6,13 +6,13 @@ if ~piDockerExists, piDockerConfig; end
 
 %%  Read the scene and add a light
 
-thisR = piRecipeDefault('scene name','flatsurface');
+flatR = piRecipeDefault('scene name','flatsurface');
 
 % Add a light
 distantLight = piLightCreate('distant','type','distant',...
     'spd', [9000 0.001], ...
     'cameracoordinate', true);
-thisR.set('light','add',distantLight);
+flatR.set('light','add',distantLight);
 
 %% Point the camera
 
@@ -20,16 +20,16 @@ thisR.set('light','add',distantLight);
 surfaceName = '001_Cube_O';
 % xyz = thisR.get('asset',surfaceName,'world position');
 
-thisR.set('asset',surfaceName,'world position',[0 2 0]);
-thisR.set('asset',surfaceName,'scale',5e-4);
+flatR.set('asset',surfaceName,'world position',[0 2 0]);
+flatR.set('asset',surfaceName,'scale',5e-4);
 % xyz = thisR.get('asset',surfaceName,'world position');
 % piAssetGeometry(thisR);
 
 % Aim the camera at the object and bring it closer.
-thisR.set('from',[0,3,0]);
-thisR.set('to',  [0,2.5,0]);
+flatR.set('from',[0,3,0]);
+flatR.set('to',  [0,2.5,0]);
 surfaceName = '001_Cube_O';
-xyz = thisR.get('asset',surfaceName,'world position');
+xyz = flatR.get('asset',surfaceName,'world position');
 
 % piAssetGeometry(thisR);
 
@@ -43,40 +43,44 @@ chartTexture = piTextureCreate(chartName,...
     'format', 'spectrum',...
     'type', 'imagemap',...
     'filename', imgFile);
-thisR.set('spatial samples',[320,320]);
+flatR.set('spatial samples',[320,320]);
 
-surfaceMaterial = thisR.get('asset',surfaceName,'material');
-thisR.set('texture', 'add', chartTexture);
+surfaceMaterial = flatR.get('asset',surfaceName,'material');
+flatR.set('texture', 'add', chartTexture);
 
-thisR.get('texture print');
+flatR.get('texture print');
 
-thisR.set('material', surfaceMaterial.name, 'kd val', chartName);
-thisR.show('assetsmaterials');
+flatR.set('material', surfaceMaterial.name, 'kd val', chartName);
+flatR.show('assetsmaterials');
 
 %%
-thisR.set('assets',surfaceName,'rotate',[30 20 10]);
+flatR.set('assets',surfaceName,'rotate',[30 20 10]);
 
 %% Write and render
 % piWrite(thisR, 'overwritematerials', true);
-piWrite(thisR);
-[scene,results] = piRender(thisR,'render type','radiance');
+piWrite(flatR);
+[scene,results] = piRender(flatR,'render type','radiance');
 sceneWindow(scene);
 
 %%
 simpleR = piRecipeDefault('scene name','simple scene');
-piAssetGeometry(simpleR);
-simpleR.get('from')
-simpleR.get('to')
+% piAssetGeometry(simpleR);
+% simpleR.get('from')
+% simpleR.get('to')
 
-flatSurface = thisR.get('asset',surfaceName);
-flatSurface.name = 'flatsurface';
+flatSurface = flatR.get('asset','001_Cube_O');
+
 simpleR.set('asset','root','add',flatSurface);
-thisR.set('asset',surfaceName,'scale',5e-6);
+
+% Is this working? Maybe not.
+simpleR.set('asset','001_Cube_O','scale',1e-2);
+
+flatSurface = flatR.get('asset','001_Cube_O');
 
 % simpleR.show;
 
-simpleR.set('asset',flatSurface.name,'world position',[1 1 0]);
-piAssetGeometry(simpleR);
+simpleR.set('asset','001_Cube_O','world position',[1 1 0]);
+piAssetGeometry(simpleR,'size',true);
 
 %%
 piWrite(simpleR);
