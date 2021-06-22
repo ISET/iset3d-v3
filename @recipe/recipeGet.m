@@ -1065,6 +1065,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('textures print')
         %
         piTexturePrint(thisR);
+        
+        % Objects
     case {'objectmaterial','materialobject'}
         % val = thisR.get('object material');
         %
@@ -1118,7 +1120,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         for ii = 1:numel(ids)
             nameParts = split(names{ids(ii)},'_');
             if numel(nameParts) > 2
-                val{ii} = join(nameParts(3:(end-1)),'-');
+                tmp = join(nameParts(3:(end-1)),'-');
+                val{ii} = tmp{1};
             elseif numel(nameParts) > 1
                 val{ii} = nameParts{2};
             else
@@ -1138,6 +1141,20 @@ switch ieParamFormat(param)  % lower case, no spaces
         for ii=1:nObjects
             thisNode = thisR.get('assets',Objects(ii));
             val(ii,:) = thisR.get('assets',thisNode.name,'world position');
+        end
+    case {'objectsizes'}
+        % Not working yet with the flat surface case in
+        % s_piMetricsSlantedBars.m
+        Objects  = thisR.get('objects');
+        nObjects = numel(Objects);
+        val = zeros(nObjects,3);
+        for ii=1:nObjects
+            thisNode = thisR.get('assets',Objects(ii));
+            pts = thisNode.shape.pointp;
+            val(ii,1) = range(pts(1:3:end));
+            val(ii,2) = range(pts(2:3:end));
+            val(ii,3) = range(pts(3:3:end));            
+            % val(ii,:) = thisR.get('assets',thisNode.name,'world position');
         end
         
         % Lights

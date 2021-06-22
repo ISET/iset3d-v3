@@ -42,7 +42,11 @@ end
 
 coords = thisR.get('object coordinates');   % World coordinates, meters
 names  = thisR.get('object simple names');  % We might do a better job with this.
-
+shapesize = thisR.get('object sizes');
+notes = cell(size(names));
+for ii=1:numel(names)
+    notes{ii} = sprintf('%s %.1f %.1f %.1f',names{ii},shapesize(ii,:));
+end
 %% Open a figure to plot
 
 % We should have no plot switch
@@ -56,7 +60,7 @@ sz = (max(coords(:,3)) - min(coords(:,3)))*0.04;
 % The object coords
 for ii=1:numel(names)
     plot3(coords(ii,1),coords(ii,2),coords(ii,3),'ko','MarkerSize',10,'MarkerFaceColor','k');
-    text(coords(ii,1)+sx,coords(ii,2)+sy,coords(ii,3)+sz,names{ii},'FontSize',14)
+    text(coords(ii,1)+sx,coords(ii,2)+sy,coords(ii,3)+sz,notes{ii},'FontSize',14)
     hold on;
 end
 
@@ -85,7 +89,7 @@ grid on
 bName = thisR.get('input basename');
 oType = thisR.get('optics type');
 title(sprintf('%s (%s)',bName,oType));
-legend({'objects','camera','to'})
+% legend({'objects','camera','to'})
 end
 
 
