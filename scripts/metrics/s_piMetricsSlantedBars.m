@@ -93,6 +93,7 @@ simpleR.set('asset','001_Cube_O','translate',[0 0 0]);
 %
 
 [~,axisTree] = simpleR.set('asset','root','graft with materials','coordinate');
+
 sXYZ = simpleR.get('asset','001_figure_6m_O','world position');
 simpleR.set('asset',axisTree.name,'world position',sXYZ + [0.3 0.3 0.3]);
 
