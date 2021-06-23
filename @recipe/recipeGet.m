@@ -1142,7 +1142,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             thisNode = thisR.get('assets',Objects(ii));
             val(ii,:) = thisR.get('assets',thisNode.name,'world position');
         end
-    case {'objectsizes'}
+    case {'objectsizes','objectsize'}
         % Not working yet with the flat surface case in
         % s_piMetricsSlantedBars.m
         Objects  = thisR.get('objects');
@@ -1150,11 +1150,15 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = zeros(nObjects,3);
         for ii=1:nObjects
             thisNode = thisR.get('assets',Objects(ii));
+            thisScale = thisR.get('assets',Objects(ii),'world scale');
+            
+            % All the object points
             pts = thisNode.shape.pointp;
-            val(ii,1) = range(pts(1:3:end));
-            val(ii,2) = range(pts(2:3:end));
-            val(ii,3) = range(pts(3:3:end));            
-            % val(ii,:) = thisR.get('assets',thisNode.name,'world position');
+            
+            % Range of points times any scale factors on the path
+            val(ii,1) = range(pts(1:3:end))*thisScale(1);
+            val(ii,2) = range(pts(2:3:end))*thisScale(2);
+            val(ii,3) = range(pts(3:3:end))*thisScale(3);            
         end
         
         % Lights
@@ -1294,6 +1298,10 @@ switch ieParamFormat(param)  % lower case, no spaces
                     % thisR.get('asset',idOrName,'world position')
                     val = thisR.get('asset', id, 'world translation');
                     val = val(1:3, 4)';
+                case 'worldscale'
+                    % Find the scale factors that apply to the object size
+                    nodeToRoot = thisR.assets.nodetoroot(id);
+                    [~, ~, val] = piTransformWorld2Obj(thisR, nodeToRoot);
                     
                     % These are local values, not world
                 case 'translation'

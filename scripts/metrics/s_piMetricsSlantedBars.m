@@ -62,30 +62,55 @@ piWrite(flatR);
 [scene,results] = piRender(flatR,'render type','radiance');
 sceneWindow(scene);
 
-%%
+%%  Now put the chart inside the simple scene
+
 simpleR = piRecipeDefault('scene name','simple scene');
-% piAssetGeometry(simpleR);
-% simpleR.get('from')
-% simpleR.get('to')
 
+simpleR.set('asset','001_mirror_O','delete');
+
+% Get the flat surface from the flatR recipe and add it to the simpleR
 flatSurface = flatR.get('asset','001_Cube_O');
-
 simpleR.set('asset','root','add',flatSurface);
 
-% Is this working? Maybe not.
-simpleR.set('asset','001_Cube_O','scale',1e-2);
+% Add the flat surface material
+surfaceMaterial = flatR.get('asset',flatSurface.name,'material');
+simpleR.set('material','add',surfaceMaterial);
 
-flatSurface = flatR.get('asset','001_Cube_O');
+% Add the chart texture, which is needed by the texture
+simpleR.set('texture', 'add', chartTexture);
+% simpleR.get('texture print');
+
+% Change the position, scale and rotation
+simpleR.set('asset','001_Cube_O','world position',[-0.5 0.7 -11]);
+simpleR.set('asset','001_Cube_O','scale',3e-4);
+simpleR.set('asset','001_Cube_O','rotate',[90 0 0]);
+
+% simpleR.set('asset','001_Cube_O','world position',[0.1 0.7 -11]);
+% simpleR.get('asset','001_Cube_O','world position')
+
+% Copy and add to a new position
+%{
+flatSurface = simpleR.get('asset','001_Cube_O');
+flatSurface.name = '002_Cube_O';
+simpleR.set('asset','root','add',flatSurface);
+simpleR.set('asset','001_Cube_O','world position',[-0.5 0.7 -11]);
+csimpleR.set('asset','002_Cube_O','scale',3e-4);
+simpleR.set('asset','002_Cube_O','rotate',[90 0 0]);
+simpleR.set('asset','001_Cube_O','delete');
+%}
 
 % simpleR.show;
+% piAssetGeometry(simpleR,'size',true);
 
-simpleR.set('asset','001_Cube_O','world position',[1 1 0]);
-piAssetGeometry(simpleR,'size',true);
+%% Render
 
-%%
 piWrite(simpleR);
 [scene,results] = piRender(simpleR,'render type','radiance');
 sceneWindow(scene);
+%%
+simpleR.set('asset','001_Cube_O','delete');
+simpleR.set('asset','002_Cube_O','delete');
 
-simpleR.set('asset','flatsurface','delete');
+% We should delete more nodes when we do this, not leave the solitary
+% branch
 
