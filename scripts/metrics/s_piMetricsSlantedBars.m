@@ -36,8 +36,8 @@ xyz = flatR.get('asset',surfaceName,'world position');
 %% Create a texture
 
 chartName = 'EIAChart';
-imgFile = 'EIA1956-300dpi-top.png';
-%imgFile = 'pngExample.png';
+imgFile   = 'EIA1956-300dpi-top.png';
+% imgFile = 'pngExample.png';
 
 chartTexture = piTextureCreate(chartName,...
     'format', 'spectrum',...
@@ -84,20 +84,29 @@ simpleR.set('texture', 'add', chartTexture);
 simpleR.set('asset','001_Cube_O','world position',[-0.5 0.7 -11]);
 simpleR.set('asset','001_Cube_O','scale',3e-4);
 simpleR.set('asset','001_Cube_O','rotate',[90 0 0]);
+simpleR.set('asset','001_Cube_O','translate',[0 0 0]);
 
-% simpleR.set('asset','001_Cube_O','world position',[0.1 0.7 -11]);
-% simpleR.get('asset','001_Cube_O','world position')
+%
+% [assetTree, matList] = piAssetTreeLoad('coordinate');
+% simpleR.set('assets','root','graft',assetTree);
+% simpleR.set('assets','graft',assetTree);
+%
+
+[~,axisTree] = simpleR.set('asset','root','graft with materials','coordinate');
+sXYZ = simpleR.get('asset','001_figure_6m_O','world position');
+simpleR.set('asset',axisTree.name,'world position',sXYZ + [0.3 0.3 0.3]);
 
 % Copy and add to a new position
-%{
+% In a way, we would like to copy the whole nodeToRoot path, insert a copy
+% of that, and then adjust the position or rotation.
 flatSurface = simpleR.get('asset','001_Cube_O');
 flatSurface.name = '002_Cube_O';
 simpleR.set('asset','root','add',flatSurface);
-simpleR.set('asset','001_Cube_O','world position',[-0.5 0.7 -11]);
-csimpleR.set('asset','002_Cube_O','scale',3e-4);
+simpleR.set('asset','002_Cube_O','world position',[0.5 0.7 -11]);
+simpleR.set('asset','002_Cube_O','scale',3e-4);
 simpleR.set('asset','002_Cube_O','rotate',[90 0 0]);
-simpleR.set('asset','001_Cube_O','delete');
-%}
+
+% simpleR.set('asset','001_Cube_O','delete');
 
 % simpleR.show;
 % piAssetGeometry(simpleR,'size',true);

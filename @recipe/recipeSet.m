@@ -1017,6 +1017,7 @@ switch param
             case {'obj2light'}
                 piAssetObject2Light(thisR, assetName, val);
             case {'graft', 'subtreeadd'}
+                % thisR.set('asset',assetName,'graft',val); (Maybe)
                 id = thisR.get('asset', assetName, 'id');
                 rootSTID = thisR.assets.nnodes + 1;
                 thisR.assets = thisR.assets.graft(id, val);
@@ -1024,10 +1025,12 @@ switch param
                 % Get the root node of the subtree.
                 out = thisR.get('asset', rootSTID);
             case {'graftwithmaterial', 'graftwithmaterials'}
+                % thisR.set('asset',assetName,'graft with materials',assetFileName)
                 [assetTree, matList] = piAssetTreeLoad(val);
                 [~,out] = thisR.set('asset', assetName, 'graft', assetTree);
-                for ii=1:numel(matList)
-                    thisR.set('material', 'add', matList{ii});
+                keyList = keys(matList);
+                for ii=1:numel(keyList)
+                    thisR.set('material', 'add', matList(keyList{ii}));
                 end
             case {'chop', 'cut'}
                 id = thisR.get('asset', assetName, 'id');

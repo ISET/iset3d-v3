@@ -118,12 +118,7 @@ while i <= length(txt)
     elseif piContains(currentLine,'Shape')
         shape = piParseShape(currentLine);
     elseif strcmp(currentLine,'AttributeEnd')
-        
-        % Assemble all the read attributes into either a groub object, or a
-        % geometry object. Only group objects can have subnodes (not
-        % children). This can be confusing but is somewhat similar to
-        % previous representation.
-        
+               
         % More to explain this long if-elseif-else condition:
         %   First check if this is a light/arealight node. If so, parse the
         %   parameters.
@@ -166,8 +161,10 @@ while i <= length(txt)
             
         elseif exist('rot','var') || exist('translation','var') || ...
                 exist('shape','var') || exist('mediumInterface','var') || exist('mat','var')
+            % This is a branch or an object
+
             if exist('shape','var') || exist('mediumInterface','var') || exist('mat','var')
-                % resChildren = createGeometryObject();
+                % This path if it is an object
                 resObject = piAssetCreate('type', 'object');
                 if exist('name','var')
                     resObject.name = sprintf('%s_O', name);
@@ -197,13 +194,12 @@ while i <= length(txt)
                             
                             resObject.name = sprintf('%s_O', n);
                         elseif ~isempty(mat)
-                            if ~isempty(mat.name)
-                                warning('An object has been created with its material name: %s', mat.name)
-                                resObject.name = sprintf('%s_O', mat.name);
-                            else
-                                warning('An object has been created with its material type: %s', mat.type)
-                                resObject.name = sprintf('%s_O', mat.type);
-                            end
+                            % We need a way to assign a name to this
+                            % object.  We want them unique.  So for now, we
+                            % just pick a random number.  Some chance of a
+                            % duplicate, but not much.
+                            
+                            resObject.name = sprintf('%s-%d_O',mat.namedmaterial,randi(1e6,1));                            
                         end
                     end
 
@@ -223,25 +219,18 @@ while i <= length(txt)
                 subtrees = cat(1, subtrees, tree(resObject));
                 trees = subtrees;
             end
-            % This is a 'branch' node
-            if exist('rot','var') || exist('translation','var')
-                % resCurrent = createGroupObject();
+            
+            % This path if it is a 'branch' node
+            if exist('rot','var') || exist('translation','var')                
                 resCurrent = piAssetCreate('type', 'branch');
                 
                 % If present populate fields.
                 if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end
                 if exist('sz','var'), resCurrent.size = sz; end
                 if exist('rot','var'), resCurrent.rotation = rot; end
-%                 if exist('ctform','var'), resCurrent.concattransform = ctform; end
                 if exist('translation','var'), resCurrent.translation = translation; end
                 if exist('scale','var'), resCurrent.scale = scale; end
                 
-                %{
-                resCurrent.groupobjs = groupobjs;
-                resCurrent.children = children;
-                children = [];
-                res = cat(1,res,resCurrent);
-                %}
                 trees = tree(resCurrent);
                 for ii = 1:numel(subtrees)
                     % TODO: solve the empty node name problem here
@@ -252,14 +241,7 @@ while i <= length(txt)
         elseif exist('name','var')
             % resCurrent = createGroupObject();
             resCurrent = piAssetCreate('type', 'branch');
-            if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end
-            
-            %{
-            resCurrent.groupobjs = groupobjs;
-            resCurrent.children = children;
-            children = [];
-            res = cat(1,res,resCurrent);
-            %}
+            if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end            
             trees = tree(resCurrent);
             for ii = 1:numel(subtrees)
                 trees = trees.graft(1, subtrees(ii));
@@ -275,12 +257,7 @@ while i <= length(txt)
     i = i+1;
 end
 parsedUntil = i;
-%{
-res = createGroupObject();
-res.name = 'root';
-res.groupobjs = groupobjs;
-res.children = children;
-%}
+
 if ~isempty(subtrees)
     trees = tree('root');
     for ii = 1:numel(subtrees)
@@ -292,59 +269,3 @@ end
 
 end
 
-function newMat = parseMaterial(curreline)
-
-thisLine = strsplit(curreline, {' "', '" ', '"'});
-thisLine = thisLine(~cellfun('isempty',thisLine));
-
-% Create a new material
-matName = ''; % Material name
-matType = thisLine{2}; % Material type
-newMat = piMaterialCreate(matName, 'type', matType);
-
-
-% For strings 3 to the end, parse
-for ss = 3:2:numel(thisLine)
-    % Get parameter type and name
-    keyTypeName = strsplit(thisLine{ss}, ' ');
-    keyType = ieParamFormat(keyTypeName{1});
-    keyName = ieParamFormat(keyTypeName{2});
-    
-    % Some corner cases
-    % "index" should be replaced with "eta"
-    switch keyName
-        case 'index'
-            keyName = 'eta';
-    end
-    
-    switch keyType
-        case {'string', 'texture'}
-            thisVal = thisLine{ss + 1};
-        case {'float', 'rgb', 'color', 'photolumi'}
-            % Parse a float number from string
-            % str2num can convert string to vector. str2double can't.
-            thisVal = str2num(thisLine{ss + 1});
-        case {'spectrum'}
-            [~, ~, e] = fileparts(thisLine{ss + 1});
-            if isequal(e, '.spd')
-                % Is a file
-                thisVal = thisLine{ss + 1};
-            else
-                % Is vector
-                thisVal = str2num(thisLine{ss + 1});
-            end
-        case 'bool'
-            if isequal(thisLine{ss + 1}, 'true')
-                thisVal = true;
-            elseif isequal(thisLine{ss + 1}, 'false')
-                thisVal = false;
-            end
-        otherwise
-            warning('Could not resolve the parameter type: %s', keyType);
-            continue;
-    end
-    
-    newMat = piMaterialSet(newMat, sprintf('%s value', keyName),...
-        thisVal);
-end
-end

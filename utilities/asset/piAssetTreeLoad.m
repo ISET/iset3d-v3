@@ -12,7 +12,10 @@ function [assetTree, matList] = piAssetTreeLoad(assetTreeName, varargin)
 
 % Examples:
 %{
-    [assetTree, matList] = piAssetTreeLoad('bunny');
+  [assetTree, matList] = piAssetTreeLoad('bunny');
+%}
+%{
+  [assetTree, matList] = piAssetTreeLoad('/Users/wandell/Documents/MATLAB/iset3d/local/coordinate');
 %}
 %% Parse input
 p = inputParser;

@@ -9,6 +9,7 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR,varargin)
 % Optional key/val
 %   size - Logical, add size to graph (default false)
 %   name - Logical, add name to graph (default true)
+%   position - World coordinates (default false)
 %
 % Outputs
 %    coords
@@ -45,6 +46,7 @@ p = inputParser;
 p.addRequired('thisR',@(x)(isa(x,'recipe')));
 p.addParameter('size',false,@islogical);
 p.addParameter('name',true,@islogical);
+p.addParameter('position',false,@islogical);
 p.parse(thisR,varargin{:});
 
 %% Find the coordinates of the leafs of the tree (the objects)
@@ -62,10 +64,18 @@ if p.Results.name
     end
 end
 
+%% Add position
+if p.Results.position
+    for ii=1:numel(names)
+        notes{ii} = sprintf('%s p %.1f %.1f %.1f',notes{ii},coords(ii,1),coords(ii,2),coords(ii,3));
+    end
+    
+end
+
 %% Add size
 if p.Results.size
     for ii=1:numel(names)
-        notes{ii} = sprintf('%s %.1f %.1f %.1f',notes{ii},shapesize(ii,1),shapesize(ii,2),shapesize(ii,3));
+        notes{ii} = sprintf('%s s %.1f %.1f %.1f',notes{ii},shapesize(ii,1),shapesize(ii,2),shapesize(ii,3));
     end
     
 end

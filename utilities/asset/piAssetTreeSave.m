@@ -20,18 +20,25 @@ assetSceneName = 'bunny';
 assetName = 'Bunny_B';
 thisR = piRecipeDefault('scene name', 'bunny');
 thisST = thisR.get('asset', assetName, 'subtree');
-
-fullPath = piAssetTreeSave(thisST, thisR.materials.list);
+fullPath = piAssetTreeSave(thisST, thisR.materials.list,'outFilePath',fullfile(piRootPath,'data','assets','bunny.mat'));
+%}
+%{
+assetSceneName = 'coordinate';
+assetName = 'Coordinate_B';
+thisR = piRecipeDefault('scene name', 'coordinate');
+thisST   = thisR.get('asset', assetName, 'subtree');
+fullPath = piAssetTreeSave(thisST, thisR.materials.list,'outFilePath',fullfile(piRootPath,'data','assets','coordinate.mat'));
 %}
 %% Parse input
 
 p = inputParser;
 p.addRequired('assetTree', @(x)isequal(class(x), 'tree'));
-p.addRequired('matList', @iscell);
+p.addRequired('matList', @(x)(isa(x,'containers.Map')));
 p.addParameter('outFilePath',...
     fullfile(piRootPath, 'local', ['assetTree', '.mat']), @ischar);
 p.parse(assetTree, matInRecipe, varargin{:});
-assetTree = p.Results.assetTree;
+
+assetTree   = p.Results.assetTree;
 matInRecipe = p.Results.matList;
 outFilePath = p.Results.outFilePath;
 
@@ -50,7 +57,7 @@ end
 %% Get materials of objects in this tree
 ids = assetTree.findleaves;
 
-matList = {};
+matList = containers.Map;
 for ii=1:numel(ids)
     if isequal(assetTree.Node{ids(ii)}.type, 'object')
         matName = piAssetGet(assetTree.Node{ids(ii)}, 'material name');

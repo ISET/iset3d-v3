@@ -1325,6 +1325,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = thisR.assets.get(1);
     case {'assetnames'}
         % The names without the XXXID_ prepended
+        % What about objectnames
         val = thisR.assets.stripID;
     case {'assetparentid'}
         % thisR.get('asset parent id',assetName or ID);

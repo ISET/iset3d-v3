@@ -83,6 +83,7 @@ classdef recipe < matlab.mixin.Copyable
             % Optional 
             %   assets
             %   assets materials
+            %   assets positions
             %   materials
             %   lights
             % 
@@ -108,6 +109,16 @@ classdef recipe < matlab.mixin.Copyable
                 case {'objectsmaterials','assetsmaterials'}
                     % Prints out a table
                     piAssetMaterialPrint(obj);
+                case {'assetpositions','assetspositions','objectpositions'}
+                    names = obj.get('object names')';
+                    coords = obj.get('object coordinates');
+                    oSizes = obj.get('object sizes');
+                    rows = cell(numel(names),2);
+                    for ii=1:numel(names), rows{ii}{1} = sprintf('%.1f %.1f %.1f',coords(ii,1), coords(ii,2),coords(ii,3)); end
+                    for ii=1:numel(names), rows{ii}{2} = sprintf('%.1f %.1f %.1f',oSizes(ii,1), oSizes(ii,2),oSizes(ii,3)); end
+                    T = table(categorical(names),'VariableNames',{'positions','sizes'}, 'RowNames',rows);
+                    disp(T);
+
                 case 'materials'
                     % Prints a table
                     piMaterialPrint(obj);
