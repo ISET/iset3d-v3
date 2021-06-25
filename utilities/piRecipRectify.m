@@ -1,6 +1,6 @@
 function thisR = piRecipRectify(thisR,origin)
-%  Move the camera and objects so that the camera is at origin
-%
+% Move the camera and objects so that the camera is at origin pointed along
+% the z-axis
 %
 % Description
 %
@@ -11,29 +11,95 @@ function thisR = piRecipRectify(thisR,origin)
 % Examples
 %{
  thisR = piRecipeDefault('scene name','simple scene');
- piAssetGeometry(thisR);
+ piCameraRotate(thisR,'y rot',7);
+ thisR.get('lookat direction')
+
  origin = [0 0 0];
- thisR = piRecipeTranslate(thisR,origin);
+ thisR = piRecipRectify(thisR,origin);
+ thisR.get('lookat direction')
+
  piAssetGeometry(thisR);
- thisR.show('objects');
+ piWrite(thisR); scene = piRender(thisR,'render type','radiance');
+ sceneWindow(scene);
 %}
 
 %% Find the camera position
-from = thisR.get('from');
+from = thisR.get('camera position');
 
 %% Move the camera to the specified origin
 
+% Identify all the children of root
+idChildren = thisR.get('asset','root','children');
+
+% Create the node we will place between the root and all other nodes to
+% rectify.
+tNode = piAssetCreate('type','branch');
+tNode.name = 'rectify';
+
+% Place the node under the root
+thisR.set('asset','root','add',tNode);
+idRectify = thisR.get('asset','rectify','id');
+
+% Place all the previous children under rectify
+for ii=1:numel(idChildren)
+    thisR.set('asset',idChildren(ii),'parent',idRectify);
+end
+% thisR.show
+
+%%  Translation
+
+% The camera is handled separately from the objects
 d = origin - from;
 piCameraTranslate(thisR,'xshift',d(1), ...
     'yshift',d(2), ...
     'zshift',d(3));
 
-objects = thisR.get('objects');
-for ii=1:numel(objects)
-    thisR.set('asset',objects(ii),'translate',d);
+% Set the translation of the rectify node
+piAssetSet(thisR,idRectify,'translation',d);
+% thisR.get('asset','rectify','translate')
+% piAssetGeometry(thisR);
+% piWrite(thisR); scene = piRender(thisR,'render type','radiance'); sceneWindow(scene);
+ 
+%% Rotation
+
+% Rotate the camera
+[xAngle, yAngle] = direction2zaxis(thisR);
+
+% No rotation needed.
+if xAngle == 0 && yAngle == 0, return; end
+
+% xAngle = 0; yAngle = 0;
+rMatrix = piRotate([xAngle,yAngle,0]);
+to = thisR.get('to');
+thisR.set('to',(rMatrix*to(:))');  % Row vector.  Should be forced in set.
+% piWrite(thisR); scene = piRender(thisR,'render type','radiance'); sceneWindow(scene);
+
+% Set the rotation the positions of all the objects
+r = piRotationMatrix('zrot',0,'yrot',-yAngle,'xrot',-xAngle);
+piAssetSet(thisR,idRectify,'rotation',r);
+% thisR.get('asset','rectify','rotation')
+% piWrite(thisR); [scene,results] = piRender(thisR,'render type','radiance'); sceneWindow(scene);
+
 end
 
-%% Rotate all the objects so that the from-to is along the z-axis
+function [xAngle, yAngle] = direction2zaxis(thisR)
+%% Angles needed to align lookat with zaxis
+%
+%  0 = [0   cos(a)  -sin(a)]*direction(:)
+%  0 = cos(a)*direction(2) - sin(a)*direction(3)
+%  sin(a)*direction(3) = cos(a)*direction(2)
+%  sin(a)/cos(a) = (direction(2)/direction(3))
+%  tan(a) = (direction(2)/direction(3))
+%  a = atan(direction(2)/direction(3))
+%
+% Rotate again, this time to be perpendicular to the x-axis (x=0). 
+%
+%  0 =  cos(b)*d2(1) + 0*d2(2) +  sin(b)*d2(3)
+%  sin(b)/cos(b) = -d2(1)/d2(3)
+%  b = atan(-d2(1)/d2(3))
+
+%
+xAngle = 0; yAngle = 0;   % Assume aligned
 
 % Angle to the z axis
 direction = thisR.get('lookat direction');   % Unit vector
@@ -42,10 +108,10 @@ CosTheta = max(min(dot(direction,zaxis),1),-1);
 ztheta = real(acosd(CosTheta));
 
 % If the direction is different from down the z-axis, do the rest.
-% Otherwise, return.  We consider 'different' to be within half a degree, I
-% guess. 
+% Otherwise, return.  We consider 'different' to be within a tenth of a
+% degree, I guess.
 %
-if ztheta < 0.5, return; end
+if ztheta < 0.1, return; end
 
 % Find the rotations in deg around the x and y axes so that the new
 % direction vector aligns with the zaxis. 
@@ -53,13 +119,6 @@ if ztheta < 0.5, return; end
 % First find a rotation angle around the x-axis into the x-z plane.
 % The angle must satisfy y = 0.  So, we take out the row of the x-rotation
 % matrix
-%
-%  0 = [0   cos(a)  -sin(a)]*direction(:)
-%  0 = cos(a)*direction(2) - sin(a)*direction(3)
-%  sin(a)*direction(3) = cos(a)*direction(2)
-%  sin(a)/cos(a) = (direction(2)/direction(3))
-%  tan(a) = (direction(2)/direction(3))
-%  a = atan(direction(2)/direction(3))
 %
 
 % Test with different direction vectors
@@ -75,21 +134,19 @@ direction2 = xRotationMatrix*direction(:);
   direction2
 %}
 
-% Rotate again, this time to be perpendicular to the x-axis (x=0). 
-%
-%  0 =  cos(b)*d2(1) + 0*d2(2) +  sin(b)*d2(3)
-%  sin(b)/cos(b) = -d2(1)/d2(3)
-%  b = atan(-d2(1)/d2(3))
+% Now solve for y rotation
 yAngle = atan2(-direction2(1),direction2(3));
 
-%
 %{
-% Should be zero
-  cos(yAngle)*direction2(1) + sin(yAngle)*direction2(3)
-% Should be aligned with z-axis
+ % Should be aligned with z-axis
+ cos(yAngle)*direction2(1) + sin(yAngle)*direction2(3)
  yRotationMatrix = piRotate([0,rad2deg(yAngle),0]);
  direction3 = yRotationMatrix*direction2(:)
 %}
+
+end
+
+%{
 
 rMatrix = piRotate([xAngle,yAngle,0]);
 
@@ -102,6 +159,7 @@ for ii=1:numel(objects)
 end
 
 end
+%}
 
 %{
 % NOTES
@@ -119,3 +177,4 @@ vR = v*R;
 % Call piDCM2angle to get the x,y,z rotations
 % Call piAssetRotate with those three rotations
 
+%}

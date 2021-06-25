@@ -16,6 +16,10 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR,varargin)
 %    lookat
 %    hdl
 %
+% To set the xz plane or xy plane views use
+%   xz plane view(0,0)
+%   xy plane view(0,90) or view(0,270)
+%
 % See also
 %  thisR.get('objects')
 %
@@ -123,6 +127,10 @@ bName = thisR.get('input basename');
 oType = thisR.get('optics type');
 title(sprintf('%s (%s)',bName,oType));
 % legend({'objects','camera','to'})
+
+%% By default set the xy plane view
+view(0,270);
+
 end
 
 

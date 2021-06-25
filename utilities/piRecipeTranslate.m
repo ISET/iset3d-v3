@@ -25,6 +25,7 @@ piCameraTranslate(thisR,'xshift',d(1), ...
     'yshift',d(2), ...
     'zshift',d(3));
 
+% Try replacing with the rectify method, where we insert the rectify node.
 objects = thisR.get('objects');
 for ii=1:numel(objects)
     thisR.set('asset',objects(ii),'translate',d);

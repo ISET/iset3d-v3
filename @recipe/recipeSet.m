@@ -571,11 +571,11 @@ switch param
             thisR.lookAt = val;
         end
     case {'from','cameraposition'}
-        thisR.lookAt.from = val;
+        thisR.lookAt.from = val(:)';  % Force row vector
     case 'to'
-        thisR.lookAt.to = val;
+        thisR.lookAt.to = val(:)';
     case 'up'
-        thisR.lookAt.up = val;
+        thisR.lookAt.up = val(:)';
         
         
         % Microlens
@@ -961,10 +961,11 @@ switch param
                 % thisR.set('asset',assetName,'insert');
                 out = piAssetInsert(thisR, assetName, val);
             case {'parent'}
+                % thisR.set('asset',assetName,'parent',id)
                 piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
                 % thisR.set('asset',assetName,'translate',val);
-                out = piAssetTranslate(thisR, assetName, val);
+                piAssetTranslate(thisR, assetName, val);
             case {'worldtranslate', 'worldtranslation'}
                 % Translate in world axis orientation.
                 rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation

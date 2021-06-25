@@ -1271,6 +1271,10 @@ switch ieParamFormat(param)  % lower case, no spaces
                     end
                     [~, val] = val.stripID([],replace);
 
+                case 'children'
+                    % Get the children of a node
+                    val = thisR.assets.getchildren(id);
+                    
                 case {'nodetoroot','pathtoroot'}
                     % thisR.get('asset',assetName,'node to root');
                     %
@@ -1369,6 +1373,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = thisR.assets.Node{parentNode};   
 
         % Delete this stuff when we get ready to merge.
+        %{
     case {'assetlist'}
         assetNames = thisR.get('asset names');
         nn = 1;
@@ -1384,6 +1389,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                 nn=nn+1;
             end
         end
+        %}
         
     otherwise
         error('Unknown parameter %s\n',param);
