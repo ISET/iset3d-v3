@@ -1,6 +1,5 @@
 function [r1,r2,r3] = piDCM2angle( dcm, varargin )
-
-%{% Simplified version of the Aerospace toolbox angle conversion utility
+% Simplified version of the Aerospace toolbox angle conversion utility
 %
 % Syntax:
 %  [r1,r2,r3] = piDCM2angle( dcm )
@@ -33,7 +32,17 @@ function [r1,r2,r3] = piDCM2angle( dcm, varargin )
  [z,y,x] = piDCM2angle(dcm)
 %}
 %{
-
+% Consistency with rotationMatrix3d
+% Some issues with negative positive rotations and dimensions.  Sigh.
+% We need to multiply z and y by -1, and it seems x,y,z have different
+% definitions.  There is a parameter in piDCM2angle that may handle some of
+% this.
+ angleList = [25 20 -40];
+ tmp = deg2rad(angleList)
+ rMatrix = rotationMatrix3d(tmp)
+ [z,x,y] = piDCM2angle(rMatrix);
+ estimatedA = rad2deg([-1*y, x, -1*z]);
+ angleList - estimatedA
 %}
 
 %% Should validate here
@@ -47,6 +56,7 @@ if isempty(varargin)
 else
     type = varargin{1};
 end
+
 %% This is the transform
 switch type
     case 'ZYX'

@@ -1,13 +1,16 @@
 function r = piRotationMatrix(varargin)
-% The default rotation matrix used to specify assets and camera
-% rotations
+% The representation of the rotation matrix used to specify assets and
+% camera rotations
 %
-% Brief syntax:
+% Syntax:
+%     r = piRotationMatrix(varargin)
 %
-% r = piRotationDefault
+% This parameterization is not a mathematical rotation matrix.  It is a
+% matrix used by PBRT.  See piRotate if you want to get a genuine 3D
+% rotation matrix.
 %
 % Input
-%  N/A
+%   N/A
 %
 % Key/value pairs
 %   xaxis - rotation in degrees
@@ -19,7 +22,7 @@ function r = piRotationMatrix(varargin)
 %  terms and an affine term
 %
 % See also:
-%   piDCM2angle, piGeometryRead, 
+%   piDCM2angle, piGeometryRead, piRotate
 
 % Examples:
 %{

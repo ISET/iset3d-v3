@@ -21,22 +21,11 @@ function newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 % Outputs:
 %   newBranch   - inserted branch
 %   
-% ZL, Vistasoft Team, 2018
-% ZLY, Vistasoft Team, 2020
+% Description
 %
 % See also
 %   piAsset*
 %
-
-% History:
-%   ZL, Vistasoft Team, 2018
-%   ZLY, Vistasoft Team, 2020
-%
-%   01/05/21  dhb  Put comments closer to ISETBio standard form.
-%                  Little bit of commenting
-%                  Fix bug where it was thisR = thisR.set(...), which
-%                      doesn't work at all anymore.
-%                  Fix example so it runs
 
 % Examples:
 %{

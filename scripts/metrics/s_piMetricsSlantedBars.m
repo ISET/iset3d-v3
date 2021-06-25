@@ -8,6 +8,8 @@ if ~piDockerExists, piDockerConfig; end
 
 flatR = piRecipeDefault('scene name','flatsurface');
 
+
+
 % Add a light
 distantLight = piLightCreate('distant','type','distant',...
     'spd', [9000 0.001], ...

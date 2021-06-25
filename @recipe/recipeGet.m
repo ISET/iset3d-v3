@@ -273,10 +273,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         
     case {'lookatdirection','objectdirection'}
         % A unit vector in the lookAt direction
-        % At some point we called this the object direction to indicate
-        % that we are looking at an object in this direction.  Though the
-        % reality is we may just be looking at the sky - no object.
-        val = thisR.lookAt.from - thisR.lookAt.to;
+        % This vector is v = to - 'from', so  v + 'from' = 'to'
+        val = thisR.lookAt.to - thisR.lookAt.from;
         val = val/norm(val);
         
         % Camera fields
