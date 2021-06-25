@@ -1090,6 +1090,11 @@ switch ieParamFormat(param)  % lower case, no spaces
         end
         val.leafNames = leafNames;
         val.leafMaterial = leafMaterial;
+    case {'objectmaterials'}
+        % A list of materials for each of the objects
+        % This and the one above should be merged.
+        tmp = thisR.get('object material');
+        val = (tmp.leafMaterial)';
     case {'objects'}
         % Indices to the objects
         nnodes = thisR.assets.nnodes;
@@ -1142,9 +1147,9 @@ switch ieParamFormat(param)  % lower case, no spaces
             thisNode = thisR.get('assets',Objects(ii));
             val(ii,:) = thisR.get('assets',thisNode.name,'world position');
         end
-    case {'objectsizes','objectsize'}
-        % Not working yet with the flat surface case in
-        % s_piMetricsSlantedBars.m
+    case {'objectsizes'}
+        % All the objects
+        % thisR.get('object sizes')
         Objects  = thisR.get('objects');
         nObjects = numel(Objects);
         val = zeros(nObjects,3);
@@ -1160,6 +1165,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             val(ii,2) = range(pts(2:3:end))*thisScale(2);
             val(ii,3) = range(pts(3:3:end))*thisScale(3);            
         end
+    
         
         % Lights
     case{'light', 'lights'}
@@ -1234,6 +1240,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('asset',assetName or ID);  % Returns the asset
         % thisR.get('asset',assetName,param);  % Returns the param val
         % thisR.get('asset',name or ID,'world position')
+        % thisR.get('asset',name or ID,'size')
         
         [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
         % If only one asset matches, turn it from cell to struct.
@@ -1313,7 +1320,22 @@ switch ieParamFormat(param)  % lower case, no spaces
                     else
                         val = piAssetGet(thisAsset, 'translation');
                     end
-                otherwise                    
+                case 'size'
+                    % thisR.get('asset',objectName,'size');
+                    % Size of one object in meters                    
+                    if thisR.assets.isleaf(id)
+                        % Only objects
+                        thisScale = thisR.get('assets',id,'world scale');
+                        pts = thisAsset.shape.pointp;
+                        val(1) = range(pts(1:3:end))*thisScale(1);
+                        val(2) = range(pts(2:3:end))*thisScale(2);
+                        val(3) = range(pts(3:3:end))*thisScale(3);
+                    else
+                        warning('Only objects have a size');
+                        val = [];
+                    end
+                otherwise          
+                    % Give it a try.
                     val = piAssetGet(thisAsset,varargin{2});
             end
         end

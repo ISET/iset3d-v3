@@ -67,7 +67,7 @@ end
 %% Add position
 if p.Results.position
     for ii=1:numel(names)
-        notes{ii} = sprintf('%s p %.1f %.1f %.1f',notes{ii},coords(ii,1),coords(ii,2),coords(ii,3));
+        notes{ii} = sprintf('%s (%.1f %.1f %.1f)p ',notes{ii},coords(ii,1),coords(ii,2),coords(ii,3));
     end
     
 end
@@ -75,7 +75,7 @@ end
 %% Add size
 if p.Results.size
     for ii=1:numel(names)
-        notes{ii} = sprintf('%s s %.1f %.1f %.1f',notes{ii},shapesize(ii,1),shapesize(ii,2),shapesize(ii,3));
+        notes{ii} = sprintf('%s (%.1f %.1f %.1f)s ',notes{ii},shapesize(ii,1),shapesize(ii,2),shapesize(ii,3));
     end
     
 end

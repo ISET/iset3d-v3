@@ -1,12 +1,11 @@
-%% Camera settings:  Object distance and focal distance illustration
+%% 
+%
+% Camera settings:  Object distance and focal distance illustration
+%
+% Illustrates depth of field
 %
 % Loads the Chess Set scene and illustrates the effect of changing
 % different camera parameters in the recipe.  Notice that
-%
-%   * We need to piWrite after changing thisR.  I wonder if we should do
-%   the piWrite as part of the piRender?
-%   * When we change the focal plane in the scene, there is a slight change
-%   in the field of view, as well.
 %
 % Dependencies:
 %    ISET3d, ISETCam, isetlens, JSONio
