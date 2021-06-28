@@ -936,7 +936,7 @@ switch param
         
     case {'asset', 'assets'}
         % Typical:    thisR.set(param,val) 
-        % This case:  thisR.set('asset',assetName, param, val);
+        % This case:  thisR.set('asset',assetNameOrID, param, val);
         %
         % These operations need the whole tree, so we send in the
         % recipe that contains the asset tree, thisR.assets.
@@ -944,7 +944,15 @@ switch param
         % Given the calling convention, val is assetName and
         % varargin{1} is the param, and varargin{2} is the value, if
         % needed.
-        assetName = val;        
+        if isnumeric(val)
+            % Person sent in an id, so we get the name here
+            [~,thisAsset] = piAssetFind(thisR,'id',val);
+            if val == 1, assetName = 'root';
+            else, assetName = thisAsset{1}.name;
+            end
+        else
+            assetName = val;
+        end
         param = varargin{1};
         if numel(varargin) == 2, val   = varargin{2}; end
         
@@ -973,7 +981,20 @@ switch param
                 newTrans = rotM \ [reshape(val, numel(val), 1); 0];
                 out = piAssetTranslate(thisR, assetName, newTrans(1:3));
             case {'rotate', 'rotation'}
+                % Figures out the rotation from the angles in val and sets
+                % the rotation matrix
                 out = piAssetRotate(thisR, assetName, val);
+            case {'rotationmatrix'}
+                % Just set the rotation matrix
+                % id = piAssetFind(thisR.assets,'name',assetName);
+                % Check that val is a rotation matrix
+                if size(val) == [4,4]
+                    piAssetSet(thisR, assetName, 'rotation',val);
+                else
+                    error('val must be 4x4 matrix');
+                end
+                
+                %thisR.assets.Node{id}.rotation = val;
             case {'worldrotate', 'worldrotation'}
                 % Get current rotation matrix
                 curRotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
@@ -1038,6 +1059,8 @@ switch param
                 thisR.assets = thisR.assets.chop(id);
             otherwise
                 % Set a parameter of an asset to val
+                % rotation is a parameter, but it is stopped above via the
+                % call to rotation matrix.
                 piAssetSet(thisR, assetName, varargin{1},val);
         end
         % reassign unique names for delete/chop;

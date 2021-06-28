@@ -17,6 +17,68 @@
  fullPath  = piAssetTreeSave(thisST, thisR.materials.list,'outFilePath',fullfile(piRootPath,'data','assets','coordinate.mat'));
 %}
 %{
+
   flatR = piRecipeDefault('scene name','flatsurface');
+  flatR.set('asset','Camera_B','delete');
+  flatR.set('lights','delete','all');
+
+  % Add a light.
+  distantLight = piLightCreate('distant','type','distant',...
+    'spd', [9000 0.001], ...
+    'cameracoordinate', true);
+  flatR.set('light','add',distantLight);
+
+ % Aim the camera at the object and bring it closer.
+  flatR.set('from',[0,3,0]);
+  flatR.set('to',  [0,2.5,0]);
+
+  % Find the position of the surface
+  surfaceName = '001_Cube_O';
+
+  flatR.set('asset',surfaceName,'world position',[0 -1 0]);
+  sz = flatR.get('asset',surfaceName,'size');
+  flatR.set('asset',surfaceName,'rotate',[5 5 5]);
+  flatR.set('asset',surfaceName,'scale', (1 ./ sz));
+
+  piWRS(flatR);
+
+
+  flatR.get('from')
+  flatR.get('to')
+  flatR.get('asset',thisObj,'world position')
+  flatR.get('asset',thisObj,'size')
+  
+  % The camera is rotated correctly, but the object is not.  Good for
+  % debugging
+  % flatR = piRecipeRectify(flatR);
+
+  flatR.set('from',[0 0 0]);
+  flatR.set('to',[0 0 1]);
+  flatR.set('asset',thisObj,'world position',[0 0 5]);
+
+  piAssetGeometry(flatR,'inplane','xy','size',true);
+  piAssetGeometry(flatR,'inplane','xz');
+  flatR.show;
 
 %}
+
+% This simplifies the tree.
+wpos    = flatR.get('asset',surfaceName,'world position')
+wscale  = flatR.get('asset',surfaceName,'world scale')
+wrotate = flatR.get('asset',surfaceName,'world rotation angle')
+
+id = flatR.get('asset',surfaceName,'path to root');
+for ii=2:numel(id)
+    flatR.set('asset',id(ii),'delete');
+end
+
+flatR.set('asset',surfaceName,'world position',wpos);
+pid = flatR.get('asset parent id',surfaceName);
+piAssetSet(flatR, pid, 'scale',wscale);
+rotMatrix = [wrotate; fliplr(eye(3))]
+piAssetSet(flatR, pid, 'rotation', rotMatrix);
+
+[scene, results] = piWRS(flatR);
+
+
+

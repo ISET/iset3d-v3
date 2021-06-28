@@ -1295,6 +1295,8 @@ switch ieParamFormat(param)  % lower case, no spaces
                     % World position and orientation properties.  These
                     % need more explanation.
                 case 'worldrotationmatrix'
+                    % This is a 4x4 matrix, not the same as the rotation
+                    % stored in the node.  Zheng should explain.
                     nodeToRoot = thisR.assets.nodetoroot(id);
                     [val, ~] = piTransformWorld2Obj(thisR, nodeToRoot);
                 case 'worldrotationangle'

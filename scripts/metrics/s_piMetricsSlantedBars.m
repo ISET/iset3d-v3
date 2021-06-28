@@ -8,8 +8,6 @@ if ~piDockerExists, piDockerConfig; end
 
 flatR = piRecipeDefault('scene name','flatsurface');
 
-
-
 % Add a light
 distantLight = piLightCreate('distant','type','distant',...
     'spd', [9000 0.001], ...
@@ -23,24 +21,23 @@ surfaceName = '001_Cube_O';
 % xyz = thisR.get('asset',surfaceName,'world position');
 % thisR.get('object size',surfaceName)
 
-flatR.set('asset',surfaceName,'world position',[0 2 0]);
-flatR.set('asset',surfaceName,'scale',5e-4);
-% xyz = thisR.get('asset',surfaceName,'world position');
+flatR.set('asset',surfaceName,'world position',[0 -10 0]);
+sz = flatR.get('asset',surfaceName,'size');
+flatR.set('asset',surfaceName,'scale', (1 ./ sz));
+
+% flatR.set('asset',surfaceName,'scale',5e-4);
 % piAssetGeometry(thisR);
 
 % Aim the camera at the object and bring it closer.
 flatR.set('from',[0,3,0]);
 flatR.set('to',  [0,2.5,0]);
-surfaceName = '001_Cube_O';
-xyz = flatR.get('asset',surfaceName,'world position');
 
 %{
-piWrite(flatR);
-scene = piRender(flatR);
-sceneWindow(scene);
+flatR.get('asset',surfaceName,'world position')
+flatR.get('asset',surfaceName,'size') 
+piWRS(flatR);
+piAssetGeometry(flatR,'size',true);
 %}
-
-% piAssetGeometry(flatR,'size',true);
 
 %% Create a texture
 

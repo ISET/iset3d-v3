@@ -1,5 +1,5 @@
 function [id, thisAsset] = piAssetFind(assets, param, val)
-% Find the id of an asset such that the parameter matches the val
+% Find the id of an asset whose parameter value matches the input val
 %
 % Synopsis:
 %   [id, theAsset] = piAssetFind(assets, param, val)
@@ -18,14 +18,15 @@ function [id, thisAsset] = piAssetFind(assets, param, val)
 
 % Examples:
 %{
- % thisR = piRecipeDefault;
  thisR = piRecipeDefault('scene name','simple scene');
- thisR.show('objects materials');
- thisR.show('node names');
+
+ [~, theAsset] = piAssetFind(thisR,13);   % Returns asset for id 13.
+ piAssetFind(thisR,theAsset.name);        % Returns the same asset
 
  id = piAssetFind(thisR.assets, 'name', 'root');
  [id, theAsset]  = piAssetFind(thisR, 'name', 'Camera_B');
- [id, theAsset]  = piAssetFind(thisR, 'id', 13); theAsset{1}
+ [id, theAsset]  = piAssetFind(thisR, 'id', 13); 
+ theAsset{1}
  id = piAssetFind(thisR.assets, 'scale', [1 1 1]);
 %}
 

@@ -10,6 +10,7 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR,varargin)
 %   size - Logical, add size to graph (default false)
 %   name - Logical, add name to graph (default true)
 %   position - World coordinates (default false)
+%   inplane  - Default view, either 'xz' or 'xy' plane
 %
 % Outputs
 %    coords
@@ -35,9 +36,10 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR,varargin)
 %}
 %{
    thisR = piRecipeDefault('scene name','macbethchecker');
-   coords = piAssetGeometry(thisR);
+   coords = piAssetGeometry(thisR,'inplane','xz');
 %}
 
+%%
 %%  Check that we have assets
 if isempty(thisR.assets)
     warning('No assets stored in the recipe');
@@ -51,6 +53,8 @@ p.addRequired('thisR',@(x)(isa(x,'recipe')));
 p.addParameter('size',false,@islogical);
 p.addParameter('name',true,@islogical);
 p.addParameter('position',false,@islogical);
+p.addParameter('inplane','xz',@ischar);
+
 p.parse(thisR,varargin{:});
 
 %% Find the coordinates of the leafs of the tree (the objects)
@@ -113,15 +117,26 @@ plot3(lookat.to(1),lookat.to(2),lookat.to(3),'go',...
     'MarkerFaceColor','g');
 text(lookat.to(1)+sx,lookat.to(2)+sy,lookat.to(3),'to','Color','g');
 
-line([lookat.from(1),lookat.to(1)],...
-    [lookat.from(2),lookat.to(2)],...
-    [lookat.from(3),lookat.to(3)],'Color','b',...
-    'Linewidth',3);
+% Blue dashed line of site
+% Equation of the line is start + t*direction
+% We draw the line from to for a lineLength
+lineLength = 10;     % Meters
+direction = lookat.to - lookat.from;
+direction = direction/norm(direction);
+
+start = lookat.from;
+stop  = lookat.from + lineLength*direction;
+line([start(1),stop(1)],...
+    [start(2), stop(2)],...
+    [start(3), stop(3)],'Color','b',...
+    'Linestyle',':',...
+    'Linewidth',2);
 
 %% Label the graph
 
 xlabel('x coord (m)'); ylabel('y coord (m)'); zlabel('z coord (m)');
 grid on
+axis equal; % Not sure we want this.  But maybe.
 
 bName = thisR.get('input basename');
 oType = thisR.get('optics type');
@@ -129,7 +144,13 @@ title(sprintf('%s (%s)',bName,oType));
 % legend({'objects','camera','to'})
 
 %% By default set the xy plane view
-view(0,270);
+switch lower(p.Results.inplane)
+    case 'xy'
+        view(0,90);
+    case 'xz'
+        view(0,0);
+end
+
 
 end
 

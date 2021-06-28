@@ -7,7 +7,7 @@ function thisR = piCameraTranslate(thisR, varargin)
 %                               'z shift',z);
 %
 % Brief description:
-%  Calculate a new camera position given by the specified shift in camera space
+%  Calculate a new camera position given by the specified shift
 %
 % Inputs
 %  recipe  - The recipe of the scene

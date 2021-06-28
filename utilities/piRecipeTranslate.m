@@ -1,5 +1,6 @@
 function thisR = piRecipeTranslate(thisR,origin)
-%  Move the camera and objects so that the camera is at origin
+%  Deprecated.  Use piRecipeRectify.
+% Move the camera and objects so that the camera is at origin
 %
 %
 % See also

@@ -1,8 +1,17 @@
-function thisR = piRecipRectify(thisR,origin)
-% Move the camera and objects so that the camera is at origin pointed along
-% the z-axis
+function thisR = piRecipeRectify(thisR,varargin)
+% Move the camera and objects so that the origin is 0 and the view
+% direction is the z-axis
 %
 % Description
+%
+% Inputs
+%   thisR
+%
+% Optional key/val pairs
+%   rotate - Logical to supress rotation.  Default is true
+%
+% Return
+%   thisR
 %
 % See piRotate for the rotation matrices for the three axes
 % See also
@@ -11,89 +20,119 @@ function thisR = piRecipRectify(thisR,origin)
 % Examples
 %{
  thisR = piRecipeDefault('scene name','simple scene');
- piAssetGeometry(thisR,'inplane','xz');
-
- piCameraRotate(thisR,'y rot',10);
- thisR.get('lookat direction')
- piAssetGeometry(thisR,'inplane','xz');
-
- origin = [0 0 0];
- thisR = piRecipRectify(thisR,origin);
- thisR.get('lookat direction')
-
- piAssetGeometry(thisR);
- piAssetGeometry(thisR,'inplane','xy');
-
  thisR.set('fov',60);
+ piWrite(thisR); scene = piRender(thisR,'render type','radiance');
+ sceneWindow(scene);
+ piAssetGeometry(thisR);
+
+ % Shifts everything to the origin
+ thisR = piRecipeRectify(thisR,'rotate',false);
+ piWrite(thisR); scene = piRender(thisR,'render type','radiance');
+ sceneWindow(scene);
+ piAssetGeometry(thisR);
+
+ % Rotate the camera around the y axis
+ % There is something wrong with rotation units and calculation.
+ piCameraRotate(thisR,'y rot',10);   % Clockwise
+ piAssetGeometry(thisR);
+ piWrite(thisR); scene = piRender(thisR,'render type','radiance');
+ sceneWindow(scene);
+
+ % Running this twice causes a problem.
+ thisR = piRecipeRectify(thisR);
+ piAssetGeometry(thisR);
+
  piWrite(thisR); scene = piRender(thisR,'render type','radiance');
  sceneWindow(scene);
 %}
 
-%% Find the camera position
-from = thisR.get('camera position');
+%% Parser
+p = inputParser;
+p.addRequired('thisR',@(x)(isa(x,'recipe')));
+p.addParameter('rotate',true,@islogical);
 
-%% Move the camera to the specified origin
+p.parse(thisR,varargin{:});
+
+%% Check if we need to insert a rectify node
 
 % Identify all the children of root
 idChildren = thisR.get('asset','root','children');
 
 if numel(idChildren) == 1
+    % If there is only one node, and it is called rectify just get it
     tmp = split(thisR.get('asset',idChildren,'name'),'_');
     if isequal(tmp{end},'rectify')
         % No need to insert a rectify node.  It is there already.
+        idRectify = thisR.get('asset','rectify','id');
     else
-        % Create the rectify node below the root and before all other nodes
+        % Insert a rectify node below the root and before all other nodes
         rectNode = piAssetCreate('type','branch');
         rectNode.name = 'rectify';
         thisR.set('asset','root','add',rectNode);
+        idRectify = thisR.get('asset','rectify','id');
+        % Place all the previous children under rectify
+        for ii=1:numel(idChildren)
+            thisR.set('asset',idChildren(ii),'parent',idRectify);
+        end
     end
 else
-    % Create the rectify node below the root and before all other nodes
+    % There was more than one node.
+    % Insert a rectify node below the root and before all other nodes
     rectNode = piAssetCreate('type','branch');
     rectNode.name = 'rectify';
     thisR.set('asset','root','add',rectNode);
+    idRectify = thisR.get('asset','rectify','id');
+    % Place all the previous children under rectify
+    for ii=1:numel(idChildren)
+        thisR.set('asset',idChildren(ii),'parent',idRectify);
+    end
 end
 
-% Get the rectify node under the root
-idRectify = thisR.get('asset','rectify','id');
-
-% Place all the previous children under rectify
-for ii=1:numel(idChildren)
-    thisR.set('asset',idChildren(ii),'parent',idRectify);
-end
 % thisR.show
 
 %%  Translation
 
 % The camera is handled separately from the objects
-d = origin - from;
-piCameraTranslate(thisR,'xshift',d(1), ...
-    'yshift',d(2), ...
-    'zshift',d(3));
+from = thisR.get('from');
+if ~isequal(from,[0,0,0])
+    
+    % Move the camera.  Maybe there is already a set for this?
+    thisR.set('from',[0,0,0]);
+    to = thisR.get('to');
+    thisR.set('to',to - from);
+    
+    % I think this may be doing something more complicated than what I
+    % want.
+    %     piCameraTranslate(thisR,'xshift',-from(1), ...
+    %         'yshift',-from(2), ...
+    %         'zshift',-from(3));
+    
+    % Set the translation of the rectify node
+    piAssetSet(thisR,idRectify,'translation',-from);
+    % thisR.get('asset','rectify','translate')
+    % piAssetGeometry(thisR);
+    % piWrite(thisR); scene = piRender(thisR,'render type','radiance'); sceneWindow(scene);
+end
 
-% Set the translation of the rectify node
-piAssetSet(thisR,idRectify,'translation',d);
-% thisR.get('asset','rectify','translate')
-% piAssetGeometry(thisR);
-% piWrite(thisR); scene = piRender(thisR,'render type','radiance'); sceneWindow(scene);
- 
-%% Rotation
+%% Rotation around the new camera position at 0,0,0
 
-% Rotate the camera
+% See if rotation was turned off
+if ~p.Results.rotate, return; end
+
+% Test whether we need to rotate the camera
+% or the direction is already aligned with z axis.
 [xAngle, yAngle] = direction2zaxis(thisR);
-
-% No rotation needed.  Direction is already aligned with z axis.
 if xAngle == 0 && yAngle == 0, return; end
 
-% Rotate the to point onto the z axis
+% Rotate to point the lookat direction along the z axis
 rMatrix = piRotate([xAngle,yAngle,0]);
 to = thisR.get('to');
-thisR.set('to',(rMatrix*to(:))');  % Row vector.  Should be forced in set.
+thisR.set('to',(rMatrix*to(:)));  % Set to a row vector
 % piWrite(thisR); scene = piRender(thisR,'render type','radiance'); sceneWindow(scene);
 
-% Set a rotation in the rectify nodes to change all the objects
+% Set a rotation in the rectify node 
 r = piRotationMatrix('zrot',0,'yrot',-yAngle,'xrot',-xAngle);
-piAssetSet(thisR,idRectify,'rotation',r);
+piAssetSet(thisR, idRectify, 'rotation', r);
 % thisR.get('asset','rectify','rotation')
 % piWrite(thisR); [scene,results] = piRender(thisR,'render type','radiance'); sceneWindow(scene);
 

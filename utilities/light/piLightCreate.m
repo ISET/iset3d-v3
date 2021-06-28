@@ -87,7 +87,7 @@ switch ieParamFormat(lght.type)
         lght.to.type = 'to';
         lght.to.value = [];
         
-        % Potentially has rotationation, transformation or concatransformaiton
+        % Potentially has rotation, transformation or concatransformaiton
         lght.rotation.type = 'rotation';
         lght.rotation.value = {};
         
