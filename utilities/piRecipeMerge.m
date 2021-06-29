@@ -16,6 +16,7 @@ function sceneR = piRecipeMerge(sceneR, objectRs, varargin)
 %   material -  The user can decide to NOT add materials.  Default is true
 %   texture  -  Same
 %   asset    -  Same
+%   nodename -  Top node of the subtree Default is the second asset name.
 %
 % Returns:
 %   sceneR   - scene recipe with added objects
@@ -24,6 +25,8 @@ function sceneR = piRecipeMerge(sceneR, objectRs, varargin)
 %
 
 %% Parse input
+varargin = ieParamFormat(varargin);
+
 p = inputParser;
 p.addRequired('sceneR', @(x)isequal(class(x),'recipe'));
 p.addRequired('objectRs', @(x)isequal(class(x),'recipe') || iscell);
@@ -33,6 +36,7 @@ p.addRequired('objectRs', @(x)isequal(class(x),'recipe') || iscell);
 p.addParameter('material',true);
 p.addParameter('texture',true);
 p.addParameter('asset',true);
+p.addParameter('nodename','',@ischar);  % Name of the top node in the subtree
 
 p.parse(sceneR, objectRs, varargin{:});
 
@@ -40,6 +44,7 @@ sceneR       = p.Results.sceneR;
 materialFlag = p.Results.material;
 textureFlag  = p.Results.texture;
 assetFlag    = p.Results.asset;
+nodeName     = p.Results.nodename;
 
 %%  The objects can be a cell or a recipe
 
@@ -58,11 +63,16 @@ for ii = 1:length(recipelist)
     
     if assetFlag
         
-        % Get the asset names in the object
-        names = thisR.get('assetnames');
+        if isempty(nodeName)
+            % Get the asset names in the object
+            % The problem with this is we don't get the geometry node above
+            % it.
+            names = thisR.get('assetnames');
+            nodeName = names{2};
+        end
         
-        % Get the subtree starting just below the root
-        thisOBJsubtree = thisR.get('asset', names{2}, 'subtree');
+        % Get the subtree starting just below the specified node
+        thisOBJsubtree = thisR.get('asset', nodeName, 'subtree');
         
         % Graft the asset three into the scene.  We graft it onto the root
         % of the main scene.

@@ -135,7 +135,7 @@ function val = recipeGet(thisR, param, varargin)
 %       'asset root'
 %       'asset names'
 %       'asset parent id'
-%       'assetparent'
+%       'asset parent'
 %       'asset list'  - a list of branches.
 %
 %    % Material information

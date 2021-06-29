@@ -24,7 +24,7 @@
 
   % Add a light.
   distantLight = piLightCreate('distant','type','distant',...
-    'spd', [9000 0.001], ...
+    'spd', [6000 0.001], ...
     'cameracoordinate', true);
   flatR.set('light','add',distantLight);
 
@@ -39,28 +39,6 @@
   sz = flatR.get('asset',surfaceName,'size');
   flatR.set('asset',surfaceName,'rotate',[5 5 5]);
   flatR.set('asset',surfaceName,'scale', (1 ./ sz));
-
-  piWRS(flatR);
-
-
-  flatR.get('from')
-  flatR.get('to')
-  flatR.get('asset',thisObj,'world position')
-  flatR.get('asset',thisObj,'size')
-  
-  % The camera is rotated correctly, but the object is not.  Good for
-  % debugging
-  % flatR = piRecipeRectify(flatR);
-
-  flatR.set('from',[0 0 0]);
-  flatR.set('to',[0 0 1]);
-  flatR.set('asset',thisObj,'world position',[0 0 5]);
-
-  piAssetGeometry(flatR,'inplane','xy','size',true);
-  piAssetGeometry(flatR,'inplane','xz');
-  flatR.show;
-
-%}
 
 % This simplifies the tree.
 wpos    = flatR.get('asset',surfaceName,'world position')
@@ -92,6 +70,58 @@ piAssetSet(flatR, geometryNode.name, 'translate',wpos);
 piAssetSet(flatR, geometryNode.name, 'scale',wscale);
 rotMatrix = [wrotate; fliplr(eye(3))];
 piAssetSet(flatR, geometryNode.name, 'rotation', rotMatrix);
+
+textureName = 'EIAChart';
+% imgFile   = 'EIA1956-300dpi-top.png';
+% imgFile   = 'EIA1956-300dpi.png';
+imgFile   = 'EIA1956-300dpi-center.png';
+flatR.get('asset',surfaceName,'size')
+
+% textureName = 'face';
+% imgFile   = 'monochromeFace.png';
+
+%{
+% We would like to make the size of the surface equal to the size of the
+% image texture.  This is a start
+foo = imread(imgFile);
+flatR.get('asset',surfaceName,'size')
+% Compare the row/col and object size.  crop the image or change the asset
+% size
+%}
+chartTexture = piTextureCreate(textureName,...
+    'format', 'spectrum',...
+    'type', 'imagemap',...
+    'filename', imgFile);
+
+surfaceMaterial = flatR.get('asset',surfaceName,'material');
+flatR.set('texture', 'add', chartTexture);
+
+% flatR.get('texture print');
+
+flatR.set('material', surfaceMaterial.name, 'kd val', textureName);
+  piWRS(flatR);
+
+%}
+%{
+  flatR.get('from')
+  flatR.get('to')
+  flatR.get('asset',thisObj,'world position')
+  flatR.get('asset',thisObj,'size')
+  
+  % The camera is rotated correctly, but the object is not.  Good for
+  % debugging
+  % flatR = piRecipeRectify(flatR);
+
+  flatR.set('from',[0 0 0]);
+  flatR.set('to',[0 0 1]);
+  flatR.set('asset',thisObj,'world position',[0 0 5]);
+
+  piAssetGeometry(flatR,'inplane','xy','size',true);
+  piAssetGeometry(flatR,'inplane','xz');
+  flatR.show;
+
+%}
+
 
 % flatR.set('asset',surfaceName,'world position',wpos);
 % pid = flatR.get('asset parent id',surfaceName);

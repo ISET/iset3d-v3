@@ -246,7 +246,6 @@ if overwriteresources && ~isempty(inputDir)
             [~, ~, extension] = fileparts(sources(i).name);
             % ChessSet needs input geometry because we can not parse it
             % yet. --zhenyi
-%             if ~(piContains(extension,'pbrt') || piContains(extension,'zip') || piContains(extension,'json'))
             if ~(piContains(extension,'zip') || piContains(extension,'json'))
                 thisFile = fullfile(sources(i).folder, sources(i).name);
                 if verbosity > 1
@@ -607,19 +606,19 @@ lineLights    = find(contains(thisR.world, {'_lights.pbrt'}));
 
 % If we have  geometry Include, we overwrite it with the name we want.
 if ~isempty(lineGeometry)
-    thisR.world{lineGeometry} = sprintf('Include "%s_geometry.pbrt" \n', basename);
+    thisR.world{lineGeometry} = sprintf('Include "%s_geometry.pbrt"\n', basename);
 end
 
 % If we have materials Include, we overwrite it.
 % end.
 if ~isempty(lineMaterials)
-    thisR.world{lineMaterials} = sprintf('Include "%s_materials.pbrt" \n',basename);        
+    thisR.world{lineMaterials} = sprintf('Include "%s_materials.pbrt"\n',basename);        
 end
 
 % We think nobody except us has these lights files.  So this will never get
 % executed.
 if ~isempty(lineLights)
-    thisR.world(lineLights) = sprintf('Include "%s_lights.pbrt" \n', basename);
+    thisR.world(lineLights) = sprintf('Include "%s_lights.pbrt"\n', basename);
 end
 
 %% Write out the World information.

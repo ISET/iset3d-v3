@@ -64,32 +64,17 @@ while i <= length(txt)
             subnodes = subnodes.set(1, thisNode);
         end
         
-        subtrees = cat(1, subtrees, subnodes);
-
-        %{
-        groupobjs = cat(1, groupobjs, subnodes);
-        
-        
-        % Give an index to the subchildren to make it different from its
-        % parents and brothers (we are not sure if it works for more than
-        % two levels). We name the subchildren based on the line number and
-        % how many subchildren there are already.
-        if ~isempty(subchildren)
-            subchildren.name = sprintf('%d_%d_%s', i, numel(children)+1, subchildren.name);
-        end
-        children = cat(1, children, subchildren);
-        %}
-        %         assets = cat(1, assets, subassets);
+        subtrees = cat(1, subtrees, subnodes);        
         i =  i + retLine;
         
     elseif piContains(currentLine,'#ObjectName')
         [name, sz] = piParseObjectName(currentLine);
         
     elseif piContains(currentLine,'ConcatTransform') 
-%         [rot, translation, ctform] = piParseConcatTransform(currentLine);
+        % [rot, translation, ctform] = piParseConcatTransform(currentLine);
         [translation, rot, scale] = parseTransform(currentLine);
     elseif strncmp(currentLine,'Transform ',10)
-%         ctform = [];
+        % ctform = [];
         [translation, rot, scale] = parseTransform(currentLine);
     elseif piContains(currentLine,'MediumInterface')
         % MediumInterface could be water or other scattering media.
@@ -112,7 +97,7 @@ while i <= length(txt)
         if ~exist('lght','var')
             lght{1} = currentLine;
         else
-            lght{end+1} = currentLine;
+            lght{end+1} = currentLine; %#ok<AGROW>
         end
         
     elseif piContains(currentLine,'Shape')

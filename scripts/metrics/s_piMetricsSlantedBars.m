@@ -4,6 +4,27 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
+chartR = piChartCreate('face');
+% chartR.show;
+chartR.get('asset','001_Cube_O','size')
+
+thisR = piRecipeDefault('scene name','simple scene');
+
+mergedR = piRecipeMerge(thisR,chartR,'node name','001_Cube_G');
+piAssetSet(mergedR,'001_Cube_G','translate',[-2 1 0]);
+piWRS(mergedR);
+
+
+chartR = piChartCreate('EIA');
+mergedR = piRecipeMerge(thisR,chartR,'node name','001_Cube_G');
+piAssetSet(mergedR,'001_Cube_G','translate',[2 1 0]);
+piWRS(mergedR);
+
+% scene = piWRS(thisR);
+% piAssetGeometry(thisR, 'inplane','xz');
+% piAssetGeometry(thisR,'inplane','xy');
+
+%%
 %%  Read the scene and add a light
 
 flatR = piRecipeDefault('scene name','flatsurface');
