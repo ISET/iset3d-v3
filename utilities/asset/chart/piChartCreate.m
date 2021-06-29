@@ -95,46 +95,58 @@ piAssetSet(chartR, geometryNode.name, 'rotation', rotMatrix);
 
 %%  Add the chart you want
 
+uniqueKey = randi(1e4,1);
+
 switch ieParamFormat(chartName)
     case 'eia'        
-        textureName = 'EIAChart';
+        textureName = sprintf('EIAChart-%d',uniqueKey);
         imgFile   = 'EIA1956-300dpi-center.png';
         
     case 'slantedbar'        
-        textureName = 'slantedbar';
+        textureName = sprintf('slantedbar-%d',uniqueKey);
         imgFile   = 'slantedbar.png';
         
     case 'ringsrays'
-        textureName = 'ringsrays';
+        textureName = sprintf('ringsrays-%d',uniqueKey);
         imgFile   = 'ringsrays.png';
         
     case 'gridlines'
-        textureName = 'gridlines';
+        textureName = sprintf('gridlines-%d',uniqueKey);
         imgFile = 'gridlines.png';
         
     case 'face'
-        textureName = 'face';
+        textureName = sprintf('face-%d',uniqueKey);
         imgFile = 'monochromeFace.png';
         
     otherwise
         error('Unknown chart name %s\n',chartName);
 end
 
-%% Make the chart texture
+%% Make a chart material and texture
 
+% Create a new material and add it to the recipe
+surfaceMaterial = piMaterialCreate(textureName,'type','Matte');
+chartR.set('material','add',surfaceMaterial);
+
+% Create a new texture and add it to the recipe
 chartTexture = piTextureCreate(textureName,...
     'format', 'spectrum',...
     'type', 'imagemap',...
     'filename', imgFile);
-
-% Attach the texture to the surface
-surfaceMaterial = chartR.get('asset',surfaceName,'material');
 chartR.set('texture', 'add', chartTexture);
+
+% Specify the texture as part of the material
 chartR.set('material', surfaceMaterial.name, 'kd val', textureName);
 
+chartR.get('material print');
+chartR.show('objects');
+
 %% Name the object and geometry node
-oName = sprintf('%s-%d',textureName,randi(1000,1));
+oName = textureName;
 chartR.set('asset',surfaceName,'name',oName);
+
+% Specify the chart as having this material
+chartR.set('asset',oName,'material name',surfaceMaterial.name);
 
 parent = chartR.get('asset parent id',oName); 
 gName = sprintf('%s_G',oName);

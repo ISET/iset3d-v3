@@ -6,16 +6,32 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Make the chart, simple scene, and merge
 
-[chartR, gName, oName]  = piChartCreate('slanted bar');
-chartR.get('asset',oName,'size')
+[chartR, gName]  = piChartCreate('EIA');
 
 thisR = piRecipeDefault('scene name','simple scene');
+thisR.set('assets','Camera_B','delete');
+% thisR.set('assets','mirror_B','delete');
 
-mergedR = piRecipeMerge(thisR,chartR,'node name',gName);
-piAssetSet(mergedR,gName,'translate',[-2 1.5 0]);
+piRecipeMerge(thisR,chartR,'node name',gName);
+piAssetSet(thisR,gName,'translate',[-2 1.5 0]);
 
-piWRS(mergedR);
+piWRS(thisR);
 % chartR.show;
+% thisR.show;
+
+%% Add a second chart
+[chartR, gName]  = piChartCreate('grid lines');
+piRecipeMerge(thisR,chartR,'node name',gName);
+piAssetSet(thisR,gName,'translate',[0.5 1.5 0]);
+piWRS(thisR);
+
+%% A third chart
+[chartR, gName]  = piChartCreate('slanted bar');
+
+piRecipeMerge(thisR,chartR,'node name',gName);
+piAssetSet(thisR,gName,'translate',[3 3 6]);
+
+piWRS(thisR);
 
 %%  I would like to control the chart reflectance
 

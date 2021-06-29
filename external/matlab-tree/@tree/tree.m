@@ -282,52 +282,6 @@ classdef tree
             end
         end
         
-        %         % Display a graphic of the tree
-        %         Deprecated.  This plotted an image as a tree.  We use the
-        %         other format (below) now.
-        %
-        %         function show(obj,nodeLimit,duration)
-        %             % Bring up a window representing the tree.
-        %             %
-        %             %  nodeLimit - If more than this amount, use showUI
-        %             %  duration  - Delete the image after duration seconds
-        %             %
-        %             % This uses tree.plot when there are nodeLimit (50) nodes or
-        %             % less. If there are more than nodeLimit nodes, we call showUI,
-        %             % the special purpose routine that Zhenyi built for larger
-        %             % scenes.
-        %             %
-        %             % This is an odd example, based on the tree documentation.  See
-        %             % the tutorials for more examples specific to ISET3d.
-        %             %{
-        %               [ lineage duration ] = tree.example; % 1st one is made of strings only, 2nd one of integers
-        %               slin = lineage.subtree(19); % Work on a subset
-        %               sdur = duration.subtree(19);
-        %               ieNewGraphWin();
-        %               [vlh hlh tlh] = slin.plot(sdur, 'YLabel', {'Division time' '(min)'});
-        %             %}
-        %
-        %             if ieNotDefined('nodeLimit'), nodeLimit = 50; end
-        %             if ieNotDefined('duration'), duration = []; end
-        %
-        %             % Call showUI if there are a lot of nodes.
-        %             if obj.nnodes > nodeLimit
-        %                 obj.showUI;
-        %             else
-        %                 % Plot an image if there are few nodes
-        %                 ieNewGraphWin([],'wide');
-        %                 % Remove the IDs from the names and create a new tree
-        %                 newTree = tree;
-        %                 newNames = obj.stripID;
-        %                 newTree.Node = newNames';
-        %                 newTree.Parent = obj.Parent;
-        %                 newTree.plot([],'font size',14);
-        %             end
-        %
-        %             if isempty(duration), return;
-        %             else, pause(duration), close;
-        %             end
-        %         end
         
         function t = show(obj)
             % Bring up a uifigure with collapsible tree
