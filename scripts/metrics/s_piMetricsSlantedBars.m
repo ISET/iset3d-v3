@@ -10,6 +10,8 @@ if ~piDockerExists, piDockerConfig; end
 
 thisR = piRecipeDefault('scene name','simple scene');
 thisR.set('assets','Camera_B','delete');
+thisR.set('assets','mirror_O','delete');
+
 % thisR.set('assets','mirror_B','delete');
 
 piRecipeMerge(thisR,chartR,'node name',gName);
@@ -40,30 +42,34 @@ chessR = piRecipeDefault('scene name','Chess set pieces');
 [chartR, eiagName, eiaName]  = piChartCreate('eia');
 thisScale = chartR.get('asset',eiagName,'scale');
 
-chessChartR = piRecipeMerge(chessR,chartR,'node name',eiagName);
-piAssetSet(chessChartR,eiagName,'translate',[0 0.5 2]);
-piAssetSet(chessChartR,eiagName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
+piRecipeMerge(chessR,chartR,'node name',eiagName);
+piAssetSet(chessR,eiagName,'translate',[0 0.5 2]);
+piAssetSet(chessR,eiagName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
 % piWRS(chessChartR); % Quick check
 
-[chartR, gridgName, gridName]  = piChartCreate('gridlines');
-chessChartChartR = piRecipeMerge(chessChartR,chartR,'node name',gridgName);
+[chartR, gridgName]  = piChartCreate('gridlines');
 thisScale = chartR.get('asset',gridgName,'scale');
-piAssetSet(chessChartChartR,gridgName,'translate',[0 0.7 2]);
-piAssetSet(chessChartChartR,gridgName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
+
+piRecipeMerge(chessR,chartR,'node name',gridgName);
+
+piAssetSet(chessR,gridgName,'translate',[0.2 0.3 1]);
+piAssetSet(chessR,gridgName,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should always do this
 
 %{
- chessChartR.set('spatial resolution',[320 320]);
- chessChartR.set('rays per pixel',32);
+ chessR.show('objects');
+ chessR.set('spatial resolution',[160 160]);
+ chessR.set('rays per pixel',8);
  piWRS(chessR); % Quick check
 %}
 
 % High resolution
-chessChartR.set('spatial resolution',[1024 1024]);
-chessChartR.set('rays per pixel',128);
-piWRS(chessChartR);
+chessR.set('spatial resolution',[1024 1024]);
+chessR.set('rays per pixel',128);
+piWRS(chessR);
 
 % chessR.show;
-
+%%
+%{
 %%  We did not set up the independent textures correctly
 
 [chartR, gName, oName] = piChartCreate('EIA');
@@ -237,7 +243,7 @@ chessR.set('asset','root','add',flatSurface);
 chessR.set('asset','001_Cube_O','world position',fig1Pos + [0 -0.2 0]);
 chessR.set('asset','001_Cube_O','rotate',[90 0 0]);
 chessR.set('asset','001_Cube_O','scale',3e-4);
-
+%}
 %{
 % Helpers
 chessR.set('asset','001_Cube_O','delete');
