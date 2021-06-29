@@ -6,7 +6,7 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Make the chart, simple scene, and merge
 
-[chartR, gName, oName]  = piChartCreate('grid lines');
+[chartR, gName, oName]  = piChartCreate('slanted bar');
 chartR.get('asset',oName,'size')
 
 thisR = piRecipeDefault('scene name','simple scene');
@@ -27,6 +27,7 @@ thisScale = chartR.get('asset',eiagName,'scale');
 chessChartR = piRecipeMerge(chessR,chartR,'node name',eiagName);
 piAssetSet(chessChartR,eiagName,'translate',[0 0.5 2]);
 piAssetSet(chessChartR,eiagName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
+% piWRS(chessChartR); % Quick check
 
 [chartR, gridgName, gridName]  = piChartCreate('gridlines');
 chessChartChartR = piRecipeMerge(chessChartR,chartR,'node name',gridgName);
@@ -46,8 +47,6 @@ chessChartR.set('rays per pixel',128);
 piWRS(chessChartR);
 
 % chessR.show;
-
-
 
 %%  We did not set up the independent textures correctly
 
