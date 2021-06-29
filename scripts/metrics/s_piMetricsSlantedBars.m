@@ -4,20 +4,37 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-chartR = piChartCreate('face');
-% chartR.show;
-chartR.get('asset','001_Cube_O','size')
+%% Make the chart, simple scene, and merge
+
+[chartR, gName, oName]  = piChartCreate('grid lines');
+chartR.get('asset',oName,'size')
 
 thisR = piRecipeDefault('scene name','simple scene');
 
-mergedR = piRecipeMerge(thisR,chartR,'node name','001_Cube_G');
-piAssetSet(mergedR,'001_Cube_G','translate',[-2 1 0]);
+mergedR = piRecipeMerge(thisR,chartR,'node name',gName);
+piAssetSet(mergedR,gName,'translate',[-2 1.5 0]);
+
 piWRS(mergedR);
+% chartR.show;
 
+%%
+[chartR, gName, oName]  = piChartCreate('slanted bar');
+chartR.get('asset',oName,'size')
+thisScale = chartR.get('asset',gName,'scale');
 
-chartR = piChartCreate('EIA');
-mergedR = piRecipeMerge(thisR,chartR,'node name','001_Cube_G');
-piAssetSet(mergedR,'001_Cube_G','translate',[2 1 0]);
+thisR = piRecipeDefault('scene name','Chess set pieces');
+
+mergedR = piRecipeMerge(thisR,chartR,'node name',gName);
+piAssetSet(mergedR,gName,'translate',[0 0.5 2]);
+piAssetSet(mergedR,gName,'scale',thisScale*0.3);
+
+piWRS(mergedR);
+% chartR.show;
+%%  We did not set up the independent textures correctly
+
+[chartR, gName, oName] = piChartCreate('EIA');
+mergedR = piRecipeMerge(thisR,chartR,'node name',gName);
+piAssetSet(mergedR,gName,'translate',[2 1 0]);
 piWRS(mergedR);
 
 % scene = piWRS(thisR);
