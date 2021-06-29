@@ -17,19 +17,38 @@ piAssetSet(mergedR,gName,'translate',[-2 1.5 0]);
 piWRS(mergedR);
 % chartR.show;
 
-%%
-[chartR, gName, oName]  = piChartCreate('slanted bar');
-chartR.get('asset',oName,'size')
-thisScale = chartR.get('asset',gName,'scale');
+%%  I would like to control the chart reflectance
 
-thisR = piRecipeDefault('scene name','Chess set pieces');
+chessR = piRecipeDefault('scene name','Chess set pieces');
 
-mergedR = piRecipeMerge(thisR,chartR,'node name',gName);
-piAssetSet(mergedR,gName,'translate',[0 0.5 2]);
-piAssetSet(mergedR,gName,'scale',thisScale*0.3);
+[chartR, eiagName, eiaName]  = piChartCreate('eia');
+thisScale = chartR.get('asset',eiagName,'scale');
 
-piWRS(mergedR);
-% chartR.show;
+chessChartR = piRecipeMerge(chessR,chartR,'node name',eiagName);
+piAssetSet(chessChartR,eiagName,'translate',[0 0.5 2]);
+piAssetSet(chessChartR,eiagName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
+
+[chartR, gridgName, gridName]  = piChartCreate('gridlines');
+chessChartChartR = piRecipeMerge(chessChartR,chartR,'node name',gridgName);
+thisScale = chartR.get('asset',gridgName,'scale');
+piAssetSet(chessChartChartR,gridgName,'translate',[0 0.7 2]);
+piAssetSet(chessChartChartR,gridgName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
+
+%{
+ chessChartR.set('spatial resolution',[320 320]);
+ chessChartR.set('rays per pixel',32);
+ piWRS(chessR); % Quick check
+%}
+
+% High resolution
+chessChartR.set('spatial resolution',[1024 1024]);
+chessChartR.set('rays per pixel',128);
+piWRS(chessChartR);
+
+% chessR.show;
+
+
+
 %%  We did not set up the independent textures correctly
 
 [chartR, gName, oName] = piChartCreate('EIA');
