@@ -10,7 +10,7 @@ if ~piDockerExists, piDockerConfig; end
 
 thisR = piRecipeDefault('scene name','simple scene');
 thisR.set('assets','Camera_B','delete');
-thisR.set('assets','mirror_O','delete');
+thisR.set('assets','001_mirror_O','delete');
 
 % thisR.set('assets','mirror_B','delete');
 
@@ -25,7 +25,7 @@ piWRS(thisR);
 % [chartR, gName]  = piChartCreate('grid lines');
 [chartR, gName]  = piChartCreate('macbeth');
 piRecipeMerge(thisR,chartR,'node name',gName);
-piAssetSet(thisR,gName,'translate',[0.5 1.5 0]);
+piAssetSet(thisR,gName,'translate',[0.5 2.5 0]);
 piWRS(thisR);
 
 %% A third chart

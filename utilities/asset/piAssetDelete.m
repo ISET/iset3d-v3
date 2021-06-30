@@ -33,9 +33,10 @@ assetInfo    = p.Results.assetInfo;
 % If assetInfo is a node name, find the id
 if ischar(assetInfo)
     assetName = assetInfo;
-    [assetInfo,thisAsset] = piAssetFind(thisR.assets, 'name', assetInfo);
+    assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
     if isempty(assetInfo)
-        warning('Couldn not find a parent with name %s:', assetName);
+        warning('Could not find an asset with name %s:', assetName);
+        thisR.show('objects');
         return;
     end
 end
