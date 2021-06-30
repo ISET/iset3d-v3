@@ -22,7 +22,8 @@ piWRS(thisR);
 % thisR.show;
 
 %% Add a second chart
-[chartR, gName]  = piChartCreate('grid lines');
+% [chartR, gName]  = piChartCreate('grid lines');
+[chartR, gName]  = piChartCreate('macbeth');
 piRecipeMerge(thisR,chartR,'node name',gName);
 piAssetSet(thisR,gName,'translate',[0.5 1.5 0]);
 piWRS(thisR);
