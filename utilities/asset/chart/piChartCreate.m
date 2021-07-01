@@ -124,7 +124,7 @@ switch ieParamFormat(chartName)
         imgFile = 'macbeth.png';
         
         % Make the surface shape match the MCC shape
-        piAssetSet(chartR, geometryNode.name, 'scale',wscale.*[6 4 1]/6);
+        piAssetSet(chartR, geometryNode.name, 'scale',wscale.*[1 4/6 1]);
 
     case 'face'
         textureName = sprintf('face-%d',uniqueKey);
@@ -150,8 +150,8 @@ chartR.set('texture', 'add', chartTexture);
 % Specify the texture as part of the material
 chartR.set('material', surfaceMaterial.name, 'kd val', textureName);
 
-chartR.get('material print');
-chartR.show('objects');
+% chartR.get('material print');
+% chartR.show('objects');
 
 %% Name the object and geometry node
 oName = textureName;

@@ -38,27 +38,36 @@ piWRS(thisR);
 
 %%  I would like to control the chart reflectance
 
+
 chessR = piRecipeDefault('scene name','Chess set pieces');
+% chessFile = fullfile(piRootPath,'local','tmp');
+% save(chessFile,'chessR'); 
+% load(chessFile,'chessR');
 
 [chartR, eiagName, eiaName]  = piChartCreate('eia');
-thisScale = chartR.get('asset',eiagName,'scale');
 
 piRecipeMerge(chessR,chartR,'node name',eiagName);
+% wRotate = chessR.get('asset', eiagName, 'rotation', rotMatrix);
 piAssetSet(chessR,eiagName,'translate',[0 0.5 2]);
+thisScale = chartR.get('asset',eiagName,'scale');
 piAssetSet(chessR,eiagName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
 % piWRS(chessChartR); % Quick check
 
 [chartR, gridgName]  = piChartCreate('gridlines');
-thisScale = chartR.get('asset',gridgName,'scale');
 
 piRecipeMerge(chessR,chartR,'node name',gridgName);
 
-piAssetSet(chessR,gridgName,'translate',[0.2 0.3 1]);
-piAssetSet(chessR,gridgName,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should always do this
+piAssetSet(chessR,gridgName,'translate',[0.1 0.2 0.2]);
+thisScale = chartR.get('asset',gridgName,'scale');
+piAssetSet(chessR,gridgName,'scale',thisScale.*[0.05 0.05 0.05]);  % scale should always do this
+% z y x
+rotMatrix = [-35 10 0; fliplr(eye(3))];
+piAssetSet(chessR, gridgName, 'rotation', rotMatrix);
 
 [chartR, mccgName]  = piChartCreate('macbeth');
 piRecipeMerge(chessR,chartR,'node name',mccgName);
-piAssetSet(chessR,mccgName,'translate',[0.2 0.5 1]);
+piAssetSet(chessR,mccgName,'translate',[-0.2 0.3 0.7]);
+thisScale = chessR.get('asset',mccgName,'scale');
 piAssetSet(chessR,mccgName,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should always do this
 
 %{
@@ -74,6 +83,78 @@ chessR.set('rays per pixel',128);
 piWRS(chessR);
 
 % chessR.show;
+
+%%
+
+kitchenR = piRecipeDefault('scene name','kitchen');
+[chartR, eiagName, eiaName]  = piChartCreate('eia');
+% kitchenR.assets = chartR.assets;
+
+piRecipeMerge(kitchenR,chartR,'node name',eiagName);
+kitchenR.get('asset',eiagName,'translate')
+d = kitchenR.get('look at direction');
+from = kitchenR.get('from');
+piAssetSet(kitchenR,eiagName,'translate',from + 3*d);
+thisScale = kitchenR.get('asset',eiagName,'scale');
+piAssetSet(kitchenR,eiagName,'scale',thisScale*0.3);
+
+kitchenR.show('objects')
+kitchenR.exporter = 'C4D';
+
+
+kitchenR.set('spatial resolution',[1024 1024]);
+kitchenR.set('rays per pixel',512);
+
+piWrite(kitchenR);
+% I edited scene.pbrt to add
+% Include "scene_geometry.pbrt"
+scene = piRender(kitchenR,'render type','radiance');
+sceneWindow(scene);
+% scene = piAIdenoise(scene);
+% sceneWindow(scene);
+%%
+whiteR = piRecipeDefault('scene name','white-room');
+whiteR.exporter = 'C4D';
+[chartR, eiagName]  = piChartCreate('macbeth');
+
+piRecipeMerge(whiteR,chartR,'node name',eiagName);
+
+d = whiteR.get('look at direction');
+from = whiteR.get('from');
+piAssetSet(whiteR,eiagName,'translate',from + 3*d);
+
+thisScale = whiteR.get('asset',eiagName,'scale');
+piAssetSet(whiteR,eiagName,'scale',thisScale*1);
+
+whiteR.set('spatial resolution',[320 320]);
+whiteR.set('rays per pixel',16);
+
+% piAssetGeometry(whiteR)
+% Include "scene_geometry.pbrt"
+piWrite(whiteR);
+% I edited scene.pbrt to add
+% Include "scene_geometry.pbrt"
+scene = piRender(whiteR,'render type','radiance');
+sceneWindow(scene);
+scene = piRender(kitchenR,'render type','radiance');
+sceneWindow(scene);
+
+%{
+whiteR.show('objects')
+whiteR.set('spatial resolution',[1024 1024]);
+whiteR.set('rays per pixel',512);
+piWrite(whiteR);
+% I edited scene.pbrt to add
+% Include "scene_geometry.pbrt"
+%}
+scene = piRender(whiteR,'render type','radiance');
+sceneWindow(scene);
+
+% scene = piAIdenoise(scene);
+% sceneWindow(scene);
+
+
+
 %%
 %{
 %%  We did not set up the independent textures correctly
