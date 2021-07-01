@@ -56,6 +56,11 @@ piRecipeMerge(chessR,chartR,'node name',gridgName);
 piAssetSet(chessR,gridgName,'translate',[0.2 0.3 1]);
 piAssetSet(chessR,gridgName,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should always do this
 
+[chartR, mccgName]  = piChartCreate('macbeth');
+piRecipeMerge(chessR,chartR,'node name',mccgName);
+piAssetSet(chessR,mccgName,'translate',[0.2 0.5 1]);
+piAssetSet(chessR,mccgName,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should always do this
+
 %{
  chessR.show('objects');
  chessR.set('spatial resolution',[160 160]);
