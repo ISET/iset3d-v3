@@ -45,6 +45,16 @@ piWRS(thisR);
 thisR = piJson2Recipe(savedjson);
 scene = piWRS(thisR);
 
+%% I want this mat file.
+
+thisR = piRecipeDefault('scene name','chess set pieces');
+oFile = fullfile(piRootPath,'data','assets','ChessPieces');
+thisR.save(oFile);
+
+% Much faster
+% load(oFile,'thisR');
+% piWRS(thisR);
+
 %% Debugging why the simple scene fails.
 ieStructCompare(thisR,testR)
 
