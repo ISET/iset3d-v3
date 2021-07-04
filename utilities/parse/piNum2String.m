@@ -1,4 +1,26 @@
 function string = piNum2String(num)
+% ISET3d replacement for num2str
+%
+% Synopsis
+%   string = piNum2String(num)
+%
+% Input
+%   num - An array of numbers
+%
+% Output
+%   str - A char array?  A string array?
+%
+% Description
+%
+%  The speed on num2str is bad.  But the function has some features we
+%  like, though. This function emulates num2string (we think) but runs much
+%  faster
+%
+%  Because these are supposed to fit in text, we always force the num to be
+%  a row vector.
+%
+% See also
+%    sprintf
 
 % Convert a number to a string
 if isinteger(num)
@@ -8,38 +30,7 @@ else
     % using %.5f is much slower than simply asking for precision
     %formatSpec = '%.5f ';
     formatSpec = 7; % 7 significant digits
-    string = num2str(num, formatSpec);
+    string = num2str(num(:)', formatSpec);
 end
-%{
-% Comment this out for reference. If the faster code is correct, we will 
-% delete this.    
 
-string='';
-  
-% by default we use the older, slower code, since I can't prove
-% that the newer, faster code doesn't break anything -- DJC
-perf = getpref('ISET','fast_num2string', false);
-
-
-if perf
-    if isinteger(num)
-        string = int2str(num);
-    else
-        % using %.5f is much slower than simply asking for precision
-        %formatSpec = '%.5f ';
-        formatSpec = 7;
-        string = num2str(num, formatSpec);
-    end
-else
-    %I Don't think we need our own for loop?!
-    for ii = 1:numel(num)
-        if isinteger(num)
-            string = [string, ' ' ,int2str(num(ii))]; % look for better perf. -- djc
-        else
-            formatSpec = '%.5f';
-            string = [string, ' ' ,num2str(num(ii), formatSpec)];
-        end
-    end
-end
-%}
 end

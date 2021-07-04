@@ -1,6 +1,17 @@
 function txt = piShape2Text(shape)
-% Convert the shape struct to text
-%%
+% Convert data in the shape struct to text for the PBRT file
+%
+% Synopsis
+%   txt = piShape2Text(shape)
+%
+% Input:
+%   shape - a shape struct with various slots
+% 
+% Output
+%   txt  - Converted to the format needed to write out in a pbrt file
+%
+% See also
+%
 txt = "Shape ";
 
 if isfield(shape, 'meshshape') && ~isempty(shape.meshshape)
@@ -10,22 +21,8 @@ if isfield(shape, 'filename') && ~isempty(shape.filename)
     txt = strcat(txt, ' "string filename" ', ' "',shape.filename,'"');
 end
 if isfield(shape, 'integerindices') && ~isempty(shape.integerindices)
-%{
-% From dev branch
-<<<<<<< HEAD
-    txt = strcat(txt, '"integer indices"'," ", shape.integerindices," ");
-end
-if isfield(shape, 'pointp') && ~isempty(shape.pointp)
-    txt = strcat(txt, '"point P"', " ", shape.pointp, " ");
-end
-if isfield(shape, 'floatuv') && ~isempty(shape.floatuv)
-    txt = strcat(txt, '"float uv"', " ", shape.floatuv, " ");
-end
-if isfield(shape, 'normaln') && ~isempty(shape.normaln)
-    txt = strcat(txt, '"normal N"', " ", shape.normaln);
-=======
-%}
-    txt = strcat(txt, ' "integer indices"', [' [',piNum2String(shape.integerindices),']',]);
+    txtShape = piNum2String(shape.integerindices);  % Row vector
+    txt = strcat(txt, ' "integer indices"', [' [',txtShape,']',]);
 end
 if isfield(shape, 'pointp') && ~isempty(shape.pointp)
     txt = strcat(txt, ' "point P"', [' [',piNum2String(shape.pointp),']',]);

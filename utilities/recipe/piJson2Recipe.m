@@ -49,6 +49,64 @@ update   = p.Results.update;
 %% Read the file
 thisR_tmp = jsonread(JsonFile);
 
+% Check the lights.  Make sure they are a cell even if only one light.
+if isstruct(thisR_tmp.lights)
+    theLights = thisR_tmp.lights;
+    thisR_tmp.lights = {theLights};
+end
+
+% The rotation field of the light struct has the wrong shape.
+
+%% Assets
+
+% The assets are stored as structs.  We convert them to a tree - we have to
+% deal with the root node and the fact that the asset can only be added
+% when its parent is already part of the tree.
+if ~isempty(thisR_tmp.assets)
+    % The first node is the root. Its parent value is 0 and ID is 1  
+    assetTree = tree('root');
+
+    % Pull out the nodes.  
+    nnodes = numel(thisR_tmp.assets.Parent);
+    nodes = thisR_tmp.assets.Node;
+    
+    % Add each of the nodes, first attaching to the root
+    for ii=2:nnodes
+        assetTree = assetTree.addnode( 1, nodes{ii});
+    end
+    
+    parentID = thisR_tmp.assets.Parent;
+    % Now set the correct parent.
+    for ii=2:nnodes
+        assetTree = assetTree.setparent(ii, parentID(ii));
+    end    
+end
+thisR_tmp.assets = assetTree;
+
+
+% Convert the materials and textures to a container.Map
+if ~isempty(thisR_tmp.textures)
+    textureMap  = containers.Map;
+    fds = fieldnames(thisR_tmp.textures.list);
+    for ii=1:numel(fds)
+        thisTexture =  thisR_tmp.textures.list.(fds{ii});
+        textureMap(thisTexture.name) = thisTexture;
+    end 
+end
+thisR_tmp.textures.list = textureMap;
+
+% Material
+if ~isempty(thisR_tmp.materials)    
+    materialMap = containers.Map;
+    fds = fieldnames(thisR_tmp.materials.list);
+    for ii=1:numel(fds)
+        thisMaterial = thisR_tmp.materials.list.(fds{ii});
+        materialMap(thisMaterial.name) = thisMaterial;
+    end
+end
+
+thisR_tmp.materials.list = materialMap;
+
 %% Loop through the fields and assign them
 
 % Find the field names in the json file recipe
@@ -59,6 +117,16 @@ if any(~ieContains(fds,'recipeVer')) || ~isequal(thisR_tmp.recipeVer,2)
 else
     thisVersion = 2;
 end
+
+%% Some of the fields that should be rows are columns.  
+
+% We fix those here in what should become a separate and general routine.
+thisR_tmp.lookAt.from = thisR_tmp.lookAt.from(:)';
+thisR_tmp.lookAt.to = thisR_tmp.lookAt.to(:)';
+thisR_tmp.lookAt.up = thisR_tmp.lookAt.up(:)';
+
+%%
+
 
 % Create a V2 recipe class 
 thisRV2 = recipe;

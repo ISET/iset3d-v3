@@ -112,7 +112,8 @@ if pbrtText && ~isempty(val) &&...
                     lightSpectrum = sprintf('"%s"', lght.spd.value);
                 end
             elseif isnumeric(lght.spd.value)
-                lightSpectrum = ['[' ,piNum2String(lght.spd.value * spectrumScale),']'];
+                txt = piNum2String(lght.spd.value * spectrumScale);
+                lightSpectrum = ['[' ,txt,']'];
             end
             switch lght.type
                 case {'point', 'goniometric', 'projection', 'spot', 'spotlight'} % I
@@ -170,10 +171,14 @@ if pbrtText && ~isempty(val) &&...
                 end
             end
         case 'ctform'
+            % Not sure why the cell stuff became a problem here ...
+            if ~iscell(val), val = {val}; end % BW
             for ii=1:numel(val)
                 txt{end + 1} = sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', val{ii}(:));
             end
         case 'scale'
+            % Or here.
+            if ~iscell(val), val = {val}; end % BW
             for ii=1:numel(val)
                 txt{end + 1} = sprintf('Scale %.3f %.3f %.3f', val{ii}(1), val{ii}(2), val{ii}(3));
             end

@@ -45,6 +45,9 @@ lightSourceText = cell(1, numel(thisR.lights));
 
 %% Check all applicable parameters for every light
 for ii = 1:numel(thisR.lights)
+    % Why do I need this again?  3rd time today. BW
+    % if ~iscell(thisR.lights), thisR.lights = {thisR.lights}; end
+    
     thisLight = thisR.lights{ii};
     spectrumScale = piLightGet(thisLight, 'specscale val');
     
