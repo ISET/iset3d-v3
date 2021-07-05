@@ -48,7 +48,7 @@ load('ChessSetPieces-recipe','thisR');
 chessR = thisR;
 
 % The EIA chart
-chart = load('EIA.mat');
+chart = load('slantedbar.mat');
 
 % Merge them
 piRecipeMerge(chessR,chart.thisR,'node name',chart.mergeNode);
