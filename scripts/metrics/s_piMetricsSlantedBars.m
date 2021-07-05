@@ -97,6 +97,21 @@ piWRS(chessR);
 
 % chessR.show;
 
+%% Add the bunny into the simple scene
+
+thisR = piRecipeDefault('scene name','simple scene');
+thisR.set('assets','Camera_B','delete');
+thisR.set('assets','001_mirror_O','delete');
+bunnychart = load('bunny.mat');
+piRecipeMerge(thisR,bunnychart.thisR,'node name',bunnychart.mergeNode);
+
+thisScale = thisR.get('asset',bunnychart.mergeNode,'scale');
+piAssetSet(thisR,bunnychart.mergeNode,'scale',thisScale.*[10 10 10]);  % scale should always do this
+piAssetSet(thisR,bunnychart.mergeNode,'translate',[0 0 -10]);  % scale should always do this
+
+% piAssetGeometry(thisR);
+% piWRS(thisR);
+
 %%  Some other scenes.  Hand editing here.  Fix!!! so that is not needed.
 
 kitchenR = piRecipeDefault('scene name','kitchen');
