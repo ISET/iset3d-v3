@@ -1,4 +1,13 @@
-%% Store simple recipes as mat-files and json-files this way
+%% Store recipes as mat-files and json-files this way
+%
+% At this date only the mat-files always work.  There are still problems
+% with the round-trip for the JSON files.  I will try to solve that.
+%
+% Saving the recipes after the piRead saves a lot of time for some scenes.
+% Not all.  
+%
+% We save the test charts and small scenes in data/assets
+% We save the recipes for the bigger scenes in their input directories.
 %
 % See also
 %
@@ -25,35 +34,44 @@ piWRS(thisR);
 thisR = piJson2Recipe(savedjson);
 piWRS(thisR);
 
-%%  Simple scene not working yet.
+%% A few more scenes as assets
 
-thisR = piRecipeDefault('scene name','simple scene');
+assetDir = fullfile(piRootPath,'data','assets');
 
-oFile = fullfile(piRootPath,'data','assets','SimpleScene');
-thisR.save(oFile);
+sceneName = 'bunny';
+thisR = piRecipeDefault('scene name', sceneName);
+oFile = thisR.save(fullfile(assetDir,[sceneName,'.mat']));
+disp(oFile)
 
-jsonFile = fullfile(piRootPath,'data','assets','SimpleScene.json');
-savedjson = thisR.savejson(jsonFile);
+sceneName = 'coordinate';
+thisR = piRecipeDefault('scene name', sceneName);
+oFile = thisR.save(fullfile(assetDir,[sceneName,'.mat']));
+disp(oFile)
 
-%% Mat file rendering of simple scene works
-load(oFile,'thisR');
-piWRS(thisR);
+thisR = piChartCreate('EIA');
+thisR.save(fullfile(assetDir,'EIA.mat'));
 
-%% Test json file round trip
-% This fails.
+thisR = piChartCreate('ringsrays');
+thisR.save(fullfile(assetDir,'ringsrays.mat'));
 
-thisR = piJson2Recipe(savedjson);
-scene = piWRS(thisR);
+thisR = piChartCreate('slanted bar');
+thisR.save(fullfile(assetDir,'slantedbar.mat'));
 
-%% I want this mat file.
+thisR = piChartCreate('grid lines');
+thisR.save(fullfile(assetDir,'gridlines.mat'));
 
-thisR = piRecipeDefault('scene name','chess set pieces');
-oFile = fullfile(piRootPath,'data','assets','ChessPieces');
-thisR.save(oFile);
+thisR = piChartCreate('face');
+thisR.save(fullfile(assetDir,'face.mat'));
 
-% Much faster
-% load(oFile,'thisR');
-% piWRS(thisR);
+thisR = piChartCreate('macbeth');
+thisR.save(fullfile(assetDir,'macbeth.mat'));
+
+
+
+
+
+
+%%
 
 %% Debugging why the simple scene fails.
 ieStructCompare(thisR,testR)
