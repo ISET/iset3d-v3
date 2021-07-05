@@ -1,4 +1,6 @@
-%% Store recipes as mat-files and json-files this way
+%% Store small recipes as mat-files in the data assets directory
+%
+% We include these assets as little test objects in other scenes
 %
 % At this date only the mat-files always work.  There are still problems
 % with the round-trip for the JSON files.  I will try to solve that.
@@ -10,43 +12,79 @@
 % We save the recipes for the bigger scenes in their input directories.
 %
 % See also
+%   s_scenesRecipe
 %
 
+%% Init
 
-
-%% A few more scenes as assets
+ieInit;
+if ~piDockerExists, piDockerConfig; end
 
 assetDir = fullfile(piRootPath,'data','assets');
 
+%% A few more scenes as assets
 sceneName = 'bunny';
 thisR = piRecipeDefault('scene name', sceneName);
+thisR.set('from',[0 0 0]);
+thisR.set('to',[0 0 1]);
+piAssetSet(thisR, 'Bunny_B','translate',[0 0 1]);
+mergeNode = 'Bunny_B';
 oFile = thisR.save(fullfile(assetDir,[sceneName,'.mat']));
-disp(oFile)
+save(oFile,'mergeNode','-append');
+
+%%  Axes at 000
 
 sceneName = 'coordinate';
 thisR = piRecipeDefault('scene name', sceneName);
+mergeNode = 'Coordinate_B';
 oFile = thisR.save(fullfile(assetDir,[sceneName,'.mat']));
-disp(oFile)
+save(oFile,'mergeNode','-append');
 
-thisR = piChartCreate('EIA');
-thisR.save(fullfile(assetDir,'EIA.mat'));
+%% We need a light to see it.
+%
+% Camera at 000 to 001 sphere at 001
+%
+sceneName = 'sphere';
+thisR = piRecipeDefault('scene name', sceneName);
+thisR.set('asset','Camera_B','delete');
+thisR.set('asset',2,'delete');
+piAssetSet(thisR, 'Sphere_B','translate',[0 0 1]);
+thisR.set('from',[0 0 0]);
+thisR.set('to',[0 0 1]);
+mergeNode = 'Sphere_B';
+oFile = thisR.save(fullfile(assetDir,[sceneName,'.mat']));
+save(oFile,'mergeNode','-append');
 
-thisR = piChartCreate('ringsrays');
-thisR.save(fullfile(assetDir,'ringsrays.mat'));
+%% Test charts
 
-thisR = piChartCreate('slanted bar');
-thisR.save(fullfile(assetDir,'slantedbar.mat'));
+% The merge node is used for
+%
+%   piRecipeMerge(thisR,chartR,'node name',mergeNode);
+%
 
-thisR = piChartCreate('grid lines');
-thisR.save(fullfile(assetDir,'gridlines.mat'));
+[thisR, mergeNode] = piChartCreate('EIA');
+oFile = thisR.save(fullfile(assetDir,'EIA.mat'));
+save(oFile,'mergeNode','-append');
 
-thisR = piChartCreate('face');
-thisR.save(fullfile(assetDir,'face.mat'));
+[thisR, mergeNode]= piChartCreate('ringsrays');
+oFile = thisR.save(fullfile(assetDir,'ringsrays.mat'));
+save(oFile,'mergeNode','-append');
 
-thisR = piChartCreate('macbeth');
-thisR.save(fullfile(assetDir,'macbeth.mat'));
+[thisR, mergeNode] = piChartCreate('slanted bar');
+oFile = thisR.save(fullfile(assetDir,'slantedbar.mat'));
+save(oFile,'mergeNode','-append');
 
-thisR = piRecipeDefault('scene name','sphere');
-thisR.save(fullfile(assetDir,'sphere.mat'));
+[thisR, mergeNode] = piChartCreate('grid lines');
+oFile = thisR.save(fullfile(assetDir,'gridlines.mat'));
+save(oFile,'mergeNode','-append');
+
+[thisR, mergeNode] = piChartCreate('face');
+oFile = thisR.save(fullfile(assetDir,'face.mat'));
+save(oFile,'mergeNode','-append');
+
+[thisR, mergeNode] = piChartCreate('macbeth');
+oFile = thisR.save(fullfile(assetDir,'macbeth.mat'));
+save(oFile,'mergeNode','-append');
+
 
 %% END

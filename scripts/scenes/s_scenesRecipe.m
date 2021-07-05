@@ -7,6 +7,10 @@
 % We save these recipes in the original folder with a scene-recipe.mat file
 % name.
 
+%% Init
+ieInit;
+if ~piDockerExists, piDockerConfig; end
+
 %% Simple scene
 
 thisR = piRecipeDefault('scene name','simple scene');
