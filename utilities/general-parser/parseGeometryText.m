@@ -6,7 +6,7 @@ function [trees, parsedUntil] = parseGeometryText(thisR, txt, name)
 %   name        - current object name
 %
 % Outputs:
-%   trees       - struct of results
+%   trees       - A tree class that describes the assets and their geometry
 %   parsedUntil - line number where the parsing ends
 %
 % Description:
@@ -42,8 +42,8 @@ i = 1;         objectIndex = 0;
 while i <= length(txt)
     
     currentLine = txt{i};
-    % ZLY: an emergent patch up for Brian's presentation tomorrow
-    % If we found ObjectBegin, that means we won't parse anything
+    % ZLY: an emergency patch for Brian's presentation tomorrow If we found
+    % ObjectBegin, that means we won't parse anything
     if piContains(currentLine, 'ObjectBegin')
         trees = {};
         parsedUntil = i;
@@ -224,7 +224,7 @@ while i <= length(txt)
             end
 
         elseif exist('name','var')
-            % resCurrent = createGroupObject();
+            % Create a branch, add it to the main tree.
             resCurrent = piAssetCreate('type', 'branch');
             if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end            
             trees = tree(resCurrent);
@@ -243,8 +243,11 @@ while i <= length(txt)
 end
 parsedUntil = i;
 
+% We build the main tree from any defined subtrees.  Each subtree is an
+% asset.
 if ~isempty(subtrees)
     trees = tree('root');
+    % Add each of the subtrees to the root
     for ii = 1:numel(subtrees)
         trees = trees.graft(1, subtrees(ii));
     end

@@ -6,9 +6,9 @@ function thisRV2 = piRecipeUpdate(thisRV2)
 %
 % The change(s) are:
 %
-%   1. Change material format: Extract texture from material slot and make it 
-%      a separate slot.
-%   2. Rearrange assets to new structure
+%   1. Change material format
+%   2. Extract texture from material slot and make it a separate slot.
+%   3. Rearrange assets to new tree structure
 %
 % Syntax:
 %
@@ -34,7 +34,7 @@ p.parse(thisRV2);
 
 thisRV2 = piRecipeUpdateLights(thisRV2);
 
-%%  Materials
+%%  Materials an
 
 thisRV2 = piRecipeUpdateMaterials(thisRV2);
 

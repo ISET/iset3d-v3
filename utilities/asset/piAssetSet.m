@@ -45,7 +45,7 @@ if ischar(assetInfo)
     assetName = assetInfo;
     assetInfo = piAssetFind(thisR.assets, 'name', assetInfo);
     if isempty(assetInfo)
-        warning('Couldn not find an asset with name %s:', assetName);
+        warning('No asset named %s:', assetName);
         return;
     end
 end

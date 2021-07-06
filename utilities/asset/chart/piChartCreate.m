@@ -5,7 +5,8 @@ function [chartR, gName, oName]  = piChartCreate(chartName)
 %  [chartR, sName] = piChartCreate(chartName)
 %
 % Input
-%   chartName - 'EIA','rings rays','slanted bar','grid lines', 'face'
+%   chartName - 'EIA','rings rays','slanted bar','grid lines',
+%               'face','macbeth'
 %
 % Output
 %   chartR  - Recipe for the chart
@@ -33,6 +34,10 @@ piWRS(thisChart);
 %}
 %{
 thisChart = piChartCreate('face');
+piWRS(thisChart);
+%}
+%{
+thisChart = piChartCreate('macbeth');
 piWRS(thisChart);
 %}
 
@@ -114,6 +119,13 @@ switch ieParamFormat(chartName)
         textureName = sprintf('gridlines-%d',uniqueKey);
         imgFile = 'gridlines.png';
         
+    case 'macbeth'
+        textureName = sprintf('macbeth-%d',uniqueKey);
+        imgFile = 'macbeth.png';
+        
+        % Make the surface shape match the MCC shape
+        piAssetSet(chartR, geometryNode.name, 'scale',wscale.*[1 4/6 1]);
+
     case 'face'
         textureName = sprintf('face-%d',uniqueKey);
         imgFile = 'monochromeFace.png';
@@ -138,8 +150,8 @@ chartR.set('texture', 'add', chartTexture);
 % Specify the texture as part of the material
 chartR.set('material', surfaceMaterial.name, 'kd val', textureName);
 
-chartR.get('material print');
-chartR.show('objects');
+% chartR.get('material print');
+% chartR.show('objects');
 
 %% Name the object and geometry node
 oName = textureName;

@@ -9,9 +9,9 @@ function [materialMap, textureMap, txtLines] = parseMaterialTexture(txtLines)
 %   txtLines - Usually thisR.world text
 %
 % Outputs
-%   materialMap - The material key-value pairs map
-%   textureMap  - The texture key-value pairs map
-%   txtLines     -  The txtLines that are NOT material or textures
+%   materialMap - The material key-value pairs map (containers.Map)
+%   textureMap  - The texture key-value pairs map  (containers.Map)
+%   txtLines    -  The txtLines that are NOT material or textures
 %
 % ZL and ZYL
 %
@@ -37,6 +37,10 @@ for ii = numel(txtLines):-1:1
     thisLine = txtLines{ii};
     
     if strncmp(thisLine,'Texture',length('Texture'))
+        % Assign the textureMap container
+        %
+        %     textureMap(textureName) = textureStruct;
+        %
         t_index = t_index+1;
         textureList{t_index}   = parseBlockTexture(thisLine);  %#ok<AGROW>'
         textureMap(textureList{t_index}.name) = textureList{t_index};
@@ -44,6 +48,10 @@ for ii = numel(txtLines):-1:1
         
     elseif strncmp(thisLine,'MakeNamedMaterial',length('MakeNamedMaterial')) ||...
             strncmp(thisLine,'Material',length('Material'))
+        % Assign the materialMap container
+        %
+        %   materialMap(matName) = materialStruct;
+        %
         m_index = m_index+1;
         materialList{m_index}  = parseBlockMaterial(thisLine); %#ok<AGROW>
         materialMap(materialList{m_index}.name) = materialList{m_index};

@@ -56,27 +56,33 @@ else
     recipelist = objectRs;
 end
 
-%% For each object recipe, add the object to the scene
+%% For each object recipe, add the object to the main scene
 
 for ii = 1:length(recipelist)
     thisR = recipelist{ii};
     
     if assetFlag
         
-        if isempty(nodeName)
-            % Get the asset names in the object
-            % The problem with this is we don't get the geometry node above
-            % it.
-            names = thisR.get('assetnames');
-            nodeName = names{2};
+        if isempty(sceneR.assets)
+            % Main scene has no assets.  Add in the assets from the object.
+            % Then we also have to set the nodeName for the return.
+            sceneR.assets = thisR.assets;
+        else
+            if isempty(nodeName)
+                % Get the asset names in the object
+                % The problem with this is we don't get the geometry node above
+                % it.
+                names = thisR.get('assetnames');
+                nodeName = names{2};
+            end
+            
+            % Get the subtree starting just below the specified node
+            thisOBJsubtree = thisR.get('asset', nodeName, 'subtree');
+            
+            % Graft the asset three into the scene.  We graft it onto the root
+            % of the main scene.
+            sceneR.set('asset', 'root', 'graft', thisOBJsubtree);
         end
-        
-        % Get the subtree starting just below the specified node
-        thisOBJsubtree = thisR.get('asset', nodeName, 'subtree');
-        
-        % Graft the asset three into the scene.  We graft it onto the root
-        % of the main scene.
-        sceneR.set('asset', 'root', 'graft', thisOBJsubtree);
         
         % Copy meshes from objects folder to scene folder here
         sourceDir = thisR.get('input dir');

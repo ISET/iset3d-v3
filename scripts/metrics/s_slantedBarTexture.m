@@ -1,5 +1,9 @@
 %% Create a slanted bar target using the flatSurface with a texture
 %
+% Deprecated.
+%
+%  This led to s_assetsCreate, s_scenesRecipe, and s_piMetrics* scripts. 
+%
 % This scene only has one object, a uniform surface, and a camera.  We
 % point the camera towards the surface, and we paint a texture on the
 % surface.  The texture is checks that we can use for calculating the

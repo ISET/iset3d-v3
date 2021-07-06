@@ -6,54 +6,82 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Make the chart, simple scene, and merge
 
-[chartR, gName]  = piChartCreate('EIA');
-
 thisR = piRecipeDefault('scene name','simple scene');
 thisR.set('assets','Camera_B','delete');
-thisR.set('assets','mirror_O','delete');
+thisR.set('assets','001_mirror_O','delete');
 
-% thisR.set('assets','mirror_B','delete');
+% Load the chart recipe and merge node
+eiachart = load('EIA.mat');
 
-piRecipeMerge(thisR,chartR,'node name',gName);
-piAssetSet(thisR,gName,'translate',[-2 1.5 0]);
+% Merge
+piRecipeMerge(thisR,eiachart.thisR,'node name',eiachart.mergeNode);
 
+% Assign the chart a position in this scene
+piAssetSet(thisR,eiachart.mergeNode,'translate',[-2 1.5 0]);
+
+% Render
 piWRS(thisR);
-% chartR.show;
+
 % thisR.show;
 
 %% Add a second chart
-[chartR, gName]  = piChartCreate('grid lines');
-piRecipeMerge(thisR,chartR,'node name',gName);
-piAssetSet(thisR,gName,'translate',[0.5 1.5 0]);
+% [chartR, chart.mergeNode]  = piChartCreate('grid lines');
+
+chart = load('macbeth.mat');
+piRecipeMerge(thisR,chart.thisR,'node name',chart.mergeNode);
+
+piAssetSet(thisR,chart.mergeNode,'translate',[0.5 2.5 0]);
+
 piWRS(thisR);
 
 %% A third chart
-[chartR, gName]  = piChartCreate('slanted bar');
-
-piRecipeMerge(thisR,chartR,'node name',gName);
-piAssetSet(thisR,gName,'translate',[3 3 6]);
+chart = load('slantedbar.mat');
+piRecipeMerge(thisR,chart.thisR,'node name',chart.mergeNode);
+piAssetSet(thisR,chart.mergeNode,'translate',[3 3 6]);
 
 piWRS(thisR);
 
 %%  I would like to control the chart reflectance
 
-chessR = piRecipeDefault('scene name','Chess set pieces');
+% The chess set with pieces
+load('ChessSetPieces-recipe','thisR');
+chessR = thisR;
 
-[chartR, eiagName, eiaName]  = piChartCreate('eia');
-thisScale = chartR.get('asset',eiagName,'scale');
+% The EIA chart
+chart = load('slantedbar.mat');
 
-piRecipeMerge(chessR,chartR,'node name',eiagName);
-piAssetSet(chessR,eiagName,'translate',[0 0.5 2]);
-piAssetSet(chessR,eiagName,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
-% piWRS(chessChartR); % Quick check
+% Merge them
+piRecipeMerge(chessR,chart.thisR,'node name',chart.mergeNode);
 
-[chartR, gridgName]  = piChartCreate('gridlines');
-thisScale = chartR.get('asset',gridgName,'scale');
+% wRotate = chessR.get('asset', eiachart.mergeNode, 'rotation', rotMatrix);
 
-piRecipeMerge(chessR,chartR,'node name',gridgName);
+% Position and scale the chart
+piAssetSet(chessR,chart.mergeNode,'translate',[0 0.5 2]);
+thisScale = chessR.get('asset',chart.mergeNode,'scale');
+piAssetSet(chessR,chart.mergeNode,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
 
-piAssetSet(chessR,gridgName,'translate',[0.2 0.3 1]);
-piAssetSet(chessR,gridgName,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should always do this
+% piWRS(chessR); % Quick check
+
+gridchart = load('gridlines.mat');
+
+piRecipeMerge(chessR,gridchart.thisR,'node name',gridchart.mergeNode);
+
+piAssetSet(chessR,gridchart.mergeNode,'translate',[0.1 0.2 0.2]);
+thisScale = chessR.get('asset',gridchart.mergeNode,'scale');
+piAssetSet(chessR,gridchart.mergeNode,'scale',thisScale.*[0.05 0.05 0.05]);  % scale should always do this
+
+% z y x
+rotMatrix = [-35 10 0; fliplr(eye(3))];
+piAssetSet(chessR, gridchart.mergeNode, 'rotation', rotMatrix);
+
+%% Color chart
+mccchart = load('macbeth.mat');
+
+% [chartR, mccchart.mergeNode]  = piChartCreate('macbeth');
+piRecipeMerge(chessR,mccchart.thisR,'node name',mccchart.mergeNode);
+piAssetSet(chessR,mccchart.mergeNode,'translate',[-0.2 0.3 0.7]);
+thisScale = chessR.get('asset',mccchart.mergeNode,'scale');
+piAssetSet(chessR,mccchart.mergeNode,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should always do this
 
 %{
  chessR.show('objects');
@@ -62,19 +90,107 @@ piAssetSet(chessR,gridgName,'scale',thisScale.*[0.1 0.1 0.1]);  % scale should a
  piWRS(chessR); % Quick check
 %}
 
-% High resolution
+%% High resolution
 chessR.set('spatial resolution',[1024 1024]);
 chessR.set('rays per pixel',128);
 piWRS(chessR);
 
 % chessR.show;
+
+%% Add the bunny into the simple scene
+
+thisR = piRecipeDefault('scene name','simple scene');
+thisR.set('assets','Camera_B','delete');
+thisR.set('assets','001_mirror_O','delete');
+bunnychart = load('bunny.mat');
+piRecipeMerge(thisR,bunnychart.thisR,'node name',bunnychart.mergeNode);
+
+thisScale = thisR.get('asset',bunnychart.mergeNode,'scale');
+piAssetSet(thisR,bunnychart.mergeNode,'scale',thisScale.*[10 10 10]);  % scale should always do this
+piAssetSet(thisR,bunnychart.mergeNode,'translate',[0 0 -10]);  % scale should always do this
+
+% piAssetGeometry(thisR);
+% piWRS(thisR);
+
+%%  Some other scenes.  Hand editing here.  Fix!!! so that is not needed.
+
+kitchenR = piRecipeDefault('scene name','kitchen');
+
+% [chartR, eiachart.mergeNode, eiaName]  = piChartCreate('eia');
+% kitchenR.assets = chartR.assets;
+
+piRecipeMerge(kitchenR,chartR,'node name',eiachart.mergeNode);
+kitchenR.get('asset',eiachart.mergeNode,'translate')
+d = kitchenR.get('look at direction');
+from = kitchenR.get('from');
+piAssetSet(kitchenR,eiachart.mergeNode,'translate',from + 3*d);
+thisScale = kitchenR.get('asset',eiachart.mergeNode,'scale');
+piAssetSet(kitchenR,eiachart.mergeNode,'scale',thisScale*0.3);
+
+kitchenR.show('objects')
+kitchenR.exporter = 'C4D';
+
+
+kitchenR.set('spatial resolution',[1024 1024]);
+kitchenR.set('rays per pixel',512);
+
+piWrite(kitchenR);
+% I edited scene.pbrt to add
+% Include "scene_geometry.pbrt"
+scene = piRender(kitchenR,'render type','radiance');
+sceneWindow(scene);
+% scene = piAIdenoise(scene);
+% sceneWindow(scene);
+%%
+whiteR = piRecipeDefault('scene name','white-room');
+whiteR.exporter = 'C4D';
+[chartR, eiachart.mergeNode]  = piChartCreate('macbeth');
+
+piRecipeMerge(whiteR,chartR,'node name',eiachart.mergeNode);
+
+d = whiteR.get('look at direction');
+from = whiteR.get('from');
+piAssetSet(whiteR,eiachart.mergeNode,'translate',from + 3*d);
+
+thisScale = whiteR.get('asset',eiachart.mergeNode,'scale');
+piAssetSet(whiteR,eiachart.mergeNode,'scale',thisScale*1);
+
+whiteR.set('spatial resolution',[320 320]);
+whiteR.set('rays per pixel',16);
+
+% piAssetGeometry(whiteR)
+% Include "scene_geometry.pbrt"
+piWrite(whiteR);
+% I edited scene.pbrt to add
+% Include "scene_geometry.pbrt"
+scene = piRender(whiteR,'render type','radiance');
+sceneWindow(scene);
+scene = piRender(kitchenR,'render type','radiance');
+sceneWindow(scene);
+
+%{
+whiteR.show('objects')
+whiteR.set('spatial resolution',[1024 1024]);
+whiteR.set('rays per pixel',512);
+piWrite(whiteR);
+% I edited scene.pbrt to add
+% Include "scene_geometry.pbrt"
+%}
+scene = piRender(whiteR,'render type','radiance');
+sceneWindow(scene);
+
+% scene = piAIdenoise(scene);
+% sceneWindow(scene);
+
+
+
 %%
 %{
 %%  We did not set up the independent textures correctly
 
-[chartR, gName, oName] = piChartCreate('EIA');
-mergedR = piRecipeMerge(thisR,chartR,'node name',gName);
-piAssetSet(mergedR,gName,'translate',[2 1 0]);
+[chartR, chart.mergeNode, oName] = piChartCreate('EIA');
+mergedR = piRecipeMerge(thisR,chartR,'node name',chart.mergeNode);
+piAssetSet(mergedR,chart.mergeNode,'translate',[2 1 0]);
 piWRS(mergedR);
 
 % scene = piWRS(thisR);
