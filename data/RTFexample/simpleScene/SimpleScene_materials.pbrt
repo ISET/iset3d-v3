@@ -1,0 +1,8 @@
+# Exported by piMaterialWrite on 2021/4/14 15:44:49.64 
+Texture "checkerboard_color" "spectrum" "imagemap" "string filename" "textures/checkerboard.png"
+MakeNamedMaterial "uber_blue" "string type" "uber" "rgb Kd" [0.0477 0.1075 0.3424] "rgb Ks" [0.0331 0.0331 0.0331] "rgb Kr" [0.0331 0.0331 0.0331] "float roughness" [0.5000] "float eta" [1.3330]
+MakeNamedMaterial "uber" "string type" "uber" "rgb Kd" [0.8228 0.8148 0.0723] "rgb Ks" [0.0331 0.0331 0.0331] "rgb Kr" [0.0331 0.0331 0.0331] "float roughness" [0.5000] "float eta" [1.3330]
+MakeNamedMaterial "BODY" "string type" "uber" "rgb Kd" [0.7197 0.0402 0.0050] "rgb Ks" [0.0000 0.0000 0.0000] "rgb Kr" [0.0082 0.0082 0.0082] "float roughness" [0.0000] "float eta" [1.3330]
+MakeNamedMaterial "GLASS" "string type" "glass" "rgb Kr" [0.0042 0.0042 0.0042] "rgb Kt" [0.9990 0.9982 0.9910] "float eta" [1.3330]
+MakeNamedMaterial "mirror" "string type" "uber" "rgb Kd" [0.0000 0.0000 0.0000] "rgb Ks" [0.0509 0.0509 0.0509] "rgb Kr" [0.0052 0.0052 0.0052] "float roughness" [0.6736] "float eta" [1.3330]
+MakeNamedMaterial "Material" "string type" "uber" "texture Kd" "checkerboard_color" "rgb Ks" [0.0509 0.0509 0.0509] "rgb Kr" [0.0509 0.0509 0.0509] "float roughness" [0.6736] "float eta" [1.3330]

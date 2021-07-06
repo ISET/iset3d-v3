@@ -1,0 +1,195 @@
+# Exported by piMaterialWrite on 2021/4/14 15:44:49.641273 
+  
+ObjectBegin "015ID_figure_3m_O"
+NamedMaterial "uber_blue"
+Include "scene/PBRT/pbrt-geometry/015ID_figure_3m_O.pbrt" 
+ObjectEnd
+
+ObjectBegin "017ID_figure_6m_O"
+NamedMaterial "uber"
+Include "scene/PBRT/pbrt-geometry/017ID_figure_6m_O.pbrt" 
+ObjectEnd
+
+ObjectBegin "019ID_Sphere_O"
+NamedMaterial "BODY"
+Include "scene/PBRT/pbrt-geometry/019ID_Sphere_O.pbrt" 
+ObjectEnd
+
+ObjectBegin "021ID_glass_O"
+NamedMaterial "GLASS"
+Include "scene/PBRT/pbrt-geometry/021ID_glass_O.pbrt" 
+ObjectEnd
+
+ObjectBegin "023ID_mirror_O"
+NamedMaterial "mirror"
+Include "scene/PBRT/pbrt-geometry/023ID_mirror_O.pbrt" 
+ObjectEnd
+
+ObjectBegin "026ID_Plane_O"
+NamedMaterial "Material"
+Include "scene/PBRT/pbrt-geometry/026ID_Plane_O.pbrt" 
+ObjectEnd
+
+AttributeBegin
+    #ObjectName 002ID_sky_B:Vector(0.00000, 0.00000, 0.00000)
+    Translate 0.00000 0.00000 0.00000
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate 0.00000 0.00000 1.00000 0.00000
+    Rotate 0.00000 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+    AttributeBegin
+        #ObjectName 003ID_Null_B:Vector(0.00000, 0.00000, 0.00000)
+        Translate 0.00000 0.00000 0.00000
+        Rotate 0.00000 0.00000 0.00000 1.00000
+        Rotate 0.00000 0.00000 1.00000 0.00000
+        Rotate 0.00000 1.00000 0.00000 0.00000
+        Scale 1.00000 1.00000 1.00000
+        AttributeBegin
+            AttributeBegin
+            Rotate 90.000 -1 0 0
+            Scale 1.000 -1.000 1.000
+            LightSource "infinite" "rgb L" [1             1             1] "integer nsamples" [128] "string mapname" "environment_Reflection.exr"
+            AttributeEnd
+        AttributeEnd
+        AttributeBegin
+            #ObjectName 005ID_Sky Null_B:Vector(0.00000, 0.00000, 0.00000)
+            Translate 0.00000 0.50000 -15.00000
+            Rotate 0.00000 0.00000 0.00000 1.00000
+            Rotate -0.00000 0.00000 1.00000 0.00000
+            Rotate 0.00000 1.00000 0.00000 0.00000
+            Scale 1.00000 1.00000 1.00000
+            AttributeBegin
+                #ObjectName 006ID_Sun_B:Vector(0.00000, 0.00000, 0.00000)
+                Translate -525.61760 39477.20010 -141783.59975
+                Rotate 0.00000 0.00000 0.00000 1.00000
+                Rotate 0.21241 0.00000 1.00000 0.00000
+                Rotate 15.55884 1.00000 0.00000 0.00000
+                Scale 1.00000 1.00000 1.00000
+                AttributeBegin
+                    #ObjectName 007ID_Lensflare Source_B:Vector(0.00000, 0.00000, 0.00000)
+                    Translate 0.00000 0.00000 0.00000
+                    Rotate 0.00000 0.00000 0.00000 1.00000
+                    Rotate 0.00000 0.00000 1.00000 0.00000
+                    Rotate 0.00000 1.00000 0.00000 0.00000
+                    Scale 1.00000 1.00000 1.00000
+                AttributeEnd
+                AttributeBegin
+                    AttributeBegin
+                    LightSource "distant" "rgb L" [0.9861017     0.8181724     0.5638673] "point from" [0.0000 0.0000 0.0000] "point to" [0.0000 0.0000 1.0000]
+                    AttributeEnd
+                AttributeEnd
+            AttributeEnd
+            AttributeBegin
+                #ObjectName 009ID_Moon_B:Vector(0.00000, 0.00000, 0.00000)
+                Translate 1916.11773 -1117.78200 2989.67337
+                Rotate -180.00000 0.00000 0.00000 1.00000
+                Rotate -32.65630 0.00000 1.00000 0.00000
+                Rotate 162.52710 1.00000 0.00000 0.00000
+                Scale 1.00000 1.00000 1.00000
+                AttributeBegin
+                    AttributeBegin
+                    LightSource "distant" "rgb L" [0             0             0] "point from" [0.0000 0.0000 0.0000] "point to" [0.0000 0.0000 1.0000]
+                    AttributeEnd
+                AttributeEnd
+            AttributeEnd
+        AttributeEnd
+        AttributeBegin
+            #ObjectName 011ID_Shadow Plane_B:Vector(2000.00000, 0.00000, 2000.00000)
+            Translate 0.00000 10000.00000 0.00000
+            Rotate 0.00000 0.00000 0.00000 1.00000
+            Rotate -0.00000 0.00000 1.00000 0.00000
+            Rotate 0.00000 1.00000 0.00000 0.00000
+            Scale 1.00000 1.00000 1.00000
+        AttributeEnd
+        AttributeBegin
+            #ObjectName 012ID_Sky Dome_B:Vector(0.00000, 0.00000, 0.00000)
+            Translate 0.00000 0.00000 0.00000
+            Rotate 0.00000 0.00000 0.00000 1.00000
+            Rotate 0.00000 0.00000 1.00000 0.00000
+            Rotate 0.00000 1.00000 0.00000 0.00000
+            Scale 1.00000 1.00000 1.00000
+        AttributeEnd
+    AttributeEnd
+AttributeEnd
+AttributeBegin
+    #ObjectName 013ID_Camera_B:Vector(0.00000, 0.00000, 0.00000)
+    Translate 0.00000 0.50000 -15.00000
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate -0.00000 0.00000 1.00000 0.00000
+    Rotate 0.00000 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+AttributeEnd
+AttributeBegin
+    #ObjectName 014ID_figure_3m_B:Vector(1.01600, 1.00000, 0.17200)
+    Translate 0.00000 0.50000 -12.02812
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate -0.00000 0.00000 1.00000 0.00000
+    Rotate 0.00000 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+    AttributeBegin
+        ObjectInstance "015ID_figure_3m_O"
+    AttributeEnd
+AttributeEnd
+AttributeBegin
+    #ObjectName 016ID_figure_6m_B:Vector(1.01600, 1.00000, 0.17200)
+    Translate 1.00000 0.50000 -9.00000
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate -0.00000 0.00000 1.00000 0.00000
+    Rotate 0.00000 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+    AttributeBegin
+        ObjectInstance "017ID_figure_6m_O"
+    AttributeEnd
+AttributeEnd
+AttributeBegin
+    #ObjectName 018ID_Sphere_B:Vector(2.00000, 2.00000, 2.00000)
+    Translate 3.63462 1.13757 8.43053
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate -0.00000 0.00000 1.00000 0.00000
+    Rotate 0.00000 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+    AttributeBegin
+        ObjectInstance "019ID_Sphere_O"
+    AttributeEnd
+AttributeEnd
+AttributeBegin
+    #ObjectName 020ID_glass_B:Vector(8.00000, 2.00000, 0.00000)
+    Translate 0.17999 0.90829 5.78959
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate -0.00000 0.00000 1.00000 0.00000
+    Rotate 0.00000 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+    AttributeBegin
+        ObjectInstance "021ID_glass_O"
+    AttributeEnd
+AttributeEnd
+AttributeBegin
+    #ObjectName 022ID_mirror_B:Vector(13.42400, 3.50800, 16.17200)
+    Translate 0.46921 4.30191 3.01301
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate -0.00000 0.00000 1.00000 0.00000
+    Rotate 7.08221 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+    AttributeBegin
+        ObjectInstance "023ID_mirror_O"
+    AttributeEnd
+AttributeEnd
+AttributeBegin
+    #ObjectName 024ID_Plane_B:Vector(0.00000, 0.00000, 0.00000)
+    Translate 0.00000 0.00000 0.00000
+    Rotate 0.00000 0.00000 0.00000 1.00000
+    Rotate 0.00000 0.00000 1.00000 0.00000
+    Rotate 0.00000 1.00000 0.00000 0.00000
+    Scale 1.00000 1.00000 1.00000
+    AttributeBegin
+        #ObjectName 025ID_Plane_B:Vector(0.00000, 0.00000, 0.00000)
+        Translate 0.00000 0.00000 0.00000
+        Rotate 0.00000 0.00000 0.00000 1.00000
+        Rotate 0.00000 0.00000 1.00000 0.00000
+        Rotate 0.00000 1.00000 0.00000 0.00000
+        Scale 1.00000 1.00000 1.00000
+        AttributeBegin
+            ObjectInstance "026ID_Plane_O"
+        AttributeEnd
+    AttributeEnd
+AttributeEnd
