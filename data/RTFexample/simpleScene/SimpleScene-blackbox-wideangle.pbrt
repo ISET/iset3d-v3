@@ -1,0 +1,32 @@
+# PBRT file created with piWrite on 2021/4/14 15:44:49.41 
+# PBRT version = 3 
+
+LookAt 0.000000 0.500000 -15.000000 0.000000 0.500000 -14.000000 0.000000 1.000000 0.000000 
+
+# camera 
+Camera "blackbox" 
+ "string lensfile" "../lens/polyjson_wideangle.json"
+    "float aperturediameter" [0.4350] 
+  "float focusdistance" [10.000000] 
+   "float filmdistance" [0.001967]
+# sampler 
+Sampler "halton" 
+  "integer pixelsamples" [64] 
+
+# film 
+Film "image" 
+  "integer xresolution" [320] 
+  "integer yresolution" [320] 
+  "float diagonal" [18.0000] 
+
+# integrator 
+Integrator "path" 
+  "integer maxdepth" [5] 
+  "string strategy" "all" 
+
+WorldBegin 
+Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333] 
+Include "SimpleScene_materials.pbrt" 
+Include "SimpleScene_geometry.pbrt" 
+Include "SimpleScene_lights.pbrt" 
+WorldEnd 

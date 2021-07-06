@@ -1,0 +1,9 @@
+# Exported by piMaterialWrite on 2021/4/14 15:44:49.641273 
+  
+
+ObjectBegin "026ID_Plane_O"
+NamedMaterial "Material"
+Include "scene/PBRT/pbrt-geometry/026ID_Plane_O.pbrt" 
+ObjectEnd
+
+

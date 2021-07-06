@@ -1,0 +1,34 @@
+# PBRT file created with piWrite on 2021/4/14 15:44:49.41 
+# PBRT version = 3 
+
+LookAt 0.000000 0.500000 -15.000000 0.000000 0.500000 -14.000000 0.000000 1.000000 0.000000 
+
+# camera 
+Camera "omnispectral" 
+  "string lensfile" "../lens/dgauss.22deg.3.0mm_aperture0.6_spectral.json" 
+  "float aperturediameter" [0.6] 
+  "float focusdistance" [10.000000] 
+  "float filmdistance" [0.002167] 
+
+# sampler 
+Sampler "halton" 
+  "integer pixelsamples" [512] 
+
+# film 
+Film "image" 
+  "integer xresolution" [320] 
+  "integer yresolution" [320] 
+  "float diagonal" [5.0000] 
+
+# integrator 
+Integrator "spectralpath" 
+  "integer maxdepth" [5]
+  "integer numCABands" [31]
+  "string strategy" "all" 
+
+WorldBegin 
+Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333] 
+Include "SimpleScene_materials.pbrt" 
+Include "SimpleScene_geometry.pbrt" 
+Include "SimpleScene_lights.pbrt" 
+WorldEnd 
