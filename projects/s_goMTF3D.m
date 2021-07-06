@@ -10,8 +10,6 @@ chart = load('slantedbar.mat');
 % Merge them
 piRecipeMerge(chessR,chart.thisR,'node name',chart.mergeNode);
 
-% wRotate = chessR.get('asset', eiachart.mergeNode, 'rotation', rotMatrix);
-
 % Position and scale the chart
 piAssetSet(chessR,chart.mergeNode,'translate',[0 0.5 2]);
 thisScale = chessR.get('asset',chart.mergeNode,'scale');
@@ -51,6 +49,39 @@ ip = ipCompute(ip,sensor);
 ipWindow(ip);
 
 
+%% The chess set with pieces and a camera
 
+load('ChessSetPieces-recipe','thisR');
+chessR = thisR;
 
+% The EIA chart
+chart = load('slantedbar.mat');
 
+% Merge them
+piRecipeMerge(chessR,chart.thisR,'node name',chart.mergeNode);
+
+% Position and scale the chart
+piAssetSet(chessR,chart.mergeNode,'translate',[0 0.5 2]);
+thisScale = chessR.get('asset',chart.mergeNode,'scale');
+piAssetSet(chessR,chart.mergeNode,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
+
+% piWRS(chessR); % Quick check
+
+%% Make a camera
+lensfile  = 'dgauss.22deg.6.0mm.json';    % 30 38 18 10
+fprintf('Using lens: %s\n',lensfile);
+thisR.camera = piCameraCreate('omni','lensFile',lensfile);
+
+% Set the film so that the field of view makes sense
+
+thisR.set('film diagonal',5,'mm');
+thisR.get('fov')
+
+%%
+chessR.set('spatial resolution',[256 256]);
+chessR.set('rays per pixel',1024);
+oi = piWRS(chessR);
+
+chessR.set('spatial resolution',[1024 1024]);
+chessR.set('rays per pixel',128);
+oi = piWRS(chessR);
