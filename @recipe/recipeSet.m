@@ -652,7 +652,12 @@ switch param
         thisR.metadata.sumo.timestamp = val;
         
     case 'filter'
-        warning('Not sure how to set filter yet');
+        % Spatial filter for interpolating rays onto the film sampling grid
+        % Options for the filter are        
+        %
+        %    'box', 'triangle','gaussian','mitchell', 'sinc'
+        %
+        thisR.filter = val;
         
         % Getting ready for camera level recipe information.
         % Not really used yet and may never get used.

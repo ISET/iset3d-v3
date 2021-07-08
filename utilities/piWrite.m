@@ -411,13 +411,14 @@ function piWriteBlocks(thisR,fileID)
 %
 % The blocks that are written out include
 %
-%  Camera and lens
+%  Camera, lens
 %
 
 workingDir = thisR.get('output dir');
 
 % These are the main fields in the recipe.  We call them the outer fields.
-% Within each outer field, there will be inner fields.
+% Within each outer field, there will be inner fields.  The outer fields
+% include film, filter, camera and such.
 outerFields = fieldnames(thisR);
 
 for ofns = outerFields'
@@ -437,6 +438,10 @@ for ofns = outerFields'
             strcmp(ofn,'outputFile')|| ...
             strcmp(ofn,'version')) || ...
             strcmp(ofn,'materials')|| ...
+            strcmp(ofn,'recipeVer')|| ...
+            strcmp(ofn,'exporter') || ...
+            strcmp(ofn,'metadata') || ...
+            strcmp(ofn,'renderedFile') || ...
             strcmp(ofn,'world')
         continue;
     end
