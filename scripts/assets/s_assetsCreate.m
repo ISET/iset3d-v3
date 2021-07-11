@@ -32,7 +32,7 @@ mergeNode = 'Bunny_B';
 oFile = thisR.save(fullfile(assetDir,[sceneName,'.mat']));
 save(oFile,'mergeNode','-append');
 
-%%  Axes at 000
+%%  Coordinate axes at 000
 
 sceneName = 'coordinate';
 thisR = piRecipeDefault('scene name', sceneName);
