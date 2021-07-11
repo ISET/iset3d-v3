@@ -334,8 +334,12 @@ elseif isequal(thisR.get('realistic eye model'),'arizona')
     % Still tracking down why no IOR files are associated with this model.
     arizonaWrite(thisR);
 else
-    % If the working copy doesn't exist, copy it.  
+    % If the working copy doesn't exist, copy it.
     % If it exists but there is a force overwrite, delete and copy.
+    %
+    % We need to check that this will work for the RTF json file as well.
+    % I think so. (BW).
+    
     if ~exist(outputLensFile,'file')
         copyfile(inputLensFile,outputLensFile);
     elseif overwritelensfile

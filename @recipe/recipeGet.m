@@ -383,7 +383,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % Translate
         if     isequal(val,'perspective'), val = 'pinhole';
         elseif isequal(val,'environment'), val = 'environment';
-        elseif ismember(val,{'realisticDiffraction','realisticEye','realistic','omni'})
+        elseif ismember(val,{'realisticDiffraction','realisticEye','realistic','omni','raytransfer'})
             val = 'lens';
         end
     case 'realisticeyemodel'
