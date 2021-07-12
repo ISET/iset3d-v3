@@ -113,21 +113,6 @@ try
     
     fNumber = focalLength/(apertureDiameter*10^-3);
     
-    %{
-    % Try to get the film properties
-    % Though is this the right idea when we have a lens???
-    filmDiag = recipe.get('film diagonal')*10^-3;
-    
-    res = recipe.get('film resolution');
-    x = res(1); y = res(2);
-    
-    d = sqrt(x^2 + y^2);         % Number of samples along the diagonal
-    fwidth= (filmDiag / d) * x;  % Diagonal size by d gives us mm per step
-    fov = 2 * atan2d(fwidth / 2, focalLength);
-    
-    success = 1;
-    %}
-    
 catch
     warning('Could not determine optics parameters from recipe. Using OI default parameters.')
 end

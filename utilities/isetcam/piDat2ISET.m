@@ -111,6 +111,8 @@ ieObjName = sprintf('%s-%s',pbrtFile,datestr(now,'mmm-dd,HH:MM'));
 % If radiance, return a scene or optical image
 cameraType = thisR.get('camera subtype');
 switch lower(cameraType)
+    case{'raytransfer'}
+        % NYI
     case {'realisticdiffraction','realistic','omni'}
         % If we used a lens, the ieObject is an optical image (irradiance).
         
