@@ -10,7 +10,7 @@ function camera = piCameraCreate(cameraType,varargin)
 %
 %    'pinhole'      - Default is pinhole camera, also called 'perspective'
 %    'omni'         - Standard lens, including potential microlens array
-%    'ray transfer' - Ray transfer function.
+%    'ray transfer' - Ray transfer function for the optics simulation
 %    'realistic'    - This seems to be superseded completely by omni, except
 %                     for some old car scene generation cases that have not
 %                     been updated.
@@ -78,14 +78,15 @@ p.addRequired('cameraType',@(x)(ismember(ieParamFormat(x),validCameraTypes)));
 
 % This will work for realistic, but not omni.  Perhaps we should make the
 % default depend on the camera type.
-switch cameraType
+switch ieParamFormat(cameraType)
     % Omni and realistic have lenses.  We are using this default lens.
     case 'omni'
         lensDefault = 'dgauss.22deg.12.5mm.json';
     case 'realistic'
         lensDefault = 'dgauss.22deg.12.5mm.dat';
     case 'raytransfer'
-        lensDefault = '';   % This is the json file for a default RTF when we have one
+        % This is the json file for a default RTF when we have one
+        lensDefault = 'dgauss-22deg-3.0mm.json';   
     otherwise
         lensDefault = '';
 end
@@ -168,23 +169,12 @@ switch ieParamFormat(cameraType)
     case {'raytransfer'}
         % Ray Transfer polynomials are in the json file specified by
         % rtfModel.  We need to add some specifications of the lens
-        % properties here for convenience
+        % properties into the JSON file for convenience.  When we get the
+        % parameters using recipeGet, we will read the JSON file.
         camera.type           = 'Camera';
         camera.subtype        = 'raytransfer';
         camera.lensfile.type  = 'string';
-        camera.lensfile.value = lensDefault;  % JSON Polynomial ray transfer model
-        
-        % The values we store here should probably be in the JSON file
-        % written out by ZEMAX.  A plan might be
-        %
-        %    lensInfo = jsonread(camera.lensfile.value);
-        %
-        % Then set the lensInfo fields here.
-        %
-        camera.aperturediameter.type  = 'float';
-        camera.aperturediameter.value = 5;    % mm
-        camera.focusdistance.type     = 'float';
-        camera.focusdistance.value    = 10; % mm
+        camera.lensfile.value = lensDefault;  % JSON Polynomial ray transfer model                
     case {'lightfield'}
         % This may no longer be used.  The 'omni' type incorporates the
         % light field microlens method and is more modern.
