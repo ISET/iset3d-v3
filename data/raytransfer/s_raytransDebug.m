@@ -5,7 +5,10 @@ thisR = piRecipeDefault('scene name','simple scene');
 camera = piCameraCreate('raytransfer','lensfile','dgauss-22deg-3.0mm.json');
 thisR.set('camera',camera);
 thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer';
+piWrite(thisR);
 [oi, result] = piRender(thisR, 'dockerimagename',thisDocker,'render type','radiance');
+oiWindow(oi);
+
 [dMap, result] = piRender(thisR, 'dockerimagename',thisDocker,'render type','depth');
 
 % The .dat file is generated and I can open it manually but there is an error generated in piRender that you might be most suited to understand.
