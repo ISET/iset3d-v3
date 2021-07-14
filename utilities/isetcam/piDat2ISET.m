@@ -111,23 +111,38 @@ ieObjName = sprintf('%s-%s',pbrtFile,datestr(now,'mmm-dd,HH:MM'));
 % If radiance, return a scene or optical image
 cameraType = thisR.get('camera subtype');
 switch lower(cameraType)
-    case{'raytransfer'}
-        % NYI
-    case {'realisticdiffraction','realistic','omni'}
-        % If we used a lens, the ieObject is an optical image (irradiance).
         
+    case {'realisticdiffraction','realistic','omni','raytransfer'}
+        % If we used a lens, the ieObject is an optical image (irradiance).
+        %
         % We specify the mean illuminance of the OI mean illuminance
         % with respect to a 1 mm^2 aperture. That way, if we change
         % the aperture, but nothing else, the illuminance level will
         % scale correctly.
 
-        % Try to find the optics parameters from the lensfile in the
-        % PBRT recipe.  The function looks for metadata, if it cannot
-        % find that slot it tries to decode the file name.  The file
-        % name part should go away before too long because we can just
-        % create the metadata once from the file name.
-        [focalLength, fNumber] = piRecipeFindOpticsParams(thisR);
-        
+        % We read the lens parameters differently for ray transfer type
+        switch(cameraType)
+            case 'raytransfer'
+                % Just made stuff up for defaults at this point
+                fNumber = [];
+                focalLength = [];
+                lensData = jsonread(thisR.camera.lensfile.value);
+                if isfield(lensData,'fnumber')
+                    fNumber = lensData.fnumber;
+                end
+                if isfield(lensData,'focallength')
+                    focalLength = lensData.focallength;
+                end
+                
+            otherwise
+                % Try to find the optics parameters from the lensfile in the
+                % PBRT recipe.  The function looks for metadata, if it cannot
+                % find that slot it tries to decode the file name.  The file
+                % name part should go away before too long because we can just
+                % create the metadata once from the file name.
+                [focalLength, fNumber] = piRecipeFindOpticsParams(thisR);
+        end
+                
         % Start building the oi
         ieObject = piOICreate(photons,'wavelength',wave);
         
