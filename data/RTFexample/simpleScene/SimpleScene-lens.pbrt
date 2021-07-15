@@ -5,7 +5,7 @@ LookAt 0.000000 0.500000 -15.000000 0.000000 0.500000 -14.000000 0.000000 1.0000
 
 # camera 
 Camera "omni" 
-  "string lensfile" "../lens/dgauss.22deg.3.0mm_aperture0.6.json" 
+  "string lensfile" "lenses/dgauss.22deg.3.0mm_aperture0.6.json" 
   "float aperturediameter" [0.6] 
   "float focusdistance" [10.000000] 
   "float filmdistance" [0.002167] 

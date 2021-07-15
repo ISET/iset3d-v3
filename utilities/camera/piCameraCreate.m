@@ -173,7 +173,10 @@ switch ieParamFormat(cameraType)
         % parameters using recipeGet, we will read the JSON file.
         camera.type           = 'Camera';
         camera.subtype        = 'raytransfer';
+        camera.filmdistance.type='float'
+        camera.filmdistance.value=0.002167;
         camera.lensfile.type  = 'string';
+        
         camera.lensfile.value = lensDefault;  % JSON Polynomial ray transfer model                
     case {'lightfield'}
         % This may no longer be used.  The 'omni' type incorporates the

@@ -9,8 +9,24 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
+%% Test image raytransfer
+        
+thisR = piRecipeDefault('scene name','simple scene');
+camera = piCameraCreate('raytransfer','lensfile','dgauss-22deg-3.0mm.json');
+thisR.set('camera',camera);
+piWrite(thisR);
+thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer';
+
+[oi, result] = piRender(thisR, 'dockerimagename',...
+            thisDocker);
+        
+        oiWindow(oi)
+        
+        
 %% Make the chart, simple scene, and merge
 
+        
+        
 thisR = piRecipeDefault('scene name','simple scene');
 thisR.set('assets','Camera_B','delete');
 thisR.set('assets','001_mirror_O','delete');

@@ -1,15 +1,18 @@
 %% Test the ray transfer docker
-
+clear;
 % docker pull vistalab/pbrt-v3-spectral:raytransfer
 thisR = piRecipeDefault('scene name','simple scene');
 camera = piCameraCreate('raytransfer','lensfile','dgauss-22deg-3.0mm.json');
+camera.filmdistance.value=0.002167; % meters
+
+thisR.set('film diagonal',5)
 thisR.set('camera',camera);
 thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer';
 piWrite(thisR);
 [oi, result] = piRender(thisR, 'dockerimagename',thisDocker,'render type','radiance');
 oiWindow(oi);
 
-[dMap, result] = piRender(thisR, 'dockerimagename',thisDocker,'render type','depth');
+%[dMap, result] = piRender(thisR, 'dockerimagename',thisDocker,'render type','depth');
 
 % The .dat file is generated and I can open it manually but there is an error generated in piRender that you might be most suited to understand.
 % Just to make sure I copied the error down here:

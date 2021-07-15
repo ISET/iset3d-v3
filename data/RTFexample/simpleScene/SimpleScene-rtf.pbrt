@@ -5,7 +5,7 @@ LookAt 0.000000 0.500000 -15.000000 0.000000 0.500000 -14.000000 0.000000 1.0000
 
 # camera 
 Camera "rtf" 
-"string lensfile" "../lens/polyjson_test_5deg_0.1.json"
+"string lensfile" "lenses/polyjson_test_5deg_0.1.json"
 "float aperturediameter" [2.531800] 
 "float focusdistance" [10.000000] 
 "float filmdistance" [0.002167]
