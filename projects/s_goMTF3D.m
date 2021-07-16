@@ -1,7 +1,12 @@
 %%  I would like to control the chart reflectance
 %
 % 
-% The chess set with pieces
+
+%%
+ieInit
+if ~piDockerExists, piDockerConfig; end
+
+%% The chess set with pieces
 load('ChessSetPieces-recipe','thisR');
 chessR = thisR;
 
@@ -19,8 +24,6 @@ piAssetSet(chessR,sbar.mergeNode,'scale',thisScale.*[0.2 0.2 0.01]);  % scale sh
 initialScale = chessR.get('asset',sbar.mergeNode,'scale');
 
 piWRS(chessR);  % Write, Render, Show a scene
-
-%% Now, add a second slanted bar
 
 %% Add a lens
 % camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
