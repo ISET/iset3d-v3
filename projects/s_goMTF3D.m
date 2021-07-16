@@ -1,5 +1,6 @@
 %%  I would like to control the chart reflectance
-
+%
+% 
 % The chess set with pieces
 load('ChessSetPieces-recipe','thisR');
 chessR = thisR;
@@ -10,12 +11,14 @@ sbar = piAssetLoad('slantedbar');
 % Merge them
 piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
 
+
 % Position and scale the chart
 piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.5 2]);
 thisScale = chessR.get('asset',sbar.mergeNode,'scale');
 piAssetSet(chessR,sbar.mergeNode,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
 initialScale = chessR.get('asset',sbar.mergeNode,'scale');
-% piWRS(chessR); % Quick check
+
+piWRS(chessR);  % Write, Render, Show a scene
 
 %% Now, add a second slanted bar
 
@@ -24,7 +27,11 @@ initialScale = chessR.get('asset',sbar.mergeNode,'scale');
 camera = piCameraCreate('raytransfer','lensfile','dgauss-22deg-3.0mm.json');
 
 chessR.set('camera',camera);
-% piWRS(chessR);  % Write, Render, Show
+chessR.set('film distance',0.002167);
+chessR.set('film diagonal',2);
+
+thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer';
+piWRS(chessR,'docker image name',thisDocker); % Quick check
 
 % piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 1]);
 % piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 .3]);
@@ -32,7 +39,7 @@ chessR.set('camera',camera);
 
 % piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.3 -0.1]);  % Fails.
 
-% piWRS(chessR);  % Write, Render, Show
+% piWRS(chessR,'docker image name',thisDocker);
 
 %%
 % thisScale = chessR.get('asset',sbar.mergeNode,'scale');
