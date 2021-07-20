@@ -14,6 +14,7 @@ if ~piDockerExists, piDockerConfig; end
 thisR = piRecipeDefault('scene name','simple scene');
 camera = piCameraCreate('raytransfer','lensfile','dgauss-22deg-3.0mm.json');
 thisR.set('camera',camera);
+thisR.set('film diagonal',5)
 piWrite(thisR);
 thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer';
 
@@ -39,6 +40,12 @@ piRecipeMerge(thisR,eiachart.thisR,'node name',eiachart.mergeNode);
 
 % Assign the chart a position in this scene
 piAssetSet(thisR,eiachart.mergeNode,'translate',[-2 1.5 0]);
+
+%% SET RTF
+thisR.set('camera',camera);
+thisR.set('film diagonal',5)
+
+%%
 
 % Render
 piWRS(thisR);

@@ -151,7 +151,7 @@ thisR.get('texture print');
 thisR.set('material', surfaceMaterial.name, 'kd val', chartName);
 thisR.show('assetsmaterials');
 
-%%
+%
 thisR.set('assets',surfaceName,'rotate',[30 20 10]);
 
 %% Write and render

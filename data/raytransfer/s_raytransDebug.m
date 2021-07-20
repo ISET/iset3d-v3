@@ -2,7 +2,7 @@
 clear;
 % docker pull vistalab/pbrt-v3-spectral:raytransfer
 thisR = piRecipeDefault('scene name','simple scene');
-camera = piCameraCreate('raytransfer','lensfile','dgauss-22deg-3.0mm.json');
+camera = piCameraCreate('raytransfer','lensfile','dgauss-2  2deg-3.0mm.json');
 camera.filmdistance.value=0.002167; % meters
 
 thisR.set('film diagonal',5)
