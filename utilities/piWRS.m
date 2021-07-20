@@ -15,16 +15,18 @@ varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addRequired('thisR',@(x)(isa(x,'recipe')));
 p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:latest',@ischar);
+p.addParameter('rendertype','radiance',@ischar);
 
 p.parse(thisR,varargin{:});
 thisDocker = p.Results.dockerimagename;
+renderType = p.Results.rendertype;
 
 %%
 piWrite(thisR);
 
 [obj,results] = piRender(thisR,...
     'docker image name',thisDocker, ...
-    'render type','radiance');
+    'render type',renderType);
 
 switch obj.type
     case 'scene'
