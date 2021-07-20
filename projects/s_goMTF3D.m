@@ -23,6 +23,23 @@ chessR = thisR;
 % The EIA chart
 sbar = piAssetLoad('slantedbar');
 
+% Adjust the input slot in the recipe for the local user
+[~,n,e] = fileparts(chessR.get('input file'));
+inFile = which([n,e]);
+if isempty(inFile), error('Cannot find the PBRT input file %s\n',chessR.inputFile); end
+chessR.set('input file',inFile);
+
+% Adjust the input slot in the recipe for the local user
+[p,n,e] = fileparts(chessR.get('output file'));
+temp=split(p,'/');
+outFile=fullfile(piRootPath,'local',temp{end});
+chessR.set('output file',outFile);
+
+% For efficience check
+chessR.set('pixel samples',1)
+
+
+%%
 % Merge them
 piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
 
@@ -31,6 +48,7 @@ piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.5 2]);
 thisScale = chessR.get('asset',sbar.mergeNode,'scale');
 piAssetSet(chessR,sbar.mergeNode,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
 initialScale = chessR.get('asset',sbar.mergeNode,'scale');
+
 
 % Render the scene with a depth map
 scene = piWRS(chessR,'render type','both');
