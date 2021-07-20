@@ -1,12 +1,22 @@
-%%  I would like to control the chart reflectance
+%%  s_goMTF3D
 %
-% 
+% Questions:
+%   * I am unsure whether the focal distance is in z or in distance from
+%   the camera.  So if the camera is at 0, these are the same.  But if the
+%   camera is at -0.5, these are not the same.
+%
+%  * There is trouble scaling the object size.  When the number gets small,
+%  the object disappears.  This may be some numerical issue reading the
+%  scale factor in the pbrt geometry file?
+%
 
 %%
 ieInit
 if ~piDockerExists, piDockerConfig; end
 
 %% The chess set with pieces
+
+% This just loads the scene.
 load('ChessSetPieces-recipe','thisR');
 chessR = thisR;
 
@@ -16,46 +26,83 @@ sbar = piAssetLoad('slantedbar');
 % Merge them
 piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
 
-
 % Position and scale the chart
 piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.5 2]);
 thisScale = chessR.get('asset',sbar.mergeNode,'scale');
 piAssetSet(chessR,sbar.mergeNode,'scale',thisScale.*[0.2 0.2 0.01]);  % scale should always do this
 initialScale = chessR.get('asset',sbar.mergeNode,'scale');
 
-piWRS(chessR);  % Write, Render, Show a scene
+% Render the scene with a depth map
+scene = piWRS(chessR,'render type','both');
 
-%% Add a lens
-% camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
-camera = piCameraCreate('raytransfer','lensfile','dgauss-22deg-3.0mm.json');
+% You can see the distance to different objects in this plot.  Select the
+% data tip and the index value is the distance in meters.  The actual
+% distance in meters is the index minus chessR.get('from'), which is -0.5,
+% I think.
+scenePlot(scene,'depth map');
 
+%% Add a lens and render.
+
+camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
 chessR.set('camera',camera);
-chessR.set('film distance',0.002167);
-chessR.set('film diagonal',2);
 
-thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer';
-piWRS(chessR,'docker image name',thisDocker); % Quick check
+%% Change the focal distance
 
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 1]);
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 .3]);
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 0]);
+% This series sets the focal distance and leaves the slanted bar in place
+% at 2.3m from the camera
+chessR.set('focal distance',2.3);   % Original distance z value of the slanted bar
+oi = piWRS(chessR);  % Write, Render, Show
 
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.3 -0.1]);  % Fails.
+chessR.set('focal distance',0.7);   % Z value of the rook
+oi = piWRS(chessR);  % Write, Render, Show
 
-% piWRS(chessR,'docker image name',thisDocker);
+chessR.set('focal distance', 0.3);   % Z value of the king
+oi = piWRS(chessR);  % Write, Render, Show
+
+%% Fix the focal distance and move the slanted bar
+
+% I think this is a z-coordinate not from the camera, which is at -0.5;
+chessR.set('focal distance', 0.45);   % Z value of a pawn, but not the nearest one
+
+% This is the size that looks OK at a distance of 2.3m
+targetScale = chessR.get('asset',sbar.mergeNode,'scale');
+
+% The scale starts to fail at less than 1/2.3  I suspect  this has to do
+% with rounding error, the scale factor gets very small.
+
+% Beyond the focal distance
+piAssetSet(chessR, sbar.mergeNode,'translate',[0 0.3 2.3]);
+oi = piWRS(chessR);  % Write, Render, Show
+
+% Make it smaller as we get closer.  There is a problem, however.
+piAssetSet(chessR, sbar.mergeNode,'scale',targetScale*(1/2.3));
+
+% Translate the object and scale it - but the scale is not quite enough 
+piAssetSet(chessR, sbar.mergeNode,'translate',[0 0.2 1]);
+chessR.get('asset',sbar.mergeNode,'scale')
+oi = piWRS(chessR);  % Write, Render, Show
+
+% This is the focal distance
+piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.2 .45]);
+chessR.get('asset',sbar.mergeNode,'scale')
+oi = piWRS(chessR);  % Write, Render, Show
+
+% Closer than the focal distance.  The position is relative to the camera,
+% at -0.5.
+chessR.set('focal distance', 0.25);
+piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 -0.25]);
+chessR.get('asset',sbar.mergeNode,'scale')
+oi = piWRS(chessR,'render type','radiance');  % Write, Render, Show
+
 
 %%
-% thisScale = chessR.get('asset',sbar.mergeNode,'scale');
-% piAssetSet(chessR,sbar.mergeNode,'scale',thisScale*0.3);   % We should scale by z
-piWRS(chessR);  % Write, Render, Show
+%{
+chessR.set('spatial resolution',[1024 1024]);
+chessR.set('rays per pixel',128);
+oi = piWRS(chessR);
+%}
 
 %%
-% scene = ieGetObject('scene');
-% oi = oiCreate;
-% oi = oiCompute(oi,scene);
-
-%%
-oi = ieGetObject('oi');
 sensor = sensorCreate('IMX363');
 sensor = sensorSet(sensor,'fov',oiGet(oi,'fov'),oi);
 sensor = sensorCompute(sensor,oi);
@@ -72,7 +119,7 @@ ipWindow(ip);
 load('ChessSetPieces-recipe','thisR');
 chessR = thisR;
 
-% The EIA chart
+% Test chart
 chart = load('slantedbar.mat');
 
 % Merge them
