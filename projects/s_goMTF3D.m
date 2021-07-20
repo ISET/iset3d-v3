@@ -42,21 +42,9 @@ scene = piWRS(chessR,'render type','both');
 scenePlot(scene,'depth map');
 
 %% Add a lens and render.
-%
-% Because we are rendering through a lens, we have an OI.
 
 camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
 chessR.set('camera',camera);
-
-% We can place the slanted bar at different distances this way
-%
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 1]);
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 .3]);
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.1 0]);
-%
-% piAssetSet(chessR,sbar.mergeNode,'translate',[0 0.3 -0.1]);  % Fails.
-
-% piWRS(chessR,'docker image name',thisDocker);
 
 %% Change the focal distance
 
@@ -79,12 +67,11 @@ chessR.set('focal distance', 0.45);   % Z value of a pawn, but not the nearest o
 % This is the size that looks OK at a distance of 2.3m
 targetScale = chessR.get('asset',sbar.mergeNode,'scale');
 
-% The scale starts to fall at less than 1/2.3  I suspect  this has to do
+% The scale starts to fail at less than 1/2.3  I suspect  this has to do
 % with rounding error, the scale factor gets very small.
 
 % Beyond the focal distance
 piAssetSet(chessR, sbar.mergeNode,'translate',[0 0.3 2.3]);
-chessR.get('asset',sbar.mergeNode,'scale')
 oi = piWRS(chessR);  % Write, Render, Show
 
 % Make it smaller as we get closer.  There is a problem, however.
