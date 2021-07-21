@@ -23,6 +23,7 @@ chessR = thisR;
 % The EIA chart
 sbar = piAssetLoad('slantedbar');
 
+
 % Adjust the input slot in the recipe for the local user
 [~,n,e] = fileparts(chessR.get('input file'));
 inFile = which([n,e]);

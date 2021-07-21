@@ -176,8 +176,19 @@ switch ieParamFormat(cameraType)
         camera.filmdistance.type='float'
         camera.filmdistance.value=0.002167;
         camera.lensfile.type  = 'string';
+           [~,name,e] = fileparts(lensFile);
+           % check if lensFile exist
+        if isempty(which(lensFile))
+            % The lensFile is not included in iset3d lens folder.
+            % So we move the file into the lens folder.
+            copyfile(lensFile, fullfile(piRootPath,'data/lens'));
+            camera.lensfile.value = [name, '.json'];
+        else
+            % lensFile in matlab path
+            camera.lensfile.value = which(lensFile);
+        end
         
-        camera.lensfile.value = lensDefault;  % JSON Polynomial ray transfer model                
+        %camera.lensfile.value = lensDefault;  % JSON Polynomial ray transfer model                
     case {'lightfield'}
         % This may no longer be used.  The 'omni' type incorporates the
         % light field microlens method and is more modern.
