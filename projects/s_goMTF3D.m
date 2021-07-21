@@ -16,12 +16,12 @@ if ~piDockerExists, piDockerConfig; end
 
 %% The chess set with pieces
 
-% This just loads the scene.
-load('ChessSetPieces-recipe','thisR');
-chessR = thisR;
+fname = 'ChessSetPieces-recipe';
+chessR = piRecipeLoad(fname);
 
 % The EIA chart
 sbar = piAssetLoad('slantedbar');
+
 
 
 % Adjust the input slot in the recipe for the local user
@@ -36,9 +36,9 @@ temp=split(p,'/');
 outFile=fullfile(piRootPath,'local',temp{end});
 chessR.set('output file',outFile);
 
+
 % For efficience check
 chessR.set('pixel samples',1)
-
 
 %%
 % Merge them
