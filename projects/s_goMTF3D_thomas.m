@@ -62,14 +62,14 @@ cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.3.0mm_aperture0.6_sp
 cameraOmni.filmdistance.type='float'
 cameraOmni.filmdistance.value=0.002167;
 cameraOmni = rmfield(cameraOmni,'focusdistance')
-cameraOmni.aperturediameter.value=0.1
+cameraOmni.aperturediameter.value=0.6
 
 
 cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.3.0mm.json-raytransfer-spectral.json')
-cameraRTF.aperturediameter.value=0.1
+cameraRTF.aperturediameter.value=0.6
 cameraRTF.aperturediameter.type='float'
 
-chessR.set('pixel samples',1)
+chessR.set('pixel samples',50)
 
 
 thisR.set('film diagonal',2,'mm');
@@ -78,7 +78,7 @@ thisR.set('film diagonal',2,'mm');
 chessR.integrator.subtype='spectralpath'
 
 chessR.integrator.numCABands.type = 'integer';
-chessR.integrator.numCABands.value =1
+chessR.integrator.numCABands.value =3
 
 
 %% Change the focal distance
