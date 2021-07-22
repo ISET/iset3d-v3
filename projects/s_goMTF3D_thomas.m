@@ -62,11 +62,14 @@ cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.3.0mm_aperture0.6_sp
 cameraOmni.filmdistance.type='float'
 cameraOmni.filmdistance.value=0.002167;
 cameraOmni = rmfield(cameraOmni,'focusdistance')
+cameraOmni.aperturediameter.value=0.1
+
 
 cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.3.0mm.json-raytransfer-spectral.json')
+cameraRTF.aperturediameter.value=0.1
+cameraRTF.aperturediameter.type='float'
 
-
-chessR.set('pixel samples',2000)
+chessR.set('pixel samples',1)
 
 
 thisR.set('film diagonal',2,'mm');
@@ -75,7 +78,7 @@ thisR.set('film diagonal',2,'mm');
 chessR.integrator.subtype='spectralpath'
 
 chessR.integrator.numCABands.type = 'integer';
-chessR.integrator.numCABands.value =3
+chessR.integrator.numCABands.value =1
 
 
 %% Change the focal distance
@@ -96,7 +99,7 @@ oiRTF = piWRS(chessR,'render type','radiance','dockerimagename',thisDocker);
 oiList = {oiOmni,oiRTF};
 
 
-save('simulation_2000samples.mat')
+%save('simulation_2000samples.mat')
 return
 %%
 clear mtf;
@@ -120,10 +123,11 @@ for o=1:numel(oiList)
     % MTF Lens
     ipWindow(ip)
     
-    [locs,rect] = ieROISelect(ip);
-    positions = round(rect.Position);
-    %positions= [203    29    79   126];
+    %[locs,rect] = ieROISelect(ip);
+    %positions = round(rect.Position);
+    positions= [203    29    79   126];
     mtf{o}= ieISO12233(ip,sensor,'all',positions);
+    saveas(gcf,['./fig/MTF-' oi.name '.png'])
 end
 
 %% MTF Compare RTF met Omni
@@ -153,4 +157,4 @@ for o=1:numel(mtf)
 end
 legend(h,'Omni','RTF')
 
-saveas(gcf,'./fig/MTF-comparison.png')
+%saveas(gcf,'./fig/MTF-comparison.png')
