@@ -27,12 +27,12 @@ areaLight = piLightCreate('lamp', 'type', 'area');
 lightName = 'cbox-lights-1';
 areaLight = piLightSet(areaLight, 'spd val', lightName);
 
-assetName = 'AreaLight_O';
+assetName = '001_AreaLight_O';
 % Move area light above by 0.5 cm
 % thisR.set('asset', assetName, 'world translate', [0 0.005 0]);
 thisR.set('asset', assetName, 'obj2light', areaLight);
 
-assetNameCube = 'CubeLarge_O';
+assetNameCube = '001_CubeLarge_O';
 thisR.set('asset', assetNameCube, 'scale', [1 1.2 1]);
 %{
 wave = 400:10:700;

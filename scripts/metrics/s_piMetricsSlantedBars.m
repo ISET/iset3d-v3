@@ -69,8 +69,7 @@ piWRS(thisR);
 %%  Chess set.  Next, try to control the reflectances of the chart
 
 % The chess set with pieces
-load('ChessSetPieces-recipe','thisR');
-chessR = thisR;
+chessR = piRecipeLoad('ChessSetPieces-recipe');
 
 % Merge them
 piRecipeMerge(chessR,eiachart.thisR,'node name',eiachart.mergeNode);
