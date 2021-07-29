@@ -23,7 +23,7 @@ chessR = piRecipeLoad(fname);
 sbar = piAssetLoad('slantedbar');
 
 
-
+%{
 % Adjust the input slot in the recipe for the local user
 [~,n,e] = fileparts(chessR.get('input file'));
 inFile = which([n,e]);
@@ -35,8 +35,7 @@ chessR.set('input file',inFile);
 temp=split(p,'/');
 outFile=fullfile(piRootPath,'local',temp{end});
 chessR.set('output file',outFile);
-
-
+%}
 % For efficience check
 chessR.set('pixel samples',1)
 
@@ -94,7 +93,7 @@ piAssetSet(chessR, sbar.mergeNode,'translate',[0 0.3 2.3]);
 oi = piWRS(chessR);  % Write, Render, Show
 
 % Make it smaller as we get closer.  There is a problem, however.
-piAssetSet(chessR, sbar.mergeNode,'scale',targetScale*(1/2.3));
+piAssetSet(chessR, sbar.mergeNode,'scale',targetScale .* [(1/2.3), (1/2.3), 1]);
 
 % Translate the object and scale it - but the scale is not quite enough 
 piAssetSet(chessR, sbar.mergeNode,'translate',[0 0.2 1]);

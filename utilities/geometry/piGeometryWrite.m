@@ -250,7 +250,7 @@ for ii = 1:numel(children)
         end
         % Scale
         fprintf(fid, strcat(spacing, indentSpacing,...
-            sprintf('Scale %.5f %.5f %.5f', thisNode.scale), '\n'));
+            sprintf('Scale %.10f %.10f %.10f', thisNode.scale), '\n'));
         
         % Write out motion
         if ~isempty(thisNode.motion)
