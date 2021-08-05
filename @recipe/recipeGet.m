@@ -1156,12 +1156,17 @@ switch ieParamFormat(param)  % lower case, no spaces
             thisScale = thisR.get('assets',Objects(ii),'world scale');
             
             % All the object points
-            pts = thisNode.shape.pointp;
+            if isfield(thisNode.shape,'pointp')
+                pts = thisNode.shape.pointp;
+                % Range of points times any scale factors on the path
+                val(ii,1) = range(pts(1:3:end))*thisScale(1);
+                val(ii,2) = range(pts(2:3:end))*thisScale(2);
+                val(ii,3) = range(pts(3:3:end))*thisScale(3);
+            else
+                % There is no shape point information.  So we return NaNs.
+                val(ii,:) = NaN;
+            end
             
-            % Range of points times any scale factors on the path
-            val(ii,1) = range(pts(1:3:end))*thisScale(1);
-            val(ii,2) = range(pts(2:3:end))*thisScale(2);
-            val(ii,3) = range(pts(3:3:end))*thisScale(3);            
         end
     
         
@@ -1349,7 +1354,9 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'assetroot'}
         % The root of all assets just has a name, not properties.
         val = thisR.assets.get(1);
-    case {'assetnames'}
+    case {'nodenames','assetnames'}
+        % We have a confusion between nodes and assets.  The assets should
+        % refer to just the objects, not all the nodes IMHO (BW).
         % The names without the XXXID_ prepended
         % What about objectnames
         val = thisR.assets.stripID;
