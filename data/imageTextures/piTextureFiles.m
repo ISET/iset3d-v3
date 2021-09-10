@@ -20,3 +20,17 @@ rgb = sceneGet(scene,'rgb');
 textureFile = fullfile(piRootPath,'data','imageTextures','gridlines.png');
 imwrite(rgb,textureFile);
 %}
+
+%{
+scene = sceneCreate('point array',512,64);
+rgb = sceneGet(scene,'rgb');
+textureFile = fullfile(piRootPath,'data','imageTextures','pointArray_512_64.png');
+imwrite(rgb,textureFile);
+%}
+
+%{
+scene = sceneCreate('point array',1024,64);
+rgb = sceneGet(scene,'rgb');
+textureFile = fullfile(piRootPath,'data','imageTextures','pointArray_1024_64.png');
+imwrite(rgb,textureFile);
+%}
