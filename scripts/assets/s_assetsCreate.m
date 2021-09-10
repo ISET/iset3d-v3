@@ -86,5 +86,9 @@ save(oFile,'mergeNode','-append');
 oFile = thisR.save(fullfile(assetDir,'macbeth.mat'));
 save(oFile,'mergeNode','-append');
 
+[thisR, mergeNode] = piChartCreate('pointarray_512_64');
+oFile = thisR.save(fullfile(assetDir,'pointarray512.mat'));
+save(oFile,'mergeNode','-append');
+
 
 %% END
