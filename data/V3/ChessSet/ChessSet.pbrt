@@ -16,8 +16,8 @@ WorldBegin
 Material "uber" 
         "float index" [ 1.33299994 ] 
         "rgb Kd" [ 0.0936064422 0.109744944 0.12801072 ] 
-Include "chessSet_materials.pbrt"
-Include "chessSet_geometry.pbrt"
+Include "ChessSet_materials.pbrt"
+Include "ChessSet_geometry.pbrt"
 # Add an environment light
 Rotate -90 1 0 0
 Rotate 180 0 0 1
