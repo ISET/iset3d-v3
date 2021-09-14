@@ -130,6 +130,10 @@ switch ieParamFormat(chartName)
         textureName = sprintf('face-%d',uniqueKey);
         imgFile = 'monochromeFace.png';
         
+    case 'pointarray_512_64'
+        textureName = sprintf('pointarray_512_64-%d',uniqueKey);
+        imgFile = 'pointArray_512_64.png';
+        
     otherwise
         error('Unknown chart name %s\n',chartName);
 end
