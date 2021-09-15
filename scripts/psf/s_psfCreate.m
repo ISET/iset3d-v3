@@ -10,64 +10,79 @@ if ~piDockerExists, piDockerConfig; end
 
 %%  Adjust the field of view and other parameters
 
-lensfile  = 'dgauss.22deg.12.5mm.json';    % 30 38 18 10
-lensfile  = 'dgauss.22deg.3.0mm.json';    % 30 38 18 10
-rtffile  = 'dgauss.22deg.3.0mm.json';    % 30 38 18 10
-fprintf('Using lens: %s\n',lensfile);
-
-
 thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
 
 %% Add a lens and render.
-%camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
-cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.3.0mm_aperture0.6_spectral.json')
-cameraOmni.filmdistance.type='float'
+cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.3.0mm_aperture0.6_spectral.json');
+cameraOmni.filmdistance.type='float';
 cameraOmni.filmdistance.value=0.002167;
-cameraOmni = rmfield(cameraOmni,'focusdistance')
-cameraOmni.aperturediameter.value=0.6
+cameraOmni = rmfield(cameraOmni,'focusdistance');
+cameraOmni.aperturediameter.value=0.6;
 
 
-cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.3.0mm.json-raytransfer-spectral.json')
-cameraRTF.aperturediameter.value=0.6
-cameraRTF.aperturediameter.type='float'
+cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.3.0mm.json-raytransfer-spectral.json');
+cameraRTF.aperturediameter.value=0.6;
+cameraRTF.aperturediameter.type='float';
 
 cameras={cameraOmni,cameraRTF};oiLabels={'cameraOmni','cameraRTF'}
 
-
-
-
-for c=1:numel(cameras)
 pa = piAssetLoad('pointarray512');
-
+%pa = piAssetLoad('face');
 
 thisR = pa.thisR;
+%thisR.set('asset','pointarray_512_64-1712','scale',[5 5 1]);
+thisR.set('asset','pointarray_512_64-1712','translate',[0 0 100]); % Put closer
+%thisR.set('asset','face-2425','worldtranslate',[0 0 -3]); % Put closer STILL GETS IMAGED???
+%thisR.set('asset','face-2425','translate',[0 0 -100]); % Put closer STILL GETS IMAGED???
+
+thisR.show('objects');
 thisR.outputFile='/home/thomas42/Documents/MATLAB/iset3d/local/flatSurface/flatSurface.pbrt'
+piWrite(thisR)
 piAssetGeometry(thisR);
+
+%%
+for c=1:numel(cameras)
+
+
+
+
+
+
 %piWRS(thisR);
 
 
 thisR.camera = cameras{c};
 
 
-thisR.set('spatial resolution',[5000 5000]);
-thisR.set('rays per pixel',300);
+thisR.set('spatial resolution',5000*[1 1]);
+thisR.set('rays per pixel',10);
 
-thisR.set('asset','pointarray_512_64-1712','scale',[5 5 1]);
 
+thisR.show('objects');
 
 thisR.integrator.subtype='path'
 thisR.integrator.numCABands.type = 'integer';
 thisR.integrator.numCABands.value =1
 
 tic;
-oi{c}=piWRS(thisR,'render type','radiance','dockerimagename',thisDocker);
+piWrite(thisR);
+pause(10)
+disp('start render')
+[obj,results] = piRender(thisR,...
+    'docker image name',thisDocker, ...
+    'render type','radiance');
+oi{c}=obj;
+
+close all
+
 oi{c}.name=oiLabels{c};
+
+disp('Waiting for interaction')
+pause
 toc;
 end
 
-thisR.show('objects');
+%%
+save(fullfile(piRootPath,'local','psffar.mat'),'-v7.3')
 
-%%  Change the position
 
-
-% thisR.set('asset','pointarray_512_64-1712','translate',[0 0 -2]);
