@@ -31,19 +31,24 @@ oiLabels = {'cameraOmni','cameraRTF'};
 
 % The scene is just the point array on the flat surface
 pa = piAssetLoad('pointarray512');
+pa.thisR.show('objects');
+piAssetSet(pa.thisR,pa.mergeNode,'translate',[0 0 8]);
 
-%pa = piAssetLoad('face');
+pa.thisR.show;
 
-thisR = pa.thisR;
-thisR.show('objects');
+piWRS(pa.thisR)
+piAssetGeometry(pa.thisR);
 
+%%
 %thisR.set('asset','pointarray_512_64-1712','scale',[5 5 1]);
-thisR.set('asset','pointarray_512_64-1712','translate',[0 0 100]); % Put closer
+% pa.thisR.set('asset','pointarray_512_64-1712','translate',[0 0 20000]); % Move it 2 meters further
+
 %thisR.set('asset','face-2425','worldtranslate',[0 0 -3]); % Put closer STILL GETS IMAGED???
 %thisR.set('asset','face-2425','translate',[0 0 -100]); % Put closer STILL GETS IMAGED???
 
 thisR.show('objects');
-thisR.outputFile= '/home/thomas42/Documents/MATLAB/iset3d/local/flatSurface/flatSurface.pbrt'
+
+% thisR.outputFile= '/home/thomas42/Documents/MATLAB/iset3d/local/flatSurface/flatSurface.pbrt'
 piWrite(thisR)
 piAssetGeometry(thisR);
 

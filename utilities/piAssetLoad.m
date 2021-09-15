@@ -48,10 +48,12 @@ asset = load(fname);
 % The problem is that the file is written out for a specific user.  But
 % another user on another system is loading it.  Still, the file should be
 % in the ISET3D directory tree.
-[~,n,e] = fileparts(asset.thisR.get('input file'));
+[thePath,n,e] = fileparts(asset.thisR.get('input file'));
+
+temp = split(thePath,'iset3d');
 
 % Find a file in the user's path that matches the name and extension
-inFile = which([n,e]);
+inFile = fullfile(piRootPath,temp{2},[n,e]);
 
 if isempty(inFile), error('Cannot find the PBRT input file %s\n',thisR.inputFile); end
 
@@ -68,13 +70,6 @@ temp = split(thePath,'/');
 outFile=fullfile(piRootPath,'local',temp{end},[n,e]);
 
 asset.thisR.set('output file',outFile);
-
-%% Adjust the input slot in the recipe for the local user
-
-[~,n,e] = fileparts(asset.thisR.get('input file'));
-inFile = which([n,e]);
-if isempty(inFile), error('Cannot find the PBRT input file %s\n',asset.thisR.inputFile); end
-asset.thisR.set('input file',inFile);
 
 end
 
