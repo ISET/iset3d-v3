@@ -55,47 +55,23 @@ piAssetSet(thisR,pa.mergeNode,'translate',[100 100 200]);
 %   emptyR.create('grid');
 %
 
+
+%% Add a grid of point sources (disk areas0
 % Add a point source
-thisR     = piLightDelete(thisR, 'all');
 radius_mm = 2;
-lightGrid = makeDiskGrid('depth',1,'center', [0 0],'grid',[101 101],'spacing',0.05,'diskradius',radius_mm/1000);
-addGridToRecipe(thisR,lightGrid)
-
-
-
-thisR.show('objects');
-
-
-% Try a camera now
+depth_m = 0.5;
+grid = [21 21];  % Make odd if you want a dot on optical axis
+gridspacing_m = 0.05;
+gridspacing_m = 0.005;
+thisR     = piLightDelete(thisR, 'all');
+lightGrid = piLightDiskGridCreate('depth',depth_m,'center', [0 0],'grid',grid,'spacing',gridspacing_m,'diskradius',radius_mm/1000);
+piAddLights(thisR,lightGrid)
 
 thisR.set('camera',cameraOmni);   
-thisR.set('spatial resolution',300*[1 1]);
-thisR.set('rays per pixel',10);
-thisR.set('focus distance',.1);    % In meters   % Q: CHanging this helps nothing?
+thisR.set('spatial resolution',1000*[1 1]);
+thisR.set('rays per pixel',200);
 thisR.set('film distance',0.002167);    % In meters  %Setting film distance does do something
 thisR.set('film diagonal',5);
-
-
-piWrite(thisR)
-oi = piRender(thisR,'render type','radiance');
-figure(1);clf;
-imagesc(oi.data.photons(:,:,1))
-
-
-
-%%
-%thisR.set('asset','pointarray_512_64-1712','scale',[5 5 1]);
-% pa.thisR.set('asset','pointarray_512_64-1712','translate',[0 0 20000]); % Move it 2 meters further
-
-%thisR.set('asset','face-2425','worldtranslate',[0 0 -3]); % Put closer STILL GETS IMAGED???
-%thisR.set('asset','face-2425','translate',[0 0 -100]); % Put closer STILL GETS IMAGED???
-
-
-thisR.show('objects');
-
-% thisR.outputFile= '/home/thomas42/Documents/MATLAB/iset3d/local/flatSurface/flatSurface.pbrt'
-piWrite(thisR)
-piAssetGeometry(thisR);
 
 %% Compare the two cameras
 
@@ -104,11 +80,8 @@ for c=1:numel(cameras)
     %piWRS(thisR);
     
     thisR.camera = cameras{c};
-    
-    
-    thisR.set('spatial resolution',300*[1 1]);
-    thisR.set('rays per pixel',10);
-    
+   
+   
     
     thisR.show('objects');
     
@@ -124,15 +97,13 @@ for c=1:numel(cameras)
         'docker image name',thisDocker, ...
         'render type','radiance');
     oi{c}=obj;
-    
-    close all
-    
     oi{c}.name=oiLabels{c};
     
     toc;
 end
 
 %%
-save(fullfile(piRootPath,'local','psffar.mat'),'-v7.3')
+
+save(fullfile(piRootPath,'local',['psf-depth_' num2str(depth_m) 'meters.mat']),'-v7.3')
 
 
