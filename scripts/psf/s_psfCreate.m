@@ -34,18 +34,36 @@ pa = piAssetLoad('pointarray512');
 
 thisR = pa.thisR;
 
-piAssetSet(thisR,pa.mergeNode,'translate',[0 0 2]);
-piAssetGeometry(thisR)
+piAssetSet(thisR,pa.mergeNode,'translate',[100 100 200]);
+
+
+% Add a point source
+thisR    = piLightDelete(thisR, 'all');
+radius_mm=2;
+lightGrid = makeDiskGrid('depth',1,'center', [0 0],'grid',[101 101],'spacing',0.05,'diskradius',radius_mm/1000);
+addGridToRecipe(thisR,lightGrid)
+
+
+
 thisR.show('objects');
 
-%% Try a camera now
+
+% Try a camera now
 
 thisR.set('camera',cameraOmni);   
 thisR.set('spatial resolution',300*[1 1]);
-thisR.set('rays per pixel',64);
-thisR.set('focus distance',100);    % In meters
-thisR.set('film diagonal',4);
-piWRS(thisR);
+thisR.set('rays per pixel',10);
+thisR.set('focus distance',.1);    % In meters   % Q: CHanging this helps nothing?
+thisR.set('film distance',0.002167);    % In meters  %Setting film distance does do something
+thisR.set('film diagonal',5);
+
+
+piWrite(thisR)
+oi = piRender(thisR)
+figure(1);clf;
+imagesc(oi.data.photons(:,:,1))
+
+
 
 %%
 %thisR.set('asset','pointarray_512_64-1712','scale',[5 5 1]);
