@@ -37,9 +37,27 @@ thisR = pa.thisR;
 piAssetSet(thisR,pa.mergeNode,'translate',[100 100 200]);
 
 
+% General rules on naming
+%
+%   nsNounAction
+%
+% And when possibly in a protected name space or part of an object.
+% So for example,
+%
+%     piAssetLoad, rather than loadAsset
+%
+% That way, piAsset<TAB> returns all the methods that deal with assets
+% piLoad<TAB> would 
+
+% Suppose we an empty recipe, emptyR.
+% Could we do this?
+%
+%   emptyR.create('grid');
+%
+
 % Add a point source
-thisR    = piLightDelete(thisR, 'all');
-radius_mm=2;
+thisR     = piLightDelete(thisR, 'all');
+radius_mm = 2;
 lightGrid = makeDiskGrid('depth',1,'center', [0 0],'grid',[101 101],'spacing',0.05,'diskradius',radius_mm/1000);
 addGridToRecipe(thisR,lightGrid)
 
@@ -59,7 +77,7 @@ thisR.set('film diagonal',5);
 
 
 piWrite(thisR)
-oi = piRender(thisR)
+oi = piRender(thisR,'render type','radiance');
 figure(1);clf;
 imagesc(oi.data.photons(:,:,1))
 

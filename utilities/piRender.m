@@ -19,7 +19,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %
 %    Spectral data
 %      'all'      - radiance, depth, illuminant
-%      'both'     - radiance and depth
+%      'both'     - radiance and depth (default)
 %      'radiance' - spectral radiance (or irradiance if an oi)
 %      'illuminant'  - radiance and illuminant data
 %      'illuminant only'- The materials are set to matte white and
