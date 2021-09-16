@@ -18,7 +18,7 @@ centersY = [round(1.0e+03 *[      2.3071    2.3063    2.3064    2.3073    2.3092
 range = @(x) [(x-30):(x+30)];
 %%
 rangeRadius=30
-visPSF(oi,centersX,centersY,rangeRadius)
+visPqqSF(oi,centersX,centersY,rangeRadius)
 
 
 %% Indpeendent verification of PSF
