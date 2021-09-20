@@ -15,18 +15,21 @@ figure(p);clf; hold on,
 for i=1:nbOi
     oi = oiList{i};
     data=oi.data.photons(range(centersX(p)),range(centersY(p)),1);
-    subplot(2,nbOi,i);
-    surf(data)
-    title(oi.name)
-    
-    subplot(2,2,3:4); hold on;
-    slice=maxnorm(data(round(end/2),:));
-    
+            slice=maxnorm(data(round(end/2),:));
     % Choose first OI as the reference to determine x axis
     if(i==1)
         index=find(slice==1);
         xax   = ([1:size(data,2)]-index)*resolutionMicron;
     end
+    
+    subplot(2,nbOi,i);
+    imagesc(xax,xax,data)
+    axis equal
+    title(oi.name)
+    
+    subplot(2,2,3:4); hold on;
+
+
     h(i)=plot(xax, slice);
     
     distOffAxis = norm([centersX(p) centersY(p)]-imageCenter)*resolutionMicron;
