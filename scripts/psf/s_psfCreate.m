@@ -13,7 +13,7 @@ thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
 
 %% Determine necessary radius of target
 filmdistance_mm=2.167 % mm 
-lens=lensC('file','dgauss.22deg.3.0mm.json')
+lens=lensC('file','dgauss.22deg.3.0mm_aperture0.6.json')
 bb=lens.bbmGetValue('all')
 
 
@@ -82,15 +82,14 @@ depthREF_m = 1;
 
 
 depths = round([0.5 1],1);
-depths=0.5
+depths=[1 0.5]
 
 for d=1:numel(depths)
     depth_m = depths(d);
     
     % Scale spotradius 
     scale = depth_m/depthREF_m;
-    
-    scale=1 % temp forcement
+
     radius_mm =radiusREF_mm*scale;
     
     %% Build scene
@@ -112,7 +111,7 @@ for d=1:numel(depths)
     
     thisR.set('camera',cameraOmni);
     thisR.set('spatial resolution',500*[1 1]);
-    thisR.set('rays per pixel',10000);
+    thisR.set('rays per pixel',100000);
     thisR.set('film distance',0.002167);    % In meters  %Setting film distance does do something
     
     thisR.set('film diagonal',0.015); % Original

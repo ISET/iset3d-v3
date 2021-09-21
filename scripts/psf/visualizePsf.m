@@ -12,10 +12,10 @@ centersX=250
 centersY=250
 visPSF(oi,centersX,centersY,rangeRadiusPixels)
 subplot(2,1,2)
-load psf_isetlens0.5.mat
+load('psf_isetlens0.5.mat')
 hold on;
-plot(x_micron-1.5,maxnorm(PSF(end/2,:)))
-xlim([-5 5]-0.62)
+plot(x_micron+1.5,maxnorm(PSF(end/2,:)))
+xlim([-5 5]-0.6)
 legend('PBRT','iset lens')
 %% Select PSF centers
 data=oi{1}.data.photons(:,:,1);

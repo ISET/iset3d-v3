@@ -4,7 +4,7 @@ clear;
 
 lensName = 'dgauss.22deg.3.0mm_aperture0.6.json';
 lens=lensC('file',lensName)
-lens.apertureSample=2*[1000 1000];
+lens.apertureSample=2*[400 400];
 
 
  
@@ -13,9 +13,8 @@ lens.apertureSample=2*[1000 1000];
 lensThickness = 1.9224;
 
 objectDistance=1000; im=lens.findImagePoint([0 0 -objectDistance],1,1);filmdistance_mm=im(1,3); %% Focus
-
-
 objectDistance=500; im=lens.findImagePoint([0 0 -objectDistance],1,1);filmdistance_mm=2.167; %% deFocus
+
 
 
 
@@ -46,7 +45,7 @@ ylabel('x (\mu m)')
 
 
 %psfCamera.PSFArray(points)
-
+figure;plot(x_micron,PSF(end/2,:))
 
 return
 %% Generate ray pairs
