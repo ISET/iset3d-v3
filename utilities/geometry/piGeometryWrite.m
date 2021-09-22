@@ -229,8 +229,46 @@ for ii = 1:numel(children)
                 'ActiveTransform StartTime \n'));
         end
         
-        % Translation
+        % Transformation section
+        if ~isempty(thisNode.rotation)
+            % Zheng: I think it is always this case, but maybe it is rarely
+            % the case below. Have no clue.
+            % If this way, we would write the translation, rotation and
+            % scale line by line based on the order of thisNode.transorder
+            pointerT = 1; pointerR = 1; pointerS = 1;
+            for tt = 1:numel(thisNode.transorder)
+                switch thisNode.transorder(tt)
+                    case 'T'
+                        fprintf(fid, strcat(spacing, indentSpacing,...
+                            sprintf('Translate %.5f %.5f %.5f', thisNode.translation{pointerT}(1),...
+                            thisNode.translation{pointerT}(2),...
+                            thisNode.translation{pointerT}(3)), '\n'));
+                        pointerT = pointerT + 1;
+                    case 'R'
+                        fprintf(fid, strcat(spacing, indentSpacing,...
+                            sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 1)), '\n'));
+                        fprintf(fid, strcat(spacing, indentSpacing,...
+                            sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 2)), '\n'));
+                        fprintf(fid, strcat(spacing, indentSpacing,...
+                            sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 3)), '\n'));
+                        pointerR = pointerR + 1;
+                    case 'S'
+                        fprintf(fid, strcat(spacing, indentSpacing,...
+                            sprintf('Scale %.10f %.10f %.10f', thisNode.scale{pointerS}), '\n'));
+                        pointerS = pointerS + 1;
+                end
+            end
+        else
+            thisNode.concattransform(13:15) = thisNode.translation(:);
+            fprintf(fid, strcat(spacing, indentSpacing,...
+            sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', thisNode.concattransform(:)), '\n'));
+            % Scale
+            fprintf(fid, strcat(spacing, indentSpacing,...
+            sprintf('Scale %.10f %.10f %.10f', thisNode.scale), '\n'));
+        end
         
+        %{
+        % This is the old transformation section
         % Rotation
         if ~isempty(thisNode.rotation)
             fprintf(fid, strcat(spacing, indentSpacing,...
@@ -251,6 +289,7 @@ for ii = 1:numel(children)
         % Scale
         fprintf(fid, strcat(spacing, indentSpacing,...
             sprintf('Scale %.10f %.10f %.10f', thisNode.scale), '\n'));
+        %}
         
         % Write out motion
         if ~isempty(thisNode.motion)

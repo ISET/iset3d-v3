@@ -1,4 +1,4 @@
-function newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
+function modifiedBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 %% Rotate an asset
 %
 % Synopsis:
@@ -29,11 +29,15 @@ function newBranch = piAssetRotate(thisR, assetInfo, rotation, varargin)
 
 % Examples:
 %{
+ieInit;
 thisR = piRecipeDefault('scene name', 'Simple scene');
-disp(thisR.assets.tostring)
+% thisR.show;
+piWRS(thisR);
 
-thisR.set('asset', '004ID_Sky1_L', 'rotation', [45, 0, 0]);
-disp(thisR.assets.tostring)
+assetName = '0014ID_figure_3m_B';
+thisR.set('asset', assetName, 'rotation', [45, 0, 0]);
+% thisR.show;
+piWRS(thisR);
 %}
 
 %% Parse input
@@ -62,6 +66,23 @@ end
 % Create the rotation matrix and put it onto a new branch node
 rotMatrix = [rotation(3), rotation(2), rotation(1);
              fliplr(eye(3))];
+         
+if isequal(thisNode.type, 'branch')
+    % Insert the new rotation matrix to existing rotation cell array, and
+    % store the order
+    thisNode.rotation{end+1} = rotMatrix;
+    thisNode.transorder(end+1) = 'R';
+    modifiedBranch = thisR.set('asset', assetInfo, thisNode);    
+else
+    % Node is object or light
+    parentNodeID = thisR.assets.getparent(assetInfo);
+    modifiedBranch = piAssetRotate(thisR, parentNodeID, rotation);
+end
+
+%{
+% Create the rotation matrix and put it onto a new branch node
+rotMatrix = [rotation(3), rotation(2), rotation(1);
+             fliplr(eye(3))];
 newBranch = piAssetCreate('type', 'branch');
 newBranch.name   = strcat(thisR.assets.stripID(assetInfo), '_', 'R');
 newBranch.rotation = rotMatrix;
@@ -86,5 +107,6 @@ else
     % thisNode and its parent.    
     thisR.set('asset', assetInfo, 'insert', newBranch);
 end
+%}
 
 end

@@ -951,7 +951,7 @@ switch param
         % needed.
         if isnumeric(val)
             % Person sent in an id, so we get the name here
-            [~,thisAsset] = piAssetFind(thisR,'id',val);
+            [id,thisAsset] = piAssetFind(thisR,'id',val);
             if val == 1, assetName = 'root';
             else, assetName = thisAsset{1}.name;
             end
@@ -959,6 +959,12 @@ switch param
             assetName = val;
         end
         param = varargin{1};
+        % If only one element in varargin, it should be a node struct.
+        if numel(varargin) == 1
+            thisR.assets = thisR.assets.set(id, varargin{1});
+            return;
+        end
+        % Else we are setting a parameter value
         if numel(varargin) == 2, val   = varargin{2}; end
         
         % Some of these functions should be edited to return the new
@@ -1003,7 +1009,9 @@ switch param
             case {'worldrotate', 'worldrotation'}
                 % Get current rotation matrix
                 curRotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
-                
+                [~, rotDeg] = piTransformRotationInAbsSpace(val, curRotM);
+                %{
+                % This section was wrapped in piTransformRotationInAbsSpace.
                 newRotM = eye(4);
                 % Loop through the three rotation                
                 for ii=1:numel(val)
@@ -1012,12 +1020,12 @@ switch param
                         axWorld = zeros(4, 1);
                         axWorld(ii) = 1;
                         
-                        % Axis orientation in object space
+                        % Axis orientation in world space
                         % axObj = inv(curRotM) * axWorld;
                         axObj = curRotM \ axWorld;
                         thisAng = val(ii);
                         
-                        % Get the rotation matrix in object space
+                        % Get the rotation matrix in world space
                         thisM = piTransformRotation(axObj, thisAng);
                         newRotM = thisM * newRotM;
                     end
@@ -1025,6 +1033,7 @@ switch param
                 % Get rotation deg around x, y and z axis in object
                 % space.
                 rotDeg = piTransformRotM2Degs(newRotM);
+                %}
                 out = thisR.set('asset', assetName, 'rotate', rotDeg);
             case {'worldposition'}
                 % thisR.set('asset', assetName, 'world position', [1 2 3]);

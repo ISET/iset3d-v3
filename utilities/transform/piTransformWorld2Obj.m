@@ -39,7 +39,32 @@ for ii=numel(nodeToRoot):-1:1
     % Get asset and its rotation and translation
     thisAsset = thisR.get('asset', nodeToRoot(ii));
     if isequal(thisAsset.type, 'branch')
-        thisRot = fliplr(piAssetGet(thisAsset, 'rotate')); % PBRT uses wired order of ZYX
+        pointerT = 1; pointerR = 1; pointerS = 1;
+        for tt = 1:numel(thisAsset.transorder)
+            switch thisAsset.transorder(tt)
+                case 'T'
+                    thisTrans = thisAsset.translation{pointerT};
+                    curTransM =  piTransformTranslation(rotM(:, 1),...
+                        rotM(:, 2),...
+                        rotM(:, 3), thisTrans);
+                    transM(1:3, 4) = transM(1:3, 4) + curTransM(1:3, 4);
+                    
+                    pointerT = pointerT + 1;
+                case 'R'
+                    rotDegs = thisAsset.rotation{pointerR}(1,:);
+                    thisRotM = piTransformDegs2RotM(rotDegs);
+                    [~, ~, ~, rotM] = piTransformAxis(rotM(:,1), rotM(:,2),rotM(:,3),thisRotM);
+                    
+                    pointerR = pointerR + 1;
+                case 'S'
+                    thisScale = thisAsset.scale{pointerS};
+                    scaleM = scaleM * diag(thisScale);
+                    pointerS = pointerS + 1;
+            end
+        end
+        
+        %{
+        % Residual code for previous structure
         thisTrans = piAssetGet(thisAsset, 'translate');
         thisScale = piAssetGet(thisAsset, 'scale');
         
@@ -50,6 +75,11 @@ for ii=numel(nodeToRoot):-1:1
         transM(1:3, 4) = transM(1:3, 4) + curTransM(1:3, 4);
         scaleM = scaleM * diag(thisScale);
         
+        thisRotM = piTransformDegs2RotM(piAssetGet(thisAsset, 'rotate'));
+        
+        %{
+        % Section was wrapped into function piTransformDegs2RotM
+        thisRot = fliplr(piAssetGet(thisAsset, 'rotate')); % PBRT uses wired order of ZYX
         % Calculate rotation transform
         thisRotM = eye(4);
         for jj=1:size(thisRot, 2)
@@ -59,8 +89,10 @@ for ii=numel(nodeToRoot):-1:1
                 thisRotM = curRotM * thisRotM;
             end
         end
+        %}
         % Update x y z axis
         [~, ~, ~, rotM] = piTransformAxis(rotM(:,1), rotM(:,2),rotM(:,3),thisRotM);
+        %}
     end
 end
 

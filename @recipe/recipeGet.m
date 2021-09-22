@@ -1300,8 +1300,8 @@ switch ieParamFormat(param)  % lower case, no spaces
                     % World position and orientation properties.  These
                     % need more explanation.
                 case 'worldrotationmatrix'
-                    % This is a 4x4 matrix, not the same as the rotation
-                    % stored in the node.  Zheng should explain.
+                    % This is a 4x4 matrix, that represents accumulated
+                    % rotation effects of ALL rotation action.
                     nodeToRoot = thisR.assets.nodetoroot(id);
                     [val, ~] = piTransformWorld2Obj(thisR, nodeToRoot);
                 case 'worldrotationangle'
@@ -1328,6 +1328,12 @@ switch ieParamFormat(param)  % lower case, no spaces
                         val = thisR.get('asset', parentID, 'translation');
                     else
                         val = piAssetGet(thisAsset, 'translation');
+                    end
+                case 'rotation'
+                    if thisR.assets.isleaf(id)
+                        
+                    else
+                        val = piAsseGet(thisAsset, 'rotation');
                     end
                 case 'size'
                     % thisR.get('asset',objectName,'size');
