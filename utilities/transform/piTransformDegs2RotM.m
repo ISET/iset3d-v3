@@ -1,4 +1,4 @@
-function rotM = piTransformDegs2RotM(rotDegs, varargin)
+function thisRotM = piTransformDegs2RotM(rotDegs, rotM, varargin)
 %% 
 % TBD
 %
@@ -11,17 +11,18 @@ rotM = piTransformDegs2RotM(rotDegs);
 %% Parse input
 p = inputParser;
 p.addRequired('rotDegs', @isvector);
-p.parse(rotDegs, varargin{:});
+p.addRequired('rotM', @ismatrix);
+p.parse(rotDegs, rotM, varargin{:});
 
 %%
-rotDegs = fliplr(rotDegs); % PBRT uses wired order of ZYX
+thisRot = fliplr(rotDegs); % PBRT uses wired order of ZYX
 % Calculate rotation transform
-rotM = eye(4);
-for jj=1:size(rotDegs, 2)
-    if rotDegs(1, jj) ~= 0
+thisRotM = eye(4);
+for jj=1:size(thisRot, 2)
+    if thisRot(1, jj) ~= 0
         % rotation matrix from basis axis
-        curRotM = piTransformRotation(rotM(:, jj), rotDegs(1, jj));
-        rotM = curRotM * rotM;
+        curRotM = piTransformRotation(rotM(:, jj), thisRot(1, jj));
+        thisRotM = curRotM * thisRotM;
     end
 end
 end

@@ -79,7 +79,7 @@ if isequal(thisNode.type, 'branch')
     % itself.
     thisNode.translation{end+1} = reshape(translation, size(thisNode.translation{1}));
     thisNode.transorder(end+1) = 'T';
-    modifiedBranch = thisR.set('asset', assetInfo, thisNode);
+    [~, modifiedBranch] = thisR.set('asset', assetInfo, thisNode);
 else
     % Node is object or light
     parentNodeID = thisR.assets.getparent(assetInfo);

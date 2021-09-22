@@ -960,8 +960,9 @@ switch param
         end
         param = varargin{1};
         % If only one element in varargin, it should be a node struct.
-        if numel(varargin) == 1
+        if numel(varargin) == 1 && ~ischar(varargin{1})
             thisR.assets = thisR.assets.set(id, varargin{1});
+            out = varargin{1};
             return;
         end
         % Else we are setting a parameter value
@@ -973,6 +974,10 @@ switch param
             case 'add'
                 % thisR.set('asset',parentName,newAsset);
                 out = piAssetAdd(thisR, assetName, val);
+            case {'cancellasttransformation', 'removelasttransformation',...
+                  'cancellasttrans', 'removelasttrans',...
+                  'cancellastaction', 'removelastaction'}
+                piAssetRemoveLastTrans(thisR, assetName);
             case {'delete', 'remove'}
                 % thisR.set('asset',assetName,'delete');
                 piAssetDelete(thisR, assetName);
@@ -984,7 +989,7 @@ switch param
                 piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
                 % thisR.set('asset',assetName,'translate',val);
-                piAssetTranslate(thisR, assetName, val);
+                out = piAssetTranslate(thisR, assetName, val);
             case {'worldtranslate', 'worldtranslation'}
                 % Translate in world axis orientation.
                 rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation

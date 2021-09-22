@@ -52,7 +52,8 @@ for ii=numel(nodeToRoot):-1:1
                     pointerT = pointerT + 1;
                 case 'R'
                     rotDegs = thisAsset.rotation{pointerR}(1,:);
-                    thisRotM = piTransformDegs2RotM(rotDegs);
+                    thisRotM = piTransformDegs2RotM(rotDegs, rotM);
+                    % Update x y z axis
                     [~, ~, ~, rotM] = piTransformAxis(rotM(:,1), rotM(:,2),rotM(:,3),thisRotM);
                     
                     pointerR = pointerR + 1;
@@ -75,9 +76,7 @@ for ii=numel(nodeToRoot):-1:1
         transM(1:3, 4) = transM(1:3, 4) + curTransM(1:3, 4);
         scaleM = scaleM * diag(thisScale);
         
-        thisRotM = piTransformDegs2RotM(piAssetGet(thisAsset, 'rotate'));
         
-        %{
         % Section was wrapped into function piTransformDegs2RotM
         thisRot = fliplr(piAssetGet(thisAsset, 'rotate')); % PBRT uses wired order of ZYX
         % Calculate rotation transform
@@ -89,7 +88,6 @@ for ii=numel(nodeToRoot):-1:1
                 thisRotM = curRotM * thisRotM;
             end
         end
-        %}
         % Update x y z axis
         [~, ~, ~, rotM] = piTransformAxis(rotM(:,1), rotM(:,2),rotM(:,3),thisRotM);
         %}

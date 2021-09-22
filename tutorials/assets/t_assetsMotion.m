@@ -59,7 +59,7 @@ sceneWindow(scene);
 % We illustrate the change in the asset three before and after deleting the
 % branch
 thisR.assets.show([],2);
-thisR.set('asset',T1.name,'delete');
+thisR.set('asset',T1.name,'cancellastaction');
 thisR.assets.show([],2);
 
 % This illustrates that we have deleted the translation correctly.

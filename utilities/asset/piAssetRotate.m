@@ -72,7 +72,7 @@ if isequal(thisNode.type, 'branch')
     % store the order
     thisNode.rotation{end+1} = rotMatrix;
     thisNode.transorder(end+1) = 'R';
-    modifiedBranch = thisR.set('asset', assetInfo, thisNode);    
+    [~, modifiedBranch] = thisR.set('asset', assetInfo, thisNode);    
 else
     % Node is object or light
     parentNodeID = thisR.assets.getparent(assetInfo);

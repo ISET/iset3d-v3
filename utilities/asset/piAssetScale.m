@@ -76,7 +76,7 @@ if isequal(thisNode.type, 'branch')
     % and store the order
     thisNode.scale{end+1} = scaleFactor;
     thisNode.transorder(end+1) = 'S';
-    modifiedBranch = thisR.set('asset', assetInfo, thisNode);
+    [~, modifiedBranch] = thisR.set('asset', assetInfo, thisNode);
 else
     parentNodeID = thisR.assets.getparent(assetInfo);
     modifiedBranch = piAssetScale(thisR, parentNodeID, scaleFactor);    
