@@ -12,8 +12,8 @@ thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
 
 
 %% Determine necessary radius of target
-filmdistance_mm=2.167 % mm 
-lens=lensC('file','dgauss.22deg.3.0mm_aperture0.6.json')
+filmdistance_mm=36.990 % mm 
+lens=lensC('file','dgauss.22deg.50.0mm_aperture6.0.json')
 bb=lens.bbmGetValue('all')
 
 
@@ -21,9 +21,14 @@ bb=lens.bbmGetValue('all')
 
 %% Gaussian equations. Knowing z=0 at rear surface vertex by construction
 scale=1
-objdistance_mm = scale*1000; %Relative to rear surface vertxof lens
-diskradius_mm = scale*0.01;
-impoint=lens.findImagePoint([0 diskradius_mm -objdistance_mm],1,1);
+lensThickness = lens.surfaceArray(1).sRadius-lens.surfaceArray(1).sCenter(3);
+
+objdistance_mm_fromfront = 3000; %Relative to rear surface vertxof lens
+objdistance_mm_fromrear= objdistance_mm_fromfront+lensThickness %Relative to film position
+objdistance_mm_fromfilm= objdistance_mm_fromrear+filmdistance_mm; %Relative to film position
+
+diskradius_mm = 0.1/10;
+impoint=lens.findImagePoint([0 diskradius_mm -objdistance_mm_fromrear],1,1);
 spotsize_micron = impoint(1,2)*1e3
 z_im_mm = impoint(1,3)
 
@@ -31,15 +36,15 @@ z_im_mm = impoint(1,3)
 
 
 %% Create the two cameras and choose a lens
-lensname='dgauss.22deg.3.0mm_aperture0.6';
+lensname='dgauss.22deg.50.0mm_aperture6.0';
 cameraOmni = piCameraCreate('omni','lensfile',[lensname '.json']);
 cameraOmni.filmdistance.type='float';
-cameraOmni.filmdistance.value=0.002167;
+cameraOmni.filmdistance.value=filmdistance_mm/1000;
 cameraOmni = rmfield(cameraOmni,'focusdistance');
-cameraOmni.aperturediameter.value=0.6;
+cameraOmni.aperturediameter.value=12;
 
 cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.3.0mm_aperture0.6-raytransfer-spectral.json');
-cameraRTF.aperturediameter.value=0.6;
+cameraRTF.aperturediameter.value=12;
 cameraRTF.aperturediameter.type='float';
 
 % Collect up the cameras
@@ -73,16 +78,16 @@ cameras = {cameraOmni}; oiLabels = {'cameraOmni'};
 
 grid = [21 21];  % Make odd if you want a dot on optical axis
 
-gridspacing_m = 0.05;
+gridspacing_m = 0.1;
 
 
 % Find a good spot size and then scale accordingly
-radiusREF_mm=0.01;
-depthREF_m = 1;
+radiusREF_mm=diskradius_mm;
+depthREF_m = objdistance_mm_fromfilm/1000;
 
 
 depths = round([0.5 1],1);
-depths=[1 0.5]
+depths=[depthREF_m]
 
 for d=1:numel(depths)
     depth_m = depths(d);
@@ -110,14 +115,14 @@ for d=1:numel(depths)
     piAddLights(thisR,lightGrid)
     
     thisR.set('camera',cameraOmni);
-    thisR.set('spatial resolution',500*[1 1]);
-    thisR.set('rays per pixel',100000);
-    thisR.set('film distance',0.002167);    % In meters  %Setting film distance does do something
+    thisR.set('spatial resolution',600*[1 1]);
+    thisR.set('rays per pixel',50000);
+    %thisR.set('film distance',0.0466356);    % In meters  %Setting film distance does do something
     
-    thisR.set('film diagonal',0.015); % Original
+    thisR.set('film diagonal',70*1e-3); % Original
     
     
-    
+
     %% Compare the two cameras
     
     

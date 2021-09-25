@@ -2,7 +2,7 @@ function lights = piLightDiskGridCreate(varargin)
 % Create a grid of disk area light sources  at a given depth and given
 % spacing
 %
-% Se aal so piLightDiskCreate
+% Se also piLightDiskCreate
 p = inputParser;
 p.addParameter('depth', @isnumeric);
 p.addParameter('center', [0 0], @isnumeric);
