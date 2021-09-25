@@ -939,12 +939,17 @@ switch param
             thisR.set('light', lgtIdx, thisLight);
         end
         
-    case {'asset', 'assets'}
+    case {'asset', 'assets','node','nodes'}
         % Typical:    thisR.set(param,val) 
         % This case:  thisR.set('asset',assetNameOrID, param, val);
         %
         % These operations need the whole tree, so we send in the
         % recipe that contains the asset tree, thisR.assets.
+        
+        % We are slowly starting to call nodes nodes, rather than
+        % assets.  We think of an asset now as, say, a car with all of
+        % its parts.  A node is the node in a tree that contains
+        % multiple assets. (BW, Sept 2021).
         
         % Given the calling convention, val is assetName and
         % varargin{1} is the param, and varargin{2} is the value, if
@@ -1058,8 +1063,8 @@ switch param
             case {'obj2light'}
                 piAssetObject2Light(thisR, assetName, val);
             case {'graft', 'subtreeadd'}
-                % thisR.set('asset',assetName,'graft',val); (Maybe)
-                id = thisR.get('asset', assetName, 'id');
+                % thisR.set('asset',nodeForGraft,'graft',subtree);
+                id = thisR.get('node', assetName, 'id');
                 rootSTID = thisR.assets.nnodes + 1;
                 thisR.assets = thisR.assets.graft(id, val);
                 thisR.assets = thisR.assets.uniqueNames;
