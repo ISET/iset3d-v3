@@ -56,17 +56,17 @@ sceneWindow(scene);
 
 %% Delete the motion translation
 
-% We illustrate the change in the asset three before and after deleting the
-% branch
-thisR.assets.show([],2);
-thisR.set('asset',T1.name,'cancellastaction');
-thisR.assets.show([],2);
-
-% This illustrates that we have deleted the translation correctly.
-piWrite(thisR);
-scene = piRender(thisR, 'render type', 'radiance');
-scene = sceneSet(scene,'name','motionblur: Translation');
-sceneWindow(scene);
+% % We illustrate the change in the asset three before and after deleting the
+% % branch
+% thisR.assets.show([],2);
+% thisR.set('asset',T1.name,'cancel last action');
+% thisR.assets.show([],2);
+% 
+% % This illustrates that we have deleted the translation correctly.
+% piWrite(thisR);
+% scene = piRender(thisR, 'render type', 'radiance');
+% scene = sceneSet(scene,'name','motionblur: Translation');
+% sceneWindow(scene);
 
 %% Add a rotation to the motion
 
