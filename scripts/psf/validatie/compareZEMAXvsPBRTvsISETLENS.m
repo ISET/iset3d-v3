@@ -44,3 +44,11 @@ normerr = norm(error)/norm(zemaxOutput)
 
 
 %% Trace in PBRT
+% Remember in PBRT we start tracing from the film plane
+% i have reverse traced the arriving ray on film 
+
+% The direciton of the ray on object side is
+pbrtObjectDirection = [0 -0.342020363 0.939692497]; %Sign diffrence
+
+relerrPBRT=norm(zemaxDirection-abs(pbrtObjectDirection))/norm(zemaxDirection)
+% Good up tol 7 decimal places

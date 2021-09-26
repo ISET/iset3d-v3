@@ -10,6 +10,7 @@ maxnorm=@(x)x/max(x);
 load('psf_isetlens3000m.mat')
 figure(1);clf
 plot(x_micron,maxnorm(PSF(end/2,:)))
+hold on ; plot(Y(:,1),maxnorm(Y(:,2)))
 xlim([-15 15])
 %%
 
