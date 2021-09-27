@@ -977,7 +977,11 @@ switch param
             case {'cancellasttransformation', 'removelasttransformation',...
                   'cancellasttrans', 'removelasttrans',...
                   'cancellastaction', 'removelastaction'}
+                % Note: this is for transformation only, not
+                % motion/animation
                 piAssetRemoveLastTrans(thisR, assetName);
+            case {'clearmotion', 'removemotion', 'cancelmotion'}
+                piAssetSet(thisR, assetName, 'motion', []);
             case {'delete', 'remove'}
                 % thisR.set('asset',assetName,'delete');
                 piAssetDelete(thisR, assetName);

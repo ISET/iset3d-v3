@@ -104,7 +104,7 @@ for ii = 1:numel(children)
     if isequal(thisNode.type, 'branch')
         % do not write object instance repeatedly
         nodeList = [nodeList children(ii)];
-          
+        
         % Define object node
     elseif isequal(thisNode.type, 'object')
         while numel(thisNode.name) >= 8 &&...
@@ -235,36 +235,14 @@ for ii = 1:numel(children)
             % the case below. Have no clue.
             % If this way, we would write the translation, rotation and
             % scale line by line based on the order of thisNode.transorder
-            pointerT = 1; pointerR = 1; pointerS = 1;
-            for tt = 1:numel(thisNode.transorder)
-                switch thisNode.transorder(tt)
-                    case 'T'
-                        fprintf(fid, strcat(spacing, indentSpacing,...
-                            sprintf('Translate %.5f %.5f %.5f', thisNode.translation{pointerT}(1),...
-                            thisNode.translation{pointerT}(2),...
-                            thisNode.translation{pointerT}(3)), '\n'));
-                        pointerT = pointerT + 1;
-                    case 'R'
-                        fprintf(fid, strcat(spacing, indentSpacing,...
-                            sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 1)), '\n'));
-                        fprintf(fid, strcat(spacing, indentSpacing,...
-                            sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 2)), '\n'));
-                        fprintf(fid, strcat(spacing, indentSpacing,...
-                            sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 3)), '\n'));
-                        pointerR = pointerR + 1;
-                    case 'S'
-                        fprintf(fid, strcat(spacing, indentSpacing,...
-                            sprintf('Scale %.10f %.10f %.10f', thisNode.scale{pointerS}), '\n'));
-                        pointerS = pointerS + 1;
-                end
-            end
+            piGeometryTransformWrite(fid, thisNode, spacing, indentSpacing);
         else
             thisNode.concattransform(13:15) = thisNode.translation(:);
             fprintf(fid, strcat(spacing, indentSpacing,...
-            sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', thisNode.concattransform(:)), '\n'));
+                sprintf('ConcatTransform [%.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f %.5f]', thisNode.concattransform(:)), '\n'));
             % Scale
             fprintf(fid, strcat(spacing, indentSpacing,...
-            sprintf('Scale %.10f %.10f %.10f', thisNode.scale), '\n'));
+                sprintf('Scale %.10f %.10f %.10f', thisNode.scale), '\n'));
         end
         
         %{
@@ -296,15 +274,20 @@ for ii = 1:numel(children)
             for jj = 1:size(thisNode.translation, 1)
                 fprintf(fid, strcat(spacing, indentSpacing,...
                     'ActiveTransform EndTime \n'));
-                if isempty(thisNode.motion.translation(jj, :))
-                    fprintf(fid, strcat(spacing, indentSpacing,...
-                        'Translate 0 0 0\n'));
-                else
-                    pos = thisNode.motion.translation(jj,:);
-                    fprintf(fid, strcat(spacing, indentSpacing,...
-                        sprintf('Translate %f %f %f', pos(1),...
-                        pos(2),...
-                        pos(3)), '\n'));
+                % First write out the same translation and rotation
+                piGeometryTransformWrite(fid, thisNode, spacing, indentSpacing);                
+                
+                if isfield(thisNode.motion, 'translation')
+                    if isempty(thisNode.motion.translation(jj, :))
+                        fprintf(fid, strcat(spacing, indentSpacing,...
+                            'Translate 0 0 0\n'));
+                    else
+                        pos = thisNode.motion.translation(jj,:);
+                        fprintf(fid, strcat(spacing, indentSpacing,...
+                            sprintf('Translate %f %f %f', pos(1),...
+                            pos(2),...
+                            pos(3)), '\n'));
+                    end
                 end
                 
                 if isfield(thisNode.motion, 'rotation') && ~isempty(thisNode.motion.rotation)
@@ -337,7 +320,7 @@ for ii = 1:numel(children)
         end
         fprintf(fid, strcat(spacing, indentSpacing, ...
             sprintf('ObjectInstance "%s"', thisNode.name), '\n'));
-
+        
     elseif isequal(thisNode.type, 'light')
         % Create a tmp recipe
         tmpR = recipe;
@@ -360,5 +343,32 @@ for ii = 1:numel(children)
     fprintf(fid, strcat(spacing, 'AttributeEnd\n'));
 end
 
+end
+
+% Geometry file writing helper
+function piGeometryTransformWrite(fid, thisNode, spacing, indentSpacing)
+    pointerT = 1; pointerR = 1; pointerS = 1;
+    for tt = 1:numel(thisNode.transorder)
+        switch thisNode.transorder(tt)
+            case 'T'
+                fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Translate %.5f %.5f %.5f', thisNode.translation{pointerT}(1),...
+                    thisNode.translation{pointerT}(2),...
+                    thisNode.translation{pointerT}(3)), '\n'));
+                pointerT = pointerT + 1;
+            case 'R'
+                fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 1)), '\n'));
+                fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 2)), '\n'));
+                fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Rotate %.5f %.5f %.5f %.5f', thisNode.rotation{pointerR}(:, 3)), '\n'));
+                pointerR = pointerR + 1;
+            case 'S'
+                fprintf(fid, strcat(spacing, indentSpacing,...
+                    sprintf('Scale %.10f %.10f %.10f', thisNode.scale{pointerS}), '\n'));
+                pointerS = pointerS + 1;
+        end
+    end
 end
 
