@@ -35,27 +35,6 @@ function modifiedBranch = piAssetTranslate(thisR, assetInfo, translation,varargi
 
 % Examples:
 %{
-% The asset name syntax:
-%
-% A branch node that contains the transforms will have a name like
-this:
-%
-%   XXXXID_nodeName_B
-%
-% Four digits followed by ID.  The four digits are the node number.
-% Then there is a name that typically would describe the object it is
-% transforming.  Then a _B to indicate this is a branch node, not a
-% leaf.
-% 
-% Object nodes are a little different.
-%
-%   XXXXID_YYY_nodeName_O
-%
-% The same ID numbering.  But there is an extra three-digit number (YYY) 
-% that says which part this is within the node name.  So the top might
-% be car, and the car might have 001_car, 002_car, ... and so forth.
-% 
-
 thisR = piRecipeDefault('scene name', 'Simple scene');
 % thisR.show;
 scene = piWRS(thisR);

@@ -57,14 +57,14 @@ ieReplaceObject(scene);
 % objects (leafs of the tree).  There is a branch node that defines
 % the transforms for all of these objects.  That transform node is
 % above the collection of these object nodes.
-assetName = 'Cube_B'; 
+nodeName = 'Cube_B'; 
 
-% We get the branch node here.
-thisAsset = thisR.get('asset',assetName);
+% Get the branch node that defines the transforms 
+thisNode = thisR.get('node',nodeName);
 
 % Rotate this node 45 deg counter-clockwise around the z-axis. The
 % rotation will be inherited by all of the cube sides.
-thisR.set('asset', thisAsset.name, 'rotate', [0, 0, 45]);
+thisR.set('node', thisNode.name, 'rotate', [0, 0, 45]);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
@@ -75,7 +75,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Scale the cube 
 
 % Now transform the objects by a scale factor.
-thisR.set('asset', thisAsset.name, 'scale', [1.2 1.2 1.2]);
+thisR.set('node', thisNode.name, 'scale', [1.2 1.2 1.2]);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
@@ -86,7 +86,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Translate the cube
 
 % In meters
-thisR.set('asset', thisAsset.name, 'translate', [0.3 0.3 0]);
+thisR.set('node', thisNode.name, 'translate', [0.3 0.3 0]);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
@@ -96,14 +96,14 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %% Here is the current world position of the object
 
-currentP = thisR.get('asset',thisAsset.name,'world position');
+currentP = thisR.get('node',thisNode.name,'world position');
 
 % We can visualize the positions this way
 piAssetGeometry(thisR);
 
 %%  Bring it closer, specifying world position
 
-thisR.set('asset',thisAsset.name,'world position',currentP + [0 0 -0.3]);
+thisR.set('node',thisNode.name,'world position',currentP + [0 0 -0.3]);
 
 piWrite(thisR);
 scene = piRender(thisR, 'render type', 'radiance');
@@ -122,8 +122,8 @@ sceneSet(scene, 'render flag', 'hdr');
 thisR = piRecipeDefault('scene name','coloredCube');
 
 % Scale and then rotate
-thisR.set('asset', thisAsset.name, 'scale', [1.3 1.3 1.3]);
-thisR.set('asset', thisAsset.name, 'rotate', [0 0 45]);
+thisR.set('node', thisNode.name, 'scale', [1.3 1.3 1.3]);
+thisR.set('node', thisNode.name, 'rotate', [0 0 45]);
 scene = piWRS(thisR);
 scene = sceneSet(scene, 'name', 'Scale-Rotate');
 ieReplaceObject(scene);
@@ -134,8 +134,8 @@ ieReplaceObject(scene);
 thisR = piRecipeDefault('scene name','coloredCube');
 
 % Scale and then rotate
-thisR.set('asset', thisAsset.name, 'rotate', [0 0 45]);
-thisR.set('asset', thisAsset.name, 'scale', [1.3 1.3 1.3]);
+thisR.set('node', thisNode.name, 'rotate', [0 0 45]);
+thisR.set('node', thisNode.name, 'scale', [1.3 1.3 1.3]);
 scene = piWRS(thisR);
 scene = sceneSet(scene, 'name', 'Rotate-Scale');
 ieReplaceObject(scene);
@@ -145,8 +145,8 @@ ieReplaceObject(scene);
 thisR = piRecipeDefault('scene name','coloredCube');
 
 % Scale and then translate
-thisR.set('asset', thisAsset.name, 'scale', [1.3 1.3 1.3]);
-thisR.set('asset', thisAsset.name, 'translate', [0.3 0.3 0]);
+thisR.set('node', thisNode.name, 'scale', [1.3 1.3 1.3]);
+thisR.set('node', thisNode.name, 'translate', [0.3 0.3 0]);
 scene = piWRS(thisR);
 scene = sceneSet(scene, 'name', 'Scale-Translate');
 ieReplaceObject(scene);
@@ -156,8 +156,8 @@ sceneWindow();
 thisR = piRecipeDefault('scene name','coloredCube');
 
 % Scale and then translate
-thisR.set('asset', thisAsset.name, 'translate', [0.3 0.3 0]);
-thisR.set('asset', thisAsset.name, 'scale', [1.3 1.3 1.3]);
+thisR.set('node', thisNode.name, 'translate', [0.3 0.3 0]);
+thisR.set('node', thisNode.name, 'scale', [1.3 1.3 1.3]);
 scene = piWRS(thisR);
 scene = sceneSet(scene, 'name', 'Translate-Scale');
 ieReplaceObject(scene);
