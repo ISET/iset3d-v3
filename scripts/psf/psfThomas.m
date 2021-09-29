@@ -11,13 +11,13 @@ lens = addPlane(lens);
 
 %% Object distances with different reference ponts
 
-
-objectFromFront = 3000;   % For zemax, measures from first lens vertex
+fieldHeightY_mm = 1000;
+objectFromFront = 3200;   % For zemax, measures from first lens vertex
 objectFromRear= objectFromFront+lensThickness; % For isetlens
 objectFromFilm= objectFromRear+filmdistance_mm; 
 
 
-%% Grid definition
+%% Grid definition to sample the pupil uniformly
 gridCenterZ = -lensThickness;
 nbGridPoints= 2000;
 gridSize_mm = 30;
@@ -34,7 +34,7 @@ grid=[rows(:) cols(:) ones(numel(rows),1)*gridCenterZ];
 %% Collect rays
 clear origins directions;
 count=1;
-origins = repmat([0 0 -objectFromRear],[numel(rows) 1]);
+origins = repmat([0 fieldHeightY_mm -objectFromRear],[numel(rows) 1]);
         
 
 directions = (grid-origins);
@@ -46,8 +46,12 @@ rays = rayC('origin',origins,'direction', directions, 'waveIndex', waveIndices, 
 [~, ~, pOut, pOutDir] = lens.rtThroughLens(rays, rays.get('n rays'), 'visualize', false);
 
 
-%% Compare zemax LSF met raytrace
-load('zemax_lsf.mat','zemax')
+%% Load LSF
+zemaxlsfXY=dlmread('zemaxLSF_3200_fieldheight1000.csv')
+% POSITION,  LSFx, LSFy
+
+
+%% LSF   Y 
 maxnorm = @(x)x/max(x);
 mmToMicron=1e3;
 figure(5);clf;hold on;
@@ -57,16 +61,26 @@ figure(5);clf;hold on;
 % large changes the relative peak height. Therefore to make the data
 % comparable we calculat the number bins required to match the same binsize
 % as zemax.
-deltazemax = diff(zemax(1:2,1));
+deltazemax = diff(zemaxlsfXY(1:2,1));
 range_micron=mmToMicron*(max(pOut(:,1))-min(pOut(:,1)));
 nbBins = round(range_micron/deltazemax)
 
 % Calculate historgram by counting rays 
-[counts,bins]=hist(mmToMicron*pOut(:,1),nbBins)
+[counts,bins]=hist(mmToMicron*pOut(:,2),nbBins)
+
 
 % Plots
-hthomas=plot(bins,maxnorm(counts))
-hzemax=plot(zemax(:,1),maxnorm(zemax(:,2)))
+hthomas=plot(bins+16000-243,maxnorm(counts))
+hzemax=plot(zemaxlsfXY(:,1),maxnorm(zemaxlsfXY(:,2)))
 
 legend([hthomas hzemax],'Thomas PSF ray counter','zemax','zemax')
-title('Linespread function')
+title('Linespread function Y Direction')
+
+
+
+%% Histogran   Y 
+maxnorm = @(x)x/max(x);
+mmToMicron=1e3;
+
+figure(2);clf
+histogram2(mmToMicron*pOut(:,1),mmToMicron*pOut(:,2),100)

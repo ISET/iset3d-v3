@@ -5,7 +5,7 @@ clear;
 lensName = 'dgauss.22deg.50.0mm_aperture6.0.json';
 
 lens=lensC('file',lensName)
-lens.apertureSample=400*[1 1 ];
+lens.apertureSample=1000*[1 1 ];
 
 
 %% Helper variables
