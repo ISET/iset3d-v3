@@ -148,6 +148,9 @@ hrtf=plot(fRTF,Mrtf)
 title('MTF Y')
 xlabel('cycles/mm')
 
+set(findall(gcf,'-property','FontSize'),'FontSize',10);
+set(findall(gcf,'-property','interpreter'),'interpreter','latex');
+
 autoArrangeFigures
 pause(0.5)
 end
