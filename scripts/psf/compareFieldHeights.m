@@ -1,4 +1,4 @@
-clear; close all
+qclear; close all
 %% My own implementation for Geometric PSF calculation
 
 filmdistance_mm=36.959;
