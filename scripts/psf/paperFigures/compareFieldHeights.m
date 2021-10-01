@@ -19,7 +19,7 @@ fieldHeights_mm = [0 1000 0 1000 0]
 objectFromFront_distances_mm = [3000 3000 3300 3300 800 ]; 
 assert(numel(fieldHeights_mm)==numel(objectFromFront_distances_mm))
 
-for f=1:numel(fieldHeights_mm)
+for f=1
     
 fieldHeightY_mm = fieldHeights_mm(f);
 objectFromFront = objectFromFront_distances_mm(f);   % For zemax, measures from first lens vertex
