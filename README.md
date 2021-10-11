@@ -10,7 +10,7 @@ The general approach is the following
 
 (We have also built an extensive set of special tools to create complex automotive scenes.  They require Flywheel and scitran.)
 
-A typical workflow:
+Then a typical workflow might be:
 
 * The user  builds a **recipe** for rendering the PBRT files into a spectral irradiance.  The recipe is a Matlab class that specifies spatial resolution, number of rays, viewing distance, type of optics (pinhole, lens or light field microlens array)
 * The recipe also specifies information about the lens (which can contain multiple elements, spherical and certain aspherical shapes) and microlens array on the film surface
