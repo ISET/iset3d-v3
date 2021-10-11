@@ -6,7 +6,12 @@ To use these tools you must have Docker and Matlab installed. This repository al
 
 The general approach is the following
 
-* A user begins with a set of PBRT files that define the scene.  We typically create scenes via the PBRT export tool from Cinema4D.  We also built an extensive set of special tools to create complex automotive scenes.  That requires Flywheel and scitran, however.
+* A user begins with a set of PBRT files that define the scene.  We typically create scenes via the PBRT export tool from Cinema4D or more recently Blender.  
+
+(We have also built an extensive set of special tools to create complex automotive scenes.  They require Flywheel and scitran.)
+
+A typical workflow:
+
 * The user  builds a **recipe** for rendering the PBRT files into a spectral irradiance.  The recipe is a Matlab class that specifies spatial resolution, number of rays, viewing distance, type of optics (pinhole, lens or light field microlens array)
 * The recipe also specifies information about the lens (which can contain multiple elements, spherical and certain aspherical shapes) and microlens array on the film surface
 
