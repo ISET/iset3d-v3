@@ -27,7 +27,7 @@ sceneName = 'bunny';
 thisR = piRecipeDefault('scene name', sceneName);
 thisR.set('from',[0 0 0]);
 thisR.set('to',[0 0 1]);
-piAssetSet(thisR, 'Bunny_B','translate',[0 0 1]);
+thisR.set('asset', 'Bunny_B', 'world position', [0 0 1]);
 mergeNode = 'Bunny_B';
 oFile = thisR.save(fullfile(assetDir,[sceneName,'.mat']));
 save(oFile,'mergeNode','-append');

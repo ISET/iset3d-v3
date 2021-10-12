@@ -212,9 +212,9 @@ while i <= length(txt)
                 % If present populate fields.
                 if exist('name','var'), resCurrent.name = sprintf('%s_B', name); end
                 if exist('sz','var'), resCurrent.size = sz; end
-                if exist('rot','var'), resCurrent.rotation = rot; end
-                if exist('translation','var'), resCurrent.translation = translation; end
-                if exist('scale','var'), resCurrent.scale = scale; end
+                if exist('rot','var'), resCurrent.rotation = {rot}; end
+                if exist('translation','var'), resCurrent.translation = {translation}; end
+                if exist('scale','var'), resCurrent.scale = {scale}; end
                 
                 trees = tree(resCurrent);
                 for ii = 1:numel(subtrees)

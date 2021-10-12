@@ -52,16 +52,10 @@ sceneWindow(scene);
 thisR.assets.show; pause(2); close;
 
 % Delete the rotation we applied above
-thisR.set('asset', R1.name, 'delete');
-
-% Now it is gone
-thisR.assets.show; pause(2); close;
+thisR.set('asset', R1.name, 'removelasttrans');
 
 % Apply the rotation angle
 thisR.set('asset', assetName, 'rotation', rotAng);
-
-% Now we put it back, but a different way
-thisR.assets.show; pause(2); close;
 
 %% Rotate two assets, specified in world space and move the camera
 
@@ -85,5 +79,6 @@ piCameraTranslate(thisR,'x shift',0.2*oDist,'fromto','to');
 piWrite(thisR)
 [scene,result] = piRender(thisR, 'render type', 'radiance');
 sceneWindow(scene);
+sceneSet(scene, 'render flag', 'hdr');
 
 %% END
