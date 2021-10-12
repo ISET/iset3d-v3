@@ -37,7 +37,7 @@ t_cameraMotion
 %% Maybe redundant with prior cameramotion
 
 disp('t_piIntro_cameraposition')
-t_piIntro_cameraposition
+t_cameraPosition
 
 %% Try a lens
 
