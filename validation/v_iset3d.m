@@ -32,7 +32,7 @@ v_piDataScenes;                  % Checks the local data scenes
 %%  Rotate the camera
 
 disp('t_piIntro_cameramotion')
-t_piIntro_cameramotion
+t_cameraMotion
 
 %% Maybe redundant with prior cameramotion
 
