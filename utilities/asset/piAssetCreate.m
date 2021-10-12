@@ -53,14 +53,15 @@ switch ieParamFormat(type)
         obj.size.h = 0;
         obj.size.pmin = [0 0];
         obj.size.pmax = [0 0];
-        obj.scale = [1 1 1];
-        obj.translation = [0 0 0];
-        obj.rotation = [0 0 0;
+        obj.scale = {[1 1 1]};
+        obj.translation = {[0 0 0]};
+        obj.rotation = {[0 0 0;
             0 0 1;
             0 1 0;
-            1 0 0];
+            1 0 0]};
         obj.concattransform=[];
         obj.motion = [];
+        obj.transorder = ['T', 'R', 'S']; % Order of translation, rotation and scale
     case 'object'
         obj.name = 'object';
         obj.mediumInterface = [];

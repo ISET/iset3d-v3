@@ -6,7 +6,7 @@
 %
 %  Camera lens properties are introduced in a separate script.
 %
-
+%
 % Describe the ISETCam camera types.  There are four:
 %   perspective (also called 'pinhole' in the documentation)
 %   realistic

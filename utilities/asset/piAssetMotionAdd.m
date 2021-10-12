@@ -1,4 +1,4 @@
-function newBranch = piAssetMotionAdd(thisR, assetInfo, varargin)
+function modifiedBranch = piAssetMotionAdd(thisR, assetInfo, varargin)
 % Add a motion branch to the asset tree
 %
 % Synopsis
@@ -52,8 +52,8 @@ thisR.assets.show;
 p = inputParser;
 p.addRequired('thisR', @(x)isequal(class(x),'recipe'));
 p.addRequired('assetInfo', @(x)(ischar(x) || isscalar(x)));
-p.addParameter('translation', [0 0 0], @isvector);
-p.addParameter('rotation', [0 0 0], @isvector);
+p.addParameter('translation', [], @isnumeric);
+p.addParameter('rotation', [], @isnumeric);
 p.parse(thisR, assetInfo, varargin{:});
 
 thisR       = p.Results.thisR;
@@ -80,14 +80,34 @@ if isempty(thisNode)
     return;
 end
 
-%%  Set the rotation and translation terms 
 
-% Form motion struct by only having the translation and rotation
-rotMatrix = [rotation(3), rotation(2), rotation(1);
-             fliplr(eye(3))];
-motion.rotation = rotMatrix;
-motion.translation = reshape(translation, 1, 3);
 
+%%
+if isequal(thisNode.type, 'branch')
+    %%  Set the rotation and translation terms 
+
+    % Form motion struct by only having the translation and rotation
+    motion = thisNode.motion; % Initialize motion with current setting
+    if ~isempty(rotation)
+        rotMatrix = [rotation(3), rotation(2), rotation(1);
+            fliplr(eye(3))];
+        motion.rotation = rotMatrix;
+    end
+    if ~isempty(translation)
+        motion.translation = reshape(translation, 1, 3);
+    end
+    thisNode.motion = motion;
+    
+    [~, modifiedBranch] = thisR.set('asset', assetInfo, thisNode);
+else
+    % Node is object or light
+    parentNodeID = thisR.assets.getparent(assetInfo);
+    modifiedBranch = piAssetMotionAdd(thisR, parentNodeID,...
+                                        'translation', translation,...
+                                        'rotation', rotation);
+end
+%% Old Scripts, to be deprecated later
+%{
 %% New branch node
 
 newBranch = piAssetCreate('type', 'branch');
@@ -113,5 +133,6 @@ else
     % Node is object or light. Insert the newBranch node under its parent
     thisR.set('asset', assetInfo, 'insert', newBranch);
 end
+%}
 
 end

@@ -80,7 +80,7 @@ sceneSet(scene, 'render flag', 'hdr');
 %% Compare with standard translation
 
 % Delete the world translation we just exected.
-thisR.set('asset',T1.name,'delete');
+thisR.set('asset',T1.name,'cancellastaction');
 
 % Render
 piWrite(thisR)
@@ -100,7 +100,7 @@ sceneSet(scene, 'render flag', 'hdr');
 
 %% Delete the translation, putting him back
 
-thisR.set('asset',A1.name,'delete');
+thisR.set('asset',A1.name,'cancellastaction');
 
 piWrite(thisR)
 scene = piRender(thisR, 'render type', 'radiance');

@@ -61,7 +61,7 @@ thisR.set('aperture diameter',10);
 % Adjust for quality
 thisR.set('rays per pixel',32);
 
-thisR.get('depth range')
+thisR.get('depth range') % This calls the docker container to get the depth
 
 %% Make a dual pixel sensor that has rectangular pixels
 %
