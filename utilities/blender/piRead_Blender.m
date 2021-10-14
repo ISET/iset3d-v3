@@ -510,7 +510,17 @@ if isequal(thisR.exporter,'C4D') || isequal(thisR.exporter,'Blender')
     
     % Check if the materials.pbrt exist
     if ~exist(inputFile_materials,'file'), error('File not found'); end
-    [thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials);
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % NOTE: below changed
+    % Edited on Oct 12, 2021, for updated version of 'piMateralRead' 
+    
+    thisR.materials.list = piMaterialRead(thisR, inputFile_materials);
+    %[thisR.materials.list,thisR.materials.txtLines] = piMaterialRead(thisR, inputFile_materials);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     thisR.materials.inputFile_materials = inputFile_materials;
     
     % Call material lib
