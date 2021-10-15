@@ -1,0 +1,206 @@
+%%  s_goMTF3D
+%
+% Questions:
+%   * I am unsure whether the focal distance is in z or in distance from
+%   the camera.  So if the camera is at 0, these are the same.  But if the
+%   camera is at -0.5, these are not the same.
+%
+%  * There is trouble scaling the object size.  When the number gets small,
+%  the object disappears.  This may be some numerical issue reading the
+%  scale factor in the pbrt geometry file?
+%
+
+%%1+1
+
+ieInit
+if ~piDockerExists, piDockerConfig; end
+
+%% The chess set with pieces
+
+% This just loads the scene.
+load('ChessSetPieces-recipe','thisR');
+chessR = thisR;
+
+% The EIA chart
+sbar = piAssetLoad('slantedbar');
+
+
+% Adjust the input slot in the recipe for the local user
+[~,n,e] = fileparts(chessR.get('input file'));
+inFile = which([n,e]);
+if isempty(inFile), error('Cannot find the PBRT input file %s\n',chessR.inputFile); end
+chessR.set('input file',inFile);
+
+% Adjust the input slot in the recipe for the local user
+[p,n,e] = fileparts(chessR.get('output file'));
+temp=split(p,'/');
+outFile=fullfile(piRootPath,'local',temp{end});
+chessR.set('output file',outFile);
+
+
+%% Set camera position
+
+
+filmZPos_m=-1.5;
+chessR.lookAt.from(3)=filmZPos_m;
+distanceFromFilm_m=1.469+50/1000
+
+%% Merge chart and chessset
+piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
+
+% Position and scale the chart
+piAssetSet(chessR,sbar.mergeNode,'translate',[0.1 0.15 distanceFromFilm_m+filmZPos_m]);
+thisScale = chessR.get('asset',sbar.mergeNode,'scale');
+
+piAssetSet(chessR,sbar.mergeNode,'scale',thisScale.*[0.1 0.1 0.01]);  % scale should always do this
+%initialScale = chessR.get('asset',sbar.mergeNode,'scale');
+
+   
+%piAssetSet(thisR,sbar.mergeNode,'translate',[0 0 800]);
+
+% Render the scene
+thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
+
+
+%%
+
+%% Add a lens and render.
+%camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
+cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json')
+cameraOmni.filmdistance.type='float'
+cameraOmni.filmdistance.value=0.037959;
+cameraOmni = rmfield(cameraOmni,'focusdistance')
+cameraOmni.aperturediameter.value=12
+
+
+cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json')
+%cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
+cameraRTF.filmdistance.value=0.037959;
+cameraRTF.aperturediameter.value=12
+cameraRTF.aperturediameter.type='float'
+
+chessR.set('pixel samples',1500)
+
+
+thisR.set('film diagonal',20,'mm');
+thisR.set('film resolution',[2000 2000])
+    
+
+chessR.integrator.subtype='path'
+
+chessR.integrator.numCABands.type = 'integer';
+chessR.integrator.numCABands.value =1
+
+
+%% Change the focal distance
+
+% This series sets the focal distance and leaves the slanted bar in place
+% at 2.3m from the camera
+%chessR.set('focal distance',0.2);   % Original distance z value of the slanted bar
+% Omni
+chessR.set('camera',cameraOmni);
+oiOmni = piWRS(chessR,'render type','radiance','dockerimagename',thisDocker);
+
+
+% 
+% % RTF
+chessR.set('camera',cameraRTF);
+oiRTF = piWRS(chessR,'render type','radiance','dockerimagename',thisDocker);
+ 
+ 
+ 
+oiList = {oiOmni,oiRTF};
+
+
+
+save('../../../local/oiList.mat')
+%save('simulation_2000samples.mat')
+return
+
+
+
+%% Make comparison figures
+
+oiLabel = {'omni', 'RTF'}
+for o=1:numel(oiList)
+    oi=oiList{o};
+    oiWindow(oi)
+    exportgraphics(gca,['./fig/chess_oi_' oiLabel{o} '.png']);
+    
+end
+
+%% Difference image
+figure(10);clf
+maxnorm=@(x)x/max(x(:));
+dataOmni=maxnorm(oiList{1}.data.photons(:,:,1));
+dataRTF=maxnorm(oiList{2}.data.photons(:,:,1));
+imagesc(dataOmni-dataRTF)
+colorbar
+
+%%
+clear mtf;
+for o=1:numel(oiList)
+    %oiWindow(oi);
+    
+    oi=oiList{o};
+    % The pixel size is not the limit!
+    sensor = sensorCreate('imx363');
+  %  sensor = sensorSet(sensor,'pixel size same fill factor',1.0e-6);
+    % How to set correct pixel size given PBRT recipe?
+   %  sensor = sensorSet(sensor,'size',2*[5000 5000]);
+    %sensor = sensorSet(sensor,'fov',22,oi); % what FOV should I use?
+    
+    ip = ipCreate;oiList = {oiOmni};
+
+    
+    sensor = sensorCompute(sensor,oi);
+    ip = ipCompute(ip,sensor);
+    
+    % MTF Lens
+  %   ipWindow(ip)
+ %    [locs,rect] = ieROISelect(ip);
+%     positions = round(rect.Position);
+
+
+%     
+
+    positions=[ 3987         716         576         967]
+    positions= [8272         577        1152        2342];
+    mtf{o}= ieISO12233(ip,sensor,'all',positions);
+    
+    saveas(gcf,['./fig/MTF-' oi.name '.png'])
+    
+end
+
+%% MTF Compare RTF met Omni
+color{1}='r'
+color{2}='g'
+color{3}='b'
+color{4}='k'
+linestyle{1}='-'
+linestyle{2}='--'
+marker{1}='none'
+marker{2}='none'
+% Compare visually MTF's
+
+
+load calculatedMTF.mat
+fig=figure;clf;
+fig.Position= [498 419 1101 245];
+for o=1:numel(mtf)
+    for k =1:4
+        subplot(1,4,k); hold on;
+        h(o)=plot(mtf{o}.freq,mtf{o}.mtf(:,k),'color',color{k},'linestyle',linestyle{o},'marker',marker{o}); hold on;
+        plot(freqLensXY{1},MLensXY{1},'k:','linewidth',2)
+        plot(freqLensXY{2},MLensXY{2},'k:','linewidth',2)
+        ylim([0 1])
+        xlim([0 200])
+        title('MTF')
+        xlabel('Freq. (cy/mm)')
+        
+    end
+    
+end
+legend(h,'Omni','RTF')
+
+%saveas(gcf,'./fig/MTF-comparison.png')

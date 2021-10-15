@@ -66,6 +66,7 @@ cameraOmni.aperturediameter.value=0.6
 
 
 cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.3.0mm.json-raytransfer-spectral.json')
+cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
 cameraRTF.aperturediameter.value=0.6
 cameraRTF.aperturediameter.type='float'
 
@@ -78,7 +79,7 @@ thisR.set('film diagonal',2,'mm');
 chessR.integrator.subtype='spectralpath'
 
 chessR.integrator.numCABands.type = 'integer';
-chessR.integrator.numCABands.value =3
+chessR.integrator.numCABands.value =1
 
 
 %% Change the focal distance
