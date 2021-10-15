@@ -222,7 +222,7 @@ lightfield = ip2lightfield(ip,'pinholes',nMicrolens,'colorspace','srgb');
 %
 % Click on window to select and then press Escape to close the window
 %
-LFDispVidCirc(lightfield.^(1/2.2))
+LFDispVidCirc(lightfield.^(1/2.2));
 %% Focus on a region
 
 %{

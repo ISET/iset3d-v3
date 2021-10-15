@@ -201,11 +201,11 @@ switch param
         % the point the camera is looking at.  Both are specified in
         % meters.
         %
-        % This routine adjusts the the 'from' position, moving the
-        % camera position. It does so by keeping the 'to' position the
-        % same, so the camera is still looking at the same location.
-        % Thus, the point of this set is to move the camera closer or
-        % further from the 'to' position.
+        % This routine adjusts the 'from' position, effectively moving the
+        % camera position. It keeps the 'to' position the same, so the
+        % camera is still looking at the same object. Thus, the point of
+        % this set is to move the camera closer or further from the 'to'
+        % position.
         %
         % What is the relationship to the focal distance?  If we move
         % the camera, the focal distance is always with respect to the
@@ -548,21 +548,6 @@ switch param
         end
         thisR.integrator.maxdepth.value = val;
         thisR.integrator.maxdepth.type = 'integer';
-        
-    case 'autofocus'
-        % Should deprecate this.  Let's run it for a while and see how
-        % often it turns up.
-        %
-        % thisR.set('autofocus',true);
-        % Sets the film distance so the lookAt to point is in good focus
-        warning('Bad autofocus set in recipe.  Fix!');
-        if val
-            fdist = thisR.get('focal distance');
-            if isnan(fdist)
-                error('Camera is probably too close (%f) to focus.',thisR.get('object distance'));
-            end
-            thisR.set('film distance',fdist);
-        end
         
         % Camera position related.  The units are in ????
     case 'lookat'
@@ -939,19 +924,24 @@ switch param
             thisR.set('light', lgtIdx, thisLight);
         end
         
-    case {'asset', 'assets'}
+    case {'asset', 'assets','node','nodes'}
         % Typical:    thisR.set(param,val) 
         % This case:  thisR.set('asset',assetNameOrID, param, val);
         %
         % These operations need the whole tree, so we send in the
         % recipe that contains the asset tree, thisR.assets.
         
+        % We are slowly starting to call nodes nodes, rather than
+        % assets.  We think of an asset now as, say, a car with all of
+        % its parts.  A node is the node in a tree that contains
+        % multiple assets. (BW, Sept 2021).
+        
         % Given the calling convention, val is assetName and
         % varargin{1} is the param, and varargin{2} is the value, if
         % needed.
         if isnumeric(val)
             % Person sent in an id, so we get the name here
-            [~,thisAsset] = piAssetFind(thisR,'id',val);
+            [id,thisAsset] = piAssetFind(thisR,'id',val);
             if val == 1, assetName = 'root';
             else, assetName = thisAsset{1}.name;
             end
@@ -959,6 +949,13 @@ switch param
             assetName = val;
         end
         param = varargin{1};
+        % If only one element in varargin, it should be a node struct.
+        if numel(varargin) == 1 && ~ischar(varargin{1})
+            thisR.assets = thisR.assets.set(id, varargin{1});
+            out = varargin{1};
+            return;
+        end
+        % Else we are setting a parameter value
         if numel(varargin) == 2, val   = varargin{2}; end
         
         % Some of these functions should be edited to return the new
@@ -967,6 +964,14 @@ switch param
             case 'add'
                 % thisR.set('asset',parentName,newAsset);
                 out = piAssetAdd(thisR, assetName, val);
+            case {'cancellasttransformation', 'removelasttransformation',...
+                  'cancellasttrans', 'removelasttrans',...
+                  'cancellastaction', 'removelastaction'}
+                % Note: this is for transformation only, not
+                % motion/animation
+                piAssetRemoveLastTrans(thisR, assetName);
+            case {'clearmotion', 'removemotion', 'cancelmotion'}
+                piAssetSet(thisR, assetName, 'motion', []);
             case {'delete', 'remove'}
                 % thisR.set('asset',assetName,'delete');
                 piAssetDelete(thisR, assetName);
@@ -978,7 +983,7 @@ switch param
                 piAssetSetParent(thisR, assetName, val);
             case {'translate', 'translation'}
                 % thisR.set('asset',assetName,'translate',val);
-                piAssetTranslate(thisR, assetName, val);
+                out = piAssetTranslate(thisR, assetName, val);
             case {'worldtranslate', 'worldtranslation'}
                 % Translate in world axis orientation.
                 rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
@@ -1003,7 +1008,9 @@ switch param
             case {'worldrotate', 'worldrotation'}
                 % Get current rotation matrix
                 curRotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
-                
+                [~, rotDeg] = piTransformRotationInAbsSpace(val, curRotM);
+                %{
+                % This section was wrapped in piTransformRotationInAbsSpace.
                 newRotM = eye(4);
                 % Loop through the three rotation                
                 for ii=1:numel(val)
@@ -1012,12 +1019,12 @@ switch param
                         axWorld = zeros(4, 1);
                         axWorld(ii) = 1;
                         
-                        % Axis orientation in object space
+                        % Axis orientation in world space
                         % axObj = inv(curRotM) * axWorld;
                         axObj = curRotM \ axWorld;
                         thisAng = val(ii);
                         
-                        % Get the rotation matrix in object space
+                        % Get the rotation matrix in world space
                         thisM = piTransformRotation(axObj, thisAng);
                         newRotM = thisM * newRotM;
                     end
@@ -1025,6 +1032,7 @@ switch param
                 % Get rotation deg around x, y and z axis in object
                 % space.
                 rotDeg = piTransformRotM2Degs(newRotM);
+                %}
                 out = thisR.set('asset', assetName, 'rotate', rotDeg);
             case {'worldposition'}
                 % thisR.set('asset', assetName, 'world position', [1 2 3]);
@@ -1044,8 +1052,8 @@ switch param
             case {'obj2light'}
                 piAssetObject2Light(thisR, assetName, val);
             case {'graft', 'subtreeadd'}
-                % thisR.set('asset',assetName,'graft',val); (Maybe)
-                id = thisR.get('asset', assetName, 'id');
+                % thisR.set('asset',nodeForGraft,'graft',subtree);
+                id = thisR.get('node', assetName, 'id');
                 rootSTID = thisR.assets.nnodes + 1;
                 thisR.assets = thisR.assets.graft(id, val);
                 thisR.assets = thisR.assets.uniqueNames;

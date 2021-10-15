@@ -101,10 +101,13 @@ switch thisNode.type
             case {'size'}
                 thisNode.size = val;
             case {'scale'}
+                if ~iscell(val), val = {val}; end
                 thisNode.scale = val;
             case {'translation', 'translate'}
+                if ~iscell(val), val = {val}; end
                 thisNode.translation = val;
             case {'rotation', 'rotate'}
+                if ~iscell(val), val = {val}; end
                 thisNode.rotation = val;
             case {'motion'}
                 thisNode.motion = val;

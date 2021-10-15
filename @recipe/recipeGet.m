@@ -1239,11 +1239,17 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('lights print');
         piLightList(thisR);
     % Asset specific gets - more work needed here.
-    case {'asset', 'assets'}
+    case {'asset', 'assets','node','nodes'}
+        % 
         % thisR.get('asset',assetName or ID);  % Returns the asset
         % thisR.get('asset',assetName,param);  % Returns the param val
         % thisR.get('asset',name or ID,'world position')
         % thisR.get('asset',name or ID,'size')
+        %
+        % We are slowly starting to call nodes nodes, rather than
+        % assets.  We think of an asset now as, say, a car with all of
+        % its parts.  A node is the node in a tree that contains
+        % multiple assets. (BW, Sept 2021).
         
         [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
         % If only one asset matches, turn it from cell to struct.
@@ -1300,8 +1306,8 @@ switch ieParamFormat(param)  % lower case, no spaces
                     % World position and orientation properties.  These
                     % need more explanation.
                 case 'worldrotationmatrix'
-                    % This is a 4x4 matrix, not the same as the rotation
-                    % stored in the node.  Zheng should explain.
+                    % This is a 4x4 matrix, that represents accumulated
+                    % rotation effects of ALL rotation action.
                     nodeToRoot = thisR.assets.nodetoroot(id);
                     [val, ~] = piTransformWorld2Obj(thisR, nodeToRoot);
                 case 'worldrotationangle'
@@ -1329,6 +1335,12 @@ switch ieParamFormat(param)  % lower case, no spaces
                     else
                         val = piAssetGet(thisAsset, 'translation');
                     end
+                case 'rotation'
+                    if thisR.assets.isleaf(id)
+                        
+                    else
+                        val = piAsseGet(thisAsset, 'rotation');
+                    end
                 case 'size'
                     % thisR.get('asset',objectName,'size');
                     % Size of one object in meters                    
@@ -1348,7 +1360,7 @@ switch ieParamFormat(param)  % lower case, no spaces
                     val = piAssetGet(thisAsset,varargin{2});
             end
         end
-    case {'assetid'}
+    case {'nodeid','assetid'}
         % thisR.get('asset id',assetName);  % ID from name
         val = piAssetFind(thisR.assets,'name',varargin{1});
     case {'assetroot'}
@@ -1360,7 +1372,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         % The names without the XXXID_ prepended
         % What about objectnames
         val = thisR.assets.stripID;
-    case {'assetparentid'}
+    case {'nodeparentid','assetparentid'}
         % thisR.get('asset parent id',assetName or ID);
         %
         % Returns the id of the parent node
@@ -1374,7 +1386,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             thisNodeID = thisNode;
         end
         val = thisR.assets.getparent(thisNodeID);
-    case {'assetparent'}
+    case {'nodeparent','assetparent'}
         % thisR.get('asset parent',assetName)
         %
         thisNode = varargin{1};
