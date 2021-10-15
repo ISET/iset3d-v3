@@ -5,7 +5,7 @@
 %  repository.
 % 
 % Dependencies:
-%    ISET3d, (ISETCam or ISETBio), JSONio
+%    ISET3d plus either ISETCam or ISETBio
 %
 %  Check that you have the updated docker image by running
 %
@@ -13,14 +13,14 @@
 %
 % Description
 %  The scripts introduces how to read one of the ISET3d default scenes to
-%  create recipe.  
+%  create a recipe for rendering with PBRT-v3.  
 %
 %  The script 
 %
 %    * initializes the recipe
 %    * adds a light
 %    * sets film resolution parameters
-%    * calls the renderer that invokes the PBRT docker
+%    * calls the renderer that invokes the PBRT docker image
 %    * loads the radiance and depth map into an ISET scene structure.
 %
 % Authors
@@ -32,6 +32,7 @@
 
 % History:
 %   10/18/20  dhb  Cleaned up comments a bit.
+%   10/15/21  djc  More comment updating
 
 %% Initialize ISET and Docker
 
@@ -49,7 +50,7 @@ thisR.set('light','add',pointLight);
 
 %{
 % You can also try this light if you like, which is more blue and distant
-distantLight = piLightCreate('distant','type','distant',...
+distantLight = piLightCreate('new distant light','type','distant',...
     'spd', [9000 0.001], ...
     'cameracoordinate', true);
 thisR.set('light','delete',pointLight.name);
@@ -59,11 +60,11 @@ thisR.set('light','add',distantLight);
 %% Set up the render quality
 %
 % There are many different parameters that can be set.  This is the just an
-% introductory script, so we do a minimal number of parameters.  Much of
+% introductory script, so we use a minimal number of parameters.  Much of
 % what is described in other scripts expands on this section.
 thisR.set('film resolution',[192 192]);
 thisR.set('rays per pixel',128);
-thisR.set('n bounces',1); % Number of bounces
+thisR.set('n bounces',1); % Number of bounces to trace for each ray
 
 %% Save the recipe and render
 piWrite(thisR);
