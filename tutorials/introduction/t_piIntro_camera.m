@@ -8,21 +8,23 @@
 %
 %
 % Describe the ISETCam camera types.  There are four:
-%   perspective (also called 'pinhole' in the documentation)
-%   realistic
-%   realisticEye (special case for the sceneEye in ISETBio)
-% omni.
+%   * perspective (also called 'pinhole' in the documentation)
+%   * realistic
+%   * realisticEye (special case for the sceneEye in ISETBio)
+%   * omni.
 %
 %  See also
 %   t_piIntro_lens
 %
+%  Update History:
+%   10/15/21    djc     fix for Windows & Linux
 %%
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
 %% Init a default recipe 
 
-% This the MCC scene
+% This the a simple scene with a variety of objects
 thisR = piRecipeDefault('scene name','SimpleScene');
 
 % By default, the camera type for this scene is a 'perspective', which
@@ -53,7 +55,10 @@ thisR.get('fov')
 piWrite(thisR);
 oi = piRender(thisR);
 
-oi = piAIdenoise(oi);  % Denoising is not necessary, but it looks nice
+% we only have the denoise binary for mac in the repo
+if ismac
+    oi = piAIdenoise(oi);  % Denoising is not necessary, but it looks nice
+end
 
 oiWindow(oi);
 
