@@ -1,15 +1,17 @@
 % s_MCCCBAssetCreate;
 % Generate and save Macbeth Color Checker for Cornell Box project.
 
-%% init
+%% Init
+
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read MCCCB recipe
-assetSceneName = 'MacBethCheckerCB';
-thisR = piRecipeDefault('scene name', assetSceneName);
-% thisR.assets.show;
+assetDir = fullfile(piRootPath,'data','assets');
 
+%% Read MCCCB recipe
+assetSceneName = 'mccCB';
+thisR = piRecipeDefault('scene name', assetSceneName);
+% thisR.set('assets', '001_Substrate_O', 'world translation', [0 0 0.0025]);
 %% Assign spectral reflectance data
 % Load MCC reflectance data
 wave = 400:10:700;
@@ -22,9 +24,20 @@ piMaterialPrint(thisR);
 for ii=1:size(reflList, 2)
     thisMatName = sprintf('Patch%02d', ii);
     thisRefl = piMaterialCreateSPD(wave, reflList(:, ii));
+    thisR.set('material', thisMatName, 'type', 'matte');
     thisR.set('material', thisMatName, 'kd value', thisRefl);
 end
 
+%%
+mergeNode = 'MCC_B';
+oFile = thisR.save(fullfile(assetDir, [assetSceneName, '.mat']));
+save(oFile, 'mergeNode', '-append');
+
+%{
+[~, results] = piWRS(thisR);
+%}
+%%
+%{
 %% Create the MCC asset subtree
 assetName = 'MCC_B';
 subTree = thisR.get('asset', assetName, 'subtree');
@@ -35,9 +48,10 @@ p = piAssetTreeSave(subTree, matList, 'outFilePath', outputPath);
 
 %{
 piWrite(thisR);
-scene = piRender(thisR, 'render type', 'illuminant', 'scaleIlluminance', false);
+scene = piRender(thisR, 'render type', 'all', 'scaleIlluminance', false);
 sceneWindow(scene);
 %}
 
 %% Load mcc asset
 loadedAsset = piAssetTreeLoad('mccCB');
+%}

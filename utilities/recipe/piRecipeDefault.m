@@ -123,7 +123,7 @@ switch ieParamFormat(sceneDir)
         sceneDir = 'MacBethCheckerCus';
         sceneFile = [sceneDir,'.pbrt'];
         exporter = 'C4D';
-    case 'macbethcheckercb'
+    case {'macbethcheckercb', 'mcccb'}
         sceneDir = 'mccCB';
         sceneFile = [sceneDir,'.pbrt'];
         exporter = 'C4D';
