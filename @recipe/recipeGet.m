@@ -1158,10 +1158,14 @@ switch ieParamFormat(param)  % lower case, no spaces
             % All the object points
             if isfield(thisNode.shape,'pointp')
                 pts = thisNode.shape.pointp;
-                % Range of points times any scale factors on the path
-                val(ii,1) = range(pts(1:3:end))*thisScale(1);
-                val(ii,2) = range(pts(2:3:end))*thisScale(2);
-                val(ii,3) = range(pts(3:3:end))*thisScale(3);
+                if ~isempty(pts)
+                    % Range of points times any scale factors on the path
+                    val(ii,1) = range(pts(1:3:end))*thisScale(1);
+                    val(ii,2) = range(pts(2:3:end))*thisScale(2);
+                    val(ii,3) = range(pts(3:3:end))*thisScale(3);
+                else
+                    val(ii,:) = NaN;
+                end
             else
                 % There is no shape point information.  So we return NaNs.
                 val(ii,:) = NaN;

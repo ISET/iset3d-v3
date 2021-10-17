@@ -1,5 +1,14 @@
 % s_MCCCBAssetCreate;
-% Generate and save Macbeth Color Checker for Cornell Box project.
+%
+%   Generate and save Macbeth Color Checker for Cornell Box project. This
+%   is a more extensive asset than the macbeth asset created by
+%   piChartCreate and used in s_assetsRecipe. This one includes the
+%   spectral data for the patches in the chart. 
+%
+% Zheng Lyu
+%
+% See also
+%
 
 %% Init
 
@@ -36,6 +45,7 @@ save(oFile, 'mergeNode', '-append');
 %{
 [~, results] = piWRS(thisR);
 %}
+
 %%
 %{
 %% Create the MCC asset subtree
