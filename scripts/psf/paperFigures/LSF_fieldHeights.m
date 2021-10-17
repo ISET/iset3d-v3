@@ -5,12 +5,14 @@
 
 filmdistance_mm=36.959;
 lens = lensC('file','dgauss.22deg.50.0mm_aperture6.0.json')
+
 lensThickness = lens.surfaceArray(1).sRadius-lens.surfaceArray(1).sCenter(3);
 addPlane = outputPlane(filmdistance_mm); % Film plane
 lens = addPlane(lens);
 
 %% Load RTF
 fit = load('rtf-dgauss.22deg.50mm.mat','fit');
+
 rtf = fit.fit{1};
 diaphragm_diameter=12
 % Set diaphraghm diameter RTF
