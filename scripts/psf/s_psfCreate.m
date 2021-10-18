@@ -23,12 +23,12 @@ bb=lens.bbmGetValue('all')
 scale=1
 lensThickness = lens.surfaceArray(1).sRadius-lens.surfaceArray(1).sCenter(3);
 
-objdistance_mm_fromfront = 3000; %Relative to rear surface vertxof lens
+objdistance_mm_fromfront = 1400; %Relative to rear surface vertxof lens
 objdistance_mm_fromrear= objdistance_mm_fromfront+lensThickness %Relative to film position
 objdistance_mm_fromfilm= objdistance_mm_fromrear+filmdistance_mm; %Relative to film position
 
 diskradius_mm = 0.1/10;
-impoint=lens.findImagePoint([0 diskradius_mm -objdistance_mm_fromrear],1,1);
+impoint=lens.findImagePoint([0 diskradius_mm -objdistance_mm_fromrear],1,1)
 spotsize_micron = impoint(1,2)*1e3
 z_im_mm = impoint(1,3)
 

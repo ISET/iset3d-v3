@@ -120,6 +120,9 @@ switch ieParamFormat(chartName)
         imgFile = 'gridlines.png';
         
     case 'macbeth'
+        % This has the macbeth as an image (texture). There is a separate
+        % script (s_assetMCCCBCreate) that includes the true spectral data.
+        % That one is used for the Cornell Box project.
         textureName = sprintf('macbeth-%d',uniqueKey);
         imgFile = 'macbeth.png';
         

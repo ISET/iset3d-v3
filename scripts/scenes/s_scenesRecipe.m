@@ -22,18 +22,37 @@ load(oFile,'thisR');
 piWRS(thisR);
 %}
 
-%% This mat file works.  
+%% Create ChessSetPieces-recipe that has assets included
 
 % Because it is a large scene, we save it in the input folder.  This takes
 % a long time to load this way.  But it is pretty quick if we just load the
 % recipe, below.
 thisR = piRecipeDefault('scene name','chess set pieces');
 oDir = thisR.get('input dir');
-oFile = thisR.save(fullfile(oDir,'ChessSetPieces.mat')); 
+oFile = thisR.save(fullfile(oDir,'ChessSetPieces-recipe.mat')); 
 
+%{
 % Much faster
-% load(oFile,'thisR');
-% piWRS(thisR);
+ load(oFile,'thisR');
+ piWRS(thisR);
+%}
+
+%% ChessSet with no assets.  Still renders.
+
+thisR = piRecipeDefault('scene name','chess set');
+oDir = thisR.get('input dir');
+oFile = thisR.save(fullfile(oDir,'ChessSet-recipe.mat')); 
+
+%{
+ load(oFile,'thisR');
+ piWRS(thisR);
+%}
+
+%% END
+
+% Test translate with the ruler.
+thisR.set('assets','001_mesh_00072_O','world translate',-[0.01 0.02 0]);
+thisR.set('assets','001_mesh_00073_O','world translate',-[0.01 0.02 0]);
 
 %% This is slow!!!  And it doesn't work.
 

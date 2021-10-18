@@ -201,11 +201,11 @@ switch param
         % the point the camera is looking at.  Both are specified in
         % meters.
         %
-        % This routine adjusts the the 'from' position, moving the
-        % camera position. It does so by keeping the 'to' position the
-        % same, so the camera is still looking at the same location.
-        % Thus, the point of this set is to move the camera closer or
-        % further from the 'to' position.
+        % This routine adjusts the 'from' position, effectively moving the
+        % camera position. It keeps the 'to' position the same, so the
+        % camera is still looking at the same object. Thus, the point of
+        % this set is to move the camera closer or further from the 'to'
+        % position.
         %
         % What is the relationship to the focal distance?  If we move
         % the camera, the focal distance is always with respect to the
@@ -548,21 +548,6 @@ switch param
         end
         thisR.integrator.maxdepth.value = val;
         thisR.integrator.maxdepth.type = 'integer';
-        
-    case 'autofocus'
-        % Should deprecate this.  Let's run it for a while and see how
-        % often it turns up.
-        %
-        % thisR.set('autofocus',true);
-        % Sets the film distance so the lookAt to point is in good focus
-        warning('Bad autofocus set in recipe.  Fix!');
-        if val
-            fdist = thisR.get('focal distance');
-            if isnan(fdist)
-                error('Camera is probably too close (%f) to focus.',thisR.get('object distance'));
-            end
-            thisR.set('film distance',fdist);
-        end
         
         % Camera position related.  The units are in ????
     case 'lookat'
