@@ -139,7 +139,7 @@ switch ieParamFormat(sceneDir)
     case 'chessset'
         sceneDir = 'ChessSet';
         sceneFile = [sceneDir,'.pbrt'];
-        exporter = 'Copy';
+        exporter = 'C4D';
     case 'chesssetpieces'
         sceneDir = 'ChessSetPieces';    
         sceneFile = ['ChessSet','.pbrt'];

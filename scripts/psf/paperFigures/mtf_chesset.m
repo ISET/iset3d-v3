@@ -14,7 +14,15 @@ chessR=piRecipeDefault('scene name','chessSet');
 % The EIA chart
 sbar = piAssetLoad('slantedbar');
 
+piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
 
+% The scene
+%
+% piWRS(chessR);
+
+%% Not needed, I think
+
+%{
 % Adjust the input slot in the recipe for the local user
 [~,n,e] = fileparts(chessR.get('input file'));
 inFile = which([n,e]);
@@ -26,43 +34,62 @@ chessR.set('input file',inFile);
 temp=split(p,'/');
 outFile=fullfile(piRootPath,'local/chess/',temp{end});
 
+<<<<<<< HEAD
 %chessR.set('output file',outFile);
+
+=======
+chessR.set('output file',outFile);
+%}
 
 
 %% Set camera position
 
-
-filmZPos_m=-1.5;
-chessR.lookAt.from(3)=filmZPos_m;
-distanceFromFilm_m=1.469+50/1000
+filmZPos_m           = -1.5;
+chessR.lookAt.from(3)= filmZPos_m;
+distanceFromFilm_m   = 1.469+50/1000
 
 %% Merge chart and chessset
+q
 chessR=piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
 
+
 % Position and scale the chart
-piAssetSet(chessR,sbar.mergeNode,'translate',[0.1 0.15 distanceFromFilm_m+filmZPos_m]);
-thisScale = chessR.get('asset',sbar.mergeNode,'scale');
+chessR.set('assets',sbar.mergeNode,'translate',[0.1 0.15 distanceFromFilm_m+filmZPos_m]);
+% piAssetSet(chessR,sbar.mergeNode,'translate',[0.1 0.15 distanceFromFilm_m+filmZPos_m]);
+% thisScale = chessR.get('asset',sbar.mergeNode,'scale');
 
-piAssetSet(chessR,sbar.mergeNode,'scale',thisScale.*[0.1 0.1 0.01]);  % scale should always do this
-%initialScale = chessR.get('asset',sbar.mergeNode,'scale');
+% We apply this scale to the existing scale by default.  No need for a new
+% thisScale.
+chessR.set('assets',sbar.mergeNode,'scale',[0.15 0.15 0.01]);
 
-   
-%piAssetSet(thisR,sbar.mergeNode,'translate',[0 0 800]);
+% piAssetSet(chessR,sbar.mergeNode,'scale',thisScale{1}.*[0.1 0.1 0.01]);  % scale should always do this
+% initialScale = chessR.get('asset',sbar.mergeNode,'scale');
+% piAssetSet(thisR,sbar.mergeNode,'translate',[0 0 800]);
 
 % Render the scene
 thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
 
+% The pinhole version after potentially moving and scaling the slanted bar
+% piWRS(chessR);
 
-%%
 
 %% Add a lens and render.
 %camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
-cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json')
-cameraOmni.filmdistance.type='float'
-cameraOmni.filmdistance.value=0.037959;
-cameraOmni = rmfield(cameraOmni,'focusdistance')
-cameraOmni.aperturediameter.value=12
 
+cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json');
+cameraOmni.filmdistance.type = 'float'
+cameraOmni.filmdistance.value = 0.037959;
+cameraOmni = rmfield(cameraOmni,'focusdistance')
+cameraOmni.aperturediameter.value = 12
+
+chessR.set('camera',cameraOmni);
+chessR.set('film diagonal',15,'mm');
+
+piWRS(chessR);
+
+%%  We could not work from here.  BUt we think you know what to do.
+%
+% Call me or Zheng if you need help! (BW)
 
 cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json')
 %cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
