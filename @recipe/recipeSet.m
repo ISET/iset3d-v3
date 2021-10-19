@@ -171,10 +171,13 @@ switch param
             mkdir(newDir);
         end
         %}
+        
+        %{
         newDir     = fileparts(val);
         if ~exist(newDir,'dir')
             warning('output directory does not exist yet');
         end
+        %}
         
         thisR.outputFile = val;
         
@@ -1039,9 +1042,13 @@ switch param
                 % First get the position
                 pos = thisR.get('asset', assetName, 'world position');
                 
+                % Calculate the scaling factor matrix
+                id = thisR.get('node', assetName, 'id');
+                nodeToRoot = thisR.assets.nodetoroot(id);
+                [~, ~, scaleM] = piTransformWorld2Obj(thisR, nodeToRoot);
                 % Set a translation to (1) cancel the current translation
                 % and (2) move the object to the target position
-                newTrans = -pos + varargin{2}(:)';
+                newTrans = (-pos + varargin{2}(:)') ./ scaleM;
                 
                 [~, out] = thisR.set('asset', assetName, 'world translation', newTrans);
             case {'scale'}
