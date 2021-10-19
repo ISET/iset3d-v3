@@ -171,10 +171,7 @@ switch param
             mkdir(newDir);
         end
         %}
-        newDir     = fileparts(val);
-        if ~exist(newDir,'dir')
-            warning('output directory does not exist yet');
-        end
+        newDir = fileparts(val);
         
         thisR.outputFile = val;
         
