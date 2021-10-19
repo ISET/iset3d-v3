@@ -283,7 +283,7 @@ classdef tree
         end
         
         
-        function t = show(obj)
+        function t = show(obj,state)
             % Bring up a uifigure with collapsible tree
             windowName = strcat('Assets Collection',':', datestr(datetime('now')));
             fig = uifigure('Name',windowName, 'Tag','assetsUI');
@@ -294,8 +294,11 @@ classdef tree
             root = 1;
             createAssetsTree(assets, obj, 1);
             
-            % collapse by default
-            % expand(t,'all');
+            if exist('state','var') && isequal(state,'all')
+                % collapse by default
+                expand(t,'all');
+            end
+            
             % User data is saved at t.UserData;
             thisAsset = t.UserData;
             %%
