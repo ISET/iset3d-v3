@@ -9,6 +9,7 @@ if ~piDockerExists, piDockerConfig; end
 % This just loads the scene.
 load('ChessSetPieces-recipe','thisR');
 chessR = thisR;
+chessR=piRecipeDefault('scene name','chessSet');
 
 % The EIA chart
 sbar = piAssetLoad('slantedbar');
@@ -33,8 +34,13 @@ chessR.set('input file',inFile);
 temp=split(p,'/');
 outFile=fullfile(piRootPath,'local/chess/',temp{end});
 
+<<<<<<< HEAD
+%chessR.set('output file',outFile);
+
+=======
 chessR.set('output file',outFile);
 %}
+
 
 %% Set camera position
 
@@ -43,6 +49,9 @@ chessR.lookAt.from(3)= filmZPos_m;
 distanceFromFilm_m   = 1.469+50/1000
 
 %% Merge chart and chessset
+q
+chessR=piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
+
 
 % Position and scale the chart
 chessR.set('assets',sbar.mergeNode,'translate',[0.1 0.15 distanceFromFilm_m+filmZPos_m]);
@@ -91,8 +100,8 @@ cameraRTF.aperturediameter.type='float'
 chessR.set('pixel samples',1500)
 
 
-thisR.set('film diagonal',20,'mm');
-thisR.set('film resolution',[2000 2000])
+chessR.set('film diagonal',20,'mm');
+chessR.set('film resolution',[2000 2000])
     
 
 chessR.integrator.subtype='path'
@@ -133,7 +142,9 @@ oiLabel = {'omni', 'RTF'}
 for o=1:numel(oiList)
     oi=oiList{o};
     oiWindow(oi)
+    
     exportgraphics(gca,['./fig/chess_oi_' oiLabel{o} '.png']);
+    close all;
     
 end
 
@@ -145,7 +156,7 @@ figure(10);clf
 maxnorm=@(x)x/max(x(:));
 dataOmni=maxnorm(oiList{1}.data.photons(:,:,1));
 dataRTF=maxnorm(oiList{2}.data.photons(:,:,1));
-imagesc(dataOmni./dataRTF)
+imagesc(dataOmni-dataRTF)
 colorbar
 
 %%
