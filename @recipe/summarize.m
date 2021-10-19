@@ -130,6 +130,7 @@ switch str
             end
         end
         
+        
     case 'materials'
         if isempty(thisR.materials)
             fprintf('\nNo materials \n-----------\n');

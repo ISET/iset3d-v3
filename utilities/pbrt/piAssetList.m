@@ -1,4 +1,6 @@
 function gnames = piAssetList(thisR,varargin)
+%  DEPRECATED
+%
 % Print out the group object names or the children names 
 %
 % Synopsis
@@ -31,6 +33,8 @@ function gnames = piAssetList(thisR,varargin)
 %}
 
 %%
+warning('deprecated');
+
 varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addRequired('thisR',@(x)(isa(x,'recipe')));
