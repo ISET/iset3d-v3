@@ -154,6 +154,9 @@ end
 % Square up the axes.
 boxMax = max([max(coords(:,1)),max(coords(:,2)),max(coords(:,3)),max(lookat.to),max(lookat.from)]);
 boxMin = min([min(coords(:,1)),min(coords(:,2)),min(coords(:,3)),min(lookat.to),min(lookat.from)]);
+delta = (boxMax - boxMin)*0.1;
+boxMax = boxMax + delta;
+boxMin = boxMin - delta;
 set(gca,'xlim',[boxMin boxMax], 'ylim',[boxMin boxMax], 'zlim',[boxMin boxMax]);
 
 end
