@@ -1,5 +1,7 @@
 % t_materials - Control material properties
 %
+% ********* DEPRECATED
+%
 % We illustrate how to find the material associated with an asset.  We then
 % change the material by replacing it.
 %
