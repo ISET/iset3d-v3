@@ -107,7 +107,7 @@ thisR.camera = piCameraCreate('omni','lensFile',thisLens);
 % camera we can reset the focus, of course.s
 thisR.set('focus distance',0.6);
 
-% The FOV is not used for the 'realistic' camera.
+% The FOV is not used for the 'omni' camera.
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters 

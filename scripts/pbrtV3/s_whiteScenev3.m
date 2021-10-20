@@ -18,7 +18,7 @@ recipe = piRead(fname,'version',3);
 
 %% Add a camera
 
-recipe.camera = struct('type','Camera','subtype','realistic');
+recipe.camera = struct('type','Camera','subtype','omni');
 
 lensFile = fullfile(piRootPath,'scripts','pbrtV3','wide.56deg.6.0mm_v3.dat');
 % Attach the lens

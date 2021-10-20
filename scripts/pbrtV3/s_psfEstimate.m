@@ -38,7 +38,7 @@ recipe.set('pixelsamples',256);
 % Currently we cannot (efficientally) render chromatic aberration for
 % PBRTv3, so this will be monochromatic.
 
-recipe.set('camera','realistic');
+recipe.set('camera','omni');
 recipe.set('lensfile',fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat'));
 recipe.set('filmdiagonal',10); 
 

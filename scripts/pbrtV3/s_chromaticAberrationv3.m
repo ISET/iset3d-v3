@@ -43,7 +43,7 @@ thisR = piWorldFindAndReplace(thisR,'dummyTexture.exr',imageName);
 
 %% Attach a lens
 
-thisR.set('camera','realistic');     % Has a lens
+thisR.set('camera','omni');     % Has a lens
 thisR.set('aperture',2);             % mm
 thisR.set('film resolution',128);    % Spatial samples
 thisR.set('rays per pixel',128);     % Rendering samples

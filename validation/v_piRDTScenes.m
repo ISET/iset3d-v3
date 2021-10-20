@@ -85,7 +85,7 @@ scenePlot(scene,'depth map');
 % Another time another script.  Show rendering with a lens.
 %
 %{
-recipe.set('camera','realistic');
+recipe.set('camera','omni');
 recipe.set('lensfile',fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat'));
 recipe.set('filmdiagonal',35); 
 %}
