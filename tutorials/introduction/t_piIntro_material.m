@@ -1,4 +1,4 @@
-%% Illustrates setting scene materials
+%% Setting scene materials
 %
 % This example scene includes glass and other materials.  The script
 % sets up the glass material and number of bounces to make the glass
@@ -18,7 +18,7 @@
 %  10/16/21    djc     Enhance comments
 %
 % See also
-%   t_piIntro_*
+%   t_piIntro*
 
 % TODO:
 %  See notes at end.
@@ -189,4 +189,3 @@ if piCamBio, sceneSet(scene,'render flag','hdr');
 else,        sceneSet(scene,'gamma',0.6);
 end
 
-%% END

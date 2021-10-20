@@ -124,15 +124,21 @@ switch str
             fprintf('\nNo assets \n-----------\n');
             return;
         else
-            piAssetPrint(thisR);
-        end        
-        
+            try
+                thisR.show('objects');
+            catch
+            end
+        end
+                
     case 'materials'
         if isempty(thisR.materials)
             fprintf('\nNo materials \n-----------\n');
             return;
         else
-            piMaterialPrint(thisR);
+            try
+                thisR.show('objects');
+            catch
+            end
         end
         
     case 'metadata'

@@ -69,7 +69,7 @@ thisR.set('focal distance',mean(depthRange));
 % This is the size of the film/sensor in millimeters (default 22)
 % From the field of view and the focal length we should be able to
 % calculate the proper size of the film.
-thisR.set('film diagonal',66);
+thisR.set('film diagonal',33);
 
 % Pick out a bit of the image to look at.  Middle dimension is up.
 % Third dimension is z.  I picked a from/to that put the ruler in the
@@ -82,7 +82,7 @@ thisR.set('to',  [0.05 -0.07 0.5]);  % Look down default compared to default
 thisR.integrator.subtype = 'path';  
 thisR.sampler.subtype    = 'sobol';
 
-thisR.set('aperture diameter',2);   % thisR.summarize('all');
+thisR.set('aperture diameter',1);   % thisR.summarize('all');
 
 % This value determines the number of ray bounces.  If the scene has
 % glass or mirrors, we need to have at least 2 or more.
@@ -99,7 +99,7 @@ oiWindow(oi);
 
 %% Image look noisy?  Try this
 
-oi = piAIdenoise(oi);
-oiWindow(oi);
+% oi = piAIdenoise(oi);
+% oiWindow(oi);
 
 %% END
