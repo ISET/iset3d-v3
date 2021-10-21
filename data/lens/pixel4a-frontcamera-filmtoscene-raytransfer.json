@@ -35,10 +35,10 @@
     },
     {
      "outputname": "outz",
-     "coeff": 4.605014999999997,
-     "termr": [0 0],
-     "termu": [0 0],
-     "termv": [0 0]
+     "coeff": [4.605014999999997],
+     "termr": [0],
+     "termu": [0],
+     "termv": [0]
     },
     {
      "outputname": "outu",
