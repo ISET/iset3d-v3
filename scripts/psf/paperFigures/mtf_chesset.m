@@ -22,24 +22,6 @@ piRecipeMerge(chessR,sbar.thisR,'node name',sbar.mergeNode);
 
 %% Not needed, I think
 
-%{
-% Adjust the input slot in the recipe for the local user
-[~,n,e] = fileparts(chessR.get('input file'));
-inFile = which([n,e]);
-if isempty(inFile), error('Cannot find the PBRT input file %s\n',chessR.inputFile); end
-chessR.set('input file',inFile);
-
-% Adjust the input slot in the recipe for the local user
-[p,n,e] = fileparts(chessR.get('output file'));
-temp=split(p,'/');
-outFile=fullfile(piRootPath,'local/chess/',temp{end});
-
-<<<<<<< HEAD
-%chessR.set('output file',outFile);
-
-=======
-chessR.set('output file',outFile);
-%}
 
 
 %% Set camera position
