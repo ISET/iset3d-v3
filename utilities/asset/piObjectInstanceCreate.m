@@ -1,4 +1,4 @@
-function thisR = piObjectInstanceCreate(thisR, assetname, varargin)
+function [thisR, instanceBranchName] = piObjectInstanceCreate(thisR, assetname, varargin)
 %% Create object instance
 %
 % Synopsis:
@@ -90,11 +90,10 @@ end
 OBJsubtree_branch.referencebranch = OBJsubtree_branch.name;
 
 OBJsubtree_branch.name = strcat(OBJsubtree_branch.name, InstanceSuffix);
- 
 % replace branch
 OBJsubtree = OBJsubtree.set(1, OBJsubtree_branch);
 % graft object tree to scene tree
-thisR.assets = thisR.assets.graft(1, OBJsubtree);
-
-
+% thisR.assets = thisR.assets.graft(1, OBJsubtree);
+thisR = thisR.set('asset', 1, 'graft', OBJsubtree);
+instanceBranchName = OBJsubtree_branch.name;
 end
