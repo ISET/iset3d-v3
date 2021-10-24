@@ -201,21 +201,27 @@ switch param
         % This routine adjusts the the 'from' position, moving the
         % camera position. It does so by keeping the 'to' position the
         % same, so the camera is still looking at the same location.
-        % Thus, the point of this set is to move the camera closer or
-        % further from the 'to' position.
+        % Thus, this set moves the camera closer or further from the 'to'
+        % position. 
         %
         % What is the relationship to the focal distance?  If we move
         % the camera, the focal distance is always with respect to the
         % camera, right?
         
-        % Unit length vector between from and to.
+        assert(val > 0);  % We do not change which side of 'to' this way.
+        
+        % Unit length vector  objDir = ('to' - 'from')
+        % So, 'from' + objDir moves towards 'to'
+        %     'from' - objDir moves away from 'to'
         objDirection = thisR.get('object direction');
         
-        % Scale the unit length vector to match val, thus setting the
-        % distance between 'from' and 'to'.  This adjust the 'from'
-        % (camera) position, but not the object position in the scene.
-        thisR.lookAt.from = thisR.lookAt.to + objDirection*val;
-        % warning('Object distance may not be important');
+        % Change in distance (in meters).  If val is bigger, delta is
+        % negative and adding moves away from 'to'.  If val is smaller,
+        % delta is positive and we move towards 'to'.
+        delta = thisR.get('object distance') - val;
+        
+        % Test: If we set val to 0, the new from should be at 'to', 
+        thisR.lookAt.from = thisR.lookAt.from + objDirection*delta;        
         
     case {'accommodation'}
         % Special case where we allow setting accommodation or focal
