@@ -295,7 +295,8 @@ classdef tree
             createAssetsTree(assets, obj, 1);
             
             % collapse by default
-            % expand(t,'all');
+            expand(t);
+            
             % User data is saved at t.UserData;
             thisAsset = t.UserData;
             %%

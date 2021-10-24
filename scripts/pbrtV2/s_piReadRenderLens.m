@@ -36,7 +36,7 @@ thisR = piRead(fname);
 
 %% Modify the recipe, thisR, to adjust the rendering
 
-thisR.set('camera','realistic');
+thisR.set('camera','omni');
 thisR.set('aperture',2);  % The number of rays should go up with the aperture 
 thisR.set('film resolution',128);
 thisR.set('rays per pixel',96);

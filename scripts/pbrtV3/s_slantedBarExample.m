@@ -26,7 +26,7 @@ recipe.set('filmresolution',[128 128]);
 recipe.set('pixelsamples',256);
 
 %% Add a camera
-recipe.set('camera','realistic');
+recipe.set('camera','omni');
 recipe.set('lensfile',fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat'));
 recipe.set('filmdiagonal',10); 
 

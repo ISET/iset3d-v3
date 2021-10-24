@@ -17,7 +17,7 @@ fname = fullfile(piRootPath,'data','whiteScene','whiteSceneV3.pbrt');
 thisR = piRead(fname);
 
 %% Add a camera
-thisR = recipeSet(thisR,'camera','realistic');
+thisR = recipeSet(thisR,'camera','omni');
 thisR.camera.specfile.value = fullfile(piRootPath,'data','lens','dgauss.22deg.50.0mm.dat');
 thisR.camera.filmdistance.value = 50;
 thisR.camera.aperture_diameter.value = 8;

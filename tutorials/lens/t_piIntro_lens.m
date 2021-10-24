@@ -63,7 +63,7 @@ thisR.camera = piCameraCreate('omni','lensFile',lensfile);
 %}
 thisR.set('focal distance',mean(depthRange));
 
-% The FOV is not used for the 'realistic' camera.
+% The FOV is not used for the 'omni' camera.
 % The FOV is determined by the lens. 
 
 % This is the size of the film/sensor in millimeters (default 22)
