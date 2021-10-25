@@ -41,7 +41,7 @@ thisR.set('light', 'add', light);
 %% Loop ver Different aperture sizes
 
 aperturediameters = [2 5 7 12 ];
-
+aperturediameters=7;
 
 for a=1:numel(aperturediameters)
 % Add a lens and render.
@@ -59,7 +59,7 @@ cameraRTF.filmdistance.value=0.037959;
 cameraRTF.aperturediameter.value=aperturediameters(a);
 cameraRTF.aperturediameter.type='float'
 
-thisR.set('pixel samples',1500)
+thisR.set('pixel samples',30)
 
 
 thisR.set('film diagonal',90,'mm');
