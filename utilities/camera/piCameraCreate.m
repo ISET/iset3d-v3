@@ -39,7 +39,7 @@ c = piCameraCreate('pinhole');
 %}
 %{
 lensname = 'dgauss.22deg.12.5mm.dat';
-c = piCameraCreate('realistic');
+c = piCameraCreate('omni');
 %}
 %{
 c = piCameraCreate('lightfield');
@@ -135,7 +135,7 @@ switch ieParamFormat(cameraType)
         end
         
         camera.type          = 'Camera';
-        camera.subtype       = 'realistic';
+        camera.subtype       = 'omni';
         camera.lensfile.type = 'string';
         camera.lensfile.value = which(lensFile);
         camera.aperturediameter.type  = 'float';

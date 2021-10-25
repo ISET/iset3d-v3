@@ -1,4 +1,4 @@
-%% Illustrates setting scene materials
+%% Setting scene materials
 %
 % This example scene includes glass and other materials.  The script
 % sets up the glass material and number of bounces to make the glass
@@ -13,8 +13,12 @@
 %
 % ZL, BW SCIEN 2018
 %
+% Updates:
+%
+%  10/16/21    djc     Enhance comments
+%
 % See also
-%   t_piIntro_*
+%   t_piIntro*
 
 % TODO:
 %  See notes at end.
@@ -23,33 +27,37 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Read pbrt file for a Cinema4D exported scene
+%% Read PBRT file for a Cinema4D exported scene of a sphere
 
 sceneName = 'sphere';
 thisR = piRecipeDefault('scene name',sceneName);
 
 % Create an environmental light source (distant light) that is a 9K
-% blackbody radiator.
+% blackbody radiator and add it to the scene
 distLight = piLightCreate('new dist light',...
                             'type', 'distant',...
                             'spd', [9000 0.001],...
                             'cameracoordinate', true);
 thisR.set('light', 'add', distLight);
 
+% Set our film (sensor) resolution, how many rays we want to cast per
+% pixel, and the number of bounces we want to trace for each ray.
 thisR.set('film resolution',[200 150]*3);
 thisR.set('rays per pixel',32);
 thisR.set('fov',45);
 thisR.set('nbounces',5);
 
-% Render
+% Write our modified recipe out, and render the radiance of the scene.
+% Then show the scene
 piWrite(thisR);
 scene = piRender(thisR,'render type','radiance');
 scene = sceneSet(scene,'name',sprintf('Uber %s',sceneName));
 sceneWindow(scene);
 
 %% The material library
+% We now inspect and modify the materials in the scene.
 
-% Print out the named materials in this scene.
+% First, we print out the named materials currently in this scene.
 thisR.get('materials print');
 
 % We have additional materials in an ISET3d library.  In the future, we
@@ -181,4 +189,3 @@ if piCamBio, sceneSet(scene,'render flag','hdr');
 else,        sceneSet(scene,'gamma',0.6);
 end
 
-%% END

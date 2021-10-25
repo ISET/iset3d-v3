@@ -60,7 +60,7 @@ thisR.set('light', 'add', newDistant);
 thisR.set('integrator subtype','path');
 thisR.set('rays per pixel', 16);
 thisR.set('fov', 30);
-thisR.set('filmresolution', [640, 360]*2);
+thisR.set('filmresolution', [640, 360]);
 
 %% Write the scene
 %

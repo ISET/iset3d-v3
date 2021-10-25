@@ -65,7 +65,7 @@ thisR = piWorldFindAndReplace(thisR,'dummyTexture.exr',imageName);
 
 %% Add the camera
 
-thisR.camera = struct('type','Camera','subtype','realistic');
+thisR.camera = struct('type','Camera','subtype','omni');
 
 % Focus at roughly meter away.
 thisR.camera.focusdistance.value = 1.5; % meter

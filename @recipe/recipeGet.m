@@ -103,7 +103,7 @@ function val = recipeGet(thisR, param, varargin)
 %      'spatial samples'    - Sampling resolution
 %      'film x resolution'  - Number of x dimension samples
 %      'film y resolution'  - Number of y-dimension samples
-%      'film diagonarl'     - Size in mm
+%      'film diagonal'      - Size in mm
 %
 %
 %      % Special retinal properties for human eye models
@@ -273,7 +273,8 @@ switch ieParamFormat(param)  % lower case, no spaces
         
     case {'lookatdirection','objectdirection'}
         % A unit vector in the lookAt direction
-        % This vector is v = to - 'from', so  v + 'from' = 'to'
+        %   This vector is v = 'to' - 'from', 
+        %   so  v + 'from' = 'to'
         val = thisR.lookAt.to - thisR.lookAt.from;
         val = val/norm(val);
         
