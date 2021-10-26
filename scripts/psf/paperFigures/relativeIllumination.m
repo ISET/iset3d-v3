@@ -33,7 +33,7 @@ thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
 %% Light should be add infinitey to avoid additional vignetting nintrouced
 % by light falloff
 light =  piLightCreate('distant','type','distant')
-    
+
  thisR     = piLightDelete(thisR, 'all');
 thisR.set('light', 'add', light);
 
@@ -41,7 +41,7 @@ thisR.set('light', 'add', light);
 %% Loop ver Different aperture sizes
 
 aperturediameters = [2 5 7 12 ];
-aperturediameters=7;
+
 
 for a=1:numel(aperturediameters)
 % Add a lens and render.
@@ -59,7 +59,7 @@ cameraRTF.filmdistance.value=0.037959;
 cameraRTF.aperturediameter.value=aperturediameters(a);
 cameraRTF.aperturediameter.type='float'
 
-thisR.set('pixel samples',30)
+thisR.set('pixel samples',300)
 
 
 thisR.set('film diagonal',90,'mm');
@@ -98,6 +98,19 @@ save('oiRelativeIlluminationLowQuality.mat')
 
 
 
+%%
+%% Manual loading of dat file
+
+
+label={};path={};
+label{end+1}='nonlinear';path{end+1}='/home/thomas/Documents/stanford/libraries/pbrt-v3-spectral/scenes/simpleScene/rtf.dat';
+
+oi = piDat2ISET(path{1}, 'wave', 400:10:700, 'recipe', thisR);
+
+    
+oiWindow(oi);
+
+oiList{2}={oi}
 
 
 %% Load zemax
