@@ -1,14 +1,4 @@
-%%  s_goMTF3D
-%
-% Questions:
-%   * I am unsure whether the focal distance is in z or in distance from
-%   the camera.  So if the camera is at 0, these are the same.  But if the
-%   camera is at -0.5, these are not the same.
-%
-%  * There is trouble scaling the object size.  When the number gets small,
-%  the object disappears.  This may be some numerical issue reading the
-%  scale factor in the pbrt geometry file?
-%
+%% Plot relative illumination DGAUSS 50mm lens compare Omni with RTF
 
 %%
 ieInit
@@ -46,20 +36,21 @@ aperturediameters = [2 5 7 12 ];
 for a=1:numel(aperturediameters)
 % Add a lens and render.
 %camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
-cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json')
-cameraOmni.filmdistance.type='float'
+cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json');
+cameraOmni.filmdistance.type='float';
 cameraOmni.filmdistance.value=0.037959;
-cameraOmni = rmfield(cameraOmni,'focusdistance')
+cameraOmni = rmfield(cameraOmni,'focusdistance');
 cameraOmni.aperturediameter.value=aperturediameters(a);
 
  
-cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json')
+cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json');
 %cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
 cameraRTF.filmdistance.value=0.037959;
 cameraRTF.aperturediameter.value=aperturediameters(a);
-cameraRTF.aperturediameter.type='float'
+cameraRTF.aperturediameter.type='float';
 
 thisR.set('pixel samples',300)
+
 
 
 thisR.set('film diagonal',90,'mm');
@@ -155,7 +146,9 @@ for o=1:numel(oiList)
 
         
         relativeIllum(:,a)=maxnorm(oi{a}.data.photons(end/2,:,1))
+             
         h(o)=plot(xaxis,relativeIllum(:,a),'color',color{o,a},'linewidth',2,'linestyle',linestyle{o})
+
         %plot(zemax(:,1),zemax(:,2+(a-1)),'color',[0.1 0.8 0.1],'linewidth',2)
     end
 
