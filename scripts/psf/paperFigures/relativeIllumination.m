@@ -42,7 +42,7 @@ cameraOmni.filmdistance.value=0.037959;
 cameraOmni = rmfield(cameraOmni,'focusdistance');
 cameraOmni.aperturediameter.value=aperturediameters(a);
 
- 
+
 cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json');
 %cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
 cameraRTF.filmdistance.value=0.037959;
@@ -85,23 +85,23 @@ end
 
 oiList = {oiOmni,oiRTF};
 
-save('oiRelativeIlluminationLowQuality.mat')
+%save('oiRelativeIlluminationLowQuality.mat')
 
 
 
-%%
-%% Manual loading of dat file
-
-
-label={};path={};
-label{end+1}='nonlinear';path{end+1}='/home/thomas/Documents/stanford/libraries/pbrt-v3-spectral/scenes/simpleScene/rtf.dat';
-
-oi = piDat2ISET(path{1}, 'wave', 400:10:700, 'recipe', thisR);
-
-    
-oiWindow(oi);
-
-oiList{2}={oi}
+% %%
+% %% Manual loading of dat file
+% 
+% 
+% label={};path={};
+% label{end+1}='nonlinear';path{end+1}='/home/thomas/Documents/stanford/libraries/pbrt-v3-spectral/scenes/simpleScene/rtf.dat';
+% 
+% oi = piDat2ISET(path{1}, 'wave', 400:10:700, 'recipe', thisR);
+% 
+%     
+% oiWindow(oi);
+% 
+% oiList{2}={oi}
 
 
 %% Load zemax
@@ -161,7 +161,7 @@ pointOnCurve = [  17.2248   22.0635   24.1673   26.3237;
       0.6486    0.6675    0.6580    0.6769]'; pointForText = [    10.8082   18.5922   23.7465   28.5326;
                       0.6344    0.9316    0.9269    0.9033]';
                  offsets = [-5 0;0 0.02; 0 0.02 ;0 0.02];
-pos=flip(pos,1);
+                 pos=flip(pos,1);
 pointOnCurve=flip(pointOnCurve,1);
 pointForText=flip(pointForText,1);
 offsets=flip(offsets,1);
