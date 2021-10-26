@@ -1,14 +1,4 @@
-%%  s_goMTF3D
-%
-% Questions:
-%   * I am unsure whether the focal distance is in z or in distance from
-%   the camera.  So if the camera is at 0, these are the same.  But if the
-%   camera is at -0.5, these are not the same.
-%
-%  * There is trouble scaling the object size.  When the number gets small,
-%  the object disappears.  This may be some numerical issue reading the
-%  scale factor in the pbrt geometry file?
-%
+%% Plot relative illumination DGAUSS 50mm lens compare Omni with RTF
 
 %%
 ieInit
@@ -33,7 +23,7 @@ thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
 %% Light should be add infinitey to avoid additional vignetting nintrouced
 % by light falloff
 light =  piLightCreate('distant','type','distant')
-    
+
  thisR     = piLightDelete(thisR, 'all');
 thisR.set('light', 'add', light);
 
@@ -59,7 +49,8 @@ cameraRTF.filmdistance.value=0.037959;
 cameraRTF.aperturediameter.value=aperturediameters(a);
 cameraRTF.aperturediameter.type='float';
 
-thisR.set('pixel samples',3000)
+thisR.set('pixel samples',300)
+
 
 
 thisR.set('film diagonal',90,'mm');
@@ -98,6 +89,19 @@ save('oiRelativeIlluminationLowQuality.mat')
 
 
 
+%%
+%% Manual loading of dat file
+
+
+label={};path={};
+label{end+1}='nonlinear';path{end+1}='/home/thomas/Documents/stanford/libraries/pbrt-v3-spectral/scenes/simpleScene/rtf.dat';
+
+oi = piDat2ISET(path{1}, 'wave', 400:10:700, 'recipe', thisR);
+
+    
+oiWindow(oi);
+
+oiList{2}={oi}
 
 
 %% Load zemax
