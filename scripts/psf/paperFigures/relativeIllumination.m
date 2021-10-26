@@ -41,25 +41,25 @@ thisR.set('light', 'add', light);
 %% Loop ver Different aperture sizes
 
 aperturediameters = [2 5 7 12 ];
-aperturediameters=7;
+
 
 for a=1:numel(aperturediameters)
 % Add a lens and render.
 %camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
-cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json')
-cameraOmni.filmdistance.type='float'
+cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json');
+cameraOmni.filmdistance.type='float';
 cameraOmni.filmdistance.value=0.037959;
-cameraOmni = rmfield(cameraOmni,'focusdistance')
+cameraOmni = rmfield(cameraOmni,'focusdistance');
 cameraOmni.aperturediameter.value=aperturediameters(a);
 
  
-cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json')
+cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json');
 %cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
 cameraRTF.filmdistance.value=0.037959;
 cameraRTF.aperturediameter.value=aperturediameters(a);
-cameraRTF.aperturediameter.type='float'
+cameraRTF.aperturediameter.type='float';
 
-thisR.set('pixel samples',30)
+thisR.set('pixel samples',3000)
 
 
 thisR.set('film diagonal',90,'mm');
@@ -142,7 +142,9 @@ for o=1:numel(oiList)
 
         
         relativeIllum(:,a)=maxnorm(oi{a}.data.photons(end/2,:,1))
+             
         h(o)=plot(xaxis,relativeIllum(:,a),'color',color{o,a},'linewidth',2,'linestyle',linestyle{o})
+
         %plot(zemax(:,1),zemax(:,2+(a-1)),'color',[0.1 0.8 0.1],'linewidth',2)
     end
 
