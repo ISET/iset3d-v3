@@ -1,14 +1,4 @@
-%%  s_goMTF3D
-%
-% Questions:
-%   * I am unsure whether the focal distance is in z or in distance from
-%   the camera.  So if the camera is at 0, these are the same.  But if the
-%   camera is at -0.5, these are not the same.
-%
-%  * There is trouble scaling the object size.  When the number gets small,
-%  the object disappears.  This may be some numerical issue reading the
-%  scale factor in the pbrt geometry file?
-%
+%% Plot relative illumination DGAUSS 50mm lens compare Omni with RTF
 
 %%
 ieInit
@@ -33,7 +23,7 @@ thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
 %% Light should be add infinitey to avoid additional vignetting nintrouced
 % by light falloff
 light =  piLightCreate('distant','type','distant')
-    
+
  thisR     = piLightDelete(thisR, 'all');
 thisR.set('light', 'add', light);
 
@@ -46,20 +36,21 @@ aperturediameters = [2 5 7 12 ];
 for a=1:numel(aperturediameters)
 % Add a lens and render.
 %camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
-cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json')
-cameraOmni.filmdistance.type='float'
+cameraOmni = piCameraCreate('omni','lensfile','dgauss.22deg.50.0mm_aperture6.0.json');
+cameraOmni.filmdistance.type='float';
 cameraOmni.filmdistance.value=0.037959;
-cameraOmni = rmfield(cameraOmni,'focusdistance')
+cameraOmni = rmfield(cameraOmni,'focusdistance');
 cameraOmni.aperturediameter.value=aperturediameters(a);
 
- 
-cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json')
+
+cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json');
 %cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
 cameraRTF.filmdistance.value=0.037959;
 cameraRTF.aperturediameter.value=aperturediameters(a);
-cameraRTF.aperturediameter.type='float'
+cameraRTF.aperturediameter.type='float';
 
-thisR.set('pixel samples',1500)
+thisR.set('pixel samples',300)
+
 
 
 thisR.set('film diagonal',90,'mm');
@@ -94,10 +85,23 @@ end
 
 oiList = {oiOmni,oiRTF};
 
-save('oiRelativeIlluminationLowQuality.mat')
+%save('oiRelativeIlluminationLowQuality.mat')
 
 
 
+% %%
+% %% Manual loading of dat file
+% 
+% 
+% label={};path={};
+% label{end+1}='nonlinear';path{end+1}='/home/thomas/Documents/stanford/libraries/pbrt-v3-spectral/scenes/simpleScene/rtf.dat';
+% 
+% oi = piDat2ISET(path{1}, 'wave', 400:10:700, 'recipe', thisR);
+% 
+%     
+% oiWindow(oi);
+% 
+% oiList{2}={oi}
 
 
 %% Load zemax
@@ -142,7 +146,9 @@ for o=1:numel(oiList)
 
         
         relativeIllum(:,a)=maxnorm(oi{a}.data.photons(end/2,:,1))
+             
         h(o)=plot(xaxis,relativeIllum(:,a),'color',color{o,a},'linewidth',2,'linestyle',linestyle{o})
+
         %plot(zemax(:,1),zemax(:,2+(a-1)),'color',[0.1 0.8 0.1],'linewidth',2)
     end
 
@@ -155,7 +161,7 @@ pointOnCurve = [  17.2248   22.0635   24.1673   26.3237;
       0.6486    0.6675    0.6580    0.6769]'; pointForText = [    10.8082   18.5922   23.7465   28.5326;
                       0.6344    0.9316    0.9269    0.9033]';
                  offsets = [-5 0;0 0.02; 0 0.02 ;0 0.02];
-pos=flip(pos,1);
+                 pos=flip(pos,1);
 pointOnCurve=flip(pointOnCurve,1);
 pointForText=flip(pointForText,1);
 offsets=flip(offsets,1);

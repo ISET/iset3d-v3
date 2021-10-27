@@ -52,7 +52,7 @@ cameraRTF.aperturediameter.type='float'
 
 
 thisR.set('film diagonal',90,'mm');
-thisR.set('film resolution',[900 900])
+thisR.set('film resolution',3*[200 200])
     
 
 thisR.integrator.subtype='path'
@@ -70,7 +70,7 @@ thisR.integrator.numCABands.value =1
 
 
 % Loop over ray number samples
-samples = [20 50 100 200 ];
+samples = [20 50 100 200 300 400 500  ];
 figure(1);clf; hold on
 time_omni=zeros(size(samples))
 time_rtf=time_omni;
