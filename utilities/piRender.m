@@ -123,7 +123,7 @@ p.addParameter('meanilluminancepermm2',[],@isnumeric);
 p.addParameter('scalepupilarea',true,@islogical);
 p.addParameter('reuse',false,@islogical);
 p.addParameter('reflectancerender', false, @islogical);
-p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:raytransfer-spectral',@ischar);
+p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral',@ischar);
 p.addParameter('wave', 400:10:700, @isnumeric); % This is the past to piDat2ISET, which is where we do the construction.
 p.addParameter('verbose', 2, @isnumeric);
 
