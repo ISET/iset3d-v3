@@ -160,7 +160,7 @@ dockerCommand   = 'docker run -ti --rm';
 % Where you want the output file
 outputFolder  = pwd;
 dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
-dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, outputFolder);
+dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, pathToLinux(outputFolder));
 
 % What you want to run
 dockerImageName = 'vistalab/pbrt-v3-spectral:latest';
