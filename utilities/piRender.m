@@ -184,7 +184,10 @@ end
 % image
 outputFolder = fileparts(thisR.outputFile);
 if(~exist(outputFolder,'dir'))
-    error('We need an absolute path for the working folder.');
+    mkdir(outputFolder);
+    if(~exist(outputFolder, 'dir'))
+        error('Unable to create path for the working folder.');
+    end
 end
 pbrtFile = thisR.outputFile;
 
