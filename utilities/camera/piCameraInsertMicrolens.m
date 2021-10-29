@@ -159,7 +159,7 @@ dockerCommand   = 'docker run -ti --rm';
 
 % Where you want the output file
 outputFolder  = pwd;
-dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
+dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, pathToLinux(outputFolder));
 dockerCommand = sprintf('%s --volume="%s":"%s"', dockerCommand, outputFolder, pathToLinux(outputFolder));
 
 % What you want to run
