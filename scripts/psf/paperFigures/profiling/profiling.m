@@ -69,8 +69,8 @@ thisR.integrator.numCABands.value =1
 % Omni
 
 
-% Loop over ray number samples
-samples = [20 50 100 200 300 400 500  ];
+% Loop over ray number samples5
+samples = [20 50 100 200 300 400 500 1000 2000 ];
 figure(1);clf; hold on
 time_omni=zeros(size(samples))
 time_rtf=time_omni;

@@ -119,7 +119,7 @@ for d=1:numel(depths)
     thisR.set('rays per pixel',50000);
     %thisR.set('film distance',0.0466356);    % In meters  %Setting film distance does do something
     
-    thisR.set('film diagonal',70*1e-3); % Original
+    thisR.set('film diagonal',70*1e-3; % Original
     
     
 
