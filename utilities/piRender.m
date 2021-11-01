@@ -36,8 +36,7 @@ function [ieObject, result] = piRender(thisR,varargin)
 %       N.B. If thisR is a fullpath to a file, then we only renderType
 %       is forced to be 'radiance'.
 %
-%  version    - PBRT version, 2 or 3.   Default is 3.  2 will be
-%               deprecated.
+%  version    - Only 3.  2 has been deprecated.
 %  mean luminance -  If a scene, this mean luminance. If set to a negative
 %                    value values returned by the renderer are used.
 %                    (default 100 cd/m2)
@@ -47,6 +46,8 @@ function [ieObject, result] = piRender(thisR,varargin)
 %               diameter in piDat2ISET (default is true)
 %  reuse      - Boolean. Indicate whether to use an existing file if one of
 %               the correct size exists (default is false)
+%
+%  dockerimagename - Default is 'pbrt-v3-spectral:raytransfer-spectral'
 %
 %  verbose    - Level of desired output:
 %               0 Silent
@@ -122,7 +123,7 @@ p.addParameter('meanilluminancepermm2',[],@isnumeric);
 p.addParameter('scalepupilarea',true,@islogical);
 p.addParameter('reuse',false,@islogical);
 p.addParameter('reflectancerender', false, @islogical);
-p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral:latest',@ischar);
+p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral',@ischar);
 p.addParameter('wave', 400:10:700, @isnumeric); % This is the past to piDat2ISET, which is where we do the construction.
 p.addParameter('verbose', 2, @isnumeric);
 
@@ -184,7 +185,10 @@ end
 % image
 outputFolder = fileparts(thisR.outputFile);
 if(~exist(outputFolder,'dir'))
-    error('We need an absolute path for the working folder.');
+    mkdir(outputFolder);
+    if(~exist(outputFolder, 'dir'))
+        error('Unable to create path for the working folder.');
+    end
 end
 pbrtFile = thisR.outputFile;
 
