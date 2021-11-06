@@ -100,9 +100,10 @@ function val = recipeGet(thisR, param, varargin)
 %                             just exist as a parameter.  If it doesn't
 %                             exist, then we use the film size to and FOV
 %                             to figure out what it must be.
-%      'spatial samples'    - Sampling resolution
+%      'spatial samples'    - Number of row and col samples 
 %      'film x resolution'  - Number of x dimension samples
 %      'film y resolution'  - Number of y-dimension samples
+%      'sample spacing'     - Spacing between row and col samples 
 %      'film diagonal'      - Size in mm
 %
 %
@@ -843,6 +844,11 @@ switch ieParamFormat(param)  % lower case, no spaces
           nSubpixels = thisR.get('n subpixels');
           thisR.set('film resolution', nMicrolens .* nSubpixels);
         %}
+    case {'samplespacing'}
+        % Distance in meters between the row and col samples
+        
+        % This formula assumes film diagonal pixels 
+        val =thisR.get('filmdiagonal')/norm(thisR.get('spatial samples'));
         
     case 'filmxresolution'
         % An integer specifying number of samples
@@ -850,7 +856,14 @@ switch ieParamFormat(param)  % lower case, no spaces
     case 'filmyresolution'
         % An integer specifying number of samples
         val = [thisR.film.yresolution.value];
-        
+    case {'filmwidth'}
+        % x-dimension, columns
+        ss   = thisR.get('spatial samples'); % Number of samples
+        val = ss(1)*thisR.get('sample spacing');
+    case {'filmheight'}
+        % y-dimension, rows
+        ss   = thisR.get('spatial samples'); % Number of samples
+        val = ss(2)*thisR.get('sample spacing');
     case 'aperturediameter'
         % Needs to be checked.  Default units are meters or millimeters?
         if isfield(thisR.camera, 'aperturediameter') ||...
