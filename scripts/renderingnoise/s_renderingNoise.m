@@ -196,3 +196,47 @@ std(electrons - polyPredicted)
 % This is the standard deviation of the Poisson distribution with the
 % same mean.
 sqrt(mean(electrons))
+
+%% Now with a flat surface for simplicity 
+
+% The idea here is to just use the flat surface to test
+
+flatR = piRecipeDefault('scene name','flat surface');
+
+lensname = 'dgauss.22deg.12.5mm.json';
+c = piCameraCreate('omni','lens file',lensname);
+flatR.set('camera',c);
+flatR.set('film diagonal',1);
+flatR.set('film resolution',[128,128]);
+
+tic
+rpp = [32 128 512 1024 2048, 4096];
+s = zeros(size(rpp));
+for ii=1:numel(rpp)
+    flatR.set('rays per pixel',rpp(ii));
+    oi = piWRS(flatR,'show',false);
+    mSensor = sensorSet(mSensor,'fov',flatR.get('fov'));
+    mSensor = sensorCompute(mSensor,oi);
+    uData = sensorPlot(mSensor,'electrons hline',[1 64]);
+    thisPoly = polyfit(uData.pixPos,uData.pixData,2);
+    polyPredicted = polyval(thisPoly,uData.pixPos);
+    % ieNewGraphWin; plot(uData.pixPos,uData.pixData,'o',uData.pixPos,polyPredicted,'-');
+    disp([std(uData.pixData - polyPredicted), sqrt(mean(uData.pixData))])
+    s(ii) = std(uData.pixData - polyPredicted);
+end
+toc
+
+%%  Show the curve approaching the photon limit
+
+ieNewGraphWin;
+semilogx(rpp,s,'o-');
+grid on; xlabel('Number of rays'); ylabel('Standard deviation');
+thisL = line([rpp(1) rpp(end)],[sqrt(mean(uData.pixData)), sqrt(mean(uData.pixData))]);
+thisL.Color = 'k';
+thisL.LineStyle = '--';
+
+%%
+
+
+
+
