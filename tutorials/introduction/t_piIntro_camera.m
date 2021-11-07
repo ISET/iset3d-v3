@@ -1,16 +1,17 @@
 %% Camera introduction
 %
-%  This tutorial demonstrates several camera types, how to set and get some basic properties of the
-%  film (sensor), and explains how to introduce camera motion to the scene that in turn affects the
+%  This tutorial demonstrates several camera types, how to set and get
+%  some basic properties of the film (sensor), and explains how to
+%  introduce camera motion to the scene that in turn affects the
 %  rendering.
 %
-%  Note: Camera lens properties are introduced in a separate script.
+%  Note: Camera lens properties are explained in a separate script.
 %
 % Describes the ISETCam camera types.  There are four:
-%   * perspective (also called 'pinhole' in the documentation)
-%   * realistic
-%   * realisticEye (special case for the sceneEye in ISETBio)
-%   * omni
+%   * perspective - also called 'pinhole' in the documentation
+%   * omni - allows for lenses and microlenses
+%   * realisticEye - special case for sceneEye class in ISETBio
+%   * realistic - will be deprecated for omni
 %
 %  See also:
 %   t_piIntro_lens
@@ -60,11 +61,6 @@ thisR.get('fov')
 %% Write, render and denoise
 piWrite(thisR);
 oi = piRender(thisR);
-
-% we only have the denoise binary for mac in the repo
-if ismac
-    oi = piAIdenoise(oi);  % Denoising is not necessary, but it looks nice
-end
 
 % show the result
 oiWindow(oi);

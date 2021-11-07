@@ -11,9 +11,9 @@ function camera = piCameraCreate(cameraType,varargin)
 %    'pinhole'      - Default is pinhole camera, also called 'perspective'
 %    'omni'         - Standard lens, including potential microlens array
 %    'ray transfer' - Ray transfer function for the optics simulation
-%    'realistic'    - This seems to be superseded completely by omni, except
-%                     for some old car scene generation cases that have not
-%                     been updated.
+%    'human eye'    - For calculating with different physiological
+%                     optics models (navarro, arizona, legrand)
+%
 %  Deprecated
 %    'light field' - microlens array in front of the sensor for a light
 %                    field camera
@@ -22,6 +22,10 @@ function camera = piCameraCreate(cameraType,varargin)
 %    'realistic'   - This seems to be superseded completely by omni, except
 %                    for some old car scene generation cases that have not
 %                    been updated.
+%
+% For example,
+%   lensname = 'dgauss.22deg.12.5mm.json';
+%   c = piCameraCreate('omni','lens file',lensname);
 %
 % Optional parameter/values
 %
