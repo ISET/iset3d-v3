@@ -8,5 +8,8 @@ if ispc
     else
         output = strrep(inputPath, '\','/');
     end
+else
+   output = inputPath; 
+end
 end
 
