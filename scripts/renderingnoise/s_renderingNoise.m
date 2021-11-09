@@ -30,10 +30,22 @@ idealSensor = sensorSet(idealSensor,'pixel size same fill factor',pSize/2);
 [rn, pn] = piRenderNoise('rays',rays,'sensor',idealSensor);
 
 %% Use a different lens
+wideLens = 'wide.56deg.100.0mm.json';
 
+[rn, pn] = piRenderNoise('rays',rays, 'lensname', wideLens);
+ieNewGraphWin;
+plot(rays,rn,'-ok','Linewidth',2);
+line([rays(1), rays(end)],[pn, pn],'Color','k','Linestyle','--');
+grid on; xlabel('Rays per pixel'); ylabel('Noise');
 
 %% Exposure time
-
+expTime = sensorGet(idealSensor, 'exp time');
+idealSensor = sensorSet(idealSensor, 'exp time', expTime / 3);
+[rn, pn] = piRenderNoise('rays',rays, 'sensor', idealSensor);
+ieNewGraphWin;
+plot(rays,rn,'-ok','Linewidth',2);
+line([rays(1), rays(end)],[pn, pn],'Color','k','Linestyle','--');
+grid on; xlabel('Rays per pixel'); ylabel('Noise');
 
 %% Now try different rendering properties.
 %  This might the path integrator or number of bounces
@@ -41,6 +53,10 @@ idealSensor = sensorSet(idealSensor,'pixel size same fill factor',pSize/2);
 thisR.set('n bounces',3);
 [rn, pn, idealSensor] = piRenderNoise('rays',rays,'recipe',thisR);
 
+% Other options could be samplers: {'halton', 'solbol', 'stratified'}
+% Or accelerators: {'bvh', 'kdtree'}
+thisR.set('sampler subtype', 'solbol');
+[rn, pn, idealSensor] = piRenderNoise('rays',rays,'recipe',thisR);
 
 %%
 %{

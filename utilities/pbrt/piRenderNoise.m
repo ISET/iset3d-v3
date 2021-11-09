@@ -46,10 +46,13 @@ p = inputParser;
 varargin = ieParamFormat(varargin);
 
 p.addParameter('recipe',[],@(x)(isa(x,'recipe')));
-p.addParameter('lensname','dgauss.22deg.12.5mm.json',@(x)exist(x,'file'));
-p.addParameter('rays',[64 256 512],@isvector);
 p.addParameter('sensor',sensorCreateIdeal,@(x)(isequal(x.type,'sensor')));
 p.addParameter('polydeg',1,@isnumeric);
+p.addParameter('lensname','dgauss.22deg.12.5mm.json',@(x)exist(x,'file'));
+% Rendering settings
+p.addParameter('rays',[64 256 512],@isvector);
+p.addParameter('sampler', 'halton', @(x)(ismember(x, {'halton', 'solbol', 'stratified'})));
+p.addParameter('accelerator', 'bvh', @(x)(ismember(x, {'bvh', 'kdtree'})));
 
 p.parse(varargin{:});
 
@@ -58,6 +61,8 @@ rpp      = p.Results.rays;
 sensor   = p.Results.sensor;
 polydeg  = p.Results.polydeg;
 thisR    = p.Results.recipe;
+sampler = p.Results.sampler;
+accelerator = p.Results.accelerator;
 
 %% Build the scene
 
@@ -73,15 +78,21 @@ if isempty(thisR)
     thisR.set('film diagonal',0.5);
     filmResolution = [128 32];
     thisR.set('film resolution',filmResolution);
+    
+    % Set up sampler and accelerator options
+    thisR.set('sampler subtype', sampler);
+    thisR.set('accelerator subtype', accelerator);
 end
 
 % Get the oi to figure out the sensor field of view (size)
 thisR.set('rays per pixel', 1);
+
 thisOI = piWRS(thisR,'show',false);
 
 %% Set up the sensor
-
-sensor = sensorSet(sensor,'exp time',1e-3);
+if sensorGet(sensor, 'auto exp')
+    sensor = sensorSet(sensor,'exp time',1e-3);
+end
 sensor = sensorSet(sensor,'fov',thisR.get('fov'),thisOI);
 sz     = sensorGet(sensor,'size');
 
