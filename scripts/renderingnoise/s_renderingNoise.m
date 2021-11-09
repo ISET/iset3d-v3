@@ -15,17 +15,36 @@
 ieInit;
 if ~piDockerExists, piDockerConfig; end
 
-%% Test scene
-% 
-%   Let's include the slanted bar for sure
-%   Maybe the Cornell Box with the slanted bar in it?
-% 
-%   Pin hole or lens or compare?
-%
-%   One sensor (Sony) or compare?
-%
-%   Different mean luminance levels
-%
+%% Use flat surface for simplicity 
+
+rays = [32 64 256];
+[rn, pn, idealSensor, thisR] = piRenderNoise('rays',rays);
+ieNewGraphWin;
+plot(rays,rn,'-ok','Linewidth',2);
+line([rays(1), rays(end)],[pn, pn],'Color','k','Linestyle','--');
+grid on; xlabel('Rays per pixel'); ylabel('Noise');
+
+%% Adjust the sensor pixel size
+pSize = sensorGet(idealSensor,'pixel size');
+idealSensor = sensorSet(idealSensor,'pixel size same fill factor',pSize/2);
+[rn, pn] = piRenderNoise('rays',rays,'sensor',idealSensor);
+
+%% Use a different lens
+
+
+%% Exposure time
+
+
+%% Now try different rendering properties.
+%  This might the path integrator or number of bounces
+%  Here is changing the bounces
+thisR.set('n bounces',3);
+[rn, pn, idealSensor] = piRenderNoise('rays',rays,'recipe',thisR);
+
+
+%%
+%{
+%%  Messing around with another scene and sensor
 
 % Read the PBRT files into a recipe (this recipe, thisR).
 % thisR = piRecipeDefault('scene name','Cornell Box Bunny Chart');
@@ -38,31 +57,6 @@ thisR.show('objects');
 % Render with a pinhole to make sure it looks OK.  When we render with a
 % pinhole that is rendering a scene.
 scene = piWRS(thisR);
-
-%%  Let's increase the number of rays per pixel
-
-raysperpixel = thisR.get('rays per pixel');
-for factor = [2, 4, 8]
-    thisR.set('rays per pixel',raysperpixel*factor);
-    piWRS(thisR);
-    scene = ieGetObject('scene');
-    scene = sceneSet(scene,'name',sprintf('nrays-%d',raysperpixel*factor));
-    ieReplaceObject(scene);
-end
-
-%% Add a lens and pick a sensor
-
-lensname = 'dgauss.22deg.12.5mm.json';
-c = piCameraCreate('omni','lens file',lensname);
-thisR.set('camera',c);
-
-% Because it has a camera, this is an optical image.  We reset the number
-% of rays in the recipe to the original value.
-thisR.set('rays per pixel',raysperpixel);
-
-% Call PBRT to render the scene.
-oi = piWRS(thisR);
-
 %%  Pick a sensor
 
 oi = oiSet(oi,'fov',5);
@@ -136,9 +130,7 @@ kurtosis(electrons(:) - polyPredicted(:))
 
 thisOI = ieGetObject('oi');
 
-mSensor = sensorCreateIdeal;
-mSensor = sensorSet(mSensor,'fov',5,thisOI);
-mSensor = sensorSet(mSensor,'exp time',1e-3);
+
 mSensor = sensorCompute(mSensor,oi);
 xy = [1, 120];
 mData = sensorPlot(mSensor,'electrons hline',xy);
@@ -197,46 +189,19 @@ std(electrons - polyPredicted)
 % same mean.
 sqrt(mean(electrons))
 
-%% Now with a flat surface for simplicity 
-
-% The idea here is to just use the flat surface to test
-
-flatR = piRecipeDefault('scene name','flat surface');
-
-lensname = 'dgauss.22deg.12.5mm.json';
-c = piCameraCreate('omni','lens file',lensname);
-flatR.set('camera',c);
-flatR.set('film diagonal',1);
-flatR.set('film resolution',[128,128]);
-
-tic
-rpp = [32 128 512 1024 2048, 4096];
-s = zeros(size(rpp));
-for ii=1:numel(rpp)
-    flatR.set('rays per pixel',rpp(ii));
-    oi = piWRS(flatR,'show',false);
-    mSensor = sensorSet(mSensor,'fov',flatR.get('fov'));
-    mSensor = sensorCompute(mSensor,oi);
-    uData = sensorPlot(mSensor,'electrons hline',[1 64]);
-    thisPoly = polyfit(uData.pixPos,uData.pixData,2);
-    polyPredicted = polyval(thisPoly,uData.pixPos);
-    % ieNewGraphWin; plot(uData.pixPos,uData.pixData,'o',uData.pixPos,polyPredicted,'-');
-    disp([std(uData.pixData - polyPredicted), sqrt(mean(uData.pixData))])
-    s(ii) = std(uData.pixData - polyPredicted);
-end
-toc
 
 %%  Show the curve approaching the photon limit
 
 ieNewGraphWin;
 semilogx(rpp,s,'o-');
 grid on; xlabel('Number of rays'); ylabel('Standard deviation');
-thisL = line([rpp(1) rpp(end)],[sqrt(mean(uData.pixData)), sqrt(mean(uData.pixData))]);
+thisL = line([rpp(1) rpp(end)],[sqrt(mean(uData.pixData)), sqrt(mean(uData.pixData))])
 thisL.Color = 'k';
 thisL.LineStyle = '--';
 
 %%
 
+%}
 
 
 
