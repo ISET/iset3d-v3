@@ -3,3 +3,6 @@ local/*
 *~
 iset3d.wiki
 *.asv
+tutorials/camera/dgauss.22deg.3.0mm+microlens.json
+tutorials/camera/dgauss.22deg.3.0mm.json
+tutorials/camera/microlens.json

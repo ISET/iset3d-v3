@@ -21,6 +21,12 @@ function [coords,lookat,hdl] = piAssetGeometry(thisR,varargin)
 %   xz plane view(0,0)
 %   xy plane view(0,90) or view(0,270)
 %
+% Other useful views - RIght click for X-Y, X-Z and Y-Z
+%  az = 180, el = -60
+%  az = 0, el = 22;
+%  az = -180, 0
+%  az = 5, el = 14
+%
 % See also
 %  thisR.get('objects')
 %
@@ -145,10 +151,12 @@ title(sprintf('%s (%s)',bName,oType));
 
 %% By default set the xy plane view
 switch lower(p.Results.inplane)
+
     case 'xy'
-        view(0,90);
+        view(0,270);
     case 'xz'
-        view(0,0);
+        % Good view when assets are rectified.
+        view(-180,0);
 end
 
 % Square up the axes.

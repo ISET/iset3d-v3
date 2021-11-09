@@ -58,7 +58,12 @@ switch thisAsset.type
             case {'material'}
                 val = thisAsset.material;
             case {'materialname'}
-                val = thisAsset.material.namedmaterial;
+                if isempty(thisAsset.material)
+                    % Possibly a light or a marker or mislabeled.
+                    return;
+                else
+                    val = thisAsset.material.namedmaterial;
+                end
             case {'shape'}
                 val = thisAsset.shape;
             case {'output'}

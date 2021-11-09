@@ -23,6 +23,10 @@ function camera = piCameraCreate(cameraType,varargin)
 %                    for some old car scene generation cases that have not
 %                    been updated.
 %
+% For example,
+%   lensname = 'dgauss.22deg.12.5mm.json';
+%   c = piCameraCreate('omni','lens file',lensname);
+%
 % Optional parameter/values
 %
 % Output

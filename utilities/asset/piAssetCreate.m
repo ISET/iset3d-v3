@@ -2,6 +2,7 @@ function obj = piAssetCreate(varargin)
 % Creates the format for different types of assets
 %
 % Synopsis
+%   obj = piAssetCreate(varargin)
 %
 % Inputs
 %
@@ -9,20 +10,25 @@ function obj = piAssetCreate(varargin)
 %   type - Possible asset node types are 'branch','object' and 'light'.
 %
 % Return
+%   obj - An object structure
 %
 % Description
 %
 %  A marker is a leaf of the tree.  We have these from Cinema4D and maybe
-% other graphics programs
+%  other graphics programs
 %
 %  A light is always a leaf of the tree.  Lights are not always included in
-% the assets.  There is a separate 'lights' slot in the recipe
+%  the assets.  There is a separate 'lights' slot in the recipe.  Sorry
+%  about that.
 %
 %  An object is always a leaf of the tree.  This is an honest to God aset.
 %
 %  A branch is a branch of the tree.  This includes position, rotation,
-% scale and other branch information.  The contents apply to all assets
-% below this branch Node
+%  scale and other branch information.  The contents apply to all assets
+%  below this branch Node
+%
+%  There are occasions in which the nodes are incorrectly labeled.  Please
+%  be aware, and sorry.
 %
 % See also
 %
