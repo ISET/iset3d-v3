@@ -21,29 +21,13 @@ function thisR = piRecipeRectify(thisR,varargin)
 %{
  thisR = piRecipeDefault('scene name','simple scene');
  thisR.set('fov',60);
- piWrite(thisR); scene = piRender(thisR,'render type','radiance');
- sceneWindow(scene);
+ thisR.set('film resolution',[160 160]);
  piAssetGeometry(thisR);
+ piWRS(thisR); 
 
- % Shifts everything to the origin
- thisR = piRecipeRectify(thisR,'rotate',false);
- piWrite(thisR); scene = piRender(thisR,'render type','radiance');
- sceneWindow(scene);
- piAssetGeometry(thisR);
-
- % Rotate the camera around the y axis
- % There is something wrong with rotation units and calculation.
- piCameraRotate(thisR,'y rot',10);   % Clockwise
- piAssetGeometry(thisR);
- piWrite(thisR); scene = piRender(thisR,'render type','radiance');
- sceneWindow(scene);
-
- % Running this twice causes a problem.
  thisR = piRecipeRectify(thisR);
  piAssetGeometry(thisR);
-
- piWrite(thisR); scene = piRender(thisR,'render type','radiance');
- sceneWindow(scene);
+ piWRS(thisR);
 %}
 
 %% Parser
@@ -88,7 +72,7 @@ else
     end
 end
 
-% thisR.show
+% thisR.show(); thisR.show('objects')
 
 %%  Translation
 
@@ -130,9 +114,16 @@ to = thisR.get('to');
 thisR.set('to',(rMatrix*to(:)));  % Set to a row vector
 % piWrite(thisR); scene = piRender(thisR,'render type','radiance'); sceneWindow(scene);
 
-% Set a rotation in the rectify node 
-r = piRotationMatrix('zrot',0,'yrot',-yAngle,'xrot',-xAngle);
-piAssetSet(thisR, idRectify, 'rotation', r);
+% Reset the position of every object, rotating by the same amount
+objects = thisR.get('objects');
+for ii=1:numel(objects)
+    curPos = thisR.get('asset',objects(ii),'world position');
+    newPos = rMatrix*curPos(:);
+    thisR.set('asset',objects(ii),'world position',newPos);
+    thisR.set('asset',objects(ii),'world rotate',[xAngle, yAngle, 0]);
+end
+
+% thisR.set('asset','rectify', 'world rotate', [-xAngle,-yAngle,0]);
 % thisR.get('asset','rectify','rotation')
 % piWrite(thisR); [scene,results] = piRender(thisR,'render type','radiance'); sceneWindow(scene);
 

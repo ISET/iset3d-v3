@@ -169,6 +169,8 @@ classdef recipe < matlab.mixin.Copyable
                     for ii=1:numel(names), sizeT{ii} = sprintf('%.2f %.2f %.2f',oSizes(ii,1), oSizes(ii,2),oSizes(ii,3)); end
                     T = table(matT, positionT, sizeT,'VariableNames',{'material','positions (m)','sizes (m)'}, 'RowNames',names);
                     disp(T);
+                    fprintf('From [%.2f, %2f, %2f] to [%.2f, %2f, %2f] up [%.2f, %2f, %2f]\n',...
+                        obj.get('from'), obj.get('to'), obj.get('up'));
                 case {'objectmaterials','objectsmaterials','assetsmaterials'}
                     % Prints out a table of just the materials
                     piAssetMaterialPrint(obj);
