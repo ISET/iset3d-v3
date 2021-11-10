@@ -52,7 +52,6 @@ p.addParameter('lensname','dgauss.22deg.12.5mm.json',@(x)exist(x,'file'));
 % Rendering settings
 p.addParameter('rays',[64 256 512],@isvector);
 p.addParameter('sampler', 'halton', @(x)(ismember(x, {'halton', 'solbol', 'stratified'})));
-p.addParameter('accelerator', 'bvh', @(x)(ismember(x, {'bvh', 'kdtree'})));
 
 p.parse(varargin{:});
 
@@ -62,7 +61,6 @@ sensor   = p.Results.sensor;
 polydeg  = p.Results.polydeg;
 thisR    = p.Results.recipe;
 sampler = p.Results.sampler;
-accelerator = p.Results.accelerator;
 
 %% Build the scene
 
@@ -81,7 +79,6 @@ if isempty(thisR)
     
     % Set up sampler and accelerator options
     thisR.set('sampler subtype', sampler);
-    thisR.set('accelerator subtype', accelerator);
 end
 
 % Get the oi to figure out the sensor field of view (size)

@@ -54,7 +54,6 @@ thisR.set('n bounces',3);
 [rn, pn, idealSensor] = piRenderNoise('rays',rays,'recipe',thisR);
 
 % Other options could be samplers: {'halton', 'solbol', 'stratified'}
-% Or accelerators: {'bvh', 'kdtree'}
 thisR.set('sampler subtype', 'solbol');
 [rn, pn, idealSensor] = piRenderNoise('rays',rays,'recipe',thisR);
 
