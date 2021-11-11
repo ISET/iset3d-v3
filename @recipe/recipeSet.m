@@ -1007,7 +1007,10 @@ switch param
                 rotM = thisR.get('asset', assetName, 'world rotation matrix'); % Get new axis orientation
                 % newTrans = inv(rotM) * [reshape(val, numel(val), 1); 0];
                 newTrans = rotM \ [reshape(val, numel(val), 1); 0];
-                out = piAssetTranslate(thisR, assetName, newTrans(1:3));
+                
+                % Get the scale
+                worldScale = thisR.get('asset', assetName, 'world scale');
+                out = piAssetTranslate(thisR, assetName, newTrans(1:3)./worldScale(:));
             case {'rotate', 'rotation'}
                 % Figures out the rotation from the angles in val and sets
                 % the rotation matrix
