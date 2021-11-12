@@ -126,6 +126,7 @@ p.addParameter('reflectancerender', false, @islogical);
 p.addParameter('dockerimagename','vistalab/pbrt-v3-spectral',@ischar);
 p.addParameter('wave', 400:10:700, @isnumeric); % This is the past to piDat2ISET, which is where we do the construction.
 p.addParameter('verbose', 2, @isnumeric);
+p.addParameter('nthreads', 0, @isnumeric); %number of threads, when 0 flag will be ignored
 
 p.parse(thisR,varargin{:});
 renderType       = ieParamFormat(p.Results.rendertype);
@@ -135,6 +136,7 @@ scalePupilArea   = p.Results.scalepupilarea;
 meanLuminance    = p.Results.meanluminance;
 wave             = p.Results.wave;
 verbosity        = p.Results.verbose;
+nbThreads= p.Results.nthreads;
 
 % For programming simplicity, we convert irradiance to radiance.
 if strcmpi(renderType,'irradiance'), renderType = 'radiance'; end
@@ -335,6 +337,13 @@ for ii = 1:length(filesToRender)
             
             outF = strcat('renderings/',currName,'.dat');
             renderCommand = sprintf('pbrt --outfile %s %s', outF, strcat(currName, '.pbrt'));
+    
+              % If number of threads are given, append this flag to the render
+               % command
+            if(nbThreads>0)
+                renderCommand = [renderCommand ' --nthreads ' num2str(nbThreads)];
+            end
+            
             folderBreak = split(outputFolder, filesep());
             shortOut = strcat('/', char(folderBreak(end)));
             
@@ -354,6 +363,11 @@ for ii = 1:length(filesToRender)
     else  % Linux & Mac
         renderCommand = sprintf('pbrt --outfile %s %s', outFile, currFile);
         
+        % If number of threads are given, append this flag to the render
+        % command
+        if(nbThreads>0)
+            renderCommand = [renderCommand ' --nthreads ' num2str(nbThreads)];
+        end
         if ~isempty(outputFolder)
             if ~exist(outputFolder,'dir'), error('Need full path to %s\n',outputFolder); end
             dockerCommand = sprintf('%s --workdir="%s"', dockerCommand, outputFolder);
