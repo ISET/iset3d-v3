@@ -467,15 +467,22 @@ switch ieParamFormat(param)  % lower case, no spaces
         val = fullfile(outputDir,'lens',lensfullbasename);
         
     case {'focusdistance','focaldistance'}
-        % recipe.get('focal distance')  (m)
-        %
         % Distance in object space that is in focus on the film. If the
         % camera model has a lens, we check whether the lens can bring this
         % distance into focus on the film plane.
         %
-        % N.B.  For pinhole this is focal distance.
-        %       For lens, this   is focus distance.
-        %       (in PBRT parlance)
+        %   recipe.get('focal distance')  (m)
+        %
+        % N.B.  The phrasing can be confusing.  This is the distance to the
+        %       plane in OBJECT space that is in focus. This can be easily
+        %       confused the the lens' focal length - which is a different
+        %       thing!
+        %
+        %       In PBRT parlance this is stored differently depending on
+        %       the camera model.
+        %
+        %       For pinhole this is stored as focal distance.  
+        %       For lens, this stored as focus distance.        
         %
         opticsType = thisR.get('optics type');
         switch opticsType
@@ -522,8 +529,10 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'filmdistance'}
         % thisR.get('film distance',unit); % Returned in meters
         %
-        % If the camera is a pinhole, we might have a filmdistance.  We
-        % don't understand that.
+        % If the camera is a pinhole, it might have a filmdistance.  If it
+        % does not, then we calculate where the film should be positioned
+        % so that the film diagonal and the field of view all make sense
+        % together.  
         %
         % When there is a lens, PBRT sets the filmdistance so that an
         % object at the focaldistance is in focus. This is a means of
@@ -564,9 +573,10 @@ switch ieParamFormat(param)  % lower case, no spaces
                     lensFile = thisR.get('lens file');
                     if exist('lensFocus','file')
                         % If isetlens is on the path, we convert the
-                        % distance to the focal plane into millimeters
-                        % and see whether there is a film distance so
-                        % that the plane is in focus.
+                        % distance to the in-focus object plane into
+                        % millimeters and see whether there is a film
+                        % distance so that that object plane is in focus.
+                        % This is
                         %
                         % But we return the value in meters
                         val = lensFocus(lensFile,1e+3*thisR.get('focal distance'))*1e-3;
