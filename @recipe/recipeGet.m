@@ -427,16 +427,21 @@ switch ieParamFormat(param)  % lower case, no spaces
                 % examples in the data/lens directory and avoiding this
                 % problem.
                 
-                % Make sure the lensfile is in the data/lens directory.
-                [~,name,ext] = fileparts(thisR.camera.lensfile.value);
-                baseName = [name,ext];
-                val = fullfile(piRootPath,'data','lens',baseName);
-                if ~exist(val,'file')
-                    val = which(baseName);
-                    if isempty(val)
-                        error('Can not find the lens file %s\n',val);
-                    else
-                        % fprintf('Using lens file at %s\n',val);
+                % If the lens file exists already found, use it
+                if exist(thisR.camera.lensfile.value, 'file')
+                    val = thisR.camera.lensfile.value;
+                else
+                    % Make sure the lensfile is in the data/lens directory.
+                    [~,name,ext] = fileparts(thisR.camera.lensfile.value);
+                    baseName = [name,ext];
+                    val = fullfile(piRootPath,'data','lens',baseName);
+                    if ~exist(val,'file')
+                        val = which(baseName);
+                        if isempty(val)
+                            error('Can not find the lens file %s\n',val);
+                        else
+                            % fprintf('Using lens file at %s\n',val);
+                        end
                     end
                 end
                 

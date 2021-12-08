@@ -35,7 +35,24 @@ end
 %%
 % Create PBRT format of reflectance
 curReflSPD = piMaterialCreateSPD(wave, refl);
-newMat = piMaterialCreate(mat, 'type', 'matte', 'kd value', curReflSPD);
+
+
+switch mat
+    case {'LeftWall', 'RightWall'}
+        wallKSSPD = piMaterialCreateSPD(wave, 0.1 * refl);
+        newMat = piMaterialCreate(mat, 'type', 'uber', 'kd value', curReflSPD,...
+            'ks value', wallKSSPD, 'roughness value', 0.3);
+    case {'CubeLarge', 'CubeSmall'}
+        cubeKSSPD = piMaterialCreateSPD(wave, refl);
+        cubeKRSPD = piMaterialCreateSPD(wave, 0.5*refl);
+        
+        newMat = piMaterialCreate(mat, 'type', 'uber', 'kd value', curReflSPD,...
+        'ks value', cubeKSSPD, 'kr value', cubeKRSPD, 'roughness value', 1.5);
+    otherwise
+        newMat = piMaterialCreate(mat, 'type', 'matte', 'kd value', curReflSPD);
+end
+
+
 thisR.set('material', mat, newMat);
 
 % Print info

@@ -14,11 +14,16 @@ function thisR = cbBoxCreate(varargin)
 varargin = ieParamFormat(varargin);
 p = inputParser;
 p.addParameter('surfacecolor', 'redgreen', @ischar);
+p.addParameter('from', [0 0.115 -0.40],@isnumeric);
+p.addParameter('to', [0 0.115, 0.6], @isnumeric);
 p.parse(varargin{:});
 surfaceColor = p.Results.surfacecolor;
-
+from = p.Results.from;
+to = p.Results.to;
 %% Read recipe
 thisR = piRecipeDefault('scene name', 'cornell box reference');
+thisR.set('from', from);
+thisR.set('to', to);
 %% Remove current existing lights
 piLightDelete(thisR, 'all');
 %% Turn the object to area light
@@ -28,12 +33,14 @@ lightName = 'cbox-lights-1';
 areaLight = piLightSet(areaLight, 'spd val', lightName);
 
 assetName = '001_AreaLight_O';
-% Move area light above by 0.5 cm
-% thisR.set('asset', assetName, 'world translate', [0 0.005 0]);
+% Move area light lower by 0.5 cm
+thisR.set('asset', assetName, 'world translate', [0 -0.005 0]);
 thisR.set('asset', assetName, 'obj2light', areaLight);
 
 assetNameCube = '001_CubeLarge_O';
-thisR.set('asset', assetNameCube, 'scale', [1 1.2 1]);
+thisR.set('asset', assetNameCube, 'world translate', [0.006 -0.008 0]);
+thisR.set('asset', assetNameCube, 'world rotate', [0 -8 0]);
+thisR.set('asset', assetNameCube, 'scale', [1 1.1 1]);
 %{
 wave = 400:10:700;
 lgt = ieReadSpectra(lightName, wave);
