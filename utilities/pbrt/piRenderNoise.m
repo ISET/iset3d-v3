@@ -45,13 +45,18 @@ function [renderNoise, photonNoise, sensor, thisR] = piRenderNoise(varargin)
 p = inputParser;
 varargin = ieParamFormat(varargin);
 
-p.addParameter('recipe',[],@(x)(isa(x,'recipe')));
+% p.addParameter('recipe',[],@(x)(isa(x,'recipe')));
 p.addParameter('sensor',sensorCreateIdeal,@(x)(isequal(x.type,'sensor')));
 p.addParameter('polydeg',1,@isnumeric);
 p.addParameter('lensname','dgauss.22deg.12.5mm.json',@(x)exist(x,'file'));
 % Rendering settings
 p.addParameter('rays',[64 256 512],@isvector);
 p.addParameter('sampler', 'halton', @(x)(ismember(x, {'halton', 'solbol', 'stratified'})));
+p.addParameter('scenename', '', @ischar);
+p.addParameter('filmresolution', [128 32], @isnumeric);
+p.addParameter('filmdiagonal', 0.5, @isnumeric);
+p.addParameter('nbounces', 1, @isnumeric);
+p.addParameter('integrator', 'path', @(x)(ismember(x, {'directlighting', 'bdpt', 'mlt','sppm', 'path'})));
 
 p.parse(varargin{:});
 
@@ -59,27 +64,59 @@ lensname = p.Results.lensname;
 rpp      = p.Results.rays;
 sensor   = p.Results.sensor;
 polydeg  = p.Results.polydeg;
-thisR    = p.Results.recipe;
+% thisR    = p.Results.recipe;
 sampler = p.Results.sampler;
-
+sceneName = p.Results.scenename;
+filmResolution = p.Results.filmresolution;
+filmDiagonal = p.Results.filmdiagonal;
+nBounces = p.Results.nbounces;
+integrator = p.Results.integrator;
 %% Build the scene
 
 % Use the default, or the one the user sent in
-if isempty(thisR)
+if isempty(sceneName)
     thisR = piRecipeDefault('scene name','flat surface');
     
-    % Add the camera to the recipe
-    c = piCameraCreate('omni','lens file',lensname);
-    thisR.set('camera',c);
-    
-    % Set small film size.
-    thisR.set('film diagonal',0.5);
-    filmResolution = [128 32];
-    thisR.set('film resolution',filmResolution);
-    
-    % Set up sampler and accelerator options
-    thisR.set('sampler subtype', sampler);
+else
+    thisR = piRecipeDefault('scene name',sceneName);
+    switch sceneName
+        case 'cornellboxreference'
+            %% Read recipe
+            %% Remove current existing lights
+            piLightDelete(thisR, 'all');
+            %% Turn the object to area light
+
+            areaLight = piLightCreate('lamp', 'type', 'area');
+            lightName = 'D65';
+            areaLight = piLightSet(areaLight, 'spd val', lightName);
+
+            assetName = '001_AreaLight_O';
+            % Move area light above by 0.5 cm
+            thisR.set('asset', assetName, 'world translate', [0 -0.005 0]);
+            thisR.set('asset', assetName, 'obj2light', areaLight);
+
+            assetNameCube = '001_CubeLarge_O';
+            thisR.set('asset', assetNameCube, 'scale', [1 1.2 1]);
+    end
 end
+
+% Add the camera to the recipe
+c = piCameraCreate('omni','lens file',lensname);
+thisR.set('camera',c);
+
+% Set small film size (default is 0.5).
+thisR.set('film diagonal',filmDiagonal);
+% filmResolution = [128 32];
+thisR.set('film resolution',filmResolution);
+
+% Set up sampler and accelerator options
+thisR.set('sampler subtype', sampler);
+
+% Set up number of bounces
+thisR.set('n bounces', nBounces);
+
+% Set up integrators
+thisR.set('integrator subtype', integrator);
 
 % Get the oi to figure out the sensor field of view (size)
 thisR.set('rays per pixel', 1);
@@ -99,8 +136,13 @@ renderNoise = zeros(size(rpp));
 for ii=1:numel(rpp)
     thisR.set('rays per pixel',rpp(ii));
     oi = piWRS(thisR,'show',false);
-
+    %{
+    oiWindow(oi);
+    %}
     sensor = sensorCompute(sensor,oi);
+    
+    % ZLY: Don't understand why just a line, shoudn't it be the whole area?
+    %{
     % We could go through a couple of lines, rather than just one.
     uData = sensorPlot(sensor,'electrons hline',round([1, sz(2)/2]),'no fig',true);
     
@@ -118,6 +160,11 @@ for ii=1:numel(rpp)
     
     % disp([std(uData.pixData - polyPredicted), photonNoise])
     renderNoise(ii) = std(uData.pixData - polyPredicted);
+    %}
+    electrons = sensorGet(sensor, 'electrons');
+    electrons = electrons(electrons~=0);
+    photonNoise = sqrt(mean(electrons(:)));
+    renderNoise(ii) = std(electrons(:) - mean(electrons(:)));
 end
 
 end

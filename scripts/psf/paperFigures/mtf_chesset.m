@@ -9,7 +9,7 @@ if ~piDockerExists, piDockerConfig; end
 % This just loads the scene.
 
 thisR=piRecipeDefault('scene name','chessSet');
-thisR=piRecipeDefault('scene name','flatSurface');
+%thisR=piRecipeDefault('scene name','flatSurface');
 
 
 % The scene
@@ -24,6 +24,7 @@ thisR=piRecipeDefault('scene name','flatSurface');
 
 filmZPos_m           = -1.5;
 thisR.lookAt.from(3)= filmZPos_m;
+%thisR.lookAt.to(3)= filmZPos_m+1;
 distanceFromFilm_m   = 1.469+50/1000
 
 %% Merge chart and chessset

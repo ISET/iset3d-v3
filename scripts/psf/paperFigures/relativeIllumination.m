@@ -1,3 +1,4 @@
+
 %% Plot relative illumination DGAUSS 50mm lens compare Omni with RTF
 
 %%
@@ -16,7 +17,7 @@ distanceFromFilm_m=1.469+50/1000
 
 
 % Render the scene
-thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-spectral';
+thisDocker = 'vistalab/pbrt-v3-spectral:raytransfer-ellipse';
 
 
 
@@ -33,6 +34,8 @@ thisR.set('light', 'add', light);
 aperturediameters = [2 5 7 12 ];
 
 
+
+
 for a=1:numel(aperturediameters)
 % Add a lens and render.
 %camera = piCameraCreate('omni','lensfile','dgauss.22deg.12.5mm.json');
@@ -42,25 +45,26 @@ cameraOmni.filmdistance.value=0.037959;
 cameraOmni = rmfield(cameraOmni,'focusdistance');
 cameraOmni.aperturediameter.value=aperturediameters(a);
 
-
-cameraRTF = piCameraCreate('raytransfer','lensfile','dgauss.22deg.50.0mm_aperture6.0.json-filmtoscene-raytransfer.json');
+rtffile=['dgauss.22deg.50.0mm-poly5-diaphragm' num2str(aperturediameters(a)) 'mm-raytransfer.json'];
+cameraRTF = piCameraCreate('raytransfer','lensfile',rtffile);
 %cameraRTF = piCameraCreate('raytransfer','lensfile','/home/thomas42/Documents/MATLAB/libs/isetlens/local/dgauss.22deg.50.0mm_aperture6.0.json-raytransfer.json')
 cameraRTF.filmdistance.value=0.037959;
-cameraRTF.aperturediameter.value=aperturediameters(a);
-cameraRTF.aperturediameter.type='float';
+%cameraRTF.aperturediameter.value=aperturediameters(a);
+%cameraRTF.aperturediameter.type='float';
 
-thisR.set('pixel samples',300)
+thisR.set('pixel samples',1500)
 
 
 
 thisR.set('film diagonal',90,'mm');
-thisR.set('film resolution',[300 300])
+resolution=400;
+thisR.set('film resolution',resolution*[1 1])
     
 
 thisR.integrator.subtype='path'
 
 thisR.integrator.numCABands.type = 'integer';
-thisR.integrator.numCABands.value =1
+thisR.integrator.numCABands.value = 1
 
 
 % Change the focal distance
@@ -134,7 +138,7 @@ maxnorm = @(x)x/max(x);
 
 %construct x axis
 filmdiagonal=thisR.get('filmdiagonal')
-xaxis=0.5*filmdiagonal/sqrt(2) *linspace(-1,1,300);
+xaxis=0.5*filmdiagonal/sqrt(2) *linspace(-1,1,resolution);
 
 linestyle={'-' ,'-.'}
 % Plot relative illuminations
@@ -182,4 +186,4 @@ xlim([0 xaxis(end)])
 set(findall(gcf,'-property','FontSize'),'FontSize',12);
 set(findall(gcf,'-property','interpreter'),'interpreter','latex');
 
-saveas(gcf,'./fig/relativeillumination_dgauss50.eps','epsc')
+saveas(gcf,'/scratch/thomas42/rtfpaper/relativeillumination_dgauss50.pdf','epsc')

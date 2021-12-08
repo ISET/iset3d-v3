@@ -38,11 +38,12 @@ film = filmC('position', filmpos, 'size', filmSize, 'wave', wave, 'resolution', 
 psfCamera = psfCameraC('lens',lens,'film',film,'pointsource',ps);
 
 %% Calculate psf image
+
 % nlines is how many lines you want to see plotted while tracing
 psfCamera.estimatePSF('nLines',0,'jitter',false);
 
 % Turn this into ISETCam optical image
-oi = psfCamera.oiCreate(); 
+oi = psfCamera.oiCreate();
 % oiWindow(oi);
 
 %% Extract the point spread data and compute the linespread
