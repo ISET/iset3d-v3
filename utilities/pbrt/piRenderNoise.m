@@ -1,4 +1,4 @@
-function [renderNoise, photonNoise, sensor, thisR] = piRenderNoise(varargin)
+function [renderNoise, photonNoise, sensor, thisR, oi] = piRenderNoise(varargin)
 % Produce a curve showing how increasing rays per pixel reduces noise
 %
 % Synopsis
