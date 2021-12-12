@@ -50,16 +50,27 @@ thisSE.set('from',from);
 % are included above.
 thisSE.set('to',toB);
 
+% Reduce the rendering noise by using more rays. 
+thisSE.set('rays per pixel',32);      
+
+% Increase the spatial resolution by adding more spatial samples.
+thisSE.set('spatial samples',512);  
+
 % Have a quick check with the pinhole
 thisSE.set('use pinhole',true);
+
+% thisSE.get('object distance')   % Default is 2.1674
+% If we make it further, we can narrow the FOV, I think
+% thisSE.set('object distance',6);
+% thisSE.set('fov',6);
 
 % Given the distance from the scene, this FOV captures everything we want
 thisSE.set('fov',15);             % Degrees
 
 % Render the scene
-scene = thisSE.render;
+scene = thisSE.render('render type','radiance');
 
-sceneWindow(scene);   
+sceneWindow(scene);
 
 thisSE.summary;
 
@@ -72,7 +83,7 @@ thisSE.summary;
 thisSE.set('use pinhole',false);
 
 % We turn on chromatic aberration.  That slows down the calculation, but
-% makes it more accurate and interesting.  We often use only 8 spectral
+% makes it more accurate and interesting.  We oftens use only 8 spectral
 % bands for speed and to get a rought sense. You can use up to 31.  It is
 % slow, but that's what we do here because we are only rendering once. When
 % the GPU work is completed, this will be fast!
@@ -86,7 +97,7 @@ oDist = thisSE.get('object distance');
 thisSE.set('focal distance',oDist);  
 
 % Reduce the rendering noise by using more rays. 
-thisSE.set('rays per pixel',128);      
+thisSE.set('rays per pixel',768);      
 
 % Increase the spatial resolution by adding more spatial samples.
 thisSE.set('spatial samples',512);     

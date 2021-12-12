@@ -355,12 +355,17 @@ end
 function piWriteLookAtScale(thisR,fileID)
 
 % Optional Scale
-theScale = thisR.get('scale');
-
-if(~isempty(theScale))   
-   fprintf(fileID,'Scale %0.2f %0.2f %0.2f \n', [theScale(1) theScale(2) theScale(3)]);
-    fprintf(fileID,'\n');
-end
+% This was here for a long time.  But I don't think it matters unless it is
+% inside the 'WorldBegin' loop.  So I deleted it and started writing the
+% Scale inside the WorldBegin' write section
+% 
+%{
+   theScale = thisR.get('scale');
+   if(~isempty(theScale))
+      fprintf(fileID,'Scale %0.2f %0.2f %0.2f \n', [theScale(1) theScale(2) theScale(3)]);
+      fprintf(fileID,'\n');
+   end
+%}
 
 % Optional Motion Blur
 % default StartTime and EndTime is 0 to 1;
@@ -631,10 +636,14 @@ if ~isempty(lineLights)
 end
 
 %% Write out the World information.
-
-% Insert the Include lines as the last three before  WorldEnd. 
+ 
+% Insert the Include lines as the last three before WorldEnd. 
+% Also, as of December 2021, placed the 'Scale' line in here.
+% Maybe we should not have an overall Scale in the recipe, however.
+%
 for ii = 1:length(thisR.world)
-    currLine = thisR.world{ii};    
+    currLine = thisR.world{ii};    % ii = 1 is 'WorldBegin'
+
     if piContains(currLine, 'WorldEnd') && isempty(lineLights)
         % Insert the lights file.
         fprintf(fileID, sprintf('Include "%s_lights.pbrt" \n', basename));
@@ -642,10 +651,22 @@ for ii = 1:length(thisR.world)
     
     fprintf(fileID,'%s \n',currLine);
     
+    if piContains(currLine,'WorldBegin')
+        % Start with the Scale value from the recipe.  This scales the whole scene,
+        % but it might be a bad idea because it does not preserve the geometric
+        % relationships between the objects.  They all get bigger.
+        theScale = thisR.get('scale');
+        if(~isempty(theScale))
+            fprintf(fileID,'Scale %0.2f %0.2f %0.2f \n', [theScale(1) theScale(2) theScale(3)]);
+            fprintf(fileID,'\n');
+        end
+    end
+    
     if piContains(currLine,'WorldBegin') && isempty(lineMaterials)
         % Insert the materials file
         fprintf(fileID,'%s \n',sprintf('Include "%s_materials.pbrt" \n', basename));
     end
+    
 end
 
 end

@@ -206,7 +206,11 @@ switch param
         %
         % What is the relationship to the focal distance?  If we move
         % the camera, the focal distance is always with respect to the
-        % camera, right?
+        % camera, right?  Or is it always at the 'to' distance???  You can
+        % force it to be the 'to' by using
+        %
+        % thisR.set('focal distance',thisR.get('object distance'))
+        %
         
         assert(val > 0);  % We do not change which side of 'to' this way.
         
@@ -273,6 +277,15 @@ switch param
         thisR.set('film diagonal',35);
         
         %}
+    case 'scale'
+        % Scale something?? Was missing until December 11, 2021.
+        % Will experiment with what it does.  There is a slot for it in
+        % piWrite().
+        if numel(val) == 3,     thisR.scale = val(:)';
+        elseif numel(val) == 1, thisR.scale = ones(3,1)*val;
+        else, warning('Bad scale value.  Must be scalar or 3-vector');
+        end        
+
     case 'mmunits'
         % thisR.set('mm units',true/false)
         %
