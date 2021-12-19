@@ -17,8 +17,9 @@ if ~piDockerExists, piDockerConfig; end
 
 %% Use flat surface for simplicity 
 
-rays = [32 64 256];
+rays = [2 4 32 128];
 [rn, pn, idealSensor, thisR] = piRenderNoise('rays',rays);
+
 ieNewGraphWin;
 plot(rays,rn,'-ok','Linewidth',2);
 line([rays(1), rays(end)],[pn, pn],'Color','k','Linestyle','--');
@@ -27,7 +28,8 @@ grid on; xlabel('Rays per pixel'); ylabel('Noise');
 %% Adjust the sensor pixel size
 pSize = sensorGet(idealSensor,'pixel size');
 idealSensor = sensorSet(idealSensor,'pixel size same fill factor',pSize/2);
-[rn, pn] = piRenderNoise('rays',rays,'sensor',idealSensor);
+[rn, pn, idealSensor, thisR] = piRenderNoise('rays',rays,'sensor',idealSensor);
+% sensorWindow(idealSensor);
 
 %% Use a different lens
 wideLens = 'wide.56deg.100.0mm.json';
@@ -57,6 +59,17 @@ thisR.set('n bounces',3);
 thisR.set('sampler subtype', 'solbol');
 [rn, pn, idealSensor] = piRenderNoise('rays',rays,'recipe',thisR);
 
+%% Try with the Cornell box.  Here the bounces are relevant
+rays = [16 256];
+[rn, pn, idealSensor] = piRenderNoise('rays',rays,...
+    'scene name','cornell box reference', ...
+    'film diagonal',0.5, ...
+    'nbounces',4);
+
+ieNewGraphWin;
+plot(rays,rn,'-ok','Linewidth',2);
+line([rays(1), rays(end)],[pn, pn],'Color','k','Linestyle','--');
+grid on; xlabel('Rays per pixel'); ylabel('Noise');
 %%
 %{
 %%  Messing around with another scene and sensor

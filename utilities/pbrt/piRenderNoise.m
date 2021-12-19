@@ -5,17 +5,17 @@ function [renderNoise, photonNoise, sensor, thisR, oi] = piRenderNoise(varargin)
 %    [renderNoise, photonNoise, sensor, thisR] = piRenderNoise(varargin)
 %
 % Brief description
-%    Use PBRT with different numbers of rays per pixel and estimate render
-%    noise.  
+%    Estimate render noise from PBRT with different number of rays, and
+%    possibly different samplers.
 %
 % Inputs
 %   N/A
 %
 % Optional key/val
-%   lens name  - ISETLens lens file
-%   rays       - Vector of rays with a default [16 64 256 512 1024]
-%   sensor     - Monochrome sensor.  Default is the ideal sensor
-%   polydeg    - Polynomial degree.  Default is 1.  
+%   lens name  - ISETLens lens file. Default: 'dgauss.22deg.12.5mm.json'
+%                If you use 'pinhole', the calculation will not use a lens.
+%   rays       - Vector of ray numbers. Default is [16 64 256 512 1024]
+%   sensor     - Monochrome sensor.  Default is the ideal monochrome sensor
 %
 % Outputs
 %   renderNoise - vector noise levels, one for each ray count
@@ -24,15 +24,18 @@ function [renderNoise, photonNoise, sensor, thisR, oi] = piRenderNoise(varargin)
 % Description
 %   We render a flat surface scene using PBRT.  We calculate the variance
 %   in the flat surface rendering, imaged onto an ideal sensor.  If there
-%   is no rendering noise, the output should be Poisson with mean equal to
-%   variance (std^2).  If there is rendering noise then the renderNoise
-%   will exceed the photonNoise.
+%   is no rendering noise, the output should be Poisson, which implies a
+%   mean equal to variance (std^2).  If there is rendering noise then the
+%   estimated noise will exceed the photonNoise.  We find that as the rays
+%   increase and number of bounces changes the estimates get closer to the
+%   photon noise limit.
 %
 % See Also
+%    s_renderingNoise
 
 % Examples:
 %{
-  rays = [32 64 256];
+  rays = [32 256];
   [rn, pn, sensor, flatR] = piRenderNoise('rays',rays);
   ieNewGraphWin; 
   plot(rays,rn,'-ok','Linewidth',2);
@@ -48,30 +51,35 @@ varargin = ieParamFormat(varargin);
 % p.addParameter('recipe',[],@(x)(isa(x,'recipe')));
 p.addParameter('sensor',sensorCreateIdeal,@(x)(isequal(x.type,'sensor')));
 p.addParameter('polydeg',1,@isnumeric);
-p.addParameter('lensname','dgauss.22deg.12.5mm.json',@(x)exist(x,'file'));
+p.addParameter('lensname','dgauss.22deg.12.5mm.json',@(x)(exist(x,'file') || isequal(x,'pinhole')));
+
 % Rendering settings
 p.addParameter('rays',[64 256 512],@isvector);
 p.addParameter('sampler', 'halton', @(x)(ismember(x, {'halton', 'solbol', 'stratified'})));
 p.addParameter('scenename', '', @ischar);
-p.addParameter('filmresolution', [128 32], @isnumeric);
+p.addParameter('filmresolution', [64 64], @isnumeric);
 p.addParameter('filmdiagonal', 0.5, @isnumeric);
 p.addParameter('nbounces', 1, @isnumeric);
 p.addParameter('integrator', 'path', @(x)(ismember(x, {'directlighting', 'bdpt', 'mlt','sppm', 'path'})));
 
 p.parse(varargin{:});
 
+% Old.  May make a comeback.
+%
+% polydeg  = p.Results.polydeg;
+% thisR    = p.Results.recipe;
+
 lensname = p.Results.lensname;
 rpp      = p.Results.rays;
 sensor   = p.Results.sensor;
-polydeg  = p.Results.polydeg;
-% thisR    = p.Results.recipe;
-sampler = p.Results.sampler;
+sampler  = p.Results.sampler;
 sceneName = p.Results.scenename;
 filmResolution = p.Results.filmresolution;
-filmDiagonal = p.Results.filmdiagonal;
-nBounces = p.Results.nbounces;
+filmDiagonal   = p.Results.filmdiagonal;
+nBounces   = p.Results.nbounces;
 integrator = p.Results.integrator;
-%% Build the scene
+
+%% Build the flat surface scene
 
 % Use the default, or the one the user sent in
 if isempty(sceneName)
@@ -79,7 +87,7 @@ if isempty(sceneName)
     
 else
     thisR = piRecipeDefault('scene name',sceneName);
-    switch sceneName
+    switch ieParamFormat(sceneName)
         case 'cornellboxreference'
             %% Read recipe
             %% Remove current existing lights
@@ -100,12 +108,7 @@ else
     end
 end
 
-% Add the camera to the recipe
-c = piCameraCreate('omni','lens file',lensname);
-thisR.set('camera',c);
 
-% Set small film size (default is 0.5).
-thisR.set('film diagonal',filmDiagonal);
 % filmResolution = [128 32];
 thisR.set('film resolution',filmResolution);
 
@@ -121,24 +124,51 @@ thisR.set('integrator subtype', integrator);
 % Get the oi to figure out the sensor field of view (size)
 thisR.set('rays per pixel', 1);
 
-thisOI = piWRS(thisR,'show',false);
+if ~isequal(lensname,'pinhole')
+    
+    % Add the camera to the recipe
+    c = piCameraCreate('omni','lens file',lensname);
+    thisR.set('camera',c);
+    
+    % The field of view of accounting for the film
+    % Set a very small film size (default is 0.5 mm).  This is near the
+    % middle of the large back wall in the cornell box case.  And a small
+    % region without much relative illumination for the flat surface case.
+    thisR.set('film diagonal',filmDiagonal);
+
+    thisOI = piWRS(thisR,'show',false);
+else
+    % For the pinhole case, we set the field of view to be 10 deg
+    thisR.set('fov',1);
+    thisScene = piWRS(thisR,'show',false);
+    oiFixed = oiCreate;
+    thisOI = oiCompute(oiFixed,thisScene);
+end
 
 %% Set up the sensor
 if sensorGet(sensor, 'auto exp')
     sensor = sensorSet(sensor,'exp time',1e-3);
 end
-sensor = sensorSet(sensor,'fov',thisR.get('fov'),thisOI);
-sz     = sensorGet(sensor,'size');
+
+% Make sure the sensor size includes only the flat surface
+sensor = sensorSet(sensor,'fov',thisR.get('fov')*0.8,thisOI);
+% sz     = sensorGet(sensor,'size');
 
 %% Loop on rays per pixel
 
 renderNoise = zeros(size(rpp));
 for ii=1:numel(rpp)
     thisR.set('rays per pixel',rpp(ii));
-    oi = piWRS(thisR,'show',false);
-    %{
-    oiWindow(oi);
-    %}
+    
+    % Deal with pinhole case.
+    tmp = piWRS(thisR,'show',false);
+    if isequal(tmp.type,'scene')
+        % Convert to oi and make sure we reduce the FOV
+        oi = oiCompute(oiFixed,tmp);
+    else
+        oi = tmp;
+    end
+
     sensor = sensorCompute(sensor,oi);
     
     % ZLY: Don't understand why just a line, shoudn't it be the whole area?
@@ -161,10 +191,16 @@ for ii=1:numel(rpp)
     % disp([std(uData.pixData - polyPredicted), photonNoise])
     renderNoise(ii) = std(uData.pixData - polyPredicted);
     %}
+    
+    % Get all the electrons that are within the sensor.
     electrons = sensorGet(sensor, 'electrons');
     electrons = electrons(electrons~=0);
-    photonNoise = sqrt(mean(electrons(:)));
-    renderNoise(ii) = std(electrons(:) - mean(electrons(:)));
+    
+    % Expected from photon noise alone
+    photonNoise = sqrt(mean(electrons(:)));   
+    
+    % This is the actual noise
+    renderNoise(ii) = std(electrons(:) - mean(electrons(:)));  
 end
 
 end
