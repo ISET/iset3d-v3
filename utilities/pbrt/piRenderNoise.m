@@ -49,7 +49,7 @@ p = inputParser;
 varargin = ieParamFormat(varargin);
 
 % p.addParameter('recipe',[],@(x)(isa(x,'recipe')));
-p.addParameter('sensor',sensorCreateIdeal,@(x)(isequal(x.type,'sensor')));
+p.addParameter('sensor',[],@(x)(isequal(x.type,'sensor')));
 p.addParameter('polydeg',1,@isnumeric);
 p.addParameter('lensname','dgauss.22deg.12.5mm.json',@(x)(exist(x,'file') || isequal(x,'pinhole')));
 
@@ -61,7 +61,7 @@ p.addParameter('filmresolution', [64 64], @isnumeric);
 p.addParameter('filmdiagonal', 0.5, @isnumeric);
 p.addParameter('nbounces', 1, @isnumeric);
 p.addParameter('integrator', 'path', @(x)(ismember(x, {'directlighting', 'bdpt', 'mlt','sppm', 'path'})));
-
+p.addParameter('pixelsize',1.2e-6,@isscalar);   % Pixel size in meters
 p.parse(varargin{:});
 
 % Old.  May make a comeback.
@@ -78,6 +78,13 @@ filmResolution = p.Results.filmresolution;
 filmDiagonal   = p.Results.filmdiagonal;
 nBounces   = p.Results.nbounces;
 integrator = p.Results.integrator;
+pixelSize  = p.Results.pixelsize;
+
+if isempty(sensor)
+    sensor = sensorCreateIdeal('monochrome',[], pixelSize);
+end
+
+% sensor = sensorSet(sensor,'pixel size same fill factor',pixelSize);
 
 %% Build the flat surface scene
 
