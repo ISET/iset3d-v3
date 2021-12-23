@@ -3,7 +3,7 @@
   "name": "dgauss.22deg.3.0mm",
   "surfaces": [
     {
-      "ior": 1.669999957084656,
+      "ior": 1.614868,
 	"radius": 54.153,
 	"semi_aperture": 29.225,
       "thickness": 8.747
@@ -15,13 +15,13 @@
       "thickness": 0.5
     },
     {
-      "ior": 1.669999957084656,
+      "ior": 1.627568,
 	"radius": 35.951,
 	"semi_aperture": 24.296,
 	"thickness": 14,
     },
     {
-      "ior": 1.699000000953674,
+      "ior":  1.614630,
 	"radius": 1e10,
 	"semi_aperture": 21.297,
 	"thickness": 3.777
@@ -39,13 +39,13 @@
       "thickness": 12.428
     },
     {
-      "ior": 1.603000044822693,
+      "ior": 1.614630,
 	"radius":-25.685,
 	"semi_aperture": 13.188,
       "thickness": 3.777
     },
     {
-      "ior": 1.657999992370605,
+	"ior": 1.627568,
 	"radius": 1e10,
 	"semi_aperture": 16.468,
 	"thickness": 10.834
@@ -57,7 +57,7 @@
       "thickness": 0.5
     },
     {
-      "ior": 1.717000007629395,
+	"ior":  1.627568,
 	"radius": 186.417,
 	"semi_aperture": 21.311,
 	"thickness": 6.858
