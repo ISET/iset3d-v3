@@ -384,7 +384,7 @@ function fname = piSceneWebTest(sceneName,sceneFile)
 % Check for a web scene
 
 % See if the scene is already in data/V3/web
-FilePath = fullfile(piRootPath,'data','V3','web',sceneName);
+FilePath = fullfile(piRootPath,'data','v3','web',sceneName);
 fname = fullfile(FilePath,sceneFile);
 
 % Download the file to data/V3/web

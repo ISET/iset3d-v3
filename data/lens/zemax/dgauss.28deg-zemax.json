@@ -18,7 +18,7 @@
       "ior": 1.627568,
 	"radius": 35.951,
 	"semi_aperture": 24.296,
-	"thickness": 14,
+	"thickness": 14
     },
     {
       "ior":  1.614630,
@@ -66,7 +66,7 @@
       "ior": 1,
 	"radius": -67.148,
 	"semi_aperture": 21.646,
-	"thickness": 57.315,
+	"thickness": 57.315
     }
   ],
   "metadata": {
