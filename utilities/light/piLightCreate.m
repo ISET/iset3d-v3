@@ -35,7 +35,7 @@ function lght = piLightCreate(lightName, varargin)
   piLightCreate('list available types')
 %}
 %{
- lgt = piLightCreate('point light 1')
+ lgt = piLightCreate('point light 1')  % The default is a point
 %}
 %{
  lgt = piLightCreate('spot light 1', 'type','spot','rgb spd',[1 1 1])

@@ -12,8 +12,16 @@
 % We save the recipes for the bigger scenes in their input directories.
 %
 % See also
-%   s_scenesRecipe
+%   s_scenesRecipe, piAssetLoad, piRecipeMerge
 %
+
+%{
+% An example of loading an asset and inserting it into thisR scene.
+sbar = piAssetLoad('slantedbar');
+piRecipeMerge(thisR,sbar.thisR,'node name',sbar.mergeNode);
+piAssetSet(thisR,sbar.mergeNode,'translate',[3 3 6]);
+piWRS(thisR);
+%}
 
 %% Init
 

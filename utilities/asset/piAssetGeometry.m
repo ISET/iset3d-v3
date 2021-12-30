@@ -96,7 +96,7 @@ end
 
 %% Open a figure to plot
 
-% We should have no plot switch
+% We should have a 'no plot' switch
 hdl = ieNewGraphWin;
 
 % Shift is a few percent of the range.  This should become a parameter
@@ -123,7 +123,8 @@ plot3(lookat.to(1),lookat.to(2),lookat.to(3),'go',...
     'MarkerFaceColor','g');
 text(lookat.to(1)+sx,lookat.to(2)+sy,lookat.to(3),'to','Color','g');
 
-% Blue dashed line of site
+%% Blue dashed line of site
+
 % Equation of the line is start + t*direction
 % We draw the line from to for a lineLength
 lineLength = 10;     % Meters

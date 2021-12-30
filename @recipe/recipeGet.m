@@ -1132,8 +1132,13 @@ switch ieParamFormat(param)  % lower case, no spaces
                 val = [val,ii]; %#ok<AGROW>
             end
         end
+        
     case {'objectnames'}
-        % Names of the objects
+        % This interface is still a work in progress.
+        % Names of the objects.  
+        % The objects without the ID and Instance can be returned using
+        % 'object simple names'
+        % This interface is still a work in progress.
         ids = thisR.get('objects');
         names = thisR.assets.names;
         val = cell(1,numel(ids));
@@ -1141,10 +1146,28 @@ switch ieParamFormat(param)  % lower case, no spaces
             % Includes ids and everything
             val{ii} = names{ids(ii)};
         end
+        
+        case {'objectnamesnoid'}
+        % Names of the objects with the ID stripped.  
+        % I don't think we are doing this properly.  We need a routine to
+        % break an asset name into
+        %
+        %    [id, instance, objectname] = assetNameParse(name)
+        %
+        % And then we should call that routine for this set of gets.
+        ids = thisR.get('objects');
+        names = thisR.assets.names;
+        val = cell(1,numel(ids));
+        for ii = 1:numel(ids)
+            % Includes ids and everything
+            thisName = names{ids(ii)};
+            val{ii} = thisName(8:end);
+        end
+        
     case 'objectsimplenames'
         % Names of the objects
         % We think there is ID_Instance_ObjectName_O.
-        % So we try to delete the first two and the O atthe end.
+        % So we try to delete the first two and the O at the end.
         % If there are fewer parts, we delete less.
         ids = thisR.get('objects');
         names = thisR.assets.names;
@@ -1205,6 +1228,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         
         % Lights
     case{'light', 'lights'}
+        % thisR.get('lights')
         if isempty(varargin)
             if isprop(thisR, 'lights')
                 val = thisR.lights;
@@ -1215,14 +1239,10 @@ switch ieParamFormat(param)  % lower case, no spaces
             return;
         end
         
-        %{
-        if ischar(varargin{1})
-            varargin{1} = ieParamFormat(varargin{1});
-        end
-        %}
-        
+        % The light properties
         switch varargin{1}
             case 'names'
+                % thisR.get('lights','names')
                 n = numel(thisR.lights);
                 val = cell(1, n);
                 for ii=1:n
@@ -1231,6 +1251,7 @@ switch ieParamFormat(param)  % lower case, no spaces
             otherwise
                 % The first argument indicates the material name and there
                 % must be a second argument for the property
+                % thisR.get('lights',lightName,lightProperty
                 if isnumeric(varargin{1}) && ...
                         varargin{1} <= numel(thisR.lights)
                     % Search by index.  Get the material directly.
@@ -1279,9 +1300,9 @@ switch ieParamFormat(param)  % lower case, no spaces
         % thisR.get('asset',name or ID,'world position')
         % thisR.get('asset',name or ID,'size')
         %
-        % We are slowly starting to call nodes nodes, rather than
-        % assets.  We think of an asset now as, say, a car with all of
-        % its parts.  A node is the node in a tree that contains
+        % We are slowly starting to call nodes nodes, rather than assets or
+        % better: objects.  We think of an asset now as, say, a car with
+        % all of its parts.  A node is the node in a tree that contains
         % multiple assets. (BW, Sept 2021).
         
         [id,thisAsset] = piAssetFind(thisR.assets,'name',varargin{1});
@@ -1402,7 +1423,7 @@ switch ieParamFormat(param)  % lower case, no spaces
     case {'nodenames','assetnames'}
         % We have a confusion between nodes and assets.  The assets should
         % refer to just the objects, not all the nodes IMHO (BW).
-        % The names without the XXXID_ prepended
+        % This should return all the node names without the XXXID_ prepended
         % What about objectnames
         val = thisR.assets.stripID;
     case {'nodeparentid','assetparentid'}
@@ -1425,25 +1446,6 @@ switch ieParamFormat(param)  % lower case, no spaces
         thisNode = varargin{1};
         parentNode = thisR.get('asset parent id',thisNode);
         val = thisR.assets.Node{parentNode};   
-
-        % Delete this stuff when we get ready to merge.
-        %{
-    case {'assetlist'}
-        assetNames = thisR.get('asset names');
-        nn = 1;
-        for ii = 1:numel(assetNames)
-            % we have several branch here, we only need the main branch
-            % which contains size information
-            if piContains(assetNames{ii},'_B') && ...
-                    ~piContains(assetNames{ii},'_T') && ...
-                    ~piContains(assetNames{ii},'_S') && ...
-                    ~piContains(assetNames{ii},'_R')
-                
-                val{nn} = thisR.get('assets',assetNames{ii});
-                nn=nn+1;
-            end
-        end
-        %}
         
     otherwise
         error('Unknown parameter %s\n',param);

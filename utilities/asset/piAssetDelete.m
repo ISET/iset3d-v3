@@ -5,7 +5,7 @@ function thisR = piAssetDelete(thisR, assetInfo, varargin)
 %   thisR = piAssetDelete(thisR, assetInfo)
 %
 % Brief description:
-%   assetInfo:  The node name or the id
+%   Delete a node from the asset tree.
 %
 % Inputs:
 %   thisR     - recipe.
