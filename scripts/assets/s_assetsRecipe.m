@@ -12,7 +12,7 @@
 % We save the recipes for the bigger scenes in their input directories.
 %
 % See also
-%   s_scenesRecipe, piAssetLoad, piRecipeMerge
+%   s_scenesRecipe, piAssetLoad, piRecipeMerge, s_assetsLetters
 %
 
 %{
