@@ -1088,7 +1088,7 @@ switch ieParamFormat(param)  % lower case, no spaces
         else
             val = 0;
         end
-    case {'texturesprint', 'printmtextures', 'textureprint', 'printtexture'}
+    case {'texturesprint', 'printtextures', 'textureprint', 'printtexture'}
         % thisR.get('textures print')
         %
         piTexturePrint(thisR);
@@ -1309,6 +1309,9 @@ switch ieParamFormat(param)  % lower case, no spaces
         % If only one asset matches, turn it from cell to struct.
         if numel(thisAsset) == 1
             thisAsset = thisAsset{1};
+        elseif numel(thisAsset) > 1
+            fprintf('Found two assets with the name %s\n',varargin{1});
+            error('Suggest renaming assets');
         end
         if isempty(id), error('Could not find asset %s\n',varargin{1}); end
         if length(varargin) == 1

@@ -687,6 +687,7 @@ switch param
         % Materials should be built up here.
     case {'materials', 'material'}
         % Act on the list of materials
+        % How do we change the name of a material?
         %
         % thisR.set('material', materialList);
         % thisR.set('material', matName, newMaterial);
@@ -730,6 +731,7 @@ switch param
                 case {'replace'}
                     thisR.materials.list(varargin{1}) = varargin{2};
                     return;
+                       
                 otherwise
                     % Probably the material name.
                     matName = val;

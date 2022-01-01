@@ -20,6 +20,7 @@ function material = piMaterialCreate(name, varargin)
 %
 %   Other key/val pairs depend on the material.  To see the properties of
 %   any specific material use
+%
 %            piMaterialProperties('materialType')
 %
 %   The material properties are set by key/val pairs. For keys. it
