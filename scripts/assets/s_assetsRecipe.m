@@ -11,8 +11,16 @@
 % We save the test charts and small scenes in data/assets
 % We save the recipes for the bigger scenes in their input directories.
 %
+% N.B.  When the files are written out, the inputFile slot can be
+% misleading, because it may have the full path of the user that saved the
+% recipe for the asset.  This is managed by piAssetLoad, which tries to
+% correct the inputFile and outputFile information to the current user.
+% This means that if you just load the file directly, without going through
+% piAssetLoad, you will probably have a problem.
+%
 % See also
-%   s_scenesRecipe, piAssetLoad, piRecipeMerge, s_assetsLetters
+%   s_scenesRecipe, piAssetLoad, piRecipeMerge, s_assetsLetters,
+%   piRecipeLoad
 %
 
 %{

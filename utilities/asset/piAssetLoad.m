@@ -16,13 +16,18 @@ function asset = piAssetLoad(fname)
 % Description
 %   We store certain simple asset recipes as mat-files for easy loading and
 %   insertion into scenes.  The assets are created in the script
-%   s_assetsCreate
+%   s_assetsCreate and s_assetsLetters.
 %
 %   The piRecipeMerge function works to combine
 %   these with general scenes.
 %
-%   The asset recipes are stored along with the critical node used for
-%   merging. The mat-file slot for the input is just the name of the 
+%   N.B.  When the asset files are written out, the inputFile slot can be
+%   misleading, because it may have the full path of the user that saved
+%   the recipe for the asset.  This is managed by piAssetLoad, which tries
+%   to correct the inputFile and outputFile information to the current
+%   user. This means that if you just load the file directly, without going
+%   through piAssetLoad, you will probably have a problem.
+%
 %
 % See also
 %   s_assetsCreate, piRootPath/data/assets
