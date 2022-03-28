@@ -1,0 +1,2 @@
+# Exported by piMaterialWrite on 2022/3/4 9:47:28.61 
+MakeNamedMaterial "Mat" "string type" "matte" "spectrum Kd" "spds/totalreflect.spd"

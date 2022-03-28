@@ -1,0 +1,65 @@
+{
+ "description": "",
+ "name": "cooke40deg-undersample-zemax",
+ "thickness": 17.96897,
+ "planeoffsetoutput": 0.01,
+ "planeoffsetinput": 0.01,
+ "polynomials": [
+  {
+   "wavelength_nm": 550,
+   "passnopass": {
+    "method": "minimalellipse",
+    "positions": [0,0.24,0.48,0.72,0.96,1.2,1.44,1.68,1.92,2.16,2.4,2.64,2.88,3.12,3.36,3.6,3.84,4.08,4.32,4.56,4.8,5.04,5.28,5.52,5.76,6,6.24,6.48,6.72,6.96,7.2,7.44,7.68,7.92],
+    "radiiX": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "radiiY": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "centersX": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "centersY": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "intersectPlaneDistance": 17
+   },
+   "poly": [
+    {
+     "outputname": "outx",
+     "coeff": [-0.003999689622657571,21.45614526939375,0.002779013234034726,0.03931858157205258],
+     "termr": [1,0,0,0],
+     "termdx": [0,1,0,0],
+     "termdy": [0,0,1,0]
+    },
+    {
+     "outputname": "outy",
+     "coeff": [0.7206409123373981,-0.08528472470862715,21.96284811977536,-0.1368243462718037],
+     "termr": [1,0,0,0],
+     "termdx": [0,1,0,0],
+     "termdy": [0,0,1,0]
+    },
+    {
+     "outputname": "outz",
+     "coeff": [-4.909228928088653e-19,1.010857050526578e-18,-6.120253173853641e-19,0.01],
+     "termr": [1,0,0,0],
+     "termdx": [0,1,0,0],
+     "termdy": [0,0,1,0]
+    },
+    {
+     "outputname": "outdx",
+     "coeff": [9.023818519332407e-05,0.8577536006009808,0.0002684203142013014,-4.423469311423263e-05],
+     "termr": [1,0,0,0],
+     "termdx": [0,1,0,0],
+     "termdy": [0,0,1,0]
+    },
+    {
+     "outputname": "outdy",
+     "coeff": [-0.01815346275219604,0.0004091469970616065,0.850034363678393,-0.0009359648033583352],
+     "termr": [1,0,0,0],
+     "termdx": [0,1,0,0],
+     "termdy": [0,0,1,0]
+    },
+    {
+     "outputname": "outdz",
+     "coeff": [-0.0003460307900102734,-0.01098741779343488,0.08045179709826898,0.9567757156923673],
+     "termr": [1,0,0,0],
+     "termdx": [0,1,0,0],
+     "termdy": [0,0,1,0]
+    }
+   ]
+  }
+ ]
+}

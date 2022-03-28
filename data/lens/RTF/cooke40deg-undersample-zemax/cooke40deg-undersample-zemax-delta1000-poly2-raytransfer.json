@@ -1,0 +1,65 @@
+{
+ "description": "",
+ "name": "cooke40deg-undersample-zemax",
+ "thickness": 17.96897,
+ "planeoffsetoutput": 0.01,
+ "planeoffsetinput": 0.01,
+ "polynomials": [
+  {
+   "wavelength_nm": 550,
+   "passnopass": {
+    "method": "minimalellipse",
+    "positions": [0,0.24,0.48,0.72,0.96,1.2,1.44,1.68,1.92,2.16,2.4,2.64,2.88,3.12,3.36,3.6,3.84,4.08,4.32,4.56,4.8,5.04,5.28,5.52,5.76,6,6.24,6.48,6.72,6.96,7.2,7.44,7.68,7.92],
+    "radiiX": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "radiiY": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "centersX": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "centersY": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+    "intersectPlaneDistance": 17
+   },
+   "poly": [
+    {
+     "outputname": "outx",
+     "coeff": [0.01017450120488177,-0.006359741732348805,0.1218077620181278,-0.06273638648829601,-0.2092921540544081,-4.483081494580806,21.18187747602487,-0.4184951397311182,-0.2811052480205171,0.1509006848985785],
+     "termr": [2,1,1,1,0,0,0,0,0,0],
+     "termdx": [0,1,0,0,2,1,1,0,0,0],
+     "termdy": [0,0,1,0,0,1,0,2,1,0]
+    },
+    {
+     "outputname": "outy",
+     "coeff": [0.01724608230737287,0.003912207346099606,0.1932229897507572,0.5786404624886802,-3.048637845669351,0.1795849144341829,0.07475036286759539,-6.987193233742016,20.65007343204724,0.5953157525511896],
+     "termr": [2,1,1,1,0,0,0,0,0,0],
+     "termdx": [0,1,0,0,2,1,1,0,0,0],
+     "termdy": [0,0,1,0,0,1,0,2,1,0]
+    },
+    {
+     "outputname": "outz",
+     "coeff": [7.509064288949283e-20,-3.343653331078314e-19,-7.860364507744214e-20,-4.859685739578328e-19,8.927105002182045e-18,-9.389469702422307e-18,-4.695552638007835e-19,-8.450010257124365e-18,2.874636419511012e-18,0.01],
+     "termr": [2,1,1,1,0,0,0,0,0,0],
+     "termdx": [0,1,0,0,2,1,1,0,0,0],
+     "termdy": [0,0,1,0,0,1,0,2,1,0]
+    },
+    {
+     "outputname": "outdx",
+     "coeff": [7.363948002565434e-07,-0.002763637848204989,0.0004519246689868111,0.000107641871367525,0.005933540719331609,0.02793820623527351,0.8679627155290391,-0.001339429090535848,-0.001689717141554088,-0.0003685962652290371],
+     "termr": [2,1,1,1,0,0,0,0,0,0],
+     "termdx": [0,1,0,0,2,1,1,0,0,0],
+     "termdy": [0,0,1,0,0,1,0,2,1,0]
+    },
+    {
+     "outputname": "outdy",
+     "coeff": [-2.554981646730049e-05,0.0005952328825266789,-0.006721254601458092,-0.01864987243949494,0.02164290292106552,0.002865146132694672,-0.002254634607963689,0.04530835632542204,0.8715585654756081,-0.003756867492434628],
+     "termr": [2,1,1,1,0,0,0,0,0,0],
+     "termdx": [0,1,0,0,2,1,1,0,0,0],
+     "termdy": [0,0,1,0,0,1,0,2,1,0]
+    },
+    {
+     "outputname": "outdz",
+     "coeff": [-0.000200330525238865,4.81038812243735e-06,0.01474074791396207,0.0002162055221712441,-0.3875229827111802,0.001861484804225076,-0.0004659279847524956,-0.3827700454617963,0.001351049555325649,0.9999905044136438],
+     "termr": [2,1,1,1,0,0,0,0,0,0],
+     "termdx": [0,1,0,0,2,1,1,0,0,0],
+     "termdy": [0,0,1,0,0,1,0,2,1,0]
+    }
+   ]
+  }
+ ]
+}
