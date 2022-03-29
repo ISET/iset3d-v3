@@ -1,0 +1,77 @@
+{
+  "description": "Zemax sample lens, multi element lens Focal length (mm) ",
+  "name": "Dgauss.28deg.zemax",
+  "surfaces": [
+    {
+      "ior": 1.614868,
+	"radius": 54.153,
+	"semi_aperture": 29.225,
+      "thickness": 8.747
+    },
+    {
+      "ior": 1,
+	"radius": 152.522,
+	"semi_aperture": 28.141,
+      "thickness": 0.5
+    },
+    {
+      "ior": 1.627568,
+	"radius": 35.951,
+	"semi_aperture": 24.296,
+	"thickness": 14
+    },
+    {
+      "ior":  1.614630,
+	"radius": 1e5,
+	"semi_aperture": 21.297,
+	"thickness": 3.777
+    },
+    {
+      "ior": 1,
+	"radius": 22.270,
+	"semi_aperture": 14.919,
+      "thickness": 14.253
+    },
+    {
+      "ior": 0,
+      "radius": 0,
+	"semi_aperture":10.229,
+      "thickness": 12.428
+    },
+    {
+      "ior": 1.614630,
+	"radius":-25.685,
+	"semi_aperture": 13.188,
+      "thickness": 3.777
+    },
+    {
+	"ior": 1.627568,
+	"radius": 1e5,
+	"semi_aperture": 16.468,
+	"thickness": 10.834
+    },
+    {
+      "ior": 1,
+	"radius": -36.980,
+	"semi_aperture": 18.930,
+      "thickness": 0.5
+    },
+    {
+	"ior":  1.627568,
+	"radius": 196.417,
+	"semi_aperture": 21.311,
+	"thickness": 6.858
+    },
+    {
+      "ior": 1,
+	"radius": -67.148,
+	"semi_aperture": 21.646,
+	"thickness": 57.315
+    }
+  ],
+  "metadata": {
+    "focalLength": 10,
+    "fNumber": 2,
+    "filmdistance": 80
+  }
+}
