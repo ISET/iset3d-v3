@@ -1,7 +1,7 @@
 # PBRT file created with piWrite on 2022/3/4 9:47:28.42 
 # PBRT version = 3 
 
-LookAt 0.000000 0.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 1.000000 
+LookAt 0.000000 0.000000 -2.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 
 
 #Camera
 Camera "perspective" "float fov" [31.417276] "float focaldistance" [2000.000000] "float lensradius" [0.000000] 
@@ -18,14 +18,8 @@ Film "image"
 # integrator 
 Integrator "path" 
   "integer maxdepth" [5] 
-  "string strategy" "all" 
 
 WorldBegin   
-Material "uber" "rgb Kd" [0.100481509938 0.119280187622 0.139984897558] "float index" [1.333]   
-Include "stepfunction_materials.pbrt"
- 
-Include "stepfunction_geometry.pbrt"
- 
 AttributeBegin
 Translate 000 0.000 0.000
 AreaLightSource "diffuse" "rgb L" [1             1             1]
