@@ -356,7 +356,7 @@ for ii = 1:length(filesToRender)
             %linuxOut = strcat('/c', strrep(erase(outputFolder, 'C:'), '\', '/'));
             linuxOut = char(join(folderBreak,"/"));
             
-            dockerCommand = sprintf('%s -v %s:%s', dockerCommand, linuxOut, shortOut);
+            dockerCommand = sprintf('%s -v "%s":"%s"', dockerCommand, linuxOut, shortOut);
             
             cmd = sprintf('%s %s %s', dockerCommand, dockerImageName, renderCommand);
         end
