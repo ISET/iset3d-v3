@@ -186,6 +186,10 @@ switch ieParamFormat(sceneDir)
         sceneDir = 'flatSurface';
         sceneFile = 'flatSurface.pbrt';
         exporter = 'C4D';
+    case 'stepfunction'
+        sceneDir = 'stepfunction';
+        sceneFile = 'stepfunction.pbrt';
+        exporter = 'C4D';
     case 'sphere'
         sceneDir = 'sphere';
         sceneFile = 'sphere.pbrt';

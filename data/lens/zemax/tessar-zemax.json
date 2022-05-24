@@ -1,0 +1,59 @@
+{
+  "description": "Zemax sample lens ",
+  "name": "Tessar.zemax",
+  "surfaces": [
+    {
+      "ior": 1.62594,
+	"radius": 21.413,
+	"semi_aperture": 10.5,
+      "thickness": 3.3
+    },
+    {
+      "ior": 1,
+	"radius": 1e5,
+	"semi_aperture": 10.5,
+      "thickness": 1.9
+    },
+    {
+      "ior": 1.6233,
+	"radius": -74.2,
+	"semi_aperture": 10.5,
+	"thickness": 1.1
+    },
+    {
+      "ior":  1,
+	"radius": 20.8,
+	"semi_aperture": 10.5,
+	"thickness": 3
+    },
+    {
+      "ior": 0,
+	"radius": 0,
+	"semi_aperture": 8.111,
+      "thickness": 3
+    },
+    {
+      "ior": 1.53617,
+	"radius":-111.3,
+	"semi_aperture": 8.5,
+      "thickness": 1.1
+    },
+    {
+	"ior": 1.62594,
+	"radius": 25.2,
+	"semi_aperture": 8.5,
+	"thickness": 3
+    },
+    {
+      "ior": 1,
+	"radius": -37.113,
+	"semi_aperture": 8.5,
+      "thickness": 0
+    }
+  ],
+  "metadata": {
+    "filmdistance": 100,
+    "focalLength": 100,
+    "fNumber": 5.45
+  }
+}

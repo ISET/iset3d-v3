@@ -1,0 +1,95 @@
+{
+  "description": "Zemax sample lens, multi element lens Focal length (mm) ",
+  "name": "inversetelephoto.zemax",
+  "surfaces": [
+    {
+     "ior": 1.6304453, 
+	"radius": 1.011,
+	"semi_aperture":0.437, 
+      "thickness": 0.049
+    },
+    {
+      "ior": 1,
+	"radius": 0.565,
+	"semi_aperture": 0.382,
+      "thickness": 0.128
+    },
+    {
+      "ior":  1.6304752,
+	"radius": 1.462,
+	"semi_aperture": 0.372,
+	"thickness": 0.048
+    },
+    {
+      "ior":  1,
+	"radius": 0.653,
+	"semi_aperture":0.341,
+	"thickness": 0.451
+    },
+    {
+      "ior": 1.6775983,
+	"radius": 1.101,
+	"semi_aperture":0.280,
+      "thickness": 0.165
+    },
+    {
+      "ior": 1,
+      "radius": -1.881,
+	"semi_aperture": 0.257,
+      "thickness": 5.3e-3
+    },
+    {
+      "ior":  1.4693939,
+	"radius": 0.514,
+	"semi_aperture": 0.222,
+      "thickness": 0.068
+    },
+    {
+	"ior": 1,
+	"radius": 1.731,
+	"semi_aperture": 0.208,
+	"thickness": 0.120
+    },
+    {
+	"ior": 0,
+	"radius": 0,
+	"semi_aperture": 0.166,
+	"thickness":  0.040
+    },
+    {
+	"ior": 1.7154901,
+	"radius": -1.052,
+	"semi_aperture": 0.167,
+	"thickness": 0.038
+    },
+    {
+	"ior": 1,
+	"radius": 0.561,
+	"semi_aperture": 0.168,
+	"thickness": 0.045
+    },
+    {
+	"ior": 1.6875220,
+	"radius": 2.191,
+	"semi_aperture": 0.182,
+	"thickness": 0.032
+    },
+    {
+	"ior": 1.6864820,
+	"radius": 1.413,
+	"semi_aperture": 0.194,
+	"thickness": 0.112
+    },
+    {
+	"ior": 1,
+	"radius": -0.556,
+	"semi_aperture": 0.213,
+	"thickness": 0
+    }
+  ],
+  "metadata": {
+    "focalLength": 1.5,
+    "fNumber": 3.8,
+    "filmdistance": 20
+  }
+}

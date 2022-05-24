@@ -1,0 +1,51 @@
+{
+  "description": "Zemax sample lens, multi element lens Focal length (mm) ",
+  "name": "Cooke40deg.zemax",
+  "surfaces": [
+    {
+      "ior": 1.6281393,
+	"radius": 22.014,
+	"semi_aperture": 9.5,
+      "thickness":3.259
+    },
+    {
+      "ior": 1,
+	"radius": -435.760,
+	"semi_aperture": 9.5,
+      "thickness": 6.008
+    },
+    {
+      "ior": 1.6330992,
+	"radius": -22.213,
+	"semi_aperture": 5,
+	"thickness": 1
+    },
+     { "ior": 1,
+	"radius": 20.292,
+	"semi_aperture": 5,
+	"thickness": 0
+    },
+     { "ior": 0,
+	"radius": 0,
+	"semi_aperture": 5,
+	"thickness": 4.750
+    },
+    {
+      "ior": 1.6281393,
+	"radius":79.684,
+	"semi_aperture": 7.5,
+      "thickness": 2.952
+    },
+    {
+      "ior": 1,
+      "radius": -18.395,
+	"semi_aperture": 7.5,
+      "thickness": 0
+    }
+  ],
+  "metadata": {
+    "focalLength": 10,
+    "fNumber": 2,
+    "filmdistance": 50
+  }
+}

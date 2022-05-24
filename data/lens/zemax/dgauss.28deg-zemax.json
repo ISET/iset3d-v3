@@ -1,6 +1,6 @@
 {
-  "description": "multi element lens Focal length (mm) ",
-  "name": "dgauss.22deg.3.0mm",
+  "description": "Zemax sample lens, multi element lens Focal length (mm) ",
+  "name": "Dgauss.28deg.zemax",
   "surfaces": [
     {
       "ior": 1.614868,
@@ -22,7 +22,7 @@
     },
     {
       "ior":  1.614630,
-	"radius": 1e10,
+	"radius": 1e5,
 	"semi_aperture": 21.297,
 	"thickness": 3.777
     },
@@ -46,7 +46,7 @@
     },
     {
 	"ior": 1.627568,
-	"radius": 1e10,
+	"radius": 1e5,
 	"semi_aperture": 16.468,
 	"thickness": 10.834
     },
@@ -58,7 +58,7 @@
     },
     {
 	"ior":  1.627568,
-	"radius": 186.417,
+	"radius": 196.417,
 	"semi_aperture": 21.311,
 	"thickness": 6.858
     },
@@ -70,7 +70,8 @@
     }
   ],
   "metadata": {
-    "focalLength": 0,
-    "fNumber": 0
+    "focalLength": 10,
+    "fNumber": 2,
+    "filmdistance": 80
   }
 }

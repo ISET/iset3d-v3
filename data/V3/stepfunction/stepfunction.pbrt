@@ -1,0 +1,29 @@
+# PBRT file created with piWrite on 2022/3/4 9:47:28.42 
+# PBRT version = 3 
+
+LookAt 0.000000 0.000000 -2.000000 0.000000 0.000000 1.000000 0.000000 1.000000 0.000000 
+
+#Camera
+Camera "perspective" "float fov" [31.417276] "float focaldistance" [2000.000000] "float lensradius" [0.000000] 
+# sampler 
+Sampler "halton" 
+  "integer pixelsamples" [100] 
+
+# film 
+Film "image" 
+  "integer xresolution" [300] 
+  "integer yresolution" [300] 
+  "float diagonal" [0.900000] 
+
+# integrator 
+Integrator "path" 
+  "integer maxdepth" [5] 
+
+WorldBegin   
+AttributeBegin
+Translate 000 0.000 0.000
+AreaLightSource "diffuse" "rgb L" [1             1             1]
+Shape "trianglemesh"  "integer indices" [0 1 2 2 3 0 ] "point P" [-200.0 -200.0 0    -200.0  200 0   0 200 0   0 -200 0 ]
+AttributeEnd
+
+WorldEnd  

@@ -1,0 +1,65 @@
+{
+  "description": "Zemax sample lens, multi element lens Focal length (mm) ",
+  "name": "Petzval.zemax",
+  "surfaces": [
+    {
+      "ior": 1.5244789,
+	"radius": 91.669,
+	"semi_aperture": 28,
+      "thickness": 21.676
+    },
+    {
+      "ior": 1.6285004,
+	"radius": -60.188,
+	"semi_aperture": 28,
+      "thickness": 3.484
+    },
+    {
+      "ior": 1,
+	"radius": 3972.619,
+	"semi_aperture": 28,
+	"thickness":0
+    },
+    {"ior": 0,
+	"radius":0,
+	"semi_aperture": 28,
+	"thickness":76.509
+    },
+ 
+    {
+      "ior":  1.5223859,
+	"radius": 35.207,
+	"semi_aperture":24,
+	"thickness": 17.361
+    },
+    {
+      "ior":  1.6321030,
+	"radius":-58.825,
+	"semi_aperture": 24,
+      "thickness": 3.484
+    },
+    {
+      "ior": 1,
+      "radius": -166.141,
+	"semi_aperture": 24,
+      "thickness": 19.4
+    },
+    {
+      "ior":   1.6321030,
+	"radius":-27.783,
+	"semi_aperture": 16,
+      "thickness": 1.970
+    },
+    {
+	"ior": 1,
+	"radius": 1.112e6,
+	"semi_aperture": 16,
+	"thickness": 0
+    }
+  ],
+  "metadata": {
+    "focalLength": 10,
+    "fNumber": 2,
+    "filmdistance": 20
+  }
+}
