@@ -1,4 +1,4 @@
-# Welcome to ISET3d (V3)!
+# Welcome to ISET3d-V3!
 
 ISET3d-V3 extended our ISETcam simulation tools by providing a physically-accurate simulation of how a 3D scene will look when rendered. This repository is no longer in active use by our lab, having shifted mainly to developing (ISET3d-V4)[https://github.com/ISET/iset3d-v4] (which enables rendering using certain Nvidia GPUs).
 
