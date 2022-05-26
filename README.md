@@ -10,7 +10,7 @@ The general approach is the following
 
 *   Begin with a set of PBRT files that define the scene. We typically create scenes via the PBRT export tool from Cinema4D or more recently Blender.
 
-(We have also built an extensive set of special tools to create complex automotive scenes. They require Flywheel and scitran)
+We have also built special tools to create complex automotive scenes.
 
 Then a typical workflow might be:
 
