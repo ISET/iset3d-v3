@@ -8,6 +8,9 @@
 %   t_eyeCrop2Cones
 %
 
+%%
+ieInit;
+if ~piDockerExists, piDockerConfig; end
 
 %% Make an oi of the chess set scene using the LeGrand eye model
 
@@ -15,7 +18,7 @@ thisSE = sceneEye('chess set scaled','human eye','navarro');
 
 thisSE.set('lens density',0);   % Just because I can
 
-thisSE.set('rays per pixel',512);  % Pretty quick, but not high quality
+thisSE.set('rays per pixel',64);
 
 oiLeft = thisSE.render;  % Render radiance and depth, and then show
 oiWindow(oiLeft);

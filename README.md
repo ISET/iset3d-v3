@@ -1,8 +1,8 @@
-# Welcome to ISET3d!
+# Welcome to ISET3d-V3!
 
-Our tools will let you go beyond simulating how a 2D image will look when captured by a camera or other optical system. We've extended our very popular ISETcam to provide a physically-accurate simulation of how a 3D scene will look when renderd.
+ISET3d-V3 extended our ISETcam simulation tools by providing a physically-accurate simulation of how a 3D scene will look when rendered. This repository is no longer in active use by our lab, having shifted mainly to developing (ISET3d-V4)[https://github.com/ISET/iset3d-v4] (which enables rendering using certain Nvidia GPUs).
 
-The tools in this repository calculate the spectral irradiance of realistic three-dimensional scenes. The tools work with a special version of PBRT **(pbrt-v3-spectral)** that we implemented. The implementation is available in a Docker container.
+The tools in this repository calculate the spectral irradiance of realistic three-dimensional scenes. The tools work with a special version of PBRT **(pbrt-v3-spectral)** that we implemented. In addition to the source code, the implementation is available in a Docker container.
 
 To use these tools you must have Docker and Matlab installed. This repository also depends on ISETCam (or ISETBio), and some people in our lab also require isetcloud. More on that in the wiki.
 
@@ -10,7 +10,7 @@ The general approach is the following
 
 *   Begin with a set of PBRT files that define the scene. We typically create scenes via the PBRT export tool from Cinema4D or more recently Blender.
 
-(We have also built an extensive set of special tools to create complex automotive scenes. They require Flywheel and scitran)
+We have also built special tools to create complex automotive scenes.
 
 Then a typical workflow might be:
 
